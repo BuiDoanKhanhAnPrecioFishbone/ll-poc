@@ -1,0 +1,103 @@
+/* =============================================================================
+   VOYAGER DESIGN SYSTEM — PRIMITIVES
+   -----------------------------------------------------------------------------
+   This is the ONLY file that defines raw values. Everything downstream consumes
+   these via Kendo's own CSS variable API (see kendo-bridge.css), which is what
+   keeps the revamp inside the "customize primitives, don't build components"
+   constraint. Change a value here and it propagates to every Kendo component.
+   ========================================================================== */
+
+:root {
+  /* --- Brand ramp -----------------------------------------------------------
+     Derived from the existing Voyager mark so the revamp keeps brand equity.
+     The legacy app used a single flat blue with no ramp, which is why disabled,
+     hover and selected states were indistinguishable. */
+  --vy-blue-50:  #eef4fc;
+  --vy-blue-100: #d4e3f7;
+  --vy-blue-200: #a9c6ef;
+  --vy-blue-300: #7aa6e4;
+  --vy-blue-400: #4a82d2;
+  --vy-blue-500: #2a63b8;
+  --vy-blue-600: #1b4f9c;  /* PRIMARY */
+  --vy-blue-700: #163f7d;
+  --vy-blue-800: #12325f;
+  --vy-blue-900: #0d2444;
+
+  /* Accent — the red from the logo. Used ONLY for destructive actions and
+     critical alerts. Never for decoration; it must stay rare to stay loud. */
+  --vy-red-50:  #fdeceb;
+  --vy-red-500: #e23a32;
+  --vy-red-600: #c62d26;
+  --vy-red-700: #9e231d;
+
+  /* --- Neutrals -------------------------------------------------------------
+     A true ramp. The legacy app used #333/#666/#ccc ad hoc, giving no reliable
+     contrast tiers and failing AA on secondary text over tinted rows. */
+  --vy-grey-0:   #ffffff;
+  --vy-grey-25:  #fbfcfd;
+  --vy-grey-50:  #f5f7fa;
+  --vy-grey-100: #eceff3;
+  --vy-grey-200: #dde2e9;
+  --vy-grey-300: #c3cbd6;
+  --vy-grey-400: #97a2b2;
+  --vy-grey-500: #6b7688;
+  --vy-grey-600: #4d5766;
+  --vy-grey-700: #363e4b;
+  --vy-grey-800: #232a34;
+  --vy-grey-900: #131820;
+
+  /* --- Status semantics -----------------------------------------------------
+     One token per BUSINESS STATE, not per colour. Every module maps its own
+     lifecycle onto these six, which is what makes status readable across
+     Sales Orders, Purchase Orders, Work Orders and RMAs without relearning. */
+  --vy-status-draft-fg:      var(--vy-grey-600);
+  --vy-status-draft-bg:      var(--vy-grey-100);
+  --vy-status-open-fg:       #92400e;
+  --vy-status-open-bg:       #fef3c7;
+  --vy-status-progress-fg:   #1e40af;
+  --vy-status-progress-bg:   #dbeafe;
+  --vy-status-done-fg:       #065f46;
+  --vy-status-done-bg:       #d1fae5;
+  --vy-status-blocked-fg:    var(--vy-red-700);
+  --vy-status-blocked-bg:    var(--vy-red-50);
+  --vy-status-cancelled-fg:  var(--vy-grey-500);
+  --vy-status-cancelled-bg:  var(--vy-grey-100);
+
+  /* --- Typography -----------------------------------------------------------
+     The legacy app declared NO font stack at all (computed font-family was the
+     bare keyword `sans-serif`), so it rendered in the browser default and
+     varied per OS. This pins it. */
+  --vy-font-sans: "Inter", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --vy-font-mono: "JetBrains Mono", "SF Mono", "Cascadia Mono", Consolas, monospace;
+
+  --vy-text-xs:   11px;
+  --vy-text-sm:   12px;
+  --vy-text-base: 13px;   /* grid + form default */
+  --vy-text-md:   14px;
+  --vy-text-lg:   16px;
+  --vy-text-xl:   20px;
+  --vy-text-2xl:  24px;
+
+  /* --- Shape ---------------------------------------------------------------- */
+  --vy-radius-sm: 3px;
+  --vy-radius-md: 4px;   /* the house radius */
+  --vy-radius-lg: 6px;
+  --vy-radius-pill: 999px;
+
+  /* --- Elevation ------------------------------------------------------------ */
+  --vy-shadow-sm: 0 1px 2px rgba(19, 24, 32, .06);
+  --vy-shadow-md: 0 2px 8px rgba(19, 24, 32, .10);
+  --vy-shadow-lg: 0 8px 28px rgba(19, 24, 32, .14);
+
+  /* --- Density --------------------------------------------------------------
+     Three grid densities. `comfortable` is the default; `compact` is what the
+     21,941-row Part Master should ship with. The legacy app had one 50px row
+     height everywhere, which is why only ~10 rows fit on a 900px screen. */
+  --vy-row-h-compact:     28px;
+  --vy-row-h-comfortable: 36px;
+  --vy-row-h-relaxed:     44px;
+
+  --vy-shell-sidebar-w:   248px;
+  --vy-shell-sidebar-w-collapsed: 56px;
+  --vy-shell-topbar-h:    52px;
+}
