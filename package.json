@@ -1,0 +1,45 @@
+{
+  "name": "voyager-ux-revamp",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "npm run license && tsc -b && vite build",
+    "lint": "oxlint",
+    "preview": "vite preview",
+    "license": "kendo-ui-license activate --ignore-no-license || true"
+  },
+  "dependencies": {
+    "@progress/kendo-data-query": "^1.7.4",
+    "@progress/kendo-licensing": "^1.11.3",
+    "@progress/kendo-react-animation": "^16.0.0",
+    "@progress/kendo-react-buttons": "^16.0.0",
+    "@progress/kendo-react-charts": "^16.0.0",
+    "@progress/kendo-react-common": "^16.0.0",
+    "@progress/kendo-react-data-tools": "^16.0.0",
+    "@progress/kendo-react-dialogs": "^16.0.0",
+    "@progress/kendo-react-dropdowns": "^16.0.0",
+    "@progress/kendo-react-grid": "^16.0.0",
+    "@progress/kendo-react-indicators": "^16.0.0",
+    "@progress/kendo-react-inputs": "^16.0.0",
+    "@progress/kendo-react-labels": "^16.0.0",
+    "@progress/kendo-react-layout": "^16.0.0",
+    "@progress/kendo-react-tooltip": "^16.0.0",
+    "@progress/kendo-react-treeview": "^16.0.0",
+    "@progress/kendo-svg-icons": "^5.4.0",
+    "@progress/kendo-theme-default": "^14.5.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-router-dom": "^7.18.2"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.4",
+    "oxlint": "^1.75.0",
+    "typescript": "~6.0.2",
+    "vite": "^8.2.0"
+  }
+}
