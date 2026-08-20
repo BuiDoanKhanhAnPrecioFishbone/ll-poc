@@ -148,7 +148,5 @@ src/
 - Only the Part Master is fully mocked. Other screens render a placeholder that states what the
   screen is for and where it lived in the current system.
 - Data is synthetic and held in memory; there is no backend.
-- No `package-lock.json` is committed, so `npm install` resolves the latest patch versions within
-  the ranges in `package.json`.
 - The audit covers the screens reachable in the session on 19 August 2026. The RMA, PCB Viewer,
   Accounting and What-If screens were not examined in depth.
