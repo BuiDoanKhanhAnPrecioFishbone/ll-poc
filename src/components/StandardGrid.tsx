@@ -1,62 +1,78 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { Grid, GridColumn, GridToolbar, type GridDataStateChangeEvent } from '@progress/kendo-react-grid';
-import { process, type State } from '@progress/kendo-data-query';
+import { process, type State, type SortDescriptor } from '@progress/kendo-data-query';
 import { Button, ButtonGroup } from '@progress/kendo-react-buttons';
 import { Input } from '@progress/kendo-react-inputs';
-import { ROLE_WIDTH, type ColumnSpec, type Part } from '../data/parts';
 import { StatusBadge } from './StatusBadge';
+import { widthOf, type ColumnSpec } from './column-model';
 
-type Density = 'compact' | 'comfortable' | 'relaxed';
+export type Density = 'compact' | 'comfortable' | 'relaxed';
 
 /**
  * THE STANDARD LIST PATTERN
  *
- * Every list screen in the ERP should be this component with a different column
- * spec. What it standardises, and what each rule answers in the current system:
+ * Generic over the row type: a new list screen costs a column spec, not a
+ * component. Part Master and Quotations are the same code with different specs.
  *
- *   1. Width by role, never uniform. Production gives all columns 108px, which
- *      clips the part number in 85% of rows while spending 108px on an
- *      always-empty ABC column.
- *   2. Identifier first, never truncated, monospaced and copyable.
- *   3. One search box, always in the same place, always labelled.
- *   4. Density is a user setting, not a developer decision.
- *   5. Empty columns are hidden by default but discoverable in the chooser,
- *      with the reason stated.
- *   6. Row click opens the record. Production spends a whole column on an eye
- *      icon because the row itself is not clickable.
- *   7. Loading, empty and error are three distinct states. Production renders
- *      "No records available" *while* the spinner is still running.
+ * What it standardises, and what each rule answers in the current system:
+ *
+ *   1. Width by role, never uniform. Production gives every column an identical
+ *      width — 108px on the Part Master, 111px on Quotations — which clips the
+ *      identifier in 85% of rows and every date in 100%.
+ *   2. Identifier never truncated, monospaced, always the first data column.
+ *   3. One search box, always first in the toolbar, always labelled.
+ *   4. Density is a user setting, with the default chosen per screen from how
+ *      often the people who use it are in it.
+ *   5. Sparse columns hidden by default, discoverable, with the reason stated.
+ *   6. Row click opens the record; no column is spent on a view icon.
+ *   7. Loading, empty and error are three distinct states.
  */
-export function StandardGrid({
+export function StandardGrid<T extends { id: string | number }>({
   data,
   columns,
   title,
+  subtitle,
+  actions,
+  filters,
+  defaultDensity = 'comfortable',
+  defaultSort,
+  searchPlaceholder = 'Search',
   onRowClick,
 }: {
-  data: Part[];
-  columns: ColumnSpec[];
+  data: T[];
+  columns: ColumnSpec<T>[];
   title: string;
-  onRowClick?: (p: Part) => void;
+  subtitle?: ReactNode;
+  actions?: ReactNode;
+  /** Screen-specific filter controls, rendered above the grid. */
+  filters?: ReactNode;
+  defaultDensity?: Density;
+  defaultSort?: SortDescriptor[];
+  searchPlaceholder?: string;
+  onRowClick?: (row: T) => void;
 }) {
-  const [density, setDensity] = useState<Density>('comfortable');
+  const [density, setDensity] = useState<Density>(defaultDensity);
   const [search, setSearch] = useState('');
   const [showHidden, setShowHidden] = useState(false);
-  const [dataState, setDataState] = useState<State>({ skip: 0, take: 50, sort: [{ field: 'lastChange', dir: 'desc' }] });
+  const [dataState, setDataState] = useState<State>({ skip: 0, take: 50, sort: defaultSort });
 
   const visibleColumns = useMemo(
     () => columns.filter(c => showHidden || !c.hiddenByDefault),
     [columns, showHidden]
   );
 
+  const searchFields = useMemo(
+    () => columns.filter(c => c.searchable).map(c => c.field),
+    [columns]
+  );
+
   const filtered = useMemo(() => {
     const n = search.trim().toLowerCase();
-    if (!n) return data;
-    return data.filter(p =>
-      p.partNumber.toLowerCase().includes(n) ||
-      p.description.toLowerCase().includes(n) ||
-      p.customer.toLowerCase().includes(n)
+    if (!n || searchFields.length === 0) return data;
+    return data.filter(row =>
+      searchFields.some(f => String(row[f] ?? '').toLowerCase().includes(n))
     );
-  }, [data, search]);
+  }, [data, search, searchFields]);
 
   const result = useMemo(() => process(filtered, dataState), [filtered, dataState]);
   const hiddenCount = columns.filter(c => c.hiddenByDefault).length;
@@ -66,20 +82,17 @@ export function StandardGrid({
       <div className="vy-page-head">
         <div>
           <h1 className="vy-page-title">{title}</h1>
-          {/* Count is stated up front. Production shows "1 - 20 of 21941 items"
-              in the footer, below the fold on most screens. */}
+          {/* Count stated up front. Production puts "1 - 20 of 330 items" in the
+              footer, below the fold on most screens. */}
           <p className="vy-page-sub">
-            {filtered.length.toLocaleString()} parts
-            {search && <> matching “{search}”</>}
-            {filtered.length !== data.length && <> · of {data.length.toLocaleString()} total</>}
+            {filtered.length.toLocaleString()} of {data.length.toLocaleString()}
+            {subtitle && <> · {subtitle}</>}
           </p>
         </div>
-        <div className="vy-page-actions">
-          <Button themeColor="base">Import</Button>
-          <Button themeColor="base">Export</Button>
-          <Button themeColor="primary">New Part</Button>
-        </div>
+        {actions && <div className="vy-page-actions">{actions}</div>}
       </div>
+
+      {filters && <div className="vy-filter-bar">{filters}</div>}
 
       <Grid
         data={result}
@@ -88,67 +101,61 @@ export function StandardGrid({
         sortable
         pageable={{ pageSizes: [25, 50, 100, 200], buttonCount: 5 }}
         total={result.total}
-        className="vy-grid"
-        onRowClick={e => onRowClick?.(e.dataItem as Part)}
-        style={{ height: 'calc(100vh - 210px)' }}
+        className={'vy-grid' + (filters ? ' vy-grid--fill-with-filters' : ' vy-grid--fill')}
+        onRowClick={e => onRowClick?.(e.dataItem as T)}
       >
         <GridToolbar>
           <div className="vy-grid-toolbar">
-            {/* Search always sits first and is always labelled. In production it
-                is an unlabelled box wedged between four buttons and a dropdown. */}
             <Input
               value={search}
               onChange={e => { setSearch(String(e.value ?? '')); setDataState(s => ({ ...s, skip: 0 })); }}
-              placeholder="Search part number, description or customer"
+              placeholder={searchPlaceholder}
               className="vy-grid-search"
-              aria-label="Search parts"
+              aria-label={searchPlaceholder}
             />
             <span className="vy-toolbar-spacer" />
             {/* Density as a segmented control rather than a dropdown: three
-                options, one click, and the current state is always visible
-                without opening anything. */}
+                options, one click, current state always visible. */}
             <span className="vy-toolbar-label" id="vy-density-label">Density</span>
             <ButtonGroup aria-labelledby="vy-density-label">
               {(['compact', 'comfortable', 'relaxed'] as Density[]).map(d => (
-                <Button
-                  key={d}
-                  togglable
-                  selected={density === d}
-                  onClick={() => setDensity(d)}
-                  aria-pressed={density === d}
-                >
+                <Button key={d} togglable selected={density === d}
+                        onClick={() => setDensity(d)} aria-pressed={density === d}>
                   {d[0].toUpperCase() + d.slice(1)}
                 </Button>
               ))}
             </ButtonGroup>
-            <Button
-              themeColor={showHidden ? 'primary' : 'base'}
-              fillMode={showHidden ? 'solid' : 'outline'}
-              onClick={() => setShowHidden(s => !s)}
-              title={`${hiddenCount} columns are empty in most or all records and are hidden by default`}
-            >
-              {showHidden ? 'Hide sparse columns' : `Show ${hiddenCount} sparse columns`}
-            </Button>
+            {hiddenCount > 0 && (
+              <Button
+                themeColor={showHidden ? 'primary' : 'base'}
+                fillMode={showHidden ? 'solid' : 'outline'}
+                onClick={() => setShowHidden(s => !s)}
+                title={columns.filter(c => c.hiddenByDefault)
+                  .map(c => `${c.title}: ${c.note ?? 'hidden by default'}`).join('\n')}
+              >
+                {showHidden ? 'Hide extra columns' : `Show ${hiddenCount} more columns`}
+              </Button>
+            )}
           </div>
         </GridToolbar>
 
         {visibleColumns.map(col => (
           <GridColumn
-            key={String(col.field)}
-            field={String(col.field)}
+            key={col.field}
+            field={col.field}
             title={col.title}
-            width={ROLE_WIDTH[col.role]}
-            /* Roles drive rendering, so a date can never be formatted two ways
-               on two screens and a number can never be left-aligned. */
+            width={widthOf(col)}
             cells={{
               data: (props) => {
-                const v = (props.dataItem as Part)[col.field];
+                const row = props.dataItem as T;
+                if (col.render) return <td className="vy-cell">{col.render(row)}</td>;
+                const v = row[col.field];
                 if (col.role === 'ident')
                   return <td className="vy-ident" title={String(v)}>{String(v)}</td>;
                 if (col.role === 'status')
                   return <td><StatusBadge value={String(v)} /></td>;
                 if (col.role === 'date')
-                  return <td className="vy-num">{(v as Date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</td>;
+                  return <td className="vy-num">{fmtDate(v as Date)}</td>;
                 if (col.role === 'money')
                   return <td className="vy-num">{(v as number).toLocaleString('en-GB', { style: 'currency', currency: 'USD' })}</td>;
                 if (col.role === 'number')
@@ -163,13 +170,19 @@ export function StandardGrid({
       </Grid>
 
       {result.total === 0 && (
-        /* A real empty state: says what happened and offers the way out. */
+        /* A real empty state: names the cause and offers the way out. Production
+           renders "No records available" while the spinner is still running. */
         <div className="vy-empty-state">
-          <strong>No parts match “{search}”</strong>
-          <p>Try a partial part number, or clear the search to see all {data.length.toLocaleString()} parts.</p>
+          <strong>Nothing matches {search ? `“${search}”` : 'these filters'}</strong>
+          <p>Clear the search to see all {data.length.toLocaleString()} records.</p>
           <Button themeColor="primary" onClick={() => setSearch('')}>Clear search</Button>
         </div>
       )}
     </div>
   );
+}
+
+/** One date format for the whole system. Dates are never rendered two ways. */
+export function fmtDate(d: Date) {
+  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 }

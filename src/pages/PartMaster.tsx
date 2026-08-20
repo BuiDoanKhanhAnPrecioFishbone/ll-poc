@@ -4,6 +4,7 @@ import { StandardGrid } from '../components/StandardGrid';
 import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
 import { Button } from '@progress/kendo-react-buttons';
 import { StatusBadge } from '../components/StatusBadge';
+import { DIALOG_WIDTH } from '../theme/tokens';
 
 export function PartMaster() {
   const data = useMemo(() => generateParts(2000), []);
@@ -11,10 +12,23 @@ export function PartMaster() {
 
   return (
     <>
-      <StandardGrid data={data} columns={PART_COLUMNS} title="Part Master" onRowClick={setSelected} />
+      <StandardGrid
+        data={data}
+        columns={PART_COLUMNS}
+        title="Part Master"
+        subtitle="parts"
+        searchPlaceholder="Search part number, description or customer"
+        defaultSort={[{ field: 'lastChange', dir: 'desc' }]}
+        actions={<>
+          <Button themeColor="base">Import</Button>
+          <Button themeColor="base">Export</Button>
+          <Button themeColor="primary">New Part</Button>
+        </>}
+        onRowClick={setSelected}
+      />
 
       {selected && (
-        <Dialog title={selected.partNumber} onClose={() => setSelected(null)} width={640}>
+        <Dialog title={selected.partNumber} onClose={() => setSelected(null)} width={DIALOG_WIDTH.record}>
           <div className="vy-record">
             <div className="vy-record-head">
               <div>

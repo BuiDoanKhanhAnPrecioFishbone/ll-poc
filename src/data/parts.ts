@@ -9,6 +9,8 @@
    No customer data is reproduced; names and numbers are synthetic.
    ========================================================================== */
 
+import type { ColumnSpec } from '../components/column-model';
+
 export type Part = {
   id: number;
   partNumber: string;
@@ -86,55 +88,13 @@ export function generateParts(count = 2000): Part[] {
   return out;
 }
 
-/* =============================================================================
-   COLUMN MODEL — THE STANDARDISED TABLE PATTERN
-   -----------------------------------------------------------------------------
-   The production grid gives every column an identical 108px. Measured against
-   live data that clips the PART NUMBER — the primary identifier — in 85% of
-   rows, CUSTOMER NAME in 100%, and LAST CHANGE in 100%, while an always-empty
-   ABC column is granted the same 108px.
-
-   The fix is a typed column model. Width follows from what the column holds:
-
-     ident     240px  never truncates — it is how a user refers to the record
-     text      280px  the only truncatable role; truncates with the full value in a tooltip
-     code       96px  short enumerations, sized to the longest member
-     number    104px  right-aligned, tabular figures
-     money     124px  right-aligned, currency-aware
-     date      150px  sized to the full rendered format — dates never truncate
-     status    128px  one badge from the shared status vocabulary
-
-   When the roles do not sum to the viewport the grid scrolls horizontally. That
-   is the correct outcome: squeezing eleven columns into the available width is
-   exactly what produces the 108px uniform column being replaced here.
-   ========================================================================== */
-
-export type ColumnRole = 'ident' | 'text' | 'code' | 'number' | 'money' | 'date' | 'status';
-
-export type ColumnSpec = {
-  field: keyof Part;
-  title: string;
-  role: ColumnRole;
-  /** Hidden by default; still available from the column chooser. */
-  hiddenByDefault?: boolean;
-  /** Why it is hidden — surfaced in the column chooser so the choice is auditable. */
-  note?: string;
-};
-
-export const ROLE_WIDTH: Record<ColumnRole, number> = {
-  ident: 240,
-  text: 280,
-  code: 96,
-  number: 104,
-  money: 124,
-  date: 150,
-  status: 128,
-};
-
-export const PART_COLUMNS: ColumnSpec[] = [
-  { field: 'partNumber', title: 'Part Number', role: 'ident' },
-  { field: 'description', title: 'Description', role: 'text' },
-  { field: 'customer', title: 'Customer', role: 'text' },
+/* Column roles and their widths are defined once in components/column-model.ts
+   and src/theme/tokens.ts; the rules behind them are in docs/table-patterns.md.
+   This file only says which role each Part column has. */
+export const PART_COLUMNS: ColumnSpec<Part>[] = [
+  { field: 'partNumber', title: 'Part Number', role: 'ident', searchable: true },
+  { field: 'description', title: 'Description', role: 'text', searchable: true },
+  { field: 'customer', title: 'Customer', role: 'text', searchable: true },
   { field: 'rev', title: 'Rev', role: 'code' },
   { field: 'partSource', title: 'Source', role: 'code' },
   { field: 'onHand', title: 'On Hand', role: 'number' },
@@ -147,13 +107,3 @@ export const PART_COLUMNS: ColumnSpec[] = [
   { field: 'partType', title: 'Part Type', role: 'code', hiddenByDefault: true, note: 'Empty in 55% of records' },
   { field: 'abc', title: 'ABC', role: 'code', hiddenByDefault: true, note: 'Empty in 100% of records — hidden until it is populated' },
 ];
-
-/** Maps every module's lifecycle vocabulary onto the six shared status tokens. */
-export const STATUS_TOKEN: Record<string, 'draft' | 'open' | 'progress' | 'done' | 'blocked' | 'cancelled'> = {
-  Pending: 'draft', Draft: 'draft',
-  Active: 'done', Released: 'done', Completed: 'done', Paid: 'done',
-  Open: 'open', New: 'open', Quoted: 'open',
-  'In-Progress': 'progress', Partial: 'progress',
-  Inactive: 'cancelled', Cancelled: 'cancelled', Closed: 'cancelled',
-  Obsolete: 'blocked', Blocked: 'blocked', Overdue: 'blocked',
-};
