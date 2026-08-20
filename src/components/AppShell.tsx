@@ -27,9 +27,23 @@ function Icon({ name }: { name: string }) {
 /** Builds a trail from the proposed IA so every screen states where it sits. */
 function useBreadcrumb() {
   const { pathname } = useLocation();
-  for (const g of [...proposedNav, ...settingsNav, reviewNav]) {
+  const all = [...proposedNav, ...settingsNav, reviewNav];
+  for (const g of all) {
     const hit = g.items.find(i => i.path === pathname);
-    if (hit) return { group: g.title, title: hit.title, wasCalled: hit.wasCalled };
+    if (hit) return { group: g.title, title: hit.title, wasCalled: hit.wasCalled, record: null };
+  }
+  /* A record route (/sell/quotations/rfq-5) belongs to its list. Without this
+     the trail collapses to the app name on exactly the screens where knowing
+     where you are matters most. */
+  for (const g of all) {
+    const parent = g.items.find(i => i.path !== '/' && pathname.startsWith(i.path + '/'));
+    if (parent) {
+      return {
+        group: g.title, title: parent.title, wasCalled: parent.wasCalled,
+        record: decodeURIComponent(pathname.slice(parent.path.length + 1)),
+        parentPath: parent.path,
+      };
+    }
   }
   return null;
 }
@@ -120,8 +134,12 @@ export function AppShell() {
               <>
                 <span className="vy-crumb-group">{crumb.group}</span>
                 <span className="vy-crumb-sep">/</span>
-                <span className="vy-crumb-title">{crumb.title}</span>
-                {crumb.wasCalled && <span className="vy-crumb-was" title="Where this screen lived in the current system">was: {crumb.wasCalled}</span>}
+                {crumb.record
+                  ? <><NavLink className="vy-crumb-link" to={crumb.parentPath!}>{crumb.title}</NavLink>
+                      <span className="vy-crumb-sep">/</span>
+                      <span className="vy-crumb-title">{crumb.record}</span></>
+                  : <span className="vy-crumb-title">{crumb.title}</span>}
+                {crumb.wasCalled && !crumb.record && <span className="vy-crumb-was" title="Where this screen lived in the current system">was: {crumb.wasCalled}</span>}
               </>
             ) : <span className="vy-crumb-title">Voyager</span>}
           </div>

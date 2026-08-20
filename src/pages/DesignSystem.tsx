@@ -1,4 +1,4 @@
-import { ROLE_WIDTH } from '../data/parts';
+import { ROLE_WIDTH } from '../components/column-model';
 import { StatusBadge } from '../components/StatusBadge';
 import { Button } from '@progress/kendo-react-buttons';
 
@@ -15,7 +15,8 @@ const ROLE_NOTES: Record<string, string> = {
   number: 'Right-aligned with tabular figures so magnitudes line up and a misplaced digit is visible.',
   money:  'Right-aligned, currency-aware, always two decimals.',
   date:   'Sized to the full rendered format. A truncated date is worse than no date — production truncates 100% of them.',
-  status: 'One badge from the six shared status tokens. Never free text.',
+  status: 'One badge from the shared status tokens. Never free text.',
+  rating: 'A Kendo Rating rendered read-only in the cell. Note that a Rating has a 32px floor, so rows containing one cannot reach compact density — see GAP-02.',
 };
 
 export function DesignSystemPage() {
@@ -48,9 +49,9 @@ export function DesignSystemPage() {
       </Section>
 
       <Section title="Status vocabulary"
-        note="Six tokens. Every module maps its own lifecycle onto them, so status reads the same everywhere. Production colours every Part Master status the same green, which makes the column decorative.">
+        note="Seven tokens, and what they encode is who is blocked — not what stage the record is at. `open` means waiting on us and is what a work queue filters to; `waiting` means waiting on a customer, supplier or approver. Production colours every Part Master status the same green, which makes the column decorative.">
         <div className="vy-badge-row">
-          {['Draft','Open','In-Progress','Completed','Blocked','Cancelled'].map(s => <StatusBadge key={s} value={s} />)}
+          {['Draft','New','In-Progress','Quoted','Completed','Blocked','Cancelled'].map(s => <StatusBadge key={s} value={s} />)}
         </div>
       </Section>
 
