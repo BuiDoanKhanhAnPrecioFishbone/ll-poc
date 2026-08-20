@@ -17,7 +17,12 @@
   --kendo-color-primary-subtle-hover:  var(--vy-blue-100);
   --kendo-color-primary-subtle-active: var(--vy-blue-200);
   --kendo-color-primary-on-subtle:     var(--vy-blue-800);
-  --kendo-color-primary-on-surface:    #ffffff;
+  /* "primary-on-surface" means primary-TONED CONTENT sitting on a neutral
+     surface — not white text on a primary background. Kendo derives it from the
+     primary colour itself. Setting it to white makes the active TabStrip tab
+     white-on-white (measured 1:1 contrast). Text on a primary BACKGROUND comes
+     from --kendo-color-on-primary, which Kendo computes and we leave alone. */
+  --kendo-color-primary-on-surface:    var(--vy-blue-600);
 
   /* Surfaces */
   --kendo-color-app-surface:    var(--vy-grey-50);
@@ -36,14 +41,18 @@
   --kendo-color-base-on-surface: var(--vy-grey-800);
 
   /* Status — Kendo's semantic slots, pointed at the Voyager status ramp */
-  --kendo-color-success:        #047857;
+  --kendo-color-success:        var(--vy-accent-positive);
   --kendo-color-success-subtle: var(--vy-status-done-bg);
-  --kendo-color-warning:        #b45309;
+  --kendo-color-warning:        var(--vy-accent-warning);
   --kendo-color-warning-subtle: var(--vy-status-open-bg);
   --kendo-color-error:          var(--vy-red-600);
   --kendo-color-error-subtle:   var(--vy-red-50);
   --kendo-color-info:           var(--vy-blue-500);
   --kendo-color-info-subtle:    var(--vy-blue-50);
+  /* secondary and tertiary carry the `cancelled` and `waiting` status tokens.
+     Leaving them at Kendo's stock values shipped a 2.63:1 badge. */
+  --kendo-color-secondary:      var(--vy-accent-neutral);
+  --kendo-color-tertiary:       var(--vy-accent-waiting);
 
   /* Typography */
   --kendo-font-family:      var(--vy-font-sans);
@@ -79,11 +88,11 @@ body {
    but they change padding AND font together; these keep type legible while
    tightening rows, which is what a 21,941-row master list actually needs. */
 [data-density="compact"] .k-grid td,
-[data-density="compact"] .k-grid .k-table-td { padding-block: 2px; height: var(--vy-row-h-compact); }
+[data-density="compact"] .k-grid .k-table-td { padding-block: var(--vy-space-1); height: var(--vy-row-h-compact); }
 [data-density="comfortable"] .k-grid td,
-[data-density="comfortable"] .k-grid .k-table-td { padding-block: 6px; height: var(--vy-row-h-comfortable); }
+[data-density="comfortable"] .k-grid .k-table-td { padding-block: var(--vy-space-3); height: var(--vy-row-h-comfortable); }
 [data-density="relaxed"] .k-grid td,
-[data-density="relaxed"] .k-grid .k-table-td { padding-block: 10px; height: var(--vy-row-h-relaxed); }
+[data-density="relaxed"] .k-grid .k-table-td { padding-block: var(--vy-space-5); height: var(--vy-row-h-relaxed); }
 
 /* Header must read as a header: the legacy grid had a 21px header above 50px
    rows, so the label was the least prominent thing in the column. */
@@ -91,7 +100,7 @@ body {
 .k-grid .k-grid-header .k-table-th {
   background: var(--vy-grey-50);
   color: var(--vy-grey-600);
-  font-weight: 600;
+  font-weight: var(--vy-weight-semibold);
   font-size: var(--vy-text-xs);
   letter-spacing: .04em;
   text-transform: uppercase;
@@ -100,7 +109,11 @@ body {
 }
 
 .k-grid tbody tr:hover, .k-grid .k-table-row:hover { background: var(--vy-blue-50); cursor: pointer; }
-.k-grid .k-selected, .k-grid tbody tr.k-selected td { background: var(--vy-blue-100) !important; }
+/* Scoped to table cells only. An earlier `.k-grid .k-selected` also matched the
+   toggle buttons in the Grid toolbar, repainting the selected density button
+   blue-100 while Kendo kept its text white — 1.3:1 contrast. */
+.k-grid tbody tr.k-selected > td,
+.k-grid tbody tr.k-selected > .k-table-td { background: var(--vy-blue-100) !important; }
 
 /* Identifier columns get tabular, monospaced treatment so part numbers and
    order numbers align digit-for-digit and scan vertically. */
