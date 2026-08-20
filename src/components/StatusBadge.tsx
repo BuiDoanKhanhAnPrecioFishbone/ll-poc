@@ -1,17 +1,25 @@
-import { STATUS_TOKEN } from '../data/parts';
+import { Badge } from '@progress/kendo-react-indicators';
+import { STATUS_TOKEN, STATUS_THEME } from '../data/status';
 
 /**
- * The single status vocabulary. Every module maps its lifecycle onto six
- * tokens, so "what state is this record in" is answered the same way in Sales
- * Orders, Work Orders and the Part Master. The legacy app coloured every Part
- * Master status the same green, which made the column decorative rather than
- * informative.
+ * Stock Kendo `Badge`, coloured through the shared status vocabulary rather
+ * than per-screen. The legacy app renders every Part Master status as the same
+ * green pill, which makes the column decorative rather than informative.
+ *
+ * Width varies with the label — see GAP-01 in docs/gap-register.md.
+ *
+ * `position={null}` is required, and is the documented value for "inline with
+ * the content of the container element". Every other value — including the
+ * default, `'edge'` — makes the badge `position: absolute`, which parks it in
+ * the corner of the nearest positioned ancestor rather than in the cell.
  */
 export function StatusBadge({ value }: { value: string }) {
   const token = STATUS_TOKEN[value] ?? 'draft';
   return (
-    <span className="vy-status" data-token={token}>
-      {value}
+    <span className="vy-status-slot">
+      <Badge themeColor={STATUS_THEME[token]} rounded="full" size="medium" position={null}>
+        {value}
+      </Badge>
     </span>
   );
 }
