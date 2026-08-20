@@ -70,6 +70,7 @@
   --vy-font-sans: "Inter", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
   --vy-font-mono: "JetBrains Mono", "SF Mono", "Cascadia Mono", Consolas, monospace;
 
+  --vy-text-2xs:  10px;
   --vy-text-xs:   11px;
   --vy-text-sm:   12px;
   --vy-text-base: 13px;   /* grid + form default */
@@ -77,6 +78,7 @@
   --vy-text-lg:   16px;
   --vy-text-xl:   20px;
   --vy-text-2xl:  24px;
+  --vy-text-3xl:  28px;
 
   /* --- Shape ---------------------------------------------------------------- */
   --vy-radius-sm: 3px;
@@ -100,4 +102,84 @@
   --vy-shell-sidebar-w:   248px;
   --vy-shell-sidebar-w-collapsed: 56px;
   --vy-shell-topbar-h:    52px;
+
+  /* --- Spacing scale --------------------------------------------------------
+     A 2px-step scale. Retrofitted from the hand-written values in app.css, which
+     used 3, 5, 7, 9, 15, 18, 22 and 26px alongside the even steps — the one-off
+     values are normalised onto the scale, which is the point of having one. */
+  --vy-space-1:   2px;
+  --vy-space-2:   4px;
+  --vy-space-3:   6px;
+  --vy-space-4:   8px;
+  --vy-space-5:  10px;
+  --vy-space-6:  12px;
+  --vy-space-7:  14px;
+  --vy-space-8:  16px;
+  --vy-space-9:  20px;
+  --vy-space-10: 24px;
+  --vy-space-11: 28px;
+  --vy-space-12: 32px;
+  --vy-space-14: 40px;
+
+  /* --- Weight scale --------------------------------------------------------- */
+  --vy-weight-regular:  400;
+  --vy-weight-medium:   500;
+  --vy-weight-semibold: 600;
+  --vy-weight-bold:     650;  /* headings — 700 reads heavy at these sizes */
+  --vy-weight-heavy:    700;
+
+  /* --- On-dark surface -------------------------------------------------------
+     The sidebar sits on --vy-grey-900. These are the only colours allowed to be
+     translucent white, and they exist so no component reaches for rgba() inline. */
+  --vy-on-dark-fg:            #ffffff;
+  --vy-on-dark-hairline:      rgba(255, 255, 255, .07);
+  --vy-on-dark-hover:         rgba(255, 255, 255, .05);
+  --vy-on-dark-active:        rgba(43, 99, 184, .22);
+  --vy-swatch-label-bg:       rgba(255, 255, 255, .85);
+  --vy-overlay-scrim:         rgba(19, 24, 32, .45);
+
+  /* Semantic accents. `caution` is the brighter amber used for borders and
+     rules; `warning` is darkened so it still clears 4.5:1 as text on white. */
+  --vy-accent-positive: #047857;
+  --vy-accent-caution:  #d97706;
+  --vy-accent-warning:  #b45309;
+  /* `waiting` needs a hue that is neither the blue of in-progress nor the amber
+     of needs-action. Kendo's stock tertiary is a light blue: 2.63:1 against
+     white text, and close enough to the info blue to be confusable. */
+  --vy-accent-waiting:  #6d28d9;
+  --vy-accent-neutral:  #4d5766;
+
+  /* --- Layout sizes ----------------------------------------------------------
+     Named because they are component dimensions, not spacing. */
+  --vy-control-sm:        28px;  /* avatar, brand mark */
+  --vy-icon-sm:           16px;  /* nav and toolbar glyphs */
+  --vy-dot-size:           6px;  /* unread indicator */
+  --vy-accent-bar-w:       3px;  /* left accent rule on queue cards */
+  --vy-swatch-w:          78px;
+  --vy-swatch-h:          52px;
+  --vy-palette-w:        620px;
+  --vy-palette-group-w:   66px;
+  --vy-palette-indent:    74px;  /* aligns the sub-line under the palette title */
+  --vy-finding-label-w:  128px;
+  --vy-finding-title-w:  260px;
+  --vy-stat-min-w:       150px;
+  --vy-card-min-w:       200px;
+  --vy-link-card-min-w:  220px;
+  --vy-search-w:         420px;
+  --vy-doc-max-w:       1180px;
+
+  /* Vertical space the grid must leave for page header, toolbar and pager.
+     Replaces a `calc(100vh - 210px)` inline style in StandardGrid. */
+  --vy-grid-viewport-offset: 210px;
+
+  /* --- Elevation layers ------------------------------------------------------ */
+  --vy-z-palette: 10050;
+
+  /* --- Record screen ---------------------------------------------------------
+     Field-list column widths and the label column of a definition list. */
+  --vy-field-label-w:    180px;
+  --vy-field-group-min:  280px;
+  --vy-record-max-w:     1180px;
+  --vy-status-slot-w:    104px;  /* GAP-01 — see docs/gap-register.md */
+  --vy-note-min-w:       320px;
 }
