@@ -60,7 +60,102 @@ export type Quotation = {
   broker: boolean;
   customerNotes: string;
   internalNotes: string;
+
+  /* --- Checklists & Assignment tab -------------------------------------- */
+  programManager: string;
+  buyer: string;
+  engineer: string;
+  programChecklist: Record<string, ChecklistState>;
+  engineeringChecklist: Record<string, ChecklistState>;
+  documents: RfqDocument[];
+
+  /* --- Quotation Result tab --------------------------------------------- */
+  results: QuoteResult[];
+
+  /* --- Conversations tab ------------------------------------------------- */
+  comments: Comment[];
+
+  /* --- Activity Logs tab -------------------------------------------------- */
+  activity: ActivityEntry[];
 };
+
+export type ChecklistState = 'Not started' | 'In progress' | 'Done' | 'N/A';
+
+export type RfqDocument = {
+  id: string;
+  type: string;
+  name: string;
+  uploadedBy: string;
+  uploadedDate: Date;
+  assignee: string;
+  status: 'Pending' | 'In-Progress' | 'Completed';
+};
+
+export type QuoteResult = {
+  id: string;
+  partNumber: string;
+  partRev: string;
+  description: string;
+  buildQty: number;
+  costPerBoard: number;
+  totalAmount: number;
+  totalWithMarkup: number;
+  lastRunBy: string;
+  lastRunDate: Date;
+  lastRunVersion: string;
+  bomFile: string;
+};
+
+export type Comment = {
+  id: string;
+  author: string;
+  initials: string;
+  at: Date;
+  body: string;
+  emailed: boolean;
+};
+
+export type ActivityEntry = {
+  id: string;
+  author: string;
+  initials: string;
+  at: Date;
+  action: 'Create' | 'Update' | 'Status';
+  summary: string;
+  changes?: { field: string; from: string; to: string }[];
+};
+
+/* Checklist item names are verbatim from the live screen, including the
+   misspelling of "Polumeric" — corrected here to "Polymeric" and recorded as a
+   content fix, not silently changed. See LABEL_FIXES below. */
+export const PROGRAM_CHECKLIST = [
+  'Assembly Drive', 'BoM Scrub', 'FAB Drive', 'Polymeric Required', 'Quoting Report',
+] as const;
+
+export const ENGINEERING_CHECKLIST = [
+  'DFM Report', 'Document validation', 'Engineer Test', 'SMT', 'Tooling/Stencil Review',
+] as const;
+
+/**
+ * Every label this mockup renames, with the original, so the change is
+ * reviewable rather than invisible. The audit's finding C2 is that the live
+ * labels are inconsistent in case, number and abbreviation; these are the
+ * specific corrections on the Quotation screens.
+ */
+export const LABEL_FIXES: { was: string; now: string; why: string }[] = [
+  { was: 'Item Ant Quantities To Quote', now: 'Quantities to quote',
+    why: '"Ant" is not a word in this context; the field holds a count of quantities.' },
+  { was: 'Provide Alt Aml For Out Stock', now: 'Provide alternate AML for out-of-stock',
+    why: 'AML is Approved Manufacturer List; the original drops articles and mis-cases the acronym.' },
+  { was: 'Acceptable LeadTime In Day', now: 'Acceptable lead time (days)',
+    why: 'camelCase in a UI label, and the unit belongs in parentheses, not the noun.' },
+  { was: 'Polumeric Required', now: 'Polymeric Required',
+    why: 'Misspelling.' },
+  { was: 'Document validation', now: 'Document validation',
+    why: 'Unchanged — sentence case here is consistent with its siblings in the same checklist.' },
+  { was: 'Rocket Consigned Inventory', now: 'Rocket Consigned Inventory',
+    why: 'UNRESOLVED — "Rocket" may be a customer, a system or a typo. Left as-is pending an answer rather than guessed.' },
+];
 
 const CUSTOMERS = [
   '00455 - Cerelogic Systems Inc.', '00848 - KT Controls Ltd', '00378 - Nokia Networks Oy',
@@ -75,6 +170,26 @@ const QUOTE_FOCUS = ['Stock-High cost', 'Lead time', 'Lowest cost', 'Balanced'];
 const PACKAGING = ['Cut Tape', 'Full Reel', 'Tube', 'Tray'];
 const BUILD_REQ = ['System', 'PCBA only', 'Box build', 'Turnkey assembly'];
 const PROJECT_TYPES = ['Production', 'Prototype', 'NPI', 'Re-quote'];
+
+/** The mockup's "now". One constant, so dates cannot disagree between screens. */
+export const TODAY = new Date(2026, 7, 19);
+const CHECK_STATES: ChecklistState[] = ['Not started', 'In progress', 'Done', 'Done', 'N/A'];
+const DOC_TYPES = ['Assembly Drawing', 'BoM', 'Fab Drawing', 'Test Spec', 'Customer RFQ'];
+const RESULT_DESC = [
+  'Main controller assembly', 'Power distribution board', 'Sensor interface PCBA',
+  'Backplane assembly', 'RF front-end module',
+];
+const COMMENT_BODIES = [
+  'Customer confirmed the build quantity — proceeding with 250.',
+  'Second-source pricing came back 12% lower; re-running the quote.',
+  'Waiting on the fab drawing before the DFM report can be closed.',
+  'Attrition set for the 0402 passives, BoM scrub complete.',
+];
+
+/** Same date, a stated hour — so timelines don't render as a column of 00:00. */
+function withHour(d: Date, h: number) {
+  const c = new Date(d); c.setHours(h, (h * 7) % 60, 0, 0); return c;
+}
 
 function mulberry32(seed: number) {
   return function () {
@@ -98,7 +213,15 @@ export function generateQuotations(count = 330): Quotation[] {
     const overdue = rnd() < 0.15;
     const dueOffset = overdue ? -(1 + Math.floor(rnd() * 10)) : Math.floor(rnd() * 45);
     const needed = new Date(2026, 7, 19 + dueOffset);
-    const created = new Date(needed.getTime() - (5 + Math.floor(rnd() * 50)) * 86400000);
+    /* Created is derived backwards from the due date, but must never land in the
+       future: deriving it naively put 26% of the queue on a creation date that
+       had not happened yet, with activity-log entries to match. Clamped to at
+       most yesterday, and given a working-hours time so the log reads like a
+       log rather than a row of midnights. */
+    const naiveCreated = needed.getTime() - (5 + Math.floor(rnd() * 50)) * 86400000;
+    const latestAllowed = TODAY.getTime() - 86400000;
+    const created = new Date(Math.min(naiveCreated, latestAllowed));
+    created.setHours(8 + Math.floor(rnd() * 9), Math.floor(rnd() * 60), 0, 0);
     const status = pick(STATUSES);
     out.push({
       id: `rfq-${i + 1}`,
@@ -116,7 +239,7 @@ export function generateQuotations(count = 330): Quotation[] {
       assignedTo: pick(OWNERS),
       dateNeeded: needed,
       createdDate: created,
-      lastUpdated: new Date(Math.min(created.getTime() + Math.floor(rnd() * 20) * 86400000, new Date(2026, 7, 19).getTime())),
+      lastUpdated: new Date(Math.min(created.getTime() + Math.floor(rnd() * 20) * 86400000, TODAY.getTime())),
       projectType: pick(PROJECT_TYPES),
       customerType: pick(RFQ_TYPES),
       historicalRfq: rnd() > 0.75 ? String(300 - Math.floor(rnd() * 200)).padStart(10, '0') : '',
@@ -137,6 +260,76 @@ export function generateQuotations(count = 330): Quotation[] {
       broker: rnd() > 0.8,
       customerNotes: rnd() > 0.6 ? 'Customer requires RoHS documentation with the quote.' : '',
       internalNotes: rnd() > 0.7 ? 'Awaiting pricing from second-source supplier.' : '',
+      programManager: pick(OWNERS),
+      buyer: pick(OWNERS),
+      engineer: rnd() > 0.3 ? pick(OWNERS) : '',
+      programChecklist: Object.fromEntries(PROGRAM_CHECKLIST.map(k => [k, pick(CHECK_STATES)])),
+      engineeringChecklist: Object.fromEntries(ENGINEERING_CHECKLIST.map(k => [k, pick(CHECK_STATES)])),
+      documents: Array.from({ length: Math.floor(rnd() * 4) }, (_, j) => {
+        /* The type is chosen once and the filename derives from it. Picking
+           twice produced documents called BoM-*.pdf typed "Test Spec". */
+        const type = pick(DOC_TYPES);
+        const ext = type === 'BoM' ? 'xlsx' : 'pdf';
+        return {
+          id: `doc-${i}-${j}`,
+          type,
+          name: `${type.replace(/\s+/g, '-')}-${cust.slice(0, 5)}-v${1 + Math.floor(rnd() * 3)}.${ext}`,
+          uploadedBy: pick(OWNERS),
+          uploadedDate: withHour(new Date(created.getTime() + j * 86400000), 10 + j),
+          assignee: pick(OWNERS),
+          status: pick(['Pending', 'In-Progress', 'Completed'] as const),
+        };
+      }),
+      /* Only quoted/completed RFQs have results — a New one has never been run. */
+      results: (status === 'Quoted' || status === 'Completed')
+        ? Array.from({ length: 1 + Math.floor(rnd() * 3) }, (_, j) => {
+            const qty = pick([25, 50, 100, 250, 500]);
+            const cpb = Math.round(rnd() * 18000) / 100 + 12;
+            const markup = 10 + Math.floor(rnd() * 20);
+            return {
+              id: `res-${i}-${j}`,
+              partNumber: `${cust.slice(0, 5)}-${100 + Math.floor(rnd() * 800)}-${1000 + Math.floor(rnd() * 8000)}`,
+              partRev: String.fromCharCode(65 + Math.floor(rnd() * 4)),
+              description: pick(RESULT_DESC),
+              buildQty: qty,
+              costPerBoard: cpb,
+              totalAmount: Math.round(cpb * qty * 100) / 100,
+              totalWithMarkup: Math.round(cpb * qty * (1 + markup / 100) * 100) / 100,
+              lastRunBy: pick(OWNERS),
+              lastRunDate: new Date(created.getTime() + 86400000 * (2 + j)),
+              lastRunVersion: `v${1 + j}`,
+              bomFile: `BOM-${cust.slice(0, 5)}-v${1 + j}.xlsx`,
+            };
+          })
+        : [],
+      comments: Array.from({ length: Math.floor(rnd() * 3) }, (_, j) => {
+        const who = pick(OWNERS);
+        return {
+          id: `cm-${i}-${j}`,
+          author: who,
+          initials: who.split(' ').map(w => w[0]).join('').slice(0, 2),
+          at: withHour(new Date(created.getTime() + 86400000 * (1 + j)), 9 + j * 3),
+          body: pick(COMMENT_BODIES),
+          emailed: rnd() > 0.6,
+        };
+      }),
+      activity: (() => {
+        const who = pick(OWNERS);
+        const init = who.split(' ').map(w => w[0]).join('').slice(0, 2);
+        const log: ActivityEntry[] = [{
+          id: `ac-${i}-0`, author: who, initials: init, at: created,
+          action: 'Create', summary: 'RFQ was created',
+        }];
+        if (status !== 'New') {
+          log.unshift({
+            id: `ac-${i}-1`, author: who, initials: init,
+            at: withHour(new Date(created.getTime() + 86400000), 14),
+            action: 'Status', summary: `Status changed to ${status}`,
+            changes: [{ field: 'Status', from: 'New', to: status }],
+          });
+        }
+        return log;
+      })(),
     });
   }
   return out;
@@ -172,6 +365,6 @@ export const QUOTATION_COLUMNS: ColumnSpec<Quotation>[] = [
 ];
 
 /** Days until the RFQ is due. Negative is overdue. */
-export function daysUntil(d: Date, today = new Date(2026, 7, 19)): number {
+export function daysUntil(d: Date, today = TODAY): number {
   return Math.round((d.getTime() - today.getTime()) / 86400000);
 }

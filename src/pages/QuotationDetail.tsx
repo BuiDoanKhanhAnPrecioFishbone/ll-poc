@@ -6,6 +6,12 @@ import { Rating } from '@progress/kendo-react-inputs';
 import { StatusBadge } from '../components/StatusBadge';
 import { fmtDate } from '../components/StandardGrid';
 import { generateQuotations, daysUntil } from '../data/quotations';
+import { ChecklistsTab } from '../components/quotation/ChecklistsTab';
+import { ResultTab } from '../components/quotation/ResultTab';
+import { ConversationsTab } from '../components/quotation/ConversationsTab';
+import { ActivityTab } from '../components/quotation/ActivityTab';
+import { BomComparisonDialog } from '../components/quotation/BomComparisonDialog';
+import { RunQuotationDialog } from '../components/quotation/RunQuotationDialog';
 
 /**
  * Quotation record.
@@ -25,6 +31,8 @@ export function QuotationDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [tab, setTab] = useState(0);
+  const [bomOpen, setBomOpen] = useState(false);
+  const [runOpen, setRunOpen] = useState(false);
   const q = useMemo(() => generateQuotations(330).find(x => x.id === id), [id]);
 
   if (!q) {
@@ -43,6 +51,11 @@ export function QuotationDetail() {
 
   const due = daysUntil(q.dateNeeded);
   const closed = q.status === 'Completed' || q.status === 'Cancelled';
+  /* Tab labels carry counts so the record's state is legible without opening
+     each tab. The live TabStrip gives five bare nouns. */
+  const checklistOutstanding =
+    [...Object.values(q.programChecklist), ...Object.values(q.engineeringChecklist)]
+      .filter(v => v === 'Not started' || v === 'In progress').length;
 
   return (
     <div className="vy-page vy-page--record">
@@ -54,9 +67,9 @@ export function QuotationDetail() {
         </div>
         <div className="vy-page-actions">
           <Button themeColor="base" onClick={() => navigate('/sales-management/quotation')}>Back</Button>
-          <Button themeColor="base">BoM Comparison</Button>
+          <Button themeColor="base" onClick={() => setBomOpen(true)}>BoM Comparison</Button>
           <Button themeColor="base">Edit</Button>
-          <Button themeColor="primary">Run Quotation</Button>
+          <Button themeColor="primary" onClick={() => setRunOpen(true)}>Run Quotation</Button>
         </div>
       </div>
 
@@ -126,11 +139,20 @@ export function QuotationDetail() {
           </div>
         </TabStripTab>
 
-        <TabStripTab title="Checklist & Assignment"><NotMocked name="Checklist & Assignment" /></TabStripTab>
-        <TabStripTab title="Quotation Result"><NotMocked name="Quotation Result" /></TabStripTab>
-        <TabStripTab title="Conversations"><NotMocked name="Conversations" /></TabStripTab>
-        <TabStripTab title="Activity Log"><NotMocked name="Activity Log" /></TabStripTab>
+        <TabStripTab title={`Checklists${checklistOutstanding ? ` (${checklistOutstanding})` : ''}`}>
+          <ChecklistsTab q={q} />
+        </TabStripTab>
+        <TabStripTab title={`Result${q.results.length ? ` (${q.results.length})` : ''}`}>
+          <ResultTab q={q} onRun={() => setRunOpen(true)} />
+        </TabStripTab>
+        <TabStripTab title={`Conversations${q.comments.length ? ` (${q.comments.length})` : ''}`}>
+          <ConversationsTab q={q} />
+        </TabStripTab>
+        <TabStripTab title="Activity"><ActivityTab q={q} /></TabStripTab>
       </TabStrip>
+
+      {bomOpen && <BomComparisonDialog onClose={() => setBomOpen(false)} />}
+      {runOpen && <RunQuotationDialog q={q} onClose={() => setRunOpen(false)} />}
     </div>
   );
 }
@@ -187,15 +209,3 @@ function Note({ title, body }: { title: string; body: string }) {
   );
 }
 
-function NotMocked({ name }: { name: string }) {
-  return (
-    <div className="vy-stub">
-      <span className="vy-stub-tag">Not mocked</span>
-      <p className="vy-stub-note">
-        <strong>{name}</strong> exists on the production screen and is not reproduced here.
-        The Requirements tab is the one built out, because it is where the field-level
-        problems live. This tab would follow the same field pattern.
-      </p>
-    </div>
-  );
-}
