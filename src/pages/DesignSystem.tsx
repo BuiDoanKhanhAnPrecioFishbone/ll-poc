@@ -16,7 +16,7 @@ const ROLE_NOTES: Record<string, string> = {
   money:  'Right-aligned, currency-aware, always two decimals.',
   date:   'Sized to the full rendered format. A truncated date is worse than no date — production truncates 100% of them.',
   status: 'One badge from the shared status tokens. Never free text.',
-  rating: 'A Kendo Rating rendered read-only in the cell. Note that a Rating has a 32px floor, so rows containing one cannot reach compact density — see GAP-02.',
+  rating: 'A Kendo Rating rendered read-only in the cell. A Rating is 32px tall by default, which would put a 36px floor on the row; GAP-02 tightens its padding under compact density so the row still reaches 28px.',
 };
 
 export function DesignSystemPage() {

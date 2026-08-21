@@ -256,11 +256,21 @@
 .vy-due-rel[data-tone="none"] { display: none; }
 .vy-cell { overflow: hidden; }
 
-/* GAP-01 (PENDING APPROVAL) — the status column reads as a ragged edge when
-   Kendo `Badge` sizes to its label ("New" beside "In-Progress"). This is the
-   recommended option (b): a fixed-width slot in the cell with the stock Badge
-   inside it, Badge itself unmodified. Delete this one rule to revert. */
+/* GAP-01 (approved 21 Aug 2026, option b) — the status column reads as a ragged
+   edge when Kendo `Badge` sizes to its label ("New" beside "In-Progress"), and
+   Badge exposes no width prop. A fixed-width slot in the cell; the Badge itself
+   is stock and unmodified. See docs/gap-register.md. */
 .vy-status-slot { display: inline-flex; justify-content: center; width: var(--vy-status-slot-w); }
+
+/* GAP-02 (approved 21 Aug 2026, option b) — Kendo `Rating` renders 32px tall:
+   .k-rating-item carries 4px padding around a 24px glyph. That put a 36px floor
+   on any row containing one, so compact density was unreachable on Quotations
+   and the density control promised something it could not deliver.
+
+   This is the ONLY rule in the repo that reaches into a Kendo internal class.
+   It is scoped to compact density, so Rating is untouched everywhere else.
+   See docs/gap-register.md. */
+[data-density="compact"] .k-grid .k-rating-item { padding: 0; }
 
 /* =============================================================================
    RECORD SCREEN
