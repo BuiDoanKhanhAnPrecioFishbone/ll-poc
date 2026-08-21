@@ -33,7 +33,7 @@ export function QuotationDetail() {
         <div className="vy-empty-state">
           <strong>No RFQ with that reference</strong>
           <p>It may have been deleted, or the link may be stale.</p>
-          <Button themeColor="primary" onClick={() => navigate('/sell/quotations')}>
+          <Button themeColor="primary" onClick={() => navigate('/sales-management/quotation')}>
             Back to Quotations
           </Button>
         </div>
@@ -53,7 +53,7 @@ export function QuotationDetail() {
           {q.itar && <span className="vy-flag" title="Subject to ITAR export control">ITAR</span>}
         </div>
         <div className="vy-page-actions">
-          <Button themeColor="base" onClick={() => navigate('/sell/quotations')}>Back</Button>
+          <Button themeColor="base" onClick={() => navigate('/sales-management/quotation')}>Back</Button>
           <Button themeColor="base">BoM Comparison</Button>
           <Button themeColor="base">Edit</Button>
           <Button themeColor="primary">Run Quotation</Button>

@@ -141,6 +141,8 @@ export type NavItem = {
   /** Plain-language description used by the command palette and empty states. */
   hint?: string;
   admin?: boolean;
+  /** Mirrors the production URL on purpose, so the two can be compared side by side. */
+  keepsLegacyRoute?: boolean;
 };
 
 export type NavGroup = {
@@ -177,7 +179,12 @@ export const proposedNav: NavGroup[] = [
   {
     title: 'Sell', icon: 'sell', purpose: 'Demand — from enquiry to cash',
     items: [
-      { title: 'Quotations', path: '/sell/quotations', wasCalled: 'Sales Management › Project Requirements', hint: 'Customer RFQs and the quotes you send back' },
+      /* Quotations deliberately keeps the PRODUCTION route rather than /sell/quotations,
+         so this mockup and the live system can be opened at the same URL and compared
+         directly. /sell/quotations redirects here, which is exactly the migration this
+         audit recommends for the other mis-namespaced screens (finding N3): move the
+         route, keep the old link working. */
+      { title: 'Quotations', path: '/sales-management/quotation', wasCalled: 'Sales Management › Project Requirements', hint: 'Customer RFQs and the quotes you send back', keepsLegacyRoute: true },
       { title: 'Sales Orders', path: '/sell/sales-orders', wasCalled: 'Sales Management › Sales Orders', hint: 'Confirmed customer demand' },
       { title: 'Returns (RMA)', path: '/sell/returns', wasCalled: 'Sales Management › RMA Lists', hint: 'Authorised customer returns' },
       { title: 'Customers', path: '/sell/customers', wasCalled: 'Sales Management › Customer Management', hint: 'Accounts, contacts, ship-to addresses' },

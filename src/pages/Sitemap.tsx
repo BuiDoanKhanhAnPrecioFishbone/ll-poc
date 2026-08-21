@@ -60,6 +60,12 @@ export function SitemapPage() {
                     <span>{i.title}</span><code>{i.path}</code>
                   </div>
                   {i.wasCalled && <div className="vy-was">was: {i.wasCalled}</div>}
+                  {i.keepsLegacyRoute && (
+                    <div className="vy-note-inline">
+                      Keeps the production URL so the mockup and the live system can be compared
+                      at the same address; the new path redirects here.
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

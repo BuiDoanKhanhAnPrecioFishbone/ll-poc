@@ -308,3 +308,4 @@
 .vy-note p { margin: 0; font-size: var(--vy-text-base); color: var(--vy-grey-700); }
 .vy-crumb-link { font-size: var(--vy-text-md); color: var(--vy-blue-700); text-decoration: none; }
 .vy-crumb-link:hover { text-decoration: underline; }
+.vy-note-inline { font-size: var(--vy-text-xs); color: var(--vy-blue-700); background: var(--vy-blue-50); border-radius: var(--vy-radius-sm); padding: var(--vy-space-2) var(--vy-space-4); margin: var(--vy-space-2) 0; }

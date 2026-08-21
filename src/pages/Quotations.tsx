@@ -84,7 +84,7 @@ export function Quotations() {
           </Button>
         )}
       </>}
-      onRowClick={q => navigate(`/sell/quotations/${q.id}`)}
+      onRowClick={q => navigate(`/sales-management/quotation/${q.id}`)}
     />
   );
 }
