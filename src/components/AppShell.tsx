@@ -50,6 +50,21 @@ function useBreadcrumb() {
 
 export function AppShell() {
   const [collapsed, setCollapsed] = useState(false);
+  const { pathname } = useLocation();
+
+  /* Which nav group is open. Measured at 1024x768: the fully-expanded nav was
+     1352px tall in a 628px rail, so 724px of it — more than half — could only
+     be reached by scrolling, with nothing on screen saying so. Group headers
+     stay visible either way, so the whole structure is still legible at a
+     glance; that was the point of replacing the hamburger, and it survives. */
+  const groupOf = (p: string) =>
+    proposedNav.find(g => g.items.some(i => i.path === p || (i.path !== '/' && p.startsWith(i.path + '/'))))?.title;
+  const [openGroup, setOpenGroup] = useState<string | null>(() => groupOf(pathname) ?? 'Sell');
+  useEffect(() => {
+    const g = groupOf(pathname);
+    if (g) setOpenGroup(g);
+  }, [pathname]);
+
   const [paletteOpen, setPaletteOpen] = useState(false);
   const crumb = useBreadcrumb();
 
@@ -63,11 +78,12 @@ export function AppShell() {
 
   return (
     <div className="vy-shell" data-collapsed={collapsed}>
+      <a className="vy-skip" href="#vy-main">Skip to content</a>
       {/* ---- Sidebar: persistent, not a drawer -----------------------------
           The production app hides all 51 destinations behind a hamburger, so
           the user never sees where they are in the structure. A persistent
           rail costs 248px and buys permanent orientation. */}
-      <aside className="vy-sidebar">
+      <aside className="vy-sidebar" aria-label="Main navigation">
         <div className="vy-brand">
           <div className="vy-brand-mark" aria-hidden>V</div>
           {!collapsed && (
@@ -79,15 +95,23 @@ export function AppShell() {
         </div>
 
         <nav className="vy-nav">
-          {proposedNav.map(g => (
-            <div className="vy-nav-group" key={g.title}>
+          {proposedNav.map(g => {
+            const open = collapsed || openGroup === g.title;
+            const hasActive = g.items.some(i => i.path === pathname || (i.path !== '/' && pathname.startsWith(i.path + '/')));
+            return (
+            <div className="vy-nav-group" key={g.title} data-open={open}>
               {!collapsed && (
-                <div className="vy-nav-group-head">
-                  <span className="vy-nav-group-title">{g.title}</span>
+                <button className="vy-nav-group-head" aria-expanded={open}
+                        onClick={() => setOpenGroup(o => o === g.title ? null : g.title)}>
+                  <span className="vy-nav-group-title">
+                    {g.title}
+                    {!open && hasActive && <span className="vy-group-dot" aria-label="contains the current screen" />}
+                  </span>
                   <span className="vy-nav-group-purpose">{g.purpose}</span>
-                </div>
+                  <span className="vy-nav-chevron" aria-hidden>{open ? '⌄' : '›'}</span>
+                </button>
               )}
-              {g.items.map(i => (
+              {open && g.items.map(i => (
                 <NavLink key={i.path} to={i.path} end={i.path === '/'}
                          className={({ isActive }) => 'vy-nav-item' + (isActive ? ' is-active' : '')}
                          title={collapsed ? `${g.title} › ${i.title}` : i.hint}>
@@ -96,8 +120,8 @@ export function AppShell() {
                 </NavLink>
               ))}
             </div>
-          ))}
-          <div className="vy-nav-group vy-nav-group--review" key={reviewNav.title}>
+          );})}
+          <div className="vy-nav-group vy-nav-group--review" data-open key={reviewNav.title}>
             {!collapsed && (
               <div className="vy-nav-group-head">
                 <span className="vy-nav-group-title">{reviewNav.title}</span>
@@ -163,7 +187,7 @@ export function AppShell() {
           </div>
         </header>
 
-        <main className="vy-content"><Outlet /></main>
+        <main className="vy-content" id="vy-main" tabIndex={-1}><Outlet /></main>
       </div>
 
       <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />

@@ -27,7 +27,7 @@
 }
 .vy-brand-text { display: flex; flex-direction: column; line-height: 1.2; overflow: hidden; }
 .vy-brand-text strong { color: var(--vy-on-dark-fg); font-size: var(--vy-text-md); letter-spacing: .08em; }
-.vy-brand-text span { color: var(--vy-grey-500); font-size: var(--vy-text-xs); white-space: nowrap; }
+.vy-brand-text span { color: var(--vy-on-dark-muted); font-size: var(--vy-text-xs); white-space: nowrap; }
 
 .vy-nav { flex: 1; overflow-y: auto; padding: var(--vy-space-4) 0 var(--vy-space-8); }
 .vy-nav::-webkit-scrollbar { width: var(--vy-space-4); }
@@ -35,10 +35,10 @@
 
 .vy-nav-group { margin-bottom: var(--vy-space-5); }
 .vy-nav-group-head { padding: var(--vy-space-5) var(--vy-space-8) var(--vy-space-2); }
-.vy-nav-group-title { display: block; font-size: var(--vy-text-xs); font-weight: var(--vy-weight-heavy); letter-spacing: .09em; text-transform: uppercase; color: var(--vy-grey-500); }
+.vy-nav-group-title { display: block; font-size: var(--vy-text-xs); font-weight: var(--vy-weight-heavy); letter-spacing: .09em; text-transform: uppercase; color: var(--vy-on-dark-secondary); }
 /* The section's purpose sits under its name. A new user should not have to open
    a group to learn what belongs in it. */
-.vy-nav-group-purpose { display: block; font-size: var(--vy-text-2xs); color: var(--vy-grey-600); margin-top: 1px; }
+.vy-nav-group-purpose { display: block; font-size: var(--vy-text-2xs); color: var(--vy-on-dark-muted); margin-top: 1px; }
 
 .vy-nav-item {
   display: flex; align-items: center; gap: var(--vy-space-5);
@@ -52,7 +52,7 @@
 .vy-nav-item.is-active svg { opacity: 1; }
 
 .vy-sidebar-foot { border-top: 1px solid var(--vy-on-dark-hairline); padding: var(--vy-space-4) 0; display: flex; flex-direction: column; gap: var(--vy-space-1); }
-.vy-collapse { margin: var(--vy-space-2) var(--vy-space-6) 0; background: transparent; border: 1px solid var(--vy-grey-700); color: var(--vy-grey-400); border-radius: var(--vy-radius-md); padding: var(--vy-space-2) 0; cursor: pointer; font-size: var(--vy-text-md); }
+.vy-collapse { margin: var(--vy-space-2) var(--vy-space-6) 0; background: transparent; border: 1px solid var(--vy-grey-700); color: var(--vy-on-dark-muted); border-radius: var(--vy-radius-md); padding: var(--vy-space-2) 0; cursor: pointer; font-size: var(--vy-text-md); }
 .vy-collapse:hover { border-color: var(--vy-grey-500); color: var(--vy-on-dark-fg); }
 
 .vy-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
@@ -89,7 +89,10 @@
 .vy-dot { position: absolute; top: var(--vy-space-2); right: var(--vy-space-2); width: var(--vy-dot-size); height: var(--vy-dot-size); border-radius: 50%; background: var(--vy-red-500); }
 .vy-avatar { width: var(--vy-control-sm); height: var(--vy-control-sm); border-radius: 50%; background: var(--vy-blue-100); color: var(--vy-blue-800); display: grid; place-items: center; font-weight: var(--vy-weight-semibold); font-size: var(--vy-text-sm); }
 
-.vy-content { flex: 1; overflow: auto; }
+.vy-content { flex: 1; overflow: auto; min-height: 0; }
+/* A list page owns the full content box so its grid can flex; document pages
+   keep normal document flow. */
+.vy-content:has(> .vy-page--list) { overflow: hidden; }
 
 /* ---- Page ----------------------------------------------------------------- */
 .vy-page { padding: var(--vy-space-9) var(--vy-space-10); }
@@ -232,10 +235,13 @@
    product navigation so nobody mistakes them for part of the proposed IA. */
 .vy-nav-group--review { border-top: 1px solid var(--vy-on-dark-hairline); padding-top: var(--vy-space-3); margin-top: var(--vy-space-3); }
 
-/* The grid fills the viewport below the page header, toolbar and pager. This
-   replaces a `style={{ height: 'calc(100vh - 210px)' }}` inline style, which
-   was both an inline style and an untokenised magic number. */
-.vy-grid--fill { height: calc(100vh - var(--vy-grid-viewport-offset)); }
+/* The grid flexes to fill whatever is left below the page header and filters.
+   This replaced an inline `height: calc(100vh - 210px)` — an untokenised magic
+   number that guessed at the height of everything above it, and guessed 80px
+   too generously at 1024x768, costing a row of data on every laptop. Flex
+   measures instead of guessing, so the number is gone rather than tokenised. */
+.vy-page--list { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+.vy-page--list .k-grid { flex: 1 1 auto; min-height: 0; }
 
 
 /* =============================================================================
@@ -244,7 +250,6 @@
 .vy-filter-bar { display: flex; align-items: center; gap: var(--vy-space-3); margin-bottom: var(--vy-space-4); flex-wrap: wrap; }
 .vy-filter-label { font-size: var(--vy-text-sm); color: var(--vy-grey-500); }
 .vy-alert-count { color: var(--vy-red-600); font-weight: var(--vy-weight-semibold); }
-.vy-grid--fill-with-filters { height: calc(100vh - var(--vy-grid-viewport-offset) - var(--vy-space-14)); }
 
 /* --- Due date ---------------------------------------------------------------
    Colour carries the same meaning as the status vocabulary: overdue is blocked,
@@ -403,3 +408,94 @@
 /* Marks content this mockup could not verify against the live system, so a
    reviewer never mistakes an inference for an observation. */
 .vy-unverified { font-size: var(--vy-text-xs); color: var(--vy-accent-warning); background: var(--vy-status-open-bg); border-radius: var(--vy-radius-sm); padding: var(--vy-space-3) var(--vy-space-5); }
+
+/* --- Collapsible nav groups --------------------------------------------------
+   The group header is a button, not a div: collapsing a section is an action
+   and belongs on something focusable and keyboard-operable. */
+.vy-nav-group-head {
+  display: grid; grid-template-columns: 1fr auto; align-items: baseline;
+  width: 100%; background: none; border: 0; cursor: pointer; text-align: left;
+  padding: var(--vy-space-5) var(--vy-space-8) var(--vy-space-2);
+  font-family: inherit;
+}
+.vy-nav-group-head:hover .vy-nav-group-title { color: var(--vy-on-dark-fg); }
+.vy-nav-group-purpose { grid-column: 1 / -1; }
+.vy-nav-chevron { color: var(--vy-on-dark-muted); font-size: var(--vy-text-sm); }
+/* A collapsed group that holds the current screen still says so. */
+.vy-group-dot {
+  display: inline-block; width: var(--vy-space-3); height: var(--vy-space-3);
+  border-radius: 50%; background: var(--vy-blue-400); margin-left: var(--vy-space-3);
+}
+
+/* =============================================================================
+   FOCUS, MOTION, DENSITY OF ATTENTION
+   ========================================================================== */
+
+/* Keyboard focus was entirely unstyled — every custom control in this repo
+   (nav items, group headers, the search button, chips) relied on the browser
+   default, which is invisible against the dark sidebar. `:focus-visible` shows
+   it for keyboard users without putting a ring on every mouse click. */
+:where(a, button, [tabindex]):focus-visible,
+.vy-nav-item:focus-visible,
+.vy-nav-group-head:focus-visible,
+.vy-search:focus-visible {
+  outline: var(--vy-space-1) solid var(--vy-blue-400);
+  outline-offset: var(--vy-space-1);
+  border-radius: var(--vy-radius-sm);
+}
+.vy-sidebar :where(a, button):focus-visible { outline-color: var(--vy-blue-300); }
+
+/* Skip link: with a 24-item sidebar, a keyboard or screen-reader user otherwise
+   tabs through the whole nav on every page load. */
+.vy-skip {
+  position: absolute; left: var(--vy-space-4); top: var(--vy-space-4);
+  transform: translateY(-200%); z-index: var(--vy-z-palette);
+  background: var(--vy-grey-0); color: var(--vy-blue-700);
+  border: 1px solid var(--vy-blue-600); border-radius: var(--vy-radius-md);
+  padding: var(--vy-space-4) var(--vy-space-6); font-size: var(--vy-text-base);
+  text-decoration: none;
+}
+.vy-skip:focus { transform: translateY(0); }
+
+/* Respect a stated preference for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+}
+
+/* --- Loading state -----------------------------------------------------------
+   Audit finding T5 says loading, empty and error are three states and the live
+   app conflates the first two. This mockup had no loading state at all, which
+   is the same gap from the other direction: the pattern was asserted in a
+   document and not demonstrated. Skeleton rows keep the grid's shape so the
+   page does not jump when data lands. */
+.vy-skeleton-row { display: flex; gap: var(--vy-space-6); padding: var(--vy-space-4) var(--vy-space-6); border-bottom: 1px solid var(--vy-grey-100); }
+.vy-skeleton-cell { height: var(--vy-space-5); border-radius: var(--vy-radius-sm); background: linear-gradient(90deg, var(--vy-grey-100) 25%, var(--vy-grey-50) 50%, var(--vy-grey-100) 75%); background-size: 200% 100%; animation: vy-shimmer 1.4s ease-in-out infinite; }
+@keyframes vy-shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+/* --- Error state -------------------------------------------------------------
+   The third of the three. Names the failure and offers the way out, rather than
+   rendering an empty grid that looks like "no data". */
+.vy-error-state { text-align: center; padding: var(--vy-space-14); }
+.vy-error-state strong { display: block; color: var(--vy-red-700); font-size: var(--vy-text-lg); margin-bottom: var(--vy-space-2); }
+.vy-error-state p { color: var(--vy-grey-600); margin: 0 0 var(--vy-space-7); }
+
+/* Skeleton cells are proportioned by column role rather than exact pixel width;
+   see GridSkeleton. Flex weights, so no inline style is needed per cell. */
+.vy-skeleton-cell[data-role="ident"]  { flex: 0 0 18%; }
+.vy-skeleton-cell[data-role="text"]   { flex: 1 1 22%; }
+.vy-skeleton-cell[data-role="code"]   { flex: 0 0 7%; }
+.vy-skeleton-cell[data-role="number"] { flex: 0 0 7%; }
+.vy-skeleton-cell[data-role="money"]  { flex: 0 0 9%; }
+.vy-skeleton-cell[data-role="date"]   { flex: 0 0 11%; }
+.vy-skeleton-cell[data-role="status"] { flex: 0 0 9%; }
+.vy-skeleton-cell[data-role="rating"] { flex: 0 0 9%; }
+
+/* Visible to screen readers only. */
+.vy-sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
+}

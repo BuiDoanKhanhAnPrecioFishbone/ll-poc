@@ -1,10 +1,11 @@
-import { useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Grid, GridColumn, GridToolbar, type GridDataStateChangeEvent } from '@progress/kendo-react-grid';
 import { process, type State, type SortDescriptor } from '@progress/kendo-data-query';
 import { Button, ButtonGroup } from '@progress/kendo-react-buttons';
 import { Input } from '@progress/kendo-react-inputs';
 import { StatusBadge } from './StatusBadge';
-import { widthOf, type ColumnSpec } from './column-model';
+import { columnsForWidth, widthOf, type ColumnSpec } from './column-model';
+import { GridSkeleton } from './GridSkeleton';
 
 export type Density = 'compact' | 'comfortable' | 'relaxed';
 
@@ -37,6 +38,9 @@ export function StandardGrid<T extends { id: string | number }>({
   defaultDensity = 'comfortable',
   defaultSort,
   searchPlaceholder = 'Search',
+  loading = false,
+  error,
+  onRetry,
   onRowClick,
 }: {
   data: T[];
@@ -49,6 +53,10 @@ export function StandardGrid<T extends { id: string | number }>({
   defaultDensity?: Density;
   defaultSort?: SortDescriptor[];
   searchPlaceholder?: string;
+  /** Loading, empty and error are three distinct states — see audit finding T5. */
+  loading?: boolean;
+  error?: string;
+  onRetry?: () => void;
   onRowClick?: (row: T) => void;
 }) {
   const [density, setDensity] = useState<Density>(defaultDensity);
@@ -56,10 +64,32 @@ export function StandardGrid<T extends { id: string | number }>({
   const [showHidden, setShowHidden] = useState(false);
   const [dataState, setDataState] = useState<State>({ skip: 0, take: 50, sort: defaultSort });
 
+  /* The grid's own width decides which priority columns fit — not the window's,
+     because the sidebar can be collapsed and that changes the answer. */
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [gridWidth, setGridWidth] = useState(1600);
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(([e]) => setGridWidth(e.contentRect.width));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const fitted = useMemo(() => columnsForWidth(columns, gridWidth), [columns, gridWidth]);
   const visibleColumns = useMemo(
-    () => columns.filter(c => showHidden || !c.hiddenByDefault),
-    [columns, showHidden]
+    () => (showHidden ? columns : fitted).filter(c => showHidden || !c.hiddenByDefault),
+    [columns, fitted, showHidden]
   );
+  /* Everything the user is not currently seeing, and why — so the toolbar
+     button can say it rather than just offering "more". */
+  const suppressed = useMemo(() => {
+    const shown = new Set(visibleColumns.map(c => c.field));
+    return columns.filter(c => !shown.has(c.field)).map(c => ({
+      title: c.title,
+      why: c.hiddenByDefault ? (c.note ?? 'hidden by default') : 'no room at this window width',
+    }));
+  }, [columns, visibleColumns]);
 
   const searchFields = useMemo(
     () => columns.filter(c => c.searchable).map(c => c.field),
@@ -75,10 +105,9 @@ export function StandardGrid<T extends { id: string | number }>({
   }, [data, search, searchFields]);
 
   const result = useMemo(() => process(filtered, dataState), [filtered, dataState]);
-  const hiddenCount = columns.filter(c => c.hiddenByDefault).length;
 
   return (
-    <div className="vy-page" data-density={density}>
+    <div className="vy-page vy-page--list" data-density={density} ref={wrapRef}>
       <div className="vy-page-head">
         <div>
           <h1 className="vy-page-title">{title}</h1>
@@ -94,14 +123,28 @@ export function StandardGrid<T extends { id: string | number }>({
 
       {filters && <div className="vy-filter-bar">{filters}</div>}
 
-      <Grid
+      {/* State 1 of 3: loading. Skeleton rows rather than a spinner over an
+          empty grid, so the page does not claim there are no records while the
+          records are still arriving. */}
+      {loading && <GridSkeleton columns={visibleColumns} />}
+
+      {/* State 2 of 3: error. Names the failure and offers the way out. */}
+      {!loading && error && (
+        <div className="vy-error-state" role="alert">
+          <strong>Could not load {title.toLowerCase()}</strong>
+          <p>{error}</p>
+          {onRetry && <Button themeColor="primary" onClick={onRetry}>Try again</Button>}
+        </div>
+      )}
+
+      {!loading && !error && <Grid
         data={result}
         {...dataState}
         onDataStateChange={(e: GridDataStateChangeEvent) => setDataState(e.dataState)}
         sortable
         pageable={{ pageSizes: [25, 50, 100, 200], buttonCount: 5 }}
         total={result.total}
-        className={'vy-grid' + (filters ? ' vy-grid--fill-with-filters' : ' vy-grid--fill')}
+        className="vy-grid" 
         onRowClick={e => onRowClick?.(e.dataItem as T)}
       >
         <GridToolbar>
@@ -125,15 +168,14 @@ export function StandardGrid<T extends { id: string | number }>({
                 </Button>
               ))}
             </ButtonGroup>
-            {hiddenCount > 0 && (
+            {(suppressed.length > 0 || showHidden) && (
               <Button
                 themeColor={showHidden ? 'primary' : 'base'}
                 fillMode={showHidden ? 'solid' : 'outline'}
                 onClick={() => setShowHidden(s => !s)}
-                title={columns.filter(c => c.hiddenByDefault)
-                  .map(c => `${c.title}: ${c.note ?? 'hidden by default'}`).join('\n')}
+                title={suppressed.map(c => `${c.title} — ${c.why}`).join('\n')}
               >
-                {showHidden ? 'Hide extra columns' : `Show ${hiddenCount} more columns`}
+                {showHidden ? 'Fit columns to window' : `Show ${suppressed.length} more columns`}
               </Button>
             )}
           </div>
@@ -167,9 +209,10 @@ export function StandardGrid<T extends { id: string | number }>({
             }}
           />
         ))}
-      </Grid>
+      </Grid>}
 
-      {result.total === 0 && (
+      {/* State 3 of 3: empty. Only ever shown once loading has finished. */}
+      {!loading && !error && result.total === 0 && (
         /* A real empty state: names the cause and offers the way out. Production
            renders "No records available" while the spinner is still running. */
         <div className="vy-empty-state">

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { generateParts, PART_COLUMNS, type Part } from '../data/parts';
 import { StandardGrid } from '../components/StandardGrid';
 import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
@@ -10,6 +10,14 @@ export function PartMaster() {
   const data = useMemo(() => generateParts(2000), []);
   const [selected, setSelected] = useState<Part | null>(null);
 
+  /* The mockup's data is synchronous, so there is nothing to wait for. This
+     short delay exists to DEMONSTRATE the loading state, because a pattern
+     asserted in a document and never rendered is not a pattern anyone can
+     review. Audit finding T5 is that the live app shows "No records available"
+     while its spinner is still running; this is the alternative, on screen. */
+  const [loading, setLoading] = useState(true);
+  useEffect(() => { const t = setTimeout(() => setLoading(false), 700); return () => clearTimeout(t); }, []);
+
   return (
     <>
       <StandardGrid
@@ -19,6 +27,7 @@ export function PartMaster() {
         subtitle="parts"
         searchPlaceholder="Search part number, description or customer"
         defaultSort={[{ field: 'lastChange', dir: 'desc' }]}
+        loading={loading}
         actions={<>
           <Button themeColor="base">Import</Button>
           <Button themeColor="base">Export</Button>

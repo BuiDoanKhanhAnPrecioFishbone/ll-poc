@@ -132,6 +132,12 @@
      The sidebar sits on --vy-grey-900. These are the only colours allowed to be
      translucent white, and they exist so no component reaches for rgba() inline. */
   --vy-on-dark-fg:            #ffffff;
+  /* Text tiers for the dark sidebar. Measured against --vy-grey-900, the greys
+     originally used here failed WCAG AA: group purpose and the chevron sat at
+     2.43:1 and the group title at 3.88:1. A grey that reads as "quiet" on a
+     light surface is not the same grey that reads as quiet on a dark one. */
+  --vy-on-dark-secondary:     var(--vy-grey-300);
+  --vy-on-dark-muted:         var(--vy-grey-400);
   --vy-on-dark-hairline:      rgba(255, 255, 255, .07);
   --vy-on-dark-hover:         rgba(255, 255, 255, .05);
   --vy-on-dark-active:        rgba(43, 99, 184, .22);
@@ -167,10 +173,6 @@
   --vy-link-card-min-w:  220px;
   --vy-search-w:         420px;
   --vy-doc-max-w:       1180px;
-
-  /* Vertical space the grid must leave for page header, toolbar and pager.
-     Replaces a `calc(100vh - 210px)` inline style in StandardGrid. */
-  --vy-grid-viewport-offset: 210px;
 
   /* --- Elevation layers ------------------------------------------------------ */
   --vy-z-palette: 10050;
