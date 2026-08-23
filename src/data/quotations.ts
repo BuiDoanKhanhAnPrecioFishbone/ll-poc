@@ -15,11 +15,12 @@
    ========================================================================== */
 
 import type { ColumnSpec } from '../components/column-model';
+import * as META from './metadata';
 
 export type QuotationStatus = 'New' | 'In-Progress' | 'Quoted' | 'Completed' | 'Cancelled';
-export type Application = 'System' | 'PCBA' | 'Sub-assy Box Build';
-export type RfqType = 'Consigned' | 'Turnkey' | 'Mixed';
-export type OrderType = 'New' | 'Repeat';
+export type Application = (typeof import('./metadata').APPLICATION)[number];
+export type RfqType = (typeof import('./metadata').RFQ_TYPE)[number];
+export type OrderType = (typeof import('./metadata').ORDER_TYPE)[number];
 
 export type Quotation = {
   id: string;
@@ -48,13 +49,14 @@ export type Quotation = {
   materialPackageType: string;
   markup: number;
   leadTimeDays: number;
-  quantitiesToQuote: number;
+  /** A list of quantities, not a count — a textarea in the live system. */
+  quantitiesToQuote: string;
   buildRequirement: string;
   testRequirements: string;
   assemblyTurnTime: number;
-  excessAndMoq: 'None' | 'Low' | 'OK';
-  netConsignedInventory: 'No' | 'Yes-No Charge';
-  rocketConsignedInventory: 'No' | 'Yes-No Charge' | 'Yes-Charge';
+  excessAndMoq: string;
+  netConsignedInventory: string;
+  rocketConsignedInventory: string;
   conformalCoating: boolean;
   provideAlternateAml: boolean;
   broker: boolean;
@@ -192,13 +194,13 @@ const CUSTOMERS = [
 /** Who can be assigned. Exported so the record can offer the same list. */
 export const PEOPLE = ['Toan Dinh', 'Huyen NTN', 'Mai Pham', 'Duc Le', 'Linh Tran'] as const;
 const OWNERS = [...PEOPLE];
-const APPLICATIONS: Application[] = ['System', 'PCBA', 'PCBA', 'Sub-assy Box Build'];
-const RFQ_TYPES: RfqType[] = ['Consigned', 'Consigned', 'Turnkey', 'Mixed'];
+
+
 const STATUSES: QuotationStatus[] = ['New', 'New', 'In-Progress', 'Quoted', 'Quoted', 'Completed', 'Cancelled'];
-const QUOTE_FOCUS = ['Stock-High cost', 'Lead time', 'Lowest cost', 'Balanced'];
-const PACKAGING = ['Cut Tape', 'Full Reel', 'Tube', 'Tray'];
-const BUILD_REQ = ['System', 'PCBA only', 'Box build', 'Turnkey assembly'];
-const PROJECT_TYPES = ['Production', 'Prototype', 'NPI', 'Re-quote'];
+
+
+
+
 
 /** The mockup's "now". One constant, so dates cannot disagree between screens. */
 export const TODAY = new Date(2026, 7, 19);
@@ -260,29 +262,29 @@ export function generateQuotations(count = 330): Quotation[] {
         : `TuLinh${300 + Math.floor(rnd() * 60)}`,
       customer: cust,
       customerContact: cust.split(' - ')[1].split(' ')[0],
-      application: pick(APPLICATIONS),
-      rfqType: pick(RFQ_TYPES),
-      orderType: rnd() > 0.65 ? 'Repeat' : 'New',
+      application: pick(META.APPLICATION),
+      rfqType: pick(META.RFQ_TYPE),
+      orderType: pick(META.ORDER_TYPE),
       status,
       assignedTo: pick(OWNERS),
       dateNeeded: needed,
       createdDate: created,
       lastUpdated: new Date(Math.min(created.getTime() + Math.floor(rnd() * 20) * 86400000, TODAY.getTime())),
-      projectType: pick(PROJECT_TYPES),
-      customerType: pick(RFQ_TYPES),
+      projectType: pick(META.PROJECT_TYPE),
+      customerType: pick(META.CUSTOMER_TYPE),
       historicalRfq: rnd() > 0.75 ? String(300 - Math.floor(rnd() * 200)).padStart(10, '0') : '',
       itar: rnd() > 0.85,
-      quoteFocus: pick(QUOTE_FOCUS),
-      materialPackageType: pick(PACKAGING),
+      quoteFocus: pick(META.QUOTE_FOCUS),
+      materialPackageType: pick(META.MATERIAL_PACKAGE_TYPE),
       markup: 10 + Math.floor(rnd() * 20),
       leadTimeDays: 10 + Math.floor(rnd() * 30),
-      quantitiesToQuote: pick([1, 5, 10, 25, 50, 100]),
-      buildRequirement: pick(BUILD_REQ),
-      testRequirements: rnd() > 0.6 ? 'ICT + Functional' : 'NA',
+      quantitiesToQuote: pick(['100', '250, 500', '1, 10, 100', '50, 100, 250, 500']),
+      buildRequirement: pick(META.APPLICATION),
+      testRequirements: pick(META.TEST_REQUIREMENTS),
       assemblyTurnTime: 5 + Math.floor(rnd() * 20),
-      excessAndMoq: pick(['None', 'Low', 'OK'] as const),
-      netConsignedInventory: pick(['No', 'Yes-No Charge'] as const),
-      rocketConsignedInventory: pick(['No', 'Yes-No Charge', 'Yes-Charge'] as const),
+      excessAndMoq: pick(META.EXCESS_AND_MOQ),
+      netConsignedInventory: pick(META.NET_CONSIGNED_INVENTORY),
+      rocketConsignedInventory: pick(META.ROCKET_CONSIGNED_INVENTORY),
       conformalCoating: rnd() > 0.7,
       provideAlternateAml: rnd() > 0.5,
       broker: rnd() > 0.8,
