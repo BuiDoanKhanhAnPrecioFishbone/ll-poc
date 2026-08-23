@@ -51,9 +51,12 @@
 .vy-nav-item svg { flex: 0 0 var(--vy-icon-sm); opacity: .8; }
 .vy-nav-item.is-active svg { opacity: 1; }
 
+/* The collapse control is a nav item, not a boxed widget: same height, same
+   padding, same hover as the links above it, so the sidebar has one vocabulary
+   rather than two. */
 .vy-sidebar-foot { border-top: 1px solid var(--vy-on-dark-hairline); padding: var(--vy-space-4) 0; display: flex; flex-direction: column; gap: var(--vy-space-1); }
-.vy-collapse { margin: var(--vy-space-2) var(--vy-space-6) 0; background: transparent; border: 1px solid var(--vy-grey-700); color: var(--vy-on-dark-muted); border-radius: var(--vy-radius-md); padding: var(--vy-space-2) 0; cursor: pointer; font-size: var(--vy-text-md); }
-.vy-collapse:hover { border-color: var(--vy-grey-500); color: var(--vy-on-dark-fg); }
+.vy-collapse { width: 100%; background: none; border: 0; font-family: inherit; text-align: left; cursor: pointer; }
+.vy-collapse svg { flex: 0 0 var(--vy-icon-sm); }
 
 .vy-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
 

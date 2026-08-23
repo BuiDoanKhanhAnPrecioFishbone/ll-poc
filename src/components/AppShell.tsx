@@ -151,9 +151,30 @@ export function AppShell() {
           <NavLink to="/settings/modules" className={({ isActive }) => 'vy-nav-item' + (isActive ? ' is-active' : '')}>
             <Icon name="settings" />{!collapsed && <span>Settings</span>}
           </NavLink>
-          <button className="vy-collapse" onClick={() => setCollapsed(c => !c)}
-                  aria-label={collapsed ? 'Expand navigation' : 'Collapse navigation'}>
-            {collapsed ? '›' : '‹'}
+          {/* Shaped like a nav item, because that is what it sits among.
+              It was a 224x30 empty bordered box holding one text character,
+              which read as an input rather than a button, and was the only
+              icon in the app that was a glyph instead of an SVG.
+
+              The icon states the CURRENT state rather than the action: the
+              left pane is solid while the sidebar is open and hollow once it
+              is collapsed, so the button reflects what you are looking at.
+              The tooltip and label carry the action. */}
+          <button
+            type="button"
+            className="vy-nav-item vy-collapse"
+            onClick={() => setCollapsed(c => !c)}
+            aria-pressed={collapsed}
+            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          >
+            <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden>
+              <rect x="2.75" y="3.75" width="14.5" height="12.5" rx="2.5"
+                    fill="none" stroke="currentColor" strokeWidth="1.5" />
+              <rect x="4" y="5" width="4" height="10" rx="1.25"
+                    fill="currentColor" opacity={collapsed ? 0.3 : 1} />
+            </svg>
+            {!collapsed && <span>Collapse</span>}
           </button>
         </div>
       </aside>
