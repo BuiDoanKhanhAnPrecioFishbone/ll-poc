@@ -60,10 +60,29 @@ Production is fixed at 50px with a 21px header — the header, the element that 
 column means, is the least prominent thing in it. The standard pattern inverts that: 11px
 uppercase headers with a strong bottom rule, over shorter rows.
 
-## Rule 4 — The row is the affordance
+## Rule 4 — The identifier is the affordance, not the row
 
-Production reserves a 60px leading column for an eye icon because rows are not clickable. Rows
-open the record. Leading columns are reserved for selection.
+Production reserves a 60px leading column for an eye icon because rows are not clickable.
+
+This pattern first said "make the row open the record" — one fewer column, one fewer pointer
+trip. **That was wrong, and the customer caught it.** People copy values out of these grids
+every day: part numbers into emails, customer names into search. A drag to select text ends in
+mouseup on the row, which fires the row's click handler and navigates away, so copying was
+effectively impossible.
+
+The identifier is already the record's name. Making *it* the link:
+
+- costs no extra column, so the eye icon still does not come back
+- leaves every other cell as inert, selectable text
+- reads as an affordance without needing to be explained
+- renders as a real anchor where the record has a URL, so middle-click,
+  open-in-new-tab and copy-link-address all work
+
+Rows keep their hover highlight — useful for reading across 1,700px of columns — but are no
+longer controls and do not claim the pointer.
+
+**The general lesson:** saving a click is worth less than not breaking a task people perform
+daily. Density and economy are worth having, but not at the cost of selection.
 
 ## Rule 5 — Loading, empty and error are three states
 

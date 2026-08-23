@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '../ui/Button';
 import { Chip } from '../ui/Chip';
 import { Rating } from '../ui/Rating';
@@ -22,7 +21,6 @@ export function Quotations() {
   const all = useMemo(() => generateQuotations(330), []);
   const [mineOnly, setMineOnly] = useState(true);
   const [openOnly, setOpenOnly] = useState(true);
-  const navigate = useNavigate();
   const toast = useToast();
 
   const data = useMemo(() => all.filter(q =>
@@ -87,7 +85,7 @@ export function Quotations() {
           </Button>
         )}
       </>}
-      onRowClick={q => navigate(`/sales-management/quotation/${q.id}`)}
+      rowHref={q => `/sales-management/quotation/${q.id}`}
     />
   );
 }

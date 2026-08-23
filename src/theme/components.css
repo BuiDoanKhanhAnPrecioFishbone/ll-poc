@@ -188,10 +188,10 @@
 .vy-tr {
   display: grid; position: absolute; top: 0; left: 0; width: 100%;
   align-items: center; border-bottom: 1px solid var(--vy-grey-100);
-  cursor: pointer;
 }
+/* Hover still tracks the row — useful for reading across 1,700px of columns —
+   but the row is no longer a control, so it does not claim the pointer. */
 .vy-tr:hover { background: var(--vy-blue-50); }
-.vy-tr:focus-visible { background: var(--vy-blue-50); outline: none; box-shadow: inset 0 0 0 var(--vy-border-emphasis) var(--vy-blue-500); }
 .vy-td {
   display: flex; align-items: center; min-width: 0; height: 100%;
   padding-inline: var(--vy-space-5); font-size: var(--vy-text-base); color: var(--vy-grey-800);
@@ -455,3 +455,16 @@
    belonging to two files is how that happens. */
 .vy-checklist-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(var(--vy-note-min-w), 1fr)); gap: var(--vy-space-9); margin-bottom: var(--vy-space-9); }
 .vy-checklist-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--vy-space-4); margin-bottom: var(--vy-space-4); }
+
+/* --- Cell link ---------------------------------------------------------------
+   The identifier opens the record. Every other cell is inert text, so a drag
+   to select and copy works anywhere in the grid — which is what the row-level
+   click handler took away. Rendered as an anchor where the record has a URL,
+   so middle-click and open-in-new-tab behave as expected. */
+.vy-cell-link {
+  background: none; border: 0; padding: 0; font: inherit; text-align: left;
+  color: var(--vy-blue-700); text-decoration: none; cursor: pointer;
+  border-radius: var(--vy-shape-xs);
+}
+.vy-cell-link:hover { text-decoration: underline; }
+.vy-tr:hover .vy-cell-link { color: var(--vy-blue-800); }

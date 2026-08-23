@@ -139,6 +139,8 @@ export function QuotationDetail() {
           </>}
         />
         <Fact label="Priority" value={<Rating value={q.priority} max={3} />} />
+        {/* Present on the live header; it was dropped in an earlier pass. */}
+        <Fact label="Created" value={fmtDate(q.createdDate)} />
       </div>
 
       <Tabs

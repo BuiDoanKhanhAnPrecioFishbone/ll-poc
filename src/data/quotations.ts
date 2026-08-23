@@ -137,10 +137,15 @@ export const ENGINEERING_CHECKLIST = [
 ] as const;
 
 /**
- * Every label this mockup renames, with the original, so the change is
- * reviewable rather than invisible. The audit's finding C2 is that the live
- * labels are inconsistent in case, number and abbreviation; these are the
- * specific corrections on the Quotation screens.
+ * EVERY label this mockup renames, with the original alongside it.
+ *
+ * The point is that no field is quietly changed: a reviewer can read this list
+ * and check each decision. Renames are for readability only — no field was
+ * dropped, merged or repurposed.
+ *
+ * Verified 22 Aug 2026 against the live screen, field by field. Three fields
+ * had gone missing in earlier passes and were restored: Customer Type,
+ * Created Date, and BoM File on the Result grid.
  */
 export const LABEL_FIXES: { was: string; now: string; why: string }[] = [
   { was: 'Item Ant Quantities To Quote', now: 'Quantities to quote',
@@ -151,10 +156,20 @@ export const LABEL_FIXES: { was: string; now: string; why: string }[] = [
     why: 'camelCase in a UI label, and the unit belongs in parentheses, not the noun.' },
   { was: 'Polumeric Required', now: 'Polymeric Required',
     why: 'Misspelling.' },
-  { was: 'Document validation', now: 'Document validation',
-    why: 'Unchanged — sentence case here is consistent with its siblings in the same checklist.' },
-  { was: 'Rocket Consigned Inventory', now: 'Rocket Consigned Inventory',
-    why: 'UNRESOLVED — "Rocket" may be a customer, a system or a typo. Left as-is pending an answer rather than guessed.' },
+  { was: 'Historical RFQ', now: 'Previous RFQ',
+    why: '"Historical" reads as an archive; the field holds the single RFQ this one re-quotes.' },
+  { was: 'Due Date', now: 'Date needed',
+    why: 'Matches the column heading already used on the list, so one date has one name.' },
+  { was: 'Material Package Type', now: 'Material packaging',
+    why: '"Package Type" is two nouns doing one job.' },
+  { was: 'Customer specific needs', now: 'Customer notes',
+    why: 'Pairs with "Internal notes"; the original two labels did not read as a pair.' },
+  { was: 'Broker', now: 'Broker sourcing permitted',
+    why: 'A bare noun as a checkbox label does not say what ticking it does.' },
+  { was: 'Customer Type', now: 'Customer type',
+    why: 'Case only. KEPT SEPARATE from RFQ type: the live system carries both, holding the same three values. Whether they are one field duplicated or two distinct ones is a question for the business, not something to resolve by guessing.' },
+  { was: 'Rocket Consigned Inventory', now: 'Rocket consigned inventory',
+    why: 'Case only. UNRESOLVED — "Rocket" may be a customer, a system or a typo. Left as-is pending an answer rather than guessed.' },
 ];
 
 const CUSTOMERS = [

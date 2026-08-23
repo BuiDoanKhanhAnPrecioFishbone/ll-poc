@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import {
   flexRender, getCoreRowModel, getSortedRowModel, useReactTable,
   type ColumnDef, type SortingState,
@@ -39,7 +40,7 @@ const DENSITY_OPTIONS = [
  */
 export function DataGrid<T extends { id: string | number }>({
   data, columns, title, subtitle, actions, filters,
-  defaultDensity = 'comfortable', searchPlaceholder = 'Search', onRowClick, emptyHint, loading,
+  defaultDensity = 'comfortable', searchPlaceholder = 'Search', rowHref, onOpenRow, emptyHint, loading,
 }: {
   data: T[];
   columns: ColumnSpec<T>[];
@@ -49,7 +50,22 @@ export function DataGrid<T extends { id: string | number }>({
   filters?: ReactNode;
   defaultDensity?: Density;
   searchPlaceholder?: string;
-  onRowClick?: (row: T) => void;
+  /**
+   * Opening a record hangs off the IDENTIFIER, not the row.
+   *
+   * The row used to be the click target — it saved a column over the live
+   * system's eye-icon button. But a drag to select text ends in mouseup on the
+   * row, which fired the click and navigated away, so copying a part number or
+   * a customer name out of the grid was effectively impossible. That is a daily
+   * task for the people using this screen, and it outranks saving a pointer trip.
+   *
+   * The identifier is already the record's name, so making it the link needs no
+   * extra column and reads as an affordance without explanation. `rowHref`
+   * renders a real anchor — middle-click, open-in-new-tab and copy-link all
+   * work. `onOpenRow` is for records that open in a dialog rather than a route.
+   */
+  rowHref?: (row: T) => string;
+  onOpenRow?: (row: T) => void;
   emptyHint?: string;
   /** Loading, empty and error are three distinct states, not one. */
   loading?: boolean;
@@ -73,12 +89,28 @@ export function DataGrid<T extends { id: string | number }>({
     return data.filter(r => searchFields.some(f => String(r[f] ?? '').toLowerCase().includes(n)));
   }, [data, search, searchFields]);
 
+  /* The first ident column becomes the open affordance. Every other cell stays
+     inert text so it can be selected and copied. */
+  const identField = visible.find(c => c.role === 'ident')?.field;
+
   const tableColumns = useMemo<ColumnDef<T>[]>(() => visible.map(spec => ({
     id: spec.field,
     accessorKey: spec.field,
     header: spec.title,
     size: widthOf(spec),
-    cell: ctx => renderCell(spec, ctx.row.original),
+    cell: ctx => {
+      const row = ctx.row.original;
+      if (spec.field === identField && !spec.render) {
+        const label = String(row[spec.field]);
+        if (rowHref) return <Link className="vy-cell-link vy-ident" to={rowHref(row)}>{label}</Link>;
+        if (onOpenRow) return (
+          <button type="button" className="vy-cell-link vy-ident" onClick={() => onOpenRow(row)}>
+            {label}
+          </button>
+        );
+      }
+      return renderCell(spec, row);
+    },
     sortingFn: spec.role === 'date' ? 'datetime' : 'auto',
   })), [visible]);
 
@@ -185,10 +217,7 @@ export function DataGrid<T extends { id: string | number }>({
                   const row = rows[vi.index];
                   return (
                     <div key={row.id} className="vy-tr" role="row"
-                         style={{ transform: `translateY(${vi.start}px)`, height: rowH, gridTemplateColumns: template }}
-                         onClick={() => onRowClick?.(row.original)}
-                         tabIndex={onRowClick ? 0 : undefined}
-                         onKeyDown={e => { if (onRowClick && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); onRowClick(row.original); } }}>
+                         style={{ transform: `translateY(${vi.start}px)`, height: rowH, gridTemplateColumns: template }}>
                       {row.getVisibleCells().map(cell => {
                         const spec = visible.find(v => v.field === cell.column.id)!;
                         return (

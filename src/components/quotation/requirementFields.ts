@@ -13,6 +13,12 @@ export const COMMERCIAL: FieldDef<Quotation>[] = [
     options: ['Production', 'Prototype', 'NPI', 'Re-quote'] },
   { name: 'orderType', label: 'Order type', kind: 'select', options: ['New', 'Repeat'] },
   { name: 'rfqType', label: 'RFQ type', kind: 'select', options: ['Consigned', 'Turnkey', 'Mixed'] },
+  /* The live system carries BOTH "Customer Type" (header) and "RFQ Type" (list
+     grid), and both hold Consigned/Turnkey/Mixed. They may be the same field
+     twice or two genuinely different ones — that is a question for the
+     business, not something to resolve by guessing, so both are kept. */
+  { name: 'customerType', label: 'Customer type', kind: 'select', options: ['Consigned', 'Turnkey', 'Mixed'],
+    hint: 'Held separately from RFQ type in the current system.' },
   { name: 'customerContact', label: 'Customer contact', kind: 'text' },
   { name: 'historicalRfq', label: 'Previous RFQ', kind: 'text',
     hint: 'The RFQ this one is re-quoting, if any.' },

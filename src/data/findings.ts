@@ -44,7 +44,7 @@ export const findings: Finding[] = [
     title: 'A whole column is spent on an eye icon because rows are not clickable',
     evidence: 'Both the Part Master and the Sales Order list reserve a 60px leading column for a single view button; the row itself has no click behaviour.',
     impact: 'A 60px column and an extra pointer trip on every record open.',
-    fix: 'Make the row open the record. Reserve leading columns for selection only.',
+    fix: 'Make the IDENTIFIER the link, not the row. REVISED 22 Aug 2026 — this first read "make the row open the record", which is wrong: users copy values out of the grid daily, and a drag to select ends in mouseup on the row, firing the click and navigating away. Linking the identifier costs no column, keeps every cell selectable, and gives a visible affordance. Verified against the customer, who raised the copy case.',
   },
   {
     id: 'T5', area: 'Tables', effort: 'Low', value: 'Medium',

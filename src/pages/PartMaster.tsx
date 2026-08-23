@@ -33,7 +33,7 @@ export function PartMaster() {
           <Button variant="filled" onClick={() => toast.notImplemented('open a blank part record')}>New Part</Button>
         </>}
         loading={loading}
-        onRowClick={setSelected}
+        onOpenRow={setSelected}
       />
 
       {selected && (

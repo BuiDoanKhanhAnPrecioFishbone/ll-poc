@@ -20,6 +20,9 @@ const RESULT_COLUMNS: ColumnSpec<QuoteResult>[] = [
   { field: 'lastRunVersion', title: 'Version', role: 'code', render: r => <span className="vy-code">{r.lastRunVersion}</span> },
   { field: 'lastRunDate', title: 'Last Run', role: 'date', render: r => fmtDate(r.lastRunDate) },
   { field: 'lastRunBy', title: 'Run By', role: 'code', width: 140, widthNote: 'Full names.' },
+  /* Present on the live grid; it was dropped in an earlier pass. It is how you
+     tell which BoM version produced a given price. */
+  { field: 'bomFile', title: 'BoM File', role: 'text' },
 ];
 
 /**
