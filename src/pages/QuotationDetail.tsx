@@ -92,9 +92,7 @@ export function QuotationDetail() {
   }
   /* Tab labels carry counts so the record's state is legible without opening
      each tab. The live TabStrip gives five bare nouns. */
-  const checklistOutstanding =
-    [...Object.values(q.programChecklist), ...Object.values(q.engineeringChecklist)]
-      .filter(v => v === 'Not started' || v === 'In progress').length;
+  const checklistOutstanding = q.tasks.filter(t => t.status !== 'Done').length;
 
   return (
     <div className="vy-page vy-page--record">

@@ -65,9 +65,8 @@ export type Quotation = {
   programManager: string;
   buyer: string;
   engineer: string;
-  programChecklist: Record<string, ChecklistState>;
-  engineeringChecklist: Record<string, ChecklistState>;
-  documents: RfqDocument[];
+  /** Which checklist items apply to this RFQ. Each selected one becomes a task. */
+  tasks: ChecklistTask[];
 
   /* --- Quotation Result tab --------------------------------------------- */
   results: QuoteResult[];
@@ -79,17 +78,30 @@ export type Quotation = {
   activity: ActivityEntry[];
 };
 
-export type ChecklistState = 'Not started' | 'In progress' | 'Done' | 'N/A';
+/**
+ * A checklist item that has been SELECTED becomes a task with its own state.
+ *
+ * Verified against the live system on 22 Aug 2026: the ticked checklist items
+ * are exactly the rows of the grid beside them. Ticking "Assembly Drive" adds
+ * an "Assembly Drive" task; the grid then carries its document, assignee and
+ * status. The tick means "this applies to this RFQ", NOT "this is finished".
+ *
+ * This mockup previously modelled them as two unrelated things — a checklist of
+ * done/not-done, and a separate list of documents — and reported progress as
+ * "3 of 5 done", which measured something the system does not track.
+ */
+export type TaskStatus = 'To do' | 'In progress' | 'Done';
 
-export type RfqDocument = {
-  id: string;
+export type ChecklistTask = {
+  /** The checklist item this task came from. */
   type: string;
-  name: string;
+  documentName: string;
   uploadedBy: string;
-  uploadedDate: Date;
+  uploadedDate: Date | null;
   assignee: string;
-  status: 'Pending' | 'In-Progress' | 'Completed';
+  status: TaskStatus;
 };
+
 
 export type QuoteResult = {
   id: string;
@@ -190,8 +202,7 @@ const PROJECT_TYPES = ['Production', 'Prototype', 'NPI', 'Re-quote'];
 
 /** The mockup's "now". One constant, so dates cannot disagree between screens. */
 export const TODAY = new Date(2026, 7, 19);
-const CHECK_STATES: ChecklistState[] = ['Not started', 'In progress', 'Done', 'Done', 'N/A'];
-const DOC_TYPES = ['Assembly Drawing', 'BoM', 'Fab Drawing', 'Test Spec', 'Customer RFQ'];
+const TASK_STATUSES: TaskStatus[] = ['To do', 'To do', 'In progress', 'Done'];
 const RESULT_DESC = [
   'Main controller assembly', 'Power distribution board', 'Sensor interface PCBA',
   'Backplane assembly', 'RF front-end module',
@@ -280,23 +291,21 @@ export function generateQuotations(count = 330): Quotation[] {
       programManager: pick(OWNERS),
       buyer: pick(OWNERS),
       engineer: rnd() > 0.3 ? pick(OWNERS) : '',
-      programChecklist: Object.fromEntries(PROGRAM_CHECKLIST.map(k => [k, pick(CHECK_STATES)])),
-      engineeringChecklist: Object.fromEntries(ENGINEERING_CHECKLIST.map(k => [k, pick(CHECK_STATES)])),
-      documents: Array.from({ length: Math.floor(rnd() * 4) }, (_, j) => {
-        /* The type is chosen once and the filename derives from it. Picking
-           twice produced documents called BoM-*.pdf typed "Test Spec". */
-        const type = pick(DOC_TYPES);
-        const ext = type === 'BoM' ? 'xlsx' : 'pdf';
-        return {
-          id: `doc-${i}-${j}`,
-          type,
-          name: `${type.replace(/\s+/g, '-')}-${cust.slice(0, 5)}-v${1 + Math.floor(rnd() * 3)}.${ext}`,
-          uploadedBy: pick(OWNERS),
-          uploadedDate: withHour(new Date(created.getTime() + j * 86400000), 10 + j),
-          assignee: pick(OWNERS),
-          status: pick(['Pending', 'In-Progress', 'Completed'] as const),
-        };
-      }),
+      /* A handful of the checklist items are selected; each is a task. */
+      tasks: [...PROGRAM_CHECKLIST, ...ENGINEERING_CHECKLIST]
+        .filter(() => rnd() > 0.62)
+        .map((type, j) => {
+          const status = pick(TASK_STATUSES);
+          const hasDoc = status !== 'To do' && rnd() > 0.35;
+          return {
+            type,
+            documentName: hasDoc ? `${type.replace(/[^A-Za-z]+/g, '-')}-${cust.slice(0, 5)}.xlsx` : '',
+            uploadedBy: hasDoc ? pick(OWNERS) : '',
+            uploadedDate: hasDoc ? withHour(new Date(created.getTime() + (j + 1) * 86400000), 10 + j) : null,
+            assignee: pick(OWNERS),
+            status,
+          };
+        }),
       /* Only quoted/completed RFQs have results — a New one has never been run. */
       results: (status === 'Quoted' || status === 'Completed')
         ? Array.from({ length: 1 + Math.floor(rnd() * 3) }, (_, j) => {

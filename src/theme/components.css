@@ -496,3 +496,13 @@
 .vy-assignee-picker { display: flex; align-items: center; gap: var(--vy-space-3); margin-top: var(--vy-space-2); }
 .vy-assignee-picker .vy-select { flex: 1; min-width: 0; }
 .vy-assignee-warn { display: block; margin-top: var(--vy-space-2); font-size: var(--vy-text-xs); color: var(--vy-accent-warning); }
+
+/* --- Checklist tasks ---------------------------------------------------------
+   The ticked checklist items are the task rows. Selecting an item is choosing
+   that it applies to this RFQ; the row then carries its document, assignee and
+   status. */
+.vy-tasks { min-width: 0; }
+.vy-checklist-items li[data-selected] .vy-check-name { color: var(--vy-grey-900); font-weight: var(--vy-weight-medium); }
+.vy-assignees > section + section { border-top: 1px solid var(--vy-grey-200); padding-top: var(--vy-space-7); }
+.vy-minitable .vy-select { min-width: 0; width: 100%; font-size: var(--vy-text-sm); padding: var(--vy-space-2) var(--vy-space-4); }
+.vy-minitable-row .vy-td { overflow: visible; }
