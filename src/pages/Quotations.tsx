@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@progress/kendo-react-buttons';
-import { Rating } from '@progress/kendo-react-inputs';
-import { Chip } from '@progress/kendo-react-buttons';
-import { StandardGrid, fmtDate } from '../components/StandardGrid';
-import { useToast } from '../components/Toast';
+import { Button } from '../ui/Button';
+import { Chip } from '../ui/Chip';
+import { Rating } from '../ui/Rating';
+import { DataGrid, fmtDate } from '../ui/DataGrid';
+import { useToast } from '../ui/Toast';
 import { generateQuotations, QUOTATION_COLUMNS, daysUntil, type Quotation } from '../data/quotations';
 
 const OWNER = 'Huyen NTN';
@@ -38,7 +38,7 @@ export function Quotations() {
     if (c.field === 'priority') return {
       ...c,
       render: (q: Quotation) => (
-        <Rating value={q.priority} max={3} readonly aria-label={`Priority ${q.priority} of 3`} />
+        <Rating value={q.priority} max={3} />
       ),
     };
     if (c.field === 'dateNeeded') return {
@@ -61,33 +61,28 @@ export function Quotations() {
   }), []);
 
   return (
-    <StandardGrid
+    <DataGrid
       data={data}
       columns={columns}
       title="Quotations"
       subtitle={<>RFQs{overdue > 0 && <> · <strong className="vy-alert-count">{overdue} overdue</strong></>}</>}
       searchPlaceholder="Search RFQ number, project or customer"
       defaultDensity="compact"
-      defaultSort={[{ field: 'dateNeeded', dir: 'asc' }]}
       actions={<>
-        <Button themeColor="base"
-                onClick={() => toast.notImplemented(`export these ${data.length} RFQs to Excel`)}>
+        <Button onClick={() => toast.notImplemented(`export these ${data.length} RFQs to Excel`)}>
           Export
         </Button>
-        <Button themeColor="primary"
+        <Button variant="filled"
                 onClick={() => toast.notImplemented('open a blank RFQ form for a new customer enquiry')}>
           New RFQ
         </Button>
       </>}
       filters={<>
         <span className="vy-filter-label">Showing</span>
-        <Chip text={`Assigned to ${OWNER}`} removable={mineOnly}
-              selected={mineOnly} onClick={() => setMineOnly(m => !m)} />
-        <Chip text="Open only" removable={openOnly}
-              selected={openOnly} onClick={() => setOpenOnly(o => !o)} />
+        <Chip label={`Assigned to ${OWNER}`} selected={mineOnly} onClick={() => setMineOnly(m => !m)} />
+        <Chip label="Open only" selected={openOnly} onClick={() => setOpenOnly(o => !o)} />
         {(mineOnly || openOnly) && (
-          <Button fillMode="flat" themeColor="primary"
-                  onClick={() => { setMineOnly(false); setOpenOnly(false); }}>
+          <Button variant="text" onClick={() => { setMineOnly(false); setOpenOnly(false); }}>
             Show all {all.length}
           </Button>
         )}

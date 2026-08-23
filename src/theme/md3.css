@@ -1,0 +1,101 @@
+/* =============================================================================
+   MATERIAL 3 — STRUCTURE ONLY
+   -----------------------------------------------------------------------------
+   Material Design 3 gives this system its structural vocabulary: an elevation
+   ladder, state layers, motion curves and a shape scale. It does NOT give it
+   colour. Every value below resolves to a Voyager token, so the result reads as
+   Linh Long's system rather than a Google app wearing a different palette.
+
+   What is borrowed, and why:
+     Elevation    5 levels, so "how far off the page is this?" has one answer
+     State layers a single hover/focus/press treatment for every interactive
+                  surface, instead of each component inventing its own
+     Motion       emphasised easing — things leave fast and arrive slow, which
+                  is what makes an interface feel responsive rather than sluggish
+     Shape        a corner scale tied to component size
+
+   What is deliberately NOT borrowed: Material's palette, its 14-step type ramp
+   (an ERP grid needs 6 sizes, not 14), and its 48dp touch targets (this is a
+   desktop system used with a mouse for hours; 48dp everywhere wastes the
+   vertical space the density work just recovered).
+   ========================================================================== */
+
+:root {
+  /* --- Elevation ------------------------------------------------------------
+     MD3's five levels. Shadows are tinted with the brand blue rather than pure
+     black: neutral-grey shadows over a warm-white surface read as dirt. */
+  --vy-elev-0: none;
+  --vy-elev-1: 0 1px 2px rgba(19, 24, 32, .06), 0 1px 3px 1px rgba(27, 79, 156, .06);
+  --vy-elev-2: 0 1px 2px rgba(19, 24, 32, .08), 0 2px 6px 2px rgba(27, 79, 156, .07);
+  --vy-elev-3: 0 4px 8px 3px rgba(27, 79, 156, .08), 0 1px 3px rgba(19, 24, 32, .10);
+  --vy-elev-4: 0 6px 10px 4px rgba(27, 79, 156, .09), 0 2px 3px rgba(19, 24, 32, .10);
+  --vy-elev-5: 0 8px 12px 6px rgba(27, 79, 156, .10), 0 4px 4px rgba(19, 24, 32, .12);
+
+  /* --- State layers ---------------------------------------------------------
+     MD3 expresses interaction as a translucent layer over the base colour, at
+     fixed opacities. One rule for every control: nothing invents its own hover. */
+  --vy-state-hover:    .08;
+  --vy-state-focus:    .12;
+  --vy-state-press:    .12;
+  --vy-state-drag:     .16;
+  --vy-state-disabled: .38;   /* MD3 disabled content opacity */
+
+  --vy-state-on-light: 27, 79, 156;   /* brand blue, as an rgb triplet */
+  --vy-state-on-dark:  255, 255, 255;
+
+  /* --- Motion ---------------------------------------------------------------
+     MD3 "emphasised" easing. Asymmetric on purpose: leaving is quicker than
+     arriving, which reads as responsive rather than laggy. */
+  --vy-ease-standard:     cubic-bezier(.2, 0, 0, 1);
+  --vy-ease-emphasised:   cubic-bezier(.2, 0, 0, 1);
+  --vy-ease-decelerate:   cubic-bezier(0, 0, 0, 1);
+  --vy-ease-accelerate:   cubic-bezier(.3, 0, 1, 1);
+
+  --vy-dur-short:  100ms;   /* state changes: hover, focus */
+  --vy-dur-medium: 200ms;   /* small components entering */
+  --vy-dur-long:   300ms;   /* dialogs, drawers */
+
+  /* --- Shape ----------------------------------------------------------------
+     Tied to component size rather than chosen per component. */
+  --vy-shape-none:  0;
+  --vy-shape-xs:    2px;
+  --vy-shape-sm:    4px;    /* the house radius — buttons, inputs, cells */
+  --vy-shape-md:    8px;    /* cards, panels */
+  --vy-shape-lg:    12px;   /* dialogs */
+  --vy-shape-xl:    16px;
+  --vy-shape-full:  999px;  /* chips, badges, pills */
+
+  /* --- Focus ring -----------------------------------------------------------
+     One ring, everywhere, and it never relies on colour alone. */
+  --vy-focus-ring: 0 0 0 2px var(--vy-grey-0), 0 0 0 4px var(--vy-blue-500);
+}
+
+/* A single state-layer implementation. Any interactive surface opts in with
+   `data-state-layer`, and gets identical hover/press behaviour for free. */
+[data-state-layer] { position: relative; isolation: isolate; }
+[data-state-layer]::after {
+  content: ''; position: absolute; inset: 0; z-index: -1;
+  border-radius: inherit; pointer-events: none;
+  background: rgb(var(--vy-state-on-light));
+  opacity: 0;
+  transition: opacity var(--vy-dur-short) var(--vy-ease-standard);
+}
+[data-state-layer]:hover::after           { opacity: var(--vy-state-hover); }
+[data-state-layer]:active::after          { opacity: var(--vy-state-press); }
+[data-state-layer][data-on-dark]::after   { background: rgb(var(--vy-state-on-dark)); }
+
+/* Focus is always visible and never colour-only: the ring has its own geometry. */
+:where(button, a, input, textarea, select, [tabindex]):focus-visible {
+  outline: none;
+  box-shadow: var(--vy-focus-ring);
+  border-radius: var(--vy-shape-sm);
+}
+
+/* Respect the OS setting. Motion is decoration; nothing here depends on it. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}

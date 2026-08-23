@@ -8,7 +8,7 @@ import { SitemapPage } from './pages/Sitemap';
 import { DesignSystemPage } from './pages/DesignSystem';
 import { AuditPage } from './pages/Audit';
 import { Placeholder } from './pages/Placeholder';
-import { ToastProvider } from './components/Toast';
+import { ToastProvider } from './ui/Toast';
 import { Navigate } from 'react-router-dom';
 
 /** Preserves the record id when redirecting the old path to the canonical one. */

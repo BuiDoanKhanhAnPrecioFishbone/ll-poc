@@ -241,7 +241,6 @@
    too generously at 1024x768, costing a row of data on every laptop. Flex
    measures instead of guessing, so the number is gone rather than tokenised. */
 .vy-page--list { display: flex; flex-direction: column; height: 100%; min-height: 0; }
-.vy-page--list .k-grid { flex: 1 1 auto; min-height: 0; }
 
 
 /* =============================================================================
@@ -267,15 +266,11 @@
    is stock and unmodified. See docs/gap-register.md. */
 .vy-status-slot { display: inline-flex; justify-content: center; width: var(--vy-status-slot-w); }
 
-/* GAP-02 (approved 21 Aug 2026, option b) — Kendo `Rating` renders 32px tall:
-   .k-rating-item carries 4px padding around a 24px glyph. That put a 36px floor
-   on any row containing one, so compact density was unreachable on Quotations
-   and the density control promised something it could not deliver.
-
-   This is the ONLY rule in the repo that reaches into a Kendo internal class.
-   It is scoped to compact density, so Rating is untouched everywhere else.
-   See docs/gap-register.md. */
-[data-density="compact"] .k-grid .k-rating-item { padding: 0; }
+/* GAP-02 is retired. It existed because the component library's Rating carried
+   4px of internal padding that forced a 36px row floor, making compact density
+   unreachable on Quotations. Our own Rating inherits the row height, so the
+   28px compact row works with a rating in it and no override is needed. The
+   entry stays in the GAP register as history. */
 
 /* =============================================================================
    RECORD SCREEN

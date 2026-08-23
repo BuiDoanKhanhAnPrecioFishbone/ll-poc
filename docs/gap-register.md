@@ -7,8 +7,8 @@ a bug — either it belongs to a token, or it was never approved.
 
 | ID | Screen | Need | Decision | Status |
 | --- | --- | --- | --- | --- |
-| GAP-01 | Quotations, Part Master | Constant-width status column | (b) fixed-width slot | **Approved** 21 Aug 2026 |
-| GAP-02 | Quotations | Compact density in a row containing a Rating | (b) tighten rating padding under compact | **Approved** 21 Aug 2026 |
+| GAP-01 | Quotations, Part Master | Constant-width status column | (b) fixed-width slot | **Retired** 22 Aug 2026 — now a token |
+| GAP-02 | Quotations | Compact density in a row containing a Rating | (b) tighten rating padding under compact | **Retired** 22 Aug 2026 — no library to fight |
 
 ---
 
@@ -63,3 +63,29 @@ screen, which is the kind of drift a design system exists to prevent.
 
 Extending the padding reduction to comfortable (`padding: 2px`) would bring it to 36px and make
 density consistent across screens. **Not written — it is beyond what was approved here.**
+
+
+---
+
+## Both gaps retired, 22 Aug 2026
+
+The customer removed the single-library constraint, so the component layer moved
+to headless primitives (TanStack Table, Radix) styled entirely from our tokens.
+
+Both gaps existed **only because a third-party component would not do what the
+design needed**:
+
+- **GAP-01** wanted a constant-width status pill; `Badge` sized to its content
+  and exposed no width prop. Our own badge takes a width token. No workaround.
+- **GAP-02** wanted 28px compact rows; `Rating` carried 4px of internal padding
+  that forced a 36px floor, and the fix reached into a Kendo internal class.
+  Our own `Rating` inherits the row height. Measured after the migration:
+  **29px compact rows with a rating in them.**
+
+Worth keeping as history: this is the clearest measure of what the constraint
+was costing. Two approved deviations, one of them touching a library internal,
+both of which simply stopped existing when the library did.
+
+The register stays in force — a GAP is now raised whenever a design needs
+something a **headless primitive** cannot express, or whenever a rule would
+reach into Radix's or TanStack's internals.

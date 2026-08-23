@@ -1,0 +1,238 @@
+/* =============================================================================
+   COMPONENT LAYER
+   -----------------------------------------------------------------------------
+   Appearance for the headless primitives in src/ui. Structure follows Material 3
+   (md3.css); every value resolves to a Voyager token (tokens.css).
+   ========================================================================== */
+
+/* --- Button ---------------------------------------------------------------
+   MD3 variant ladder: emphasis is carried by the variant, not by colour alone. */
+.vy-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--vy-space-3);
+  font-family: inherit; font-size: var(--vy-text-base); font-weight: var(--vy-weight-medium);
+  border-radius: var(--vy-shape-full); border: 1px solid transparent;
+  padding: var(--vy-space-3) var(--vy-space-8); cursor: pointer; white-space: nowrap;
+  transition: background-color var(--vy-dur-short) var(--vy-ease-standard),
+              border-color var(--vy-dur-short) var(--vy-ease-standard),
+              box-shadow var(--vy-dur-short) var(--vy-ease-standard);
+}
+.vy-btn--sm { padding: var(--vy-space-1) var(--vy-space-5); font-size: var(--vy-text-sm); }
+.vy-btn:disabled { opacity: var(--vy-state-disabled); cursor: not-allowed; }
+.vy-btn:disabled::after { display: none; }
+
+.vy-btn--filled   { background: var(--vy-blue-600); color: var(--vy-on-dark-fg); box-shadow: var(--vy-elev-1); }
+.vy-btn--filled:hover  { box-shadow: var(--vy-elev-2); }
+.vy-btn--tonal    { background: var(--vy-blue-50); color: var(--vy-blue-800); }
+.vy-btn--outlined { background: var(--vy-grey-0); color: var(--vy-grey-800); border-color: var(--vy-grey-300); }
+.vy-btn--outlined:hover { border-color: var(--vy-grey-400); }
+.vy-btn--text     { background: transparent; color: var(--vy-blue-700); padding-inline: var(--vy-space-5); }
+.vy-btn--danger   { background: var(--vy-red-600); color: var(--vy-on-dark-fg); box-shadow: var(--vy-elev-1); }
+.vy-btn-icon { display: inline-flex; }
+
+/* --- Badge / pill ---------------------------------------------------------
+   Fixed width so a status column scans as a straight edge. This was GAP-01
+   against the old library; with our own component it is simply a token. */
+.vy-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: var(--vy-status-slot-w); padding: var(--vy-space-1) var(--vy-space-4);
+  font-size: var(--vy-text-xs); font-weight: var(--vy-weight-semibold);
+  border-radius: var(--vy-shape-full); white-space: nowrap;
+}
+.vy-badge[data-token="draft"]     { color: var(--vy-status-draft-fg);     background: var(--vy-status-draft-bg); }
+.vy-badge[data-token="open"]      { color: var(--vy-status-open-fg);      background: var(--vy-status-open-bg); }
+.vy-badge[data-token="progress"]  { color: var(--vy-status-progress-fg);  background: var(--vy-status-progress-bg); }
+.vy-badge[data-token="done"]      { color: var(--vy-status-done-fg);      background: var(--vy-status-done-bg); }
+.vy-badge[data-token="blocked"]   { color: var(--vy-status-blocked-fg);   background: var(--vy-status-blocked-bg); }
+.vy-badge[data-token="cancelled"] { color: var(--vy-status-cancelled-fg); background: var(--vy-status-cancelled-bg); }
+.vy-pill { font-size: var(--vy-text-xs); color: var(--vy-grey-600); background: var(--vy-grey-100); border-radius: var(--vy-shape-full); padding: 1px var(--vy-space-4); }
+
+/* --- Chip ------------------------------------------------------------------ */
+.vy-chip {
+  display: inline-flex; align-items: center; gap: var(--vy-space-2);
+  font-family: inherit; font-size: var(--vy-text-base); color: var(--vy-grey-700);
+  background: var(--vy-grey-0); border: 1px solid var(--vy-grey-300);
+  border-radius: var(--vy-shape-sm); padding: var(--vy-space-2) var(--vy-space-5); cursor: pointer;
+  transition: background-color var(--vy-dur-short) var(--vy-ease-standard);
+}
+.vy-chip[data-selected] { background: var(--vy-blue-50); border-color: var(--vy-blue-300); color: var(--vy-blue-800); font-weight: var(--vy-weight-medium); }
+.vy-chip-check { color: var(--vy-blue-600); }
+
+/* --- Fields ---------------------------------------------------------------- */
+.vy-field-control { display: flex; flex-direction: column; gap: var(--vy-space-2); }
+.vy-field-label { font-size: var(--vy-text-sm); color: var(--vy-grey-600); }
+.vy-field-hint  { font-size: var(--vy-text-xs); color: var(--vy-grey-500); }
+.vy-input {
+  font-family: inherit; font-size: var(--vy-text-base); color: var(--vy-grey-900);
+  background: var(--vy-grey-0); border: 1px solid var(--vy-grey-300);
+  border-radius: var(--vy-shape-sm); padding: var(--vy-space-4) var(--vy-space-5); width: 100%;
+  transition: border-color var(--vy-dur-short) var(--vy-ease-standard);
+}
+.vy-input:hover { border-color: var(--vy-grey-400); }
+.vy-input:focus { border-color: var(--vy-blue-500); outline: none; box-shadow: var(--vy-focus-ring); }
+.vy-textarea { resize: vertical; min-height: calc(var(--vy-space-14) * 2); line-height: 1.5; }
+.vy-search-field { position: relative; display: flex; align-items: center; flex: 1; max-width: var(--vy-search-w); }
+.vy-search-field svg { position: absolute; left: var(--vy-space-5); color: var(--vy-grey-500); pointer-events: none; }
+.vy-search-field .vy-input { padding-left: var(--vy-space-12); }
+
+/* --- Select / menu --------------------------------------------------------- */
+.vy-select {
+  display: inline-flex; align-items: center; justify-content: space-between; gap: var(--vy-space-4);
+  font-family: inherit; font-size: var(--vy-text-base); color: var(--vy-grey-900);
+  background: var(--vy-grey-0); border: 1px solid var(--vy-grey-300);
+  border-radius: var(--vy-shape-sm); padding: var(--vy-space-4) var(--vy-space-5); cursor: pointer; min-width: var(--vy-card-min-w);
+}
+.vy-menu { background: var(--vy-grey-0); border: 1px solid var(--vy-grey-200); border-radius: var(--vy-shape-md); box-shadow: var(--vy-elev-3); padding: var(--vy-space-2); z-index: var(--vy-z-palette); }
+.vy-menu-item { font-size: var(--vy-text-base); color: var(--vy-grey-800); padding: var(--vy-space-3) var(--vy-space-5); border-radius: var(--vy-shape-sm); cursor: pointer; outline: none; }
+.vy-menu-item[data-highlighted] { background: var(--vy-blue-50); }
+
+/* --- Checkbox / radio ------------------------------------------------------ */
+.vy-check, .vy-radio { display: flex; align-items: center; gap: var(--vy-space-4); font-size: var(--vy-text-base); color: var(--vy-grey-800); cursor: pointer; }
+.vy-check-box, .vy-radio-dot {
+  display: grid; place-items: center; flex: 0 0 auto;
+  width: var(--vy-space-9); height: var(--vy-space-9);
+  background: var(--vy-grey-0); border: 1px solid var(--vy-grey-400); color: var(--vy-on-dark-fg);
+  cursor: pointer; transition: background-color var(--vy-dur-short) var(--vy-ease-standard);
+}
+.vy-check-box { border-radius: var(--vy-shape-xs); }
+.vy-radio-dot { border-radius: var(--vy-shape-full); }
+.vy-check-box[data-state="checked"] { background: var(--vy-blue-600); border-color: var(--vy-blue-600); }
+.vy-radio-dot[data-state="checked"] { border-color: var(--vy-blue-600); border-width: var(--vy-border-emphasis); }
+.vy-radio-fill { width: var(--vy-space-4); height: var(--vy-space-4); border-radius: var(--vy-shape-full); background: var(--vy-blue-600); }
+.vy-radios { display: flex; flex-direction: column; gap: var(--vy-space-4); }
+
+/* --- Segmented control ----------------------------------------------------- */
+.vy-segmented { display: inline-flex; border: 1px solid var(--vy-grey-300); border-radius: var(--vy-shape-sm); overflow: hidden; background: var(--vy-grey-0); }
+.vy-segment {
+  font-family: inherit; font-size: var(--vy-text-sm); color: var(--vy-grey-700);
+  background: transparent; border: 0; border-right: 1px solid var(--vy-grey-200);
+  padding: var(--vy-space-3) var(--vy-space-6); cursor: pointer;
+}
+.vy-segment:last-child { border-right: 0; }
+.vy-segment[data-state="on"] { background: var(--vy-blue-600); color: var(--vy-on-dark-fg); font-weight: var(--vy-weight-medium); }
+
+/* --- Progress -------------------------------------------------------------- */
+.vy-progress { position: relative; overflow: hidden; width: 100%; height: var(--vy-space-3); background: var(--vy-grey-200); border-radius: var(--vy-shape-full); }
+.vy-progress-bar { height: 100%; background: var(--vy-accent-positive); border-radius: inherit; transition: width var(--vy-dur-medium) var(--vy-ease-decelerate); }
+
+/* --- Dialog ---------------------------------------------------------------- */
+.vy-scrim { position: fixed; inset: 0; background: var(--vy-overlay-scrim); z-index: var(--vy-z-palette); animation: vy-fade var(--vy-dur-medium) var(--vy-ease-standard); }
+.vy-dialog {
+  position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: min(var(--vy-dialog-md), 94vw); max-height: 88vh; display: flex; flex-direction: column;
+  background: var(--vy-grey-0); border-radius: var(--vy-shape-lg); box-shadow: var(--vy-elev-5);
+  z-index: var(--vy-z-palette); animation: vy-rise var(--vy-dur-long) var(--vy-ease-emphasised);
+}
+.vy-dialog[data-size="lg"] { width: min(var(--vy-dialog-lg), 94vw); }
+.vy-dialog[data-size="xl"] { width: min(var(--vy-dialog-xl), 96vw); }
+.vy-dialog-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--vy-space-8); padding: var(--vy-space-8) var(--vy-space-9) var(--vy-space-5); border-bottom: 1px solid var(--vy-grey-200); }
+.vy-dialog-title { font-size: var(--vy-text-lg); font-weight: var(--vy-weight-bold); color: var(--vy-grey-900); margin: 0; }
+.vy-dialog-sub { font-size: var(--vy-text-base); color: var(--vy-grey-500); margin: var(--vy-space-2) 0 0; }
+.vy-dialog-body { padding: var(--vy-space-9); overflow-y: auto; flex: 1; }
+.vy-dialog-actions { display: flex; justify-content: flex-end; gap: var(--vy-space-4); padding: var(--vy-space-5) var(--vy-space-9) var(--vy-space-8); border-top: 1px solid var(--vy-grey-200); }
+@keyframes vy-fade { from { opacity: 0 } to { opacity: 1 } }
+@keyframes vy-rise { from { opacity: 0; transform: translate(-50%, calc(-50% + var(--vy-space-6))) } to { opacity: 1; transform: translate(-50%, -50%) } }
+
+/* --- Tabs ------------------------------------------------------------------ */
+.vy-tablist { display: flex; gap: var(--vy-space-1); border-bottom: 1px solid var(--vy-grey-200); margin-bottom: var(--vy-space-9); overflow-x: auto; }
+.vy-tab {
+  font-family: inherit; font-size: var(--vy-text-base); font-weight: var(--vy-weight-medium);
+  color: var(--vy-grey-600); background: transparent; border: 0;
+  border-bottom: var(--vy-border-emphasis) solid transparent; padding: var(--vy-space-5) var(--vy-space-7);
+  cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: var(--vy-space-3);
+  transition: color var(--vy-dur-short) var(--vy-ease-standard);
+}
+.vy-tab[data-state="active"] { color: var(--vy-blue-700); border-bottom-color: var(--vy-blue-600); }
+.vy-tab-count { font-size: var(--vy-text-xs); background: var(--vy-grey-100); color: var(--vy-grey-600); border-radius: var(--vy-shape-full); padding: 0 var(--vy-space-3); }
+.vy-tab[data-state="active"] .vy-tab-count { background: var(--vy-blue-100); color: var(--vy-blue-800); }
+
+/* =============================================================================
+   DATA GRID — virtualised
+   -----------------------------------------------------------------------------
+   CSS grid rather than a <table>: rows are absolutely positioned by the
+   virtualiser, which a table layout cannot express. Column alignment comes from
+   one shared grid-template built from the column-role tokens, so a cell cannot
+   drift out of line with its heading.
+   ========================================================================== */
+ /* A grid page fills the content area exactly and never scrolls itself: the
+    grid owns the only scrollbar. Using flex rather than height:100% avoids the
+    40px overflow that padding produced, which put a second scrollbar beside
+    the grid's own. */
+.vy-content:has(.vy-page--grid) { display: flex; flex-direction: column; overflow: hidden; }
+.vy-page--grid { flex: 1; min-height: 0; display: flex; flex-direction: column; padding-bottom: var(--vy-space-6); }
+.vy-page--grid .vy-grid-shell { flex: 1; min-height: 0; }
+.vy-grid-shell { background: var(--vy-grey-0); border: 1px solid var(--vy-grey-200); border-radius: var(--vy-shape-md); box-shadow: var(--vy-elev-1); overflow: hidden; display: flex; flex-direction: column; }
+.vy-grid-toolbar { display: flex; align-items: center; gap: var(--vy-space-5); padding: var(--vy-space-5) var(--vy-space-6); border-bottom: 1px solid var(--vy-grey-200); flex-wrap: wrap; }
+/* The grid fills whatever height its container has, rather than subtracting a
+   guessed offset from the viewport. The previous rule used
+   calc(100vh - var(--vy-grid-viewport-offset)); when that token went missing in
+   a refactor the calc became invalid, the whole declaration was dropped, and
+   the scroll container grew to 72,030px — so the virtualiser had nothing to
+   cull and put all 2,000 rows in the DOM. Flex has no value to lose. */
+.vy-grid-scroll { flex: 1; min-height: 0; overflow: auto; }
+.vy-grid-table { min-width: min-content; }
+
+.vy-grid-head { display: grid; position: sticky; top: 0; z-index: 2; background: var(--vy-grey-50); border-bottom: 1px solid var(--vy-grey-300); }
+.vy-th {
+  display: flex; align-items: center; gap: var(--vy-space-2);
+  font-family: inherit; font-size: var(--vy-text-xs); font-weight: var(--vy-weight-semibold);
+  letter-spacing: .04em; text-transform: uppercase; color: var(--vy-grey-600);
+  background: transparent; border: 0; border-right: 1px solid var(--vy-grey-200);
+  padding: var(--vy-space-4) var(--vy-space-5); cursor: pointer; text-align: left; white-space: nowrap;
+}
+.vy-th:last-child { border-right: 0; }
+.vy-th[data-sorted] { color: var(--vy-blue-700); }
+.vy-th[data-role="number"], .vy-th[data-role="money"], .vy-th[data-role="date"] { justify-content: flex-end; }
+.vy-sort { flex: 0 0 auto; }
+
+.vy-grid-body { position: relative; width: 100%; }
+.vy-tr {
+  display: grid; position: absolute; top: 0; left: 0; width: 100%;
+  align-items: center; border-bottom: 1px solid var(--vy-grey-100);
+  cursor: pointer;
+}
+.vy-tr:hover { background: var(--vy-blue-50); }
+.vy-tr:focus-visible { background: var(--vy-blue-50); outline: none; box-shadow: inset 0 0 0 var(--vy-border-emphasis) var(--vy-blue-500); }
+.vy-td {
+  display: flex; align-items: center; min-width: 0; height: 100%;
+  padding-inline: var(--vy-space-5); font-size: var(--vy-text-base); color: var(--vy-grey-800);
+}
+.vy-td[data-role="number"], .vy-td[data-role="money"], .vy-td[data-role="date"] {
+  justify-content: flex-end; font-variant-numeric: tabular-nums;
+}
+.vy-td[data-role="ident"] { font-family: var(--vy-font-mono); font-size: var(--vy-text-sm); color: var(--vy-grey-900); }
+.vy-td .vy-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.vy-grid-foot { display: flex; align-items: center; justify-content: space-between; gap: var(--vy-space-6); padding: var(--vy-space-4) var(--vy-space-6); border-top: 1px solid var(--vy-grey-200); font-size: var(--vy-text-sm); color: var(--vy-grey-600); background: var(--vy-grey-25); }
+.vy-grid-foot-hint { color: var(--vy-grey-400); font-size: var(--vy-text-xs); }
+
+/* --- Toast ----------------------------------------------------------------- */
+.vy-toasts { position: fixed; left: 50%; bottom: var(--vy-space-9); transform: translateX(-50%); display: flex; flex-direction: column; gap: var(--vy-space-4); z-index: var(--vy-z-palette); margin: 0; padding: 0; list-style: none; max-width: 92vw; }
+.vy-toast {
+  display: flex; align-items: flex-start; gap: var(--vy-space-5);
+  background: var(--vy-grey-900); color: var(--vy-on-dark-fg);
+  border-radius: var(--vy-shape-sm); box-shadow: var(--vy-elev-4);
+  padding: var(--vy-space-5) var(--vy-space-6); font-size: var(--vy-text-base);
+  animation: vy-toast-in var(--vy-dur-medium) var(--vy-ease-decelerate);
+}
+.vy-toast[data-kind="success"] { background: var(--vy-accent-positive); }
+.vy-toast[data-swipe="end"] { animation: vy-toast-out var(--vy-dur-short) var(--vy-ease-accelerate); }
+.vy-toast-text { margin: 0; }
+.vy-toast-close { background: none; border: 0; color: inherit; opacity: .7; cursor: pointer; padding: 0; display: inline-flex; }
+.vy-toast-close:hover { opacity: 1; }
+@keyframes vy-toast-in  { from { opacity: 0; transform: translateY(var(--vy-space-6)) } to { opacity: 1; transform: none } }
+@keyframes vy-toast-out { to { opacity: 0; transform: translateY(var(--vy-space-6)) } }
+
+/* --- Rating ---------------------------------------------------------------- */
+.vy-rating { display: inline-flex; gap: var(--vy-space-1); align-items: center; line-height: 1; }
+.vy-star { color: var(--vy-grey-300); flex: 0 0 auto; }
+.vy-star[data-on] { color: var(--vy-accent-caution); }
+
+/* --- Design-system page: elevation demo ------------------------------------ */
+.vy-elev-row { display: flex; gap: var(--vy-space-9); flex-wrap: wrap; padding: var(--vy-space-4) 0; }
+.vy-elev-swatch { width: var(--vy-space-14); height: var(--vy-space-14); border-radius: var(--vy-shape-md); background: var(--vy-grey-0); display: grid; place-items: center; font-size: var(--vy-text-sm); color: var(--vy-grey-500); }
+.vy-elev-swatch[data-level="0"] { box-shadow: var(--vy-elev-0); border: 1px solid var(--vy-grey-200); }
+.vy-elev-swatch[data-level="1"] { box-shadow: var(--vy-elev-1); }
+.vy-elev-swatch[data-level="2"] { box-shadow: var(--vy-elev-2); }
+.vy-elev-swatch[data-level="3"] { box-shadow: var(--vy-elev-3); }
+.vy-elev-swatch[data-level="4"] { box-shadow: var(--vy-elev-4); }
+.vy-elev-swatch[data-level="5"] { box-shadow: var(--vy-elev-5); }

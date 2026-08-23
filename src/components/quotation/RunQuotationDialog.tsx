@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
-import { Button } from '@progress/kendo-react-buttons';
-import { Stepper } from '@progress/kendo-react-layout';
-import { Grid, GridColumn } from '@progress/kendo-react-grid';
-import { Input } from '@progress/kendo-react-inputs';
-import { DropDownList } from '@progress/kendo-react-dropdowns';
-import { COLUMN_WIDTH, DIALOG_WIDTH } from '../../theme/tokens';
+import { Dialog } from '../../ui/Overlays';
+import { Button } from '../../ui/Button';
+import { Stepper } from '../../ui/Stepper';
+import { MiniTable } from '../../ui/MiniTable';
+import { SearchField } from '../../ui/Field';
+import { Select } from '../../ui/Overlays';
+import type { ColumnSpec } from '../column-model';
 import type { Quotation } from '../../data/quotations';
-import { useToast } from '../Toast';
+import { useToast } from '../../ui/Toast';
 
 /**
  * Run Quotation.
@@ -69,11 +69,23 @@ export function RunQuotationDialog({ q, onClose }: { q: Quotation; onClose: () =
   const missingAttrition = LINES.filter(l => l.attrition === null && l.match === 'Matched').length;
 
   return (
-    <Dialog title={`Run quotation — RFQ${q.no}`} onClose={onClose} width={DIALOG_WIDTH.wide}>
+    <Dialog open size="xl" title={`Run quotation — RFQ${q.no}`}
+            subtitle="Upload a BoM, resolve manufacturers, then price every line."
+            onClose={onClose}
+            actions={<>
+              <Button onClick={onClose}>Cancel</Button>
+              <Button onClick={() => setStep(s => Math.max(0, s - 1))} disabled={step === 0}>Back</Button>
+              {step < STEPS.length - 1
+                ? <Button variant="filled" onClick={() => setStep(s => s + 1)}>Continue</Button>
+                : <Button variant="filled"
+                          onClick={() => { toast.notImplemented('price every line and write a new version to the Result tab'); onClose(); }}>
+                    Run quotation
+                  </Button>}
+            </>}>
       <div className="vy-run">
         {/* Kendo Stepper. The live flow has no visible progress model at all;
             you discover what is left by hitting errors. */}
-        <Stepper value={step} onChange={e => setStep(e.value)} items={STEPS} className="vy-run-stepper" />
+        <Stepper steps={STEPS} value={step} onChange={setStep} />
 
         {/* Context stays on screen. The live wizard shows an "RFQ Information"
             panel only on its first screen, so by the parts grid you can no
@@ -91,27 +103,19 @@ export function RunQuotationDialog({ q, onClose }: { q: Quotation; onClose: () =
         {step === 3 && <StepSummary unresolved={unresolved} />}
       </div>
 
-      <DialogActionsBar>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={() => setStep(s => Math.max(0, s - 1))} disabled={step === 0}>Back</Button>
-        {step < STEPS.length - 1
-          ? <Button themeColor="primary" onClick={() => setStep(s => s + 1)}>Continue</Button>
-          : <Button themeColor="primary"
-                     onClick={() => { toast.notImplemented('price every line and write a new version to the Result tab'); onClose(); }}>
-              Run quotation
-            </Button>}
-      </DialogActionsBar>
     </Dialog>
   );
 }
 
 function StepBom({ toast }: { toast: ReturnType<typeof useToast> }) {
+  const [detection, setDetection] = useState('Automatic');
+  const [sheet, setSheet] = useState('Sheet1');
   return (
     <div className="vy-run-step">
       <div className="vy-dropzone">
         <strong>Drop the BoM file here</strong>
         <span>or</span>
-        <Button themeColor="base" onClick={() => toast.notImplemented('open a file picker for the BoM spreadsheet')}>
+        <Button onClick={() => toast.notImplemented('open a file picker for the BoM spreadsheet')}>
           Select file…
         </Button>
         <p className="vy-hint">.xlsx or .csv — uploading creates a new BoM version</p>
@@ -119,14 +123,16 @@ function StepBom({ toast }: { toast: ReturnType<typeof useToast> }) {
       <div className="vy-run-cols">
         <label className="vy-inline-field vy-inline-field--stack">
           <span>Column detection</span>
-          <DropDownList data={['Automatic', 'Use template', 'Map manually']} defaultValue="Automatic" />
+          <Select label="Column detection" value={detection} onChange={setDetection}
+                  options={['Automatic', 'Use template', 'Map manually']} />
           <p className="vy-hint">
             Which spreadsheet columns hold the part number, revision, quantity and source.
           </p>
         </label>
         <label className="vy-inline-field vy-inline-field--stack">
           <span>Sheet</span>
-          <DropDownList data={['Sheet1', 'BOM', 'Consolidated']} defaultValue="Sheet1" />
+          <Select label="Sheet" value={sheet} onChange={setSheet}
+                  options={['Sheet1', 'BOM', 'Consolidated']} />
         </label>
       </div>
     </div>
@@ -134,6 +140,26 @@ function StepBom({ toast }: { toast: ReturnType<typeof useToast> }) {
 }
 
 function StepParts({ unresolved, toast }: { unresolved: number; toast: ReturnType<typeof useToast> }) {
+  const columns: ColumnSpec<Line>[] = [
+    { field: 'part', title: 'Part', role: 'ident' },
+    { field: 'mfgpn', title: 'MPN', role: 'ident' },
+    { field: 'manufacturer', title: 'Manufacturer', role: 'text' },
+    { field: 'rev', title: 'Rev', role: 'code', render: l => <span className="vy-code">{l.rev}</span> },
+    { field: 'source', title: 'Source', role: 'code', width: 110,
+      widthNote: 'Values include "Manual" alongside "Nexar".',
+      render: l => <span className="vy-code">{l.source}</span> },
+    { field: 'match', title: 'Match', role: 'status', width: 210,
+      widthNote: 'Longest value is "Matches Another Supplier".',
+      render: l => <span className="vy-match" data-match={l.match}>{l.match}</span> },
+    { field: 'id', title: 'Action', role: 'code', width: 120,
+      widthNote: 'Holds a button, not a code.',
+      render: l => l.match !== 'Matched'
+        ? <Button size="sm" variant="tonal"
+                  onClick={() => toast.notImplemented(`open manufacturer matching for ${l.part}`)}>
+            Resolve
+          </Button>
+        : <span className="vy-empty">—</span> },
+  ];
   return (
     <div className="vy-run-step">
       <div className="vy-run-banner" data-tone={unresolved ? 'warn' : 'ok'}>
@@ -141,34 +167,34 @@ function StepParts({ unresolved, toast }: { unresolved: number; toast: ReturnTyp
           ? <><strong>{unresolved} of {LINES.length} {unresolved === 1 ? 'lines needs' : 'lines need'} a decision.</strong> Everything else priced automatically from Nexar.</>
           : <><strong>All lines matched.</strong></>}
       </div>
-      <Input placeholder="Search by part, description, MPN, manufacturer or supplier" className="vy-grid-search" aria-label="Search parts" />
-      <Grid data={LINES} className="vy-grid">
-        <GridColumn field="part" title="Part" width={COLUMN_WIDTH.ident}
-          cells={{ data: p => <td className="vy-ident">{p.dataItem.part}</td> }} />
-        <GridColumn field="mfgpn" title="MPN" width={COLUMN_WIDTH.ident}
-          cells={{ data: p => <td className="vy-ident">{p.dataItem.mfgpn}</td> }} />
-        <GridColumn field="manufacturer" title="Manufacturer" width={COLUMN_WIDTH.text} />
-        <GridColumn field="rev" title="Rev" width={COLUMN_WIDTH.code}
-          cells={{ data: p => <td><span className="vy-code">{p.dataItem.rev}</span></td> }} />
-        <GridColumn field="source" title="Source" width={COLUMN_WIDTH.code + 20}
-          cells={{ data: p => <td><span className="vy-code">{p.dataItem.source}</span></td> }} />
-        <GridColumn field="match" title="Match" width={COLUMN_WIDTH.status + 90}
-          cells={{ data: p => <td><span className="vy-match" data-match={p.dataItem.match}>{p.dataItem.match}</span></td> }} />
-        <GridColumn title="Action" width={COLUMN_WIDTH.code + 60}
-          cells={{ data: p => (
-            <td>{p.dataItem.match !== 'Matched'
-              ? <Button fillMode="outline" themeColor="primary" size="small"
-                        onClick={() => toast.notImplemented(`open manufacturer matching for ${p.dataItem.part}`)}>
-                  Resolve
-                </Button>
-              : <span className="vy-empty">—</span>}</td>
-          ) }} />
-      </Grid>
+      <SearchField placeholder="Search by part, description, MPN, manufacturer or supplier"
+                   aria-label="Search parts" />
+      <MiniTable data={LINES} columns={columns} />
     </div>
   );
 }
 
 function StepPricing({ missingAttrition, toast }: { missingAttrition: number; toast: ReturnType<typeof useToast> }) {
+  const columns: ColumnSpec<Line>[] = [
+    { field: 'part', title: 'Part', role: 'ident' },
+    { field: 'qty', title: 'Total Qty', role: 'number', render: l => l.qty.toLocaleString() },
+    { field: 'attrition', title: 'Attrition %', role: 'number',
+      render: l => l.attrition === null
+        ? <span className="vy-warn-cell">Not set</span>
+        : `${l.attrition}%` },
+    { field: 'price', title: 'Unit Price', role: 'money',
+      render: l => l.price ? money(l.price) : <span className="vy-empty">—</span> },
+    { field: 'stock', title: 'Stock', role: 'number', render: l => l.stock.toLocaleString() },
+    { field: 'minQty', title: 'Min Qty', role: 'number', render: l => l.minQty.toLocaleString() },
+    { field: 'id', title: 'Action', role: 'code', width: 120,
+      widthNote: 'Holds a button, not a code.',
+      render: l => l.attrition === null && l.match === 'Matched'
+        ? <Button size="sm" variant="tonal"
+                  onClick={() => toast.notImplemented(`set the attrition percentage for ${l.part}`)}>
+            Set
+          </Button>
+        : <span className="vy-empty">—</span> },
+  ];
   return (
     <div className="vy-run-step">
       <div className="vy-run-banner" data-tone={missingAttrition ? 'warn' : 'ok'}>
@@ -176,33 +202,7 @@ function StepPricing({ missingAttrition, toast }: { missingAttrition: number; to
           ? <><strong>{missingAttrition} {missingAttrition === 1 ? 'line has' : 'lines have'} no attrition set.</strong> Attrition is the overage ordered to cover placement loss; without it the quote understates material cost.</>
           : <><strong>Attrition set on every line.</strong></>}
       </div>
-      <Grid data={LINES} className="vy-grid">
-        <GridColumn field="part" title="Part" width={COLUMN_WIDTH.ident}
-          cells={{ data: p => <td className="vy-ident">{p.dataItem.part}</td> }} />
-        <GridColumn field="qty" title="Total Qty" width={COLUMN_WIDTH.number}
-          cells={{ data: p => <td className="vy-num">{p.dataItem.qty.toLocaleString()}</td> }} />
-        <GridColumn field="attrition" title="Attrition %" width={COLUMN_WIDTH.number}
-          cells={{ data: p => (
-            <td className="vy-num">{p.dataItem.attrition === null
-              ? <span className="vy-warn-cell">Not set</span>
-              : `${p.dataItem.attrition}%`}</td>
-          ) }} />
-        <GridColumn field="price" title="Unit Price" width={COLUMN_WIDTH.money}
-          cells={{ data: p => <td className="vy-num">{p.dataItem.price ? money(p.dataItem.price) : <span className="vy-empty">—</span>}</td> }} />
-        <GridColumn field="stock" title="Stock" width={COLUMN_WIDTH.number}
-          cells={{ data: p => <td className="vy-num">{p.dataItem.stock.toLocaleString()}</td> }} />
-        <GridColumn field="minQty" title="Min Qty" width={COLUMN_WIDTH.number}
-          cells={{ data: p => <td className="vy-num">{p.dataItem.minQty.toLocaleString()}</td> }} />
-        <GridColumn title="Action" width={COLUMN_WIDTH.code + 60}
-          cells={{ data: p => (
-            <td>{p.dataItem.attrition === null && p.dataItem.match === 'Matched'
-              ? <Button fillMode="outline" themeColor="primary" size="small"
-                        onClick={() => toast.notImplemented(`set the attrition percentage for ${p.dataItem.part}`)}>
-                  Set
-                </Button>
-              : <span className="vy-empty">—</span>}</td>
-          ) }} />
-      </Grid>
+      <MiniTable data={LINES} columns={columns} />
     </div>
   );
 }

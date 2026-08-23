@@ -1,4 +1,4 @@
-import { type ColumnSpec } from './column-model';
+import { type ColumnSpec } from '../components/column-model';
 
 /**
  * Loading state for the standard list pattern.

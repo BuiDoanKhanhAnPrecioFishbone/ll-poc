@@ -62,9 +62,17 @@ class. Depending on `.k-grid-header-wrap` is a gap, not a solution.
 **No static inline styles.** `style={{ padding: 12 }}` in a component is how a themed app
 becomes unthemeable.
 
-*Carve-out:* a style attribute is allowed when the value is computed at runtime **and**
-interpolates a token — `style={{ background: \`var(${tokenName})\` }}`. A page that renders the
-token palette cannot work any other way. Static values are never allowed.
+*Carve-outs*, both narrow:
+
+1. The value is computed at runtime **and** interpolates a token —
+   `style={{ background: \`var(${tokenName})\` }}`. A page that renders the token palette
+   cannot work any other way.
+2. **Computed layout geometry** — a virtualiser's row offset, a measured total height, a
+   grid template derived from column-role tokens. A `translateY(3847px)` is not a design
+   value and never could be; the rule exists to stop colour, spacing and type escaping the
+   token layer, not to ban arithmetic. Anything of this kind carries a comment saying so.
+
+Static design values are never allowed inline.
 
 **No raw hex, px, or font-weight outside the token file.** Every colour, size, radius and
 weight resolves to a custom property. This is the rule most likely to be violated by accident,

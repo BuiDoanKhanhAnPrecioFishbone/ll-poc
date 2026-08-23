@@ -1,6 +1,6 @@
 import { ROLE_WIDTH } from '../components/column-model';
-import { StatusBadge } from '../components/StatusBadge';
-import { Button } from '@progress/kendo-react-buttons';
+import { StatusBadge } from '../ui/Badge';
+import { Button } from '../ui/Button';
 
 const RAMPS = {
   Blue: ['--vy-blue-50','--vy-blue-100','--vy-blue-200','--vy-blue-300','--vy-blue-400','--vy-blue-500','--vy-blue-600','--vy-blue-700','--vy-blue-800','--vy-blue-900'],
@@ -71,13 +71,26 @@ export function DesignSystemPage() {
         </table>
       </Section>
 
-      <Section title="Buttons" note="Kendo Button, unmodified. Only the primitives changed.">
+      <Section title="Buttons"
+        note="Material 3's emphasis ladder: the variant carries importance, not the colour. One filled button per view; everything else steps down. `danger` is the one addition — an ERP deletes records, and Material folds that into filled-with-error, which reads as the main thing to do.">
         <div className="vy-badge-row">
-          <Button themeColor="primary">Primary</Button>
-          <Button themeColor="base">Secondary</Button>
-          <Button themeColor="base" fillMode="outline">Outline</Button>
-          <Button themeColor="error">Destructive</Button>
-          <Button themeColor="primary" disabled>Disabled</Button>
+          <Button variant="filled">Filled</Button>
+          <Button variant="tonal">Tonal</Button>
+          <Button variant="outlined">Outlined</Button>
+          <Button variant="text">Text</Button>
+          <Button variant="danger">Danger</Button>
+          <Button variant="filled" disabled>Disabled</Button>
+        </div>
+      </Section>
+
+      <Section title="Elevation"
+        note="Five levels from Material 3, so “how far off the page is this?” has one answer. Shadows are tinted with the brand blue — neutral-grey shadows over a warm-white surface read as dirt.">
+        <div className="vy-elev-row">
+          {[0, 1, 2, 3, 4, 5].map(n => (
+            <div className="vy-elev-swatch" key={n} data-level={n}>
+              <span>{n}</span>
+            </div>
+          ))}
         </div>
       </Section>
 

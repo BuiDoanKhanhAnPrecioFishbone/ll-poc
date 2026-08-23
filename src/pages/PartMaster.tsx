@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { generateParts, PART_COLUMNS, type Part } from '../data/parts';
-import { StandardGrid } from '../components/StandardGrid';
-import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
-import { Button } from '@progress/kendo-react-buttons';
-import { StatusBadge } from '../components/StatusBadge';
-import { DIALOG_WIDTH } from '../theme/tokens';
+import { DataGrid } from '../ui/DataGrid';
+import { Dialog } from '../ui/Overlays';
+import { Button } from '../ui/Button';
+import { StatusBadge } from '../ui/Badge';
+import { useToast } from '../ui/Toast';
 
 export function PartMaster() {
+  const toast = useToast();
   const data = useMemo(() => generateParts(2000), []);
   const [selected, setSelected] = useState<Part | null>(null);
 
@@ -20,24 +21,28 @@ export function PartMaster() {
 
   return (
     <>
-      <StandardGrid
+      <DataGrid
         data={data}
         columns={PART_COLUMNS}
         title="Part Master"
         subtitle="parts"
         searchPlaceholder="Search part number, description or customer"
-        defaultSort={[{ field: 'lastChange', dir: 'desc' }]}
-        loading={loading}
         actions={<>
-          <Button themeColor="base">Import</Button>
-          <Button themeColor="base">Export</Button>
-          <Button themeColor="primary">New Part</Button>
+          <Button onClick={() => toast.notImplemented('import parts from a spreadsheet')}>Import</Button>
+          <Button onClick={() => toast.notImplemented(`export these ${data.length} parts to Excel`)}>Export</Button>
+          <Button variant="filled" onClick={() => toast.notImplemented('open a blank part record')}>New Part</Button>
         </>}
+        loading={loading}
         onRowClick={setSelected}
       />
 
       {selected && (
-        <Dialog title={selected.partNumber} onClose={() => setSelected(null)} width={DIALOG_WIDTH.record}>
+        <Dialog open title={selected.partNumber} subtitle={selected.description}
+                onClose={() => setSelected(null)}
+                actions={<>
+                  <Button onClick={() => setSelected(null)}>Close</Button>
+                  <Button variant="filled" onClick={() => setSelected(null)}>Edit part</Button>
+                </>}>
           <div className="vy-record">
             <div className="vy-record-head">
               <div>
@@ -58,10 +63,6 @@ export function PartMaster() {
               <div><dt>Last changed</dt><dd>{selected.lastChange.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</dd></div>
             </dl>
           </div>
-          <DialogActionsBar>
-            <Button onClick={() => setSelected(null)}>Close</Button>
-            <Button themeColor="primary" onClick={() => setSelected(null)}>Edit part</Button>
-          </DialogActionsBar>
         </Dialog>
       )}
     </>

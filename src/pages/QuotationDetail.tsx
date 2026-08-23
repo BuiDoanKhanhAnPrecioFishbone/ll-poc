@@ -1,18 +1,18 @@
 import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { TabStrip, TabStripTab } from '@progress/kendo-react-layout';
-import { Button } from '@progress/kendo-react-buttons';
-import { Rating } from '@progress/kendo-react-inputs';
-import { StatusBadge } from '../components/StatusBadge';
-import { fmtDate } from '../components/StandardGrid';
-import { generateQuotations, daysUntil } from '../data/quotations';
+import { Tabs } from '../ui/Overlays';
+import { Button } from '../ui/Button';
+import { Rating } from '../ui/Rating';
+import { StatusBadge } from '../ui/Badge';
+import { fmtDate } from '../ui/DataGrid';
+import { generateQuotations, daysUntil, type Quotation } from '../data/quotations';
 import { ChecklistsTab } from '../components/quotation/ChecklistsTab';
 import { ResultTab } from '../components/quotation/ResultTab';
 import { ConversationsTab } from '../components/quotation/ConversationsTab';
 import { ActivityTab } from '../components/quotation/ActivityTab';
 import { BomComparisonDialog } from '../components/quotation/BomComparisonDialog';
 import { RunQuotationDialog } from '../components/quotation/RunQuotationDialog';
-import { useToast } from '../components/Toast';
+import { useToast } from '../ui/Toast';
 
 /**
  * Quotation record.
@@ -31,7 +31,7 @@ import { useToast } from '../components/Toast';
 export function QuotationDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [tab, setTab] = useState(0);
+  const [tab, setTab] = useState('requirements');
   const [bomOpen, setBomOpen] = useState(false);
   const [runOpen, setRunOpen] = useState(false);
   const toast = useToast();
@@ -43,7 +43,7 @@ export function QuotationDetail() {
         <div className="vy-empty-state">
           <strong>No RFQ with that reference</strong>
           <p>It may have been deleted, or the link may be stale.</p>
-          <Button themeColor="primary" onClick={() => navigate('/sales-management/quotation')}>
+          <Button variant="filled" onClick={() => navigate('/sales-management/quotation')}>
             Back to Quotations
           </Button>
         </div>
@@ -68,13 +68,13 @@ export function QuotationDetail() {
           {q.itar && <span className="vy-flag" title="Subject to ITAR export control">ITAR</span>}
         </div>
         <div className="vy-page-actions">
-          <Button themeColor="base" onClick={() => navigate('/sales-management/quotation')}>Back</Button>
-          <Button themeColor="base" onClick={() => setBomOpen(true)}>BoM Comparison</Button>
-          <Button themeColor="base"
+          <Button onClick={() => navigate('/sales-management/quotation')}>Back</Button>
+          <Button onClick={() => setBomOpen(true)}>BoM Comparison</Button>
+          <Button
                   onClick={() => toast.notImplemented('unlock the header and requirements fields for editing')}>
             Edit
           </Button>
-          <Button themeColor="primary" onClick={() => setRunOpen(true)}>Run Quotation</Button>
+          <Button variant="filled" onClick={() => setRunOpen(true)}>Run Quotation</Button>
         </div>
       </div>
 
@@ -95,70 +95,72 @@ export function QuotationDetail() {
             )}
           </>}
         />
-        <Fact label="Priority" value={<Rating value={q.priority} max={3} readonly aria-label={`Priority ${q.priority} of 3`} />} />
+        <Fact label="Priority" value={<Rating value={q.priority} max={3} />} />
       </div>
 
-      {/* animation={false} is not cosmetic: with animation on, Kendo wraps tab
-          content in `.k-animation-container`, which is `display: inline-block`
-          and collapses the panel to its intrinsic width — 338px inside a 984px
-          tab strip, so the three-column field layout never gets the room to
-          form. Turning animation off removes the wrapper entirely. */}
-      <TabStrip selected={tab} onSelect={e => setTab(e.selected)} animation={false} className="vy-tabs">
-        <TabStripTab title="Requirements">
-          <div className="vy-field-groups">
-            <FieldGroup title="Commercial">
-              <Field label="Project type" value={q.projectType} />
-              <Field label="Order type" value={q.orderType} />
-              <Field label="RFQ type" value={q.rfqType} />
-              <Field label="Customer contact" value={q.customerContact} />
-              <Field label="Previous RFQ" value={q.historicalRfq ? `RFQ${q.historicalRfq}` : undefined} />
-              <Field label="Markup" value={`${q.markup}%`} />
-              <Field label="Quantities to quote" value={q.quantitiesToQuote} />
-              <Field label="Quote focus" value={q.quoteFocus} />
-            </FieldGroup>
-
-            <FieldGroup title="Technical">
-              <Field label="Application" value={q.application} />
-              <Field label="Build requirement" value={q.buildRequirement} />
-              <Field label="Test requirements" value={q.testRequirements === 'NA' ? undefined : q.testRequirements} />
-              <Field label="Material packaging" value={q.materialPackageType} />
-              <Field label="Assembly turn time" value={`${q.assemblyTurnTime} days`} />
-              <Field label="Acceptable lead time" value={`${q.leadTimeDays} days`} />
-            </FieldGroup>
-
-            <FieldGroup title="Inventory & options">
-              <Field label="Excess and MOQ" value={q.excessAndMoq} />
-              <Field label="Net consigned inventory" value={q.netConsignedInventory} />
-              <Field label="Rocket consigned inventory" value={q.rocketConsignedInventory} />
-              <Flags items={[
-                ['Conformal coating', q.conformalCoating],
-                ['Provide alternate AML for out-of-stock', q.provideAlternateAml],
-                ['Broker sourcing permitted', q.broker],
-              ]} />
-            </FieldGroup>
-          </div>
-
-          <div className="vy-notes">
-            <Note title="Customer notes" body={q.customerNotes} />
-            <Note title="Internal notes" body={q.internalNotes} />
-          </div>
-        </TabStripTab>
-
-        <TabStripTab title={`Checklists${checklistOutstanding ? ` (${checklistOutstanding})` : ''}`}>
-          <ChecklistsTab q={q} />
-        </TabStripTab>
-        <TabStripTab title={`Result${q.results.length ? ` (${q.results.length})` : ''}`}>
-          <ResultTab q={q} onRun={() => setRunOpen(true)} />
-        </TabStripTab>
-        <TabStripTab title={`Conversations${q.comments.length ? ` (${q.comments.length})` : ''}`}>
-          <ConversationsTab q={q} />
-        </TabStripTab>
-        <TabStripTab title="Activity"><ActivityTab q={q} /></TabStripTab>
-      </TabStrip>
+      <Tabs
+        value={tab}
+        onValueChange={setTab}
+        tabs={[
+          { value: 'requirements', label: 'Requirements', content: <RequirementsTab q={q} /> },
+          { value: 'checklists',   label: 'Checklists',   count: checklistOutstanding, content: <ChecklistsTab q={q} /> },
+          { value: 'result',       label: 'Result',       count: q.results.length,     content: <ResultTab q={q} onRun={() => setRunOpen(true)} /> },
+          { value: 'conversations',label: 'Conversations',count: q.comments.length,    content: <ConversationsTab q={q} /> },
+          { value: 'activity',     label: 'Activity',     content: <ActivityTab q={q} /> },
+        ]}
+      />
 
       {bomOpen && <BomComparisonDialog onClose={() => setBomOpen(false)} />}
       {runOpen && <RunQuotationDialog q={q} onClose={() => setRunOpen(false)} />}
     </div>
+  );
+}
+
+/** The requirements tab. Three groups, because the fields divide by who cares
+ *  about them: commercial terms, technical build, and inventory options. The
+ *  live screen uses the same three headings but renders every value as a
+ *  read-only input, so a record you are only reading looks like a broken form. */
+function RequirementsTab({ q }: { q: Quotation }) {
+  return (
+    <>
+      <div className="vy-field-groups">
+        <FieldGroup title="Commercial">
+          <Field label="Project type" value={q.projectType} />
+          <Field label="Order type" value={q.orderType} />
+          <Field label="RFQ type" value={q.rfqType} />
+          <Field label="Customer contact" value={q.customerContact} />
+          <Field label="Previous RFQ" value={q.historicalRfq ? `RFQ${q.historicalRfq}` : undefined} />
+          <Field label="Markup" value={`${q.markup}%`} />
+          <Field label="Quantities to quote" value={q.quantitiesToQuote} />
+          <Field label="Quote focus" value={q.quoteFocus} />
+        </FieldGroup>
+
+        <FieldGroup title="Technical">
+          <Field label="Application" value={q.application} />
+          <Field label="Build requirement" value={q.buildRequirement} />
+          <Field label="Test requirements" value={q.testRequirements === 'NA' ? undefined : q.testRequirements} />
+          <Field label="Material packaging" value={q.materialPackageType} />
+          <Field label="Assembly turn time" value={`${q.assemblyTurnTime} days`} />
+          <Field label="Acceptable lead time" value={`${q.leadTimeDays} days`} />
+        </FieldGroup>
+
+        <FieldGroup title="Inventory & options">
+          <Field label="Excess and MOQ" value={q.excessAndMoq} />
+          <Field label="Net consigned inventory" value={q.netConsignedInventory} />
+          <Field label="Rocket consigned inventory" value={q.rocketConsignedInventory} />
+          <Flags items={[
+            ['Conformal coating', q.conformalCoating],
+            ['Provide alternate AML for out-of-stock', q.provideAlternateAml],
+            ['Broker sourcing permitted', q.broker],
+          ]} />
+        </FieldGroup>
+      </div>
+
+      <div className="vy-notes">
+        <Note title="Customer notes" body={q.customerNotes} />
+        <Note title="Internal notes" body={q.internalNotes} />
+      </div>
+    </>
   );
 }
 

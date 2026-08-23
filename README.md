@@ -1,8 +1,7 @@
 # Voyager ERP — UX revamp mockup
 
 An interactive mockup for the redesign of **Voyager Cloud ERP** (`erp.linhlongengineering.com`),
-built on the same stack as the production system — **React + Vite + KendoReact** — so that
-everything demonstrated here is directly transferable.
+built with **React + Vite**, **TanStack Table**, **Radix UI** and a design system of its own.
 
 > **This is a mockup, not the ERP.** All data is synthetic. No customer data, no credentials
 > and no production code from the live system are included in this repository.
@@ -20,17 +19,52 @@ The revamp has four objectives. This repo is the executable argument for each of
 | 3. Standardised data-table patterns | `src/components/StandardGrid.tsx`, the **Part Master** page |
 | 4. Low-to-medium effort improvements | `src/data/findings.ts` and the **UX Audit** page |
 
-## The constraint this respects
+## How it is built
 
-> *Customise design primitives only. Use existing Kendo components. Build nothing bespoke.*
+The repo began under a hard constraint — customise KendoReact primitives, build nothing bespoke
+— because production is KendoReact and everything here had to be drop-in. That constraint was
+lifted on 22 Aug 2026: components may now be built freely, with no licence, informed by
+Material Design.
 
-No Kendo component is re-implemented or overridden by copying its internal CSS. The entire
-visual change is achieved by defining primitives in `src/theme/tokens.css` and mapping them onto
-Kendo's own CSS variable API in `src/theme/kendo-bridge.css`. Change a value in `tokens.css` and
-every Kendo component — Grid, Button, Dialog, DropDownList, Charts — updates with it.
+What that changed, and what it did not:
 
-The only non-Kendo UI in the repo is application chrome that Kendo does not ship: the sidebar,
-the breadcrumb bar and the ⌘K palette.
+**Unchanged.** The design system itself. Tokens, the six-token status vocabulary, the column
+role model, the restructured IA and the whole audit were always library-agnostic. That is the
+part with the thinking in it.
+
+**Replaced.** The component layer. Three libraries, all MIT:
+
+| | | |
+| --- | --- | --- |
+| **TanStack Table** | grids | headless, with row virtualisation |
+| **Radix UI** | dialogs, tabs, select, toast | WAI-ARIA behaviour, zero styling |
+| Everything visual | `src/ui` | ours, driven entirely by tokens |
+
+**Structure** comes from Material 3 (`src/theme/md3.css`): a five-level elevation ladder, one
+state-layer treatment for every interactive surface, emphasised motion curves and a shape scale.
+**Colour never does.** Every value resolves to a Voyager token, so the result reads as Linh
+Long's system rather than a Google app in different paint.
+
+### What dropping the library bought
+
+| | Before | After |
+| --- | --- | --- |
+| CSS bundle | 764 kB | **51 kB** |
+| JS bundle | 1,065 kB | **514 kB** |
+| Rows in the DOM (2,000-row list) | 2,000 | **~40** |
+| Paging | 50 per page | none — scroll all 21,941 |
+| Licence | required, watermark without it | none |
+| Open GAPs | 2 | **0** |
+
+Both GAPs existed only because a third-party component would not do what the design needed.
+They stopped existing when the library did — see [`gap-register.md`](docs/gap-register.md).
+
+### The trade-off, stated plainly
+
+Production **is** KendoReact. While this repo was Kendo-based, everything in it was directly
+transferable: the same stack, restyled. It is now a design *target* — adopting it means
+replacing the UI layer of a 218-chunk application. That may be exactly the intent, but it is a
+different proposition and should not be discovered by accident.
 
 ---
 
@@ -88,20 +122,9 @@ npm install
 npm run dev
 ```
 
-### KendoReact licence
+### Licences
 
-KendoReact requires a licence key. Without one, every component renders a trial watermark and a
-banner across the top of the page — which is what you will see on a fresh clone.
-
-Linh Long already holds a KendoReact licence (the production ERP uses it). To activate:
-
-**Locally** — download your key from [telerik.com](https://www.telerik.com/account/your-licenses/license-keys)
-and save it as `kendo-ui-license.txt` in the repo root. It is git-ignored and must never be committed.
-
-**On Vercel** — add an environment variable named `KENDO_UI_LICENSE` with the key as its value.
-The build script activates it automatically.
-
-The build succeeds without a key; the watermark is cosmetic.
+None. Every dependency is MIT. There is no key to configure and no watermark.
 
 ## Deploying to Vercel
 
@@ -112,7 +135,6 @@ Import the repository at [vercel.com/new](https://vercel.com/new). The defaults 
 | Framework preset | Vite |
 | Build command | `npm run build` |
 | Output directory | `dist` |
-| Environment variable | `KENDO_UI_LICENSE` (see above) |
 
 `vercel.json` already rewrites all routes to `index.html` so that deep links work.
 
