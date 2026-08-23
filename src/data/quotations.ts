@@ -177,7 +177,9 @@ const CUSTOMERS = [
   '01204 - Meridian Avionics', '00912 - Halden Marine AS', '01455 - Brightpath Medical',
   '00109 - Comtec Industrial',
 ];
-const OWNERS = ['Toan Dinh', 'Huyen NTN', 'Mai Pham', 'Duc Le', 'Linh Tran'];
+/** Who can be assigned. Exported so the record can offer the same list. */
+export const PEOPLE = ['Toan Dinh', 'Huyen NTN', 'Mai Pham', 'Duc Le', 'Linh Tran'] as const;
+const OWNERS = [...PEOPLE];
 const APPLICATIONS: Application[] = ['System', 'PCBA', 'PCBA', 'Sub-assy Box Build'];
 const RFQ_TYPES: RfqType[] = ['Consigned', 'Consigned', 'Turnkey', 'Mixed'];
 const STATUSES: QuotationStatus[] = ['New', 'New', 'In-Progress', 'Quoted', 'Quoted', 'Completed', 'Cancelled'];

@@ -107,16 +107,6 @@ export function QuotationDetail() {
         <div className="vy-page-actions">
           <Button onClick={() => navigate('/sales-management/quotation')}>Back</Button>
           <Button onClick={() => setBomOpen(true)}>BoM Comparison</Button>
-          {editing ? (
-            <>
-              <Button onClick={cancelEdit}>Cancel</Button>
-              <Button variant="filled" disabled={!dirty} onClick={saveEdit}>
-                {dirty ? `Save ${changeCount} ${changeCount === 1 ? 'change' : 'changes'}` : 'Save'}
-              </Button>
-            </>
-          ) : (
-            <Button onClick={() => setDraft({ ...q })}>Edit</Button>
-          )}
           <Button variant="filled" onClick={() => setRunOpen(true)}>Run Quotation</Button>
         </div>
       </div>
@@ -147,7 +137,17 @@ export function QuotationDetail() {
         value={tab}
         onValueChange={setTab}
         tabs={[
-          { value: 'requirements', label: 'Requirements', content: <RequirementsTab q={draft ?? q} editing={editing} onChange={setField} /> },
+          { value: 'requirements', label: 'Requirements', content:
+            <RequirementsTab
+              q={draft ?? q}
+              editing={editing}
+              onChange={setField}
+              dirty={dirty}
+              changeCount={changeCount}
+              onEdit={() => setDraft({ ...q })}
+              onSave={saveEdit}
+              onCancel={cancelEdit}
+            /> },
           { value: 'checklists',   label: 'Checklists',   count: checklistOutstanding, content: <ChecklistsTab q={q} /> },
           { value: 'result',       label: 'Result',       count: q.results.length,     content: <ResultTab q={q} onRun={() => setRunOpen(true)} /> },
           { value: 'conversations',label: 'Conversations',count: q.comments.length,    content: <ConversationsTab q={q} /> },
@@ -165,8 +165,23 @@ export function QuotationDetail() {
  *  about them: commercial terms, technical build, and inventory options. The
  *  live screen uses the same three headings but renders every value as a
  *  read-only input, so a record you are only reading looks like a broken form. */
-function RequirementsTab({ q, editing, onChange }: {
+/**
+ * Editing is scoped to this tab, and its controls live here.
+ *
+ * They used to sit in the record header, which reads as "edit this record" —
+ * but the button only ever unlocked these fields. Checklists already edit
+ * inline, so the header control was claiming a scope it did not have.
+ *
+ * The two models are deliberate rather than inconsistent: a twenty-field form
+ * with required values gets an explicit mode and an explicit Save, because
+ * committing half-finished changes to it is a real risk. Ticking a checklist
+ * item is a single discrete act with nothing to half-finish, so it saves as you
+ * go. The rule is that the control lives where it acts.
+ */
+function RequirementsTab({ q, editing, onChange, dirty, changeCount, onEdit, onSave, onCancel }: {
   q: Quotation; editing: boolean; onChange: (name: string, v: unknown) => void;
+  dirty: boolean; changeCount: number;
+  onEdit: () => void; onSave: () => void; onCancel: () => void;
 }) {
   const group = (defs: typeof COMMERCIAL) =>
     defs.map(def => (
@@ -175,11 +190,23 @@ function RequirementsTab({ q, editing, onChange }: {
 
   return (
     <>
-      {editing && (
-        <p className="vy-edit-banner">
-          Editing this RFQ. Changes are not saved until you choose Save.
-        </p>
-      )}
+      <div className="vy-tab-actions">
+        {editing
+          ? <p className="vy-edit-banner">Editing these requirements. Nothing is saved until you choose Save.</p>
+          : <span />}
+        <div className="vy-page-actions">
+          {editing ? (
+            <>
+              <Button onClick={onCancel}>Cancel</Button>
+              <Button variant="filled" disabled={!dirty} onClick={onSave}>
+                {dirty ? `Save ${changeCount} ${changeCount === 1 ? 'change' : 'changes'}` : 'Save'}
+              </Button>
+            </>
+          ) : (
+            <Button onClick={onEdit}>Edit requirements</Button>
+          )}
+        </div>
+      </div>
 
       <div className="vy-field-groups">
         <FieldGroup title="Commercial">{group(COMMERCIAL)}</FieldGroup>

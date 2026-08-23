@@ -468,3 +468,15 @@
 }
 .vy-cell-link:hover { text-decoration: underline; }
 .vy-tr:hover .vy-cell-link { color: var(--vy-blue-800); }
+
+/* --- Tab-level actions -------------------------------------------------------
+   Edit controls sit with the fields they change. They were in the record
+   header, which reads as "edit this record" while only ever unlocking the
+   Requirements fields. */
+.vy-tab-actions { display: flex; align-items: center; justify-content: space-between; gap: var(--vy-space-6); margin-bottom: var(--vy-space-8); flex-wrap: wrap; }
+.vy-tab-actions .vy-edit-banner { margin: 0; flex: 1; min-width: 0; }
+
+/* --- Assignee picker --------------------------------------------------------- */
+.vy-assignee-picker { display: flex; align-items: center; gap: var(--vy-space-3); margin-top: var(--vy-space-2); }
+.vy-assignee-picker .vy-select { flex: 1; min-width: 0; }
+.vy-assignee-warn { display: block; margin-top: var(--vy-space-2); font-size: var(--vy-text-xs); color: var(--vy-accent-warning); }

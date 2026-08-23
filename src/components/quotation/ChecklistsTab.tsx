@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { Button } from '../../ui/Button';
+import { Select } from '../../ui/Overlays';
 import { MiniTable } from '../../ui/MiniTable';
 import { StatusBadge } from '../../ui/Badge';
 import { fmtDate } from '../../ui/DataGrid';
 import { useToast } from '../../ui/Toast';
 import type { ColumnSpec } from '../column-model';
 import {
-  PROGRAM_CHECKLIST, ENGINEERING_CHECKLIST,
+  PROGRAM_CHECKLIST, ENGINEERING_CHECKLIST, PEOPLE,
   type Quotation, type ChecklistState, type RfqDocument,
 } from '../../data/quotations';
 
@@ -36,14 +37,23 @@ export function ChecklistsTab({ q }: { q: Quotation }) {
      prototype's edits — but a checklist you cannot check is not a checklist. */
   const [program, setProgram] = useState(q.programChecklist);
   const [engineering, setEngineering] = useState(q.engineeringChecklist);
+  /* Assignees were read-only, though the live system marks Program Manager and
+     Buyer as required. Like the checkboxes, they save as you go: picking a name
+     is one discrete act. */
+  const [people, setPeople] = useState({
+    programManager: q.programManager, buyer: q.buyer, engineer: q.engineer,
+  });
   return (
     <>
       <section className="vy-assignees">
         <h2 className="vy-field-group-title">Assignees</h2>
         <div className="vy-assignee-row">
-          <Assignee role="Program Manager" name={q.programManager} required />
-          <Assignee role="Buyer" name={q.buyer} required />
-          <Assignee role="Engineer" name={q.engineer} />
+          <Assignee role="Program Manager" required value={people.programManager}
+                    onChange={v => setPeople(p => ({ ...p, programManager: v }))} />
+          <Assignee role="Buyer" required value={people.buyer}
+                    onChange={v => setPeople(p => ({ ...p, buyer: v }))} />
+          <Assignee role="Engineer" value={people.engineer}
+                    onChange={v => setPeople(p => ({ ...p, engineer: v }))} />
         </div>
       </section>
 
@@ -76,15 +86,25 @@ export function ChecklistsTab({ q }: { q: Quotation }) {
   );
 }
 
-function Assignee({ role, name, required }: { role: string; name: string; required?: boolean }) {
+function Assignee({ role, value, required, onChange }: {
+  role: string; value: string; required?: boolean; onChange: (v: string) => void;
+}) {
+  const unset = !value;
   return (
     <div className="vy-assignee">
-      <div className="vy-fact-label">
-        {role}{required && <span className="vy-req" title="Required">required</span>}
+      <label className="vy-fact-label" htmlFor={`as-${role}`}>
+        {role}
+        {/* A space before the tag, so a screen reader says "Program Manager,
+            required" rather than "Program Managerrequired". */}
+        {required && <> <span className="vy-req">required</span></>}
+      </label>
+      <div className="vy-assignee-picker">
+        {!unset && <span className="vy-avatar vy-avatar--sm" aria-hidden>{initials(value)}</span>}
+        <Select id={`as-${role}`} label={role} value={value || 'Unassigned'}
+                options={['Unassigned', ...PEOPLE]}
+                onChange={v => onChange(v === 'Unassigned' ? '' : v)} />
       </div>
-      {name
-        ? <div className="vy-assignee-name"><span className="vy-avatar vy-avatar--sm">{initials(name)}</span>{name}</div>
-        : <div className="vy-assignee-name is-empty">Unassigned</div>}
+      {required && unset && <span className="vy-assignee-warn">Needs an owner before the quote can run.</span>}
     </div>
   );
 }
