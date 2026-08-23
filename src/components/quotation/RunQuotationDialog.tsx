@@ -63,6 +63,10 @@ const money = (n: number) => n.toLocaleString('en-GB', { style: 'currency', curr
 
 export function RunQuotationDialog({ q, onClose }: { q: Quotation; onClose: () => void }) {
   const [step, setStep] = useState(0);
+  /* The furthest step reached. Lets you move freely across work already done
+     without letting you skip ahead into a step whose inputs do not exist yet. */
+  const [furthest, setFurthest] = useState(0);
+  const goTo = (i: number) => { setStep(i); setFurthest(f => Math.max(f, i)); };
   const toast = useToast();
 
   const unresolved = LINES.filter(l => l.match !== 'Matched').length;
@@ -74,9 +78,9 @@ export function RunQuotationDialog({ q, onClose }: { q: Quotation; onClose: () =
             onClose={onClose}
             actions={<>
               <Button onClick={onClose}>Cancel</Button>
-              <Button onClick={() => setStep(s => Math.max(0, s - 1))} disabled={step === 0}>Back</Button>
+              <Button onClick={() => goTo(Math.max(0, step - 1))} disabled={step === 0}>Back</Button>
               {step < STEPS.length - 1
-                ? <Button variant="filled" onClick={() => setStep(s => s + 1)}>Continue</Button>
+                ? <Button variant="filled" onClick={() => goTo(step + 1)}>Continue</Button>
                 : <Button variant="filled"
                           onClick={() => { toast.notImplemented('price every line and write a new version to the Result tab'); onClose(); }}>
                     Run quotation
@@ -85,7 +89,7 @@ export function RunQuotationDialog({ q, onClose }: { q: Quotation; onClose: () =
       <div className="vy-run">
         {/* Kendo Stepper. The live flow has no visible progress model at all;
             you discover what is left by hitting errors. */}
-        <Stepper steps={STEPS} value={step} onChange={setStep} />
+        <Stepper steps={STEPS} value={step} furthest={furthest} onChange={goTo} />
 
         {/* Context stays on screen. The live wizard shows an "RFQ Information"
             panel only on its first screen, so by the parts grid you can no

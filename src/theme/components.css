@@ -236,3 +236,50 @@
 .vy-elev-swatch[data-level="3"] { box-shadow: var(--vy-elev-3); }
 .vy-elev-swatch[data-level="4"] { box-shadow: var(--vy-elev-4); }
 .vy-elev-swatch[data-level="5"] { box-shadow: var(--vy-elev-5); }
+
+/* --- Stepper ---------------------------------------------------------------- */
+.vy-stepper { display: flex; gap: var(--vy-space-2); list-style: none; margin: 0; padding: 0; flex-wrap: wrap; }
+.vy-step { flex: 1 1 0; min-width: 0; }
+.vy-step-btn {
+  display: flex; align-items: center; gap: var(--vy-space-4); width: 100%;
+  font-family: inherit; text-align: left; background: transparent;
+  border: 0; border-top: var(--vy-border-emphasis) solid var(--vy-grey-200);
+  padding: var(--vy-space-5) var(--vy-space-4) var(--vy-space-4); border-radius: var(--vy-shape-sm);
+  cursor: default; color: var(--vy-grey-500);
+}
+.vy-step-btn[data-reachable] { cursor: pointer; }
+.vy-step-dot {
+  display: grid; place-items: center; flex: 0 0 auto;
+  width: var(--vy-space-11); height: var(--vy-space-11); border-radius: var(--vy-shape-full);
+  background: var(--vy-grey-100); color: var(--vy-grey-600);
+  font-size: var(--vy-text-sm); font-weight: var(--vy-weight-semibold);
+}
+.vy-step-labels { display: flex; flex-direction: column; min-width: 0; }
+.vy-step-label { font-size: var(--vy-text-base); font-weight: var(--vy-weight-medium); color: var(--vy-grey-700); }
+.vy-step-text { font-size: var(--vy-text-xs); color: var(--vy-grey-500); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.vy-step[data-state="done"] .vy-step-btn    { border-top-color: var(--vy-accent-positive); }
+.vy-step[data-state="done"] .vy-step-dot    { background: var(--vy-accent-positive); color: var(--vy-on-dark-fg); }
+.vy-step[data-state="current"] .vy-step-btn { border-top-color: var(--vy-blue-600); }
+.vy-step[data-state="current"] .vy-step-dot { background: var(--vy-blue-600); color: var(--vy-on-dark-fg); }
+.vy-step[data-state="current"] .vy-step-label { color: var(--vy-grey-900); font-weight: var(--vy-weight-bold); }
+.vy-step[data-state="todo"] .vy-step-btn    { opacity: .55; }
+
+/* --- Record editing --------------------------------------------------------- */
+.vy-edit-banner {
+  margin: 0 0 var(--vy-space-8); padding: var(--vy-space-4) var(--vy-space-6);
+  background: var(--vy-blue-50); color: var(--vy-blue-800);
+  border-left: var(--vy-accent-bar-w) solid var(--vy-blue-600);
+  border-radius: var(--vy-shape-sm); font-size: var(--vy-text-base);
+}
+/* An editing row gives the control room to breathe; a reading row stays dense.
+   Same grid, different rhythm, so nothing jumps sideways when the mode flips. */
+.vy-field--editing { align-items: start; padding-block: var(--vy-space-4); }
+.vy-field--editing dt { padding-top: var(--vy-space-4); }
+.vy-field--editing dd { display: flex; flex-direction: column; gap: var(--vy-space-2); }
+.vy-field--wide { grid-template-columns: 1fr; }
+.vy-field--wide dt { padding-top: 0; }
+.vy-suffixed { display: flex; align-items: center; gap: var(--vy-space-3); }
+.vy-suffixed .vy-field-control { flex: 1; }
+.vy-suffix { font-size: var(--vy-text-base); color: var(--vy-grey-500); white-space: nowrap; }
+.vy-notes-edit { display: grid; grid-template-columns: repeat(auto-fit, minmax(var(--vy-note-min-w), 1fr)); gap: var(--vy-space-8); margin-top: var(--vy-space-9); }

@@ -13,6 +13,8 @@ import { ActivityTab } from '../components/quotation/ActivityTab';
 import { BomComparisonDialog } from '../components/quotation/BomComparisonDialog';
 import { RunQuotationDialog } from '../components/quotation/RunQuotationDialog';
 import { useToast } from '../ui/Toast';
+import { RecordField } from '../components/quotation/RecordField';
+import { COMMERCIAL, TECHNICAL, INVENTORY, NOTES, ALL_FIELDS } from '../components/quotation/requirementFields';
 
 /**
  * Quotation record.
@@ -35,9 +37,17 @@ export function QuotationDetail() {
   const [bomOpen, setBomOpen] = useState(false);
   const [runOpen, setRunOpen] = useState(false);
   const toast = useToast();
-  const q = useMemo(() => generateQuotations(330).find(x => x.id === id), [id]);
 
-  if (!q) {
+  /* Edit is a mode, not a permanent state of the page. `saved` holds edits made
+     in this session; `draft` holds edits not yet committed. Keeping them apart
+     is what makes Cancel able to actually discard. */
+  const [saved, setSaved] = useState<Quotation | null>(null);
+  const [draft, setDraft] = useState<Quotation | null>(null);
+  const editing = draft !== null;
+  const base = useMemo(() => generateQuotations(330).find(x => x.id === id), [id]);
+  const q = saved ?? base;
+
+  if (!q || !base) {
     return (
       <div className="vy-page">
         <div className="vy-empty-state">
@@ -53,6 +63,33 @@ export function QuotationDetail() {
 
   const due = daysUntil(q.dateNeeded);
   const closed = q.status === 'Completed' || q.status === 'Cancelled';
+
+  /* Dirty tracking compares only the fields the form actually owns, so an
+     unrelated change elsewhere in the record can never make Save look armed. */
+  const changed = draft
+    ? ALL_FIELDS.filter(f => draft[f.name] !== q[f.name]).map(f => f.label)
+    : [];
+  const dirty = changed.length > 0;
+  const changeCount = changed.length;
+
+  const setField = (name: string, v: unknown) =>
+    setDraft(d => (d ? { ...d, [name]: v } : d));
+
+  function saveEdit() {
+    if (!draft) return;
+    setSaved(draft);
+    setDraft(null);
+    toast.success(
+      `Saved ${changeCount} ${changeCount === 1 ? 'change' : 'changes'} to RFQ${draft.no}. Held in this browser session only.`
+    );
+  }
+
+  function cancelEdit() {
+    /* Discarding work silently is how people lose it. Only ask when there is
+       something to lose. */
+    if (dirty && !confirm(`Discard ${changeCount} unsaved ${changeCount === 1 ? 'change' : 'changes'}?`)) return;
+    setDraft(null);
+  }
   /* Tab labels carry counts so the record's state is legible without opening
      each tab. The live TabStrip gives five bare nouns. */
   const checklistOutstanding =
@@ -70,10 +107,16 @@ export function QuotationDetail() {
         <div className="vy-page-actions">
           <Button onClick={() => navigate('/sales-management/quotation')}>Back</Button>
           <Button onClick={() => setBomOpen(true)}>BoM Comparison</Button>
-          <Button
-                  onClick={() => toast.notImplemented('unlock the header and requirements fields for editing')}>
-            Edit
-          </Button>
+          {editing ? (
+            <>
+              <Button onClick={cancelEdit}>Cancel</Button>
+              <Button variant="filled" disabled={!dirty} onClick={saveEdit}>
+                {dirty ? `Save ${changeCount} ${changeCount === 1 ? 'change' : 'changes'}` : 'Save'}
+              </Button>
+            </>
+          ) : (
+            <Button onClick={() => setDraft({ ...q })}>Edit</Button>
+          )}
           <Button variant="filled" onClick={() => setRunOpen(true)}>Run Quotation</Button>
         </div>
       </div>
@@ -102,7 +145,7 @@ export function QuotationDetail() {
         value={tab}
         onValueChange={setTab}
         tabs={[
-          { value: 'requirements', label: 'Requirements', content: <RequirementsTab q={q} /> },
+          { value: 'requirements', label: 'Requirements', content: <RequirementsTab q={draft ?? q} editing={editing} onChange={setField} /> },
           { value: 'checklists',   label: 'Checklists',   count: checklistOutstanding, content: <ChecklistsTab q={q} /> },
           { value: 'result',       label: 'Result',       count: q.results.length,     content: <ResultTab q={q} onRun={() => setRunOpen(true)} /> },
           { value: 'conversations',label: 'Conversations',count: q.comments.length,    content: <ConversationsTab q={q} /> },
@@ -120,46 +163,29 @@ export function QuotationDetail() {
  *  about them: commercial terms, technical build, and inventory options. The
  *  live screen uses the same three headings but renders every value as a
  *  read-only input, so a record you are only reading looks like a broken form. */
-function RequirementsTab({ q }: { q: Quotation }) {
+function RequirementsTab({ q, editing, onChange }: {
+  q: Quotation; editing: boolean; onChange: (name: string, v: unknown) => void;
+}) {
+  const group = (defs: typeof COMMERCIAL) =>
+    defs.map(def => (
+      <RecordField key={def.name} def={def} value={q[def.name]} editing={editing} onChange={onChange} />
+    ));
+
   return (
     <>
+      {editing && (
+        <p className="vy-edit-banner">
+          Editing this RFQ. Changes are not saved until you choose Save.
+        </p>
+      )}
+
       <div className="vy-field-groups">
-        <FieldGroup title="Commercial">
-          <Field label="Project type" value={q.projectType} />
-          <Field label="Order type" value={q.orderType} />
-          <Field label="RFQ type" value={q.rfqType} />
-          <Field label="Customer contact" value={q.customerContact} />
-          <Field label="Previous RFQ" value={q.historicalRfq ? `RFQ${q.historicalRfq}` : undefined} />
-          <Field label="Markup" value={`${q.markup}%`} />
-          <Field label="Quantities to quote" value={q.quantitiesToQuote} />
-          <Field label="Quote focus" value={q.quoteFocus} />
-        </FieldGroup>
-
-        <FieldGroup title="Technical">
-          <Field label="Application" value={q.application} />
-          <Field label="Build requirement" value={q.buildRequirement} />
-          <Field label="Test requirements" value={q.testRequirements === 'NA' ? undefined : q.testRequirements} />
-          <Field label="Material packaging" value={q.materialPackageType} />
-          <Field label="Assembly turn time" value={`${q.assemblyTurnTime} days`} />
-          <Field label="Acceptable lead time" value={`${q.leadTimeDays} days`} />
-        </FieldGroup>
-
-        <FieldGroup title="Inventory & options">
-          <Field label="Excess and MOQ" value={q.excessAndMoq} />
-          <Field label="Net consigned inventory" value={q.netConsignedInventory} />
-          <Field label="Rocket consigned inventory" value={q.rocketConsignedInventory} />
-          <Flags items={[
-            ['Conformal coating', q.conformalCoating],
-            ['Provide alternate AML for out-of-stock', q.provideAlternateAml],
-            ['Broker sourcing permitted', q.broker],
-          ]} />
-        </FieldGroup>
+        <FieldGroup title="Commercial">{group(COMMERCIAL)}</FieldGroup>
+        <FieldGroup title="Technical">{group(TECHNICAL)}</FieldGroup>
+        <FieldGroup title="Inventory & options">{group(INVENTORY)}</FieldGroup>
       </div>
 
-      <div className="vy-notes">
-        <Note title="Customer notes" body={q.customerNotes} />
-        <Note title="Internal notes" body={q.internalNotes} />
-      </div>
+      <div className="vy-notes-edit">{group(NOTES)}</div>
     </>
   );
 }
@@ -184,35 +210,6 @@ function FieldGroup({ title, children }: { title: string; children: React.ReactN
 
 /** Renders a value. An empty field says so once, quietly, rather than showing
  *  an empty disabled input that reads as broken. */
-function Field({ label, value }: { label: string; value?: React.ReactNode }) {
-  const empty = value === undefined || value === '' || value === null;
-  return (
-    <div className="vy-field">
-      <dt>{label}</dt>
-      <dd className={empty ? 'is-empty' : undefined}>{empty ? 'Not set' : value}</dd>
-    </div>
-  );
-}
 
-function Flags({ items }: { items: [string, boolean][] }) {
-  return (
-    <div className="vy-flags">
-      {items.map(([label, on]) => (
-        <div key={label} className="vy-flag-row" data-on={on}>
-          <span className="vy-flag-mark" aria-hidden>{on ? '✓' : '–'}</span>
-          <span>{label}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
 
-function Note({ title, body }: { title: string; body: string }) {
-  return (
-    <section className="vy-note">
-      <h3>{title}</h3>
-      <p className={body ? undefined : 'is-empty'}>{body || 'None recorded'}</p>
-    </section>
-  );
-}
 
