@@ -394,3 +394,64 @@
 .vy-doc-section { margin-top: var(--vy-space-9); }
 .vy-record { min-width: 0; }
 .vy-tabpanel:focus-visible { outline: none; }
+
+/* --- Checklist --------------------------------------------------------------
+   One control per row. The checkbox carries the state; a word appears only
+   where a tick cannot say it ("In progress", "Not applicable"). The previous
+   version drew the state twice — a glyph at the left edge and a word at the
+   right — and neither was clickable. */
+.vy-checklist-items { list-style: none; margin: 0 0 var(--vy-space-4); padding: 0; }
+.vy-checklist-items li { border-bottom: 1px solid var(--vy-grey-100); }
+.vy-checklist-items li:last-child { border-bottom: 0; }
+
+.vy-check-row {
+  display: flex; align-items: center; gap: var(--vy-space-4);
+  padding: var(--vy-space-3) var(--vy-space-3) var(--vy-space-3) 0;
+  cursor: pointer; border-radius: var(--vy-shape-sm);
+  font-size: var(--vy-text-base); color: var(--vy-grey-800);
+}
+.vy-check-row:hover { background: var(--vy-blue-50); }
+.vy-check-input {
+  appearance: none; flex: 0 0 auto; margin: 0;
+  width: var(--vy-space-9); height: var(--vy-space-9);
+  border: 1px solid var(--vy-grey-400); border-radius: var(--vy-shape-xs);
+  background: var(--vy-grey-0); cursor: pointer;
+  display: grid; place-content: center;
+  transition: background-color var(--vy-dur-short) var(--vy-ease-standard),
+              border-color var(--vy-dur-short) var(--vy-ease-standard);
+}
+.vy-check-input::before {
+  content: ''; width: var(--vy-space-5); height: var(--vy-space-5);
+  transform: scale(0); transform-origin: center;
+  clip-path: polygon(14% 44%, 0 60%, 39% 100%, 100% 22%, 84% 6%, 39% 68%);
+  background: var(--vy-on-dark-fg);
+  transition: transform var(--vy-dur-short) var(--vy-ease-decelerate);
+}
+.vy-check-input:checked { background: var(--vy-accent-positive); border-color: var(--vy-accent-positive); }
+.vy-check-input:checked::before { transform: scale(1); }
+.vy-check-input:disabled { background: var(--vy-grey-100); border-color: var(--vy-grey-300); cursor: not-allowed; }
+
+.vy-check-name { flex: 1; min-width: 0; }
+/* Completed items step back so the outstanding ones read first. */
+.vy-checklist-items li[data-state="Done"] .vy-check-name { color: var(--vy-grey-500); }
+.vy-checklist-items li[data-state="N/A"] .vy-check-name { color: var(--vy-grey-400); }
+
+/* A quiet tag, not a ghost row: "does not apply" is information, not absence. */
+.vy-tag-soft {
+  flex: 0 0 auto; font-size: var(--vy-text-xs); color: var(--vy-grey-600);
+  background: var(--vy-grey-100); border-radius: var(--vy-shape-full);
+  padding: 1px var(--vy-space-4); white-space: nowrap;
+}
+.vy-checklist-items li[data-state="In progress"] .vy-tag-soft { background: var(--vy-status-progress-bg); color: var(--vy-status-progress-fg); }
+
+.vy-checklist-progress { font-size: var(--vy-text-sm); color: var(--vy-grey-600); white-space: nowrap; }
+.vy-checklist-progress[data-complete] { color: var(--vy-accent-positive); font-weight: var(--vy-weight-semibold); }
+.vy-checklist-foot { margin: 0; font-size: var(--vy-text-sm); color: var(--vy-grey-600); }
+
+/* Layout for the two checklist columns and their headers. Kept with the rest
+   of the checklist rules: the previous split left `.vy-checklist-items li`
+   in app.css declaring `display: grid` with a 28px first column, which
+   collapsed the new checkbox row to 20px wide. Rules for one component
+   belonging to two files is how that happens. */
+.vy-checklist-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(var(--vy-note-min-w), 1fr)); gap: var(--vy-space-9); margin-bottom: var(--vy-space-9); }
+.vy-checklist-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--vy-space-4); margin-bottom: var(--vy-space-4); }

@@ -314,18 +314,7 @@
 .vy-req { font-size: var(--vy-text-2xs); text-transform: uppercase; letter-spacing: .05em; color: var(--vy-accent-warning); margin-left: var(--vy-space-3); }
 
 .vy-checklist-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(var(--vy-note-min-w), 1fr)); gap: var(--vy-space-9); margin-bottom: var(--vy-space-9); }
-.vy-checklist-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--vy-space-4); }
-.vy-checklist-progress { font-size: var(--vy-text-sm); font-weight: var(--vy-weight-semibold); color: var(--vy-grey-500); }
-.vy-checklist-progress[data-complete="true"] { color: var(--vy-accent-positive); }
 .vy-progress { width: 100%; margin-bottom: var(--vy-space-4); }
-.vy-checklist-items { list-style: none; margin: 0; padding: 0; }
-.vy-checklist-items li { display: grid; grid-template-columns: var(--vy-space-9) 1fr auto; align-items: baseline; gap: var(--vy-space-3); padding: var(--vy-space-3) 0; border-bottom: 1px solid var(--vy-grey-100); font-size: var(--vy-text-base); }
-.vy-check-mark { color: var(--vy-grey-300); font-weight: var(--vy-weight-heavy); }
-.vy-checklist-items li[data-state="Done"] .vy-check-mark { color: var(--vy-accent-positive); }
-.vy-checklist-items li[data-state="In progress"] .vy-check-mark { color: var(--vy-blue-500); }
-.vy-check-label { color: var(--vy-grey-800); }
-.vy-checklist-items li[data-state="N/A"] .vy-check-label { color: var(--vy-grey-400); }
-.vy-check-state { font-size: var(--vy-text-xs); color: var(--vy-grey-500); white-space: nowrap; }
 
 .vy-doc-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--vy-space-4); margin-bottom: var(--vy-space-4); }
 .vy-count { font-size: var(--vy-text-xs); color: var(--vy-grey-500); background: var(--vy-grey-100); border-radius: var(--vy-radius-pill); padding: 1px var(--vy-space-3); margin-left: var(--vy-space-2); }
