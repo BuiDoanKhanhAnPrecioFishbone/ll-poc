@@ -499,3 +499,7 @@
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
   overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
 }
+
+/* Action feedback. Anchored bottom-centre so it never covers the toolbar or
+   the record header, which are where the action was triggered from. */
+.vy-toasts { position: fixed; left: 50%; bottom: var(--vy-space-9); transform: translateX(-50%); z-index: var(--vy-z-palette); align-items: center; }

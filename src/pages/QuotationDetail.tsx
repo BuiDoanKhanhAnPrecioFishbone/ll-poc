@@ -12,6 +12,7 @@ import { ConversationsTab } from '../components/quotation/ConversationsTab';
 import { ActivityTab } from '../components/quotation/ActivityTab';
 import { BomComparisonDialog } from '../components/quotation/BomComparisonDialog';
 import { RunQuotationDialog } from '../components/quotation/RunQuotationDialog';
+import { useToast } from '../components/Toast';
 
 /**
  * Quotation record.
@@ -33,6 +34,7 @@ export function QuotationDetail() {
   const [tab, setTab] = useState(0);
   const [bomOpen, setBomOpen] = useState(false);
   const [runOpen, setRunOpen] = useState(false);
+  const toast = useToast();
   const q = useMemo(() => generateQuotations(330).find(x => x.id === id), [id]);
 
   if (!q) {
@@ -68,7 +70,10 @@ export function QuotationDetail() {
         <div className="vy-page-actions">
           <Button themeColor="base" onClick={() => navigate('/sales-management/quotation')}>Back</Button>
           <Button themeColor="base" onClick={() => setBomOpen(true)}>BoM Comparison</Button>
-          <Button themeColor="base">Edit</Button>
+          <Button themeColor="base"
+                  onClick={() => toast.notImplemented('unlock the header and requirements fields for editing')}>
+            Edit
+          </Button>
           <Button themeColor="primary" onClick={() => setRunOpen(true)}>Run Quotation</Button>
         </div>
       </div>

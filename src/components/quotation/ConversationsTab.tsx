@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Button } from '@progress/kendo-react-buttons';
 import { TextArea, Checkbox } from '@progress/kendo-react-inputs';
-import type { Quotation } from '../../data/quotations';
+import type { Comment, Quotation } from '../../data/quotations';
+import { useToast } from '../Toast';
 
 /**
  * Conversations.
@@ -15,17 +16,44 @@ import type { Quotation } from '../../data/quotations';
 export function ConversationsTab({ q }: { q: Quotation }) {
   const [draft, setDraft] = useState('');
   const [email, setEmail] = useState(false);
+  /* Posting works for real, against local state. It was the one control on the
+     screen that looked interactive, enabled itself once you typed, and then did
+     nothing — the most misleading kind of dead button. Comments live in
+     component state, so they reset on reload; that is a prototype limit, not a
+     silent failure, and the toast says so. */
+  const [posted, setPosted] = useState<Comment[]>([]);
+  const toast = useToast();
+
+  const comments = [...q.comments, ...posted];
+
+  function post() {
+    const body = draft.trim();
+    if (!body) return;
+    setPosted(p => [...p, {
+      id: `local-${p.length}`,
+      author: 'Huyen NTN',
+      initials: 'HN',
+      at: new Date(),
+      body,
+      emailed: email,
+    }]);
+    setDraft('');
+    setEmail(false);
+    toast.success(email
+      ? 'Comment posted and queued to email the customer contact. It is held in this browser session only.'
+      : 'Comment posted. It is held in this browser session only.');
+  }
 
   return (
     <div className="vy-conv">
-      {q.comments.length === 0 ? (
+      {comments.length === 0 ? (
         <div className="vy-empty-inline">
           No comments on this RFQ yet. Notes here are visible to everyone assigned to it,
           and are the record of why decisions were made.
         </div>
       ) : (
         <ol className="vy-thread">
-          {q.comments.map(c => (
+          {comments.map(c => (
             <li key={c.id} className="vy-comment">
               <span className="vy-avatar vy-avatar--sm">{c.initials}</span>
               <div className="vy-comment-body">
@@ -55,7 +83,7 @@ export function ConversationsTab({ q }: { q: Quotation }) {
             onChange={e => setEmail(Boolean(e.value))}
             label="Also email this to the customer contact"
           />
-          <Button themeColor="primary" disabled={!draft.trim()}>Post comment</Button>
+          <Button themeColor="primary" disabled={!draft.trim()} onClick={post}>Post comment</Button>
         </div>
       </div>
     </div>

@@ -7,6 +7,7 @@ import { Input } from '@progress/kendo-react-inputs';
 import { DropDownList } from '@progress/kendo-react-dropdowns';
 import { COLUMN_WIDTH, DIALOG_WIDTH } from '../../theme/tokens';
 import type { Quotation } from '../../data/quotations';
+import { useToast } from '../Toast';
 
 /**
  * Run Quotation.
@@ -62,6 +63,7 @@ const money = (n: number) => n.toLocaleString('en-GB', { style: 'currency', curr
 
 export function RunQuotationDialog({ q, onClose }: { q: Quotation; onClose: () => void }) {
   const [step, setStep] = useState(0);
+  const toast = useToast();
 
   const unresolved = LINES.filter(l => l.match !== 'Matched').length;
   const missingAttrition = LINES.filter(l => l.attrition === null && l.match === 'Matched').length;
@@ -83,9 +85,9 @@ export function RunQuotationDialog({ q, onClose }: { q: Quotation; onClose: () =
           <span className="vy-code">{q.rfqType}</span>
         </div>
 
-        {step === 0 && <StepBom />}
-        {step === 1 && <StepParts unresolved={unresolved} />}
-        {step === 2 && <StepPricing missingAttrition={missingAttrition} />}
+        {step === 0 && <StepBom toast={toast} />}
+        {step === 1 && <StepParts unresolved={unresolved} toast={toast} />}
+        {step === 2 && <StepPricing missingAttrition={missingAttrition} toast={toast} />}
         {step === 3 && <StepSummary unresolved={unresolved} />}
       </div>
 
@@ -94,19 +96,24 @@ export function RunQuotationDialog({ q, onClose }: { q: Quotation; onClose: () =
         <Button onClick={() => setStep(s => Math.max(0, s - 1))} disabled={step === 0}>Back</Button>
         {step < STEPS.length - 1
           ? <Button themeColor="primary" onClick={() => setStep(s => s + 1)}>Continue</Button>
-          : <Button themeColor="primary">Run quotation</Button>}
+          : <Button themeColor="primary"
+                     onClick={() => { toast.notImplemented('price every line and write a new version to the Result tab'); onClose(); }}>
+              Run quotation
+            </Button>}
       </DialogActionsBar>
     </Dialog>
   );
 }
 
-function StepBom() {
+function StepBom({ toast }: { toast: ReturnType<typeof useToast> }) {
   return (
     <div className="vy-run-step">
       <div className="vy-dropzone">
         <strong>Drop the BoM file here</strong>
         <span>or</span>
-        <Button themeColor="base">Select file…</Button>
+        <Button themeColor="base" onClick={() => toast.notImplemented('open a file picker for the BoM spreadsheet')}>
+          Select file…
+        </Button>
         <p className="vy-hint">.xlsx or .csv — uploading creates a new BoM version</p>
       </div>
       <div className="vy-run-cols">
@@ -126,7 +133,7 @@ function StepBom() {
   );
 }
 
-function StepParts({ unresolved }: { unresolved: number }) {
+function StepParts({ unresolved, toast }: { unresolved: number; toast: ReturnType<typeof useToast> }) {
   return (
     <div className="vy-run-step">
       <div className="vy-run-banner" data-tone={unresolved ? 'warn' : 'ok'}>
@@ -150,7 +157,10 @@ function StepParts({ unresolved }: { unresolved: number }) {
         <GridColumn title="Action" width={COLUMN_WIDTH.code + 60}
           cells={{ data: p => (
             <td>{p.dataItem.match !== 'Matched'
-              ? <Button fillMode="outline" themeColor="primary" size="small">Resolve</Button>
+              ? <Button fillMode="outline" themeColor="primary" size="small"
+                        onClick={() => toast.notImplemented(`open manufacturer matching for ${p.dataItem.part}`)}>
+                  Resolve
+                </Button>
               : <span className="vy-empty">—</span>}</td>
           ) }} />
       </Grid>
@@ -158,7 +168,7 @@ function StepParts({ unresolved }: { unresolved: number }) {
   );
 }
 
-function StepPricing({ missingAttrition }: { missingAttrition: number }) {
+function StepPricing({ missingAttrition, toast }: { missingAttrition: number; toast: ReturnType<typeof useToast> }) {
   return (
     <div className="vy-run-step">
       <div className="vy-run-banner" data-tone={missingAttrition ? 'warn' : 'ok'}>
@@ -186,7 +196,10 @@ function StepPricing({ missingAttrition }: { missingAttrition: number }) {
         <GridColumn title="Action" width={COLUMN_WIDTH.code + 60}
           cells={{ data: p => (
             <td>{p.dataItem.attrition === null && p.dataItem.match === 'Matched'
-              ? <Button fillMode="outline" themeColor="primary" size="small">Set</Button>
+              ? <Button fillMode="outline" themeColor="primary" size="small"
+                        onClick={() => toast.notImplemented(`set the attrition percentage for ${p.dataItem.part}`)}>
+                  Set
+                </Button>
               : <span className="vy-empty">—</span>}</td>
           ) }} />
       </Grid>

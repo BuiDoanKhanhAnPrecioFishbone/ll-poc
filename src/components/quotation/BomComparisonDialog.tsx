@@ -4,6 +4,7 @@ import { Button } from '@progress/kendo-react-buttons';
 import { RadioGroup, Checkbox } from '@progress/kendo-react-inputs';
 import { DropDownList } from '@progress/kendo-react-dropdowns';
 import { DIALOG_WIDTH } from '../../theme/tokens';
+import { useToast } from '../Toast';
 
 /**
  * BoM Comparison.
@@ -28,6 +29,7 @@ const ACTIONS = [
 ];
 
 export function BomComparisonDialog({ onClose }: { onClose: () => void }) {
+  const toast = useToast();
   const [action, setAction] = useState('upload');
   const [summary, setSummary] = useState(false);
 
@@ -64,13 +66,17 @@ export function BomComparisonDialog({ onClose }: { onClose: () => void }) {
 
       <DialogActionsBar>
         <Button onClick={onClose}>Cancel</Button>
-        <Button themeColor="primary">Compare</Button>
+        <Button themeColor="primary"
+                onClick={() => { toast.notImplemented('run the comparison and list added, removed and changed lines'); onClose(); }}>
+          Compare
+        </Button>
       </DialogActionsBar>
     </Dialog>
   );
 }
 
 function BomPane({ title, upload }: { title: string; upload: boolean }) {
+  const toast = useToast();
   return (
     <section className="vy-bom-pane">
       <h3 className="vy-field-group-title">{title}</h3>
@@ -79,7 +85,9 @@ function BomPane({ title, upload }: { title: string; upload: boolean }) {
           <div className="vy-dropzone">
             <strong>Drop a BoM file here</strong>
             <span>or</span>
-            <Button themeColor="base">Select file…</Button>
+            <Button themeColor="base" onClick={() => toast.notImplemented('open a file picker for the BoM spreadsheet')}>
+              Select file…
+            </Button>
             <p className="vy-hint">.xlsx or .csv</p>
           </div>
           <label className="vy-inline-field">

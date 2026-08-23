@@ -8,6 +8,7 @@ import { SitemapPage } from './pages/Sitemap';
 import { DesignSystemPage } from './pages/DesignSystem';
 import { AuditPage } from './pages/Audit';
 import { Placeholder } from './pages/Placeholder';
+import { ToastProvider } from './components/Toast';
 import { Navigate } from 'react-router-dom';
 
 /** Preserves the record id when redirecting the old path to the canonical one. */
@@ -19,6 +20,7 @@ function RedirectToQuotation() {
 export default function App() {
   return (
     <BrowserRouter>
+      <ToastProvider>
       <Routes>
         <Route element={<AppShell />}>
           <Route path="/" element={<Home />} />
@@ -38,6 +40,7 @@ export default function App() {
           <Route path="*" element={<Placeholder />} />
         </Route>
       </Routes>
+      </ToastProvider>
     </BrowserRouter>
   );
 }

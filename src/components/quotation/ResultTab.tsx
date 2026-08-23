@@ -3,6 +3,7 @@ import { Button } from '@progress/kendo-react-buttons';
 import { fmtDate } from '../StandardGrid';
 import { COLUMN_WIDTH } from '../../theme/tokens';
 import type { Quotation } from '../../data/quotations';
+import { useToast } from '../Toast';
 
 const money = (n: number) => n.toLocaleString('en-GB', { style: 'currency', currency: 'USD' });
 
@@ -20,6 +21,7 @@ const money = (n: number) => n.toLocaleString('en-GB', { style: 'currency', curr
  * be added up by eye.
  */
 export function ResultTab({ q, onRun }: { q: Quotation; onRun: () => void }) {
+  const toast = useToast();
   if (q.results.length === 0) {
     return (
       <div className="vy-empty-state vy-empty-state--tab">
@@ -53,7 +55,10 @@ export function ResultTab({ q, onRun }: { q: Quotation; onRun: () => void }) {
           <div className="vy-fact-value">{fmtDate(latest.lastRunDate)} · {latest.lastRunBy}</div>
         </div>
         <div className="vy-page-actions">
-          <Button themeColor="base">Export</Button>
+          <Button themeColor="base"
+                  onClick={() => toast.notImplemented('export the costed lines as the customer-facing quote')}>
+            Export
+          </Button>
           <Button themeColor="primary" onClick={onRun}>Re-run quotation</Button>
         </div>
       </div>

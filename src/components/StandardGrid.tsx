@@ -104,7 +104,38 @@ export function StandardGrid<T extends { id: string | number }>({
     );
   }, [data, search, searchFields]);
 
+  /* Changing a filter returns you to page 1.
+
+     Without this, narrowing the set while deep in the pager left `skip` past
+     the new end: from page 7 of 330, toggling a filter down to 62 records gave
+     an entirely blank grid, a pager reading "62 - 62 of 62", and no empty state
+     — because total was 62, not 0, so nothing claimed anything was wrong. A
+     screen that renders nothing and explains nothing is the same defect this
+     project criticised the live system for (finding T5).
+
+     Done during render rather than in an effect: as an effect it raced the
+     clamp below, which reads `skip` from the same render's closure, so the
+     clamp overwrote the reset and landed the user on page 2 instead of page 1.
+     This is React's documented pattern for adjusting state when props change,
+     and it settles before `process()` runs. */
+  const prevData = useRef(data);
+  if (prevData.current !== data) {
+    prevData.current = data;
+    if (dataState.skip) setDataState(s => ({ ...s, skip: 0 }));
+  }
+
   const result = useMemo(() => process(filtered, dataState), [filtered, dataState]);
+
+  /* Belt and braces: if skip ever lands past the end for any other reason —
+     a page size change, a sort that drops rows — step back to the last page
+     that has rows rather than render nothing. */
+  useEffect(() => {
+    const take = dataState.take ?? 50;
+    const skip = dataState.skip ?? 0;
+    if (result.total > 0 && skip >= result.total) {
+      setDataState(s => ({ ...s, skip: Math.max(0, (Math.ceil(result.total / take) - 1) * take) }));
+    }
+  }, [result.total, dataState.skip, dataState.take]);
 
   return (
     <div className="vy-page vy-page--list" data-density={density} ref={wrapRef}>

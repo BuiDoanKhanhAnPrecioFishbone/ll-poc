@@ -1,6 +1,7 @@
 import { Grid, GridColumn } from '@progress/kendo-react-grid';
 import { Button } from '@progress/kendo-react-buttons';
 import { ProgressBar } from '@progress/kendo-react-progressbars';
+import { useToast } from '../Toast';
 import { StatusBadge } from '../StatusBadge';
 import { fmtDate } from '../StandardGrid';
 import { COLUMN_WIDTH } from '../../theme/tokens';
@@ -19,6 +20,7 @@ import {
  * because they are worked by different people (program vs engineering).
  */
 export function ChecklistsTab({ q }: { q: Quotation }) {
+  const toast = useToast();
   return (
     <>
       <section className="vy-assignees">
@@ -40,7 +42,10 @@ export function ChecklistsTab({ q }: { q: Quotation }) {
           <h2 className="vy-field-group-title">
             Documents <span className="vy-count">{q.documents.length}</span>
           </h2>
-          <Button themeColor="base">Upload</Button>
+          <Button themeColor="base"
+                  onClick={() => toast.notImplemented('attach a drawing, BoM or test spec to this RFQ')}>
+            Upload
+          </Button>
         </div>
         {q.documents.length === 0 ? (
           <div className="vy-empty-inline">

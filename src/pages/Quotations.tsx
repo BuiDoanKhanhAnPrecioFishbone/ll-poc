@@ -4,6 +4,7 @@ import { Button } from '@progress/kendo-react-buttons';
 import { Rating } from '@progress/kendo-react-inputs';
 import { Chip } from '@progress/kendo-react-buttons';
 import { StandardGrid, fmtDate } from '../components/StandardGrid';
+import { useToast } from '../components/Toast';
 import { generateQuotations, QUOTATION_COLUMNS, daysUntil, type Quotation } from '../data/quotations';
 
 const OWNER = 'Huyen NTN';
@@ -22,6 +23,7 @@ export function Quotations() {
   const [mineOnly, setMineOnly] = useState(true);
   const [openOnly, setOpenOnly] = useState(true);
   const navigate = useNavigate();
+  const toast = useToast();
 
   const data = useMemo(() => all.filter(q =>
     (!mineOnly || q.assignedTo === OWNER) &&
@@ -68,8 +70,14 @@ export function Quotations() {
       defaultDensity="compact"
       defaultSort={[{ field: 'dateNeeded', dir: 'asc' }]}
       actions={<>
-        <Button themeColor="base">Export</Button>
-        <Button themeColor="primary">New RFQ</Button>
+        <Button themeColor="base"
+                onClick={() => toast.notImplemented(`export these ${data.length} RFQs to Excel`)}>
+          Export
+        </Button>
+        <Button themeColor="primary"
+                onClick={() => toast.notImplemented('open a blank RFQ form for a new customer enquiry')}>
+          New RFQ
+        </Button>
       </>}
       filters={<>
         <span className="vy-filter-label">Showing</span>
