@@ -16,7 +16,7 @@ const ROLE_NOTES: Record<string, string> = {
   money:  'Right-aligned, currency-aware, always two decimals.',
   date:   'Sized to the full rendered format. A truncated date is worse than no date — production truncates 100% of them.',
   status: 'One badge from the shared status tokens. Never free text.',
-  rating: 'A Kendo Rating rendered read-only in the cell. A Rating is 32px tall by default, which would put a 36px floor on the row; GAP-02 tightens its padding under compact density so the row still reaches 28px.',
+  rating: 'Read-only stars. Written here rather than imported: the library version carried internal padding that forced a 36px row floor and made compact density unreachable. This one inherits the row height, so a 28px compact row works with a rating in it.',
 };
 
 export function DesignSystemPage() {
@@ -26,8 +26,9 @@ export function DesignSystemPage() {
         <div>
           <h1 className="vy-page-title">Design system</h1>
           <p className="vy-page-sub">
-            Every value below is a CSS custom property. Nothing here overrides a Kendo component —
-            the tokens are mapped onto Kendo’s own variable API, so all components inherit at once.
+            Every value below is a CSS custom property, and the token files are the only place raw
+            values are allowed. Structure follows Material 3 — elevation, state layers, motion and
+            shape — while every colour resolves to a Voyager token.
           </p>
         </div>
       </div>

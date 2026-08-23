@@ -67,8 +67,8 @@
      The legacy app declared NO font stack at all (computed font-family was the
      bare keyword `sans-serif`), so it rendered in the browser default and
      varied per OS. This pins it. */
-  --vy-font-sans: "Inter", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
-  --vy-font-mono: "JetBrains Mono", "SF Mono", "Cascadia Mono", Consolas, monospace;
+  --vy-font-sans: "Inter Variable", "Inter", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  --vy-font-mono: "JetBrains Mono", ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
 
   --vy-text-2xs:  10px;
   --vy-text-xs:   11px;

@@ -1,0 +1,49 @@
+/* =============================================================================
+   BASE / RESET
+   -----------------------------------------------------------------------------
+   This file exists because its absence was a bug. These rules previously lived
+   at the bottom of the Kendo bridge; deleting that file during the migration
+   took the global reset with it, and the entire application fell back to the
+   browser default — Times, a serif, in an ERP — with no box-sizing reset and no
+   full-height root. Global resets belong in a file of their own, not appended
+   to a stylesheet that might be deleted.
+   ========================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body, #root { height: 100%; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--vy-font-sans);
+  font-size: var(--vy-text-base);
+  line-height: 1.45;
+  color: var(--vy-grey-800);
+  background: var(--vy-grey-50);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-synthesis-weight: none;   /* Inter has real weights; never fake bold */
+}
+
+/* Form controls do not inherit font by default in any browser. This is the
+   single most common cause of a stray system font inside a themed app. */
+button, input, textarea, select, optgroup {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+}
+
+h1, h2, h3, h4, h5, h6, p, figure, blockquote, dl, dd { margin: 0; }
+ul[class], ol[class] { list-style: none; margin: 0; padding: 0; }
+img, svg, video { max-width: 100%; display: block; }
+a { color: inherit; }
+
+/* Tabular figures wherever numbers are compared vertically. Proportional digits
+   in a grid make a mis-keyed value impossible to spot. */
+table, .vy-num, [data-role="number"], [data-role="money"], [data-role="date"] {
+  font-variant-numeric: tabular-nums;
+}
+
+.vy-sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
+}

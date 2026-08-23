@@ -66,7 +66,12 @@ export function AppShell() {
   }, [pathname]);
 
   const [paletteOpen, setPaletteOpen] = useState(false);
+  /* Below 820px the sidebar overlays rather than squeezing the content. It
+     closes on navigation, because leaving it open over the screen you just
+     asked for is the classic mobile-drawer mistake. */
+  const [navOpen, setNavOpen] = useState(false);
   const crumb = useBreadcrumb();
+  useEffect(() => { setNavOpen(false); }, [pathname]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -77,13 +82,16 @@ export function AppShell() {
   }, []);
 
   return (
-    <div className="vy-shell" data-collapsed={collapsed}>
+    <div className="vy-shell" data-collapsed={collapsed} data-nav-open={navOpen}>
       <a className="vy-skip" href="#vy-main">Skip to content</a>
       {/* ---- Sidebar: persistent, not a drawer -----------------------------
           The production app hides all 51 destinations behind a hamburger, so
           the user never sees where they are in the structure. A persistent
           rail costs 248px and buys permanent orientation. */}
-      <aside className="vy-sidebar" aria-label="Main navigation">
+
+      {navOpen && <div className="vy-nav-scrim" onClick={() => setNavOpen(false)} aria-hidden />}
+
+      <aside className="vy-sidebar">
         <div className="vy-brand">
           <div className="vy-brand-mark" aria-hidden>V</div>
           {!collapsed && (
@@ -152,6 +160,14 @@ export function AppShell() {
 
       <div className="vy-main">
         <header className="vy-topbar">
+          <button className="vy-icon-btn vy-nav-toggle" aria-label="Open navigation"
+                  aria-expanded={navOpen} onClick={() => setNavOpen(o => !o)}>
+            <svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor"
+                 strokeWidth="1.8" strokeLinecap="round" aria-hidden>
+              <path d="M3 5h14M3 10h14M3 15h14" />
+            </svg>
+          </button>
+
           {/* ---- Breadcrumb: the orientation the production app has none of --- */}
           <div className="vy-crumb">
             {crumb ? (

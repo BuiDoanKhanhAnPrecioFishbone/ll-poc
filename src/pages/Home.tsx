@@ -25,8 +25,8 @@ export function Home() {
       <div className="vy-callout">
         <h2>This is a mockup, not the ERP</h2>
         <p>
-          It exists to test three things before any of it is built: a Kendo theme driven entirely
-          by design tokens, a restructured sitemap, and one standard list pattern that every
+          It exists to test three things before any of it is built: a design system driven
+          entirely by tokens, a restructured sitemap, and one standard list pattern that every
           module can inherit.
         </p>
         <div className="vy-callout-links">
