@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { widthOf, type ColumnSpec } from '../components/column-model';
+import { renderCell } from './renderCell';
 
 /**
  * Non-virtualised table for the short lists inside a record — documents,
@@ -25,7 +26,7 @@ export function MiniTable<T extends { id: string | number }>({ data, columns, em
           <div key={row.id} className="vy-minitable-row" role="row" style={{ gridTemplateColumns: template }}>
             {columns.map(c => (
               <div key={c.field} role="cell" className="vy-td" data-role={c.role}>
-                {c.render ? c.render(row) : String(row[c.field] ?? '')}
+                {renderCell(c, row)}
               </div>
             ))}
           </div>

@@ -283,3 +283,73 @@
 .vy-suffixed .vy-field-control { flex: 1; }
 .vy-suffix { font-size: var(--vy-text-base); color: var(--vy-grey-500); white-space: nowrap; }
 .vy-notes-edit { display: grid; grid-template-columns: repeat(auto-fit, minmax(var(--vy-note-min-w), 1fr)); gap: var(--vy-space-8); margin-top: var(--vy-space-9); }
+
+/* =============================================================================
+   MINI TABLE
+   -----------------------------------------------------------------------------
+   The short lists inside a record: documents, quotation results, wizard lines.
+   Same column-role model and visual language as the main DataGrid, without the
+   virtualiser — these are tens of rows, not tens of thousands.
+
+   This block was missing entirely when MiniTable was written. With no
+   `display: grid`, the inline grid-template had nothing to act on and every
+   cell stacked into one column: seven headings down the page, then each row's
+   values beneath them. Row counts were still correct, so automated checks
+   passed while the table was unusable.
+   ========================================================================== */
+.vy-minitable {
+  border: 1px solid var(--vy-grey-200);
+  border-radius: var(--vy-shape-md);
+  overflow-x: auto;
+  background: var(--vy-grey-0);
+}
+.vy-minitable-head,
+.vy-minitable-row { display: grid; align-items: center; min-width: min-content; }
+
+.vy-minitable-head {
+  position: sticky; top: 0; z-index: 1;
+  background: var(--vy-grey-50);
+  border-bottom: 1px solid var(--vy-grey-300);
+}
+.vy-minitable-head .vy-th {
+  border-right: 1px solid var(--vy-grey-200);
+  cursor: default;
+}
+.vy-minitable-head .vy-th:last-child { border-right: 0; }
+
+.vy-minitable-row { border-bottom: 1px solid var(--vy-grey-100); min-height: var(--vy-row-h-comfortable); }
+.vy-minitable-row:last-child { border-bottom: 0; }
+.vy-minitable-row:hover { background: var(--vy-blue-50); }
+.vy-minitable-row .vy-td { padding-block: var(--vy-space-3); }
+
+/* Inside a dialog the table gets its own scroll rather than growing the dialog:
+   a wizard step that pushes its own action bar off-screen cannot be completed. */
+.vy-dialog .vy-minitable { max-height: 46vh; overflow-y: auto; }
+
+/* --- Identifiers -----------------------------------------------------------
+   Part numbers, RFQ numbers, MPNs. Monospaced and tabular so they align
+   digit-for-digit down a column and a transposed character is visible.
+
+   The DataGrid applies this via [data-role="ident"]; this class is for the
+   places that render an identifier outside a grid — MiniTable cells, the
+   record header. It was lost with kendo-bridge.css and those identifiers
+   silently fell back to the body font. */
+.vy-ident {
+  font-family: var(--vy-font-mono);
+  font-size: var(--vy-text-sm);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.01em;
+  white-space: nowrap;
+  color: var(--vy-grey-900);
+}
+
+/* --- Containers ------------------------------------------------------------
+   Grouping wrappers whose children carry the styling. Declared so the layout
+   is stated rather than inherited by accident. */
+.vy-field-group { min-width: 0; }
+.vy-fact { min-width: 0; }
+.vy-assignee { min-width: 0; }
+.vy-checklist { min-width: 0; }
+.vy-doc-section { margin-top: var(--vy-space-9); }
+.vy-record { min-width: 0; }
+.vy-tabpanel:focus-visible { outline: none; }

@@ -4,12 +4,12 @@ import {
   type ColumnDef, type SortingState,
 } from '@tanstack/react-table';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { StatusBadge } from './Badge';
 import { SearchField } from './Field';
 import { Button } from './Button';
 import { SegmentedControl } from './Overlays';
 import { widthOf, type ColumnSpec } from '../components/column-model';
 import { GridSkeleton } from './GridSkeleton';
+import { renderCell, fmtDate } from './renderCell';
 
 export type Density = 'compact' | 'comfortable' | 'relaxed';
 const ROW_H: Record<Density, number> = { compact: 28, comfortable: 36, relaxed: 44 };
@@ -216,21 +216,5 @@ export function DataGrid<T extends { id: string | number }>({
   );
 }
 
-/** Roles drive rendering, so a date can never be formatted two ways. */
-function renderCell<T>(spec: ColumnSpec<T>, row: T): ReactNode {
-  if (spec.render) return spec.render(row);
-  const v = row[spec.field] as unknown;
-  switch (spec.role) {
-    case 'ident':  return <span className="vy-ident" title={String(v)}>{String(v)}</span>;
-    case 'status': return <StatusBadge value={String(v)} />;
-    case 'date':   return fmtDate(v as Date);
-    case 'money':  return (v as number).toLocaleString('en-GB', { style: 'currency', currency: 'USD' });
-    case 'number': return (v as number).toLocaleString();
-    case 'code':   return v ? <span className="vy-code">{String(v)}</span> : <span className="vy-empty">—</span>;
-    default:       return <span className="vy-truncate" title={String(v)}>{String(v)}</span>;
-  }
-}
-
-export function fmtDate(d: Date) {
-  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-}
+/* Re-exported so existing imports of fmtDate from DataGrid keep working. */
+export { fmtDate };
