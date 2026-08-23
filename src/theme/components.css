@@ -453,7 +453,23 @@
    in app.css declaring `display: grid` with a 28px first column, which
    collapsed the new checkbox row to 20px wide. Rules for one component
    belonging to two files is how that happens. */
-.vy-checklist-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(var(--vy-note-min-w), 1fr)); gap: var(--vy-space-9); margin-bottom: var(--vy-space-9); }
+/* Three columns: assignees, then the two bodies of work. Measured: a checklist
+   row needs 282px (20px box + 139px longest label + 91px tag + gaps), so at a
+   1400px viewport the two lists still get 400px each with 118px to spare. */
+.vy-checklist-layout {
+  display: grid;
+  grid-template-columns: var(--vy-assignee-panel-w) 1fr;
+  gap: var(--vy-space-10);
+  align-items: start;
+  margin-bottom: var(--vy-space-9);
+}
+.vy-assignees {
+  position: sticky; top: var(--vy-space-4);
+  display: flex; flex-direction: column; gap: var(--vy-space-7);
+  padding-right: var(--vy-space-8);
+  border-right: 1px solid var(--vy-grey-200);
+}
+.vy-checklist-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(var(--vy-checklist-col-min), 1fr)); gap: var(--vy-space-9); }
 .vy-checklist-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--vy-space-4); margin-bottom: var(--vy-space-4); }
 
 /* --- Cell link ---------------------------------------------------------------

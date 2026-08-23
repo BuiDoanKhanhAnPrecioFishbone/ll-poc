@@ -45,21 +45,25 @@ export function ChecklistsTab({ q }: { q: Quotation }) {
   });
   return (
     <>
-      <section className="vy-assignees">
-        <h2 className="vy-field-group-title">Assignees</h2>
-        <div className="vy-assignee-row">
+      {/* Three columns: who, then the two bodies of work. The assignee panel
+          matches the original layout, and sticks so the roles stay on screen
+          while a long checklist scrolls — which is exactly when "who owns the
+          outstanding item?" gets asked. */}
+      <div className="vy-checklist-layout">
+        <section className="vy-assignees">
+          <h2 className="vy-field-group-title">Assignees</h2>
           <Assignee role="Program Manager" required value={people.programManager}
                     onChange={v => setPeople(p => ({ ...p, programManager: v }))} />
           <Assignee role="Buyer" required value={people.buyer}
                     onChange={v => setPeople(p => ({ ...p, buyer: v }))} />
           <Assignee role="Engineer" value={people.engineer}
                     onChange={v => setPeople(p => ({ ...p, engineer: v }))} />
-        </div>
-      </section>
+        </section>
 
-      <div className="vy-checklist-cols">
-        <Checklist title="Program" items={PROGRAM_CHECKLIST} state={program} onToggle={setProgram} />
-        <Checklist title="Engineering" items={ENGINEERING_CHECKLIST} state={engineering} onToggle={setEngineering} />
+        <div className="vy-checklist-cols">
+          <Checklist title="Program" items={PROGRAM_CHECKLIST} state={program} onToggle={setProgram} />
+          <Checklist title="Engineering" items={ENGINEERING_CHECKLIST} state={engineering} onToggle={setEngineering} />
+        </div>
       </div>
 
       <section className="vy-doc-section">

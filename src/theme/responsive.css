@@ -53,6 +53,12 @@
   .vy-run-cols { grid-template-columns: 1fr; }
   .vy-run-summary { grid-template-columns: repeat(2, 1fr); }
   .vy-checklist-cols { grid-template-columns: 1fr; }
+  /* Below this the left panel has no width to spare: assignees go back to a
+     band above the lists rather than squeezing both. */
+  .vy-checklist-layout { grid-template-columns: 1fr; }
+  .vy-assignees { position: static; border-right: 0; padding-right: 0;
+    border-bottom: 1px solid var(--vy-grey-200); padding-bottom: var(--vy-space-7);
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(var(--vy-card-min-w), 1fr)); }
 }
 
 @media (max-width: 820px) {
