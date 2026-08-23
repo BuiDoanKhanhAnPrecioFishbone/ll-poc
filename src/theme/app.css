@@ -287,15 +287,8 @@
 .vy-fact-value { font-size: var(--vy-text-md); color: var(--vy-grey-900); display: flex; align-items: baseline; gap: var(--vy-space-3); flex-wrap: wrap; }
 
 .vy-tabs { background: transparent; }
-.vy-field-groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(var(--vy-field-group-min), 1fr)); gap: var(--vy-space-9); }
-.vy-field-group-title { font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .06em; color: var(--vy-grey-500); font-weight: var(--vy-weight-heavy); margin: 0 0 var(--vy-space-4); padding-bottom: var(--vy-space-2); border-bottom: 1px solid var(--vy-grey-200); }
-.vy-field-list { margin: 0; }
-.vy-field { display: grid; grid-template-columns: var(--vy-field-label-w) 1fr; gap: var(--vy-space-4); padding: var(--vy-space-3) 0; border-bottom: 1px solid var(--vy-grey-100); }
-.vy-field dt { font-size: var(--vy-text-base); color: var(--vy-grey-500); }
-.vy-field dd { margin: 0; font-size: var(--vy-text-base); color: var(--vy-grey-900); }
 /* An unset field says so once, quietly. The production screen renders an empty
    read-only input, which reads as a control that failed to load. */
-.vy-field dd.is-empty, .vy-note p.is-empty { color: var(--vy-grey-400); font-style: italic; }
 
 .vy-flags { display: flex; flex-direction: column; gap: var(--vy-space-2); margin-top: var(--vy-space-4); }
 .vy-flag-row { display: flex; align-items: baseline; gap: var(--vy-space-3); font-size: var(--vy-text-base); color: var(--vy-grey-400); }

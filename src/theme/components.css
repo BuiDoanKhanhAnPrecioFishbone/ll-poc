@@ -272,11 +272,52 @@
   border-left: var(--vy-accent-bar-w) solid var(--vy-blue-600);
   border-radius: var(--vy-shape-sm); font-size: var(--vy-text-base);
 }
-/* An editing row gives the control room to breathe; a reading row stays dense.
-   Same grid, different rhythm, so nothing jumps sideways when the mode flips. */
-.vy-field--editing { align-items: start; padding-block: var(--vy-space-4); }
-.vy-field--editing dt { padding-top: var(--vy-space-4); }
-.vy-field--editing dd { display: flex; flex-direction: column; gap: var(--vy-space-2); }
+
+/* =============================================================================
+   RECORD FIELDS
+   -----------------------------------------------------------------------------
+   Moved here from app.css. These are component rules, not application chrome,
+   and app.css loads AFTER components.css — so the base `.vy-field` was
+   overriding its own `.vy-field--editing` modifier at equal specificity, and
+   edit mode silently kept the two-column reading layout. A modifier must live
+   in the same file as its base, after it.
+   ========================================================================== */
+.vy-field-groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(var(--vy-field-group-min), 1fr)); gap: var(--vy-space-9); }
+.vy-field-group-title { font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .06em; color: var(--vy-grey-500); font-weight: var(--vy-weight-heavy); margin: 0 0 var(--vy-space-4); padding-bottom: var(--vy-space-2); border-bottom: 1px solid var(--vy-grey-200); }
+.vy-field-list { margin: 0; }
+.vy-field { display: grid; grid-template-columns: var(--vy-field-label-w) 1fr; gap: var(--vy-space-4); padding: var(--vy-space-3) 0; border-bottom: 1px solid var(--vy-grey-100); }
+.vy-field dt { font-size: var(--vy-text-base); color: var(--vy-grey-500); }
+.vy-field dd { margin: 0; font-size: var(--vy-text-base); color: var(--vy-grey-900); }
+.vy-field dd.is-empty, .vy-note p.is-empty { color: var(--vy-grey-400); font-style: italic; }
+
+/* Reading rows are two columns and dense: a 180px label beside its value.
+   EDITING rows stack, because a control is not a value.
+
+   The arithmetic that forced this: label 180px + gap 8px + the select's 200px
+   minimum = 388px per field, while each of the three requirement groups gets
+   about 330px at a 1500px viewport. The control overflowed its column and
+   landed on the next group's labels — "Application", "Excess and MOQ" and
+   "Net consigned inventory" were all sitting underneath a select.
+
+   Stacking removes the 180px tax entirely and gives the control the full
+   column width, which is what a form control wants anyway. */
+.vy-field--editing {
+  grid-template-columns: 1fr;
+  gap: var(--vy-space-2);
+  align-items: stretch;
+  padding-block: var(--vy-space-5);
+}
+.vy-field--editing dt { padding-top: 0; }
+.vy-field--editing dt label { font-size: var(--vy-text-sm); color: var(--vy-grey-600); }
+.vy-field--editing dd { display: flex; flex-direction: column; gap: var(--vy-space-2); min-width: 0; }
+
+/* Controls fill their field. The select's default minimum is for standalone
+   use — inside a field the column decides the width, not the control. */
+.vy-field--editing .vy-select,
+.vy-field--editing .vy-input,
+.vy-field--editing .vy-field-control,
+.vy-field--editing .vy-suffixed { width: 100%; min-width: 0; }
+.vy-field--editing .vy-suffixed .vy-input { flex: 1; }
 .vy-field--wide { grid-template-columns: 1fr; }
 .vy-field--wide dt { padding-top: 0; }
 .vy-suffixed { display: flex; align-items: center; gap: var(--vy-space-3); }
