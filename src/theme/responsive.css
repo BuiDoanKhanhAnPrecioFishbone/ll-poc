@@ -87,23 +87,51 @@
 
 
 /* ---- Stepper: the label survives, the gloss does not ---------------------
-   Four steps with a one-line description each need roughly 760px. Below that
-   the labels start truncating — and a truncated "1 - Confi…" is worse than no
-   description at all, because the step NAME is the thing you navigate by.
-   A container query rather than a viewport one: the stepper lives inside a
-   dialog, so what matters is the space it actually has. */
-.vy-stepper { container-type: inline-size; }
-@container (max-width: 760px) {
+
+   DO NOT reintroduce `container-type` here. It was a container query, which is
+   the more correct tool — the stepper lives in a dialog, so its own width is
+   what matters, not the window's — and it rendered the entire page blank.
+
+   `container-type: inline-size` applies size containment. On the Run Quotation
+   dialog that put a size-contained element inside a fixed-position flex column
+   whose sibling scrolls, at exactly its max-height. Chrome's compositor dropped
+   the frame: correct DOM, correct geometry, every ancestor computing
+   `visibility: visible` and `opacity: 1`, and nothing painted at all — not the
+   dialog, not the scrim, not the app behind it. Only step 2 showed it, because
+   step 2 is the one step whose content overflows the dialog body; the other
+   three fit and painted normally, which is what made it look like one broken
+   screen rather than a stylesheet fault.
+
+   Viewport breakpoints instead. They are a proxy, but a derivable one rather
+   than a guess, because the dialog's width is a pure function of the viewport:
+
+       width          = min(1180px, 96vw)
+       stepper width  = that, minus 2 x 20px of body padding
+
+   so 840px of viewport gives ~766px of stepper, and 700px gives ~632px. */
+
+/* Four steps with a one-line description each need about 760px of stepper.
+   Below that the labels start truncating, and a truncated "1 - Confi…" is worse
+   than no description at all — the step NAME is what you navigate by. */
+@media (max-width: 840px) {
   .vy-step-text { display: none; }
 }
-/* Narrower still, the labels alone stop fitting side by side. Rather than
-   truncate all four, only the current step keeps its label — the others become
-   their marker, which is enough to show position and stay clickable. */
-/* Measured: "2 - Review BoM" needs 98px of label, and a step costs about 146px
-   with its marker, gap and padding. Four of those is 584px, so the labels stop
-   fitting well before the container looks tight. */
-@container (max-width: 620px) {
+
+/* Narrower still and the labels alone stop fitting side by side. Measured:
+   "2 - Review BoM" needs 98px of label, and a step costs about 146px with its
+   marker, gap and padding — four of those is 584px. Rather than truncate all
+   four, only the current step keeps its label; the others become their marker,
+   which still shows position and stays clickable. */
+@media (max-width: 700px) {
   .vy-step:not([data-state="current"]) .vy-step-label { display: none; }
   .vy-step:not([data-state="current"]) { flex: 0 0 auto; }
   .vy-step[data-state="current"] { flex: 1 1 auto; }
+}
+
+/* The Cost Estimation summary is a 2fr/1fr split, which needs about 900px of
+   viewport. Below that the money card's labels wrap to three and four lines
+   ("Total Cost / With / MarkUp") and the numbers stop lining up, which is the
+   one thing a column of figures has to do. Stack instead. */
+@media (max-width: 900px) {
+  .vy-run-summary-step { grid-template-columns: 1fr; }
 }
