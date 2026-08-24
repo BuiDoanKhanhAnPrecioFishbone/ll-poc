@@ -167,9 +167,14 @@ export function DataGrid<T extends { id: string | number }>({
           <SearchField value={search} placeholder={searchPlaceholder} aria-label={searchPlaceholder}
                        onChange={e => setSearch(e.target.value)} />
           <span className="vy-toolbar-spacer" />
-          <span className="vy-toolbar-label" id="density-label">Density</span>
-          <SegmentedControl label="Row density" options={DENSITY_OPTIONS}
-                            value={density} onChange={setDensity} />
+          {/* Label and control wrap together. Left as siblings of the flex row
+              they broke apart, stranding "Density" on the line above the buttons
+              it names. */}
+          <div className="vy-toolbar-group">
+            <span className="vy-toolbar-label" id="density-label">Density</span>
+            <SegmentedControl label="Row density" options={DENSITY_OPTIONS}
+                              value={density} onChange={setDensity} />
+          </div>
           {hiddenCount > 0 && (
             <Button variant={showHidden ? 'tonal' : 'outlined'} onClick={() => setShowHidden(s => !s)}
                     title={columns.filter(c => c.hiddenByDefault)

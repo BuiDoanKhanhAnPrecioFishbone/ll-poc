@@ -38,7 +38,6 @@
 .vy-nav-group-title { display: block; font-size: var(--vy-text-xs); font-weight: var(--vy-weight-heavy); letter-spacing: .09em; text-transform: uppercase; color: var(--vy-on-dark-secondary); }
 /* The section's purpose sits under its name. A new user should not have to open
    a group to learn what belongs in it. */
-.vy-nav-group-purpose { display: block; font-size: var(--vy-text-2xs); color: var(--vy-on-dark-muted); margin-top: 1px; }
 
 .vy-nav-item {
   display: flex; align-items: center; gap: var(--vy-space-5);
@@ -70,7 +69,6 @@
 .vy-crumb-group { font-size: var(--vy-text-sm); color: var(--vy-grey-500); }
 .vy-crumb-sep { color: var(--vy-grey-300); }
 .vy-crumb-title { font-size: var(--vy-text-md); font-weight: var(--vy-weight-semibold); color: var(--vy-grey-800); white-space: nowrap; }
-.vy-crumb-was { font-size: var(--vy-text-xs); color: var(--vy-grey-400); background: var(--vy-grey-50); border: 1px solid var(--vy-grey-200); border-radius: var(--vy-radius-pill); padding: 1px var(--vy-space-4); white-space: nowrap; }
 
 .vy-search {
   margin-left: auto; display: flex; align-items: center; gap: var(--vy-space-4);
@@ -93,9 +91,6 @@
 .vy-avatar { width: var(--vy-control-sm); height: var(--vy-control-sm); border-radius: 50%; background: var(--vy-blue-100); color: var(--vy-blue-800); display: grid; place-items: center; font-weight: var(--vy-weight-semibold); font-size: var(--vy-text-sm); }
 
 .vy-content { flex: 1; overflow: auto; min-height: 0; }
-/* A list page owns the full content box so its grid can flex; document pages
-   keep normal document flow. */
-.vy-content:has(> .vy-page--list) { overflow: hidden; }
 
 /* ---- Page ----------------------------------------------------------------- */
 .vy-page { padding: var(--vy-space-9) var(--vy-space-10); }
@@ -106,9 +101,15 @@
 .vy-page-actions { display: flex; gap: var(--vy-space-4); flex-shrink: 0; }
 
 /* ---- Grid ----------------------------------------------------------------- */
-.vy-grid { border-radius: var(--vy-radius-md); box-shadow: var(--vy-shadow-sm); }
-.vy-grid-toolbar { display: flex; align-items: center; gap: var(--vy-space-5); width: 100%; }
-.vy-grid-search { width: min(var(--vy-search-w), 40%); }
+.vy-grid-toolbar { display: flex; align-items: center; gap: var(--vy-space-5); width: 100%; flex-wrap: wrap; }
+/* The search box is the toolbar's primary control, so it gets a floor and takes
+   the slack. Without a min-width it was the first thing flexbox squeezed, and at
+   800px it collapsed to about six characters — "Sear…" — while the density
+   segmented control kept its full width beside it. */
+.vy-grid-toolbar > .vy-search-field { flex: 1 1 var(--vy-grid-search-min); min-width: var(--vy-grid-search-min); max-width: var(--vy-search-w); }
+/* The spacer only earns its keep on one line; once the toolbar wraps it would
+   push the density control onto a row of its own. */
+.vy-toolbar-spacer { flex: 1 1 0; min-width: 0; }
 .vy-toolbar-spacer { flex: 1; }
 .vy-toolbar-label { font-size: var(--vy-text-sm); color: var(--vy-grey-500); }
 .vy-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -152,14 +153,6 @@
 .vy-queue-n { font-size: var(--vy-text-3xl); font-weight: var(--vy-weight-bold); color: var(--vy-grey-900); line-height: 1; }
 .vy-queue-label { font-size: var(--vy-text-base); color: var(--vy-grey-600); margin-top: var(--vy-space-3); }
 
-.vy-callout { background: var(--vy-grey-0); border: 1px solid var(--vy-grey-200); border-radius: var(--vy-radius-md); padding: var(--vy-space-9) var(--vy-space-9); box-shadow: var(--vy-shadow-sm); }
-.vy-callout h2 { margin: 0 0 var(--vy-space-3); font-size: var(--vy-text-lg); color: var(--vy-grey-900); }
-.vy-callout p { margin: 0 0 var(--vy-space-8); color: var(--vy-grey-600); max-width: 68ch; }
-.vy-callout-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(var(--vy-link-card-min-w), 1fr)); gap: var(--vy-space-5); }
-.vy-link-card { display: block; padding: var(--vy-space-6) var(--vy-space-7); border: 1px solid var(--vy-grey-200); border-radius: var(--vy-radius-md); text-decoration: none; background: var(--vy-grey-25); }
-.vy-link-card:hover { border-color: var(--vy-blue-300); background: var(--vy-blue-50); }
-.vy-link-card strong { display: block; color: var(--vy-blue-700); font-size: var(--vy-text-md); }
-.vy-link-card span { color: var(--vy-grey-500); font-size: var(--vy-text-sm); }
 
 /* ---- Sitemap comparison --------------------------------------------------- */
 .vy-stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(var(--vy-stat-min-w), 1fr)); gap: var(--vy-space-5); margin-bottom: var(--vy-space-9); }
@@ -231,19 +224,16 @@
 .vy-stub { background: var(--vy-grey-0); border: 1px dashed var(--vy-grey-300); border-radius: var(--vy-radius-md); padding: var(--vy-space-11); max-width: 72ch; }
 .vy-stub-tag { display: inline-block; font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .06em; color: var(--vy-grey-500); background: var(--vy-grey-100); border-radius: var(--vy-radius-pill); padding: var(--vy-space-2) var(--vy-space-5); margin-bottom: var(--vy-space-6); }
 .vy-stub-hint { font-size: var(--vy-text-lg); color: var(--vy-grey-800); margin: 0 0 var(--vy-space-5); }
-.vy-stub-was { color: var(--vy-grey-600); margin: 0 0 var(--vy-space-7); }
 .vy-stub-note { color: var(--vy-grey-500); font-size: var(--vy-text-base); margin: 0; }
 
 /* The review pages document the revamp; they are visually separated from the
    product navigation so nobody mistakes them for part of the proposed IA. */
-.vy-nav-group--review { border-top: 1px solid var(--vy-on-dark-hairline); padding-top: var(--vy-space-3); margin-top: var(--vy-space-3); }
 
 /* The grid flexes to fill whatever is left below the page header and filters.
    This replaced an inline `height: calc(100vh - 210px)` — an untokenised magic
    number that guessed at the height of everything above it, and guessed 80px
    too generously at 1024x768, costing a row of data on every laptop. Flex
    measures instead of guessing, so the number is gone rather than tokenised. */
-.vy-page--list { display: flex; flex-direction: column; height: 100%; min-height: 0; }
 
 
 /* =============================================================================
@@ -257,17 +247,10 @@
    Colour carries the same meaning as the status vocabulary: overdue is blocked,
    due soon is open. Nothing new is invented for this column. */
 .vy-due { display: flex; align-items: baseline; gap: var(--vy-space-2); justify-content: flex-end; }
-.vy-due-rel { font-size: var(--vy-text-xs); font-weight: var(--vy-weight-semibold); white-space: nowrap; }
-.vy-due[data-tone="overdue"] .vy-due-rel, .vy-due-rel[data-tone="overdue"] { color: var(--vy-status-blocked-fg); }
-.vy-due[data-tone="soon"] .vy-due-rel, .vy-due-rel[data-tone="soon"] { color: var(--vy-status-open-fg); }
-.vy-due-rel[data-tone="none"] { display: none; }
-.vy-cell { overflow: hidden; }
-
 /* GAP-01 (approved 21 Aug 2026, option b) — the status column reads as a ragged
    edge when Kendo `Badge` sizes to its label ("New" beside "In-Progress"), and
    Badge exposes no width prop. A fixed-width slot in the cell; the Badge itself
    is stock and unmodified. See docs/gap-register.md. */
-.vy-status-slot { display: inline-flex; justify-content: center; width: var(--vy-status-slot-w); }
 
 /* GAP-02 is retired. It existed because the component library's Rating carried
    4px of internal padding that forced a 36px row floor, making compact density
@@ -279,13 +262,12 @@
    RECORD SCREEN
    ========================================================================== */
 .vy-page--record { max-width: var(--vy-record-max-w); }
-.vy-record-bar { display: flex; align-items: center; justify-content: space-between; gap: var(--vy-space-8); margin-bottom: var(--vy-space-3); flex-wrap: wrap; }
+.vy-record-bar { display: flex; align-items: center; justify-content: space-between; gap: var(--vy-space-6); flex-wrap: wrap; }
 .vy-record-id { display: flex; align-items: center; gap: var(--vy-space-4); }
 .vy-record-no { font-size: var(--vy-text-lg); font-weight: var(--vy-weight-semibold); color: var(--vy-grey-900); }
 .vy-flag { font-size: var(--vy-text-xs); font-weight: var(--vy-weight-semibold); letter-spacing: .06em; color: var(--vy-red-700); background: var(--vy-red-50); border: 1px solid var(--vy-red-500); border-radius: var(--vy-radius-sm); padding: 1px var(--vy-space-3); }
-.vy-record-title { font-size: var(--vy-text-2xl); font-weight: var(--vy-weight-bold); margin: 0 0 var(--vy-space-6); color: var(--vy-grey-900); letter-spacing: -.01em; }
+.vy-record-title { font-size: var(--vy-text-2xl); font-weight: var(--vy-weight-bold); margin: var(--vy-space-4) 0 0; color: var(--vy-grey-900); letter-spacing: -.01em; }
 
-.vy-record-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(var(--vy-card-min-w), 1fr)); gap: var(--vy-space-6); background: var(--vy-grey-0); border: 1px solid var(--vy-grey-200); border-radius: var(--vy-radius-md); padding: var(--vy-space-7) var(--vy-space-8); margin-bottom: var(--vy-space-8); box-shadow: var(--vy-shadow-sm); }
 .vy-fact-label { font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .05em; color: var(--vy-grey-500); margin-bottom: var(--vy-space-1); }
 .vy-fact-value { font-size: var(--vy-text-md); color: var(--vy-grey-900); display: flex; align-items: baseline; gap: var(--vy-space-3); flex-wrap: wrap; }
 
@@ -293,15 +275,11 @@
 /* An unset field says so once, quietly. The production screen renders an empty
    read-only input, which reads as a control that failed to load. */
 
-.vy-flags { display: flex; flex-direction: column; gap: var(--vy-space-2); margin-top: var(--vy-space-4); }
 .vy-flag-row { display: flex; align-items: baseline; gap: var(--vy-space-3); font-size: var(--vy-text-base); color: var(--vy-grey-400); }
 .vy-flag-row[data-on="true"] { color: var(--vy-grey-800); }
 .vy-flag-mark { font-weight: var(--vy-weight-heavy); width: var(--vy-space-5); color: var(--vy-grey-300); }
 .vy-flag-row[data-on="true"] .vy-flag-mark { color: var(--vy-accent-positive); }
 
-.vy-notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(var(--vy-note-min-w), 1fr)); gap: var(--vy-space-8); margin-top: var(--vy-space-9); }
-.vy-note h3 { font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .06em; color: var(--vy-grey-500); margin: 0 0 var(--vy-space-2); }
-.vy-note p { margin: 0; font-size: var(--vy-text-base); color: var(--vy-grey-700); }
 .vy-crumb-link { font-size: var(--vy-text-md); color: var(--vy-blue-700); text-decoration: none; }
 .vy-crumb-link:hover { text-decoration: underline; }
 .vy-note-inline { font-size: var(--vy-text-xs); color: var(--vy-blue-700); background: var(--vy-blue-50); border-radius: var(--vy-radius-sm); padding: var(--vy-space-2) var(--vy-space-4); margin: var(--vy-space-2) 0; }
@@ -310,24 +288,18 @@
    QUOTATION — CHECKLISTS & ASSIGNMENT
    ========================================================================== */
 .vy-assignees { margin-bottom: var(--vy-space-9); }
-.vy-assignee-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(var(--vy-card-min-w), 1fr)); gap: var(--vy-space-6); }
-.vy-assignee-name { display: flex; align-items: center; gap: var(--vy-space-3); font-size: var(--vy-text-md); color: var(--vy-grey-900); }
-.vy-assignee-name.is-empty { color: var(--vy-grey-400); font-style: italic; }
 .vy-avatar--sm { width: var(--vy-space-11); height: var(--vy-space-11); font-size: var(--vy-text-xs); }
 .vy-req { font-size: var(--vy-text-2xs); text-transform: uppercase; letter-spacing: .05em; color: var(--vy-accent-warning); margin-left: var(--vy-space-3); }
 
-.vy-checklist-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(var(--vy-note-min-w), 1fr)); gap: var(--vy-space-9); margin-bottom: var(--vy-space-9); }
 .vy-progress { width: 100%; margin-bottom: var(--vy-space-4); }
 
 .vy-doc-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--vy-space-4); margin-bottom: var(--vy-space-4); }
-.vy-count { font-size: var(--vy-text-xs); color: var(--vy-grey-500); background: var(--vy-grey-100); border-radius: var(--vy-radius-pill); padding: 1px var(--vy-space-3); margin-left: var(--vy-space-2); }
 .vy-empty-inline { color: var(--vy-grey-500); font-size: var(--vy-text-base); background: var(--vy-grey-25); border: 1px dashed var(--vy-grey-300); border-radius: var(--vy-radius-md); padding: var(--vy-space-8); max-width: 72ch; }
 
 /* --- Quotation Result -------------------------------------------------------- */
 .vy-result-summary { display: flex; align-items: flex-end; gap: var(--vy-space-10); flex-wrap: wrap; background: var(--vy-grey-0); border: 1px solid var(--vy-grey-200); border-radius: var(--vy-radius-md); padding: var(--vy-space-7) var(--vy-space-8); margin-bottom: var(--vy-space-7); box-shadow: var(--vy-shadow-sm); }
 .vy-result-summary .vy-page-actions { margin-left: auto; }
 .vy-result-total { font-size: var(--vy-text-2xl); font-weight: var(--vy-weight-bold); color: var(--vy-grey-900); font-variant-numeric: tabular-nums; }
-.vy-emphasis { font-weight: var(--vy-weight-semibold); color: var(--vy-grey-900); }
 .vy-empty-state--tab { border: 1px dashed var(--vy-grey-300); border-radius: var(--vy-radius-md); background: var(--vy-grey-25); }
 .vy-empty-state--tab p { max-width: 60ch; margin-inline: auto; }
 
@@ -362,7 +334,6 @@
 .vy-inline-field--stack { flex-direction: column; align-items: stretch; }
 
 .vy-run { display: flex; flex-direction: column; gap: var(--vy-space-7); }
-.vy-run-stepper { margin-bottom: var(--vy-space-3); }
 .vy-run-context { display: flex; align-items: baseline; gap: var(--vy-space-6); flex-wrap: wrap; font-size: var(--vy-text-base); color: var(--vy-grey-600); background: var(--vy-grey-50); border-radius: var(--vy-radius-md); padding: var(--vy-space-4) var(--vy-space-6); }
 .vy-run-step { display: flex; flex-direction: column; gap: var(--vy-space-6); }
 .vy-run-cols { display: grid; grid-template-columns: 1fr 1fr; gap: var(--vy-space-9); }
@@ -374,16 +345,7 @@
 .vy-match[data-match="No Match"] { background: var(--vy-red-50); color: var(--vy-red-700); }
 .vy-match[data-match="Matches Another Supplier"] { background: var(--vy-status-open-bg); color: var(--vy-status-open-fg); }
 .vy-match[data-match="No Bid"] { background: var(--vy-grey-100); color: var(--vy-grey-600); }
-.vy-warn-cell { color: var(--vy-accent-warning); font-weight: var(--vy-weight-semibold); }
 
-.vy-run-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--vy-space-6); }
-.vy-bucket { border: 1px solid var(--vy-grey-200); border-left: var(--vy-accent-bar-w) solid var(--vy-grey-300); border-radius: var(--vy-radius-md); padding: var(--vy-space-6) var(--vy-space-7); }
-.vy-bucket[data-tone="done"]      { border-left-color: var(--vy-accent-positive); }
-.vy-bucket[data-tone="blocked"]   { border-left-color: var(--vy-red-500); }
-.vy-bucket[data-tone="open"]      { border-left-color: var(--vy-accent-caution); }
-.vy-bucket[data-tone="cancelled"] { border-left-color: var(--vy-grey-300); }
-.vy-bucket-n { font-size: var(--vy-text-2xl); font-weight: var(--vy-weight-bold); color: var(--vy-grey-900); line-height: 1; }
-.vy-bucket-label { font-size: var(--vy-text-sm); color: var(--vy-grey-600); margin-top: var(--vy-space-2); }
 
 /* Marks content this mockup could not verify against the live system, so a
    reviewer never mistakes an inference for an observation. */
@@ -399,7 +361,6 @@
   font-family: inherit;
 }
 .vy-nav-group-head:hover .vy-nav-group-title { color: var(--vy-on-dark-fg); }
-.vy-nav-group-purpose { grid-column: 1 / -1; }
 .vy-nav-chevron { color: var(--vy-on-dark-muted); font-size: var(--vy-text-sm); }
 /* A collapsed group that holds the current screen still says so. */
 .vy-group-dot {
@@ -459,9 +420,6 @@
 /* --- Error state -------------------------------------------------------------
    The third of the three. Names the failure and offers the way out, rather than
    rendering an empty grid that looks like "no data". */
-.vy-error-state { text-align: center; padding: var(--vy-space-14); }
-.vy-error-state strong { display: block; color: var(--vy-red-700); font-size: var(--vy-text-lg); margin-bottom: var(--vy-space-2); }
-.vy-error-state p { color: var(--vy-grey-600); margin: 0 0 var(--vy-space-7); }
 
 /* Skeleton cells are proportioned by column role rather than exact pixel width;
    see GridSkeleton. Flex weights, so no inline style is needed per cell. */
@@ -483,3 +441,305 @@
 /* Action feedback. Anchored bottom-centre so it never covers the toolbar or
    the record header, which are where the action was triggered from. */
 .vy-toasts { position: fixed; left: 50%; bottom: var(--vy-space-9); transform: translateX(-50%); z-index: var(--vy-z-palette); align-items: center; }
+
+/* =============================================================================
+   MY QUEUES
+   -----------------------------------------------------------------------------
+   Extends the .vy-queue base above. These live in this file rather than
+   components.css because the base does: a modifier in the earlier file loses to
+   its own base at equal specificity, which is how three earlier bugs happened.
+   ========================================================================== */
+.vy-queue { display: block; }
+.vy-queue[data-tone="overdue"] { border-left-color: var(--vy-red-600); }
+.vy-queue[data-tone="soon"]    { border-left-color: var(--vy-accent-caution); }
+.vy-queue[data-tone="waiting"] { border-left-color: var(--vy-accent-waiting); }
+/* A zero is information, not an alarm: it keeps its place in the row so the four
+   measures stay in the same order every visit, but stops competing for attention. */
+.vy-queue[data-zero] { opacity: .62; }
+.vy-queue[data-zero] .vy-queue-n { color: var(--vy-grey-500); }
+.vy-queue-label { font-weight: var(--vy-weight-semibold); color: var(--vy-grey-900); }
+.vy-queue-meaning {
+  margin-top: var(--vy-space-2);
+  font-size: var(--vy-text-sm);
+  color: var(--vy-grey-600);
+  line-height: 1.45;
+}
+/* Skeletons, never a zero: "0" while loading asserts something false. */
+.vy-queue--loading { pointer-events: none; }
+.vy-queue--loading .vy-skel { background: var(--vy-grey-100); border-radius: var(--vy-radius-sm); }
+.vy-skel--n     { width: 3ch;  height: var(--vy-text-3xl); }
+.vy-skel--label { width: 62%;  height: var(--vy-text-base); margin-top: var(--vy-space-3); }
+
+/* ---- Mine / Team toggle --------------------------------------------------
+   A segmented control, because the two states are a scope and both are always
+   available. A dropdown would hide one behind a click; a checkbox labelled
+   "show team" would imply Team is an add-on to Mine rather than a wider view. */
+.vy-scope {
+  display: inline-flex;
+  /* flex-start, not stretch: .vy-page-head is a flex row, and a segmented
+     control that spans the page reads as a banner rather than a control. */
+  flex: 0 0 auto; align-self: flex-start;
+  background: var(--vy-grey-100); border-radius: var(--vy-radius-pill);
+  padding: var(--vy-space-1);
+}
+.vy-scope-btn {
+  appearance: none; border: 0; background: none; cursor: pointer;
+  padding: var(--vy-space-3) var(--vy-space-7);
+  border-radius: var(--vy-radius-pill);
+  font-size: var(--vy-text-sm); font-weight: var(--vy-weight-medium);
+  color: var(--vy-grey-600);
+}
+.vy-scope-btn:hover { color: var(--vy-grey-900); }
+.vy-scope-btn[aria-pressed="true"] {
+  background: var(--vy-grey-0); color: var(--vy-grey-900);
+  font-weight: var(--vy-weight-semibold); box-shadow: var(--vy-shadow-sm);
+}
+.vy-scope-btn:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
+
+/* ---- Who is carrying the most ------------------------------------------- */
+.vy-load { margin-top: var(--vy-space-10); }
+.vy-load-list { list-style: none; margin: var(--vy-space-6) 0 0; padding: 0; display: flex; flex-direction: column; gap: var(--vy-space-4); }
+.vy-load-list li { display: grid; grid-template-columns: 10rem 1fr auto; align-items: center; gap: var(--vy-space-6); }
+.vy-load-name { font-size: var(--vy-text-base); color: var(--vy-grey-900); }
+.vy-load-bar { height: var(--vy-space-6); background: var(--vy-grey-100); border-radius: var(--vy-radius-pill); overflow: hidden; }
+.vy-load-bar > span { display: block; height: 100%; background: var(--vy-blue-500); border-radius: var(--vy-radius-pill); }
+.vy-load-n { font-size: var(--vy-text-sm); color: var(--vy-grey-600); white-space: nowrap; }
+.vy-load-late { font-style: normal; margin-left: var(--vy-space-4); color: var(--vy-red-600); font-weight: var(--vy-weight-semibold); }
+
+/* =============================================================================
+   RUN QUOTATION — additions for the restored steps
+   ========================================================================== */
+.vy-run-section + .vy-run-section { margin-top: var(--vy-space-9); padding-top: var(--vy-space-9); border-top: 1px solid var(--vy-grey-200); }
+.vy-run-actions { display: flex; flex-wrap: wrap; gap: var(--vy-space-4); align-items: center; margin: var(--vy-space-6) 0; }
+.vy-run-banner[data-tone="info"] { background: var(--vy-blue-50); border-color: var(--vy-blue-200); }
+.vy-run-drafts { display: flex; align-items: center; gap: var(--vy-space-4); margin-top: var(--vy-space-9); padding-top: var(--vy-space-6); border-top: 1px solid var(--vy-grey-200); font-size: var(--vy-text-sm); color: var(--vy-grey-600); }
+.vy-run-total { margin-top: var(--vy-space-6); text-align: right; font-size: var(--vy-text-base); color: var(--vy-grey-700); }
+
+/* Manufacturer mismatch: BOM spelling on the left, Z2Data's on the right, with
+   the arrow between them saying which way the rename would go. */
+.vy-mismatch { list-style: none; margin: var(--vy-space-6) 0 0; padding: 0; display: flex; flex-direction: column; gap: var(--vy-space-5); }
+.vy-mismatch li { display: flex; flex-wrap: wrap; align-items: center; gap: var(--vy-space-4); padding: var(--vy-space-5) var(--vy-space-6); background: var(--vy-grey-25); border: 1px solid var(--vy-grey-200); border-radius: var(--vy-radius-md); }
+.vy-mismatch-arrow { color: var(--vy-grey-500); }
+.vy-mismatch-actions { display: flex; flex-wrap: wrap; gap: var(--vy-space-3); margin-left: auto; }
+
+/* Line states. There is no "matched" state in the live product — a line with no
+   flag is simply fine, so only the problems get colour. */
+.vy-match[data-match="No Match"]            { background: var(--vy-status-blocked-bg);   color: var(--vy-status-blocked-fg); }
+.vy-match[data-match="Not Enough Qty"]      { background: var(--vy-status-open-bg);      color: var(--vy-status-open-fg); }
+.vy-match[data-match="Out Stock"]           { background: var(--vy-status-open-bg);      color: var(--vy-status-open-fg); }
+.vy-match[data-match="Unselected Supplier"] { background: var(--vy-status-draft-bg);     color: var(--vy-status-draft-fg); }
+
+.vy-empty-state--inline { padding: var(--vy-space-10) var(--vy-space-8); margin: var(--vy-space-6) 0 0; }
+
+/* ---- Step 4: Cost Estimation -------------------------------------------- */
+.vy-run-summary-step { display: grid; grid-template-columns: 2fr 1fr; gap: var(--vy-space-8); align-items: start; }
+.vy-summary-detail { display: grid; grid-template-columns: repeat(auto-fit, minmax(var(--vy-field-group-min), 1fr)); gap: var(--vy-space-8); padding: var(--vy-space-8); border: 1px solid var(--vy-grey-200); border-radius: var(--vy-radius-lg); }
+.vy-cost-card { padding: var(--vy-space-8); background: var(--vy-grey-50); border: 1px solid var(--vy-grey-200); border-radius: var(--vy-radius-lg); }
+.vy-cost-title { margin: 0 0 var(--vy-space-6); font-size: var(--vy-text-sm); font-weight: var(--vy-weight-semibold); color: var(--vy-grey-600); text-transform: uppercase; letter-spacing: .04em; }
+.vy-cost-list { margin: 0; display: flex; flex-direction: column; gap: var(--vy-space-4); }
+.vy-cost-row { display: flex; justify-content: space-between; align-items: baseline; gap: var(--vy-space-6); }
+.vy-cost-row dt { font-size: var(--vy-text-sm); color: var(--vy-grey-600); }
+.vy-cost-row dd { margin: 0; font-family: var(--vy-font-mono); font-size: var(--vy-text-base); color: var(--vy-grey-900); font-variant-numeric: tabular-nums; }
+/* The number the quote is actually judged on. */
+.vy-cost-row[data-emphasis] { margin-top: var(--vy-space-3); padding-top: var(--vy-space-5); border-top: 1px solid var(--vy-grey-300); }
+.vy-cost-row[data-emphasis] dt { color: var(--vy-grey-900); font-weight: var(--vy-weight-semibold); }
+.vy-cost-row[data-emphasis] dd { font-size: var(--vy-text-lg); font-weight: var(--vy-weight-bold); }
+
+/* =============================================================================
+   BOM COMPARISON RESULT
+   -----------------------------------------------------------------------------
+   Grouped by part, not by column difference. A part with four changed columns is
+   one change to review, not four; a flat list makes a ten-line edit read as a
+   forty-line rewrite and buries which PARTS moved.
+   ========================================================================== */
+.vy-bom-result-head { display: flex; justify-content: space-between; align-items: center; gap: var(--vy-space-6); }
+.vy-bom-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(var(--vy-stat-min-w), 1fr)); gap: var(--vy-space-5); margin: var(--vy-space-6) 0 var(--vy-space-9); }
+.vy-bom-summary-item { padding: var(--vy-space-5) var(--vy-space-6); background: var(--vy-grey-25); border: 1px solid var(--vy-grey-200); border-radius: var(--vy-radius-md); }
+.vy-bom-summary-item dt { font-size: var(--vy-text-xs); color: var(--vy-grey-600); }
+.vy-bom-summary-item dd { margin: var(--vy-space-2) 0 0; font-size: var(--vy-text-xl); font-weight: var(--vy-weight-bold); color: var(--vy-grey-900); font-variant-numeric: tabular-nums; }
+.vy-bom-summary-item[data-zero] dd { color: var(--vy-grey-400); font-weight: var(--vy-weight-medium); }
+
+.vy-bom-parts { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--vy-space-3); }
+.vy-bom-parts > li { border: 1px solid var(--vy-grey-200); border-radius: var(--vy-radius-md); overflow: hidden; }
+.vy-bom-part-head { display: flex; align-items: center; gap: var(--vy-space-5); width: 100%; padding: var(--vy-space-5) var(--vy-space-6); background: none; border: 0; cursor: pointer; text-align: left; }
+.vy-bom-part-head:hover { background: var(--vy-grey-25); }
+.vy-bom-part-head:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
+.vy-bom-chevron { color: var(--vy-grey-500); width: 1em; }
+.vy-bom-count { margin-left: auto; font-size: var(--vy-text-sm); color: var(--vy-grey-600); }
+.vy-bom-status { padding: var(--vy-space-1) var(--vy-space-4); border-radius: var(--vy-radius-pill); font-size: var(--vy-text-xs); font-weight: var(--vy-weight-semibold); }
+/* Green adds, red removes, amber changes — the same three the live Excel export
+   uses, so the screen and the downloaded sheet agree. */
+.vy-bom-status[data-status="Added"]   { background: var(--vy-status-done-bg);      color: var(--vy-status-done-fg); }
+.vy-bom-status[data-status="Removed"] { background: var(--vy-status-blocked-bg);   color: var(--vy-status-blocked-fg); }
+.vy-bom-status[data-status="Changed"] { background: var(--vy-status-open-bg);      color: var(--vy-status-open-fg); }
+
+.vy-bom-diff { width: 100%; border-collapse: collapse; border-top: 1px solid var(--vy-grey-200); font-size: var(--vy-text-sm); }
+.vy-bom-diff th { text-align: left; padding: var(--vy-space-4) var(--vy-space-6); background: var(--vy-grey-25); color: var(--vy-grey-600); font-weight: var(--vy-weight-semibold); font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .03em; }
+.vy-bom-diff td { padding: var(--vy-space-4) var(--vy-space-6); border-top: 1px solid var(--vy-grey-100); color: var(--vy-grey-800); vertical-align: top; }
+.vy-bom-diff td:last-child { font-family: var(--vy-font-mono); font-size: var(--vy-text-xs); color: var(--vy-grey-700); }
+
+/* The queue filter's plain-language gloss, next to the chip that names it. The
+   chip says WHICH queue; this says what that queue means, so nobody has to
+   remember the definition of "overdue" between two screens. */
+.vy-filter-note { font-size: var(--vy-text-sm); color: var(--vy-grey-500); }
+
+/* =============================================================================
+   HOME — Quotation Request chart
+   ========================================================================== */
+.vy-chart-card { background: var(--vy-grey-0); border: 1px solid var(--vy-grey-200); border-radius: var(--vy-radius-lg); padding: var(--vy-space-9); box-shadow: var(--vy-shadow-sm); }
+.vy-chart-head { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: var(--vy-space-6); margin-bottom: var(--vy-space-9); }
+.vy-chart-title { margin: 0; font-size: var(--vy-text-lg); font-weight: var(--vy-weight-semibold); color: var(--vy-grey-900); }
+.vy-chart-sub { margin: var(--vy-space-2) 0 0; font-size: var(--vy-text-sm); color: var(--vy-grey-600); }
+.vy-chart-filters { display: flex; flex-wrap: wrap; gap: var(--vy-space-4); }
+
+/* Bars grow from a shared baseline, so twelve columns can be compared by eye
+   without reading a single number. The numbers are there anyway, under each
+   bar, because "roughly how many" and "exactly how many" are different
+   questions and a chart that answers only the first is half a chart. */
+.vy-chart { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--vy-space-3); align-items: end; height: var(--vy-chart-h); }
+.vy-chart-col { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; min-width: 0; }
+.vy-chart-stack { display: flex; flex-direction: column-reverse; justify-content: flex-start; width: 100%; max-width: var(--vy-chart-bar-w); flex: 1; }
+.vy-chart-seg { display: block; width: 100%; height: var(--seg-h); min-height: 2px; }
+.vy-chart-stack > .vy-chart-seg:last-child { border-radius: var(--vy-radius-sm) var(--vy-radius-sm) 0 0; }
+.vy-chart-n { margin-top: var(--vy-space-3); font-size: var(--vy-text-xs); font-weight: var(--vy-weight-semibold); color: var(--vy-grey-700); font-variant-numeric: tabular-nums; }
+.vy-chart-n[data-zero] { color: var(--vy-grey-300); font-weight: var(--vy-weight-regular); }
+.vy-chart-month { margin-top: var(--vy-space-1); font-size: var(--vy-text-xs); color: var(--vy-grey-500); }
+
+.vy-chart-seg[data-status="draft"],     .vy-chart-key[data-status="draft"]     { background: var(--vy-status-draft-fg); }
+.vy-chart-seg[data-status="progress"],  .vy-chart-key[data-status="progress"]  { background: var(--vy-status-progress-fg); }
+.vy-chart-seg[data-status="open"],      .vy-chart-key[data-status="open"]      { background: var(--vy-status-open-fg); }
+.vy-chart-seg[data-status="done"],      .vy-chart-key[data-status="done"]      { background: var(--vy-status-done-fg); }
+.vy-chart-seg[data-status="cancelled"], .vy-chart-key[data-status="cancelled"] { background: var(--vy-status-cancelled-fg); }
+
+.vy-chart-legend { list-style: none; display: flex; flex-wrap: wrap; gap: var(--vy-space-4) var(--vy-space-8); margin: var(--vy-space-8) 0 0; padding: var(--vy-space-6) 0 0; border-top: 1px solid var(--vy-grey-200); }
+.vy-chart-legend li { display: flex; align-items: center; gap: var(--vy-space-3); font-size: var(--vy-text-sm); color: var(--vy-grey-700); }
+.vy-chart-legend li[data-zero] { color: var(--vy-grey-400); }
+.vy-chart-legend em { font-style: normal; font-weight: var(--vy-weight-semibold); color: var(--vy-grey-900); font-variant-numeric: tabular-nums; }
+.vy-chart-legend li[data-zero] em { color: var(--vy-grey-400); font-weight: var(--vy-weight-regular); }
+.vy-chart-key { width: var(--vy-space-6); height: var(--vy-space-6); border-radius: var(--vy-radius-sm); flex: 0 0 auto; }
+
+/* The Sitemap page's verdict, and the badges that say which column is real.
+   Without these the page reads as a live proposal rather than a closed
+   question, which is the whole reason it was nearly deleted. */
+.vy-verdict {
+  padding: var(--vy-space-8);
+  margin-bottom: var(--vy-space-9);
+  background: var(--vy-blue-50);
+  border: 1px solid var(--vy-blue-200);
+  border-left: var(--vy-accent-bar-w) solid var(--vy-blue-600);
+  border-radius: var(--vy-radius-md);
+}
+.vy-verdict h2 { margin: 0 0 var(--vy-space-4); font-size: var(--vy-text-md); font-weight: var(--vy-weight-semibold); color: var(--vy-grey-900); }
+.vy-verdict p { margin: 0 0 var(--vy-space-4); color: var(--vy-grey-700); font-size: var(--vy-text-base); line-height: 1.55; }
+.vy-verdict p:last-child { margin-bottom: 0; }
+
+.vy-compare-tag {
+  display: inline-block; margin-left: var(--vy-space-4);
+  padding: var(--vy-space-1) var(--vy-space-4);
+  border-radius: var(--vy-radius-pill);
+  font-size: var(--vy-text-2xs); font-weight: var(--vy-weight-semibold);
+  text-transform: none; letter-spacing: 0;
+}
+.vy-compare-tag[data-state="built"]    { background: var(--vy-status-done-bg); color: var(--vy-status-done-fg); }
+.vy-compare-tag[data-state="declined"] { background: var(--vy-status-cancelled-bg); color: var(--vy-status-cancelled-fg); }
+/* The declined column reads quieter than the built one, so the comparison is
+   legible at a glance without having to read either badge. */
+.vy-compare-col:last-child .vy-tree-group { opacity: .72; }
+
+/* An audit finding that will never be actioned should not look like one that is
+   waiting to be. The left rule carries the difference, so the state is legible
+   while scrolling without reading a single badge. */
+.vy-finding[data-status="observation"] { border-left: var(--vy-accent-bar-w) solid var(--vy-grey-300); }
+.vy-finding[data-status="fixed"]       { border-left: var(--vy-accent-bar-w) solid var(--vy-accent-positive); }
+.vy-tag[data-status="fixed"]       { background: var(--vy-status-done-bg); color: var(--vy-status-done-fg); }
+.vy-tag[data-status="observation"] { background: var(--vy-grey-100); color: var(--vy-grey-600); }
+.vy-finding-outcome { color: var(--vy-grey-600); }
+
+
+/* =============================================================================
+   RFQ RECORD HEADER — one block
+   (Named vy-rfq-head, not vy-record-head: the latter is already the Part Master
+   record dialog's header, and two components sharing a class name is how one
+   layout silently reshapes another.)
+   -----------------------------------------------------------------------------
+   Was an action bar, a card of facts, and a card of fields: roughly 900px before
+   the first tab, with the project name printed twice. Same fields, same names,
+   same order; one container.
+   ========================================================================== */
+.vy-rfq-head {
+  background: var(--vy-grey-0);
+  border: 1px solid var(--vy-grey-200);
+  border-radius: var(--vy-radius-lg);
+  padding: var(--vy-space-7) var(--vy-space-8) var(--vy-space-8);
+  margin-bottom: var(--vy-space-8);
+  box-shadow: var(--vy-shadow-sm);
+}
+
+/* Back is an exit, not an action on the record. It sits above the action row and
+   carries no button chrome, so it stops competing with Run Quotation. */
+.vy-back {
+  display: inline-flex; align-items: center; gap: var(--vy-space-3);
+  margin-bottom: var(--vy-space-5); padding: 0;
+  background: none; border: 0; cursor: pointer;
+  font: inherit; font-size: var(--vy-text-sm); color: var(--vy-grey-600);
+}
+.vy-back:hover { color: var(--vy-blue-700); text-decoration: underline; }
+.vy-back:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; border-radius: var(--vy-radius-sm); }
+
+/* Lateness sits beside the status because it is the other half of "what state is
+   this in". In the old header it was a small note inside a date value, which is
+   the last place someone scanning for trouble would look. */
+.vy-due-chip {
+  padding: var(--vy-space-1) var(--vy-space-4);
+  border-radius: var(--vy-radius-pill);
+  font-size: var(--vy-text-xs); font-weight: var(--vy-weight-semibold);
+  white-space: nowrap;
+}
+.vy-due-chip[data-tone="overdue"] { background: var(--vy-status-blocked-bg); color: var(--vy-status-blocked-fg); }
+.vy-due-chip[data-tone="soon"]    { background: var(--vy-status-open-bg);    color: var(--vy-status-open-fg); }
+.vy-due-chip[data-tone="none"]    { background: var(--vy-grey-100);          color: var(--vy-grey-600); }
+
+/* One grid for every header value, system-owned or editable, so they line up
+   instead of reading as two separate groups. */
+.vy-record-fields {
+  display: grid;
+  /* A narrower minimum than a form group's 280px. These are short label/value
+     pairs, not labelled controls, so they pack four to a row on a desktop and
+     still manage two at 800px — where the shared 280px gave exactly one, and
+     nine stacked rows of mostly empty space. */
+  grid-template-columns: repeat(auto-fit, minmax(var(--vy-header-field-min), 1fr));
+  gap: var(--vy-space-6) var(--vy-space-8);
+  margin: var(--vy-space-7) 0 0;
+  padding-top: var(--vy-space-7);
+  border-top: 1px solid var(--vy-grey-200);
+}
+
+/* Label ABOVE value here, unlike the form below.
+   A form reads down a single column, so a left-hand label column aligns the
+   controls and is worth its width. A header is a grid of independent facts read
+   in any order, and reserving 180px of every cell for the label leaves the value
+   squeezed into what is left. Stacked, each fact costs one narrow column. */
+.vy-record-fields .vy-field {
+  display: block;
+  padding: 0;
+  border-bottom: 0;
+}
+.vy-record-fields .vy-field dt {
+  font-size: var(--vy-text-xs);
+  font-weight: var(--vy-weight-semibold);
+  color: var(--vy-grey-500);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  margin-bottom: var(--vy-space-2);
+}
+.vy-record-fields .vy-field dd { font-size: var(--vy-text-md); line-height: 1.35; }
+/* Editing puts a real control in the value slot, which sets its own height. */
+.vy-record-fields[data-editing] .vy-field dd { font-size: var(--vy-text-base); }
+/* Editing needs room for controls, so the grid loosens rather than the labels
+   shrinking — the collision this stylesheet has hit twice before. */
+.vy-record-fields[data-editing] { gap: var(--vy-space-7) var(--vy-space-8); }
+.vy-rfq-head .vy-edit-banner { margin: var(--vy-space-5) 0 0; }
+
+/* A toolbar control and the word that names it are one unit and must wrap as
+   one. As flex siblings they split, leaving the label a line above its buttons. */
+.vy-toolbar-group { display: flex; align-items: center; gap: var(--vy-space-5); }

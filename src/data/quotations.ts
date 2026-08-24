@@ -151,52 +151,105 @@ export const ENGINEERING_CHECKLIST = [
 ] as const;
 
 /**
- * EVERY label this mockup renames, with the original alongside it.
+ * EVERY label this mockup changes, with the original alongside it.
  *
- * The point is that no field is quietly changed: a reviewer can read this list
- * and check each decision. Renames are for readability only — no field was
- * dropped, merged or repurposed.
+ * This list was eleven entries long. Nine of them were style opinions —
+ * sentence case, shorter phrasing, a bare noun expanded into a sentence — and
+ * decision D2 reverted every one. Renaming a label a user has already learned
+ * costs them a re-learn and buys a tidier screenshot.
+ *
+ * What stays is the set a reasonable person would call an error rather than a
+ * preference: a misspelling, and an acronym mangled past recognition.
  *
  * Verified 22 Aug 2026 against the live screen, field by field. Three fields
  * had gone missing in earlier passes and were restored: Customer Type,
  * Created Date, and BoM File on the Result grid.
  */
 export const LABEL_FIXES: { was: string; now: string; why: string }[] = [
-  { was: 'Item Ant Quantities To Quote', now: 'Quantities to quote',
-    why: '"Ant" is not a word in this context; the field holds a count of quantities.' },
-  { was: 'Provide Alt Aml For Out Stock', now: 'Provide alternate AML for out-of-stock',
-    why: 'AML is Approved Manufacturer List; the original drops articles and mis-cases the acronym.' },
-  { was: 'Acceptable LeadTime In Day', now: 'Acceptable lead time (days)',
-    why: 'camelCase in a UI label, and the unit belongs in parentheses, not the noun.' },
   { was: 'Polumeric Required', now: 'Polymeric Required',
-    why: 'Misspelling.' },
-  { was: 'Historical RFQ', now: 'Previous RFQ',
-    why: '"Historical" reads as an archive; the field holds the single RFQ this one re-quotes.' },
-  { was: 'Due Date', now: 'Date needed',
-    why: 'Matches the column heading already used on the list, so one date has one name.' },
-  { was: 'Material Package Type', now: 'Material packaging',
-    why: '"Package Type" is two nouns doing one job.' },
-  { was: 'Customer specific needs', now: 'Customer notes',
-    why: 'Pairs with "Internal notes"; the original two labels did not read as a pair.' },
-  { was: 'Broker', now: 'Broker sourcing permitted',
-    why: 'A bare noun as a checkbox label does not say what ticking it does.' },
-  { was: 'Customer Type', now: 'Customer type',
-    why: 'Case only. KEPT SEPARATE from RFQ type: the live system carries both, holding the same three values. Whether they are one field duplicated or two distinct ones is a question for the business, not something to resolve by guessing.' },
-  { was: 'Rocket Consigned Inventory', now: 'Rocket consigned inventory',
-    why: 'Case only. UNRESOLVED — "Rocket" may be a customer, a system or a typo. Left as-is pending an answer rather than guessed.' },
+    why: 'Misspelling. A word that is not a word is an error under any style, so it is corrected.' },
+  { was: 'Provide Alt Aml For Out Stock', now: 'Provide Alt AML For Out of Stock',
+    why: 'Two mangled fragments: AML is an acronym (Approved Manufacturer List) and "Out Stock" is missing a word. Title Case and the "Alt" abbreviation are LEFT ALONE — they are the house style, not mistakes.' },
 ];
 
-const CUSTOMERS = [
-  '00455 - Cerelogic Systems Inc.', '00848 - KT Controls Ltd', '00378 - Nokia Networks Oy',
-  '01204 - Meridian Avionics', '00912 - Halden Marine AS', '01455 - Brightpath Medical',
-  '00109 - Comtec Industrial',
+/**
+ * The customer master, as the live form actually uses it.
+ *
+ * Verified from the shipped bundle: the RFQ form loads `custMsts { … custType
+ * isItar priceMarkup contactInfos { contactName … } }` and drives four things
+ * from the row you pick —
+ *
+ *   custName        → Customer
+ *   contactInfos    → the Customer Contact list, filtered to this customer and
+ *                     defaulted to its first entry
+ *   custType        → Customer Type
+ *   isItar          → the ITAR flag
+ *   priceMarkup     → Markup, but only while Markup is still unset
+ *
+ * This mockup had Customer and Customer Contact as free-text inputs, which let a
+ * user type a customer that does not exist and a contact who does not work there.
+ * See docs/bundle-evidence.md.
+ */
+export type Customer = {
+  code: string;
+  name: string;
+  /** Display value, `code - name`, which is what the live picker shows. */
+  label: string;
+  contacts: string[];
+  custType: string;
+  isItar: boolean;
+  priceMarkup: number;
+  /** Project names already used by this customer. The live form fetches these. */
+  projectNames: string[];
+};
+
+export const CUSTOMER_MASTER: Customer[] = [
+  { code: '00455', name: 'Cerelogic Systems Inc.', label: '00455 - Cerelogic Systems Inc.',
+    contacts: ['Dana Whitfield', 'Marc Oyelaran', 'Priya Raghunathan'],
+    custType: 'Turnkey', isItar: false, priceMarkup: 12,
+    projectNames: ['Halo Controller', 'Halo Backplane', 'Orion Sensor Board'] },
+  { code: '00848', name: 'KT Controls Ltd', label: '00848 - KT Controls Ltd',
+    contacts: ['Steven Achebe', 'Lena Brandt'],
+    custType: 'Consign', isItar: false, priceMarkup: 9,
+    projectNames: ['KT Drive Module', 'KT Panel Interface'] },
+  { code: '00378', name: 'Nokia Networks Oy', label: '00378 - Nokia Networks Oy',
+    contacts: ['Aino Virtanen', 'Petri Laaksonen', 'Sanna Koskinen'],
+    custType: 'Hybrid', isItar: false, priceMarkup: 14,
+    projectNames: ['RF Front-end Rev C', 'Baseband Carrier'] },
+  { code: '01204', name: 'Meridian Avionics', label: '01204 - Meridian Avionics',
+    contacts: ['Ruth Calderon', 'Devon Achterberg'],
+    custType: 'Turnkey', isItar: true, priceMarkup: 18,
+    projectNames: ['ADS-B Transponder', 'Flight Data Concentrator'] },
+  { code: '00912', name: 'Halden Marine AS', label: '00912 - Halden Marine AS',
+    contacts: ['Ingrid Solberg'],
+    custType: 'TBD', isItar: false, priceMarkup: 11,
+    projectNames: ['Bridge Display Unit'] },
+  { code: '01455', name: 'Brightpath Medical', label: '01455 - Brightpath Medical',
+    contacts: ['Yusuf Adeyemi', 'Carla Menendez'],
+    custType: 'Turnkey', isItar: false, priceMarkup: 16,
+    projectNames: ['Infusion Pump Main', 'Infusion Pump Sensor'] },
+  { code: '00109', name: 'Comtec Industrial', label: '00109 - Comtec Industrial',
+    contacts: ['Rob Tanaka', 'Hedy Lindqvist'],
+    custType: 'Consign', isItar: false, priceMarkup: 10,
+    projectNames: ['Comtec Gateway', 'Comtec IO Expander'] },
 ];
+
+export const CUSTOMER_OPTIONS = CUSTOMER_MASTER.map(c => c.label);
+
+export const findCustomer = (label: string) =>
+  CUSTOMER_MASTER.find(c => c.label === label);
+
+/** The contacts that belong to a customer — the live list is filtered this way. */
+export const contactsFor = (label: string) => findCustomer(label)?.contacts ?? [];
+
+const CUSTOMERS = CUSTOMER_OPTIONS;
 /** Who can be assigned. Exported so the record can offer the same list. */
 export const PEOPLE = ['Toan Dinh', 'Huyen NTN', 'Mai Pham', 'Duc Le', 'Linh Tran'] as const;
 const OWNERS = [...PEOPLE];
 
 
-const STATUSES: QuotationStatus[] = ['New', 'New', 'In-Progress', 'Quoted', 'Quoted', 'Completed', 'Cancelled'];
+/* Status is no longer picked freely — it follows the RFQ's age. See the two
+   populations in generateQuotations. */
 
 
 
@@ -236,32 +289,66 @@ export function generateQuotations(count = 330): Quotation[] {
   const out: Quotation[] = [];
   for (let i = 0; i < count; i++) {
     const cust = pick(CUSTOMERS);
-    /* Due dates are spread around "today" so the queue looks like a real one:
-       roughly 15% overdue, the rest ahead. An earlier version derived the due
-       date from the created date, which put 71% of the queue overdue — a
-       distribution no estimator would recognise. */
-    const overdue = rnd() < 0.15;
-    const dueOffset = overdue ? -(1 + Math.floor(rnd() * 10)) : Math.floor(rnd() * 45);
-    const needed = new Date(2026, 7, 19 + dueOffset);
-    /* Created is derived backwards from the due date, but must never land in the
-       future: deriving it naively put 26% of the queue on a creation date that
-       had not happened yet, with activity-log entries to match. Clamped to at
-       most yesterday, and given a working-hours time so the log reads like a
-       log rather than a row of midnights. */
-    const naiveCreated = needed.getTime() - (5 + Math.floor(rnd() * 50)) * 86400000;
-    const latestAllowed = TODAY.getTime() - 86400000;
-    const created = new Date(Math.min(naiveCreated, latestAllowed));
+
+    /* Two populations, because an ERP holds both and they behave differently.
+       An earlier version generated only the second, which made every RFQ in the
+       system land in a two-month window — fine for a queue, but it turned the
+       twelve-month chart on Home into nine empty columns and three tall ones,
+       which reads as a broken chart rather than a quiet year.
+
+       RFQ numbers descend with `i`, so the newest work must come first: the
+       first fifth is live, the rest is history.
+
+       1. LIVE (first 20%) — open work. Due dates cluster around today, with
+          roughly 15% already overdue. Deriving the due date from the creation
+          date instead put 71% of the queue overdue, a distribution no estimator
+          would recognise.
+       2. HISTORICAL (the rest) — closed work spread across the preceding year.
+          Due date follows creation by a normal quoting turnaround, and the
+          status is a closed one, because an RFQ raised eight months ago that is
+          still "New" would be a data problem, not a backlog. */
+    const live = i < Math.floor(count * 0.2);
+
+    let needed: Date;
+    let created: Date;
+    let status: QuotationStatus;
+
+    if (live) {
+      const overdue = rnd() < 0.15;
+      const dueOffset = overdue ? -(1 + Math.floor(rnd() * 10)) : Math.floor(rnd() * 45);
+      needed = new Date(2026, 7, 19 + dueOffset);
+      /* Never in the future: deriving creation naively from the due date put 26%
+         of the queue on a creation date that had not happened yet, with
+         activity-log entries to match. */
+      const naiveCreated = needed.getTime() - (5 + Math.floor(rnd() * 50)) * 86400000;
+      created = new Date(Math.min(naiveCreated, TODAY.getTime() - 86400000));
+      status = rnd() < 0.45 ? 'New' : 'In-Progress';
+    } else {
+      /* 30 to 365 days back, so the year fills without spilling into the live
+         window and double-counting the current month. */
+      const age = 30 + Math.floor(rnd() * 335);
+      created = new Date(TODAY.getTime() - age * 86400000);
+      needed = new Date(created.getTime() + (10 + Math.floor(rnd() * 40)) * 86400000);
+      status = rnd() < 0.28 ? 'Quoted' : rnd() < 0.82 ? 'Completed' : 'Cancelled';
+    }
+
+    /* Working-hours time, so the activity log reads like a log rather than a
+       column of midnights. */
     created.setHours(8 + Math.floor(rnd() * 9), Math.floor(rnd() * 60), 0, 0);
-    const status = pick(STATUSES);
     out.push({
       id: `rfq-${i + 1}`,
       no: String(358 - i).padStart(10, '0'),
       priority: 1 + Math.floor(rnd() * 3),
-      projectName: rnd() > 0.5
-        ? `${cust.slice(0, 5)}-${100 + Math.floor(rnd() * 800)}-${1000 + Math.floor(rnd() * 8000)}-01-F`
-        : `TuLinh${300 + Math.floor(rnd() * 60)}`,
+      /* Either a project this customer already runs, or a new assembly number.
+         The live form offers the customer's existing `projectNames` and lets you
+         type a new one, so both shapes are real. */
+      projectName: rnd() > 0.45
+        ? pick(findCustomer(cust)!.projectNames)
+        : `${cust.slice(0, 5)}-${100 + Math.floor(rnd() * 800)}-${1000 + Math.floor(rnd() * 8000)}-01-F`,
       customer: cust,
-      customerContact: cust.split(' - ')[1].split(' ')[0],
+      /* A real contact belonging to THIS customer, the way the live form
+         populates it — not a name sliced out of the company string. */
+      customerContact: pick(findCustomer(cust)!.contacts),
       application: pick(META.APPLICATION),
       rfqType: pick(META.RFQ_TYPE),
       orderType: pick(META.ORDER_TYPE),
@@ -271,9 +358,11 @@ export function generateQuotations(count = 330): Quotation[] {
       createdDate: created,
       lastUpdated: new Date(Math.min(created.getTime() + Math.floor(rnd() * 20) * 86400000, TODAY.getTime())),
       projectType: pick(META.PROJECT_TYPE),
-      customerType: pick(META.CUSTOMER_TYPE),
+      /* Derived from the customer record on the live form, not picked freely. */
+      customerType: findCustomer(cust)!.custType,
       historicalRfq: rnd() > 0.75 ? String(300 - Math.floor(rnd() * 200)).padStart(10, '0') : '',
-      itar: rnd() > 0.85,
+      /* ITAR follows the customer's `isItar` flag on the live form. */
+      itar: findCustomer(cust)!.isItar,
       quoteFocus: pick(META.QUOTE_FOCUS),
       materialPackageType: pick(META.MATERIAL_PACKAGE_TYPE),
       markup: 10 + Math.floor(rnd() * 20),

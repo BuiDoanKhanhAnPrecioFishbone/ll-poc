@@ -18,6 +18,8 @@ export type FieldKind =
   | { kind: 'text' }
   | { kind: 'notes' }
   | { kind: 'select'; options: readonly string[] }
+  /** A reference to another record. Options depend on the rest of the form. */
+  | { kind: 'lookup'; optionsFor: (row: any) => readonly string[] }
   | { kind: 'number'; suffix?: string; min?: number; max?: number }
   | { kind: 'flag' };
 
@@ -26,17 +28,44 @@ export type FieldDef<T> = FieldKind & {
   label: string;
   /** Shown under the control while editing — units, constraints, consequences. */
   hint?: string;
+  /**
+   * Not editable on the live form. Two reasons, and the UI distinguishes them:
+   * the system owns it (RFQ No, Created Date), or another field determines it
+   * (Customer Type follows Customer). Marking a field read-only is a claim about
+   * the LIVE system, so it needs evidence — see docs/bundle-evidence.md.
+   */
+  readOnly?: boolean;
+  /** Which field determines this one. Renders as "follows Customer". */
+  derivedFrom?: string;
 };
 
-export function RecordField<T extends Record<string, any>>({ def, value, editing, onChange }: {
+export function RecordField<T extends Record<string, any>>({ def, value, editing, onChange, row }: {
   def: FieldDef<T>;
   value: T[keyof T];
   editing: boolean;
   onChange: (name: string, v: unknown) => void;
+  /** The whole record, so a lookup can narrow its options to the current row. */
+  row?: T;
 }) {
-  if (!editing) return <ReadField def={def} value={value} />;
+  /* A read-only field looks the same whether or not you are editing. Rendering
+     it as a disabled input instead would be worse than useless: a greyed control
+     reads as "broken" or "you lack permission", when the truth is that the value
+     is decided elsewhere. The derivation note says where. */
+  if (!editing || def.readOnly) return <ReadField def={def} value={value} editing={editing} />;
 
   switch (def.kind) {
+    case 'lookup':
+      return (
+        <div className="vy-field vy-field--editing">
+          <dt><label htmlFor={`f-${def.name}`}>{def.label}</label></dt>
+          <dd>
+            <Select id={`f-${def.name}`} label={def.label} value={String(value ?? '')}
+                    options={[...def.optionsFor(row ?? {})]}
+                    onChange={v => onChange(def.name, v)} />
+            {def.hint && <span className="vy-field-hint">{def.hint}</span>}
+          </dd>
+        </div>
+      );
     case 'select':
       return (
         <div className="vy-field vy-field--editing">
@@ -98,12 +127,13 @@ export function RecordField<T extends Record<string, any>>({ def, value, editing
   }
 }
 
-function ReadField<T>({ def, value }: { def: FieldDef<T>; value: unknown }) {
+function ReadField<T>({ def, value, editing }: { def: FieldDef<T>; value: unknown; editing?: boolean }) {
   if (def.kind === 'flag') {
     return (
-      <div className="vy-flag-row" data-on={Boolean(value)}>
+      <div className="vy-flag-row" data-on={Boolean(value)} data-locked={editing && def.readOnly || undefined}>
         <span className="vy-flag-mark" aria-hidden>{value ? '✓' : '–'}</span>
         <span>{def.label}</span>
+        {editing && def.readOnly && <LockNote def={def} />}
       </div>
     );
   }
@@ -113,9 +143,29 @@ function ReadField<T>({ def, value }: { def: FieldDef<T>; value: unknown }) {
     ? `${value}${/^[%°]/.test(def.suffix) ? '' : ' '}${def.suffix}`
     : value;
   return (
-    <div className={'vy-field' + (def.kind === 'notes' ? ' vy-field--wide' : '')}>
+    <div className={'vy-field' + (def.kind === 'notes' ? ' vy-field--wide' : '')}
+         data-locked={editing && def.readOnly || undefined}>
       <dt>{def.label}</dt>
-      <dd className={empty ? 'is-empty' : undefined}>{empty ? 'Not set' : String(shown)}</dd>
+      <dd className={empty ? 'is-empty' : undefined}>
+        {empty ? 'Not set' : String(shown)}
+        {editing && def.readOnly && <LockNote def={def} />}
+      </dd>
     </div>
+  );
+}
+
+/**
+ * Says WHY a field cannot be edited, and only while editing — when you are just
+ * reading, every field is read-only and the note would be noise on all of them.
+ *
+ * "Set by the system" and "follows Customer" are different answers to the same
+ * question, and a user who gets neither will assume the form is broken or that
+ * they lack a permission.
+ */
+function LockNote<T>({ def }: { def: FieldDef<T> }) {
+  return (
+    <span className="vy-field-locked">
+      {def.derivedFrom ? `follows ${def.derivedFrom}` : 'set by the system'}
+    </span>
   );
 }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
-import { proposedNav, settingsNav, reviewNav } from '../data/sitemap';
+import { liveNav, reviewPages } from '../data/sitemap';
 import { CommandPalette } from './CommandPalette';
 
 const ICONS: Record<string, string> = {
@@ -24,13 +24,13 @@ function Icon({ name }: { name: string }) {
   );
 }
 
-/** Builds a trail from the proposed IA so every screen states where it sits. */
+/** Builds a trail from the live menu so every screen states where it sits. */
 function useBreadcrumb() {
   const { pathname } = useLocation();
-  const all = [...proposedNav, ...settingsNav, reviewNav];
+  const all = liveNav;
   for (const g of all) {
     const hit = g.items.find(i => i.path === pathname);
-    if (hit) return { group: g.title, title: hit.title, wasCalled: hit.wasCalled, record: null };
+    if (hit) return { group: g.leaf ? null : g.title, title: hit.title, record: null };
   }
   /* A record route (/sell/quotations/rfq-5) belongs to its list. Without this
      the trail collapses to the app name on exactly the screens where knowing
@@ -39,7 +39,7 @@ function useBreadcrumb() {
     const parent = g.items.find(i => i.path !== '/' && pathname.startsWith(i.path + '/'));
     if (parent) {
       return {
-        group: g.title, title: parent.title, wasCalled: parent.wasCalled,
+        group: g.leaf ? null : g.title, title: parent.title,
         record: decodeURIComponent(pathname.slice(parent.path.length + 1)),
         parentPath: parent.path,
       };
@@ -58,8 +58,8 @@ export function AppShell() {
      stay visible either way, so the whole structure is still legible at a
      glance; that was the point of replacing the hamburger, and it survives. */
   const groupOf = (p: string) =>
-    proposedNav.find(g => g.items.some(i => i.path === p || (i.path !== '/' && p.startsWith(i.path + '/'))))?.title;
-  const [openGroup, setOpenGroup] = useState<string | null>(() => groupOf(pathname) ?? 'Sell');
+    liveNav.find(g => !g.leaf && g.items.some(i => i.path === p || (i.path !== '/' && p.startsWith(i.path + '/'))))?.title;
+  const [openGroup, setOpenGroup] = useState<string | null>(() => groupOf(pathname) ?? 'Sales Management');
   useEffect(() => {
     const g = groupOf(pathname);
     if (g) setOpenGroup(g);
@@ -103,19 +103,39 @@ export function AppShell() {
         </div>
 
         <nav className="vy-nav">
-          {proposedNav.map(g => {
+          {liveNav.map(g => {
+            /* Home and DB Encryption have no children in the live menu. Rendering
+               a group header above a single item that repeats its title reads as
+               a bug, so a childless group is just a link. */
+            if (g.leaf) {
+              const i = g.items[0];
+              return (
+                <div className="vy-nav-group vy-nav-group--leaf" key={g.title}>
+                  <NavLink to={i.path} end={i.path === '/'}
+                           className={({ isActive }) => 'vy-nav-item' + (isActive ? ' is-active' : '')}
+                           title={collapsed ? i.title : i.hint}>
+                    <Icon name={g.icon} />
+                    {!collapsed && <span>{i.title}</span>}
+                  </NavLink>
+                </div>
+              );
+            }
             const open = collapsed || openGroup === g.title;
             const hasActive = g.items.some(i => i.path === pathname || (i.path !== '/' && pathname.startsWith(i.path + '/')));
             return (
             <div className="vy-nav-group" key={g.title} data-open={open}>
               {!collapsed && (
+                /* In the live menu these headers are links, and three of the eight
+                   route to `/` — clicking the section you want lands you on Home.
+                   Expand/collapse is the behaviour the header already implies, and
+                   it takes nothing away: no destination is reachable only via the
+                   header. */
                 <button className="vy-nav-group-head" aria-expanded={open}
                         onClick={() => setOpenGroup(o => o === g.title ? null : g.title)}>
                   <span className="vy-nav-group-title">
                     {g.title}
                     {!open && hasActive && <span className="vy-group-dot" aria-label="contains the current screen" />}
                   </span>
-                  <span className="vy-nav-group-purpose">{g.purpose}</span>
                   <span className="vy-nav-chevron" aria-hidden>{open ? '⌄' : '›'}</span>
                 </button>
               )}
@@ -129,28 +149,28 @@ export function AppShell() {
               ))}
             </div>
           );})}
-          <div className="vy-nav-group vy-nav-group--review" data-open key={reviewNav.title}>
-            {!collapsed && (
-              <div className="vy-nav-group-head">
-                <span className="vy-nav-group-title">{reviewNav.title}</span>
-                <span className="vy-nav-group-purpose">{reviewNav.purpose}</span>
-              </div>
-            )}
-            {reviewNav.items.map(i => (
-              <NavLink key={i.path} to={i.path}
-                       className={({ isActive }) => 'vy-nav-item' + (isActive ? ' is-active' : '')}
-                       title={collapsed ? `Review › ${i.title}` : i.hint}>
-                <Icon name={reviewNav.icon} />
-                {!collapsed && <span>{i.title}</span>}
-              </NavLink>
-            ))}
-          </div>
         </nav>
 
         <div className="vy-sidebar-foot">
-          <NavLink to="/settings/modules" className={({ isActive }) => 'vy-nav-item' + (isActive ? ' is-active' : '')}>
-            <Icon name="settings" />{!collapsed && <span>Settings</span>}
-          </NavLink>
+          {/* ---- Reviewer material, deliberately outside the product nav ------
+              Decision D7. These three pages document the revamp; they are not
+              screens the customer is buying. Sitting them beside Quotations made
+              a stakeholder demo read as an argument rather than as the system.
+              They stay one click away, below the fold, visually quieter than
+              anything in the nav proper. */}
+          {!collapsed && (
+            <details className="vy-about">
+              <summary>About this prototype</summary>
+              <div className="vy-about-links">
+                {reviewPages.map(r => (
+                  <NavLink key={r.path} to={r.path}
+                           className={({ isActive }) => 'vy-about-link' + (isActive ? ' is-active' : '')}
+                           title={r.hint}>{r.title}</NavLink>
+                ))}
+              </div>
+            </details>
+          )}
+
           {/* Shaped like a nav item, because that is what it sits among.
               It was a 224x30 empty bordered box holding one text character,
               which read as an input rather than a button, and was the only
@@ -193,14 +213,15 @@ export function AppShell() {
           <div className="vy-crumb">
             {crumb ? (
               <>
-                <span className="vy-crumb-group">{crumb.group}</span>
-                <span className="vy-crumb-sep">/</span>
+                {crumb.group && <>
+                  <span className="vy-crumb-group">{crumb.group}</span>
+                  <span className="vy-crumb-sep">/</span>
+                </>}
                 {crumb.record
                   ? <><NavLink className="vy-crumb-link" to={crumb.parentPath!}>{crumb.title}</NavLink>
                       <span className="vy-crumb-sep">/</span>
                       <span className="vy-crumb-title">{crumb.record}</span></>
                   : <span className="vy-crumb-title">{crumb.title}</span>}
-                {crumb.wasCalled && !crumb.record && <span className="vy-crumb-was" title="Where this screen lived in the current system">was: {crumb.wasCalled}</span>}
               </>
             ) : <span className="vy-crumb-title">Voyager</span>}
           </div>

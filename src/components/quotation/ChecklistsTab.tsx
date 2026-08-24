@@ -37,24 +37,65 @@ export function ChecklistsTab({ q }: { q: Quotation }) {
 
   const selected = new Set(tasks.map(t => t.type));
 
+  /**
+   * Every change here commits at once — there is no Edit mode on this tab and
+   * no Save button, unlike the Requirements tab.
+   *
+   * That is deliberate rather than inconsistent. Ticking an item or moving it to
+   * Done is one discrete act with nothing to half-finish, it happens many times
+   * a day, and several people work the same RFQ; an edit gate would make a
+   * shared working screen feel locked. A twenty-field specification is the
+   * opposite case and keeps its explicit Save.
+   *
+   * The price of removing Save is that a mis-click commits silently. Undo is
+   * what pays it, so every one of these goes through `undoable`.
+   */
   function toggle(type: string, on: boolean) {
+    const before = tasks;
     if (on) {
       setTasks(t => [...t, {
         type, documentName: '', uploadedBy: '', uploadedDate: null,
         assignee: '', status: 'To do',
       }]);
+      toast.undoable(`"${type}" now applies to this RFQ.`, () => setTasks(before));
       return;
     }
     const task = tasks.find(t => t.type === type);
-    /* Removing a task discards whatever was attached to it, so say so. */
-    if (task?.documentName && !confirm(`Remove "${type}"? Its document and status will be discarded.`)) return;
     setTasks(t => t.filter(x => x.type !== type));
+    /* Unticking discards a document and a status, so the message names what
+       went rather than saying "removed". Undo restores the whole row, which is
+       why it captures the previous array instead of re-adding a blank task. */
+    toast.undoable(
+      task?.documentName
+        ? `"${type}" removed, along with ${task.documentName}.`
+        : `"${type}" no longer applies to this RFQ.`,
+      () => setTasks(before),
+    );
   }
 
-  const setStatus = (type: string, status: TaskStatus) =>
+  const setStatus = (type: string, status: TaskStatus) => {
+    const before = tasks;
+    const was = tasks.find(x => x.type === type)?.status;
+    if (was === status) return;
     setTasks(t => t.map(x => (x.type === type ? { ...x, status } : x)));
-  const setAssignee = (type: string, assignee: string) =>
+    toast.undoable(`${type} moved to ${status}.`, () => setTasks(before));
+  };
+
+  /* Assignment is the one change here that is quietly damaging when wrong: work
+     lands in someone else's queue and neither person is told. It says WHO, and
+     names the person it moved away from when there was one. */
+  const setAssignee = (type: string, assignee: string) => {
+    const before = tasks;
+    const was = tasks.find(x => x.type === type)?.assignee;
+    if (was === assignee) return;
     setTasks(t => t.map(x => (x.type === type ? { ...x, assignee } : x)));
+    toast.undoable(
+      assignee
+        ? `${type} assigned to ${assignee}${was ? `, was ${was}` : ''}.`
+        : `${type} unassigned${was ? `, was ${was}` : ''}.`,
+      () => setTasks(before),
+    );
+  };
 
   const columns: ColumnSpec<ChecklistTask & { id: string }>[] = [
     { field: 'type', title: 'Task', role: 'text' },

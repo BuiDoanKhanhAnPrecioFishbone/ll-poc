@@ -148,15 +148,23 @@ export type NavItem = {
 export type NavGroup = {
   title: string;
   icon: string;
+  /** Rendered as a single link with no group header (live "Home", "DB Encryption"). */
+  leaf?: boolean;
   /** The question this section answers. Shown under the group in the nav. */
   purpose: string;
   items: NavItem[];
 };
 
 /* =============================================================================
-   PROPOSED IA
+   PROPOSED IA — NOT BUILT. Kept as a record of a proposal the customer declined.
    -----------------------------------------------------------------------------
-   Three rules drive the restructure:
+   Decision D1 (24 Aug 2026): "same workflow, clearer surface". Renaming and
+   regrouping 51 screens invalidates what every user has already learned, and the
+   value being bought is legibility, not a different information architecture.
+   `liveNav` below is what the product actually renders. This constant now feeds
+   only the Sitemap page, which shows it marked as declined.
+
+   The three rules it was built on, for the record:
 
    1. VERB-FIRST GROUPING. Sections are named after the work, not the database.
       A new user asks "where do I raise a purchase order", not "where is the
@@ -258,9 +266,68 @@ export const settingsNav: NavGroup[] = [
   },
 ];
 
-/** Flattened, for the command palette. */
-export const allDestinations = [...proposedNav, ...settingsNav].flatMap(g =>
-  g.items.map(i => ({ ...i, group: g.title }))
+/* =============================================================================
+   LIVE IA — what the product renders
+   -----------------------------------------------------------------------------
+   Derived from `legacyNav`, not retyped, so a title or an order can never drift
+   from the captured GET /api/account/get/menus payload. Groups with no children
+   in the live menu (Home, DB Encryption) render as single links.
+
+   One entry is added: My Queues (decision D3/D6). It is additive — no live entry
+   is renamed, moved or removed to make room for it.
+   ========================================================================== */
+
+const LIVE_ICONS: Record<string, string> = {
+  'Home': 'home',
+  'Sales Management': 'sell',
+  'Procurement Management': 'buy',
+  'Inventory Management': 'parts',
+  'Production': 'make',
+  'Accounting': 'finance',
+  'DB Encryption': 'settings',
+  'System Configuration': 'settings',
+};
+
+function toLiveGroup(g: LegacyGroup): NavGroup {
+  const icon = LIVE_ICONS[g.title] ?? 'settings';
+  if (!g.children.length) {
+    return { title: g.title, icon, purpose: '', leaf: true, items: [{ title: g.title, path: g.path }] };
+  }
+  return {
+    title: g.title, icon, purpose: '',
+    items: g.children.map(c => ({ title: c.title, path: c.path })),
+  };
+}
+
+/** The queues page. The only entry in the nav that does not exist in the live menu. */
+export const QUEUES_PATH = '/my-queues';
+
+export const liveNav: NavGroup[] = (() => {
+  const groups = legacyNav.map(toLiveGroup);
+  const queues: NavGroup = {
+    title: 'My Queues', icon: 'insight', purpose: '', leaf: true,
+    items: [{ title: 'My Queues', path: QUEUES_PATH, hint: 'What needs attention across your RFQs' }],
+  };
+  /* Directly after Home: it is the second thing you look at, and inserting it
+     here shifts no existing entry relative to its siblings. */
+  const homeIndex = groups.findIndex(g => g.title === 'Home');
+  groups.splice(homeIndex + 1, 0, queues);
+  return groups;
+})();
+
+/**
+ * Reviewer-facing pages. NOT in the product nav (decision D7) — reached from a
+ * footer entry, so a stakeholder demo shows the ERP rather than the case for it.
+ */
+export const reviewPages: NavItem[] = [
+  { title: 'UX Audit', path: '/audit', hint: 'Findings measured from the live system' },
+  { title: 'Sitemap', path: '/sitemap', hint: 'The live menu, and the restructure that was declined' },
+  { title: 'Design System', path: '/design-system', hint: 'Tokens, status vocabulary and column roles' },
+];
+
+/** Flattened, for the command palette. Live destinations only. */
+export const allDestinations = liveNav.flatMap(g =>
+  g.items.map(i => ({ ...i, group: g.leaf ? '' : g.title }))
 );
 
 export const legacyStats = {
@@ -271,18 +338,4 @@ export const legacyStats = {
   namespaceMismatches: 7,
   groupsRoutingToRoot: 3,
   duplicateSequences: 4,
-};
-
-/**
- * The research deliverables. Kept deliberately separate from `proposedNav` so
- * the proposed IA stays honest — these pages document the revamp, they are not
- * part of the product.
- */
-export const reviewNav: NavGroup = {
-  title: 'Review', icon: 'insight', purpose: 'The case for this revamp',
-  items: [
-    { title: 'UX Audit', path: '/audit', hint: 'Findings measured from the live system' },
-    { title: 'Sitemap', path: '/sitemap', hint: 'Current vs proposed information architecture' },
-    { title: 'Design System', path: '/design-system', hint: 'Tokens, status vocabulary and column roles' },
-  ],
 };

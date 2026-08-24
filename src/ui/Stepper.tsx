@@ -13,12 +13,18 @@
  * Each step states its own status to screen readers, so "where am I and what is
  * left" does not depend on seeing the tick marks.
  */
-export function Stepper({ steps, value, furthest = value, onChange }: {
+export function Stepper({ steps, value, furthest = value, onChange, numbered = true }: {
   steps: { label: string; text?: string }[];
   value: number;
   /** Highest step reached. Steps beyond this are not yet reachable. */
   furthest?: number;
   onChange?: (i: number) => void;
+  /**
+   * Set false when the labels already carry their own numbers, as Run Quotation's
+   * do ("1 - Config BoM"). Otherwise the dot repeats the label and every step
+   * reads "① 1 - …", which looks like a rendering fault rather than a design.
+   */
+  numbered?: boolean;
 }) {
   return (
     <ol className="vy-stepper">
@@ -51,7 +57,7 @@ export function Stepper({ steps, value, furthest = value, onChange }: {
                       <path d="M3 8.5 6.2 11.5 13 4.5" fill="none" stroke="currentColor"
                             strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
-                  : i + 1}
+                  : numbered ? i + 1 : <span className="vy-step-pip" />}
               </span>
               <span className="vy-step-labels">
                 <span className="vy-step-label">{s.label}</span>

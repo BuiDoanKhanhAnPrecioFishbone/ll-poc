@@ -46,13 +46,10 @@
   /* The keyboard hint is the first thing to go: it is a nicety, and on a
      touch terminal it is a lie. */
   .vy-search kbd { display: none; }
-  .vy-crumb-was { display: none; }
   .vy-record-summary { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
   .vy-field-groups { grid-template-columns: 1fr; gap: var(--vy-space-8); }
   .vy-bom-panes { grid-template-columns: 1fr; }
   .vy-run-cols { grid-template-columns: 1fr; }
-  .vy-run-summary { grid-template-columns: repeat(2, 1fr); }
-  .vy-checklist-cols { grid-template-columns: 1fr; }
   /* Below this the left panel has no width to spare: assignees go back to a
      band above the lists rather than squeezing both. */
   .vy-checklist-layout { grid-template-columns: 1fr; }
@@ -85,7 +82,28 @@
   .vy-page-head { flex-direction: column; align-items: stretch; gap: var(--vy-space-5); }
   .vy-page-actions { flex-wrap: wrap; }
   .vy-record-bar { flex-direction: column; align-items: stretch; }
-  .vy-notes { grid-template-columns: 1fr; }
-  .vy-run-summary { grid-template-columns: 1fr; }
   .vy-dialog { width: 96vw; max-height: 92vh; }
+}
+
+
+/* ---- Stepper: the label survives, the gloss does not ---------------------
+   Four steps with a one-line description each need roughly 760px. Below that
+   the labels start truncating — and a truncated "1 - Confi…" is worse than no
+   description at all, because the step NAME is the thing you navigate by.
+   A container query rather than a viewport one: the stepper lives inside a
+   dialog, so what matters is the space it actually has. */
+.vy-stepper { container-type: inline-size; }
+@container (max-width: 760px) {
+  .vy-step-text { display: none; }
+}
+/* Narrower still, the labels alone stop fitting side by side. Rather than
+   truncate all four, only the current step keeps its label — the others become
+   their marker, which is enough to show position and stay clickable. */
+/* Measured: "2 - Review BoM" needs 98px of label, and a step costs about 146px
+   with its marker, gap and padding. Four of those is 584px, so the labels stop
+   fitting well before the container looks tight. */
+@container (max-width: 620px) {
+  .vy-step:not([data-state="current"]) .vy-step-label { display: none; }
+  .vy-step:not([data-state="current"]) { flex: 0 0 auto; }
+  .vy-step[data-state="current"] { flex: 1 1 auto; }
 }

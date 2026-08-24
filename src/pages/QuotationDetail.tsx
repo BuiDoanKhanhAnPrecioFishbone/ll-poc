@@ -5,7 +5,7 @@ import { Button } from '../ui/Button';
 import { Rating } from '../ui/Rating';
 import { StatusBadge } from '../ui/Badge';
 import { fmtDate } from '../ui/DataGrid';
-import { generateQuotations, daysUntil, type Quotation } from '../data/quotations';
+import { generateQuotations, daysUntil, findCustomer, contactsFor, type Quotation } from '../data/quotations';
 import { ChecklistsTab } from '../components/quotation/ChecklistsTab';
 import { ResultTab } from '../components/quotation/ResultTab';
 import { ConversationsTab } from '../components/quotation/ConversationsTab';
@@ -14,7 +14,8 @@ import { BomComparisonDialog } from '../components/quotation/BomComparisonDialog
 import { RunQuotationDialog } from '../components/quotation/RunQuotationDialog';
 import { useToast } from '../ui/Toast';
 import { RecordField } from '../components/quotation/RecordField';
-import { COMMERCIAL, TECHNICAL, INVENTORY, NOTES, ALL_FIELDS } from '../components/quotation/requirementFields';
+import { HEADER, COMMERCIAL, TECHNICAL, INVENTORY, NOTES, ALL_FIELDS, setHistoricalRfqOptions,
+         PROJECT_NAME_FIELD } from '../components/quotation/requirementFields';
 
 /**
  * Quotation record.
@@ -28,7 +29,11 @@ import { COMMERCIAL, TECHNICAL, INVENTORY, NOTES, ALL_FIELDS } from '../componen
  *    field in a read-only `Input`, so a record you are merely looking at reads
  *    as a broken form. Editing is an explicit mode.
  * 3. The header answers "what is this and what does it need" before any detail:
- *    identity, status, owner and due date, in that order.
+ *    identity, status, owner and due date, in that order — followed by the
+ *    classification fields the live header carries (Project Type, Order Type,
+ *    Customer Type, Customer Contact). An earlier pass moved those four into a
+ *    tab to slim the header down; decision D1 put them back, because an
+ *    estimator reads them to decide whether the RFQ is theirs to work at all.
  */
 export function QuotationDetail() {
   const { id } = useParams();
@@ -44,7 +49,11 @@ export function QuotationDetail() {
   const [saved, setSaved] = useState<Quotation | null>(null);
   const [draft, setDraft] = useState<Quotation | null>(null);
   const editing = draft !== null;
-  const base = useMemo(() => generateQuotations(330).find(x => x.id === id), [id]);
+  const all = useMemo(() => generateQuotations(330), []);
+  /* Historical RFQ is a reference to another RFQ, so its options are the other
+     RFQs — seeded here rather than invented inside the field definition. */
+  useMemo(() => setHistoricalRfqOptions(['', ...all.map(x => `RFQ${x.no}`)]), [all]);
+  const base = useMemo(() => all.find(x => x.id === id), [all, id]);
   const q = saved ?? base;
 
   if (!q || !base) {
@@ -72,8 +81,34 @@ export function QuotationDetail() {
   const dirty = changed.length > 0;
   const changeCount = changed.length;
 
+  /**
+   * Changing the customer cascades, because on the live form the customer record
+   * owns four other values.
+   *
+   * Leaving the old contact in place would be the worse failure: the form would
+   * read as valid while naming someone who does not work for the new customer,
+   * and nothing on screen would say so. Resetting to that customer's first
+   * contact is what the live code does.
+   */
   const setField = (name: string, v: unknown) =>
-    setDraft(d => (d ? { ...d, [name]: v } : d));
+    setDraft(d => {
+      if (!d) return d;
+      if (name !== 'customer') return { ...d, [name]: v };
+      const cust = findCustomer(String(v));
+      if (!cust) return { ...d, customer: String(v) };
+      return {
+        ...d,
+        customer: cust.label,
+        customerContact: contactsFor(cust.label)[0] ?? '',
+        customerType: cust.custType,
+        itar: cust.isItar,
+        /* Only suggested, never overwritten: the live code writes the customer's
+           markup solely when the field is still unset. */
+        markup: d.markup || cust.priceMarkup,
+        /* The old project belonged to the old customer. */
+        projectName: '',
+      };
+    });
 
   function saveEdit() {
     if (!draft) return;
@@ -96,40 +131,89 @@ export function QuotationDetail() {
 
   return (
     <div className="vy-page vy-page--record">
-      <div className="vy-record-bar">
-        <div className="vy-record-id">
-          <span className="vy-ident vy-record-no">RFQ{q.no}</span>
-          <StatusBadge value={q.status} />
-          {q.itar && <span className="vy-flag" title="Subject to ITAR export control">ITAR</span>}
-        </div>
-        <div className="vy-page-actions">
-          <Button onClick={() => navigate('/sales-management/quotation')}>Back</Button>
-          <Button onClick={() => setBomOpen(true)}>BoM Comparison</Button>
-          <Button variant="filled" onClick={() => setRunOpen(true)}>Run Quotation</Button>
-        </div>
-      </div>
+      {/* ---- Record header: ONE block ------------------------------------
+          It used to be three — an action bar, a card of four facts, and a
+          second card of header fields — which cost about 900px before the tabs
+          and printed the project name twice. Same fields, same names, same
+          order; one container, half the height. */}
+      <header className="vy-rfq-head">
+        {/* Back is a way OUT, not something you do to the record. As a pill
+            beside "Run Quotation" it competed with the actions; above them and
+            unstyled, it reads as the escape hatch it is. */}
+        <button type="button" className="vy-back"
+                onClick={() => navigate('/sales-management/quotation')}>
+          <span aria-hidden>←</span> Quotations
+        </button>
 
-      <h1 className="vy-record-title">{q.projectName}</h1>
-
-      {/* The four facts an estimator needs before anything else. */}
-      <div className="vy-record-summary">
-        <Fact label="Customer" value={q.customer} />
-        <Fact label="Assigned to" value={q.assignedTo} />
-        <Fact
-          label="Date needed"
-          value={<>
-            {fmtDate(q.dateNeeded)}
+        <div className="vy-record-bar">
+          <div className="vy-record-id">
+            <span className="vy-ident vy-record-no">RFQ{q.no}</span>
+            <StatusBadge value={q.status} />
+            {/* Reads the DRAFT, not the saved record. ITAR follows the customer,
+                so changing the customer mid-edit changes it — and a badge that
+                still showed the old value would be telling you this RFQ is not
+                export-controlled while the form beneath it says otherwise. */}
+            {(draft ?? q).itar && (
+              <span className="vy-flag" title="Subject to ITAR export control">ITAR</span>
+            )}
             {!closed && (
-              <span className="vy-due-rel" data-tone={due < 0 ? 'overdue' : due <= 3 ? 'soon' : 'none'}>
-                {due < 0 ? `${-due} days late` : `in ${due} days`}
+              /* Lateness belongs beside the status, not buried in a date field.
+                 It is the one fact that changes what you do next. */
+              <span className="vy-due-chip" data-tone={due < 0 ? 'overdue' : due <= 3 ? 'soon' : 'none'}>
+                {due < 0 ? `${-due} days late` : due === 0 ? 'Due today' : `Due in ${due} days`}
               </span>
             )}
-          </>}
-        />
-        <Fact label="Priority" value={<Rating value={q.priority} max={3} />} />
-        {/* Present on the live header; it was dropped in an earlier pass. */}
-        <Fact label="Created" value={fmtDate(q.createdDate)} />
-      </div>
+          </div>
+
+          {/* Edit governs the header fields AND the Requirements tab, so it sits
+              where both are visible. When it sat on the tab alone it under-
+              claimed; when it sat here while unlocking only the tab, it over-
+              claimed. */}
+          <div className="vy-page-actions">
+            {editing ? (
+              <>
+                <Button onClick={cancelEdit}>Cancel</Button>
+                <Button variant="filled" disabled={!dirty} onClick={saveEdit}>
+                  {dirty ? `Save ${changeCount} ${changeCount === 1 ? 'change' : 'changes'}` : 'Save'}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button onClick={() => setDraft({ ...q })}>Edit</Button>
+                <Button onClick={() => setBomOpen(true)}>BoM Comparison</Button>
+                <Button variant="filled" onClick={() => setRunOpen(true)}>Run Quotation</Button>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* The project name is the heading when you are reading. While editing
+            it becomes a field in the grid below — printing it in both places is
+            what made the old header look duplicated. */}
+        {!editing && <h1 className="vy-record-title">{q.projectName}</h1>}
+
+        {editing && (
+          <p className="vy-edit-banner" role="status">
+            Editing RFQ{q.no}. Nothing is saved until you choose Save.
+          </p>
+        )}
+
+        {/* One grid. Dates and people first, because they say what to do; the
+            classification fields after, because they say what it is. */}
+        <dl className="vy-record-fields" data-editing={editing || undefined}>
+          {editing && (
+            <RecordField def={PROJECT_NAME_FIELD} value={(draft ?? q).projectName}
+                         editing onChange={setField} row={draft ?? q} />
+          )}
+          <Fact label="Due Date" value={fmtDate(q.dateNeeded)} />
+          <Fact label="Created Date" value={fmtDate(q.createdDate)} />
+          <Fact label="Priority" value={<Rating value={q.priority} max={3} />} />
+          {HEADER.map(def => (
+            <RecordField key={def.name} def={def} value={(draft ?? q)[def.name]}
+                         editing={editing} onChange={setField} row={draft ?? q} />
+          ))}
+        </dl>
+      </header>
 
       <Tabs
         value={tab}
@@ -140,11 +224,6 @@ export function QuotationDetail() {
               q={draft ?? q}
               editing={editing}
               onChange={setField}
-              dirty={dirty}
-              changeCount={changeCount}
-              onEdit={() => setDraft({ ...q })}
-              onSave={saveEdit}
-              onCancel={cancelEdit}
             /> },
           { value: 'checklists',   label: 'Checklists',   count: checklistOutstanding, content: <ChecklistsTab q={q} /> },
           { value: 'result',       label: 'Result',       count: q.results.length,     content: <ResultTab q={q} onRun={() => setRunOpen(true)} /> },
@@ -164,48 +243,31 @@ export function QuotationDetail() {
  *  live screen uses the same three headings but renders every value as a
  *  read-only input, so a record you are only reading looks like a broken form. */
 /**
- * Editing is scoped to this tab, and its controls live here.
+ * The specification: what was agreed, as distinct from what is being done
+ * about it.
  *
- * They used to sit in the record header, which reads as "edit this record" —
- * but the button only ever unlocked these fields. Checklists already edit
- * inline, so the header control was claiming a scope it did not have.
+ * These fields get an explicit edit mode with an explicit Save, because they
+ * are a twenty-field form where committing half-finished changes is a real
+ * risk and Cancel needs to mean something. Checklists take the opposite model
+ * and save as you go: ticking an item or moving it to Done is one discrete act
+ * with nothing to half-finish, and it happens many times a day by several
+ * people on the same record. Gating that behind Edit/Save would make a shared
+ * working screen feel locked.
  *
- * The two models are deliberate rather than inconsistent: a twenty-field form
- * with required values gets an explicit mode and an explicit Save, because
- * committing half-finished changes to it is a real risk. Ticking a checklist
- * item is a single discrete act with nothing to half-finish, so it saves as you
- * go. The rule is that the control lives where it acts.
+ * Same data, two rhythms. The rule is that the commitment ceremony should match
+ * what a mistake costs.
  */
-function RequirementsTab({ q, editing, onChange, dirty, changeCount, onEdit, onSave, onCancel }: {
+function RequirementsTab({ q, editing, onChange }: {
   q: Quotation; editing: boolean; onChange: (name: string, v: unknown) => void;
-  dirty: boolean; changeCount: number;
-  onEdit: () => void; onSave: () => void; onCancel: () => void;
 }) {
   const group = (defs: typeof COMMERCIAL) =>
     defs.map(def => (
-      <RecordField key={def.name} def={def} value={q[def.name]} editing={editing} onChange={onChange} />
+      <RecordField key={def.name} def={def} value={q[def.name]}
+                   editing={editing} onChange={onChange} row={q} />
     ));
 
   return (
     <>
-      <div className="vy-tab-actions">
-        {editing
-          ? <p className="vy-edit-banner">Editing these requirements. Nothing is saved until you choose Save.</p>
-          : <span />}
-        <div className="vy-page-actions">
-          {editing ? (
-            <>
-              <Button onClick={onCancel}>Cancel</Button>
-              <Button variant="filled" disabled={!dirty} onClick={onSave}>
-                {dirty ? `Save ${changeCount} ${changeCount === 1 ? 'change' : 'changes'}` : 'Save'}
-              </Button>
-            </>
-          ) : (
-            <Button onClick={onEdit}>Edit requirements</Button>
-          )}
-        </div>
-      </div>
-
       <div className="vy-field-groups">
         <FieldGroup title="Commercial">{group(COMMERCIAL)}</FieldGroup>
         <FieldGroup title="Technical">{group(TECHNICAL)}</FieldGroup>
@@ -217,11 +279,20 @@ function RequirementsTab({ q, editing, onChange, dirty, changeCount, onEdit, onS
   );
 }
 
+/**
+ * A read-only header value that has no FieldDef, because the system owns it —
+ * the two dates and the priority.
+ *
+ * It renders as `.vy-field` rather than a shape of its own, so it sits in the
+ * same grid as the editable fields and aligns with them. Two visual vocabularies
+ * for "label above value" in one header was half the reason it read as two
+ * separate cards.
+ */
 function Fact({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="vy-fact">
-      <div className="vy-fact-label">{label}</div>
-      <div className="vy-fact-value">{value}</div>
+    <div className="vy-field">
+      <dt>{label}</dt>
+      <dd>{value}</dd>
     </div>
   );
 }

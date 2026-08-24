@@ -163,6 +163,8 @@
   --vy-accent-bar-w:       3px;  /* left accent rule on queue cards */
   --vy-border-emphasis:    2px;  /* active tab underline, checked radio, focus ring */
   --vy-swatch-w:          78px;
+  --vy-chart-h:          220px;  /* Home chart plot area */
+  --vy-chart-bar-w:       28px;  /* a bar wide enough to segment, narrow enough for 12 */
   --vy-swatch-h:          52px;
   --vy-palette-w:        620px;
   --vy-palette-group-w:   66px;
@@ -173,6 +175,7 @@
   --vy-card-min-w:       200px;
   --vy-link-card-min-w:  220px;
   --vy-search-w:         420px;
+  --vy-grid-search-min:  220px;  /* below this the placeholder truncates */
   --vy-doc-max-w:       1180px;
 
   /* --- Elevation layers ------------------------------------------------------ */
@@ -182,6 +185,7 @@
      Field-list column widths and the label column of a definition list. */
   --vy-field-label-w:    180px;
   --vy-field-group-min:  280px;
+  --vy-header-field-min: 190px;  /* record-header facts: label above value */
   --vy-record-max-w:     1180px;
   --vy-status-slot-w:    104px;  /* GAP-01 — see docs/gap-register.md */
   --vy-note-min-w:       320px;
