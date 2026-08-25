@@ -656,3 +656,22 @@
    target had no feedback before the click. */
 .vy-check-box:hover { border-color: var(--vy-grey-600); }
 .vy-check-box[data-state="checked"]:hover { border-color: var(--vy-blue-700); background: var(--vy-blue-700); }
+
+/* ---- Required marker -----------------------------------------------------
+   `(*)`, as the live form writes it, rather than a bare asterisk — that is the
+   convention these users have already learned and the customer's requirements
+   do not ask for it to change.
+
+   Amber rather than red: red is the colour this system uses for something that
+   has gone WRONG (overdue, blocked, removed). A field that is merely required
+   has not gone wrong, and spending the error colour on the resting state of a
+   form leaves nothing louder for an actual error. */
+.vy-required {
+  margin-left: var(--vy-space-2);
+  color: var(--vy-accent-warning);
+  font-weight: var(--vy-weight-semibold);
+}
+
+/* The notes section spans the full width — two free-text boxes side by side
+   read better than two narrow ones in a column of field groups. */
+.vy-field-group--notes { margin-top: var(--vy-space-9); }

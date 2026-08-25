@@ -2,7 +2,7 @@ import type { FieldDef } from './RecordField';
 import type { Quotation } from '../../data/quotations';
 import { CUSTOMER_OPTIONS, contactsFor, findCustomer, PEOPLE } from '../../data/quotations';
 import {
-  PROJECT_TYPE, ORDER_TYPE, RFQ_TYPE, CUSTOMER_TYPE, APPLICATION, QUOTE_FOCUS,
+  PROJECT_TYPE, ORDER_TYPE, CUSTOMER_TYPE, APPLICATION, QUOTE_FOCUS,
   MATERIAL_PACKAGE_TYPE, TEST_REQUIREMENTS, EXCESS_AND_MOQ,
   NET_CONSIGNED_INVENTORY, ROCKET_CONSIGNED_INVENTORY,
 } from '../../data/metadata';
@@ -28,7 +28,7 @@ import {
  * names for it.
  */
 export const PROJECT_NAME_FIELD: FieldDef<Quotation> = {
-  name: 'projectName', label: 'Project Name', kind: 'lookup',
+  name: 'projectName', label: 'Project Name', kind: 'lookup', required: true,
   optionsFor: (q: Quotation) => findCustomer(q.customer)?.projectNames ?? [],
   hint: 'An existing project for this customer, or a new assembly number.',
 };
@@ -59,27 +59,27 @@ export const HEADER: FieldDef<Quotation>[] = [
   /* Customer comes FIRST because four other fields are decided by it. Putting a
      dependent field above the one it depends on makes the form change under the
      user's cursor after they have already filled it in. */
-  { name: 'customer', label: 'Customer', kind: 'lookup', optionsFor: () => CUSTOMER_OPTIONS,
+  { name: 'customer', label: 'Customer', kind: 'lookup', required: true, optionsFor: () => CUSTOMER_OPTIONS,
     hint: 'Sets the contact list, Customer Type and the ITAR flag, and suggests a markup.' },
   /* Filtered to the chosen customer, exactly as the live form does it. As free
      text this accepted a contact who does not work for the customer. */
   { name: 'customerContact', label: 'Customer Contact', kind: 'lookup',
     optionsFor: (q: Quotation) => contactsFor(q.customer) },
   { name: 'projectType', label: 'Project Type', kind: 'select', options: PROJECT_TYPE },
-  { name: 'orderType', label: 'Order Type', kind: 'select', options: ORDER_TYPE },
+  { name: 'orderType', label: 'Order Type', kind: 'select', options: ORDER_TYPE, required: true },
   /* Derived: the live form writes this from the customer record's `custType`.
      The live system carries BOTH "Customer Type" (header) and "RFQ Type" (list
      grid), and both hold Consigned/Turnkey/Mixed. They may be the same field
      twice or two genuinely different ones — that is a question for the
      business, not something to resolve by guessing, so both are kept. */
   { name: 'customerType', label: 'Customer Type', kind: 'select', options: CUSTOMER_TYPE,
-    readOnly: true, derivedFrom: 'Customer' },
-  { name: 'assignedTo', label: 'Assigned To', kind: 'select', options: PEOPLE },
+    required: true, readOnly: true, derivedFrom: 'Customer' },
+  { name: 'assignedTo', label: 'Assigned To', kind: 'select', options: PEOPLE, required: true },
   /* Editable, and a dropdown rather than a star rating. The 25 Aug review:
      "priority indicator: unclear interaction -> change to a dropdown with
      dot+label options". It was read-only here, so the one field that says how
      urgent this RFQ is could be read and never set. */
-  { name: 'priority', label: 'Priority', kind: 'priority' },
+  { name: 'priority', label: 'Priority', kind: 'priority', required: true },
 ];
 
 const byName = (n: string) => HEADER.find(f => f.name === n)!;
@@ -119,65 +119,91 @@ export const HEADER_GROUPS: HeaderGroup[] = [
   },
 ];
 
+/* =============================================================================
+   THE FOUR SECTIONS OF THE SPECIFIC REQUIREMENTS TAB
+   -----------------------------------------------------------------------------
+   Names, membership and order read off the live form on 25 Aug 2026
+   (docs/live-spec-25aug.md). The previous three groups — "Commercial",
+   "Technical", "Inventory & options" — were invented, and their membership did
+   not match the live screen either: Markup and Quantities To Quote sat under
+   "Commercial" when the live form groups them with the other quoting inputs.
+
+   The constants keep their old export names so nothing downstream has to move;
+   only what they contain has changed.
+   ========================================================================== */
+
+/** QUOTE CONFIGURATION — what the quote optimises for and what it is marked up by. */
 export const COMMERCIAL: FieldDef<Quotation>[] = [
-  { name: 'rfqType', label: 'RFQ Type', kind: 'select', options: RFQ_TYPE },
-  /* Carried live as the pair `rfqParentName` + `rfqParentGuid` — a reference to
-     another RFQ, not a string. Free text let you cite an RFQ that never existed. */
-  { name: 'historicalRfq', label: 'Historical RFQ', kind: 'lookup',
-    optionsFor: () => HISTORICAL_RFQ_OPTIONS,
-    hint: 'The RFQ this one re-quotes, if any.' },
+  { name: 'quoteFocus', label: 'Quote Focus', kind: 'select', options: QUOTE_FOCUS, required: true,
+    hint: 'What the sourcing engine optimises for when more than one part matches.' },
+  { name: 'materialPackageType', label: 'Material Package Type', kind: 'select',
+    options: MATERIAL_PACKAGE_TYPE, required: true },
   /* Defaults from the customer's `priceMarkup`, but stays editable: the live
      code only writes the default while markup is still unset, which is what an
      overridable default looks like. */
-  { name: 'markup', label: 'Markup', kind: 'number', suffix: '%', min: 0, max: 100,
+  { name: 'markup', label: 'Markup', kind: 'number', suffix: '%', min: 0, max: 100, required: true,
     hint: 'Applied to material and labour to produce the quoted total. Suggested from the customer.' },
+  { name: 'leadTimeDays', label: 'Acceptable LeadTime In Day', kind: 'number', suffix: 'days',
+    min: 1, required: true,
+    hint: 'Parts quoted beyond this are flagged rather than silently accepted.' },
   /* A TEXTAREA in the live system, not a number: it holds the quantities
-     themselves (a list of price breaks), not a count of them. This mockup had
-     it as "how many price breaks", which was a misreading of the label. */
-  { name: 'quantitiesToQuote', label: 'Item Ant Quantities To Quote', kind: 'notes',
+     themselves (a list of price breaks), not a count of them. */
+  { name: 'quantitiesToQuote', label: 'Item Ant Quantities To Quote', kind: 'notes', required: true,
     hint: 'The quantities the customer wants priced, e.g. 100, 250, 500.' },
-  { name: 'quoteFocus', label: 'Quote Focus', kind: 'select', options: QUOTE_FOCUS,
-    hint: 'What the sourcing engine optimises for when more than one part matches.' },
 ];
 
+/** TECHNICAL SPECIFICATIONS — how it is built and what inventory rules apply. */
 export const TECHNICAL: FieldDef<Quotation>[] = [
-  { name: 'application', label: 'Application', kind: 'select', options: APPLICATION },
   /* There is no BUILD_REQUIREMENT metadata code. The live value observed was
      "System", which is an APPLICATION value, so this reuses that list —
-     an inference, not a lookup, and the one option list here still worth
-     confirming with the business. */
-  { name: 'buildRequirement', label: 'Build Requirement', kind: 'select', options: APPLICATION },
-  /* A fixed list, not free text — this mockup previously had it as an input. */
-  { name: 'testRequirements', label: 'Test Requirements', kind: 'select', options: TEST_REQUIREMENTS },
-  { name: 'materialPackageType', label: 'Material Package Type', kind: 'select', options: MATERIAL_PACKAGE_TYPE },
+     an inference, not a lookup, and still worth confirming with the business. */
+  { name: 'buildRequirement', label: 'Build Requirement', kind: 'select', options: APPLICATION, required: true },
+  { name: 'testRequirements', label: 'Test Requirements', kind: 'select', options: TEST_REQUIREMENTS, required: true },
   { name: 'assemblyTurnTime', label: 'Assembly Turn Time', kind: 'number', suffix: 'days', min: 1 },
-  { name: 'leadTimeDays', label: 'Acceptable LeadTime In Day', kind: 'number', suffix: 'days', min: 1,
-    hint: 'Parts quoted beyond this are flagged rather than silently accepted.' },
+  /* Lower-case "and", as the live form writes it. */
+  { name: 'excessAndMoq', label: 'Excess and MOQ', kind: 'select', options: EXCESS_AND_MOQ, required: true },
+  { name: 'netConsignedInventory', label: 'Net Consigned Inventory', kind: 'select',
+    options: NET_CONSIGNED_INVENTORY, required: true },
+  /* "Rocket" is a real concept with its own metadata code (NET_ROCKET_INVENTORY),
+     parallel to the consigned one. Not a typo — it is the customer's own
+     part-number namespace, confirmed from the BoM comparison export. */
+  { name: 'rocketConsignedInventory', label: 'Rocket Consigned Inventory', kind: 'select',
+    options: ROCKET_CONSIGNED_INVENTORY, required: true },
 ];
 
+/** SPECIAL REQUIREMENTS & OPTIONS — three flags, none of them required. */
 export const INVENTORY: FieldDef<Quotation>[] = [
-  { name: 'excessAndMoq', label: 'Excess And MOQ', kind: 'select', options: EXCESS_AND_MOQ },
-  { name: 'netConsignedInventory', label: 'Net Consigned Inventory', kind: 'select', options: NET_CONSIGNED_INVENTORY },
-  /* "Rocket" is a real concept with its own metadata code (NET_ROCKET_INVENTORY),
-     parallel to the consigned one. Not a typo. */
-  { name: 'rocketConsignedInventory', label: 'Rocket Consigned Inventory', kind: 'select', options: ROCKET_CONSIGNED_INVENTORY },
   { name: 'conformalCoating', label: 'Conformal Coating', kind: 'flag' },
+  /* One of the two corrections decision D2 kept: the live label reads
+     "Provide Alt Aml For Out Stock", which mis-cases an acronym and drops a
+     word. Everything else about it — Title Case, the "Alt" abbreviation — is
+     house style and is left alone. */
   { name: 'provideAlternateAml', label: 'Provide Alt AML For Out of Stock', kind: 'flag' },
   { name: 'broker', label: 'Broker', kind: 'flag' },
 ];
 
+/** ADDITIONAL NOTES. */
 export const NOTES: FieldDef<Quotation>[] = [
   { name: 'customerNotes', label: 'Customer specific needs', kind: 'notes',
     hint: 'Visible to the customer if the quote is shared.' },
-  { name: 'internalNotes', label: 'Internal Notes', kind: 'notes',
+  /* Lower-case "notes", as the live form writes it. */
+  { name: 'internalNotes', label: 'Internal notes', kind: 'notes',
     hint: 'Never leaves Linh Long.' },
 ];
 
 /**
- * Populated once at module load from the generated RFQs, so Historical RFQ can
- * offer real references. A lookup whose options are made up is only a text box
- * with extra steps.
+ * REMOVED, because the live record does not have them.
+ *
+ *   RFQ Type      — a grid column only; it is not on the form.
+ *   Application   — likewise a grid column only.
+ *   Historical RFQ — appears nowhere on the record. It was added here from a
+ *                    `rfqParentName` reference found in the shipped bundle,
+ *                    which turns out not to surface on this screen.
+ *
+ * Left recorded rather than deleted silently, so the decision is auditable.
  */
+export const NOT_ON_THE_RECORD = ['rfqType', 'application', 'historicalRfq'] as const;
+
 export let HISTORICAL_RFQ_OPTIONS: string[] = [];
 export function setHistoricalRfqOptions(all: string[]) { HISTORICAL_RFQ_OPTIONS = all; }
 

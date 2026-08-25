@@ -280,7 +280,6 @@
    QUOTATION — CHECKLISTS & ASSIGNMENT
    ========================================================================== */
 .vy-avatar--sm { width: var(--vy-space-11); height: var(--vy-space-11); font-size: var(--vy-text-xs); }
-.vy-req { font-size: var(--vy-text-2xs); text-transform: uppercase; letter-spacing: .05em; color: var(--vy-accent-warning); margin-left: var(--vy-space-3); }
 
 .vy-checklist-head .vy-progress { width: 100%; margin-bottom: var(--vy-space-4); }
 
@@ -300,7 +299,7 @@
 .vy-comment, .vy-activity-item { display: grid; grid-template-columns: auto 1fr; gap: var(--vy-space-5); }
 .vy-comment-meta { display: flex; align-items: baseline; gap: var(--vy-space-4); flex-wrap: wrap; font-size: var(--vy-text-xs); color: var(--vy-grey-500); margin-bottom: var(--vy-space-2); }
 .vy-comment-meta strong { color: var(--vy-grey-800); font-size: var(--vy-text-base); }
-.vy-comment-body p, .vy-activity-body p { margin: 0; font-size: var(--vy-text-base); color: var(--vy-grey-700); }
+.vy-comment-body p { margin: 0; font-size: var(--vy-text-base); color: var(--vy-grey-700); }
 .vy-composer { border-top: 1px solid var(--vy-grey-200); padding-top: var(--vy-space-7); }
 .vy-composer-foot { display: flex; align-items: center; justify-content: space-between; gap: var(--vy-space-6); margin-top: var(--vy-space-4); flex-wrap: wrap; }
 

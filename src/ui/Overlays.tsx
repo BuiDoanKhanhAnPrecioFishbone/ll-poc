@@ -127,12 +127,14 @@ export function RadioGroup({ options, value, onChange, label }: {
   );
 }
 
-export function Select({ options, value, onChange, label, id }: {
-  options: string[]; value: string; onChange: (v: string) => void; label?: string; id?: string;
+export function Select({ options, value, onChange, label, id, required }: {
+  options: string[]; value: string; onChange: (v: string) => void;
+  label?: string; id?: string; required?: boolean;
 }) {
   return (
     <RSelect.Root value={value} onValueChange={onChange}>
-      <RSelect.Trigger className="vy-select" aria-label={label} id={id} data-state-layer>
+      <RSelect.Trigger className="vy-select" aria-label={label} id={id}
+                       aria-required={required || undefined} data-state-layer>
         <RSelect.Value />
         <RSelect.Icon>
           <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor"

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button } from '../../ui/Button';
 import { Select } from '../../ui/Overlays';
+import { RequiredMark } from './RecordField';
 import { MiniTable } from '../../ui/MiniTable';
 import { fmtDate } from '../../ui/DataGrid';
 import { useToast } from '../../ui/Toast';
@@ -197,7 +198,10 @@ function Assignee({ role, value, required, onChange }: {
     <div className="vy-assignee">
       <label className="vy-fact-label" htmlFor={`as-${role}`}>
         {role}
-        {required && <> <span className="vy-req">required</span></>}
+        {/* `(*)`, matching every other required field on this record. It read
+            "required" here and nothing at all everywhere else — one record
+            cannot carry two conventions for the same fact. */}
+        {required && <RequiredMark />}
       </label>
       <div className="vy-assignee-picker">
         {!unset && <span className="vy-avatar vy-avatar--sm" aria-hidden>{initials(value)}</span>}

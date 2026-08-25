@@ -42,7 +42,36 @@ export type FieldDef<T> = FieldKind & {
   readOnly?: boolean;
   /** Which field determines this one. Renders as "follows Customer". */
   derivedFrom?: string;
+  /**
+   * Required on the live form, which marks these with a trailing `(*)`.
+   *
+   * Seventeen fields on the Specific Requirements tab carry it, plus Program
+   * Manager and Buyer on Checklists & Assignment. The prototype marked none of
+   * them, so a user filling this in had no way to tell which fields the system
+   * would refuse to save without — they would find out on submit.
+   */
+  required?: boolean;
 };
+
+/**
+ * The required marker.
+ *
+ * Rendered as the live system writes it — a trailing `(*)` — rather than the
+ * more usual bare asterisk, because that is the convention users here have
+ * learned and the customer's requirements do not ask for it to change.
+ *
+ * `aria-hidden` on the glyph with the word "required" for screen readers: a
+ * reader announcing "open paren star close paren" is noise, and the field also
+ * carries `aria-required` where it is a real control.
+ */
+export function RequiredMark() {
+  return (
+    <>
+      <span className="vy-required" aria-hidden>(*)</span>
+      <span className="vy-sr-only"> required</span>
+    </>
+  );
+}
 
 export function RecordField<T extends Record<string, any>>({ def, value, editing, onChange, row }: {
   def: FieldDef<T>;
@@ -62,7 +91,7 @@ export function RecordField<T extends Record<string, any>>({ def, value, editing
     case 'priority':
       return (
         <div className="vy-field vy-field--editing">
-          <dt><label htmlFor={`f-${def.name}`}>{def.label}</label></dt>
+          <dt><label htmlFor={`f-${def.name}`}>{def.label}{def.required && <RequiredMark />}</label></dt>
           <dd>
             <Select id={`f-${def.name}`} label={def.label}
                     value={priorityLevel(Number(value))}
@@ -75,7 +104,7 @@ export function RecordField<T extends Record<string, any>>({ def, value, editing
     case 'lookup':
       return (
         <div className="vy-field vy-field--editing">
-          <dt><label htmlFor={`f-${def.name}`}>{def.label}</label></dt>
+          <dt><label htmlFor={`f-${def.name}`}>{def.label}{def.required && <RequiredMark />}</label></dt>
           <dd>
             <Select id={`f-${def.name}`} label={def.label} value={String(value ?? '')}
                     options={[...def.optionsFor(row ?? {})]}
@@ -87,9 +116,10 @@ export function RecordField<T extends Record<string, any>>({ def, value, editing
     case 'select':
       return (
         <div className="vy-field vy-field--editing">
-          <dt><label htmlFor={`f-${def.name}`}>{def.label}</label></dt>
+          <dt><label htmlFor={`f-${def.name}`}>{def.label}{def.required && <RequiredMark />}</label></dt>
           <dd>
             <Select id={`f-${def.name}`} label={def.label} value={String(value ?? '')}
+                    required={def.required}
                     options={[...def.options]} onChange={v => onChange(def.name, v)} />
             {def.hint && <span className="vy-field-hint">{def.hint}</span>}
           </dd>
@@ -98,7 +128,7 @@ export function RecordField<T extends Record<string, any>>({ def, value, editing
     case 'number':
       return (
         <div className="vy-field vy-field--editing">
-          <dt><label htmlFor={`f-${def.name}`}>{def.label}</label></dt>
+          <dt><label htmlFor={`f-${def.name}`}>{def.label}{def.required && <RequiredMark />}</label></dt>
           <dd>
             <div className="vy-suffixed">
               <TextField id={`f-${def.name}`} type="number" value={String(value ?? '')}
@@ -123,7 +153,7 @@ export function RecordField<T extends Record<string, any>>({ def, value, editing
     case 'notes':
       return (
         <div className="vy-field vy-field--editing vy-field--wide">
-          <dt><label htmlFor={`f-${def.name}`}>{def.label}</label></dt>
+          <dt><label htmlFor={`f-${def.name}`}>{def.label}{def.required && <RequiredMark />}</label></dt>
           <dd>
             <TextArea id={`f-${def.name}`} rows={3} value={String(value ?? '')}
                       onChange={e => onChange(def.name, e.target.value)} />
@@ -134,7 +164,7 @@ export function RecordField<T extends Record<string, any>>({ def, value, editing
     default:
       return (
         <div className="vy-field vy-field--editing">
-          <dt><label htmlFor={`f-${def.name}`}>{def.label}</label></dt>
+          <dt><label htmlFor={`f-${def.name}`}>{def.label}{def.required && <RequiredMark />}</label></dt>
           <dd>
             <TextField id={`f-${def.name}`} value={String(value ?? '')}
                        onChange={e => onChange(def.name, e.target.value)} />
@@ -150,7 +180,7 @@ function ReadField<T>({ def, value, editing }: { def: FieldDef<T>; value: unknow
     return (
       <div className="vy-flag-row" data-on={Boolean(value)} data-locked={editing && def.readOnly || undefined}>
         <span className="vy-flag-mark" aria-hidden>{value ? '✓' : '–'}</span>
-        <span>{def.label}</span>
+        <span>{def.label}{def.required && <RequiredMark />}</span>
         {editing && def.readOnly && <LockNote def={def} />}
       </div>
     );
@@ -158,7 +188,7 @@ function ReadField<T>({ def, value, editing }: { def: FieldDef<T>; value: unknow
   if (def.kind === 'priority') {
     return (
       <div className="vy-field" data-locked={editing && def.readOnly || undefined}>
-        <dt>{def.label}</dt>
+        <dt>{def.label}{def.required && <RequiredMark />}</dt>
         <dd><Priority value={Number(value)} /></dd>
       </div>
     );
@@ -171,7 +201,7 @@ function ReadField<T>({ def, value, editing }: { def: FieldDef<T>; value: unknow
   return (
     <div className={'vy-field' + (def.kind === 'notes' ? ' vy-field--wide' : '')}
          data-locked={editing && def.readOnly || undefined}>
-      <dt>{def.label}</dt>
+      <dt>{def.label}{def.required && <RequiredMark />}</dt>
       <dd className={empty ? 'is-empty' : undefined}>
         {empty ? 'Not set' : String(shown)}
         {editing && def.readOnly && <LockNote def={def} />}

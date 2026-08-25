@@ -140,9 +140,12 @@ export function QuotationDetail() {
         {/* Back is a way OUT, not something you do to the record. As a pill
             beside "Run Quotation" it competed with the actions; above them and
             unstyled, it reads as the escape hatch it is. */}
+        {/* "Cancel" on the live record, not "Back". Kept as a quiet link
+            rather than a pill so it does not compete with Run Quotation — the
+            layout is ours to change, the word is not. */}
         <button type="button" className="vy-back"
                 onClick={() => navigate('/sales-management/quotation')}>
-          <span aria-hidden>←</span> Quotations
+          <span aria-hidden>←</span> Cancel
         </button>
 
         {/* ---- Smart buttons -----------------------------------------------
@@ -270,16 +273,19 @@ export function QuotationDetail() {
         value={tab}
         onValueChange={setTab}
         tabs={[
-          { value: 'requirements', label: 'Requirements', content:
+          /* Tab names verbatim from the live record (docs/live-spec-25aug.md).
+             All five had been shortened — "Requirements", "Result", "Activity" —
+             without anyone asking for it. */
+          { value: 'requirements', label: 'Specific Requirements', content:
             <RequirementsTab
               q={draft ?? q}
               editing={editing}
               onChange={setField}
             /> },
-          { value: 'checklists',   label: 'Checklists',   count: checklistOutstanding, content: <ChecklistsTab q={q} /> },
-          { value: 'result',       label: 'Result',       count: q.results.length,     content: <ResultTab q={q} onRun={() => setRunOpen(true)} /> },
+          { value: 'checklists',   label: 'Checklists & Assignment', count: checklistOutstanding, content: <ChecklistsTab q={q} /> },
+          { value: 'result',       label: 'Quotation Result', count: q.results.length,     content: <ResultTab q={q} onRun={() => setRunOpen(true)} /> },
           { value: 'conversations',label: 'Conversations',count: q.comments.length,    content: <ConversationsTab q={q} /> },
-          { value: 'activity',     label: 'Activity',     content: <ActivityTab q={q} /> },
+          { value: 'activity',     label: 'Activity Logs', content: <ActivityTab q={q} /> },
         ]}
       />
 
@@ -320,12 +326,21 @@ function RequirementsTab({ q, editing, onChange }: {
   return (
     <>
       <div className="vy-field-groups">
-        <FieldGroup title="Commercial">{group(COMMERCIAL)}</FieldGroup>
-        <FieldGroup title="Technical">{group(TECHNICAL)}</FieldGroup>
-        <FieldGroup title="Inventory & options">{group(INVENTORY)}</FieldGroup>
+        {/* Section names verbatim from the live form. "Commercial",
+            "Technical" and "Inventory & options" were invented; the live screen
+            names these itself. */}
+        <FieldGroup title="Quote Configuration">{group(COMMERCIAL)}</FieldGroup>
+        <FieldGroup title="Technical Specifications">{group(TECHNICAL)}</FieldGroup>
+        <FieldGroup title="Special Requirements & Options">{group(INVENTORY)}</FieldGroup>
       </div>
 
-      <div className="vy-notes-edit">{group(NOTES)}</div>
+      {/* The live form's fourth section. It had no heading here, so two
+          free-text boxes sat under the flags with nothing saying they were a
+          section of their own. */}
+      <section className="vy-field-group vy-field-group--notes">
+        <h2 className="vy-field-group-title">Additional Notes</h2>
+        <dl className="vy-notes-edit">{group(NOTES)}</dl>
+      </section>
     </>
   );
 }
