@@ -6,6 +6,7 @@ import {
 } from '@tanstack/react-table';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { SearchField } from './Field';
+import { ColumnChooser } from './ColumnChooser';
 import { Button } from './Button';
 import { SegmentedControl } from './Overlays';
 import { widthOf, type ColumnSpec } from '../components/column-model';
@@ -72,15 +73,30 @@ export function DataGrid<T extends { id: string | number }>({
 }) {
   const [density, setDensity] = useState<Density>(defaultDensity);
   const [search, setSearch] = useState('');
-  const [showHidden, setShowHidden] = useState(false);
+  /**
+   * Which columns are on.
+   *
+   * Was a single "Show N more columns" toggle, which the 25 Aug review called a
+   * confusing label and asked to become a Columns checklist. The toggle also
+   * only had two states — the shipped set, or the shipped set plus everything —
+   * so a user who wanted one extra column had to take all of them, and could
+   * not turn off a column they never use.
+   *
+   * Hidden-by-default columns start off; everything else starts on.
+   */
+  const [hidden, setHidden] = useState<Set<string>>(
+    () => new Set(columns.filter(c => c.hiddenByDefault).map(c => String(c.field))),
+  );
+  const toggleColumn = (field: string) =>
+    setHidden(h => { const n = new Set(h); n.has(field) ? n.delete(field) : n.add(field); return n; });
   const [sorting, setSorting] = useState<SortingState>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const visible = useMemo(
-    () => columns.filter(c => showHidden || !c.hiddenByDefault),
-    [columns, showHidden]
+    () => columns.filter(c => !hidden.has(String(c.field))),
+    [columns, hidden]
   );
-  const hiddenCount = columns.filter(c => c.hiddenByDefault).length;
+  const hiddenCount = hidden.size;
   const searchFields = useMemo(() => columns.filter(c => c.searchable).map(c => c.field), [columns]);
 
   const filtered = useMemo(() => {
@@ -175,13 +191,20 @@ export function DataGrid<T extends { id: string | number }>({
             <SegmentedControl label="Row density" options={DENSITY_OPTIONS}
                               value={density} onChange={setDensity} />
           </div>
-          {hiddenCount > 0 && (
-            <Button variant={showHidden ? 'tonal' : 'outlined'} onClick={() => setShowHidden(s => !s)}
-                    title={columns.filter(c => c.hiddenByDefault)
-                      .map(c => `${c.title}: ${c.note ?? 'hidden by default'}`).join('\n')}>
-              {showHidden ? 'Hide extra columns' : `Show ${hiddenCount} more columns`}
-            </Button>
-          )}
+          {/* "Columns", not "Show 2 more columns". The old label described the
+              action's effect on one particular state rather than naming the
+              thing it opens, so it read differently depending on what was
+              already on. */}
+          <ColumnChooser
+            columns={columns.map(c => ({
+              field: String(c.field), title: c.title,
+              on: !hidden.has(String(c.field)),
+              note: c.note,
+            }))}
+            hiddenCount={hiddenCount}
+            onToggle={toggleColumn}
+            onReset={() => setHidden(new Set(columns.filter(c => c.hiddenByDefault).map(c => String(c.field))))}
+          />
         </div>
 
         <div className="vy-grid-scroll" ref={scrollRef}>

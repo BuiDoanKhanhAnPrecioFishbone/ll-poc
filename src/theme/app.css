@@ -820,3 +820,43 @@
   margin: 0; padding: var(--vy-space-6);
   border-top: 0;
 }
+
+/* =============================================================================
+   FILTERS — quick + advanced
+   -----------------------------------------------------------------------------
+   Two tiers, per the 25 Aug review. They share one bar because they answer the
+   same question at two levels of effort; splitting them would make the cheap
+   one hard to find.
+   ========================================================================== */
+.vy-filters { display: flex; flex-direction: column; gap: var(--vy-space-4); width: 100%; }
+.vy-filter-row-main { display: flex; align-items: center; flex-wrap: wrap; gap: var(--vy-space-4); width: 100%; }
+.vy-filter-count { font-size: var(--vy-text-sm); color: var(--vy-grey-600); font-variant-numeric: tabular-nums; white-space: nowrap; }
+/* Conditions stay visible when the panel is closed. A filter you cannot see is
+   a grid that looks wrong for no reason. */
+.vy-filter-summary { padding-left: var(--vy-space-2); }
+
+.vy-advanced {
+  padding: var(--vy-space-6);
+  background: var(--vy-grey-25);
+  border: 1px solid var(--vy-grey-200);
+  border-radius: var(--vy-radius-md);
+  display: flex; flex-direction: column; gap: var(--vy-space-4);
+}
+/* Field, operator, value, then the remove control. The value column takes the
+   slack because it is the only one whose content is not a known vocabulary. */
+.vy-condition {
+  display: grid;
+  grid-template-columns: minmax(var(--vy-condition-col), 1fr) minmax(var(--vy-condition-col), 1fr) 2fr auto;
+  gap: var(--vy-space-4);
+  align-items: center;
+}
+.vy-condition > .vy-field-control { min-width: 0; }
+.vy-condition-remove {
+  display: grid; place-items: center;
+  width: var(--vy-space-10); height: var(--vy-space-10);
+  background: none; border: 0; border-radius: var(--vy-radius-sm);
+  color: var(--vy-grey-500); cursor: pointer;
+}
+.vy-condition-remove:hover { background: var(--vy-red-50); color: var(--vy-red-700); }
+.vy-condition-remove:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
+.vy-advanced-actions { display: flex; align-items: center; gap: var(--vy-space-5); flex-wrap: wrap; }

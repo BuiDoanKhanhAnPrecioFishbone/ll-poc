@@ -187,6 +187,8 @@
   --vy-field-group-min:  280px;
   --vy-header-field-min: 190px;  /* record-header facts: label above value */
   --vy-header-group-min: 260px;  /* one of the three header regions */
+  --vy-condition-col:    150px;  /* field / operator column in the advanced filter */
+  --vy-popover-min-w:    240px;
   --vy-record-max-w:     1180px;
   --vy-status-slot-w:    104px;  /* GAP-01 — see docs/gap-register.md */
   --vy-note-min-w:       320px;

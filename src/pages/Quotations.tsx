@@ -6,7 +6,10 @@ import { Priority } from '../ui/Priority';
 import { DataGrid, fmtDate } from '../ui/DataGrid';
 import { useToast } from '../ui/Toast';
 import { generateQuotations, QUOTATION_COLUMNS, daysUntil, type Quotation } from '../data/quotations';
-import { measureFor, scopeFilter, MEASURES, ME as OWNER } from '../data/queues';
+import { measureFor, scopeFilter, MEASURES } from '../data/queues';
+import { FilterBar } from '../ui/FilterBar';
+import { applyConditions, type Condition } from '../ui/filters';
+import { QUOTATION_QUICK, QUOTATION_FILTER_FIELDS } from '../data/quotationFilters';
 
 /**
  * Quotations list.
@@ -29,9 +32,15 @@ export function Quotations() {
   const queue = measureFor(params.get('queue'));
   const scope = params.get('scope');
 
-  const [mineOnly, setMineOnly] = useState(true);
-  const [openOnly, setOpenOnly] = useState(true);
+  /* Quick filters default to the two an estimator wants on arrival. They are
+     one click to drop, and the bar states what is applied rather than filtering
+     silently. */
+  const [quickOn, setQuickOn] = useState<string[]>(['mine', 'open']);
+  const [conditions, setConditions] = useState<Condition[]>([]);
   const toast = useToast();
+
+  const toggleQuick = (key: string) =>
+    setQuickOn(v => (v.includes(key) ? v.filter(k => k !== key) : [...v, key]));
 
   const clearQueue = () => {
     const next = new URLSearchParams(params);
@@ -41,22 +50,23 @@ export function Quotations() {
 
   const data = useMemo(() => {
     if (queue) {
-      /* The queue's own definition of scope, not the chips'. The tile counted
-         with this pair; the list must show that same set. */
+      /* Arriving from a queue tile overrides the page's own filters. A tile that
+         says 4 and opens a list of 2 has lied about something, so the tile's
+         predicate is the only one that applies. */
       const inScope = scopeFilter(scope);
       return all.filter(q => inScope(q) && queue.match(q));
     }
-    return all.filter(q =>
-      (!mineOnly || q.assignedTo === OWNER) &&
-      (!openOnly || (q.status !== 'Completed' && q.status !== 'Cancelled'))
-    );
-  }, [all, queue, scope, mineOnly, openOnly]);
+    /* Quick filters are conjunctive with each other and with the advanced
+       conditions: every chip you turn on narrows further. */
+    const quickMatched = all.filter(q =>
+      QUOTATION_QUICK.filter(f => quickOn.includes(f.key)).every(f => f.match(q)));
+    return applyConditions(quickMatched, conditions, QUOTATION_FILTER_FIELDS);
+  }, [all, queue, scope, quickOn, conditions]);
 
-  /* The SAME predicate the queues page counts with, not a re-written one.
-     Counting a bare `dateNeeded < today` here reported 22 of 33 overdue while
-     My Queues said 2, because it swept in historical RFQs that were quoted
-     months ago and are nobody's outstanding work. Two definitions of "overdue"
-     on two screens is the exact drift data/queues.ts exists to prevent. */
+  /* The SAME predicate My Queues counts with, not a re-written one. Counting a
+     bare `dateNeeded < today` here reported 22 of 33 overdue while My Queues
+     said 2, because it swept in RFQs quoted months ago that are nobody's
+     outstanding work. */
   const isOverdue = MEASURES.find(m => m.key === 'overdue')!.match;
   const overdue = data.filter(isOverdue).length;
 
@@ -108,23 +118,19 @@ export function Quotations() {
       filters={queue ? (
         /* One filter, stated in full, with one way out. Showing the page's own
            chips alongside it would imply they still apply — they do not. */
-        <>
+        <div className="vy-filter-row-main">
           <span className="vy-filter-label">From My Queues</span>
           <Chip label={`${queue.label} · ${scope === 'team' ? 'Team' : 'Mine'}`} selected onClick={clearQueue} />
           <span className="vy-filter-note">{queue.meaning}</span>
           <Button variant="text" onClick={clearQueue}>Clear</Button>
-        </>
+        </div>
       ) : (
-        <>
-          <span className="vy-filter-label">Showing</span>
-          <Chip label={`Assigned to ${OWNER}`} selected={mineOnly} onClick={() => setMineOnly(m => !m)} />
-          <Chip label="Open only" selected={openOnly} onClick={() => setOpenOnly(o => !o)} />
-          {(mineOnly || openOnly) && (
-            <Button variant="text" onClick={() => { setMineOnly(false); setOpenOnly(false); }}>
-              Show all {all.length}
-            </Button>
-          )}
-        </>
+        <FilterBar
+          quick={QUOTATION_QUICK} activeQuick={quickOn} onQuick={toggleQuick}
+          fields={QUOTATION_FILTER_FIELDS}
+          conditions={conditions} onConditions={setConditions}
+          total={all.length} shown={data.length}
+        />
       )}
       rowHref={q => `/sales-management/quotation/${q.id}`}
     />
