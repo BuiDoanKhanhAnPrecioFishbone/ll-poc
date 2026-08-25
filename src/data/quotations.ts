@@ -461,7 +461,7 @@ export function generateQuotations(count = 330): Quotation[] {
    -------------------------------------------------------------------------- */
 
 export const QUOTATION_COLUMNS: ColumnSpec<Quotation>[] = [
-  { field: 'priority', title: 'Priority', role: 'rating', priority: 2 },
+  { field: 'priority', title: 'Priority', role: 'priority', priority: 2 },
   { field: 'no', title: 'RFQ No', role: 'ident', searchable: true, width: 150,
     widthNote: 'RFQ numbers are a fixed 10 digits; the 240px ident default was sized for part numbers and wastes 90px here.' },
   { field: 'projectName', title: 'Project', role: 'text', searchable: true, width: 220, priority: 1,

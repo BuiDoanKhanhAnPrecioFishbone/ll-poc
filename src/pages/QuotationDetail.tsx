@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Tabs } from '../ui/Overlays';
 import { Button } from '../ui/Button';
-import { Rating } from '../ui/Rating';
+import { Priority } from '../ui/Priority';
 import { StatusBadge } from '../ui/Badge';
 import { fmtDate } from '../ui/DataGrid';
 import { generateQuotations, daysUntil, findCustomer, contactsFor, type Quotation } from '../data/quotations';
@@ -14,8 +14,9 @@ import { BomComparisonDialog } from '../components/quotation/BomComparisonDialog
 import { RunQuotationDialog } from '../components/quotation/RunQuotationDialog';
 import { useToast } from '../ui/Toast';
 import { RecordField } from '../components/quotation/RecordField';
-import { HEADER, COMMERCIAL, TECHNICAL, INVENTORY, NOTES, ALL_FIELDS, setHistoricalRfqOptions,
-         PROJECT_NAME_FIELD } from '../components/quotation/requirementFields';
+import { smartButtonsFor, SmartIcon } from '../components/quotation/SmartButtons';
+import { HEADER_GROUPS, COMMERCIAL, TECHNICAL, INVENTORY, NOTES, ALL_FIELDS,
+         setHistoricalRfqOptions } from '../components/quotation/requirementFields';
 
 /**
  * Quotation record.
@@ -145,6 +146,30 @@ export function QuotationDetail() {
           <span aria-hidden>←</span> Quotations
         </button>
 
+        {/* ---- Smart buttons -----------------------------------------------
+            Flagged in the 25 Aug review as outright missing: "In leading ERP
+            systems, every record must have related navigation."
+
+            They are deliberately NOT styled like the action buttons beside
+            them. An action button does something TO this record; a smart button
+            goes somewhere else. Same shape for both is how a user learns to
+            hesitate before every click. These carry a count, so they also
+            answer "is there anything there" without being pressed — a zero is
+            information, and stays visible rather than being hidden. */}
+        <nav className="vy-smart-buttons" aria-label="Related records">
+          {smartButtonsFor(q).map(b => (
+            <button key={b.label} type="button" className="vy-smart-btn"
+                    data-empty={b.count === 0 || undefined}
+                    onClick={() => b.count
+                      ? toast.notImplemented(`open the ${b.count === 1 ? b.label.toLowerCase() : b.plural.toLowerCase()} linked to RFQ${q.no}`)
+                      : toast.notImplemented(`create a ${b.label.toLowerCase()} for RFQ${q.no}`)}>
+              <SmartIcon name={b.icon} />
+              {b.count !== null && <span className="vy-smart-n">{b.count}</span>}
+              <span>{b.count === 1 ? b.label : b.plural}</span>
+            </button>
+          ))}
+        </nav>
+
         <div className="vy-record-bar">
           <div className="vy-record-id">
             <span className="vy-ident vy-record-no">RFQ{q.no}</span>
@@ -198,21 +223,46 @@ export function QuotationDetail() {
           </p>
         )}
 
-        {/* One grid. Dates and people first, because they say what to do; the
-            classification fields after, because they say what it is. */}
-        <dl className="vy-record-fields" data-editing={editing || undefined}>
-          {editing && (
-            <RecordField def={PROJECT_NAME_FIELD} value={(draft ?? q).projectName}
-                         editing onChange={setField} row={draft ?? q} />
-          )}
-          <Fact label="Due Date" value={fmtDate(q.dateNeeded)} />
-          <Fact label="Created Date" value={fmtDate(q.createdDate)} />
-          <Fact label="Priority" value={<Rating value={q.priority} max={3} />} />
-          {HEADER.map(def => (
-            <RecordField key={def.name} def={def} value={(draft ?? q)[def.name]}
-                         editing={editing} onChange={setField} row={draft ?? q} />
+        {/* ---- Three regions, not one grid ---------------------------------
+            Grouped by what the fields are ABOUT: who it is for, what it is, and
+            whether it is on track. Nine fields in a flat row give the eye
+            nothing to navigate by, so finding "who is the contact" means reading
+            every label; three named regions give three places to look.
+
+            Field order INSIDE each region is unchanged, so nothing a user has
+            learned moves relative to anything else in its own section.
+
+            Pattern follows the reviewed Customer Invoice mockup, which divides
+            its header into Customer & references, Invoice info, and Documents &
+            shipping. */}
+        <div className="vy-header-groups" data-editing={editing || undefined}>
+          {HEADER_GROUPS.map(g => (
+            <section className="vy-header-group" key={g.id}>
+              <h2 className="vy-header-group-title">
+                <SmartIcon name={g.icon} />{g.title}
+              </h2>
+              <dl className="vy-record-fields" data-editing={editing || undefined}>
+                {g.fields
+                  /* The project name is the heading while reading, so printing
+                     it here too would repeat it on one screen. Editing needs it
+                     as a control, and the heading steps aside for it. */
+                  .filter(def => editing || def.name !== 'projectName')
+                  .map(def => (
+                    <RecordField key={def.name} def={def} value={(draft ?? q)[def.name]}
+                                 editing={editing} onChange={setField} row={draft ?? q} />
+                  ))}
+                {/* Two system-stamped dates and a rating, which have no FieldDef
+                    because nothing about them is typed. They belong with the
+                    owner: a due date means little without knowing whose it is. */}
+                {g.id === 'schedule' && <>
+                  <Fact label="Due Date" value={fmtDate(q.dateNeeded)} />
+                  <Fact label="Created Date" value={fmtDate(q.createdDate)} />
+                  <Fact label="Priority" value={<Priority value={q.priority} />} />
+                </>}
+              </dl>
+            </section>
           ))}
-        </dl>
+        </div>
       </header>
 
       <Tabs

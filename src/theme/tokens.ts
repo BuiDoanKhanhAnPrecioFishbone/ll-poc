@@ -21,7 +21,9 @@ export const COLUMN_WIDTH = {
   money: 124,
   date: 150,
   status: 128,
-  rating: 132,
+  /* Was `rating` at 132px, sized for three stars. Priority is now a dot and a
+     word, and the widest word is "Medium" — a dot, a gap and six characters. */
+  priority: 104,
 } as const;
 
 export type ColumnRole = keyof typeof COLUMN_WIDTH;

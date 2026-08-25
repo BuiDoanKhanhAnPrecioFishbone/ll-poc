@@ -743,3 +743,80 @@
 /* A toolbar control and the word that names it are one unit and must wrap as
    one. As flex siblings they split, leaving the label a line above its buttons. */
 .vy-toolbar-group { display: flex; align-items: center; gap: var(--vy-space-5); }
+
+/* =============================================================================
+   SMART BUTTONS
+   -----------------------------------------------------------------------------
+   Navigation to linked records, flagged as missing in the 25 Aug review.
+
+   Deliberately NOT shaped like the action buttons below them. An action button
+   does something to this record and may be irreversible; a smart button only
+   goes somewhere. Same shape for both teaches hesitation before every click, so
+   these are a quiet tinted row: no fill, no border weight, no pill.
+   ========================================================================== */
+.vy-smart-buttons {
+  display: flex; flex-wrap: wrap; gap: var(--vy-space-2);
+  margin-bottom: var(--vy-space-6);
+  padding-bottom: var(--vy-space-5);
+  border-bottom: 1px solid var(--vy-grey-200);
+}
+.vy-smart-btn {
+  display: inline-flex; align-items: center; gap: var(--vy-space-3);
+  padding: var(--vy-space-3) var(--vy-space-5);
+  background: none; border: 1px solid transparent; border-radius: var(--vy-radius-md);
+  font: inherit; font-size: var(--vy-text-sm); color: var(--vy-grey-700);
+  cursor: pointer; white-space: nowrap;
+}
+.vy-smart-btn:hover { background: var(--vy-grey-50); border-color: var(--vy-grey-200); color: var(--vy-grey-900); }
+.vy-smart-btn:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
+.vy-smart-btn svg { color: var(--vy-grey-500); flex: 0 0 auto; }
+.vy-smart-btn:hover svg { color: var(--vy-blue-600); }
+/* The count leads, because "is there anything there" is the question the button
+   answers before it is pressed. */
+.vy-smart-n {
+  font-weight: var(--vy-weight-bold); color: var(--vy-grey-900);
+  font-variant-numeric: tabular-nums;
+}
+/* A zero keeps its place in the row — a row whose buttons appear and disappear
+   cannot be learned by position — but stops competing for attention. */
+.vy-smart-btn[data-empty] { color: var(--vy-grey-500); }
+.vy-smart-btn[data-empty] .vy-smart-n { color: var(--vy-grey-400); font-weight: var(--vy-weight-regular); }
+
+/* =============================================================================
+   HEADER GROUPS
+   -----------------------------------------------------------------------------
+   Three regions instead of one flat grid, per the 25 Aug review: related data
+   grouped so that entering it keeps related fields together.
+   ========================================================================== */
+.vy-header-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--vy-header-group-min), 1fr));
+  gap: var(--vy-space-6);
+  margin-top: var(--vy-space-7);
+  padding-top: var(--vy-space-7);
+  border-top: 1px solid var(--vy-grey-200);
+}
+.vy-header-group {
+  border: 1px solid var(--vy-grey-200);
+  border-radius: var(--vy-radius-md);
+  overflow: hidden;
+  min-width: 0;
+}
+/* A tinted bar, as in the reviewed invoice mockup. It is what makes the region
+   read as a region rather than as three fields that happen to sit together. */
+.vy-header-group-title {
+  display: flex; align-items: center; gap: var(--vy-space-3);
+  margin: 0; padding: var(--vy-space-4) var(--vy-space-6);
+  background: var(--vy-blue-50);
+  border-bottom: 1px solid var(--vy-grey-200);
+  font-size: var(--vy-text-sm); font-weight: var(--vy-weight-semibold);
+  color: var(--vy-grey-800);
+}
+.vy-header-group-title svg { color: var(--vy-blue-600); }
+/* Inside a region the fields stack in one column: a region is already narrow,
+   and two columns inside three regions is six columns of very short values. */
+.vy-header-group .vy-record-fields {
+  grid-template-columns: 1fr;
+  margin: 0; padding: var(--vy-space-6);
+  border-top: 0;
+}

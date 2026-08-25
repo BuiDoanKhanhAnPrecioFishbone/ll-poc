@@ -19,16 +19,6 @@ import {
    that remain are recorded in LABEL_FIXES in data/quotations.ts. */
 
 /**
- * The record header. These sit ABOVE the tabs on the live screen, and an
- * earlier pass moved them into the Requirements tab because the header looked
- * crowded. That was the wrong trade: an estimator reads Project Type and
- * Customer Type to decide whether the RFQ is even theirs to work, so burying
- * them one click down costs a decision that used to be free.
- *
- * Decision D1 (24 Aug 2026) returns them. Verified present on the live header:
- * Customer Contact, Project Type, Order Type, Customer Type.
- */
-/**
  * Project Name is separate from HEADER because it renders in two places: as the
  * record's HEADING while reading, and as a field only while editing. Leaving it
  * in HEADER printed it twice on the same screen.
@@ -43,6 +33,28 @@ export const PROJECT_NAME_FIELD: FieldDef<Quotation> = {
   hint: 'An existing project for this customer, or a new assembly number.',
 };
 
+/**
+ * The record header, GROUPED BY SUBJECT.
+ *
+ * These sit above the tabs on the live screen. An earlier pass moved them into
+ * the Requirements tab because the header looked crowded, which was the wrong
+ * trade — an estimator reads Project Type and Customer Type to decide whether
+ * the RFQ is theirs to work at all, so burying them one click down costs a
+ * decision that used to be free. Decision D1 returned them.
+ *
+ * They were then returned as ONE flat grid, which is the mistake this structure
+ * fixes. Nine unrelated fields in a row give the eye nothing to navigate by, so
+ * finding "who is the contact" means reading every label. Grouped by what the
+ * fields are ABOUT, each group is a place to look:
+ *
+ *   who it is for  ->  Customer, Customer Contact, Customer Type
+ *   what it is     ->  Project Name, Project Type, Order Type, Historical RFQ
+ *   when and whose ->  Due Date, Created Date, Priority, Assigned To
+ *
+ * This follows the grouped-region pattern in the reviewed Customer Invoice
+ * mockup (25 Aug 2026), which divides its header into Customer & references,
+ * Invoice info, and Documents & shipping.
+ */
 export const HEADER: FieldDef<Quotation>[] = [
   /* Customer comes FIRST because four other fields are decided by it. Putting a
      dependent field above the one it depends on makes the form change under the
@@ -63,6 +75,43 @@ export const HEADER: FieldDef<Quotation>[] = [
   { name: 'customerType', label: 'Customer Type', kind: 'select', options: CUSTOMER_TYPE,
     readOnly: true, derivedFrom: 'Customer' },
   { name: 'assignedTo', label: 'Assigned To', kind: 'select', options: PEOPLE },
+];
+
+const byName = (n: string) => HEADER.find(f => f.name === n)!;
+
+export type HeaderGroup = {
+  id: 'customer' | 'project' | 'schedule';
+  title: string;
+  /** Which of the shell's nav icons heads the group. */
+  icon: string;
+  fields: FieldDef<Quotation>[];
+};
+
+/**
+ * The header's three regions. Field ORDER inside a group is unchanged from the
+ * live screen; only the grouping is added, so nothing a user has learned moves
+ * relative to anything else in its own section.
+ *
+ * The `schedule` group also carries Due Date, Created Date and Priority. Those
+ * have no FieldDef because two are system-stamped and one is a rating, so the
+ * record page renders them itself and this group's `id` is how it knows where.
+ */
+export const HEADER_GROUPS: HeaderGroup[] = [
+  {
+    id: 'customer', title: 'Customer', icon: 'sell',
+    fields: [byName('customer'), byName('customerContact'), byName('customerType')],
+  },
+  {
+    id: 'project', title: 'Project', icon: 'parts',
+    fields: [PROJECT_NAME_FIELD, byName('projectType'), byName('orderType')],
+  },
+  {
+    /* Everything that answers "is this on track, and whose is it". Kept together
+       because they are read as a set: a due date means little without knowing
+       who owns it and how urgent it is. */
+    id: 'schedule', title: 'Schedule & ownership', icon: 'insight',
+    fields: [byName('assignedTo')],
+  },
 ];
 
 export const COMMERCIAL: FieldDef<Quotation>[] = [

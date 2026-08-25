@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Button } from '../ui/Button';
 import { Chip } from '../ui/Chip';
-import { Rating } from '../ui/Rating';
+import { Priority } from '../ui/Priority';
 import { DataGrid, fmtDate } from '../ui/DataGrid';
 import { useToast } from '../ui/Toast';
 import { generateQuotations, QUOTATION_COLUMNS, daysUntil, type Quotation } from '../data/quotations';
@@ -66,7 +66,7 @@ export function Quotations() {
     if (c.field === 'priority') return {
       ...c,
       render: (q: Quotation) => (
-        <Rating value={q.priority} max={3} />
+        <Priority value={q.priority} />
       ),
     };
     if (c.field === 'dateNeeded') return {
