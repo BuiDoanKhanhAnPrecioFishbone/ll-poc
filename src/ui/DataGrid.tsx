@@ -7,8 +7,9 @@ import {
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { SearchField } from './Field';
 import { ColumnChooser } from './ColumnChooser';
+import { Pager } from './Pager';
+import { usePrefs } from './prefs';
 import { Button } from './Button';
-import { SegmentedControl } from './Overlays';
 import { widthOf, type ColumnSpec } from '../components/column-model';
 import { GridSkeleton } from './GridSkeleton';
 import { renderCell, fmtDate } from './renderCell';
@@ -16,11 +17,6 @@ import { renderCell, fmtDate } from './renderCell';
 export type Density = 'compact' | 'comfortable' | 'relaxed';
 const ROW_H: Record<Density, number> = { compact: 28, comfortable: 36, relaxed: 44 };
 
-const DENSITY_OPTIONS = [
-  { value: 'compact' as const, label: 'Compact' },
-  { value: 'comfortable' as const, label: 'Comfortable' },
-  { value: 'relaxed' as const, label: 'Relaxed' },
-];
 
 /**
  * THE STANDARD LIST PATTERN — headless build.
@@ -41,7 +37,7 @@ const DENSITY_OPTIONS = [
  */
 export function DataGrid<T extends { id: string | number }>({
   data, columns, title, subtitle, actions, filters,
-  defaultDensity = 'comfortable', searchPlaceholder = 'Search', rowHref, onOpenRow, emptyHint, loading,
+  searchPlaceholder = 'Search', rowHref, onOpenRow, emptyHint, loading, kpis,
 }: {
   data: T[];
   columns: ColumnSpec<T>[];
@@ -49,7 +45,8 @@ export function DataGrid<T extends { id: string | number }>({
   subtitle?: ReactNode;
   actions?: ReactNode;
   filters?: ReactNode;
-  defaultDensity?: Density;
+  /** Clickable summary tiles, shown in place of a count in the page title. */
+  kpis?: ReactNode;
   searchPlaceholder?: string;
   /**
    * Opening a record hangs off the IDENTIFIER, not the row.
@@ -71,7 +68,11 @@ export function DataGrid<T extends { id: string | number }>({
   /** Loading, empty and error are three distinct states, not one. */
   loading?: boolean;
 }) {
-  const [density, setDensity] = useState<Density>(defaultDensity);
+  /* Density is a USER PREFERENCE, not a per-screen control (25 Aug review):
+     "do not show settings in the list view, move this into User Preference...
+     the UI elements you want to show should be configured here for consistency".
+     Set once, applies to every grid. */
+  const { density } = usePrefs();
   const [search, setSearch] = useState('');
   /**
    * Which columns are on.
@@ -139,7 +140,20 @@ export function DataGrid<T extends { id: string | number }>({
     getSortedRowModel: getSortedRowModel(),
   });
 
-  const rows = table.getRowModel().rows;
+  const allRows = table.getRowModel().rows;
+
+  /* Paging replaces infinite scroll (25 Aug review). Virtualisation stays
+     underneath, so a 100-row page is still cheap; what the pager adds is a
+     POSITION — where you are, and a way back to it. */
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(50);
+  const pageCount = Math.max(1, Math.ceil(allRows.length / pageSize));
+  /* Clamp during render, not in an effect. An effect loses the race with the
+     first paint and shows a blank page for one frame — the exact bug the old
+     pager had when a filter narrowed the set while you were on page 7. */
+  const safePage = Math.min(page, pageCount - 1);
+  const rows = allRows.slice(safePage * pageSize, safePage * pageSize + pageSize);
+
   const rowH = ROW_H[density];
 
   const virt = useVirtualizer({
@@ -154,7 +168,10 @@ export function DataGrid<T extends { id: string | number }>({
 
   /* A narrower result set should start at the top, not wherever the last scroll
      left you — the scroll equivalent of the pager bug this replaced. */
-  useEffect(() => { scrollRef.current?.scrollTo({ top: 0 }); }, [filtered]);
+  useEffect(() => { scrollRef.current?.scrollTo({ top: 0 }); }, [filtered, safePage, pageSize]);
+  /* A narrower result set starts at page one. Staying on page 7 of a set that
+     now has two pages is how a grid ends up looking empty for no reason. */
+  useEffect(() => { setPage(0); }, [filtered]);
 
   const items = virt.getVirtualItems();
 
@@ -168,13 +185,16 @@ export function DataGrid<T extends { id: string | number }>({
       <div className="vy-page-head">
         <div>
           <h1 className="vy-page-title">{title}</h1>
-          <p className="vy-page-sub">
-            {filtered.length.toLocaleString()} of {data.length.toLocaleString()}
-            {subtitle && <> · {subtitle}</>}
-          </p>
+          {/* The count is NOT here. The review: "displaying it right in the
+              module name doesn't have much meaning" — it belongs at the foot,
+              beside the control that moves through it. What is worth
+              highlighting goes in the KPI row below, where it can be clicked. */}
+          {subtitle && <p className="vy-page-sub">{subtitle}</p>}
         </div>
         {actions && <div className="vy-page-actions">{actions}</div>}
       </div>
+
+      {kpis && <div className="vy-kpi-row">{kpis}</div>}
 
       {filters && <div className="vy-filter-bar">{filters}</div>}
 
@@ -183,14 +203,6 @@ export function DataGrid<T extends { id: string | number }>({
           <SearchField value={search} placeholder={searchPlaceholder} aria-label={searchPlaceholder}
                        onChange={e => setSearch(e.target.value)} />
           <span className="vy-toolbar-spacer" />
-          {/* Label and control wrap together. Left as siblings of the flex row
-              they broke apart, stranding "Density" on the line above the buttons
-              it names. */}
-          <div className="vy-toolbar-group">
-            <span className="vy-toolbar-label" id="density-label">Density</span>
-            <SegmentedControl label="Row density" options={DENSITY_OPTIONS}
-                              value={density} onChange={setDensity} />
-          </div>
           {/* "Columns", not "Show 2 more columns". The old label described the
               action's effect on one particular state rather than naming the
               thing it opens, so it read differently depending on what was
@@ -262,12 +274,8 @@ export function DataGrid<T extends { id: string | number }>({
           </div>
         </div>
 
-        {/* No pager. Virtualisation makes every row reachable by scrolling, so
-            the count is a fact rather than a navigation control. */}
-        <div className="vy-grid-foot">
-          <span>{rows.length.toLocaleString()} {rows.length === 1 ? 'row' : 'rows'}</span>
-          {rows.length > 0 && <span className="vy-grid-foot-hint">scroll for all — no paging</span>}
-        </div>
+        <Pager page={safePage} pageSize={pageSize} total={allRows.length}
+               onPage={setPage} onPageSize={setPageSize} />
       </div>
     </div>
   );

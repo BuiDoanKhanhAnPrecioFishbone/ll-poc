@@ -136,6 +136,15 @@ export const legacyNav: LegacyGroup[] = [
 export type NavItem = {
   title: string;
   path: string;
+  /**
+   * The icon shown when the rail is collapsed.
+   *
+   * Every item needs its OWN. The 25 Aug review asked for a collapsed icon-only
+   * menu that can still be navigated, and items were inheriting their group's
+   * icon — so collapsing Sales Management gave six identical trolley glyphs and
+   * the rail became decoration you had to expand to read.
+   */
+  icon?: string;
   /** Where this lived before, so the migration is auditable and searchable. */
   wasCalled?: string;
   /** Plain-language description used by the command palette and empty states. */
@@ -288,14 +297,62 @@ const LIVE_ICONS: Record<string, string> = {
   'System Configuration': 'settings',
 };
 
+/**
+ * One icon per destination, keyed on the words in its own label.
+ *
+ * Matched on the label rather than the path because the paths are the part of
+ * this menu that is unreliable — seven of them sit in the wrong namespace, so a
+ * Procurement screen served from `sales-management` would inherit a sales icon.
+ * The label is what the user reads and what the icon has to agree with.
+ */
+const ITEM_ICONS: [RegExp, string][] = [
+  [/requirement|quotation|rfq/i, 'quote'],
+  [/sales order/i,               'order'],
+  [/rma|return/i,                'return'],
+  [/customer/i,                  'customer'],
+  [/requisition/i,               'requisition'],
+  [/purchase order/i,            'buy'],
+  [/supplier/i,                  'supplier'],
+  [/manufactur/i,                'factory'],
+  [/what if|simulat/i,           'simulate'],
+  [/part manage|part master|mpn|manufacture part/i, 'parts'],
+  [/bill of material|bom/i,      'bom'],
+  [/transfer/i,                  'transfer'],
+  [/adjust/i,                    'adjust'],
+  [/pcb/i,                       'pcb'],
+  [/work order/i,                'make'],
+  [/tool/i,                      'tool'],
+  [/machine/i,                   'machine'],
+  [/invoice/i,                   'invoice'],
+  [/bill/i,                      'invoice'],
+  [/journal/i,                   'journal'],
+  [/payment/i,                   'finance'],
+  [/report/i,                    'insight'],
+  [/configuration|set ?up|config/i, 'settings'],
+  [/encryption/i,                'lock'],
+  [/employee|user|department|designation/i, 'people'],
+  [/email|template/i,            'template'],
+  [/job/i,                       'job'],
+  [/api|integration/i,           'plug'],
+  [/menu/i,                      'menu'],
+  [/branch|region|language/i,    'globe'],
+  [/metadata/i,                  'metadata'],
+  [/queue/i,                     'queue'],
+  [/home/i,                      'home'],
+];
+
+export const iconFor = (title: string) =>
+  ITEM_ICONS.find(([re]) => re.test(title))?.[1] ?? 'doc';
+
 function toLiveGroup(g: LegacyGroup): NavGroup {
   const icon = LIVE_ICONS[g.title] ?? 'settings';
   if (!g.children.length) {
-    return { title: g.title, icon, purpose: '', leaf: true, items: [{ title: g.title, path: g.path }] };
+    return { title: g.title, icon, purpose: '', leaf: true,
+             items: [{ title: g.title, path: g.path, icon: iconFor(g.title) }] };
   }
   return {
     title: g.title, icon, purpose: '',
-    items: g.children.map(c => ({ title: c.title, path: c.path })),
+    items: g.children.map(c => ({ title: c.title, path: c.path, icon: iconFor(c.title) })),
   };
 }
 
@@ -306,7 +363,8 @@ export const liveNav: NavGroup[] = (() => {
   const groups = legacyNav.map(toLiveGroup);
   const queues: NavGroup = {
     title: 'My Queues', icon: 'insight', purpose: '', leaf: true,
-    items: [{ title: 'My Queues', path: QUEUES_PATH, hint: 'What needs attention across your RFQs' }],
+    items: [{ title: 'My Queues', path: QUEUES_PATH, icon: 'queue',
+              hint: 'What needs attention across your RFQs' }],
   };
   /* Directly after Home: it is the second thing you look at, and inserting it
      here shifts no existing entry relative to its siblings. */

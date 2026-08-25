@@ -55,7 +55,7 @@ export function AuditPage() {
 
       <div className="vy-filter-row">
         {(['All', 'fixed', 'observation'] as const).map(sKey => (
-          <button key={sKey} className={'vy-chip' + (sKey === status ? ' is-on' : '')}
+          <button key={sKey} className={'vy-audit-chip' + (sKey === status ? ' is-on' : '')}
                   onClick={() => setStatus(sKey)}>
             {sKey === 'All' ? 'All findings' : sKey === 'fixed' ? 'Built' : 'Recorded only'}
             {sKey !== 'All' && <span> {sKey === 'fixed' ? fixed : observed}</span>}
@@ -65,7 +65,7 @@ export function AuditPage() {
 
       <div className="vy-filter-row">
         {AREAS.map(a => (
-          <button key={a} className={'vy-chip' + (a === area ? ' is-on' : '')} onClick={() => setArea(a)}>
+          <button key={a} className={'vy-audit-chip' + (a === area ? ' is-on' : '')} onClick={() => setArea(a)}>
             {a}{a !== 'All' && <span> {findings.filter(f => f.area === a).length}</span>}
           </button>
         ))}

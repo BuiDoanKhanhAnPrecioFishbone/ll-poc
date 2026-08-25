@@ -75,6 +75,11 @@ export const HEADER: FieldDef<Quotation>[] = [
   { name: 'customerType', label: 'Customer Type', kind: 'select', options: CUSTOMER_TYPE,
     readOnly: true, derivedFrom: 'Customer' },
   { name: 'assignedTo', label: 'Assigned To', kind: 'select', options: PEOPLE },
+  /* Editable, and a dropdown rather than a star rating. The 25 Aug review:
+     "priority indicator: unclear interaction -> change to a dropdown with
+     dot+label options". It was read-only here, so the one field that says how
+     urgent this RFQ is could be read and never set. */
+  { name: 'priority', label: 'Priority', kind: 'priority' },
 ];
 
 const byName = (n: string) => HEADER.find(f => f.name === n)!;
@@ -110,7 +115,7 @@ export const HEADER_GROUPS: HeaderGroup[] = [
        because they are read as a set: a due date means little without knowing
        who owns it and how urgent it is. */
     id: 'schedule', title: 'Schedule & ownership', icon: 'insight',
-    fields: [byName('assignedTo')],
+    fields: [byName('assignedTo'), byName('priority')],
   },
 ];
 

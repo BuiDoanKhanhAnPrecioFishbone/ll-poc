@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Tabs } from '../ui/Overlays';
 import { Button } from '../ui/Button';
-import { Priority } from '../ui/Priority';
 import { StatusBadge } from '../ui/Badge';
 import { fmtDate } from '../ui/DataGrid';
 import { generateQuotations, daysUntil, findCustomer, contactsFor, type Quotation } from '../data/quotations';
@@ -254,10 +253,12 @@ export function QuotationDetail() {
                 {/* Two system-stamped dates and a rating, which have no FieldDef
                     because nothing about them is typed. They belong with the
                     owner: a due date means little without knowing whose it is. */}
+                {/* Two system-stamped dates, which have no FieldDef because
+                    nothing about them is typed. Priority is a real field and
+                    lives in the group's own list, editable. */}
                 {g.id === 'schedule' && <>
                   <Fact label="Due Date" value={fmtDate(q.dateNeeded)} />
                   <Fact label="Created Date" value={fmtDate(q.createdDate)} />
-                  <Fact label="Priority" value={<Priority value={q.priority} />} />
                 </>}
               </dl>
             </section>

@@ -46,7 +46,6 @@
   /* The keyboard hint is the first thing to go: it is a nicety, and on a
      touch terminal it is a lie. */
   .vy-search kbd { display: none; }
-  .vy-record-summary { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
   .vy-field-groups { grid-template-columns: 1fr; gap: var(--vy-space-8); }
   .vy-bom-panes { grid-template-columns: 1fr; }
   .vy-run-cols { grid-template-columns: 1fr; }
@@ -134,4 +133,16 @@
    one thing a column of figures has to do. Stack instead. */
 @media (max-width: 900px) {
   .vy-run-summary-step { grid-template-columns: 1fr; }
+}
+
+/* ---- Global header: shed the optional widgets before the essential ones ---
+   Clock, timezone and language are true on every screen but needed on none of
+   them urgently. Below 1100px the timezone picker goes (the clock still states
+   the zone), and below 900px the clock goes too — leaving navigation, search,
+   My Queues and the account menu, which are the ones you press. */
+@media (max-width: 1100px) {
+  .vy-header-select:not(.vy-header-select--short) { display: none; }
+}
+@media (max-width: 900px) {
+  .vy-clock, .vy-header-select, .vy-topbar-sep { display: none; }
 }

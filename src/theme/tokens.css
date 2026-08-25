@@ -158,6 +158,7 @@
   /* --- Layout sizes ----------------------------------------------------------
      Named because they are component dimensions, not spacing. */
   --vy-control-sm:        28px;  /* avatar, brand mark */
+  --vy-control-md:        34px;  /* input / locked-field height */
   --vy-icon-sm:           16px;  /* nav and toolbar glyphs */
   --vy-dot-size:           6px;  /* unread indicator */
   --vy-accent-bar-w:       3px;  /* left accent rule on queue cards */
@@ -189,6 +190,8 @@
   --vy-header-group-min: 260px;  /* one of the three header regions */
   --vy-condition-col:    150px;  /* field / operator column in the advanced filter */
   --vy-popover-min-w:    240px;
+  --vy-tz-w:             180px;  /* timezone select in the global header */
+  --vy-kpi-min-w:        140px;
   --vy-record-max-w:     1180px;
   --vy-status-slot-w:    104px;  /* GAP-01 — see docs/gap-register.md */
   --vy-note-min-w:       320px;

@@ -1,5 +1,8 @@
 import { TextField, TextArea } from '../../ui/Field';
 import { Select, Checkbox } from '../../ui/Overlays';
+import { Priority, priorityLevel, PRIORITY_LEVELS, type PriorityLevel } from '../../ui/Priority';
+
+const LEVEL_TO_N: Record<PriorityLevel, number> = { High: 3, Medium: 2, Low: 1 };
 
 /**
  * One field declaration drives both reading and editing.
@@ -21,7 +24,9 @@ export type FieldKind =
   /** A reference to another record. Options depend on the rest of the form. */
   | { kind: 'lookup'; optionsFor: (row: any) => readonly string[] }
   | { kind: 'number'; suffix?: string; min?: number; max?: number }
-  | { kind: 'flag' };
+  | { kind: 'flag' }
+  /** High / Medium / Low, stored 1-3. Rendered as a dot and a word, not stars. */
+  | { kind: 'priority' };
 
 export type FieldDef<T> = FieldKind & {
   name: Extract<keyof T, string>;
@@ -54,6 +59,19 @@ export function RecordField<T extends Record<string, any>>({ def, value, editing
   if (!editing || def.readOnly) return <ReadField def={def} value={value} editing={editing} />;
 
   switch (def.kind) {
+    case 'priority':
+      return (
+        <div className="vy-field vy-field--editing">
+          <dt><label htmlFor={`f-${def.name}`}>{def.label}</label></dt>
+          <dd>
+            <Select id={`f-${def.name}`} label={def.label}
+                    value={priorityLevel(Number(value))}
+                    options={[...PRIORITY_LEVELS]}
+                    onChange={v => onChange(def.name, LEVEL_TO_N[v as PriorityLevel])} />
+            {def.hint && <span className="vy-field-hint">{def.hint}</span>}
+          </dd>
+        </div>
+      );
     case 'lookup':
       return (
         <div className="vy-field vy-field--editing">
@@ -134,6 +152,14 @@ function ReadField<T>({ def, value, editing }: { def: FieldDef<T>; value: unknow
         <span className="vy-flag-mark" aria-hidden>{value ? '✓' : '–'}</span>
         <span>{def.label}</span>
         {editing && def.readOnly && <LockNote def={def} />}
+      </div>
+    );
+  }
+  if (def.kind === 'priority') {
+    return (
+      <div className="vy-field" data-locked={editing && def.readOnly || undefined}>
+        <dt>{def.label}</dt>
+        <dd><Priority value={Number(value)} /></dd>
       </div>
     );
   }

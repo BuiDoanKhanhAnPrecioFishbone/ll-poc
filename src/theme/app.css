@@ -65,10 +65,6 @@
   background: var(--vy-grey-0); border-bottom: 1px solid var(--vy-grey-200);
   display: flex; align-items: center; gap: var(--vy-space-8); padding: 0 var(--vy-space-8);
 }
-.vy-crumb { display: flex; align-items: baseline; gap: var(--vy-space-4); min-width: 0; }
-.vy-crumb-group { font-size: var(--vy-text-sm); color: var(--vy-grey-500); }
-.vy-crumb-sep { color: var(--vy-grey-300); }
-.vy-crumb-title { font-size: var(--vy-text-md); font-weight: var(--vy-weight-semibold); color: var(--vy-grey-800); white-space: nowrap; }
 
 .vy-search {
   margin-left: auto; display: flex; align-items: center; gap: var(--vy-space-4);
@@ -111,7 +107,6 @@
    push the density control onto a row of its own. */
 .vy-toolbar-spacer { flex: 1 1 0; min-width: 0; }
 .vy-toolbar-spacer { flex: 1; }
-.vy-toolbar-label { font-size: var(--vy-text-sm); color: var(--vy-grey-500); }
 .vy-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .vy-code { font-family: var(--vy-font-mono); font-size: var(--vy-text-xs); background: var(--vy-grey-100); border-radius: var(--vy-radius-sm); padding: 1px var(--vy-space-3); color: var(--vy-grey-700); }
 .vy-empty { color: var(--vy-grey-300); }
@@ -198,10 +193,10 @@
 
 /* ---- Audit ---------------------------------------------------------------- */
 .vy-filter-row { display: flex; gap: var(--vy-space-3); flex-wrap: wrap; margin-bottom: var(--vy-space-8); }
-.vy-chip { background: var(--vy-grey-0); border: 1px solid var(--vy-grey-200); border-radius: var(--vy-radius-pill); padding: var(--vy-space-2) var(--vy-space-6); font-size: var(--vy-text-base); color: var(--vy-grey-600); cursor: pointer; font-family: inherit; }
-.vy-chip:hover { border-color: var(--vy-grey-300); }
-.vy-chip.is-on { background: var(--vy-blue-600); border-color: var(--vy-blue-600); color: var(--vy-on-dark-fg); }
-.vy-chip span { opacity: .7; margin-left: var(--vy-space-2); }
+.vy-audit-chip { background: var(--vy-grey-0); border: 1px solid var(--vy-grey-200); border-radius: var(--vy-radius-pill); padding: var(--vy-space-2) var(--vy-space-6); font-size: var(--vy-text-base); color: var(--vy-grey-600); cursor: pointer; font-family: inherit; }
+.vy-audit-chip:hover { border-color: var(--vy-grey-300); }
+.vy-audit-chip.is-on { background: var(--vy-blue-600); border-color: var(--vy-blue-600); color: var(--vy-on-dark-fg); }
+.vy-audit-chip span { opacity: .7; margin-left: var(--vy-space-2); }
 .vy-findings { display: flex; flex-direction: column; gap: var(--vy-space-6); }
 .vy-finding { background: var(--vy-grey-0); border: 1px solid var(--vy-grey-200); border-radius: var(--vy-radius-md); padding: var(--vy-space-8) var(--vy-space-8); }
 .vy-finding header { display: flex; align-items: baseline; gap: var(--vy-space-5); flex-wrap: wrap; margin-bottom: var(--vy-space-5); }
@@ -241,7 +236,6 @@
    ========================================================================== */
 .vy-filter-bar { display: flex; align-items: center; gap: var(--vy-space-3); margin-bottom: var(--vy-space-4); flex-wrap: wrap; }
 .vy-filter-label { font-size: var(--vy-text-sm); color: var(--vy-grey-500); }
-.vy-alert-count { color: var(--vy-red-600); font-weight: var(--vy-weight-semibold); }
 
 /* --- Due date ---------------------------------------------------------------
    Colour carries the same meaning as the status vocabulary: overdue is blocked,
@@ -280,18 +274,15 @@
 .vy-flag-mark { font-weight: var(--vy-weight-heavy); width: var(--vy-space-5); color: var(--vy-grey-300); }
 .vy-flag-row[data-on="true"] .vy-flag-mark { color: var(--vy-accent-positive); }
 
-.vy-crumb-link { font-size: var(--vy-text-md); color: var(--vy-blue-700); text-decoration: none; }
-.vy-crumb-link:hover { text-decoration: underline; }
 .vy-note-inline { font-size: var(--vy-text-xs); color: var(--vy-blue-700); background: var(--vy-blue-50); border-radius: var(--vy-radius-sm); padding: var(--vy-space-2) var(--vy-space-4); margin: var(--vy-space-2) 0; }
 
 /* =============================================================================
    QUOTATION — CHECKLISTS & ASSIGNMENT
    ========================================================================== */
-.vy-assignees { margin-bottom: var(--vy-space-9); }
 .vy-avatar--sm { width: var(--vy-space-11); height: var(--vy-space-11); font-size: var(--vy-text-xs); }
 .vy-req { font-size: var(--vy-text-2xs); text-transform: uppercase; letter-spacing: .05em; color: var(--vy-accent-warning); margin-left: var(--vy-space-3); }
 
-.vy-progress { width: 100%; margin-bottom: var(--vy-space-4); }
+.vy-checklist-head .vy-progress { width: 100%; margin-bottom: var(--vy-space-4); }
 
 .vy-doc-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--vy-space-4); margin-bottom: var(--vy-space-4); }
 .vy-empty-inline { color: var(--vy-grey-500); font-size: var(--vy-text-base); background: var(--vy-grey-25); border: 1px dashed var(--vy-grey-300); border-radius: var(--vy-radius-md); padding: var(--vy-space-8); max-width: 72ch; }
@@ -314,7 +305,6 @@
 .vy-composer-foot { display: flex; align-items: center; justify-content: space-between; gap: var(--vy-space-6); margin-top: var(--vy-space-4); flex-wrap: wrap; }
 
 /* --- Activity ---------------------------------------------------------------- */
-.vy-activity { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--vy-space-7); max-width: 78ch; }
 .vy-diff { display: flex; align-items: baseline; gap: var(--vy-space-3); font-size: var(--vy-text-xs); margin-top: var(--vy-space-2); flex-wrap: wrap; }
 .vy-diff-field { color: var(--vy-grey-500); }
 .vy-diff-from { color: var(--vy-grey-500); text-decoration: line-through; }
@@ -433,14 +423,10 @@
 .vy-skeleton-cell[data-role="rating"] { flex: 0 0 9%; }
 
 /* Visible to screen readers only. */
-.vy-sr-only {
-  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
-  overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
-}
+
 
 /* Action feedback. Anchored bottom-centre so it never covers the toolbar or
    the record header, which are where the action was triggered from. */
-.vy-toasts { position: fixed; left: 50%; bottom: var(--vy-space-9); transform: translateX(-50%); z-index: var(--vy-z-palette); align-items: center; }
 
 /* =============================================================================
    MY QUEUES
@@ -724,12 +710,15 @@
   padding: 0;
   border-bottom: 0;
 }
+/* Title Case, NOT uppercase. The 25 Aug review: "standardize casing — header
+   uses ALL CAPS, tabs use Title Case; more readable for 30-60+ users." The
+   labels are already Title Case in the data because they are the live system's
+   own words; upper-casing them in CSS made one screen carry two conventions and
+   cost legibility at 11px for the readers who need it most. */
 .vy-record-fields .vy-field dt {
-  font-size: var(--vy-text-xs);
-  font-weight: var(--vy-weight-semibold);
-  color: var(--vy-grey-500);
-  text-transform: uppercase;
-  letter-spacing: .05em;
+  font-size: var(--vy-text-sm);
+  font-weight: var(--vy-weight-medium);
+  color: var(--vy-grey-600);
   margin-bottom: var(--vy-space-2);
 }
 .vy-record-fields .vy-field dd { font-size: var(--vy-text-md); line-height: 1.35; }
@@ -742,7 +731,6 @@
 
 /* A toolbar control and the word that names it are one unit and must wrap as
    one. As flex siblings they split, leaving the label a line above its buttons. */
-.vy-toolbar-group { display: flex; align-items: center; gap: var(--vy-space-5); }
 
 /* =============================================================================
    SMART BUTTONS
@@ -860,3 +848,187 @@
 .vy-condition-remove:hover { background: var(--vy-red-50); color: var(--vy-red-700); }
 .vy-condition-remove:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
 .vy-advanced-actions { display: flex; align-items: center; gap: var(--vy-space-5); flex-wrap: wrap; }
+
+/* =============================================================================
+   GLOBAL HEADER WIDGETS
+   ========================================================================== */
+.vy-clock { display: flex; align-items: baseline; gap: var(--vy-space-3); white-space: nowrap; }
+.vy-clock-time { font-family: var(--vy-font-mono); font-size: var(--vy-text-md); color: var(--vy-grey-900); font-variant-numeric: tabular-nums; }
+.vy-clock-zone { font-size: var(--vy-text-xs); color: var(--vy-grey-500); }
+
+/* Native selects here on purpose: they are shell chrome, used rarely, and a
+   custom listbox in the top bar would out-weigh what it does. */
+.vy-header-select select {
+  appearance: none; font: inherit; font-size: var(--vy-text-sm);
+  color: var(--vy-grey-700); background: transparent;
+  border: 1px solid transparent; border-radius: var(--vy-radius-sm);
+  padding: var(--vy-space-2) var(--vy-space-4); cursor: pointer; max-width: var(--vy-tz-w);
+}
+.vy-header-select select:hover { background: var(--vy-grey-50); border-color: var(--vy-grey-200); }
+.vy-header-select select:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
+.vy-header-select--short select { max-width: none; font-weight: var(--vy-weight-semibold); }
+.vy-topbar-sep { width: 1px; height: var(--vy-space-9); background: var(--vy-grey-200); }
+
+/* My Queues, reachable from every screen. The badge counts what is LATE, not
+   total workload — a permanently lit badge stops being read.
+
+   Named vy-count-badge, not vy-badge: the latter is the status pill in
+   components.css. Reusing it inherited that pill's padding and min-width and
+   stretched this one to 104px — the second name collision in two days, which is
+   why `npm run css:orphans` now also reports duplicated class names. */
+.vy-queue-bell.is-active { background: var(--vy-blue-50); color: var(--vy-blue-700); }
+.vy-count-badge {
+  position: absolute; top: -2px; right: -2px;
+  min-width: var(--vy-space-8); height: var(--vy-space-8);
+  padding: 0 var(--vy-space-2);
+  display: grid; place-items: center;
+  background: var(--vy-red-600); color: var(--vy-grey-0);
+  border-radius: var(--vy-radius-pill);
+  font-size: var(--vy-text-2xs); font-weight: var(--vy-weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- User menu ----------------------------------------------------------- */
+.vy-avatar { border: 0; cursor: pointer; font-family: inherit; }
+.vy-avatar--lg { width: var(--vy-space-12); height: var(--vy-space-12); font-size: var(--vy-text-md); cursor: default; }
+.vy-usermenu-id { display: flex; align-items: center; gap: var(--vy-space-5); padding-bottom: var(--vy-space-5); border-bottom: 1px solid var(--vy-grey-200); }
+.vy-usermenu-id strong { display: block; color: var(--vy-grey-900); font-size: var(--vy-text-base); }
+.vy-usermenu-id span { color: var(--vy-grey-500); font-size: var(--vy-text-xs); }
+.vy-usermenu-section { padding-top: var(--vy-space-5); }
+.vy-usermenu-section h3 { margin: 0; font-size: var(--vy-text-sm); font-weight: var(--vy-weight-semibold); color: var(--vy-grey-800); }
+.vy-usermenu-hint { margin: var(--vy-space-1) 0 var(--vy-space-4); font-size: var(--vy-text-xs); color: var(--vy-grey-500); }
+.vy-density-choices { display: flex; flex-direction: column; gap: var(--vy-space-1); }
+.vy-density-choice {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 1px;
+  padding: var(--vy-space-3) var(--vy-space-5); text-align: left;
+  background: none; border: 1px solid transparent; border-radius: var(--vy-radius-sm);
+  font: inherit; cursor: pointer;
+}
+.vy-density-choice:hover { background: var(--vy-grey-50); }
+.vy-density-choice[aria-checked="true"] { background: var(--vy-blue-50); border-color: var(--vy-blue-200); }
+.vy-density-label { font-size: var(--vy-text-base); color: var(--vy-grey-900); }
+.vy-density-choice[aria-checked="true"] .vy-density-label { font-weight: var(--vy-weight-semibold); color: var(--vy-blue-800); }
+.vy-density-note { font-size: var(--vy-text-xs); color: var(--vy-grey-500); }
+
+/* =============================================================================
+   KPI ROW — the count, made actionable
+   -----------------------------------------------------------------------------
+   Replaces "13 of 13" in the page title. The review: a KPI summary is worth
+   more than a number in the module name, and the KPI can also be the filter.
+   So each tile IS its quick filter and shows whether it is on.
+   ========================================================================== */
+.vy-kpi-row { display: flex; flex-wrap: wrap; gap: var(--vy-space-4); margin-bottom: var(--vy-space-6); }
+.vy-kpi {
+  display: flex; flex-direction: column; gap: var(--vy-space-1);
+  min-width: var(--vy-kpi-min-w);
+  padding: var(--vy-space-5) var(--vy-space-7);
+  background: var(--vy-grey-0);
+  border: 1px solid var(--vy-grey-200);
+  border-left: var(--vy-accent-bar-w) solid var(--vy-grey-300);
+  border-radius: var(--vy-radius-md);
+  font: inherit; text-align: left; cursor: pointer;
+}
+.vy-kpi:hover { border-color: var(--vy-grey-300); box-shadow: var(--vy-shadow-sm); }
+.vy-kpi:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
+/* Pressed means "this filter is on", so the tile has to look switched rather
+   than merely hovered. */
+.vy-kpi[aria-pressed="true"] { background: var(--vy-blue-50); border-color: var(--vy-blue-300); }
+.vy-kpi-n { font-size: var(--vy-text-2xl); font-weight: var(--vy-weight-bold); color: var(--vy-grey-900); line-height: 1.1; font-variant-numeric: tabular-nums; }
+.vy-kpi-label { font-size: var(--vy-text-sm); color: var(--vy-grey-600); }
+.vy-kpi[data-key="overdue"]     { border-left-color: var(--vy-red-600); }
+.vy-kpi[data-key="due-week"]    { border-left-color: var(--vy-accent-caution); }
+.vy-kpi[data-key="waiting-doc"] { border-left-color: var(--vy-accent-waiting); }
+.vy-kpi[data-key="open"]        { border-left-color: var(--vy-blue-500); }
+
+/* Export sits in the far corner; New RFQ leads. */
+.vy-actions-gap { flex: 1; min-width: var(--vy-space-8); }
+
+/* =============================================================================
+   PAGER
+   ========================================================================== */
+.vy-pager {
+  display: flex; align-items: center; flex-wrap: wrap; gap: var(--vy-space-5);
+  padding: var(--vy-space-4) var(--vy-space-6);
+  border-top: 1px solid var(--vy-grey-200);
+  background: var(--vy-grey-25);
+  font-size: var(--vy-text-sm); color: var(--vy-grey-600);
+}
+.vy-pager-count { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.vy-pager-size { display: flex; align-items: center; gap: var(--vy-space-3); white-space: nowrap; }
+.vy-pager-size select {
+  font: inherit; font-size: var(--vy-text-sm); color: var(--vy-grey-800);
+  background: var(--vy-grey-0); border: 1px solid var(--vy-grey-200);
+  border-radius: var(--vy-radius-sm); padding: var(--vy-space-1) var(--vy-space-3); cursor: pointer;
+}
+.vy-pager-nav { display: flex; align-items: center; gap: var(--vy-space-1); }
+.vy-pager-page {
+  min-width: var(--vy-space-10); height: var(--vy-space-10); padding: 0 var(--vy-space-3);
+  background: none; border: 1px solid transparent; border-radius: var(--vy-radius-sm);
+  font: inherit; font-size: var(--vy-text-sm); color: var(--vy-grey-700);
+  cursor: pointer; font-variant-numeric: tabular-nums;
+}
+.vy-pager-page:hover { background: var(--vy-grey-100); color: var(--vy-grey-900); }
+.vy-pager-page[aria-current="page"] {
+  background: var(--vy-blue-600); border-color: var(--vy-blue-600);
+  color: var(--vy-grey-0); font-weight: var(--vy-weight-semibold);
+}
+.vy-pager-page:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
+.vy-pager-gap { padding: 0 var(--vy-space-2); color: var(--vy-grey-400); }
+
+/* =============================================================================
+   ACTIVITY LOG — grouped by day, then by person
+   -----------------------------------------------------------------------------
+   Rebuilt after the 25 Aug review asked for less blank space and grouping by
+   date and user. The flat list repeated the date and the name on every row and
+   gave each entry an avatar column it did not need.
+   ========================================================================== */
+.vy-activity { display: flex; flex-direction: column; gap: var(--vy-space-8); }
+
+/* The date stays put while its entries scroll under it — the one label you need
+   while reading a long log is which day you are in. */
+.vy-activity-date {
+  position: sticky; top: 0; z-index: 1;
+  margin: 0 0 var(--vy-space-5);
+  padding: var(--vy-space-3) 0;
+  background: var(--vy-grey-50);
+  font-size: var(--vy-text-sm); font-weight: var(--vy-weight-semibold);
+  color: var(--vy-grey-700);
+}
+.vy-activity-group + .vy-activity-group { margin-top: var(--vy-space-6); }
+.vy-activity-who { display: flex; align-items: center; gap: var(--vy-space-4); margin-bottom: var(--vy-space-3); }
+.vy-activity-who strong { font-size: var(--vy-text-base); color: var(--vy-grey-900); font-weight: var(--vy-weight-semibold); }
+.vy-activity-count { font-size: var(--vy-text-xs); color: var(--vy-grey-500); }
+.vy-avatar--sm { width: var(--vy-space-9); height: var(--vy-space-9); font-size: var(--vy-text-2xs); }
+
+/* Entries indent under their person, so the group reads as one block of work.
+   The rule is the only chrome — it replaces the per-row avatar column. */
+.vy-activity-list {
+  list-style: none; margin: 0;
+  padding: 0 0 0 var(--vy-space-8);
+  border-left: 1px solid var(--vy-grey-200);
+  margin-left: var(--vy-space-6);
+  display: flex; flex-direction: column;
+}
+.vy-activity-line {
+  display: flex; align-items: baseline; gap: var(--vy-space-5); width: 100%;
+  padding: var(--vy-space-3) var(--vy-space-4);
+  background: none; border: 0; border-radius: var(--vy-radius-sm);
+  font: inherit; text-align: left; color: var(--vy-grey-800);
+}
+button.vy-activity-line { cursor: pointer; }
+button.vy-activity-line:hover { background: var(--vy-grey-0); }
+button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
+.vy-activity-time { font-family: var(--vy-font-mono); font-size: var(--vy-text-xs); color: var(--vy-grey-500); flex: 0 0 auto; font-variant-numeric: tabular-nums; }
+.vy-activity-summary { flex: 1; min-width: 0; font-size: var(--vy-text-base); }
+.vy-activity-detail-n { font-size: var(--vy-text-xs); color: var(--vy-grey-500); white-space: nowrap; }
+.vy-activity-chevron { color: var(--vy-grey-400); width: 1em; flex: 0 0 auto; }
+.vy-activity-detail {
+  margin: var(--vy-space-2) 0 var(--vy-space-4) var(--vy-space-11);
+  padding: var(--vy-space-4) var(--vy-space-5);
+  background: var(--vy-grey-0);
+  border: 1px solid var(--vy-grey-200);
+  border-radius: var(--vy-radius-sm);
+  display: flex; flex-direction: column; gap: var(--vy-space-2);
+}
+/* A status change is the entry people scan for, so it keeps a marker. */
+.vy-activity-item[data-action="Status"] .vy-activity-summary { font-weight: var(--vy-weight-medium); }

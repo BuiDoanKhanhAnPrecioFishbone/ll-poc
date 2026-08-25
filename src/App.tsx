@@ -10,6 +10,7 @@ import { AuditPage } from './pages/Audit';
 import { Placeholder } from './pages/Placeholder';
 import { Queues } from './pages/Queues';
 import { ToastProvider } from './ui/Toast';
+import { PrefsProvider } from './ui/prefs';
 import { Navigate } from 'react-router-dom';
 
 /** Preserves the record id when redirecting the old path to the canonical one. */
@@ -21,6 +22,7 @@ function RedirectToQuotation() {
 export default function App() {
   return (
     <BrowserRouter>
+      <PrefsProvider>
       <ToastProvider>
       <Routes>
         <Route element={<AppShell />}>
@@ -44,6 +46,7 @@ export default function App() {
         </Route>
       </Routes>
       </ToastProvider>
+      </PrefsProvider>
     </BrowserRouter>
   );
 }
