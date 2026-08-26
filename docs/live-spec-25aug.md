@@ -151,9 +151,18 @@ Task grid: `Type` · `Document Name` · `Uploaded By` · `Uploaded Date` ·
 `Last Run Version` · `BoM File` — empty state `No records available`
 
 ### Conversations
-A `Comment` / `Send Email` choice, then a **rich text editor** (undo, redo, bold,
-italic, underline, strikethrough, ordered and unordered lists, indent/outdent).
+A `Comment` / `Send Email` choice, then a **rich text editor**. Full toolbar, in
+its live order:
+
+`Undo` · `Redo` | `Bold` · `Italic` · `Underline` · `Strikethrough` |
+`Insert unordered list` · `Insert ordered list` | `Color` · `Background color` |
+`Outdent` · `Indent` | `Format` (showing *Paragraph*) | `Clean formatting`
+
 Empty state: `No comments yet. Be the first to comment!`
+
+> The "?" beside the toolbar is NOT a help control — it is the current user's
+> avatar with no initials to render. Recorded because it reads as a feature and
+> is not one.
 
 ### Activity Logs
 Grouped by **year**. Entry format:

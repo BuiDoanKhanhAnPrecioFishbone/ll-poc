@@ -759,3 +759,117 @@
 /* A BoM file name in a grid cell. Monospace, because these are versioned file
    names read character by character when checking which BoM produced a price. */
 .vy-cell-file { font-family: var(--vy-font-mono); font-size: var(--vy-text-xs); }
+
+/* =============================================================================
+   RICH TEXT EDITOR
+   -----------------------------------------------------------------------------
+   Matches the toolbar the live Conversations tab carries. Drawn glyphs rather
+   than lettered B/I/U, so the buttons do not depend on the UI font having a
+   convincing bold or italic at 15px.
+   ========================================================================== */
+.vy-richtext {
+  border: 1px solid var(--vy-grey-300);
+  border-radius: var(--vy-radius-md);
+  background: var(--vy-grey-0);
+  overflow: hidden;
+}
+.vy-richtext:focus-within { border-color: var(--vy-blue-500); box-shadow: var(--vy-focus-ring); }
+
+.vy-rt-toolbar {
+  display: flex; align-items: center; flex-wrap: wrap; gap: var(--vy-space-2);
+  padding: var(--vy-space-3) var(--vy-space-4);
+  background: var(--vy-grey-25);
+  border-bottom: 1px solid var(--vy-grey-200);
+}
+/* Groups are separated by a rule rather than extra space: undo/redo, character
+   formatting and block formatting are three different kinds of act, and a gap
+   alone reads as inconsistent spacing. */
+.vy-rt-group { display: flex; gap: var(--vy-space-1); }
+.vy-rt-group + .vy-rt-group { margin-left: var(--vy-space-3); padding-left: var(--vy-space-3); border-left: 1px solid var(--vy-grey-200); }
+
+.vy-rt-btn {
+  display: grid; place-items: center;
+  width: var(--vy-space-10); height: var(--vy-space-10);
+  background: none; border: 0; border-radius: var(--vy-radius-sm);
+  color: var(--vy-grey-600); cursor: pointer;
+}
+.vy-rt-btn:hover { background: var(--vy-grey-100); color: var(--vy-grey-900); }
+.vy-rt-btn:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
+/* Pressed means "this format is on where the cursor is", so it has to look
+   switched rather than merely hovered. */
+.vy-rt-btn[aria-pressed="true"] { background: var(--vy-blue-50); color: var(--vy-blue-700); }
+
+.vy-rt-block select {
+  font: inherit; font-size: var(--vy-text-sm); color: var(--vy-grey-800);
+  background: var(--vy-grey-0); border: 1px solid var(--vy-grey-200);
+  border-radius: var(--vy-radius-sm); padding: var(--vy-space-1) var(--vy-space-3);
+  cursor: pointer; margin-right: var(--vy-space-3);
+}
+
+.vy-rt-body { position: relative; }
+.vy-rt-input {
+  min-height: var(--vy-editor-min-h);
+  padding: var(--vy-space-5) var(--vy-space-6);
+  font-size: var(--vy-text-base); color: var(--vy-grey-900); line-height: 1.55;
+  outline: none;
+}
+.vy-rt-input:empty { min-height: var(--vy-editor-min-h); }
+.vy-rt-input p { margin: 0 0 var(--vy-space-4); }
+.vy-rt-input p:last-child { margin-bottom: 0; }
+.vy-rt-input h3 { margin: 0 0 var(--vy-space-4); font-size: var(--vy-text-md); font-weight: var(--vy-weight-semibold); }
+.vy-rt-input ul, .vy-rt-input ol { margin: 0 0 var(--vy-space-4); padding-left: var(--vy-space-10); }
+.vy-rt-placeholder {
+  position: absolute; top: var(--vy-space-5); left: var(--vy-space-6);
+  color: var(--vy-grey-400); pointer-events: none;
+}
+
+/* ---- Comment / Send Email ------------------------------------------------
+   A choice, not a checkbox. It changes WHO reads what you are about to write,
+   so it sits above the editor rather than below it. */
+.vy-conv-modes { display: inline-flex; background: var(--vy-grey-100); border-radius: var(--vy-radius-pill); padding: var(--vy-space-1); margin-bottom: var(--vy-space-4); }
+.vy-conv-mode {
+  appearance: none; border: 0; background: none; cursor: pointer;
+  padding: var(--vy-space-3) var(--vy-space-7);
+  border-radius: var(--vy-radius-pill);
+  font-size: var(--vy-text-sm); font-weight: var(--vy-weight-medium); color: var(--vy-grey-600);
+}
+.vy-conv-mode:hover { color: var(--vy-grey-900); }
+.vy-conv-mode[aria-selected="true"] {
+  background: var(--vy-grey-0); color: var(--vy-grey-900);
+  font-weight: var(--vy-weight-semibold); box-shadow: var(--vy-shadow-sm);
+}
+.vy-conv-mode:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
+
+.vy-conv-audience { margin: 0 0 var(--vy-space-4); font-size: var(--vy-text-sm); color: var(--vy-grey-600); }
+/* Emailing leaves the building. The composer says so with a colour it does not
+   otherwise use, so the difference is visible without reading. */
+.vy-composer[data-mode="email"] .vy-conv-audience { color: var(--vy-accent-warning); }
+.vy-composer[data-mode="email"] .vy-richtext { border-color: var(--vy-accent-caution); }
+
+.vy-comment-text p { margin: 0 0 var(--vy-space-3); }
+.vy-comment-text p:last-child { margin-bottom: 0; }
+.vy-comment-text ul, .vy-comment-text ol { margin: 0 0 var(--vy-space-3); padding-left: var(--vy-space-9); }
+
+/* Colour and highlight pickers. A native <details> — it closes on Escape and on
+   outside click without any of that being written, and the whole control is
+   four swatches. */
+.vy-rt-swatches { position: relative; }
+.vy-rt-swatches > summary { list-style: none; cursor: pointer; }
+.vy-rt-swatches > summary::-webkit-details-marker { display: none; }
+.vy-rt-swatches[open] > summary { background: var(--vy-blue-50); color: var(--vy-blue-700); }
+.vy-rt-swatch-list {
+  position: absolute; z-index: var(--vy-z-palette); top: calc(100% + var(--vy-space-2)); left: 0;
+  display: flex; gap: var(--vy-space-2);
+  padding: var(--vy-space-3);
+  background: var(--vy-grey-0);
+  border: 1px solid var(--vy-grey-200);
+  border-radius: var(--vy-radius-md);
+  box-shadow: var(--vy-shadow-lg);
+}
+.vy-rt-swatch {
+  width: var(--vy-space-9); height: var(--vy-space-9);
+  border: 1px solid var(--vy-grey-300); border-radius: var(--vy-radius-sm);
+  cursor: pointer; padding: 0;
+}
+.vy-rt-swatch:hover { transform: scale(1.12); }
+.vy-rt-swatch:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }

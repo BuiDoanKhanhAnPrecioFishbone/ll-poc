@@ -104,7 +104,9 @@ so far are kept but wired to nothing; see the header comment in
    account. The rule now lives in `src/data/itar.ts` and the list applies it.
 ~~5. Validation — "This field is required." on blur, Save gated.~~ **done**
 ~~6. **A14** — Quotation Result's eleven columns.~~ **done**
-7. **A13** — Conversations: the Comment / Send Email choice and the rich editor.
+~~7. **A13** — Conversations: the Comment / Send Email choice and the rich editor.~~ **done**
+
+**FORM VIEW IS COMPLETE.** Everything below is list view.
 
 **LIST VIEW**
 7. **B1, B11, B6** — rebuild the filter: no operators, the real field set,

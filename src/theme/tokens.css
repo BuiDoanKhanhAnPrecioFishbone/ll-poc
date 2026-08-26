@@ -190,6 +190,7 @@
   --vy-header-group-min: 260px;  /* one of the three header regions */
   --vy-condition-col:    150px;  /* field / operator column in the advanced filter */
   --vy-popover-min-w:    240px;
+  --vy-editor-min-h:     110px;  /* rich text composer */
   --vy-tz-w:             180px;  /* timezone select in the global header */
   --vy-kpi-min-w:        140px;
   --vy-record-max-w:     1180px;
