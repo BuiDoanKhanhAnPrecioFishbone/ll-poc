@@ -8,6 +8,7 @@ import { useToast } from '../ui/Toast';
 import { usePrefs } from '../ui/prefs';
 import { generateQuotations, QUOTATION_COLUMNS, daysUntil, type Quotation } from '../data/quotations';
 import { measureFor, scopeFilter } from '../data/queues';
+import { applyItarVisibility } from '../data/itar';
 import { FilterBar } from '../ui/FilterBar';
 import { applyConditions, type Condition } from '../ui/filters';
 import { QUOTATION_QUICK, QUOTATION_FILTER_FIELDS } from '../data/quotationFilters';
@@ -41,7 +42,11 @@ function relativeDay(d: number): string {
 }
 
 export function Quotations() {
-  const all = useMemo(() => generateQuotations(330), []);
+  /* ITAR visibility is applied FIRST, before any filter or count. An
+     export-controlled record must not reach an uncleared account through a
+     total, a KPI tile or a queue link either — not only through the grid. */
+  const { rows: all, withheld } = useMemo(
+    () => applyItarVisibility(generateQuotations(330)), []);
   const [params, setParams] = useSearchParams();
   const queue = measureFor(params.get('queue'));
   const scope = params.get('scope');
@@ -116,7 +121,12 @@ export function Quotations() {
       data={data}
       columns={columns}
       title="Quotations"
-      subtitle="Customer RFQs and the quotes sent back"
+      subtitle={withheld > 0
+        /* Says that something is hidden without saying what — the count alone
+           is not export-controlled, the records are. Silence here would make a
+           compliance filter look like missing data. */
+        ? <>Customer RFQs and the quotes sent back · <strong>{withheld} not shown (ITAR)</strong></>
+        : 'Customer RFQs and the quotes sent back'}
       kpis={
         /* The review: "if you want to highlight it, a KPI summary would be
            better than those numbers... This KPI can also be the filter. When

@@ -98,12 +98,13 @@ so far are kept but wired to nothing; see the header comment in
 ~~4. **A10, A11, A12** — invented fields removed, close button renamed.~~ **done**
 
 **FORM VIEW**
-3. **A4, A5, A7** — option values and radio groups. Highest risk remaining: the
-   same class as the metadata errors, where wrong values make the built system
-   reject valid input.
-4. **A15** — ITAR is a field on the live form, a badge here.
-5. **A14** — Quotation Result's eleven columns.
-6. **A13** — Conversations: the Comment / Send Email choice and the rich editor.
+~~3. **A4, A5, A7** — option values and radio groups.~~ **done**
+~~4. **A15** — ITAR as a field.~~ **done** — and it turned out to be an ACCESS
+   CONTROL flag, not a label: an ITAR record is only visible to an ITAR-cleared
+   account. The rule now lives in `src/data/itar.ts` and the list applies it.
+~~5. Validation — "This field is required." on blur, Save gated.~~ **done**
+6. **A14** — Quotation Result's eleven columns.
+7. **A13** — Conversations: the Comment / Send Email choice and the rich editor.
 
 **LIST VIEW**
 7. **B1, B11, B6** — rebuild the filter: no operators, the real field set,

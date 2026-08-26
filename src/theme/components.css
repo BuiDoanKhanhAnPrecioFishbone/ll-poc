@@ -733,3 +733,25 @@
   color: var(--vy-grey-500);
   line-height: 1.4;
 }
+
+/* ---- Invalid field -------------------------------------------------------
+   Shown only after the user has LEFT the field, per the guideline's "click
+   outside" trigger. A form that turns red before it has been filled in teaches
+   people to ignore red.
+
+   The border carries the state as well as the message, because the message
+   sits below the control and a long form scrolls — the edge is visible from
+   further away than the text. */
+.vy-field--editing[data-invalid] .vy-input,
+.vy-field--editing[data-invalid] .vy-select,
+.vy-field--editing[data-invalid] textarea {
+  border-color: var(--vy-red-600);
+}
+.vy-field--editing[data-invalid] .vy-input:focus-visible,
+.vy-field--editing[data-invalid] .vy-select:focus-visible {
+  box-shadow: 0 0 0 2px var(--vy-grey-0), 0 0 0 4px var(--vy-red-500);
+}
+/* A radio group has no single control to outline, so the group is boxed. */
+.vy-field--radio[data-invalid] dd {
+  border-color: var(--vy-red-600);
+}

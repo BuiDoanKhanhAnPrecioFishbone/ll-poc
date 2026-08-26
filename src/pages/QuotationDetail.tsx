@@ -12,7 +12,7 @@ import { ActivityTab } from '../components/quotation/ActivityTab';
 import { BomComparisonDialog } from '../components/quotation/BomComparisonDialog';
 import { RunQuotationDialog } from '../components/quotation/RunQuotationDialog';
 import { useToast } from '../ui/Toast';
-import { RecordField, RequiredMark } from '../components/quotation/RecordField';
+import { RecordField, RequiredMark, isMissing } from '../components/quotation/RecordField';
 import { smartButtonsFor, SmartIcon } from '../components/quotation/SmartButtons';
 import { HISTORICAL_RFQ_FIELD, showsHistoricalRfq, HEADER_GROUPS, COMMERCIAL, TECHNICAL, INVENTORY, NOTES, ALL_FIELDS,
          setHistoricalRfqOptions } from '../components/quotation/requirementFields';
@@ -48,6 +48,13 @@ export function QuotationDetail() {
      is what makes Cancel able to actually discard. */
   const [saved, setSaved] = useState<Quotation | null>(null);
   const [draft, setDraft] = useState<Quotation | null>(null);
+
+  /* Which fields the user has left. The guideline validates when the user
+     "clicks outside", not on every keystroke, so a field nobody has reached
+     yet stays quiet. Attempting Save marks everything touched at once, which
+     is what makes the errors appear where the eye is not. */
+  const [touched, setTouched] = useState<Set<string>>(new Set());
+  const markTouched = (name: string) => setTouched(t => new Set(t).add(name));
   const editing = draft !== null;
   const all = useMemo(() => generateQuotations(330), []);
   /* Historical RFQ is a reference to another RFQ, so its options are the other
@@ -90,6 +97,11 @@ export function QuotationDetail() {
    * and nothing on screen would say so. Resetting to that customer's first
    * contact is what the live code does.
    */
+  /* Every required field that is still empty. Save stays disabled while this
+     is non-empty — "the Save button becomes enabled after the user enters or
+     selects values for all required fields". */
+  const missingRequired = ALL_FIELDS.filter(f => isMissing(f, (draft ?? q)[f.name]));
+
   const setField = (name: string, v: unknown) =>
     setDraft(d => {
       if (!d) return d;
@@ -112,6 +124,12 @@ export function QuotationDetail() {
 
   function saveEdit() {
     if (!draft) return;
+    /* Belt and braces: the button is already disabled, but a keyboard submit or
+       a future caller should not be able to slip past the same rule. */
+    if (missingRequired.length) {
+      setTouched(new Set(ALL_FIELDS.map(f => f.name)));
+      return;
+    }
     setSaved(draft);
     setDraft(null);
     toast.success(
@@ -200,13 +218,25 @@ export function QuotationDetail() {
             {editing ? (
               <>
                 <Button onClick={cancelEdit}>Cancel</Button>
-                <Button variant="filled" disabled={!dirty} onClick={saveEdit}>
-                  {dirty ? `Save ${changeCount} ${changeCount === 1 ? 'change' : 'changes'}` : 'Save'}
+                {/* Disabled while a required field is empty — "the Save button
+                    becomes enabled after the user enters or selects values for
+                    all required fields". The label and tooltip say WHICH are
+                    outstanding, because a disabled button with no explanation
+                    is a dead end: you can see it is off, not why. */}
+                <Button variant="filled"
+                        disabled={!dirty || missingRequired.length > 0}
+                        title={missingRequired.length
+                          ? `Still needed: ${missingRequired.map(f => f.label).join(', ')}`
+                          : undefined}
+                        onClick={saveEdit}>
+                  {missingRequired.length
+                    ? `${missingRequired.length} field${missingRequired.length === 1 ? '' : 's'} still needed`
+                    : dirty ? `Save ${changeCount} ${changeCount === 1 ? 'change' : 'changes'}` : 'Save'}
                 </Button>
               </>
             ) : (
               <>
-                <Button onClick={() => setDraft({ ...q })}>Edit</Button>
+                <Button onClick={() => { setDraft({ ...q }); setTouched(new Set()); }}>Edit</Button>
                 <Button onClick={() => setBomOpen(true)}>BoM Comparison</Button>
                 <Button variant="filled" onClick={() => setRunOpen(true)}>Run Quotation</Button>
               </>
@@ -251,7 +281,8 @@ export function QuotationDetail() {
                   .filter(def => editing || def.name !== 'projectName')
                   .map(def => (
                     <RecordField key={def.name} def={def} value={(draft ?? q)[def.name]}
-                                 editing={editing} onChange={setField} row={draft ?? q} />
+                                 editing={editing} onChange={setField} row={draft ?? q}
+                                 touched={touched.has(def.name)} onBlur={markTouched} />
                   ))}
 
                 {/* Historical RFQ appears only when Order Type is "Repeat", and
@@ -261,7 +292,8 @@ export function QuotationDetail() {
                 {g.id === 'project' && showsHistoricalRfq(draft ?? q) && (
                   <RecordField def={HISTORICAL_RFQ_FIELD}
                                value={(draft ?? q).historicalRfq}
-                               editing={editing} onChange={setField} row={draft ?? q} />
+                               editing={editing} onChange={setField} row={draft ?? q}
+                               touched={touched.has('historicalRfq')} onBlur={markTouched} />
                 )}
                 {/* Two system-stamped dates and a rating, which have no FieldDef
                     because nothing about them is typed. They belong with the
@@ -294,6 +326,8 @@ export function QuotationDetail() {
               q={draft ?? q}
               editing={editing}
               onChange={setField}
+              touched={touched}
+              onBlur={markTouched}
             /> },
           { value: 'checklists',   label: 'Checklists & Assignment', count: checklistOutstanding, content: <ChecklistsTab q={q} /> },
           { value: 'result',       label: 'Quotation Result', count: q.results.length,     content: <ResultTab q={q} onRun={() => setRunOpen(true)} /> },
@@ -327,13 +361,15 @@ export function QuotationDetail() {
  * Same data, two rhythms. The rule is that the commitment ceremony should match
  * what a mistake costs.
  */
-function RequirementsTab({ q, editing, onChange }: {
+function RequirementsTab({ q, editing, onChange, touched, onBlur }: {
   q: Quotation; editing: boolean; onChange: (name: string, v: unknown) => void;
+  touched: Set<string>; onBlur: (name: string) => void;
 }) {
   const group = (defs: typeof COMMERCIAL) =>
     defs.map(def => (
       <RecordField key={def.name} def={def} value={q[def.name]}
-                   editing={editing} onChange={onChange} row={q} />
+                   editing={editing} onChange={onChange} row={q}
+                   touched={touched.has(def.name)} onBlur={onBlur} />
     ));
 
   return (

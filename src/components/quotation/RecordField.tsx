@@ -84,14 +84,42 @@ export function RequiredMark() {
   );
 }
 
-export function RecordField<T extends Record<string, any>>({ def, value, editing, onChange, row }: {
+/**
+ * Is this field empty in a way that fails validation?
+ *
+ * A flag is never "empty" — false is a legitimate answer to a yes/no question —
+ * and a number of 0 is a value, not an absence.
+ */
+export function isMissing<T>(def: FieldDef<T>, value: unknown): boolean {
+  if (!def.required) return false;
+  if (def.kind === 'flag') return false;
+  return value === undefined || value === null || value === '';
+}
+
+export function RecordField<T extends Record<string, any>>({
+  def, value, editing, onChange, row, touched, onBlur,
+}: {
   def: FieldDef<T>;
   value: T[keyof T];
   editing: boolean;
   onChange: (name: string, v: unknown) => void;
   /** The whole record, so a lookup can narrow its options to the current row. */
   row?: T;
+  /**
+   * Has the user left this field yet?
+   *
+   * The guideline triggers validation when the user "clicks outside", not on
+   * every keystroke — so a field you have not reached yet stays silent. Marking
+   * a form red before it has been filled in is the commonest way to make a
+   * required-field indicator useless.
+   */
+  touched?: boolean;
+  onBlur?: (name: string) => void;
 }) {
+  const missing = editing && touched && isMissing(def, value);
+  const err = missing
+    ? <span className="vy-field-error" role="alert">This field is required.</span>
+    : null;
   /* A read-only field looks the same whether or not you are editing. Rendering
      it as a disabled input instead would be worse than useless: a greyed control
      reads as "broken" or "you lack permission", when the truth is that the value
@@ -101,7 +129,7 @@ export function RecordField<T extends Record<string, any>>({ def, value, editing
   switch (def.kind) {
     case 'radio':
       return (
-        <div className="vy-field vy-field--editing vy-field--radio">
+        <div className="vy-field vy-field--editing vy-field--radio" data-invalid={missing || undefined}>
           <dt id={`f-${def.name}`}>{def.label}{def.required && <RequiredMark />}</dt>
           <dd>
             <RadioGroup label={def.label} value={String(value ?? '')}
@@ -112,66 +140,74 @@ export function RecordField<T extends Record<string, any>>({ def, value, editing
                              choosing rather than in a tooltip nobody opens. */
                           label: o,
                         }))}
-                        onChange={v => onChange(def.name, v)} />
-            {def.hint && <span className="vy-field-hint">{def.hint}</span>}
+                        onChange={v => { onChange(def.name, v); onBlur?.(def.name); }} />
+            {err}
+            {def.hint && !missing && <span className="vy-field-hint">{def.hint}</span>}
           </dd>
         </div>
       );
     case 'priority':
       return (
-        <div className="vy-field vy-field--editing">
+        <div className="vy-field vy-field--editing" data-invalid={missing || undefined}>
           <dt><label htmlFor={`f-${def.name}`}>{def.label}{def.required && <RequiredMark />}</label></dt>
           <dd>
             <Select id={`f-${def.name}`} label={def.label}
                     value={priorityLevel(Number(value))}
                     options={[...PRIORITY_LEVELS]}
-                    onChange={v => onChange(def.name, LEVEL_TO_N[v as PriorityLevel])} />
-            {def.hint && <span className="vy-field-hint">{def.hint}</span>}
+                    onChange={v => { onChange(def.name, LEVEL_TO_N[v as PriorityLevel]); onBlur?.(def.name); }} />
+            {err}
+            {def.hint && !missing && <span className="vy-field-hint">{def.hint}</span>}
           </dd>
         </div>
       );
     case 'lookup':
       return (
-        <div className="vy-field vy-field--editing">
+        <div className="vy-field vy-field--editing" data-invalid={missing || undefined}>
           <dt><label htmlFor={`f-${def.name}`}>{def.label}{def.required && <RequiredMark />}</label></dt>
           <dd>
             <Select id={`f-${def.name}`} label={def.label} value={String(value ?? '')}
+                    required={def.required} invalid={Boolean(missing)}
                     options={[...def.optionsFor(row ?? {})]}
-                    onChange={v => onChange(def.name, v)} />
-            {def.hint && <span className="vy-field-hint">{def.hint}</span>}
+                    onChange={v => { onChange(def.name, v); onBlur?.(def.name); }} />
+            {err}
+            {def.hint && !missing && <span className="vy-field-hint">{def.hint}</span>}
           </dd>
         </div>
       );
     case 'select':
       return (
-        <div className="vy-field vy-field--editing">
+        <div className="vy-field vy-field--editing" data-invalid={missing || undefined}>
           <dt><label htmlFor={`f-${def.name}`}>{def.label}{def.required && <RequiredMark />}</label></dt>
           <dd>
             <Select id={`f-${def.name}`} label={def.label} value={String(value ?? '')}
-                    required={def.required}
-                    options={[...def.options]} onChange={v => onChange(def.name, v)} />
-            {def.hint && <span className="vy-field-hint">{def.hint}</span>}
+                    required={def.required} invalid={Boolean(missing)}
+                    options={[...def.options]}
+                    onChange={v => { onChange(def.name, v); onBlur?.(def.name); }} />
+            {err}
+            {def.hint && !missing && <span className="vy-field-hint">{def.hint}</span>}
           </dd>
         </div>
       );
     case 'number':
       return (
-        <div className="vy-field vy-field--editing">
+        <div className="vy-field vy-field--editing" data-invalid={missing || undefined}>
           <dt><label htmlFor={`f-${def.name}`}>{def.label}{def.required && <RequiredMark />}</label></dt>
           <dd>
             <div className="vy-suffixed">
               <TextField id={`f-${def.name}`} type="number" value={String(value ?? '')}
-                         min={def.min} max={def.max}
+                         min={def.min} max={def.max} aria-invalid={missing || undefined}
+                         onBlur={() => onBlur?.(def.name)}
                          onChange={e => onChange(def.name, Number(e.target.value))} />
               {def.suffix && <span className="vy-suffix">{def.suffix}</span>}
             </div>
-            {def.hint && <span className="vy-field-hint">{def.hint}</span>}
+            {err}
+            {def.hint && !missing && <span className="vy-field-hint">{def.hint}</span>}
           </dd>
         </div>
       );
     case 'flag':
       return (
-        <div className="vy-field vy-field--editing">
+        <div className="vy-field vy-field--editing" data-invalid={missing || undefined}>
           <dt />
           <dd>
             <Checkbox checked={Boolean(value)} onCheckedChange={c => onChange(def.name, c)}
@@ -181,23 +217,29 @@ export function RecordField<T extends Record<string, any>>({ def, value, editing
       );
     case 'notes':
       return (
-        <div className="vy-field vy-field--editing vy-field--wide">
+        <div className="vy-field vy-field--editing vy-field--wide" data-invalid={missing || undefined}>
           <dt><label htmlFor={`f-${def.name}`}>{def.label}{def.required && <RequiredMark />}</label></dt>
           <dd>
             <TextArea id={`f-${def.name}`} rows={3} value={String(value ?? '')}
+                      aria-invalid={missing || undefined}
+                      onBlur={() => onBlur?.(def.name)}
                       onChange={e => onChange(def.name, e.target.value)} />
-            {def.hint && <span className="vy-field-hint">{def.hint}</span>}
+            {err}
+            {def.hint && !missing && <span className="vy-field-hint">{def.hint}</span>}
           </dd>
         </div>
       );
     default:
       return (
-        <div className="vy-field vy-field--editing">
+        <div className="vy-field vy-field--editing" data-invalid={missing || undefined}>
           <dt><label htmlFor={`f-${def.name}`}>{def.label}{def.required && <RequiredMark />}</label></dt>
           <dd>
             <TextField id={`f-${def.name}`} value={String(value ?? '')}
+                       aria-invalid={missing || undefined}
+                       onBlur={() => onBlur?.(def.name)}
                        onChange={e => onChange(def.name, e.target.value)} />
-            {def.hint && <span className="vy-field-hint">{def.hint}</span>}
+            {err}
+            {def.hint && !missing && <span className="vy-field-hint">{def.hint}</span>}
           </dd>
         </div>
       );

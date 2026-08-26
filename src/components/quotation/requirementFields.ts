@@ -65,6 +65,22 @@ export const HEADER: FieldDef<Quotation>[] = [
      text this accepted a contact who does not work for the customer. */
   { name: 'customerContact', label: 'Customer Contact', kind: 'lookup',
     optionsFor: (q: Quotation) => contactsFor(q.customer) },
+  /**
+   * ITAR — an ACCESS CONTROL flag, not a label.
+   *
+   * The customer's Testing Guideline: "If the RFQ is marked as ITAR = true,
+   * only users whose account has ITAR = true can access and view it. Users
+   * whose account has ITAR = false can view only RFQs with ITAR = false."
+   *
+   * So this one checkbox decides who can open the record at all. It sits on
+   * the form between Project Name and Project Type, exactly where the live
+   * screen puts it.
+   *
+   * Read-only because it follows the customer record — the live form writes it
+   * from the customer's `isItar`. Marking a customer as export-controlled is a
+   * decision made on the customer, not per RFQ.
+   */
+  { name: 'itar', label: 'ITAR', kind: 'flag', readOnly: true, derivedFrom: 'Customer' },
   { name: 'projectType', label: 'Project Type', kind: 'select', options: PROJECT_TYPE },
   { name: 'orderType', label: 'Order Type', kind: 'select', options: ORDER_TYPE, required: true },
   /* Derived: the live form writes this from the customer record's `custType`.
@@ -108,7 +124,8 @@ export const HEADER_GROUPS: HeaderGroup[] = [
   },
   {
     id: 'project', title: 'Project', icon: 'parts',
-    fields: [PROJECT_NAME_FIELD, byName('projectType'), byName('orderType')],
+    /* ITAR follows Project Name, as it does on the live form. */
+    fields: [PROJECT_NAME_FIELD, byName('itar'), byName('projectType'), byName('orderType')],
   },
   {
     /* Everything that answers "is this on track, and whose is it". Kept together
