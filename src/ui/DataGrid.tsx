@@ -38,6 +38,7 @@ const ROW_H: Record<Density, number> = { compact: 28, comfortable: 36, relaxed: 
 export function DataGrid<T extends { id: string | number }>({
   data, columns, title, subtitle, actions, filters,
   searchPlaceholder = 'Search', rowHref, onOpenRow, emptyHint, loading, kpis,
+  filterPanel, filterActive = 0, views,
 }: {
   data: T[];
   columns: ColumnSpec<T>[];
@@ -47,6 +48,15 @@ export function DataGrid<T extends { id: string | number }>({
   filters?: ReactNode;
   /** Clickable summary tiles, shown in place of a count in the page title. */
   kpis?: ReactNode;
+  /**
+   * The filter fields, revealed by the funnel. Hidden by default, as the live
+   * screen has it — "clicking the button again collapses the filter area".
+   */
+  filterPanel?: ReactNode;
+  /** How many fields are filtering, for the badge on the funnel. */
+  filterActive?: number;
+  /** The Select View control. Rendered by the caller until saved views exist. */
+  views?: ReactNode;
   searchPlaceholder?: string;
   /**
    * Opening a record hangs off the IDENTIFIER, not the row.
@@ -145,6 +155,10 @@ export function DataGrid<T extends { id: string | number }>({
   /* Paging replaces infinite scroll (25 Aug review). Virtualisation stays
      underneath, so a 100-row page is still cheap; what the pager adds is a
      POSITION — where you are, and a way back to it. */
+  /* Collapsed on arrival. The badge on the funnel is what stops a hidden
+     filter looking like missing data. */
+  const [filterOpen, setFilterOpen] = useState(false);
+
   const [page, setPage] = useState(0);
   /* 20 is the live default. */
   const [pageSize, setPageSize] = useState(20);
@@ -204,6 +218,27 @@ export function DataGrid<T extends { id: string | number }>({
           <SearchField value={search} placeholder={searchPlaceholder} aria-label={searchPlaceholder}
                        onChange={e => setSearch(e.target.value)} />
           <span className="vy-toolbar-spacer" />
+
+          {views}
+
+          {filterPanel && (
+            /* The funnel. Carries a count when filters are on, because the
+               panel it opens is closed by default and a grid silently showing
+               a third of its rows is indistinguishable from missing data. */
+            <button type="button"
+                    className="vy-funnel"
+                    aria-expanded={filterOpen}
+                    aria-label={filterOpen ? 'Hide filter toolbar' : 'Show filter toolbar'}
+                    title={filterOpen ? 'Hide filter toolbar' : 'Show filter toolbar'}
+                    data-on={filterActive > 0 || undefined}
+                    onClick={() => setFilterOpen(o => !o)}>
+              <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor"
+                   strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M3 4h14l-5.5 6.5v5L8.5 17v-6.5z" />
+              </svg>
+              {filterActive > 0 && <span className="vy-count-badge">{filterActive}</span>}
+            </button>
+          )}
           {/* "Columns", not "Show 2 more columns". The old label described the
               action's effect on one particular state rather than naming the
               thing it opens, so it read differently depending on what was
@@ -219,6 +254,8 @@ export function DataGrid<T extends { id: string | number }>({
             onReset={() => setHidden(new Set(columns.filter(c => c.hiddenByDefault).map(c => String(c.field))))}
           />
         </div>
+
+        {filterOpen && filterPanel}
 
         <div className="vy-grid-scroll" ref={scrollRef}>
           <div className="vy-grid-table">
@@ -245,10 +282,35 @@ export function DataGrid<T extends { id: string | number }>({
             {loading ? (
               <GridSkeleton columns={visible} rows={14} />
             ) : rows.length === 0 ? (
+              /* An empty grid has to say WHICH of the two things emptied it,
+                 and offer the matching way out. It previously always blamed the
+                 search — offering to "clear the search to see all 0 records"
+                 when the search was empty, the filters were doing the work, and
+                 the count it quoted was the filtered one. Three wrong things in
+                 one sentence. */
               <div className="vy-empty-state">
-                <strong>Nothing matches {search ? `“${search}”` : 'these filters'}</strong>
-                <p>{emptyHint ?? `Clear the search to see all ${data.length.toLocaleString()} records.`}</p>
+                <strong>
+                  {search
+                    ? <>Nothing matches “{search}”</>
+                    : filterActive > 0
+                      ? <>Nothing matches these filters</>
+                      : <>Nothing to show</>}
+                </strong>
+                <p>
+                  {emptyHint ?? (
+                    search && filterActive > 0
+                      ? 'Both a search and a filter are narrowing this list.'
+                      : search
+                        ? 'No record contains that text.'
+                        : filterActive > 0
+                          ? `${filterActive} ${filterActive === 1 ? 'filter is' : 'filters are'} applied. Clear them to see every record.`
+                          : 'There are no records here yet.'
+                  )}
+                </p>
                 {search && <Button variant="filled" onClick={() => setSearch('')}>Clear search</Button>}
+                {!search && filterActive > 0 && (
+                  <Button variant="filled" onClick={() => setFilterOpen(true)}>Show filters</Button>
+                )}
               </div>
             ) : (
               /* Virtualiser geometry: computed layout, not design values.

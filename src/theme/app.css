@@ -815,38 +815,12 @@
    same question at two levels of effort; splitting them would make the cheap
    one hard to find.
    ========================================================================== */
-.vy-filters { display: flex; flex-direction: column; gap: var(--vy-space-4); width: 100%; }
 .vy-filter-row-main { display: flex; align-items: center; flex-wrap: wrap; gap: var(--vy-space-4); width: 100%; }
-.vy-filter-count { font-size: var(--vy-text-sm); color: var(--vy-grey-600); font-variant-numeric: tabular-nums; white-space: nowrap; }
 /* Conditions stay visible when the panel is closed. A filter you cannot see is
    a grid that looks wrong for no reason. */
-.vy-filter-summary { padding-left: var(--vy-space-2); }
 
-.vy-advanced {
-  padding: var(--vy-space-6);
-  background: var(--vy-grey-25);
-  border: 1px solid var(--vy-grey-200);
-  border-radius: var(--vy-radius-md);
-  display: flex; flex-direction: column; gap: var(--vy-space-4);
-}
 /* Field, operator, value, then the remove control. The value column takes the
    slack because it is the only one whose content is not a known vocabulary. */
-.vy-condition {
-  display: grid;
-  grid-template-columns: minmax(var(--vy-condition-col), 1fr) minmax(var(--vy-condition-col), 1fr) 2fr auto;
-  gap: var(--vy-space-4);
-  align-items: center;
-}
-.vy-condition > .vy-field-control { min-width: 0; }
-.vy-condition-remove {
-  display: grid; place-items: center;
-  width: var(--vy-space-10); height: var(--vy-space-10);
-  background: none; border: 0; border-radius: var(--vy-radius-sm);
-  color: var(--vy-grey-500); cursor: pointer;
-}
-.vy-condition-remove:hover { background: var(--vy-red-50); color: var(--vy-red-700); }
-.vy-condition-remove:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
-.vy-advanced-actions { display: flex; align-items: center; gap: var(--vy-space-5); flex-wrap: wrap; }
 
 /* =============================================================================
    GLOBAL HEADER WIDGETS
@@ -1043,3 +1017,58 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
 }
 .vy-view-detail:hover { background: var(--vy-blue-50); color: var(--vy-blue-700); }
 .vy-view-detail:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
+
+/* =============================================================================
+   FILTER TOOLBAR — the panel behind the funnel
+   -----------------------------------------------------------------------------
+   Every field visible at once, no operators. Tinted, so the panel reads as a
+   region attached to the grid rather than more page.
+   ========================================================================== */
+.vy-filter-toolbar {
+  padding: var(--vy-space-6);
+  background: var(--vy-blue-50);
+  border-bottom: 1px solid var(--vy-grey-200);
+}
+/* Auto-fit rather than a fixed column count: eleven controls in a fixed grid
+   either waste half a wide screen or crush a narrow one. */
+.vy-filter-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--vy-filter-field-min), 1fr));
+  gap: var(--vy-space-5) var(--vy-space-6);
+}
+.vy-filter-field { display: flex; flex-direction: column; gap: var(--vy-space-2); min-width: 0; }
+/* A date range needs two inputs, so it takes two columns where there is room. */
+.vy-filter-field--range { grid-column: span 2; }
+.vy-filter-label-sm { font-size: var(--vy-text-sm); color: var(--vy-grey-700); }
+.vy-filter-range { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: var(--vy-space-3); }
+.vy-filter-range-sep { color: var(--vy-grey-500); }
+
+.vy-filter-toolbar-foot {
+  display: flex; align-items: center; gap: var(--vy-space-6);
+  margin-top: var(--vy-space-6);
+  padding-top: var(--vy-space-5);
+  border-top: 1px solid var(--vy-blue-200);
+}
+.vy-clear-all {
+  background: none; border: 0; padding: 0; cursor: pointer;
+  font: inherit; font-size: var(--vy-text-sm); font-weight: var(--vy-weight-semibold);
+  color: var(--vy-blue-700);
+}
+.vy-clear-all:hover:not(:disabled) { text-decoration: underline; }
+.vy-clear-all:disabled { color: var(--vy-grey-400); cursor: default; }
+.vy-clear-all:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; border-radius: var(--vy-radius-sm); }
+.vy-filter-active { font-size: var(--vy-text-sm); color: var(--vy-grey-600); }
+
+/* The funnel. Carries its count, because the panel it opens is closed by
+   default and a grid quietly showing a third of its rows looks like data loss. */
+.vy-funnel {
+  position: relative;
+  display: inline-grid; place-items: center;
+  width: var(--vy-space-11); height: var(--vy-space-11);
+  background: none; border: 1px solid var(--vy-grey-200); border-radius: var(--vy-radius-md);
+  color: var(--vy-grey-600); cursor: pointer; flex: 0 0 auto;
+}
+.vy-funnel:hover { background: var(--vy-grey-50); color: var(--vy-grey-900); }
+.vy-funnel[aria-expanded="true"] { background: var(--vy-blue-50); border-color: var(--vy-blue-300); color: var(--vy-blue-700); }
+.vy-funnel[data-on] { border-color: var(--vy-blue-500); color: var(--vy-blue-700); }
+.vy-funnel:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }

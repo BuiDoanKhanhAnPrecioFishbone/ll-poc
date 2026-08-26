@@ -111,8 +111,8 @@ so far are kept but wired to nothing; see the header comment in
 **FORM VIEW IS COMPLETE.** Everything below is list view.
 
 **LIST VIEW**
-7. **B1, B11, B6** — rebuild the filter: no operators, the real field set,
-   hidden behind the funnel by default.
+~~7. **B1, B11, B6** — rebuild the filter: no operators, the real field set,
+   hidden behind the funnel.~~ **done**
 ~~8. **B7, B8, B9, B10** — pager text and page size, the eleven real columns,
    `Add New`.~~ **done** — plus the View Detail column, first/last paging, the
    guideline's status colours, and a `waiting` badge token that had no CSS at

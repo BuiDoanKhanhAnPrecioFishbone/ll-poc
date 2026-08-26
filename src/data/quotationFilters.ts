@@ -1,60 +1,67 @@
-import { PEOPLE, type Quotation } from './quotations';
-import {
-  PROJECT_TYPE, ORDER_TYPE, RFQ_TYPE, CUSTOMER_TYPE, APPLICATION, QUOTE_FOCUS,
-} from './metadata';
-import { CUSTOMER_OPTIONS } from './quotations';
+import { CUSTOMER_OPTIONS, type Quotation } from './quotations';
 import { MEASURES, ME, isOpen } from './queues';
-import type { FilterField, QuickFilter } from '../ui/filters';
+import type { ViewField } from '../ui/views';
 import { priorityLevel } from '../ui/Priority';
 
 /**
- * Quotations: the quick set, and the fields the advanced filter can reach.
+ * The Project Requirements filter fields.
  *
- * The quick set is the questions people bring to this screen every day. The
- * four queue measures are here too, so the same question asked from My Queues
- * and from the list gets the same answer — they import one predicate rather
- * than defining "overdue" twice.
+ * Read off the live filter toolbar, 25 Aug 2026. Eleven controls, five pickers
+ * and three date ranges, with NO operators anywhere — see docs/filter-spec.md.
+ *
+ * Every non-date field is a PICKER, including "No" and "Project Name": the live
+ * placeholders are "Select No" and "Select Project Name", not "Enter". You
+ * choose from values that exist rather than typing one that might not, which is
+ * why a filter here can never return nothing by typo.
  */
-export const QUOTATION_QUICK: QuickFilter<Quotation>[] = [
-  { key: 'mine', label: `Assigned to ${ME}`, match: q => q.assignedTo === ME },
-  { key: 'open', label: 'Open only', match: isOpen },
-  ...MEASURES
-    /* "Unassigned" is dropped from the quick row: it contradicts "mine", and a
-       chip that empties the grid whenever another chip is on is a trap. It stays
-       reachable from My Queues and from the advanced filter. */
-    .filter(m => m.key !== 'unassigned')
-    .map(m => ({ key: m.key, label: m.label, match: m.match })),
-];
+export function quotationFilterFields(rows: Quotation[]): ViewField[] {
+  /* Options come from the data actually present, sorted, de-duplicated. A
+     picker offering a value no record has is a dead end. */
+  const uniq = (xs: string[]) => [...new Set(xs)].filter(Boolean).sort();
+
+  return [
+    { field: 'priority', label: 'Priority', kind: 'select',
+      options: ['High', 'Medium', 'Low'],
+      value: q => priorityLevel(q.priority) },
+
+    { field: 'no', label: 'No', kind: 'select',
+      options: uniq(rows.map(q => q.no)),
+      value: q => q.no },
+
+    { field: 'projectName', label: 'Project Name', kind: 'select',
+      options: uniq(rows.map(q => q.projectName)),
+      value: q => q.projectName },
+
+    { field: 'customer', label: 'Customer Name', kind: 'select',
+      options: [...CUSTOMER_OPTIONS],
+      value: q => q.customer },
+
+    { field: 'status', label: 'Status', kind: 'select',
+      options: ['New', 'In-Progress', 'Quoted', 'Completed', 'Cancelled'],
+      value: q => q.status },
+
+    /* Three ranges, each an explicit From and To. The live control is two date
+       inputs, not an operator plus a value. */
+    { field: 'dateNeeded', label: 'Date Needed', kind: 'date-range', value: q => q.dateNeeded },
+    { field: 'createdDate', label: 'Created Date', kind: 'date-range', value: q => q.createdDate },
+    { field: 'lastUpdated', label: 'Last Updated Date', kind: 'date-range', value: q => q.lastUpdated },
+  ];
+}
 
 /**
- * Every field the advanced filter can reach — including ones that are not
- * columns on this grid. That is the point of the tier: "cases where users want
- * to access additional fields of a transaction/record".
+ * Quick filters — the review's other tier: "displays basic filter sets per
+ * module", kept alongside the field panel rather than replacing it.
+ *
+ * These are the questions people bring to this screen daily, and they reuse the
+ * My Queues predicates so "overdue" cannot mean two different things on two
+ * screens.
  */
-export const QUOTATION_FILTER_FIELDS: FilterField<Quotation>[] = [
-  { field: 'no', label: 'RFQ No', type: 'text', value: q => `RFQ${q.no}` },
-  { field: 'projectName', label: 'Project', type: 'text', value: q => q.projectName },
-  { field: 'customer', label: 'Customer', type: 'select', options: CUSTOMER_OPTIONS, value: q => q.customer },
-  { field: 'customerContact', label: 'Customer Contact', type: 'text', value: q => q.customerContact },
-  { field: 'status', label: 'Status', type: 'select',
-    options: ['New', 'In-Progress', 'Quoted', 'Completed', 'Cancelled'], value: q => q.status },
-  { field: 'assignedTo', label: 'Assigned To', type: 'select', options: PEOPLE, value: q => q.assignedTo },
-  { field: 'priority', label: 'Priority', type: 'select',
-    options: ['High', 'Medium', 'Low'], value: q => priorityLevel(q.priority) },
-  { field: 'dateNeeded', label: 'Due Date', type: 'date', value: q => q.dateNeeded },
-  { field: 'createdDate', label: 'Created Date', type: 'date', value: q => q.createdDate },
-  { field: 'projectType', label: 'Project Type', type: 'select', options: PROJECT_TYPE, value: q => q.projectType },
-  { field: 'orderType', label: 'Order Type', type: 'select', options: ORDER_TYPE, value: q => q.orderType },
-  { field: 'rfqType', label: 'RFQ Type', type: 'select', options: RFQ_TYPE, value: q => q.rfqType },
-  { field: 'customerType', label: 'Customer Type', type: 'select', options: CUSTOMER_TYPE, value: q => q.customerType },
-  { field: 'application', label: 'Application', type: 'select', options: APPLICATION, value: q => q.application },
-  /* Below here are fields the grid never shows. They are why the advanced tier
-     exists — "which RFQs did we quote at under 12% markup" is a real question
-     and the list has no column for it. */
-  { field: 'quoteFocus', label: 'Quote Focus', type: 'select', options: QUOTE_FOCUS, value: q => q.quoteFocus },
-  { field: 'markup', label: 'Markup %', type: 'number', value: q => q.markup },
-  { field: 'leadTimeDays', label: 'Acceptable LeadTime In Day', type: 'number', value: q => q.leadTimeDays },
-  { field: 'itar', label: 'ITAR', type: 'boolean', value: q => q.itar },
-  { field: 'historicalRfq', label: 'Historical RFQ', type: 'text', value: q => q.historicalRfq },
-  { field: 'internalNotes', label: 'Internal Notes', type: 'text', value: q => q.internalNotes },
+export const QUOTATION_QUICK = [
+  { key: 'mine', label: `Assigned to ${ME}`, match: (q: Quotation) => q.assignedTo === ME },
+  { key: 'open', label: 'Open only', match: isOpen },
+  ...MEASURES
+    /* "Unassigned" is dropped from this row: it contradicts "mine", and a chip
+       that empties the grid whenever another chip is on is a trap. */
+    .filter(m => m.key !== 'unassigned')
+    .map(m => ({ key: m.key, label: m.label, match: m.match })),
 ];

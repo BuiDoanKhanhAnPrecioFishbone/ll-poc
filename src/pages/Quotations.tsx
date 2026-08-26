@@ -10,9 +10,9 @@ import { usePrefs } from '../ui/prefs';
 import { generateQuotations, QUOTATION_COLUMNS, daysUntil, type Quotation } from '../data/quotations';
 import { measureFor, scopeFilter } from '../data/queues';
 import { applyItarVisibility } from '../data/itar';
-import { FilterBar } from '../ui/FilterBar';
-import { applyConditions, type Condition } from '../ui/filters';
-import { QUOTATION_QUICK, QUOTATION_FILTER_FIELDS } from '../data/quotationFilters';
+import { FilterToolbar } from '../ui/FilterToolbar';
+import { applyView, activeCount, type FilterValues } from '../ui/views';
+import { QUOTATION_QUICK, quotationFilterFields } from '../data/quotationFilters';
 
 /** Which quick filters are worth a tile. Not all of them — five tiles is a
  *  dashboard, and the row stops being read. */
@@ -56,8 +56,14 @@ export function Quotations() {
      one click to drop, and the bar states what is applied rather than filtering
      silently. */
   const [quickOn, setQuickOn] = useState<string[]>(['mine', 'open']);
-  const [conditions, setConditions] = useState<Condition[]>([]);
+  /* One value per field. No operators — see docs/filter-spec.md. */
+  const [values, setValues] = useState<FilterValues>({});
   const { dateStyle } = usePrefs();
+
+  /* Options are drawn from the rows themselves, so a picker never offers a
+     value no record has. */
+  const fields = useMemo(() => quotationFilterFields(all), [all]);
+  const active = activeCount(fields, values);
   const toast = useToast();
 
   const toggleQuick = (key: string) =>
@@ -81,8 +87,8 @@ export function Quotations() {
        conditions: every chip you turn on narrows further. */
     const quickMatched = all.filter(q =>
       QUOTATION_QUICK.filter(f => quickOn.includes(f.key)).every(f => f.match(q)));
-    return applyConditions(quickMatched, conditions, QUOTATION_FILTER_FIELDS);
-  }, [all, queue, scope, quickOn, conditions]);
+    return applyView(quickMatched, fields, values);
+  }, [all, queue, scope, quickOn, values, fields]);
 
 
   /**
@@ -203,13 +209,37 @@ export function Quotations() {
           <Button variant="text" onClick={clearQueue}>Clear</Button>
         </div>
       ) : (
-        <FilterBar
-          quick={QUOTATION_QUICK} activeQuick={quickOn} onQuick={toggleQuick}
-          fields={QUOTATION_FILTER_FIELDS}
-          conditions={conditions} onConditions={setConditions}
-          total={all.length} shown={data.length}
-        />
+        /* The QUICK tier: named sets, one click. The field panel behind the
+           funnel is the other tier. The review requires both. */
+        <div className="vy-filter-row-main">
+          <span className="vy-filter-label">Show</span>
+          {QUOTATION_QUICK.map(f => (
+            <Chip key={f.key} label={f.label}
+                  selected={quickOn.includes(f.key)}
+                  onClick={() => toggleQuick(f.key)} />
+          ))}
+          {(quickOn.length > 0 || active > 0) && (
+            <Button variant="text"
+                    onClick={() => { setQuickOn([]); setValues({}); }}>
+              Clear
+            </Button>
+          )}
+        </div>
       )}
+      filterPanel={
+        <FilterToolbar fields={fields} values={values} onChange={setValues}
+                       onClear={() => setValues({})} activeCount={active} />
+      }
+      filterActive={active}
+      views={
+        /* Placeholder until saved views are built (B2-B5). It is a real control
+           on the live toolbar, so it is here rather than absent — but it says
+           it does nothing yet rather than pretending. */
+        <Button variant="outlined"
+                onClick={() => toast.notImplemented('load a saved view')}>
+          Select View
+        </Button>
+      }
       rowHref={q => `/sales-management/quotation/${q.id}`}
     />
   );
