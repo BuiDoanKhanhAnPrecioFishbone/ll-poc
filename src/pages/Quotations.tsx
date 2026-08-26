@@ -13,6 +13,9 @@ import { applyItarVisibility } from '../data/itar';
 import { FilterToolbar } from '../ui/FilterToolbar';
 import { applyView, activeCount, type FilterValues } from '../ui/views';
 import { QUOTATION_QUICK, quotationFilterFields } from '../data/quotationFilters';
+import { ViewSetting } from '../ui/ViewSetting';
+import { useViews, draftFrom } from '../ui/useViews';
+import { applySort, type SavedView } from '../ui/views';
 
 /** Which quick filters are worth a tile. Not all of them — five tiles is a
  *  dashboard, and the row stops being read. */
@@ -62,7 +65,26 @@ export function Quotations() {
 
   /* Options are drawn from the rows themselves, so a picker never offers a
      value no record has. */
-  const fields = useMemo(() => quotationFilterFields(all), [all]);
+  /**
+   * The built-in view: every column the screen has, in the guideline's order,
+   * and the filter fields the live toolbar shows. It cannot be renamed or
+   * deleted — a screen with no views left would have no columns at all.
+   */
+  const systemView = useMemo<SavedView>(() => ({
+    id: 'system', name: 'Default', isDefault: false, system: true,
+    fields: ['priority', 'no', 'projectName', 'customer', 'status',
+             'dateNeeded', 'createdDate', 'lastUpdated'],
+    columns: QUOTATION_COLUMNS.map(c => ({ field: String(c.field) })),
+    sort: [],
+  }), []);
+
+  const { views: savedViews, active: view, activeId, setActiveId, save, remove } =
+    useViews('quotation', systemView);
+  const [settingOpen, setSettingOpen] = useState(false);
+
+  const fields = useMemo(
+    () => quotationFilterFields(all).filter(f => view.fields.includes(f.field)),
+    [all, view.fields]);
   const active = activeCount(fields, values);
   const toast = useToast();
 
@@ -150,11 +172,38 @@ export function Quotations() {
     return c;
   }), [dateStyle]);
 
-  const allColumns = useMemo(() => [viewDetailColumn, ...columns], [columns]);
+  /**
+   * The view decides which columns appear, in what order, under what name and
+   * at what width. View Detail is prepended and is not part of the view — it is
+   * an action, not data, and a view that could hide it would leave rows with no
+   * way to open.
+   */
+  const allColumns = useMemo(() => {
+    const byField = new Map(columns.map(c => [String(c.field), c]));
+    const ordered = view.columns
+      .map(vc => {
+        const base = byField.get(vc.field);
+        if (!base) return null;
+        return {
+          ...base,
+          ...(vc.label ? { title: vc.label } : {}),
+          ...(vc.width ? { width: vc.width, widthNote: 'Set on this view.' } : {}),
+        };
+      })
+      .filter(Boolean) as typeof columns;
+    return [viewDetailColumn, ...ordered];
+  }, [columns, view.columns]);
+
+  /* The view's sort runs before the grid's own header sorting, so a saved view
+     opens in the order it was saved in. */
+  const sorted = useMemo(
+    () => applySort(data, view.sort, (row, f) => (row as Record<string, unknown>)[f]),
+    [data, view.sort]);
 
   return (
+    <>
     <DataGrid
-      data={data}
+      data={sorted}
       columns={allColumns}
       title="Quotations"
       subtitle={withheld > 0
@@ -232,15 +281,48 @@ export function Quotations() {
       }
       filterActive={active}
       views={
-        /* Placeholder until saved views are built (B2-B5). It is a real control
-           on the live toolbar, so it is here rather than absent — but it says
-           it does nothing yet rather than pretending. */
-        <Button variant="outlined"
-                onClick={() => toast.notImplemented('load a saved view')}>
-          Select View
-        </Button>
+        <label className="vy-view-picker">
+          <span className="vy-sr-only">Select View</span>
+          <select value={activeId} onChange={e => setActiveId(e.target.value)}>
+            {savedViews.map(v => (
+              <option key={v.id} value={v.id}>
+                {v.name}{v.isDefault ? ' (default)' : ''}
+              </option>
+            ))}
+          </select>
+        </label>
+      }
+      viewSetting={
+        <button type="button" className="vy-funnel" aria-label="Setup View Template"
+                title="Setup View Template" onClick={() => setSettingOpen(true)}>
+          <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor"
+               strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="M10 7a3 3 0 1 0 0 6 3 3 0 0 0 0-6M10 2v2M10 16v2M4 10H2M18 10h-2M5 5 3.6 3.6M16.4 16.4 15 15M15 5l1.4-1.4M3.6 16.4 5 15" />
+          </svg>
+        </button>
       }
       rowHref={q => `/sales-management/quotation/${q.id}`}
     />
+
+    {settingOpen && (
+      <ViewSetting
+        view={view}
+        allColumns={columns}
+        allFields={quotationFilterFields(all)}
+        canDelete={!view.system}
+        onClose={() => setSettingOpen(false)}
+        onDiscard={() => setSettingOpen(false)}
+        onDelete={() => { remove(view.id); setSettingOpen(false); }}
+        onSave={(v, asNew) => {
+          /* Saving a built-in view, or ticking "New View", creates a copy —
+             the built-in is the fallback every other view is measured against
+             and must stay as shipped. */
+          save(asNew ? { ...draftFrom(v, v.name), isDefault: v.isDefault } : v);
+          setSettingOpen(false);
+          toast.success(asNew ? `View “${v.name}” created.` : `View “${v.name}” saved.`);
+        }}
+      />
+    )}
+    </>
   );
 }

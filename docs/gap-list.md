@@ -117,7 +117,11 @@ so far are kept but wired to nothing; see the header comment in
    `Add New`.~~ **done** — plus the View Detail column, first/last paging, the
    guideline's status colours, and a `waiting` badge token that had no CSS at
    all so every "Quoted" badge rendered unstyled.
-9. **B2, B3, B4, B5** — saved views and the View Setting dialog. Substantial;
-   worth its own estimate.
+~~9. **B2, B3, B4, B5** — saved views and the View Setting sidebar.~~ **done**
+
+**THE GAP LIST IS CLEAR.** Everything from the 25 Aug live-system read and the
+customer's Testing Guideline is now built for Project Requirements list and form
+view, except the items listed under "Parked" and the open questions in
+`docs/testing/what-this-changes.md`.
 
 **PARKED** — My Queues module separation and role scoping.

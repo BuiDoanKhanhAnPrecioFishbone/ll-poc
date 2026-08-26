@@ -201,6 +201,9 @@
   --vy-popover-min-w:    240px;
   --vy-editor-min-h:     110px;  /* rich text composer */
   --vy-filter-field-min: 190px;  /* one control in the filter toolbar */
+  --vy-viewsetting-w:    460px;  /* the View Setting right sidebar */
+  --vy-vs-width-col:      88px;  /* the Width input on the Column tab */
+  --vy-view-picker-w:    180px;
   --vy-tz-w:             180px;  /* timezone select in the global header */
   --vy-kpi-min-w:        140px;
   --vy-record-max-w:     1180px;

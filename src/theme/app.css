@@ -1072,3 +1072,79 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
 .vy-funnel[aria-expanded="true"] { background: var(--vy-blue-50); border-color: var(--vy-blue-300); color: var(--vy-blue-700); }
 .vy-funnel[data-on] { border-color: var(--vy-blue-500); color: var(--vy-blue-700); }
 .vy-funnel:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
+
+/* =============================================================================
+   VIEW SETTING — a right sidebar, per the customer's guideline
+   ========================================================================== */
+.vy-viewsetting {
+  position: fixed; inset: 0 0 0 auto; z-index: var(--vy-z-palette);
+  width: min(var(--vy-viewsetting-w), 96vw);
+  display: flex; flex-direction: column;
+  background: var(--vy-grey-0);
+  border-left: 1px solid var(--vy-grey-200);
+  box-shadow: var(--vy-shadow-lg);
+}
+.vy-vs-head {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--vy-space-5);
+  padding: var(--vy-space-6) var(--vy-space-7);
+  border-bottom: 1px solid var(--vy-grey-200);
+}
+.vy-vs-head h2 { margin: 0; font-size: var(--vy-text-md); font-weight: var(--vy-weight-semibold); color: var(--vy-grey-900); }
+
+.vy-vs-actions { display: flex; gap: var(--vy-space-4); padding: var(--vy-space-5) var(--vy-space-7); border-bottom: 1px solid var(--vy-grey-200); }
+.vy-vs-form { display: flex; flex-direction: column; gap: var(--vy-space-5); padding: var(--vy-space-6) var(--vy-space-7); border-bottom: 1px solid var(--vy-grey-200); }
+.vy-vs-field { display: flex; flex-direction: column; gap: var(--vy-space-2); font-size: var(--vy-text-sm); color: var(--vy-grey-700); }
+
+.vy-vs-tabs { display: flex; gap: var(--vy-space-2); padding: 0 var(--vy-space-7); border-bottom: 1px solid var(--vy-grey-200); }
+.vy-vs-tab {
+  background: none; border: 0; cursor: pointer; font: inherit;
+  padding: var(--vy-space-5) var(--vy-space-6);
+  border-bottom: var(--vy-border-emphasis) solid transparent;
+  color: var(--vy-grey-600); font-size: var(--vy-text-base);
+}
+.vy-vs-tab[aria-selected="true"] { color: var(--vy-blue-700); border-bottom-color: var(--vy-blue-600); font-weight: var(--vy-weight-semibold); }
+.vy-vs-tab:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
+
+.vy-vs-body { flex: 1; overflow-y: auto; padding: var(--vy-space-7); }
+.vy-vs-heading { margin: 0 0 var(--vy-space-2); font-size: var(--vy-text-sm); font-weight: var(--vy-weight-semibold); color: var(--vy-grey-800); text-transform: uppercase; letter-spacing: .04em; }
+.vy-vs-hint { margin: 0 0 var(--vy-space-6); font-size: var(--vy-text-xs); color: var(--vy-grey-500); line-height: 1.45; }
+.vy-vs-colhead { display: grid; grid-template-columns: 1fr var(--vy-vs-width-col); gap: var(--vy-space-4); padding: 0 var(--vy-space-4) var(--vy-space-3) var(--vy-space-9); font-size: var(--vy-text-xs); color: var(--vy-grey-500); }
+
+.vy-vs-list { list-style: none; margin: 0 0 var(--vy-space-6); padding: 0; display: flex; flex-direction: column; gap: var(--vy-space-2); }
+.vy-vs-row {
+  display: flex; align-items: center; gap: var(--vy-space-4);
+  padding: var(--vy-space-3) var(--vy-space-4);
+  border: 1px solid var(--vy-grey-200); border-radius: var(--vy-radius-sm);
+  background: var(--vy-grey-0);
+}
+.vy-vs-row--col { display: grid; grid-template-columns: auto 1fr var(--vy-vs-width-col) auto; }
+.vy-vs-row--sort { display: grid; grid-template-columns: auto 1fr auto auto; }
+.vy-vs-row[draggable="true"] { cursor: grab; }
+.vy-vs-row[draggable="true"]:active { cursor: grabbing; }
+.vy-vs-grip { color: var(--vy-grey-400); letter-spacing: -2px; user-select: none; }
+.vy-vs-name { font-size: var(--vy-text-base); color: var(--vy-grey-900); min-width: 0; }
+/* Required columns keep their place but lose the remove control, so the row
+   still reads as a row rather than one with a hole where a button should be. */
+.vy-vs-required { font-size: var(--vy-text-2xs); color: var(--vy-grey-500); white-space: nowrap; }
+.vy-vs-remove {
+  display: grid; place-items: center; width: var(--vy-space-10); height: var(--vy-space-10);
+  background: none; border: 0; border-radius: var(--vy-radius-sm);
+  color: var(--vy-grey-500); cursor: pointer;
+}
+.vy-vs-remove:hover { background: var(--vy-red-50); color: var(--vy-red-700); }
+.vy-vs-remove:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
+.vy-vs-dir {
+  background: var(--vy-grey-50); border: 1px solid var(--vy-grey-200); border-radius: var(--vy-radius-pill);
+  padding: var(--vy-space-1) var(--vy-space-5); font: inherit; font-size: var(--vy-text-xs);
+  color: var(--vy-grey-700); cursor: pointer; white-space: nowrap;
+}
+.vy-vs-dir[aria-pressed="true"] { background: var(--vy-blue-50); border-color: var(--vy-blue-300); color: var(--vy-blue-700); }
+.vy-vs-add { display: flex; align-items: center; gap: var(--vy-space-4); flex-wrap: wrap; }
+.vy-vs-foot { padding: var(--vy-space-5) var(--vy-space-7); border-top: 1px solid var(--vy-grey-200); font-size: var(--vy-text-xs); color: var(--vy-grey-500); }
+
+.vy-view-picker select {
+  font: inherit; font-size: var(--vy-text-sm); color: var(--vy-grey-800);
+  background: var(--vy-grey-0); border: 1px solid var(--vy-grey-200);
+  border-radius: var(--vy-radius-md); padding: var(--vy-space-3) var(--vy-space-5);
+  cursor: pointer; max-width: var(--vy-view-picker-w);
+}

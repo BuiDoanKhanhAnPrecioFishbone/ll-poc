@@ -32,18 +32,72 @@ export type ViewField = {
 /** A date range is two inputs and one concept, so it stores two values. */
 export type FilterValues = Record<string, string>;
 
+/**
+ * One column inside a view.
+ *
+ * `label` overrides the column's own title. The live Column tab renders the
+ * name as a TEXT INPUT, so a user can rename a column inside their own view —
+ * "Customer Name" becomes "Client" for whoever wants that. Nothing in the
+ * prototype anticipated this, and it is the reason a view stores columns as
+ * objects rather than a list of field names.
+ */
+export type ViewColumn = {
+  field: string;
+  /** Renamed by the user. Undefined means "use the column's own title". */
+  label?: string;
+  /** Pixels. Undefined means "use the width the column role gives it". */
+  width?: number;
+};
+
+/** Multi-level: the live Sort tab lets you stack fields and reorder them. */
+export type ViewSort = { field: string; dir: 'asc' | 'desc' };
+
 export type SavedView = {
   id: string;
   name: string;
   isDefault: boolean;
-  /** Which fields the filter panel shows — chosen in the View Setting dialog. */
+  /** Which fields the filter panel shows — chosen on the Filter tab. */
   fields: string[];
-  /** Which columns the grid shows. */
-  columns: string[];
-  sort: { field: string; dir: 'asc' | 'desc' } | null;
-  /** Built in, cannot be deleted or renamed. */
+  /** Which columns the grid shows, in order. */
+  columns: ViewColumn[];
+  /** Applied outermost-first, as the list is ordered. */
+  sort: ViewSort[];
+  /** Built in. Cannot be renamed or deleted. */
   system?: boolean;
 };
+
+/**
+ * Sorts rows by a stacked sort.
+ *
+ * Stable and multi-level: the second field only decides rows the first field
+ * ties on, which is the whole point of stacking them.
+ */
+export function applySort<T>(
+  rows: T[],
+  sort: ViewSort[],
+  valueOf: (row: T, field: string) => unknown,
+): T[] {
+  if (!sort.length) return rows;
+  return [...rows].sort((a, b) => {
+    for (const s of sort) {
+      const av = valueOf(a, s.field);
+      const bv = valueOf(b, s.field);
+      if (av === bv) continue;
+      /* Empty sorts last in both directions. A blank is an absence, not a
+         value smaller than every other one, and burying real rows under a
+         block of blanks is never what someone sorting wanted. */
+      if (av === null || av === undefined || av === '') return 1;
+      if (bv === null || bv === undefined || bv === '') return -1;
+      const cmp = av instanceof Date && bv instanceof Date
+        ? av.getTime() - bv.getTime()
+        : typeof av === 'number' && typeof bv === 'number'
+          ? av - bv
+          : String(av).localeCompare(String(bv));
+      if (cmp !== 0) return s.dir === 'asc' ? cmp : -cmp;
+    }
+    return 0;
+  });
+}
 
 const dayStart = (s: string) => { const d = new Date(s); d.setHours(0, 0, 0, 0); return d.getTime(); };
 const dayOf = (v: unknown) => {

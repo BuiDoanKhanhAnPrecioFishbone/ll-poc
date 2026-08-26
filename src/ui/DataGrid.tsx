@@ -38,7 +38,7 @@ const ROW_H: Record<Density, number> = { compact: 28, comfortable: 36, relaxed: 
 export function DataGrid<T extends { id: string | number }>({
   data, columns, title, subtitle, actions, filters,
   searchPlaceholder = 'Search', rowHref, onOpenRow, emptyHint, loading, kpis,
-  filterPanel, filterActive = 0, views,
+  filterPanel, filterActive = 0, views, viewSetting,
 }: {
   data: T[];
   columns: ColumnSpec<T>[];
@@ -55,8 +55,10 @@ export function DataGrid<T extends { id: string | number }>({
   filterPanel?: ReactNode;
   /** How many fields are filtering, for the badge on the funnel. */
   filterActive?: number;
-  /** The Select View control. Rendered by the caller until saved views exist. */
+  /** The Select View control. */
   views?: ReactNode;
+  /** The gear that opens View Setting. */
+  viewSetting?: ReactNode;
   searchPlaceholder?: string;
   /**
    * Opening a record hangs off the IDENTIFIER, not the row.
@@ -239,6 +241,8 @@ export function DataGrid<T extends { id: string | number }>({
               {filterActive > 0 && <span className="vy-count-badge">{filterActive}</span>}
             </button>
           )}
+
+          {viewSetting}
           {/* "Columns", not "Show 2 more columns". The old label described the
               action's effect on one particular state rather than naming the
               thing it opens, so it read differently depending on what was
