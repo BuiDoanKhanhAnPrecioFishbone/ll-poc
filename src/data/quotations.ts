@@ -335,6 +335,9 @@ export function generateQuotations(count = 330): Quotation[] {
     /* Working-hours time, so the activity log reads like a log rather than a
        column of midnights. */
     created.setHours(8 + Math.floor(rnd() * 9), Math.floor(rnd() * 60), 0, 0);
+
+    /* Needed before the record literal, because Historical RFQ depends on it. */
+    const orderType = pick(META.ORDER_TYPE);
     out.push({
       id: `rfq-${i + 1}`,
       no: String(358 - i).padStart(10, '0'),
@@ -351,7 +354,7 @@ export function generateQuotations(count = 330): Quotation[] {
       customerContact: pick(findCustomer(cust)!.contacts),
       application: pick(META.APPLICATION),
       rfqType: pick(META.RFQ_TYPE),
-      orderType: pick(META.ORDER_TYPE),
+      orderType,
       status,
       assignedTo: pick(OWNERS),
       dateNeeded: needed,
@@ -360,7 +363,13 @@ export function generateQuotations(count = 330): Quotation[] {
       projectType: pick(META.PROJECT_TYPE),
       /* Derived from the customer record on the live form, not picked freely. */
       customerType: findCustomer(cust)!.custType,
-      historicalRfq: rnd() > 0.75 ? String(300 - Math.floor(rnd() * 200)).padStart(10, '0') : '',
+      /* Only a Repeat order has one, because that is the only case where the
+         field is shown. The customer's Testing Guideline: "Precondition:
+         displays when selected Order Type is Repeat." A stored value on a New
+         order would be data the form can never show or clear. */
+      historicalRfq: orderType === 'Repeat'
+        ? `RFQ${String(300 - Math.floor(rnd() * 200)).padStart(10, '0')}`
+        : '',
       /* ITAR follows the customer's `isItar` flag on the live form. */
       itar: findCustomer(cust)!.isItar,
       quoteFocus: pick(META.QUOTE_FOCUS),

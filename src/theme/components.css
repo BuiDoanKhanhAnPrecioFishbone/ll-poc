@@ -684,18 +684,26 @@
 .vy-check-box[data-state="checked"]:hover { border-color: var(--vy-blue-700); background: var(--vy-blue-700); }
 
 /* ---- Required marker -----------------------------------------------------
-   `(*)`, as the live form writes it, rather than a bare asterisk — that is the
-   convention these users have already learned and the customer's requirements
-   do not ask for it to change.
+   `(*)` in RED. The customer's Testing Guideline is explicit: "A red asterisk
+   (*) is displayed next to each required field label."
 
-   Amber rather than red: red is the colour this system uses for something that
-   has gone WRONG (overdue, blocked, removed). A field that is merely required
-   has not gone wrong, and spending the error colour on the resting state of a
-   form leaves nothing louder for an actual error. */
+   I had made this amber, on the argument that red is this system's colour for
+   something that has gone wrong and spending it on a form's resting state
+   leaves nothing louder for a real error. The customer specified red, so it is
+   red — and the error text below an empty required field is red too, which is
+   also what they asked for. */
 .vy-required {
   margin-left: var(--vy-space-2);
-  color: var(--vy-accent-warning);
+  color: var(--vy-red-600);
   font-weight: var(--vy-weight-semibold);
+}
+
+/* "This field is required." — shown below the field, in red, on blur. */
+.vy-field-error {
+  display: block;
+  margin-top: var(--vy-space-2);
+  font-size: var(--vy-text-xs);
+  color: var(--vy-red-600);
 }
 
 /* The notes section spans the full width — two free-text boxes side by side

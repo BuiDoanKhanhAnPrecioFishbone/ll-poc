@@ -194,18 +194,58 @@ export const NOTES: FieldDef<Quotation>[] = [
 /**
  * REMOVED, because the live record does not have them.
  *
- *   RFQ Type      — a grid column only; it is not on the form.
- *   Application   — likewise a grid column only.
- *   Historical RFQ — appears nowhere on the record. It was added here from a
- *                    `rfqParentName` reference found in the shipped bundle,
- *                    which turns out not to surface on this screen.
+ *   RFQ Type    — a grid column only; it is not on the form.
+ *   Application — likewise a grid column only.
  *
- * Left recorded rather than deleted silently, so the decision is auditable.
+ * Historical RFQ was on this list and should not have been. See below.
  */
-export const NOT_ON_THE_RECORD = ['rfqType', 'application', 'historicalRfq'] as const;
+export const NOT_ON_THE_RECORD = ['rfqType', 'application'] as const;
 
-export let HISTORICAL_RFQ_OPTIONS: string[] = [];
-export function setHistoricalRfqOptions(all: string[]) { HISTORICAL_RFQ_OPTIONS = all; }
+/**
+ * Historical RFQ options, indexed by customer.
+ *
+ * The guideline scopes the list to "RFQs corresponding to the selected existing
+ * customer" — offering every RFQ in the system would let someone copy details
+ * across from a different customer's job.
+ */
+let HISTORICAL_BY_CUSTOMER: Record<string, string[]> = {};
+export function setHistoricalRfqOptions(rows: { customer: string; no: string }[]) {
+  const byCust: Record<string, string[]> = {};
+  for (const r of rows) (byCust[r.customer] ??= []).push(`RFQ${r.no}`);
+  HISTORICAL_BY_CUSTOMER = byCust;
+}
+export const historicalRfqsFor = (customer: string) =>
+  ['', ...(HISTORICAL_BY_CUSTOMER[customer] ?? [])];
+
+/**
+ * Historical RFQ — shown only when Order Type is "Repeat".
+ *
+ * I removed this field on the evidence that it was absent from the record I
+ * opened live. That record's Order Type was "New", so the field was correctly
+ * hidden, and I read its absence as non-existence. The customer's Testing
+ * Guideline is explicit:
+ *
+ *   "If selected value is Repeat, the Historical RFQ field is displayed below,
+ *    allowing the user to select an existing RFQ associated with the selected
+ *    customer in order to copy basic information from that RFQ and reduce
+ *    re-entry effort."
+ *   "Precondition: Displays when selected Order Type is Repeat."
+ *   "The option list is populated with RFQs corresponding to the selected
+ *    existing customer."
+ *
+ * So the options are scoped to the CUSTOMER, not to every RFQ in the system —
+ * which is also why it is a lookup rather than free text.
+ */
+export const HISTORICAL_RFQ_FIELD: FieldDef<Quotation> = {
+  name: 'historicalRfq', label: 'Historical RFQ', kind: 'lookup',
+  optionsFor: (q: Quotation) => historicalRfqsFor(q.customer),
+  hint: 'Copies basic information from the RFQ you pick, to save re-entry.',
+};
+
+/** True when the record should show Historical RFQ at all. */
+export const showsHistoricalRfq = (q: Quotation) => q.orderType === 'Repeat';
+
+
 
 export const ALL_FIELDS = [PROJECT_NAME_FIELD, ...HEADER, ...COMMERCIAL, ...TECHNICAL, ...INVENTORY, ...NOTES];
 

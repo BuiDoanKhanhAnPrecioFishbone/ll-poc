@@ -3,8 +3,20 @@
 Three sources describe what to build, and they disagree. The order is:
 
 ### 1. Customer requirements — HIGHEST
-The reviewer's report (25 Aug 2026) and anything the customer says after it.
-**Where this asks for a change, it wins outright**, even against the live system.
+Two documents, plus anything the customer says after them:
+
+- **`docs/testing/testing-guideline.md`** — the customer's official Testing
+  Guideline. It reads as a QA checklist but it is a functional specification:
+  it states expected behaviour screen by screen, names the required fields,
+  specifies validation messages and pagination sizes. Where it and the running
+  system disagree, **this wins** — the live build is what exists, this is what
+  it is supposed to do.
+- The reviewer's design report (25 Aug 2026).
+
+**Where these ask for a change, they win outright**, even against the live
+system. Where the two disagree with each other, ask — one such conflict is
+already open, over whether the date format is a user preference or a system
+setting.
 
 Examples it overrides: priority becomes a dot and a label though live uses stars;
 breadcrumbs go; the record count leaves the module name; density moves to user
@@ -47,6 +59,12 @@ building from inference where the live system had an answer:
 - four section names invented where the live form names them
   `QUOTE CONFIGURATION`, `TECHNICAL SPECIFICATIONS`,
   `SPECIAL REQUIREMENTS & OPTIONS`, `ADDITIONAL NOTES`
+- Historical RFQ deleted as "not on the record", when it is conditional on
+  Order Type being `Repeat` — I had looked at one record, whose Order Type was
+  `New`
+
+That last one is worth stating on its own: **reading one record tells you about
+one record.** The Testing Guideline would have told me the rule outright.
 
 None of these were judgement calls. Each had a verifiable answer that I did not
 go and look up first.

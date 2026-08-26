@@ -26,3 +26,6 @@ dist-ssr
 # Kendo UI license — never commit. Set KENDO_UI_LICENSE in Vercel instead.
 kendo-ui-license.txt
 telerik-license.txt
+
+# Excel lock files, created when a workbook is open
+~$*

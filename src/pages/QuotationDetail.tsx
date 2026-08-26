@@ -12,9 +12,9 @@ import { ActivityTab } from '../components/quotation/ActivityTab';
 import { BomComparisonDialog } from '../components/quotation/BomComparisonDialog';
 import { RunQuotationDialog } from '../components/quotation/RunQuotationDialog';
 import { useToast } from '../ui/Toast';
-import { RecordField } from '../components/quotation/RecordField';
+import { RecordField, RequiredMark } from '../components/quotation/RecordField';
 import { smartButtonsFor, SmartIcon } from '../components/quotation/SmartButtons';
-import { HEADER_GROUPS, COMMERCIAL, TECHNICAL, INVENTORY, NOTES, ALL_FIELDS,
+import { HISTORICAL_RFQ_FIELD, showsHistoricalRfq, HEADER_GROUPS, COMMERCIAL, TECHNICAL, INVENTORY, NOTES, ALL_FIELDS,
          setHistoricalRfqOptions } from '../components/quotation/requirementFields';
 
 /**
@@ -52,7 +52,7 @@ export function QuotationDetail() {
   const all = useMemo(() => generateQuotations(330), []);
   /* Historical RFQ is a reference to another RFQ, so its options are the other
      RFQs — seeded here rather than invented inside the field definition. */
-  useMemo(() => setHistoricalRfqOptions(['', ...all.map(x => `RFQ${x.no}`)]), [all]);
+  useMemo(() => setHistoricalRfqOptions(all.map(x => ({ customer: x.customer, no: x.no }))), [all]);
   const base = useMemo(() => all.find(x => x.id === id), [all, id]);
   const q = saved ?? base;
 
@@ -253,6 +253,16 @@ export function QuotationDetail() {
                     <RecordField key={def.name} def={def} value={(draft ?? q)[def.name]}
                                  editing={editing} onChange={setField} row={draft ?? q} />
                   ))}
+
+                {/* Historical RFQ appears only when Order Type is "Repeat", and
+                    sits directly below it — the guideline says "displayed
+                    below". Reads the DRAFT, so choosing Repeat mid-edit reveals
+                    it immediately rather than after a save. */}
+                {g.id === 'project' && showsHistoricalRfq(draft ?? q) && (
+                  <RecordField def={HISTORICAL_RFQ_FIELD}
+                               value={(draft ?? q).historicalRfq}
+                               editing={editing} onChange={setField} row={draft ?? q} />
+                )}
                 {/* Two system-stamped dates and a rating, which have no FieldDef
                     because nothing about them is typed. They belong with the
                     owner: a due date means little without knowing whose it is. */}
@@ -260,7 +270,10 @@ export function QuotationDetail() {
                     nothing about them is typed. Priority is a real field and
                     lives in the group's own list, editable. */}
                 {g.id === 'schedule' && <>
-                  <Fact label="Due Date" value={fmtDate(q.dateNeeded)} />
+                  {/* Required per the Testing Guideline's list of seven. It has
+                      no FieldDef because the date itself is not typed here, so
+                      the marker has to be passed in. */}
+                  <Fact label="Due Date" required value={fmtDate(q.dateNeeded)} />
                   <Fact label="Created Date" value={fmtDate(q.createdDate)} />
                 </>}
               </dl>
@@ -354,10 +367,12 @@ function RequirementsTab({ q, editing, onChange }: {
  * for "label above value" in one header was half the reason it read as two
  * separate cards.
  */
-function Fact({ label, value }: { label: string; value: React.ReactNode }) {
+function Fact({ label, value, required }: {
+  label: string; value: React.ReactNode; required?: boolean;
+}) {
   return (
     <div className="vy-field">
-      <dt>{label}</dt>
+      <dt>{label}{required && <RequiredMark />}</dt>
       <dd>{value}</dd>
     </div>
   );
