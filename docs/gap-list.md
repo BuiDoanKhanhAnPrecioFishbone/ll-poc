@@ -73,6 +73,8 @@ Precedence per `docs/precedence.md`.
 | D6 | Sort tab's add button reads `Add a column` |
 | D7 | Demo pie chart `World Population by Broad Age Groups` still on Home in production |
 | D8 | One date is `Due Date` on the form and `Date Needed` on the grid |
+| D9 | `Assigned To` is not a list column and the Column tab does not offer it, so an estimator cannot see who owns a row without opening it — worth raising, given My Queues is built on assignment |
+| D10 | The guideline says Priority uses "star icons"; the 25 Aug review asked for a dot and a label. Both are customer sources — the review is newer and explicit, so it wins. Flagging so nobody re-reads it as a regression |
 
 ---
 
@@ -111,8 +113,10 @@ so far are kept but wired to nothing; see the header comment in
 **LIST VIEW**
 7. **B1, B11, B6** — rebuild the filter: no operators, the real field set,
    hidden behind the funnel by default.
-8. **B7, B8, B9, B10** — pager text and page size, the eleven real columns,
-   `Add New`.
+~~8. **B7, B8, B9, B10** — pager text and page size, the eleven real columns,
+   `Add New`.~~ **done** — plus the View Detail column, first/last paging, the
+   guideline's status colours, and a `waiting` badge token that had no CSS at
+   all so every "Quoted" badge rendered unstyled.
 9. **B2, B3, B4, B5** — saved views and the View Setting dialog. Substantial;
    worth its own estimate.
 

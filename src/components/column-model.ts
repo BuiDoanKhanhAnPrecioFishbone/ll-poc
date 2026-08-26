@@ -30,6 +30,14 @@ export type ColumnSpec<T> = {
 
   /** Hidden by default; still offered in the column chooser, with `note` shown. */
   hiddenByDefault?: boolean;
+  /**
+   * The live Column tab refuses to remove this one.
+   *
+   * Not a style choice — a grid without its identifier or its due date stops
+   * being usable, and the real system enforces that rather than trusting each
+   * user not to hide them.
+   */
+  required?: boolean;
   note?: string;
 
   /** Bespoke cell content (a Rating, a link). Roles still drive width. */

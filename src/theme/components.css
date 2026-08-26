@@ -41,6 +41,7 @@
 .vy-badge[data-token="draft"]     { color: var(--vy-status-draft-fg);     background: var(--vy-status-draft-bg); }
 .vy-badge[data-token="open"]      { color: var(--vy-status-open-fg);      background: var(--vy-status-open-bg); }
 .vy-badge[data-token="progress"]  { color: var(--vy-status-progress-fg);  background: var(--vy-status-progress-bg); }
+.vy-badge[data-token="waiting"]   { color: var(--vy-status-waiting-fg);   background: var(--vy-status-waiting-bg); }
 .vy-badge[data-token="done"]      { color: var(--vy-status-done-fg);      background: var(--vy-status-done-bg); }
 .vy-badge[data-token="blocked"]   { color: var(--vy-status-blocked-fg);   background: var(--vy-status-blocked-bg); }
 .vy-badge[data-token="cancelled"] { color: var(--vy-status-cancelled-fg); background: var(--vy-status-cancelled-bg); }

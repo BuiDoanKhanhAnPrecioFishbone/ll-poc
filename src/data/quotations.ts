@@ -473,25 +473,41 @@ export function generateQuotations(count = 330): Quotation[] {
    60px eye-icon column and puts Date Needed ninth.
    -------------------------------------------------------------------------- */
 
+/**
+ * The list columns, named and ordered as the customer's Testing Guideline lists
+ * them. The live Column tab offers exactly these and no others.
+ *
+ * Five had been reworded here — "RFQ No", "Project", "Customer", "Created",
+ * "Last Updated" — and the order differed.
+ *
+ * `Order Type` carries a SPACE. The live system renders "OrderType" without
+ * one; the guideline writes it correctly, and the guideline outranks the
+ * running build. Recorded as a live defect in docs/gap-list.md.
+ *
+ * REMOVED: "Assigned To". It is not a live column and the Column tab does not
+ * offer it, so it cannot be turned on either. Worth raising — My Queues is
+ * built on assignment, and an estimator cannot see who owns a row without
+ * opening it — but it is an addition to request, not a gap to fill quietly.
+ *
+ * `required` marks the columns the live Column tab will not let you remove.
+ */
 export const QUOTATION_COLUMNS: ColumnSpec<Quotation>[] = [
-  { field: 'priority', title: 'Priority', role: 'priority', priority: 2 },
-  { field: 'no', title: 'RFQ No', role: 'ident', searchable: true, width: 150,
+  { field: 'priority', title: 'Priority', role: 'priority', priority: 2, required: true },
+  { field: 'no', title: 'No', role: 'ident', searchable: true, width: 150, required: true,
     widthNote: 'RFQ numbers are a fixed 10 digits; the 240px ident default was sized for part numbers and wastes 90px here.' },
-  { field: 'projectName', title: 'Project', role: 'text', searchable: true, width: 220, priority: 1,
+  { field: 'projectName', title: 'Project Name', role: 'text', searchable: true, width: 220, priority: 1, required: true,
     widthNote: 'Project names observed run to ~22 characters; 280px over-reserves.' },
-  { field: 'customer', title: 'Customer', role: 'text', searchable: true, priority: 2 },
-  { field: 'status', title: 'Status', role: 'status' },
-  { field: 'dateNeeded', title: 'Date Needed', role: 'date' },
-  { field: 'assignedTo', title: 'Assigned To', role: 'code', width: 140, priority: 3,
-    widthNote: 'Holds full names, not an enum; 96px clips every value.' },
+  { field: 'customer', title: 'Customer Name', role: 'text', searchable: true, priority: 2, required: true },
   { field: 'application', title: 'Application', role: 'code', width: 150, priority: 3,
     widthNote: 'Longest member is "Sub-assy Box Build" — the 96px role default clips it.' },
-  { field: 'rfqType', title: 'RFQ Type', role: 'code', priority: 3 },
+  { field: 'rfqType', title: 'RFQ Type', role: 'code', width: 140, priority: 3,
+    widthNote: 'Longest value "Managed Consigned" measures 127px; the 96px code default wraps it and makes the row taller than every other.' },
   { field: 'orderType', title: 'Order Type', role: 'code', priority: 3 },
-  { field: 'createdDate', title: 'Created', role: 'date', hiddenByDefault: true,
-    note: 'Rarely used when working a queue; Date Needed is the operative date' },
-  { field: 'lastUpdated', title: 'Last Updated', role: 'date', hiddenByDefault: true,
-    note: 'Audit field — available, but not what an estimator sorts by' },
+  { field: 'status', title: 'Status', role: 'status' },
+  { field: 'dateNeeded', title: 'Date Needed', role: 'date', required: true },
+  { field: 'createdDate', title: 'Created Date', role: 'date' },
+  { field: 'lastUpdated', title: 'Last Updated Date', role: 'date', width: 160, required: true,
+    widthNote: 'The heading is longer than the 150px date default allows.' },
 ];
 
 /** Days until the RFQ is due. Negative is overdue. */

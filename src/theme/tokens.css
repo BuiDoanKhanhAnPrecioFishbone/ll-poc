@@ -54,10 +54,19 @@
   --vy-status-draft-bg:      var(--vy-grey-100);
   --vy-status-open-fg:       #92400e;
   --vy-status-open-bg:       #fef3c7;
-  --vy-status-progress-fg:   #1e40af;
-  --vy-status-progress-bg:   #dbeafe;
+  /* In-Progress is GREEN, per the customer's Testing Guideline. It was blue.
+     Solid rather than pale, so it stays distinct from Completed — the guideline
+     names them "Green" and "Light Green", which only works if one of them is
+     actually saturated. White on this green measures 5.0:1, passing AA. */
+  --vy-status-progress-fg:   #ffffff;
+  --vy-status-progress-bg:   #15803d;
   --vy-status-done-fg:       #065f46;
   --vy-status-done-bg:       #d1fae5;
+  /* `waiting` is in the StatusToken union and had NO colours, so every
+     "Quoted" badge in the app rendered unstyled. Purple, as the guideline
+     specifies. Measures 7.3:1. */
+  --vy-status-waiting-fg:    #5b21b6;
+  --vy-status-waiting-bg:    #ede9fe;
   --vy-status-blocked-fg:    var(--vy-red-700);
   --vy-status-blocked-bg:    var(--vy-red-50);
   --vy-status-cancelled-fg:  var(--vy-grey-500);

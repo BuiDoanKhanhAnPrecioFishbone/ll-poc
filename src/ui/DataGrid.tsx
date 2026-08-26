@@ -146,7 +146,8 @@ export function DataGrid<T extends { id: string | number }>({
      underneath, so a 100-row page is still cheap; what the pager adds is a
      POSITION — where you are, and a way back to it. */
   const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState(50);
+  /* 20 is the live default. */
+  const [pageSize, setPageSize] = useState(20);
   const pageCount = Math.max(1, Math.ceil(allRows.length / pageSize));
   /* Clamp during render, not in an effect. An effect loses the race with the
      first paint and shows a blank page for one frame — the exact bug the old

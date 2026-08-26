@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
+import type { ColumnSpec } from '../components/column-model';
 import { Button } from '../ui/Button';
 import { Chip } from '../ui/Chip';
 import { Priority } from '../ui/Priority';
@@ -84,6 +85,33 @@ export function Quotations() {
   }, [all, queue, scope, quickOn, conditions]);
 
 
+  /**
+   * "View Detail: provides an action for the user to open the detail modal of
+   * the selected project requirement." The guideline lists it as a column, so
+   * it is one.
+   *
+   * It sits ALONGSIDE the link on the RFQ number rather than replacing it. The
+   * two are different affordances: this is the discoverable one, matching the
+   * control users already know, and the link on the identifier is the fast one
+   * that also supports middle-click and open-in-new-tab. Neither is redundant
+   * with the other, and the row itself stays inert so text can still be
+   * selected and copied — which is the daily task on this screen.
+   */
+  const viewDetailColumn: ColumnSpec<Quotation> = {
+    field: 'id', title: 'View', role: 'code', width: 56,
+    widthNote: 'Holds one icon button; the 96px code default is twice what it needs.',
+    render: (q: Quotation) => (
+      <Link className="vy-view-detail" to={`/sales-management/quotation/${q.id}`}
+            aria-label={`View detail for RFQ${q.no}`} title="View detail">
+        <svg viewBox="0 0 20 20" width="15" height="15" fill="none" stroke="currentColor"
+             strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <path d="M1.8 10S4.6 4.8 10 4.8 18.2 10 18.2 10 15.4 15.2 10 15.2 1.8 10 1.8 10" />
+          <circle cx="10" cy="10" r="2.2" />
+        </svg>
+      </Link>
+    ),
+  };
+
   /* Priority and Date Needed carry bespoke cells; every other column is
      rendered by its role. Widths still come from the role in both cases. */
   const columns = useMemo(() => QUOTATION_COLUMNS.map(c => {
@@ -116,10 +144,12 @@ export function Quotations() {
     return c;
   }), [dateStyle]);
 
+  const allColumns = useMemo(() => [viewDetailColumn, ...columns], [columns]);
+
   return (
     <DataGrid
       data={data}
-      columns={columns}
+      columns={allColumns}
       title="Quotations"
       subtitle={withheld > 0
         /* Says that something is hidden without saying what — the count alone
@@ -150,13 +180,13 @@ export function Quotations() {
       }
       searchPlaceholder="Search RFQ number, project or customer"
       actions={<>
-        {/* New RFQ FIRST. The 25 Aug review: users read left to right, and the
-            most frequent action should be encountered first — estimators raise
-            RFQs many times a day, and the system they already use puts it on
-            the left. Export is the rare action and keeps the far corner. */}
+        {/* "Add New", as the live toolbar labels it — not "New RFQ". It leads,
+            per the 25 Aug review: users read left to right and the most
+            frequent action should be met first. Export is rare and keeps the
+            far corner. */}
         <Button variant="filled"
-                onClick={() => toast.notImplemented('open a blank RFQ form for a new customer enquiry')}>
-          New RFQ
+                onClick={() => toast.notImplemented('open the New Project Requirement modal')}>
+          Add New
         </Button>
         <span className="vy-actions-gap" />
         <Button onClick={() => toast.notImplemented(`export these ${data.length} RFQs to Excel`)}>

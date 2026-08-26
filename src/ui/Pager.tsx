@@ -15,7 +15,9 @@ import { Button } from './Button';
  *
  * Virtualisation stays underneath, so a 200-row page is still cheap to render.
  */
-const SIZES = [25, 50, 100];
+/* The live pager offers exactly these: "the user can select 20, 50, or 100
+   items per page". It was 25/50/100 here. */
+const SIZES = [20, 50, 100];
 
 export function Pager({ page, pageSize, total, onPage, onPageSize }: {
   page: number;
@@ -30,8 +32,11 @@ export function Pager({ page, pageSize, total, onPage, onPageSize }: {
 
   return (
     <div className="vy-pager">
+      {/* Worded as the live pager words it: "1 - 20 of 336 items". */}
       <span className="vy-pager-count">
-        {total === 0 ? 'No records' : <>Showing {from.toLocaleString()}–{to.toLocaleString()} of {total.toLocaleString()}</>}
+        {total === 0
+          ? 'No items'
+          : <>{from.toLocaleString()} - {to.toLocaleString()} of {total.toLocaleString()} items</>}
       </span>
 
       <span className="vy-toolbar-spacer" />
@@ -39,13 +44,18 @@ export function Pager({ page, pageSize, total, onPage, onPageSize }: {
       {/* Page size lives here rather than in the toolbar: it is a property of
           the pager and means nothing without it. */}
       <label className="vy-pager-size">
-        <span>Rows</span>
+        <span>items per page</span>
         <select value={pageSize} onChange={e => { onPageSize(Number(e.target.value)); onPage(0); }}>
           {SIZES.map(n => <option key={n} value={n}>{n}</option>)}
         </select>
       </label>
 
       <nav className="vy-pager-nav" aria-label="Pagination">
+        {/* First and last, as the guideline requires: "the user can navigate to
+            the first, previous, next, and last page", each disabled at its own
+            end. Without them, reaching the end of 17 pages is 17 clicks. */}
+        <Button size="sm" variant="text" disabled={page === 0}
+                onClick={() => onPage(0)} aria-label="First page">«</Button>
         <Button size="sm" variant="text" disabled={page === 0}
                 onClick={() => onPage(page - 1)} aria-label="Previous page">‹</Button>
         {pageNumbers(page, pages).map((n, i) =>
@@ -57,6 +67,8 @@ export function Pager({ page, pageSize, total, onPage, onPageSize }: {
         )}
         <Button size="sm" variant="text" disabled={page >= pages - 1}
                 onClick={() => onPage(page + 1)} aria-label="Next page">›</Button>
+        <Button size="sm" variant="text" disabled={page >= pages - 1}
+                onClick={() => onPage(pages - 1)} aria-label="Last page">»</Button>
       </nav>
     </div>
   );
