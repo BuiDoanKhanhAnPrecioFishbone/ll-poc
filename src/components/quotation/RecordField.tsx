@@ -1,6 +1,7 @@
 import { TextField, TextArea } from '../../ui/Field';
-import { Select, Checkbox } from '../../ui/Overlays';
+import { Select, Checkbox, RadioGroup } from '../../ui/Overlays';
 import { Priority, priorityLevel, PRIORITY_LEVELS, type PriorityLevel } from '../../ui/Priority';
+import { OPTION_MEANINGS } from '../../data/metadata';
 
 const LEVEL_TO_N: Record<PriorityLevel, number> = { High: 3, Medium: 2, Low: 1 };
 
@@ -21,6 +22,16 @@ export type FieldKind =
   | { kind: 'text' }
   | { kind: 'notes' }
   | { kind: 'select'; options: readonly string[] }
+  /**
+   * A single choice shown in full, rather than behind a dropdown.
+   *
+   * The live form renders Excess and MOQ, Net Consigned Inventory and Rocket
+   * Consigned Inventory this way, and the guideline says of each: "Allows the
+   * user to check one option." Two or three options are not worth a dropdown —
+   * collapsing them hides the whole vocabulary behind a click, and these are
+   * precisely the fields whose options need comparing against each other.
+   */
+  | { kind: 'radio'; options: readonly string[] }
   /** A reference to another record. Options depend on the rest of the form. */
   | { kind: 'lookup'; optionsFor: (row: any) => readonly string[] }
   | { kind: 'number'; suffix?: string; min?: number; max?: number }
@@ -88,6 +99,24 @@ export function RecordField<T extends Record<string, any>>({ def, value, editing
   if (!editing || def.readOnly) return <ReadField def={def} value={value} editing={editing} />;
 
   switch (def.kind) {
+    case 'radio':
+      return (
+        <div className="vy-field vy-field--editing vy-field--radio">
+          <dt id={`f-${def.name}`}>{def.label}{def.required && <RequiredMark />}</dt>
+          <dd>
+            <RadioGroup label={def.label} value={String(value ?? '')}
+                        options={def.options.map(o => ({
+                          value: o,
+                          /* The meaning rides with the option, so the difference
+                             between "Low" and "OK" is legible at the point of
+                             choosing rather than in a tooltip nobody opens. */
+                          label: o,
+                        }))}
+                        onChange={v => onChange(def.name, v)} />
+            {def.hint && <span className="vy-field-hint">{def.hint}</span>}
+          </dd>
+        </div>
+      );
     case 'priority':
       return (
         <div className="vy-field vy-field--editing">
@@ -190,6 +219,20 @@ function ReadField<T>({ def, value, editing }: { def: FieldDef<T>; value: unknow
       <div className="vy-field" data-locked={editing && def.readOnly || undefined}>
         <dt>{def.label}{def.required && <RequiredMark />}</dt>
         <dd><Priority value={Number(value)} /></dd>
+      </div>
+    );
+  }
+  if (def.kind === 'radio') {
+    const chosen = String(value ?? '');
+    return (
+      <div className="vy-field">
+        <dt>{def.label}{def.required && <RequiredMark />}</dt>
+        <dd className={chosen ? undefined : 'is-empty'}>
+          {chosen || 'Not set'}
+          {chosen && OPTION_MEANINGS[chosen] && (
+            <span className="vy-option-meaning">{OPTION_MEANINGS[chosen]}</span>
+          )}
+        </dd>
       </div>
     );
   }

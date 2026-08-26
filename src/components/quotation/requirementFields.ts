@@ -161,13 +161,15 @@ export const TECHNICAL: FieldDef<Quotation>[] = [
   { name: 'testRequirements', label: 'Test Requirements', kind: 'select', options: TEST_REQUIREMENTS, required: true },
   { name: 'assemblyTurnTime', label: 'Assembly Turn Time', kind: 'number', suffix: 'days', min: 1 },
   /* Lower-case "and", as the live form writes it. */
-  { name: 'excessAndMoq', label: 'Excess and MOQ', kind: 'select', options: EXCESS_AND_MOQ, required: true },
-  { name: 'netConsignedInventory', label: 'Net Consigned Inventory', kind: 'select',
+  /* Radio, not a dropdown — the live form shows all options at once, and the
+     guideline says "allows the user to check one option" of each. */
+  { name: 'excessAndMoq', label: 'Excess and MOQ', kind: 'radio', options: EXCESS_AND_MOQ, required: true },
+  { name: 'netConsignedInventory', label: 'Net Consigned Inventory', kind: 'radio',
     options: NET_CONSIGNED_INVENTORY, required: true },
   /* "Rocket" is a real concept with its own metadata code (NET_ROCKET_INVENTORY),
      parallel to the consigned one. Not a typo — it is the customer's own
      part-number namespace, confirmed from the BoM comparison export. */
-  { name: 'rocketConsignedInventory', label: 'Rocket Consigned Inventory', kind: 'select',
+  { name: 'rocketConsignedInventory', label: 'Rocket Consigned Inventory', kind: 'radio',
     options: ROCKET_CONSIGNED_INVENTORY, required: true },
 ];
 

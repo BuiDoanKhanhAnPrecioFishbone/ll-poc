@@ -91,6 +91,27 @@ supports the dot-and-label change rather than stars.
 
 ---
 
+### 10. Rocket Consigned Inventory — the two sources disagree
+
+| Source | Options |
+|---|---|
+| Live system | `No` · `Yes-No Charge` · `Yes-Charge` |
+| Testing Guideline | `None` · `Yes - No Charge` · `Yes - Charge` |
+
+Two differences: the first option, and whether the hyphens are spaced.
+
+The guideline's entry for the **parallel** field, Net Consigned Inventory, reads
+`No` and `Yes-No Charge` — unspaced, and starting with "No". So the guideline
+contradicts itself between two fields that are otherwise identical in shape,
+which points to a typo in the Rocket entry rather than a real difference.
+
+**Built with the live values**, because those are what the API accepts, and a
+mismatch is the same class of defect this project has already had to correct
+twice: wrong option values make the built system reject valid input.
+
+**Question for the customer:** which is right? If the guideline is, the live
+system needs changing too, not just the prototype.
+
 ## Still to reconcile
 
 The guideline covers far more than the current scope — Quick Quote, Standard
