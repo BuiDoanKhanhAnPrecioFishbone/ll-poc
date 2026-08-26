@@ -76,15 +76,41 @@ Precedence per `docs/precedence.md`.
 
 ---
 
+## Customer answers, 25 Aug 2026
+
+**Read-only field styling** — confirmed: grey box in EDIT mode only; VIEW mode
+shows the normal white box. Done. Note this reverses an earlier call of mine to
+render view mode as bare values — the boxes stay, only the GREY is confined to
+editing.
+
+**My Queues** — parked. "Low priority, so for now just note that we will have it
+in the future rather than handling it. Let's focus on the list view and form
+view of Project Requirement first." The permission model and module queues built
+so far are kept but wired to nothing; see the header comment in
+`src/data/permissions.ts`.
+
+**Scope is now: Project Requirements list view and form view only.**
+
 ## Order of work
 
-1. **A1, A2, A8, A9** — names. Cheapest, and they are pure fidelity.
-2. **A3** — required markers. 16 fields currently give no indication.
-3. **A4, A5, A7** — option values and radio groups. Same class as the metadata
-   errors: wrong values make the built system reject valid input.
-4. **A10, A11, A12** — remove the two invented fields, rename the close button.
-5. **B1, B11, B6** — rebuild the filter with no operators, the real field set,
-   hidden by default.
-6. **B2, B3, B4, B5** — saved views and the View Setting dialog.
-7. **B7, B8, B9, B10** — pager, columns, create button.
-8. **A13** — Conversations rich editor.
+~~1. **A1, A2, A8, A9** — names.~~ **done**
+~~2. **A3** — required markers.~~ **done**
+~~4. **A10, A11, A12** — invented fields removed, close button renamed.~~ **done**
+
+**FORM VIEW**
+3. **A4, A5, A7** — option values and radio groups. Highest risk remaining: the
+   same class as the metadata errors, where wrong values make the built system
+   reject valid input.
+4. **A15** — ITAR is a field on the live form, a badge here.
+5. **A14** — Quotation Result's eleven columns.
+6. **A13** — Conversations: the Comment / Send Email choice and the rich editor.
+
+**LIST VIEW**
+7. **B1, B11, B6** — rebuild the filter: no operators, the real field set,
+   hidden behind the funnel by default.
+8. **B7, B8, B9, B10** — pager text and page size, the eleven real columns,
+   `Add New`.
+9. **B2, B3, B4, B5** — saved views and the View Setting dialog. Substantial;
+   worth its own estimate.
+
+**PARKED** — My Queues module separation and role scoping.

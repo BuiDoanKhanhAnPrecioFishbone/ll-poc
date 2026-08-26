@@ -1,3 +1,20 @@
+/**
+ * PARKED — not in scope, and not wired into anything.
+ *
+ * Customer decision, 25 Aug 2026: "My Queue is low priority, so for now just
+ * note that we will have it in the future rather than handling it — let's focus
+ * on the list view and form view of Project Requirement first."
+ *
+ * The work below is kept rather than deleted because it is most of the way
+ * done and will be wanted later. Nothing imports it, so it costs nothing to
+ * leave; if it starts costing something, delete it and read it back out of
+ * git history.
+ *
+ * What is still missing before it could ship: the role has to come from the
+ * JWT rather than a local preference, and every module's counts except Project
+ * Requirements are illustrative — those record types are not modelled here.
+ */
+
 import { legacyNav } from './sitemap';
 
 /**

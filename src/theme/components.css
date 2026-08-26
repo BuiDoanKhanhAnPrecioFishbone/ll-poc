@@ -293,8 +293,32 @@
 .vy-field-list { margin: 0; }
 .vy-field { display: grid; grid-template-columns: var(--vy-field-label-w) 1fr; gap: var(--vy-space-4); padding: var(--vy-space-3) 0; border-bottom: 1px solid var(--vy-grey-100); }
 .vy-field dt { font-size: var(--vy-text-base); color: var(--vy-grey-500); }
-.vy-field dd { margin: 0; font-size: var(--vy-text-base); color: var(--vy-grey-900); }
+/* ---- Field values ---------------------------------------------------------
+   VIEW mode renders a WHITE BOX. Customer decision, 25 Aug 2026: "the grey box
+   only shows in EDIT mode; in VIEW mode just show the white box as normal."
+
+   This reverses an earlier call of mine. I had rendered read mode as bare
+   values on the argument that a record you are only looking at should not
+   resemble a form — but the customer's users read this screen as a form either
+   way, the boxes give every value a consistent left edge to scan down, and it
+   is what the live system does. The concern that made me drop the boxes was
+   really about GREY ones, which is exactly what the answer confines to edit
+   mode. */
+.vy-field dd {
+  margin: 0;
+  min-height: var(--vy-control-md);
+  padding: var(--vy-space-3) var(--vy-space-5);
+  background: var(--vy-grey-0);
+  border: 1px solid var(--vy-grey-200);
+  border-radius: var(--vy-radius-sm);
+  font-size: var(--vy-text-base);
+  color: var(--vy-grey-900);
+}
+/* Empty stays a stated absence rather than an empty box, which reads as a
+   field that failed to load. */
 .vy-field dd.is-empty { color: var(--vy-grey-400); font-style: italic; }
+/* A notes field holds a paragraph, so its box grows with the text. */
+.vy-field--wide dd { min-height: calc(var(--vy-control-md) * 2); }
 
 /* Reading rows are two columns and dense: a 180px label beside its value.
    EDITING rows stack, because a control is not a value.
@@ -553,7 +577,9 @@
    A field the live form does not let you type into. It renders as a VALUE even
    in edit mode: a greyed-out input reads as "broken" or "you lack permission",
    when the truth is that the value is decided elsewhere and the note says where. */
-.vy-field[data-locked] dd,
+/* Locked styling is edit-mode only — see the rule further down. In view mode a
+   read-only field is indistinguishable from any other, because in view mode
+   they all are. */
 .vy-flag-row[data-locked] { color: var(--vy-grey-600); }
 .vy-field-locked {
   display: inline-block;

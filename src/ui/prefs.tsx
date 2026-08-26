@@ -1,5 +1,4 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { ROLES, roleById, type Role, type RoleId } from '../data/permissions';
 
 /**
  * User preferences.
@@ -35,22 +34,11 @@ export type DateStyle = 'exact' | 'relative';
 type Prefs = {
   density: Density; setDensity: (d: Density) => void;
   dateStyle: DateStyle; setDateStyle: (d: DateStyle) => void;
-  /**
-   * The signed-in user's role.
-   *
-   * In the real system this is resolved from the JWT's role GUID, and the user
-   * cannot change it. It is switchable here because a permission model is
-   * impossible to review otherwise — a reviewer has to be able to SEE what a
-   * Buyer sees. The switcher is labelled as a prototype control so nobody reads
-   * it as a feature.
-   */
-  role: Role; setRole: (id: RoleId) => void;
 };
 
 const Ctx = createContext<Prefs>({
   density: 'compact', setDensity: () => {},
   dateStyle: 'exact', setDateStyle: () => {},
-  role: ROLES[0], setRole: () => {},
 });
 export const usePrefs = () => useContext(Ctx);
 
@@ -65,15 +53,10 @@ export function PrefsProvider({ children }: { children: ReactNode }) {
   );
   useEffect(() => { localStorage.setItem('vy.dateStyle', dateStyle); }, [dateStyle]);
 
-  const [roleId, setRole] = useState<RoleId>(
-    () => (localStorage.getItem('vy.role') as RoleId) ?? 'estimator',
-  );
-  useEffect(() => { localStorage.setItem('vy.role', roleId); }, [roleId]);
-  const role = roleById(roleId);
 
   const value = useMemo(
-    () => ({ density, setDensity, dateStyle, setDateStyle, role, setRole }),
-    [density, dateStyle, role],
+    () => ({ density, setDensity, dateStyle, setDateStyle }),
+    [density, dateStyle],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
