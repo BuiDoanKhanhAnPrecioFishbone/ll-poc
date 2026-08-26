@@ -424,7 +424,11 @@ export function generateQuotations(count = 330): Quotation[] {
               lastRunBy: pick(OWNERS),
               lastRunDate: new Date(created.getTime() + 86400000 * (2 + j)),
               lastRunVersion: `v${1 + j}`,
-              bomFile: `BOM-${cust.slice(0, 5)}-v${1 + j}.xlsx`,
+              /* Blank when the run used the BoM already on the RFQ: "the BOM
+                 File field is blank when the quotation is run from an existing
+                 BOM". Roughly a third of runs, since re-runs against the
+                 current BoM are the common case. */
+              bomFile: rnd() > 0.35 ? `BOM-${cust.slice(0, 5)}-v${1 + j}.xlsx` : '',
             };
           })
         : [],

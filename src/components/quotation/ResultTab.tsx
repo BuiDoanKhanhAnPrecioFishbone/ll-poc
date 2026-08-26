@@ -7,29 +7,62 @@ import type { Quotation, QuoteResult } from '../../data/quotations';
 
 const money = (n: number) => n.toLocaleString('en-GB', { style: 'currency', currency: 'USD' });
 
-const RESULT_COLUMNS: ColumnSpec<QuoteResult>[] = [
-  { field: 'partNumber', title: 'Part Number', role: 'ident' },
-  { field: 'partRev', title: 'Rev', role: 'code', render: r => <span className="vy-code">{r.partRev}</span> },
+/**
+ * The eleven columns, in the order the customer's Testing Guideline lists them:
+ *
+ *   "Part Number, Part Rev, Description, Build Qty, Cost/Board, Total Amt,
+ *    Total w/ Markup, Last Run By, Last Run Date, Last Run Version, BoM File"
+ *
+ * Eight of these had been reworded here — "Rev", "Total", "Version", "Last Run",
+ * "Run By" — and the last four were in the wrong order. Names and order are the
+ * customer's; only the rendering is ours.
+ */
+function resultColumns(onOpen: (r: QuoteResult) => void): ColumnSpec<QuoteResult>[] { return [
+  /* "Each quotation result line allows the user to open and view the
+     corresponding quotation detail." The IDENTIFIER carries that, not the whole
+     row — a row-wide click target breaks text selection, and these cells hold
+     part numbers people copy out into email. */
+  { field: 'partNumber', title: 'Part Number', role: 'ident',
+    render: r => (
+      <button type="button" className="vy-cell-link" onClick={() => onOpen(r)}>
+        {r.partNumber}
+      </button>
+    ) },
+  { field: 'partRev', title: 'Part Rev', role: 'code', render: r => <span className="vy-code">{r.partRev}</span> },
   { field: 'description', title: 'Description', role: 'text' },
   { field: 'buildQty', title: 'Build Qty', role: 'number', render: r => r.buildQty.toLocaleString() },
-  { field: 'costPerBoard', title: 'Cost / Board', role: 'money', render: r => money(r.costPerBoard) },
-  { field: 'totalAmount', title: 'Total', role: 'money', render: r => money(r.totalAmount) },
+  { field: 'costPerBoard', title: 'Cost/Board', role: 'money', render: r => money(r.costPerBoard) },
+  { field: 'totalAmount', title: 'Total Amt', role: 'money', render: r => money(r.totalAmount) },
   { field: 'totalWithMarkup', title: 'Total w/ Markup', role: 'money', width: 150,
     widthNote: 'The headline number; the role default clips the heading.',
     render: r => <strong>{money(r.totalWithMarkup)}</strong> },
-  { field: 'lastRunVersion', title: 'Version', role: 'code', render: r => <span className="vy-code">{r.lastRunVersion}</span> },
-  { field: 'lastRunDate', title: 'Last Run', role: 'date', render: r => fmtDate(r.lastRunDate) },
-  { field: 'lastRunBy', title: 'Run By', role: 'code', width: 140, widthNote: 'Full names.' },
-  /* Present on the live grid; it was dropped in an earlier pass. It is how you
-     tell which BoM version produced a given price. */
-  { field: 'bomFile', title: 'BoM File', role: 'text' },
-];
+  { field: 'lastRunBy', title: 'Last Run By', role: 'code', width: 140, widthNote: 'Full names.' },
+  { field: 'lastRunDate', title: 'Last Run Date', role: 'date', render: r => fmtDate(r.lastRunDate) },
+  /* "Last Run Version displays the corresponding assembly run number", and
+     re-running against the same BoM increments it — so it is a counter, not a
+     label, and reads better right-aligned with the other numbers. */
+  { field: 'lastRunVersion', title: 'Last Run Version', role: 'code',
+    render: r => <span className="vy-code">{r.lastRunVersion}</span> },
+  /* "The BOM File field is blank when the quotation is run from an existing
+     BOM." An empty cell here is a fact about how the quote was run, not missing
+     data, so it says so rather than showing a dash. */
+  { field: 'bomFile', title: 'BoM File', role: 'text',
+    render: r => r.bomFile
+      ? <span className="vy-cell-file">{r.bomFile}</span>
+      : <span className="vy-empty" title="Run from an existing BoM, so no file was uploaded">From existing BoM</span> },
+]; }
 
 /**
- * Quotation Result. Columns are the live ones. Two changes: the live grid has
- * no totals row, so the number a salesperson needs has to be added up by eye;
- * and on an RFQ that was never costed it shows an empty grid without saying
- * that running a quotation is what fills it.
+ * Quotation Result.
+ *
+ * Columns, names and order are the customer's — see RESULT_COLUMNS. Two things
+ * here are ours:
+ *
+ * 1. A total. The live grid has no totals row, so the one number a salesperson
+ *    actually needs — what this quote comes to — has to be added up by eye.
+ * 2. A real empty state. The live tab shows "No records available" on an RFQ
+ *    that has never been costed, which says what the grid contains rather than
+ *    what to do about it.
  */
 export function ResultTab({ q, onRun }: { q: Quotation; onRun: () => void }) {
   const toast = useToast();
@@ -74,7 +107,11 @@ export function ResultTab({ q, onRun }: { q: Quotation; onRun: () => void }) {
         </div>
       </div>
 
-      <MiniTable data={q.results} columns={RESULT_COLUMNS} />
+      <MiniTable
+        data={q.results}
+        columns={resultColumns(r =>
+          toast.notImplemented(`open the quotation detail for ${r.partNumber} run ${r.lastRunVersion}`))}
+      />
     </>
   );
 }

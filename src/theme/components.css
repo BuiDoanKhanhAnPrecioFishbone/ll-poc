@@ -755,3 +755,7 @@
 .vy-field--radio[data-invalid] dd {
   border-color: var(--vy-red-600);
 }
+
+/* A BoM file name in a grid cell. Monospace, because these are versioned file
+   names read character by character when checking which BoM produced a price. */
+.vy-cell-file { font-family: var(--vy-font-mono); font-size: var(--vy-text-xs); }

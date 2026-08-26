@@ -103,7 +103,7 @@ so far are kept but wired to nothing; see the header comment in
    CONTROL flag, not a label: an ITAR record is only visible to an ITAR-cleared
    account. The rule now lives in `src/data/itar.ts` and the list applies it.
 ~~5. Validation — "This field is required." on blur, Save gated.~~ **done**
-6. **A14** — Quotation Result's eleven columns.
+~~6. **A14** — Quotation Result's eleven columns.~~ **done**
 7. **A13** — Conversations: the Comment / Send Email choice and the rich editor.
 
 **LIST VIEW**
