@@ -359,19 +359,23 @@ function toLiveGroup(g: LegacyGroup): NavGroup {
 /** The queues page. The only entry in the nav that does not exist in the live menu. */
 export const QUEUES_PATH = '/my-queues';
 
-export const liveNav: NavGroup[] = (() => {
-  const groups = legacyNav.map(toLiveGroup);
-  const queues: NavGroup = {
-    title: 'My Queues', icon: 'insight', purpose: '', leaf: true,
-    items: [{ title: 'My Queues', path: QUEUES_PATH, icon: 'queue',
-              hint: 'What needs attention across your RFQs' }],
-  };
-  /* Directly after Home: it is the second thing you look at, and inserting it
-     here shifts no existing entry relative to its siblings. */
-  const homeIndex = groups.findIndex(g => g.title === 'Home');
-  groups.splice(homeIndex + 1, 0, queues);
-  return groups;
-})();
+/**
+ * The live menu, unchanged. NOTHING is added to it.
+ *
+ * My Queues used to sit here as an extra entry. It was removed once it became
+ * an icon in the global header, for two reasons — one from the reviewer and one
+ * from the screen itself.
+ *
+ * The reviewer, 25 Aug: "I think the My Queues menu can be reduced if we follow
+ * the approach below (reason: the system's operation menu is quite long, so
+ * reducing excessive items)." She asked for the header icon INSTEAD of the menu
+ * entry, and the icon was added without the entry being taken away.
+ *
+ * And two doors to one room is a cost with no benefit: a user who finds it in
+ * the menu never learns the badge exists, which is the half that tells them
+ * something needs doing.
+ */
+export const liveNav: NavGroup[] = legacyNav.map(toLiveGroup);
 
 /**
  * Reviewer-facing pages. NOT in the product nav (decision D7) — reached from a

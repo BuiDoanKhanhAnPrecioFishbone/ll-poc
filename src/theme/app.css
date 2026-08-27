@@ -913,8 +913,6 @@
 .vy-kpi[data-key="waiting-doc"] { border-left-color: var(--vy-accent-waiting); }
 .vy-kpi[data-key="open"]        { border-left-color: var(--vy-blue-500); }
 
-/* Export sits in the far corner; New RFQ leads. */
-.vy-actions-gap { flex: 1; min-width: var(--vy-space-8); }
 
 /* =============================================================================
    PAGER
@@ -1137,3 +1135,7 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
   border-radius: var(--vy-radius-md); padding: var(--vy-space-3) var(--vy-space-5);
   cursor: pointer; max-width: var(--vy-view-picker-w);
 }
+
+/* The screen's primary action, beside the title. Left, where the eye starts —
+   the rare actions keep the far corner. */
+.vy-lead-action { margin-top: var(--vy-space-6); }

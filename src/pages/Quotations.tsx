@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Button } from '../ui/Button';
 import { Chip } from '../ui/Chip';
@@ -95,6 +95,25 @@ export function Quotations() {
     useViews('quotation', systemView);
   const [settingOpen, setSettingOpen] = useState(false);
 
+  /**
+   * The columns as they are RIGHT NOW — the saved view plus any unsaved
+   * tweaking. Both the Columns checklist and the View Setting panel edit this
+   * one list, which is what stops them disagreeing.
+   *
+   * Resets when you switch view, because that is what switching a view means.
+   */
+  const [workingCols, setWorkingCols] = useState(view.columns);
+  useEffect(() => { setWorkingCols(view.columns); }, [view]);
+
+  const toggleColumn = (field: string) => setWorkingCols(cols =>
+    cols.some(c => c.field === field)
+      ? cols.filter(c => c.field !== field)
+      /* Re-adding puts a column back where the screen defines it, not at the
+         end — a column that reappears in a different place reads as a new one. */
+      : [...cols, { field }].sort((a, b) =>
+          QUOTATION_COLUMNS.findIndex(c => String(c.field) === a.field) -
+          QUOTATION_COLUMNS.findIndex(c => String(c.field) === b.field)));
+
   const fields = useMemo(
     () => quotationFilterFields(all).filter(f => view.fields.includes(f.field)),
     [all, view.fields]);
@@ -180,7 +199,7 @@ export function Quotations() {
    */
   const allColumns = useMemo(() => {
     const byField = new Map(columns.map(c => [String(c.field), c]));
-    const ordered = view.columns
+    const ordered = workingCols
       .map(vc => {
         const base = byField.get(vc.field);
         if (!base) return null;
@@ -192,7 +211,7 @@ export function Quotations() {
       })
       .filter(Boolean) as typeof columns;
     return ordered;
-  }, [columns, view.columns]);
+  }, [columns, workingCols]);
 
   /* The view's sort runs before the grid's own header sorting, so a saved view
      opens in the order it was saved in. */
@@ -212,6 +231,12 @@ export function Quotations() {
            compliance filter look like missing data. */
         ? <>Customer RFQs and the quotes sent back · <strong>{withheld} not shown (ITAR)</strong></>
         : 'Customer RFQs and the quotes sent back'}
+      leadAction={
+        <Button variant="filled"
+                onClick={() => toast.notImplemented('open the New Project Requirement modal')}>
+          Add New
+        </Button>
+      }
       kpis={
         /* The review: "if you want to highlight it, a KPI summary would be
            better than those numbers... This KPI can also be the filter. When
@@ -237,15 +262,15 @@ export function Quotations() {
       }
       searchPlaceholder="Search RFQ number, project or customer"
       actions={<>
-        {/* "Add New", as the live toolbar labels it — not "New RFQ". It leads,
-            per the 25 Aug review: users read left to right and the most
-            frequent action should be met first. Export is rare and keeps the
-            far corner. */}
-        <Button variant="filled"
-                onClick={() => toast.notImplemented('open the New Project Requirement modal')}>
-          Add New
-        </Button>
-        <span className="vy-actions-gap" />
+        {/* Only Export lives here, in the far corner, because it is the rare
+            action. "Add New" is NOT in this group — it sits at the left of the
+            screen beside the title, which is what the 25 Aug review asked for:
+            users read left to right and the most frequent action should be met
+            first.
+
+            Both were in this group before, so "left" meant "left of Export"
+            rather than left of anything — the two sat together in the right
+            corner with a stretched gap between them. */}
         <Button onClick={() => toast.notImplemented(`export these ${data.length} RFQs to Excel`)}>
           Export
         </Button>
@@ -296,6 +321,9 @@ export function Quotations() {
           </select>
         </label>
       }
+      allColumns={columns}
+      onToggleColumn={toggleColumn}
+      onResetColumns={() => setWorkingCols(view.columns)}
       viewSetting={
         <button type="button" className="vy-funnel" aria-label="Setup View Template"
                 title="Setup View Template" onClick={() => setSettingOpen(true)}>
@@ -310,7 +338,7 @@ export function Quotations() {
 
     {settingOpen && (
       <ViewSetting
-        view={view}
+        view={{ ...view, columns: workingCols }}
         allColumns={columns}
         allFields={quotationFilterFields(all)}
         canDelete={!view.system}
@@ -322,6 +350,7 @@ export function Quotations() {
              the built-in is the fallback every other view is measured against
              and must stay as shipped. */
           save(asNew ? { ...draftFrom(v, v.name), isDefault: v.isDefault } : v);
+          setWorkingCols(v.columns);
           setSettingOpen(false);
           toast.success(asNew ? `View “${v.name}” created.` : `View “${v.name}” saved.`);
         }}

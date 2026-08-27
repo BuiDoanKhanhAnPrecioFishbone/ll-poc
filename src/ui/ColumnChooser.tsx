@@ -18,7 +18,7 @@ import { Button } from './Button';
  * button hid the existence of the extra columns behind a count.
  */
 export function ColumnChooser({ columns, hiddenCount, onToggle, onReset }: {
-  columns: { field: string; title: string; on: boolean; note?: string }[];
+  columns: { field: string; title: string; on: boolean; note?: string; required?: boolean }[];
   hiddenCount: number;
   onToggle: (field: string) => void;
   onReset: () => void;
@@ -39,9 +39,14 @@ export function ColumnChooser({ columns, hiddenCount, onToggle, onReset }: {
           <ul className="vy-column-list">
             {columns.map(c => (
               <li key={c.field}>
-                <label>
-                  <input type="checkbox" checked={c.on} onChange={() => onToggle(c.field)} />
+                {/* A required column shows as ticked and disabled rather than
+                    being absent — otherwise its row is missing from a list that
+                    claims to be every column. */}
+                <label data-required={c.required || undefined}>
+                  <input type="checkbox" checked={c.on} disabled={c.required}
+                         onChange={() => onToggle(c.field)} />
                   <span>{c.title}</span>
+                  {c.required && <em className="vy-column-req">always shown</em>}
                 </label>
                 {/* Why a column ships hidden — the reason a reviewer would
                     otherwise have to ask for. */}

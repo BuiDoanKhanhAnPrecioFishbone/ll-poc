@@ -39,6 +39,7 @@ export function DataGrid<T extends { id: string | number }>({
   data, columns, title, subtitle, actions, filters,
   searchPlaceholder = 'Search', rowHref, onOpenRow, emptyHint, loading, kpis,
   filterPanel, filterActive = 0, views, viewSetting,
+  allColumns, onToggleColumn, onResetColumns, leadAction,
 }: {
   data: T[];
   columns: ColumnSpec<T>[];
@@ -59,6 +60,19 @@ export function DataGrid<T extends { id: string | number }>({
   views?: ReactNode;
   /** The gear that opens View Setting. */
   viewSetting?: ReactNode;
+  /**
+   * Every column this screen HAS, as distinct from the ones currently shown.
+   * The checklist needs both to render an unticked row.
+   */
+  allColumns?: ColumnSpec<T>[];
+  onToggleColumn?: (field: string) => void;
+  onResetColumns?: () => void;
+  /**
+   * The screen's primary action, rendered at the LEFT beside the title.
+   * Separate from `actions` so the frequent one is met first and the rare ones
+   * keep the far corner.
+   */
+  leadAction?: ReactNode;
   searchPlaceholder?: string;
   /**
    * Opening a record hangs off the IDENTIFIER, not the row.
@@ -87,29 +101,25 @@ export function DataGrid<T extends { id: string | number }>({
   const { density } = usePrefs();
   const [search, setSearch] = useState('');
   /**
-   * Which columns are on.
+   * Column visibility is NOT held here.
    *
-   * Was a single "Show N more columns" toggle, which the 25 Aug review called a
-   * confusing label and asked to become a Columns checklist. The toggle also
-   * only had two states — the shipped set, or the shipped set plus everything —
-   * so a user who wanted one extra column had to take all of them, and could
-   * not turn off a column they never use.
+   * It was, and that was a bug: this grid kept its own `hidden` set while the
+   * View Setting panel kept the view's column list, so the two disagreed. You
+   * could hide a column in the Columns checklist, open View Setting, and find it
+   * still listed — and saving the view would put it back without saying so.
    *
-   * Hidden-by-default columns start off; everything else starts on.
+   * Both controls now edit the same list, owned by the page. The checklist is
+   * the quick path (on/off), View Setting is the full one (order, name, width).
+   * Two doors into one room, rather than two rooms.
    */
-  const [hidden, setHidden] = useState<Set<string>>(
-    () => new Set(columns.filter(c => c.hiddenByDefault).map(c => String(c.field))),
-  );
-  const toggleColumn = (field: string) =>
-    setHidden(h => { const n = new Set(h); n.has(field) ? n.delete(field) : n.add(field); return n; });
   const [sorting, setSorting] = useState<SortingState>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const visible = useMemo(
-    () => columns.filter(c => !hidden.has(String(c.field))),
-    [columns, hidden]
+    () => columns,
+    [columns]
   );
-  const hiddenCount = hidden.size;
+  const hiddenCount = (allColumns?.length ?? columns.length) - columns.length;
   const searchFields = useMemo(() => columns.filter(c => c.searchable).map(c => c.field), [columns]);
 
   const filtered = useMemo(() => {
@@ -207,6 +217,7 @@ export function DataGrid<T extends { id: string | number }>({
               beside the control that moves through it. What is worth
               highlighting goes in the KPI row below, where it can be clicked. */}
           {subtitle && <p className="vy-page-sub">{subtitle}</p>}
+          {leadAction && <div className="vy-lead-action">{leadAction}</div>}
         </div>
         {actions && <div className="vy-page-actions">{actions}</div>}
       </div>
@@ -247,16 +258,19 @@ export function DataGrid<T extends { id: string | number }>({
               action's effect on one particular state rather than naming the
               thing it opens, so it read differently depending on what was
               already on. */}
-          <ColumnChooser
-            columns={columns.map(c => ({
-              field: String(c.field), title: c.title,
-              on: !hidden.has(String(c.field)),
-              note: c.note,
-            }))}
-            hiddenCount={hiddenCount}
-            onToggle={toggleColumn}
-            onReset={() => setHidden(new Set(columns.filter(c => c.hiddenByDefault).map(c => String(c.field))))}
-          />
+          {allColumns && onToggleColumn && (
+            <ColumnChooser
+              columns={allColumns.map(c => ({
+                field: String(c.field), title: c.title,
+                on: columns.some(v => String(v.field) === String(c.field)),
+                note: c.note,
+                required: c.required,
+              }))}
+              hiddenCount={hiddenCount}
+              onToggle={onToggleColumn}
+              onReset={onResetColumns ?? (() => {})}
+            />
+          )}
         </div>
 
         {filterOpen && filterPanel}

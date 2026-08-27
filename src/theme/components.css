@@ -874,3 +874,10 @@
 }
 .vy-rt-swatch:hover { transform: scale(1.12); }
 .vy-rt-swatch:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
+
+/* A column that cannot be turned off shows as ticked and disabled rather than
+   being absent — otherwise its row is missing from a list that claims to be
+   every column, and the user wonders where it went. */
+.vy-column-list label[data-required] { cursor: default; color: var(--vy-grey-600); }
+.vy-column-list label[data-required]:hover { background: none; }
+.vy-column-req { margin-left: auto; font-style: normal; font-size: var(--vy-text-2xs); color: var(--vy-grey-500); }
