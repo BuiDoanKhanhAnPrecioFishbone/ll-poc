@@ -256,7 +256,7 @@ export function StepConfigBom({ q, cfg, set }: {
                   <span className="vy-field-hint">Filled in when you upload.</span>
                 </Field>
 
-                <Field label="Upload file" wide>
+                <Field label="Upload file">
                   <Button onClick={() => setImportOpen(true)}
                           title="Choose a BoM file from Voyager or from this machine">
                     Upload file

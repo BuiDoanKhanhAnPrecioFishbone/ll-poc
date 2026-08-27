@@ -988,6 +988,10 @@
   margin-top: var(--vy-space-6);
 }
 .vy-quote-config-field { display: flex; flex-direction: column; gap: var(--vy-space-2); min-width: 0; }
+/* A button in a field slot sizes to its label. The column stretches its
+   children so inputs fill it, which is right for an input and wrong for a
+   button — "Upload file" spanned the whole row and read as a drop zone. */
+.vy-quote-config-field > .vy-btn { align-self: flex-start; }
 .vy-quote-config-field[data-wide] { grid-column: 1 / -1; }
 
 /* A value the step did not ask for — carried from the RFQ, or filled by the
@@ -1124,3 +1128,21 @@
 }
 .vy-filter-edit-fields:hover { background: var(--vy-blue-50); }
 .vy-filter-edit-fields:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
+
+/* ---- Standard Quote: the assembly picker --------------------------------- */
+/* Select plus its Clear, on one line. The guideline asks for both — "User can
+   clear and chose another value again in this field" — and a clear that wrapped
+   below the select would read as an action on the whole section. */
+.vy-assembly-pick { display: flex; align-items: center; gap: var(--vy-space-4); }
+.vy-assembly-pick .vy-select { flex: 1; min-width: 0; }
+
+/* ---- Import File from Voyager -------------------------------------------- */
+.vy-voyager-files { list-style: none; margin: 0 0 var(--vy-space-8); padding: 0; display: flex; flex-direction: column; gap: var(--vy-space-3); }
+.vy-voyager-files li {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--vy-space-6);
+  padding: var(--vy-space-4) var(--vy-space-6);
+  background: var(--vy-grey-25);
+  border: 1px solid var(--vy-grey-200);
+  border-radius: var(--vy-radius-md);
+}
+.vy-voyager-files li > div { display: flex; flex-direction: column; gap: var(--vy-space-1); min-width: 0; }
