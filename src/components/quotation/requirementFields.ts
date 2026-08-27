@@ -28,7 +28,12 @@ import {
  * names for it.
  */
 export const PROJECT_NAME_FIELD: FieldDef<Quotation> = {
-  name: 'projectName', label: 'Project Name', kind: 'lookup', required: true,
+  /* TYPED, with the customer's existing projects as suggestions — not a closed
+     dropdown. The guideline is explicit ("Allows the user to enter the project
+     name") and the dropdown broke the new-customer path outright: a customer
+     who is not in Customer Management has no projects, so this required field
+     offered an empty list and no way past it. */
+  name: 'projectName', label: 'Project Name', kind: 'combo', required: true,
   optionsFor: (q: Quotation) => findCustomer(q.customer)?.projectNames ?? [],
   hint: 'An existing project for this customer, or a new assembly number.',
 };
@@ -59,12 +64,24 @@ export const HEADER: FieldDef<Quotation>[] = [
   /* Customer comes FIRST because four other fields are decided by it. Putting a
      dependent field above the one it depends on makes the form change under the
      user's cursor after they have already filled it in. */
-  { name: 'customer', label: 'Customer', kind: 'lookup', required: true, optionsFor: () => CUSTOMER_OPTIONS,
+  { name: 'customer', label: 'Customer', kind: 'lookup', required: true,
+    optionsFor: () => CUSTOMER_OPTIONS,
+    /* An RFQ created with "New Customer?" names someone who is not in Customer
+       Management, so the dropdown cannot hold their name — it rendered as an
+       empty control, silently discarding what the user typed on create the
+       first time they pressed Edit. */
+    freeTextWhen: (q: Quotation) => Boolean(q.newCustomer),
+    placeholder: 'Customer name',
     hint: 'Sets the contact list, Customer Type and the ITAR flag, and suggests a markup.' },
   /* Filtered to the chosen customer, exactly as the live form does it. As free
-     text this accepted a contact who does not work for the customer. */
+     text this accepted a contact who does not work for the customer.
+
+     A customer created through "New Customer?" is not in Customer Management,
+     so `contactsFor` has nothing to offer — its contacts come from Add Contact
+     and are held on the RFQ until the customer record exists. */
   { name: 'customerContact', label: 'Customer Contact', kind: 'lookup',
-    optionsFor: (q: Quotation) => contactsFor(q.customer) },
+    optionsFor: (q: Quotation) =>
+      (q.newCustomer ? q.newCustomerContacts ?? [] : contactsFor(q.customer)) },
   /**
    * ITAR — an ACCESS CONTROL flag, not a label.
    *
@@ -83,13 +100,24 @@ export const HEADER: FieldDef<Quotation>[] = [
   { name: 'itar', label: 'ITAR', kind: 'flag', readOnly: true, derivedFrom: 'Customer' },
   { name: 'projectType', label: 'Project Type', kind: 'select', options: PROJECT_TYPE },
   { name: 'orderType', label: 'Order Type', kind: 'select', options: ORDER_TYPE, required: true },
-  /* Derived: the live form writes this from the customer record's `custType`.
-     The live system carries BOTH "Customer Type" (header) and "RFQ Type" (list
-     grid), and both hold Consigned/Turnkey/Mixed. They may be the same field
-     twice or two genuinely different ones — that is a question for the
-     business, not something to resolve by guessing, so both are kept. */
+  /* SELECTABLE, not derived. The live form writes this from the customer
+     record's `custType` and never lets you change it, which is what this
+     prototype copied. The Testing Guideline says otherwise — "Allows the user
+     to select the appropriate customer type for the RFQ", and lists it among
+     the seven required fields on create — and the guideline outranks the live
+     system (docs/precedence.md).
+
+     The customer record still supplies the DEFAULT, which is what selecting a
+     customer does on create. That keeps the convenience of the derivation
+     without making it a cage: a supply model can differ from the customer's
+     usual one for a particular RFQ, and that is presumably why the customer
+     wants it selectable.
+
+     Whether this and the grid's "RFQ Type" are one field under two labels is
+     open question 10. Both are kept until they say. */
   { name: 'customerType', label: 'Customer Type', kind: 'select', options: CUSTOMER_TYPE,
-    required: true, readOnly: true, derivedFrom: 'Customer' },
+    required: true,
+    hint: 'Defaults to the customer\u2019s usual supply model. Change it if this RFQ differs.' },
   { name: 'assignedTo', label: 'Assigned To', kind: 'select', options: PEOPLE, required: true },
   /* Editable, and a dropdown rather than a star rating. The 25 Aug review:
      "priority indicator: unclear interaction -> change to a dropdown with
@@ -285,7 +313,21 @@ export const showsHistoricalRfq = (q: Quotation) => q.orderType === 'Repeat';
 
 
 
-export const ALL_FIELDS = [PROJECT_NAME_FIELD, ...HEADER, ...COMMERCIAL, ...TECHNICAL, ...INVENTORY, ...NOTES];
+/**
+ * Every field the record form owns, and therefore every field validation and
+ * change tracking see.
+ *
+ * DUE_DATE_FIELD and CREATED_DATE_FIELD are listed explicitly because they live
+ * in HEADER_GROUPS rather than HEADER — they were rendered by hand before they
+ * were declarations. Leaving them out here would have made Due Date carry a
+ * required marker that nothing enforced: the Save button would arm with no due
+ * date set, which is the same defect the marker exists to prevent, one step
+ * further along.
+ */
+export const ALL_FIELDS = [
+  PROJECT_NAME_FIELD, ...HEADER, DUE_DATE_FIELD, CREATED_DATE_FIELD,
+  ...COMMERCIAL, ...TECHNICAL, ...INVENTORY, ...NOTES,
+];
 
 /**
  * Fields the live form does not let you type into.

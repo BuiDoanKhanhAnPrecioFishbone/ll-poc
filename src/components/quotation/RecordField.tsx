@@ -33,8 +33,26 @@ export type FieldKind =
    * precisely the fields whose options need comparing against each other.
    */
   | { kind: 'radio'; options: readonly string[] }
-  /** A reference to another record. Options depend on the rest of the form. */
-  | { kind: 'lookup'; optionsFor: (row: any) => readonly string[] }
+  /**
+   * A reference to another record. Options depend on the rest of the form.
+   *
+   * `freeTextWhen` covers the case where the referenced record does not exist
+   * yet: an RFQ created with "New Customer?" names a customer who is not in
+   * Customer Management, so a dropdown over that list has nothing to show and
+   * the name the user typed on create disappears the moment they press Edit.
+   */
+  | { kind: 'lookup'; optionsFor: (row: any) => readonly string[];
+      freeTextWhen?: (row: any) => boolean; placeholder?: string }
+  /**
+   * Type anything, with the known values offered as suggestions.
+   *
+   * Project Name is the case: the guideline says it "allows the user to enter
+   * the project name", while the live form offers the customer's existing
+   * projects. Both are true, and a closed dropdown serves only the second — for
+   * a customer created through "New Customer?" it has no options at all, so the
+   * one required field naming the project became impossible to fill.
+   */
+  | { kind: 'combo'; optionsFor: (row: any) => readonly string[] }
   | { kind: 'number'; suffix?: string; min?: number; max?: number }
   /**
    * A calendar date, held as a Date and read back in the system's one format.
@@ -173,7 +191,45 @@ export function RecordField<T extends Record<string, any>>({
           </dd>
         </div>
       );
+    case 'combo': {
+      const list = def.optionsFor(row ?? {});
+      return (
+        <div className="vy-field vy-field--editing" data-invalid={missing || undefined}>
+          <dt><label htmlFor={`f-${def.name}`}>{def.label}{def.required && <RequiredMark />}</label></dt>
+          <dd>
+            <TextField id={`f-${def.name}`} value={String(value ?? '')}
+                       list={list.length ? `dl-${def.name}` : undefined}
+                       aria-invalid={missing || undefined}
+                       onBlur={() => onBlur?.(def.name)}
+                       onChange={e => onChange(def.name, e.target.value)} />
+            {list.length > 0 && (
+              <datalist id={`dl-${def.name}`}>
+                {list.map(o => <option key={o} value={o} />)}
+              </datalist>
+            )}
+            {err}
+            {def.hint && !missing && <span className="vy-field-hint">{def.hint}</span>}
+          </dd>
+        </div>
+      );
+    }
     case 'lookup':
+      if (def.freeTextWhen?.(row ?? {})) {
+        return (
+          <div className="vy-field vy-field--editing" data-invalid={missing || undefined}>
+            <dt><label htmlFor={`f-${def.name}`}>{def.label}{def.required && <RequiredMark />}</label></dt>
+            <dd>
+              <TextField id={`f-${def.name}`} value={String(value ?? '')}
+                         placeholder={def.placeholder}
+                         aria-invalid={missing || undefined}
+                         onBlur={() => onBlur?.(def.name)}
+                         onChange={e => onChange(def.name, e.target.value)} />
+              {err}
+              {def.hint && !missing && <span className="vy-field-hint">{def.hint}</span>}
+            </dd>
+          </div>
+        );
+      }
       return (
         <div className="vy-field vy-field--editing" data-invalid={missing || undefined}>
           <dt><label htmlFor={`f-${def.name}`}>{def.label}{def.required && <RequiredMark />}</label></dt>

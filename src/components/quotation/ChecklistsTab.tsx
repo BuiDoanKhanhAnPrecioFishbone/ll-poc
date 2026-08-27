@@ -14,6 +14,21 @@ import {
 const STATUSES: TaskStatus[] = ['To do', 'In progress', 'Done'];
 
 /**
+ * Which project types bring an engineering stage with them.
+ *
+ * Verbatim from the Testing Guideline (Create PR, r89). "Production" and
+ * "Box Build" are listed separately there, and this metadata has them as
+ * separate values too, so the list is taken at its word rather than read as
+ * one "Production Box Build" entry.
+ */
+export const ENGINEERING_PROJECT_TYPES = [
+  'NPI - Validation Production', 'Production', 'Box Build', 'Test Development - High Vol',
+];
+
+export const showsEngineeringChecklist = (projectType: string) =>
+  ENGINEERING_PROJECT_TYPES.includes(projectType);
+
+/**
  * Checklists & Assignment.
  *
  * THE MODEL, verified against the live system on 22 Aug 2026: the ticked
@@ -29,12 +44,33 @@ const STATUSES: TaskStatus[] = ['To do', 'In progress', 'Done'];
  * Layout follows the original: assignees and the checklist groups down the left,
  * the task grid filling the right.
  */
-export function ChecklistsTab({ q }: { q: Quotation }) {
+export function ChecklistsTab({ q, people: controlled, onPeopleChange, touched, onBlur }: {
+  q: Quotation;
+  /**
+   * Assignees, lifted out when the caller needs to validate them.
+   *
+   * The record screen leaves this tab to own its own state: Program Manager and
+   * Buyer are already set there, and nothing gates on them. The create modal
+   * cannot — the guideline makes both required for Save, and a Save button that
+   * ignores two required fields on a tab the user has not opened is exactly the
+   * failure the required markers exist to prevent. So the modal passes them in.
+   */
+  people?: { programManager: string; buyer: string; engineer: string };
+  onPeopleChange?: (p: { programManager: string; buyer: string; engineer: string }) => void;
+  /** Which assignees the user has left, so create-mode errors stay quiet until then. */
+  touched?: Set<string>;
+  onBlur?: (name: string) => void;
+}) {
   const toast = useToast();
   const [tasks, setTasks] = useState<ChecklistTask[]>(q.tasks);
-  const [people, setPeople] = useState({
+  const [ownPeople, setOwnPeople] = useState({
     programManager: q.programManager, buyer: q.buyer, engineer: q.engineer,
   });
+  const people = controlled ?? ownPeople;
+  const setPeople = (fn: (p: typeof people) => typeof people) => {
+    const next = fn(people);
+    if (onPeopleChange) onPeopleChange(next); else setOwnPeople(next);
+  };
 
   const selected = new Set(tasks.map(t => t.type));
 
@@ -126,17 +162,26 @@ export function ChecklistsTab({ q }: { q: Quotation }) {
         <section>
           <h2 className="vy-field-group-title">Assignees</h2>
           <Assignee role="Program Manager" required value={people.programManager}
-                    onChange={v => setPeople(p => ({ ...p, programManager: v }))} />
+                    invalid={Boolean(touched?.has('programManager') && !people.programManager)}
+                    onChange={v => { setPeople(p => ({ ...p, programManager: v })); onBlur?.('programManager'); }} />
           <Assignee role="Buyer" required value={people.buyer}
-                    onChange={v => setPeople(p => ({ ...p, buyer: v }))} />
+                    invalid={Boolean(touched?.has('buyer') && !people.buyer)}
+                    onChange={v => { setPeople(p => ({ ...p, buyer: v })); onBlur?.('buyer'); }} />
           <Assignee role="Engineer" value={people.engineer}
                     onChange={v => setPeople(p => ({ ...p, engineer: v }))} />
         </section>
 
         <ChecklistGroup title="Program checklist" items={PROGRAM_CHECKLIST}
                         selected={selected} onToggle={toggle} />
-        <ChecklistGroup title="Engineering checklist" items={ENGINEERING_CHECKLIST}
-                        selected={selected} onToggle={toggle} />
+        {/* "This panel is displayed only when the selected Project Type is one
+            of the following: NPI - Validation Production, Production, Box Build,
+            or Test Development - High Vol" — Testing Guideline, Create PR r89.
+            It used to show for every project type, which put engineering items
+            on RFQs that have no engineering stage. */}
+        {showsEngineeringChecklist(q.projectType) && (
+          <ChecklistGroup title="Engineering checklist" items={ENGINEERING_CHECKLIST}
+                          selected={selected} onToggle={toggle} />
+        )}
       </aside>
 
       <section className="vy-tasks">
@@ -190,8 +235,9 @@ function ChecklistGroup({ title, items, selected, onToggle }: {
   );
 }
 
-function Assignee({ role, value, required, onChange }: {
-  role: string; value: string; required?: boolean; onChange: (v: string) => void;
+function Assignee({ role, value, required, invalid, onChange }: {
+  role: string; value: string; required?: boolean; invalid?: boolean;
+  onChange: (v: string) => void;
 }) {
   const unset = !value;
   return (
@@ -206,10 +252,17 @@ function Assignee({ role, value, required, onChange }: {
       <div className="vy-assignee-picker">
         {!unset && <span className="vy-avatar vy-avatar--sm" aria-hidden>{initials(value)}</span>}
         <Select id={`as-${role}`} label={role} value={value || 'Unassigned'}
+                required={required} invalid={invalid}
                 options={['Unassigned', ...PEOPLE]}
                 onChange={v => onChange(v === 'Unassigned' ? '' : v)} />
       </div>
-      {required && unset && <span className="vy-assignee-warn">Needs an owner before the quote can run.</span>}
+      {/* While creating, an empty required assignee is an ERROR in the same
+          words the rest of the form uses. On an existing record it is a
+          standing note, because the RFQ is real either way and the assignee
+          only blocks the quote run. */}
+      {invalid
+        ? <span className="vy-field-error" role="alert">This field is required.</span>
+        : required && unset && <span className="vy-assignee-warn">Needs an owner before the quote can run.</span>}
     </div>
   );
 }

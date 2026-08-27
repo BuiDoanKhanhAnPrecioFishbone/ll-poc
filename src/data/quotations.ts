@@ -15,6 +15,7 @@
    ========================================================================== */
 
 import type { ColumnSpec } from '../components/column-model';
+import { createdQuotations } from './createdQuotations';
 import * as META from './metadata';
 
 export type QuotationStatus = 'New' | 'In-Progress' | 'Quoted' | 'Completed' | 'Cancelled';
@@ -37,6 +38,22 @@ export type Quotation = {
   dateNeeded: Date;
   createdDate: Date;
   lastUpdated: Date;
+
+  /**
+   * Created for a customer who was not yet in Customer Management.
+   *
+   * Set by the create modal's "New Customer?" tick and kept on the record,
+   * because the guideline gives it two consequences that outlive creation: a
+   * "New Customer" status at the top right of the RFQ screen, and an Add
+   * Contact button under the Customer field.
+   */
+  newCustomer?: boolean;
+
+  /**
+   * Contacts entered through Add Contact, for a customer who has no record in
+   * Customer Management yet. They become the Customer Contact options.
+   */
+  newCustomerContacts?: string[];
 
   /* Header fields visible on the detail screen */
   projectType: string;
@@ -210,11 +227,11 @@ export const CUSTOMER_MASTER: Customer[] = [
     projectNames: ['Halo Controller', 'Halo Backplane', 'Orion Sensor Board'] },
   { code: '00848', name: 'KT Controls Ltd', label: '00848 - KT Controls Ltd',
     contacts: ['Steven Achebe', 'Lena Brandt'],
-    custType: 'Consign', isItar: false, priceMarkup: 9,
+    custType: 'Consigned', isItar: false, priceMarkup: 9,
     projectNames: ['KT Drive Module', 'KT Panel Interface'] },
   { code: '00378', name: 'Nokia Networks Oy', label: '00378 - Nokia Networks Oy',
     contacts: ['Aino Virtanen', 'Petri Laaksonen', 'Sanna Koskinen'],
-    custType: 'Hybrid', isItar: false, priceMarkup: 14,
+    custType: 'Mixed', isItar: false, priceMarkup: 14,
     projectNames: ['RF Front-end Rev C', 'Baseband Carrier'] },
   { code: '01204', name: 'Meridian Avionics', label: '01204 - Meridian Avionics',
     contacts: ['Ruth Calderon', 'Devon Achterberg'],
@@ -222,7 +239,7 @@ export const CUSTOMER_MASTER: Customer[] = [
     projectNames: ['ADS-B Transponder', 'Flight Data Concentrator'] },
   { code: '00912', name: 'Halden Marine AS', label: '00912 - Halden Marine AS',
     contacts: ['Ingrid Solberg'],
-    custType: 'TBD', isItar: false, priceMarkup: 11,
+    custType: 'Managed Consigned', isItar: false, priceMarkup: 11,
     projectNames: ['Bridge Display Unit'] },
   { code: '01455', name: 'Brightpath Medical', label: '01455 - Brightpath Medical',
     contacts: ['Yusuf Adeyemi', 'Carla Menendez'],
@@ -230,7 +247,7 @@ export const CUSTOMER_MASTER: Customer[] = [
     projectNames: ['Infusion Pump Main', 'Infusion Pump Sensor'] },
   { code: '00109', name: 'Comtec Industrial', label: '00109 - Comtec Industrial',
     contacts: ['Rob Tanaka', 'Hedy Lindqvist'],
-    custType: 'Consign', isItar: false, priceMarkup: 10,
+    custType: 'Consigned', isItar: false, priceMarkup: 10,
     projectNames: ['Comtec Gateway', 'Comtec IO Expander'] },
 ];
 
@@ -285,8 +302,13 @@ function mulberry32(seed: number) {
 
 export function generateQuotations(count = 330): Quotation[] {
   const rnd = mulberry32(20260819);
+  /* Anything created in this session sits at the top, newest first, exactly
+     where the next sequential RFQ number puts it. Prepending here rather than
+     at each call site means the list, the record screen, Home and My Queues
+     all see a new RFQ without any of them knowing it was created rather than
+     generated. */
   const pick = <T,>(a: readonly T[]) => a[Math.floor(rnd() * a.length)];
-  const out: Quotation[] = [];
+  const out: Quotation[] = [...createdQuotations()];
   for (let i = 0; i < count; i++) {
     const cust = pick(CUSTOMERS);
 

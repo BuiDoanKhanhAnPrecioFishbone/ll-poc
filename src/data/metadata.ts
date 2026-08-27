@@ -28,12 +28,24 @@ export const ORDER_TYPE = ['New', 'Repeat', 'Rev Change'] as const;
 export const RFQ_TYPE = ['Consigned', 'Managed Consigned', 'Mixed', 'Turnkey'] as const;
 
 /**
- * CUST_TYPE — the field labelled "Customer Type" in the record header.
- * A DIFFERENT list from QUOTATION_TYPE: "Consign" not "Consigned", plus TBD and
- * Hybrid, and no "Managed Consigned". They are two distinct fields, which
- * settles the question of whether one was a duplicate of the other.
+ * CUST_TYPE — the field labelled "Customer Type" on the record form.
+ *
+ * These four values come from the Testing Guideline (PR - EC - Create PR, r31):
+ * "Specifies the customer supply model for the RFQ ... Consigned / Managed
+ * Consigned / Mixed / Turnkey", and it lists the field as required and
+ * user-selected.
+ *
+ * That CONTRADICTS the shipped bundle, where `custMsts.custType` carries
+ * TBD / Consign / Turnkey / Hybrid and the form writes it from the customer
+ * record. The guideline is the customer's latest word and outranks the live
+ * system (docs/precedence.md), so it wins — but the older list is recorded
+ * here because it is real, and because the swap makes this list identical to
+ * RFQ_TYPE above. Whether "RFQ Type" on the grid and "Customer Type" on the
+ * form are one field under two labels is open question 10; they are kept
+ * separate until the customer says otherwise, since the guideline's list sheet
+ * specifies an RFQ Type column.
  */
-export const CUSTOMER_TYPE = ['TBD', 'Consign', 'Turnkey', 'Hybrid'] as const;
+export const CUSTOMER_TYPE = ['Consigned', 'Managed Consigned', 'Mixed', 'Turnkey'] as const;
 
 /** APPLICATION */
 export const APPLICATION = [

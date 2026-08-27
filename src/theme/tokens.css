@@ -210,6 +210,8 @@
   --vy-record-max-w:     1180px;
   --vy-status-slot-w:    104px;  /* GAP-01 — see docs/gap-register.md */
   --vy-note-min-w:       320px;
+  /* One short contact field — name, job title, email or phone. */
+  --vy-contact-field-min: 180px;
   --vy-assignee-panel-w: 240px;   /* the left column on Checklists */
   --vy-checklist-col-min: 282px;  /* measured minimum for a checklist row */
 

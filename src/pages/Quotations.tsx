@@ -15,6 +15,7 @@ import { QUOTATION_QUICK, quotationFilterFields } from '../data/quotationFilters
 import { ViewSetting } from '../ui/ViewSetting';
 import { useViews, draftFrom } from '../ui/useViews';
 import { applySort, type SavedView } from '../ui/views';
+import { NewRequirementDialog } from '../components/quotation/NewRequirementDialog';
 
 /**
  * The four measures. These are the ONLY quick filters, and they live in the KPI
@@ -94,6 +95,7 @@ export function Quotations() {
   const { views: savedViews, active: view, activeId, setActiveId, save, remove } =
     useViews('quotation', systemView);
   const [settingOpen, setSettingOpen] = useState(false);
+  const [creating, setCreating] = useState(false);
 
   /**
    * The columns as they are RIGHT NOW — the saved view plus any unsaved
@@ -236,7 +238,7 @@ export function Quotations() {
         : 'Customer RFQs and the quotes sent back'}
       leadAction={
         <Button variant="filled" title="Create a new Project Requirement"
-                onClick={() => toast.notImplemented('open the New Project Requirement modal')}>
+                onClick={() => setCreating(true)}>
           Add New
         </Button>
       }
@@ -360,6 +362,8 @@ export function Quotations() {
         }}
       />
     )}
+
+    {creating && <NewRequirementDialog open onClose={() => setCreating(false)} />}
     </>
   );
 }

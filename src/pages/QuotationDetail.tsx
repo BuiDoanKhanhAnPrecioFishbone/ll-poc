@@ -10,6 +10,7 @@ import { ConversationsTab } from '../components/quotation/ConversationsTab';
 import { ActivityTab } from '../components/quotation/ActivityTab';
 import { BomComparisonDialog } from '../components/quotation/BomComparisonDialog';
 import { RunQuotationDialog } from '../components/quotation/RunQuotationDialog';
+import { AddContactDialog, type NewContact } from '../components/quotation/AddContactDialog';
 import { useToast } from '../ui/Toast';
 import { RecordField, isMissing } from '../components/quotation/RecordField';
 import { smartButtonsFor, SmartIcon } from '../components/quotation/SmartButtons';
@@ -40,6 +41,8 @@ export function QuotationDetail() {
   const [tab, setTab] = useState('requirements');
   const [bomOpen, setBomOpen] = useState(false);
   const [runOpen, setRunOpen] = useState(false);
+  const [contactOpen, setContactOpen] = useState(false);
+  const [newContacts, setNewContacts] = useState<NewContact[]>([]);
   const toast = useToast();
 
   /* Edit is a mode, not a permanent state of the page. `saved` holds edits made
@@ -200,6 +203,18 @@ export function QuotationDetail() {
             {(draft ?? q).itar && (
               <span className="vy-flag" title="Subject to ITAR export control">ITAR</span>
             )}
+            {/* "After the RFQ is created successfully, the system displays an
+                additional New Customer status at the top-right corner of the
+                RFQ screen." It sits with the other statuses rather than in the
+                corner on its own, because it answers the same question they do
+                — what kind of RFQ is this — and a lone badge in the opposite
+                corner would be read as belonging to the buttons under it. */}
+            {q.newCustomer && (
+              <span className="vy-flag vy-flag--new-customer"
+                    title="This customer was not in Customer Management when the RFQ was created">
+                New Customer
+              </span>
+            )}
             {!closed && (
               /* Lateness belongs beside the status, not buried in a date field.
                  It is the one fact that changes what you do next. */
@@ -279,9 +294,25 @@ export function QuotationDetail() {
                      as a control, and the heading steps aside for it. */
                   .filter(def => editing || def.name !== 'projectName')
                   .map(def => (
-                    <RecordField key={def.name} def={def} value={(draft ?? q)[def.name]}
-                                 editing={editing} onChange={setField} row={draft ?? q}
-                                 touched={touched.has(def.name)} onBlur={markTouched} />
+                    <div key={def.name} className="vy-field-slot">
+                      <RecordField def={def} value={(draft ?? q)[def.name]}
+                                   editing={editing} onChange={setField} row={draft ?? q}
+                                   touched={touched.has(def.name)} onBlur={markTouched} />
+                      {/* "After the RFQ is created successfully, the system
+                          displays an additional Add Contact button below the
+                          Customer field." Only for a customer who has no record
+                          to add contacts to — for everyone else the contacts
+                          already exist in Customer Management, and a button
+                          here would be a second, divergent place to create
+                          them. */}
+                      {def.name === 'customer' && q.newCustomer && (
+                        <Button variant="text" className="vy-add-contact"
+                                onClick={() => setContactOpen(true)}
+                                title={`Add a contact for ${q.customer}`}>
+                          + Add Contact
+                        </Button>
+                      )}
+                    </div>
                   ))}
 
                 {/* Historical RFQ appears only when Order Type is "Repeat", and
@@ -322,6 +353,39 @@ export function QuotationDetail() {
         ]}
       />
 
+      {contactOpen && (
+        <AddContactDialog
+          open
+          customer={q.customer}
+          contacts={newContacts}
+          onClose={() => setContactOpen(false)}
+          onAdd={c => {
+            const next = [...newContacts, c];
+            setNewContacts(next);
+            /* Committed to the RECORD, not the draft. Add Contact is reachable
+               while merely reading — there is no Edit mode around it — and
+               `setField` writes to the draft, so routing this through it made
+               the first contact silently fail to be selected whenever the user
+               had not pressed Edit, which is nearly always.
+
+               The first contact added also becomes the selected one, matching
+               what choosing an existing customer does: "if the selected
+               customer has only one customer contact, the system automatically
+               populates this field with that contact". */
+            const names = next.map(x => x.name);
+            const applyTo = <T extends Quotation>(on: T): T => ({
+              ...on,
+              newCustomerContacts: names,
+              customerContact: on.customerContact || c.name,
+            });
+            setSaved(prev => applyTo(prev ?? q));
+            /* And the draft, if one is open. Add Contact is reachable in both
+               modes, and a contact that reached only the record would vanish
+               from the dropdown the moment the user pressed Edit. */
+            setDraft(d => (d ? applyTo(d) : d));
+          }}
+        />
+      )}
       {bomOpen && <BomComparisonDialog onClose={() => setBomOpen(false)} />}
       {runOpen && <RunQuotationDialog q={q} onClose={() => setRunOpen(false)} />}
     </div>

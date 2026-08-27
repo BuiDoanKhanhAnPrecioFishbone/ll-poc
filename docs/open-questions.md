@@ -92,6 +92,14 @@ count from today — a per-user preference.
 
 These cannot both be true. We have built it as a user preference and flagged it.
 
+**Update, 27 Aug.** The Create PR sheet is more specific than either: Due Date
+"accepts the date in MM/DD/YYYY format" with a `month/day/year` placeholder, and
+Created Date "displays in MM/DD/YYYY HH:MM:SS format". The prototype currently
+renders dates as `15 Oct 2026` and uses the browser's native date picker, which
+shows `dd/mm/yyyy` in a European locale and `mm/dd/yyyy` in a US one — so today
+it follows the *reader's* machine, not either of your sources. Confirm
+MM/DD/YYYY and we will pin it, and add the time to Created Date.
+
 ---
 
 ## 5. "Assigned To" is not available on the list
@@ -115,6 +123,12 @@ asked for a coloured dot with High / Medium / Low.
 
 We have followed the review, as it is the more recent and more specific
 instruction. Flagging so nobody later reads it as a regression.
+
+**Update, 27 Aug.** The Create PR sheet repeats the guideline's side of this —
+"Allows the user to set the RFQ priority using a rating input ... Displays a
+tooltip on hover corresponding to the selected level: Low, Medium, or High" —
+so the disagreement is between two of your own documents, not between your
+document and our judgement. Still built as the review asked.
 
 ---
 
@@ -158,6 +172,29 @@ middle of a dimmed screen — which does not achieve what minimising is for.
 If your users minimise a dialog to read the list underneath it, the real answer
 is a non-modal draggable window. That is a different component, and worth
 knowing before it gets built rather than after.
+
+---
+
+## 10. Are "RFQ Type" and "Customer Type" the same field?
+
+The **PR List** sheet specifies an **RFQ Type** column. The **Create PR** sheet
+specifies a required **Customer Type** field on the form, and gives it the same
+four values: Consigned, Managed Consigned, Mixed, Turnkey.
+
+Meanwhile the shipped system carries a *different* Customer Type, written from
+the customer record's `custType` and never editable, whose values are TBD,
+Consign, Turnkey and Hybrid.
+
+So there are two labels, two option lists and two behaviours across three
+sources. We have followed the guideline — Customer Type is now user-selectable
+with your four values, defaulting from the customer record — and kept RFQ Type
+as its own column, because your list sheet asks for it. If they are one field
+under two names, tell us and we will merge them; that is not a change we will
+make on a guess.
+
+**Related:** the guideline also says Customer Contact "is read-only" and, four
+lines later, that "the user can select a different customer contact from the
+list". We have built it as selectable. Worth a correction in your document.
 
 ---
 

@@ -260,6 +260,15 @@
 .vy-record-id { display: flex; align-items: center; gap: var(--vy-space-4); }
 .vy-record-no { font-size: var(--vy-text-lg); font-weight: var(--vy-weight-semibold); color: var(--vy-grey-900); }
 .vy-flag { font-size: var(--vy-text-xs); font-weight: var(--vy-weight-semibold); letter-spacing: .06em; color: var(--vy-red-700); background: var(--vy-red-50); border: 1px solid var(--vy-red-500); border-radius: var(--vy-radius-sm); padding: 1px var(--vy-space-3); }
+
+/* ITAR is a warning — red, because seeing it changes who may open the record.
+   "New Customer" is not a warning, it is a fact, so it borrows the flag's shape
+   and drops its alarm. Same red for both would have taught users to read red as
+   "a badge", which is how a real warning stops being noticed. */
+.vy-flag--new-customer {
+  color: var(--vy-blue-700); background: var(--vy-blue-50); border-color: var(--vy-blue-500);
+}
+
 .vy-record-title { font-size: var(--vy-text-2xl); font-weight: var(--vy-weight-bold); margin: var(--vy-space-4) 0 0; color: var(--vy-grey-900); letter-spacing: -.01em; }
 
 .vy-fact-label { font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .05em; color: var(--vy-grey-500); margin-bottom: var(--vy-space-1); }

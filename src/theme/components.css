@@ -660,11 +660,14 @@
 /* ---- Locked fields, in edit mode ----------------------------------------
    The 25 Aug review: "read-only fields: use gray background and gray border".
 
-   Applied while EDITING only. In read mode every field is read-only, so boxing
-   them all would put the record back to looking like a form that failed to
-   load — which is what the live screen does and what this prototype set out to
-   fix. Editing is the mode where "why can't I type here" is a live question,
-   and there the grey box answers it before the note does. */
+   Applied while EDITING only. Put to the customer and CONFIRMED 27 Aug 2026:
+   the grey fill and grey border appear in edit mode and nowhere else.
+
+   In read mode every field is read-only, so GREYING them all would put the
+   record back to looking like a form that failed to load — which is what the
+   live screen does and what this prototype set out to fix. Editing is the mode
+   where "why can't I type here" is a live question, and there the grey box
+   answers it before the note does. */
 .vy-record-fields[data-editing] .vy-field[data-locked] dd,
 .vy-field--editing[data-locked] dd {
   display: flex; align-items: center; gap: var(--vy-space-4);
@@ -889,4 +892,63 @@
 .vy-dialog[data-maximised] {
   width: 96vw; max-width: none;
   height: 94vh; max-height: none;
+}
+
+/* =============================================================================
+   NEW PROJECT REQUIREMENT
+   -----------------------------------------------------------------------------
+   The create modal holds the whole record form: General information above, then
+   the same three tabs the record screen carries. It is the record's own layout
+   inside a dialog rather than a second form, so almost everything here is
+   spacing — the field, group and tab rules are the ones already defined above.
+   ========================================================================== */
+.vy-create-form { display: flex; flex-direction: column; gap: var(--vy-space-9); }
+
+/* General information sits in a panel so the eye can tell "the RFQ's identity"
+   from "its detail", the same split the record screen makes with its header. */
+.vy-create-general {
+  background: var(--vy-grey-50);
+  border: 1px solid var(--vy-grey-200);
+  border-radius: var(--vy-shape-md);
+  padding: var(--vy-space-8);
+}
+
+/* A field that has nothing to offer yet — no customer chosen, or contacts that
+   arrive only after saving. Says what it is waiting for, in the place the
+   control will occupy, rather than showing an empty dropdown that looks broken. */
+.vy-field-note {
+  margin: 0;
+  min-height: var(--vy-control-md);
+  display: flex; align-items: center;
+  padding: var(--vy-space-3) var(--vy-space-5);
+  background: var(--vy-grey-100);
+  border: 1px dashed var(--vy-grey-300);
+  border-radius: var(--vy-radius-sm);
+  font-size: var(--vy-text-sm);
+  color: var(--vy-grey-600);
+}
+
+/* A field plus anything that hangs off it — currently Add Contact under
+   Customer. The wrapper exists so the button sits with its field rather than
+   becoming the next row of the definition list, where it would read as a
+   value belonging to Customer Contact. */
+.vy-field-slot { display: contents; }
+.vy-record-fields .vy-field-slot { display: block; }
+.vy-add-contact {
+  margin-top: var(--vy-space-2);
+  padding-inline: 0;
+  font-size: var(--vy-text-sm);
+}
+
+/* ---- Create New Customer > Contact -------------------------------------- */
+.vy-contact-form { display: flex; flex-direction: column; gap: var(--vy-space-8); }
+/* The form is a row of short fields ending in its button, because every one of
+   them is a single line and stacking five of them would push the list of
+   contacts already added off the screen — which is the thing the user is
+   checking as they type the next one. */
+.vy-contact-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--vy-contact-field-min), 1fr));
+  gap: var(--vy-space-5);
+  align-items: end;
 }
