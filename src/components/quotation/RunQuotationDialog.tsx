@@ -15,7 +15,7 @@ import { StepSummary } from './run/StepSummary';
 import {
   ExcludedPartsDialog, AddAttritionDialog, ConfirmQuoteDialog, AddPackageDialog,
 } from './run/dialogs';
-import { step1Missing, type RunConfig } from './run/state';
+import { step1Error, type RunConfig } from './run/state';
 
 /**
  * Run Quotation — Quick Quote.
@@ -50,7 +50,7 @@ import { step1Missing, type RunConfig } from './run/state';
  */
 
 const STEPS = [
-  { label: '1 - Config BoM', text: 'Choose the BoM file, template and assembly' },
+  { label: '1 - Config BoM', text: 'Choose the BoM and the assembly to quote' },
   { label: '2 - Review BoM', text: 'Check the parsed lines and what is excluded' },
   { label: '3 - Quoting',    text: 'Run the quote and choose suppliers' },
   { label: '4 - Summary',    text: 'Cost estimation and submission' },
@@ -62,14 +62,16 @@ export function RunQuotationDialog({ q, onClose }: { q: Quotation; onClose: () =
   const [furthest, setFurthest] = useState(0);
 
   const [cfg, setCfg] = useState<RunConfig>(() => ({
-    action: 'upload',
+    action: 'import-new',
+    bomOption: 'current',
     attachment: 'BOM_RevC_2026-08-12.xlsx',
     template: '',
     detection: 'part number',
-    version: 'v3 — 12 Aug 2026',
+    uploadedFile: '',
     assemblyPartNumber: '',
     partRev: '',
     partDesc: '',
+    assembly: '',
     quoteFocus: q.quoteFocus,
     materialPackageType: q.materialPackageType,
     markup: q.markup,
@@ -96,13 +98,12 @@ export function RunQuotationDialog({ q, onClose }: { q: Quotation; onClose: () =
 
   /* ---- Step 1 -> 2 ------------------------------------------------------- */
   function leaveStep1() {
-    const missing = step1Missing(cfg);
-    if (missing.length) {
-      /* The live message, camel-case field names and all — a tester matching
-         this sheet against the build is looking for that exact string. */
-      toast.success(`Please input information for ${missing.join(', ')}`);
-      return;
-    }
+    /* Each flow has its own message and the guideline gives both verbatim —
+       "Please input information for assemblyPartNumber, partRev, partDesc" and
+       "Select assembly first!". Quoted rather than rewritten, because a tester
+       matching the sheet against the build is looking for those strings. */
+    const err = step1Error(cfg);
+    if (err) { toast.success(err); return; }
     goTo(1);
   }
 

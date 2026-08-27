@@ -217,6 +217,19 @@ export function DataGrid<T extends { id: string | number }>({
               highlighting goes in the KPI row below, where it can be clicked. */}
           {subtitle && <p className="vy-page-sub">{subtitle}</p>}
         </div>
+        {/* Page-level actions live in the PAGE header, on the right, together.
+
+            They spent a version in the grid toolbar below — an over-literal
+            reading of the guideline's "Left corner: Add New. Right corner:
+            Select View, Filter Toolbar, Setup View Template." That row is the
+            TABLE's own control strip: search, saved view, filter, density,
+            columns. Putting Add New and Export in it mixed two tiers of
+            control, crowded the search field, and is not a pattern any
+            comparable product uses.
+
+            The guideline's left/right split still holds where it belongs —
+            among the view controls in that toolbar. */}
+        {actions && <div className="vy-page-actions">{actions}</div>}
       </div>
 
       {kpis && <div className="vy-kpi-row">{kpis}</div>}
@@ -225,18 +238,6 @@ export function DataGrid<T extends { id: string | number }>({
 
       <div className="vy-grid-shell">
         <div className="vy-grid-toolbar">
-          {/* ONE action bar, split by what the controls act on. The guideline
-              (PR List, r7): "The action buttons are displayed in the following
-              order from left to right: Left corner: Add New. Right corner:
-              Select View, Filter Toolbar, Setup View Template."
-
-              So the record actions occupy the left corner and the view controls
-              the right corner of the SAME row. Add New spent two versions
-              elsewhere — first in the page-actions group beside Export, then on
-              its own under the page heading — and the second was worse: it read
-              as a third action area on a screen that already had two. */}
-          {actions && <div className="vy-toolbar-actions">{actions}</div>}
-
           <SearchField value={search} placeholder={searchPlaceholder} aria-label={searchPlaceholder}
                        onChange={e => setSearch(e.target.value)} />
           <span className="vy-toolbar-spacer" />

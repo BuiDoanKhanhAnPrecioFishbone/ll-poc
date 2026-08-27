@@ -21,6 +21,8 @@
  * The guideline writes MAKE/PHAN in one place and MAKE/PHANT in another; the
  * auto-exclusion rule (r81) uses MAKE/PHANT, so that is the spelling kept.
  */
+import { CUSTOMER_MASTER } from './quotations';
+
 export type PartSource = 'MAKE' | 'BUY' | 'MAKE/PHANT' | 'FLRSTK' | 'MAKE/BUY' | 'PACKAGING';
 
 /**
@@ -349,6 +351,53 @@ export const PACKAGING_PARTS = [
   { part: 'PKG-BOX-RSC-12', description: 'RSC carton 12x9x6 in', mfg: 'Uline', mpn: 'S-4124' },
   { part: 'PKG-FOAM-INS', description: 'Anti-static foam insert', mfg: 'Desco', mpn: '26200' },
 ] as const;
+
+/* =============================================================================
+   ASSEMBLIES — Standard Quote's entry point
+   -----------------------------------------------------------------------------
+   "The assembly corresponding to the PR's customer will be fully listed. Each
+   option also format: Customer Code - Part Number - Rev - Version."
+
+   Standard Quote starts from a BoM that is already approved and loaded through
+   the ECO process, so the assembly is CHOSEN rather than typed — which is the
+   whole difference between the two flows at step 1.
+   ========================================================================== */
+
+export type Assembly = {
+  /** The whole option label, in the guideline's format. */
+  label: string;
+  partNumber: string;
+  rev: string;
+  version: string;
+  /** Auto-populated into Description, and not editable afterwards. */
+  description: string;
+};
+
+/**
+ * The assemblies on file for a customer.
+ *
+ * Derived from the customer's own project names and code so that the list
+ * always belongs to the customer on the RFQ — the guideline's one constraint on
+ * it. Two revisions of the first project, so "choose a different one" has
+ * something to choose.
+ */
+export function assembliesFor(customerLabel: string): Assembly[] {
+  const cust = CUSTOMER_MASTER.find(c => c.label === customerLabel);
+  if (!cust) return [];
+  const out: Assembly[] = [];
+  cust.projectNames.forEach((name, i) => {
+    const partNumber = `${cust.code}-${(184 + i * 37).toString().padStart(3, '0')}-${(6456 + i * 211)}`;
+    const revs = i === 0 ? ['A', 'B'] : ['A'];
+    revs.forEach((rev, j) => {
+      const version = `v${revs.length - j}`;
+      out.push({
+        label: `${cust.code} - ${partNumber} - ${rev} - ${version}`,
+        partNumber, rev, version, description: name,
+      });
+    });
+  });
+  return out;
+}
 
 export const money = (n: number) =>
   n.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 });

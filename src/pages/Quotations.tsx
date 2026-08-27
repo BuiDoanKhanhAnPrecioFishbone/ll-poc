@@ -16,6 +16,7 @@ import { ViewSetting } from '../ui/ViewSetting';
 import { useViews, draftFrom } from '../ui/useViews';
 import { applySort, type SavedView } from '../ui/views';
 import { NewRequirementDialog } from '../components/quotation/NewRequirementDialog';
+import { SmartIcon } from '../components/quotation/SmartButtons';
 
 /**
  * The four measures. These are the ONLY quick filters, and they live in the KPI
@@ -328,12 +329,11 @@ export function Quotations() {
       onToggleColumn={toggleColumn}
       onResetColumns={() => setWorkingCols(view.columns)}
       viewSetting={
+        /* One definition, in the shared icon set — this button carried its own
+           inline copy of the glyph, so the nav and the toolbar could drift. */
         <button type="button" className="vy-funnel" aria-label="Setup View Template"
                 title="Setup View Template" onClick={() => setSettingOpen(true)}>
-          <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor"
-               strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-            <path d="M10 7a3 3 0 1 0 0 6 3 3 0 0 0 0-6M10 2v2M10 16v2M4 10H2M18 10h-2M5 5 3.6 3.6M16.4 16.4 15 15M15 5l1.4-1.4M3.6 16.4 5 15" />
-          </svg>
+          <SmartIcon name="settings" />
         </button>
       }
       rowHref={q => `/sales-management/quotation/${q.id}`}
