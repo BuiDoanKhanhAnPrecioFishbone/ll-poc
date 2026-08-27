@@ -1139,3 +1139,7 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
 /* The screen's primary action, beside the title. Left, where the eye starts —
    the rare actions keep the far corner. */
 .vy-lead-action { margin-top: var(--vy-space-6); }
+
+/* Maximised, the sidebar becomes a full-height panel wide enough for the Column
+   tab's three-column table to breathe. */
+.vy-viewsetting[data-maximised] { width: min(var(--vy-viewsetting-max-w), 96vw); }

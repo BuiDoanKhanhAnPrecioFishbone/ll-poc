@@ -5,7 +5,7 @@ import * as RProgress from '@radix-ui/react-progress';
 import * as RCheckbox from '@radix-ui/react-checkbox';
 import * as RRadio from '@radix-ui/react-radio-group';
 import * as RSelect from '@radix-ui/react-select';
-import type { ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 
 /* =============================================================================
    Radix primitives, styled from tokens.
@@ -15,26 +15,65 @@ import type { ReactNode } from 'react';
    be reinventing. Appearance is entirely ours.
    ========================================================================== */
 
+/**
+ * Dialog, with the window controls the customer's guideline specifies:
+ * "Allow user to use modal window actions: Minimize · Maximize/Restore Down ·
+ * Close."
+ *
+ * MAXIMIZE is built. It earns its place — Run Quotation's pricing grid has
+ * fourteen columns, and being able to fill the screen with it is the difference
+ * between reading the table and scrolling it sideways.
+ *
+ * MINIMIZE is NOT built, deliberately. In Kendo it collapses a draggable window
+ * to its title bar, in place. These dialogs are centred and modal, not
+ * draggable, so a minimised one would be a title bar floating in the middle of a
+ * dimmed screen — which does not do the thing minimising is for. What a user
+ * wants there is to see the list behind, and Close already does that without
+ * losing anything, since nothing here is a long-running form.
+ *
+ * Raised as question 9 rather than guessed at: if their users minimise dialogs
+ * to compare against the list underneath, the answer is a non-modal draggable
+ * window, which is a different component and worth knowing before it is built.
+ */
 export function Dialog({ open, onClose, title, subtitle, children, actions, size = 'md' }: {
   open: boolean; onClose: () => void; title: string; subtitle?: ReactNode;
   children: ReactNode; actions?: ReactNode; size?: 'md' | 'lg' | 'xl';
 }) {
+  const [maximised, setMaximised] = useState(false);
+  /* A dialog reopens at its normal size. Carrying "maximised" across two
+     unrelated dialogs would surprise whoever opens the next one. */
+  useEffect(() => { if (!open) setMaximised(false); }, [open]);
+
   return (
     <RDialog.Root open={open} onOpenChange={o => !o && onClose()}>
       <RDialog.Portal>
         <RDialog.Overlay className="vy-scrim" />
-        <RDialog.Content className="vy-dialog" data-size={size}>
+        <RDialog.Content className="vy-dialog" data-size={size} data-maximised={maximised || undefined}>
           <header className="vy-dialog-head">
             <div>
               <RDialog.Title className="vy-dialog-title">{title}</RDialog.Title>
               {subtitle && <RDialog.Description className="vy-dialog-sub">{subtitle}</RDialog.Description>}
             </div>
-            <RDialog.Close className="vy-icon-btn" aria-label="Close" data-state-layer>
-              <svg viewBox="0 0 20 20" width="17" height="17" fill="none" stroke="currentColor"
-                   strokeWidth="1.8" strokeLinecap="round" aria-hidden>
-                <path d="m5 5 10 10M15 5 5 15" />
-              </svg>
-            </RDialog.Close>
+            <div className="vy-window-actions">
+              <button type="button" className="vy-icon-btn"
+                      aria-pressed={maximised}
+                      aria-label={maximised ? 'Restore down' : 'Maximize'}
+                      title={maximised ? 'Restore down' : 'Maximize'}
+                      onClick={() => setMaximised(m => !m)}>
+                <svg viewBox="0 0 20 20" width="15" height="15" fill="none" stroke="currentColor"
+                     strokeWidth="1.7" strokeLinejoin="round" aria-hidden>
+                  {maximised
+                    ? <path d="M7 7V4h9v9h-3M4 7h9v9H4z" />
+                    : <rect x="4" y="4" width="12" height="12" rx="1" />}
+                </svg>
+              </button>
+              <RDialog.Close className="vy-icon-btn" aria-label="Close" title="Close" data-state-layer>
+                <svg viewBox="0 0 20 20" width="17" height="17" fill="none" stroke="currentColor"
+                     strokeWidth="1.8" strokeLinecap="round" aria-hidden>
+                  <path d="m5 5 10 10M15 5 5 15" />
+                </svg>
+              </RDialog.Close>
+            </div>
           </header>
           <div className="vy-dialog-body">{children}</div>
           {actions && <footer className="vy-dialog-actions">{actions}</footer>}

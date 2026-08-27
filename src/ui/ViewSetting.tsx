@@ -39,6 +39,9 @@ export function ViewSetting<T>({
   onClose: () => void;
 }) {
   const [tab, setTab] = useState<Tab>('filter');
+  /* Maximise earns its place here: the Column tab is a three-column table of
+     eleven rows, and at 460px the name and width inputs are cramped. */
+  const [maximised, setMaximised] = useState(false);
   const [draft, setDraft] = useState<SavedView>(() => ({ ...view }));
   /* Ticked by default for a built-in view, because you cannot overwrite one —
      the only thing Save can do there is create. */
@@ -64,13 +67,27 @@ export function ViewSetting<T>({
   return (
     <>
       <div className="vy-scrim" onClick={onClose} aria-hidden />
-      <aside className="vy-viewsetting" role="dialog" aria-label="Request For Quotation - View Setting">
+      <aside className="vy-viewsetting" role="dialog" data-maximised={maximised || undefined}
+             aria-label="Request For Quotation - View Setting">
         <header className="vy-vs-head">
           <h2>Request For Quotation - View Setting</h2>
-          <button className="vy-icon-btn" aria-label="Close" onClick={onClose}>
-            <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor"
-                 strokeWidth="1.8" strokeLinecap="round" aria-hidden><path d="m5 5 10 10M15 5 5 15" /></svg>
-          </button>
+          <div className="vy-window-actions">
+            <button className="vy-icon-btn" aria-pressed={maximised}
+                    aria-label={maximised ? 'Restore down' : 'Maximize'}
+                    title={maximised ? 'Restore down' : 'Maximize'}
+                    onClick={() => setMaximised(m => !m)}>
+              <svg viewBox="0 0 20 20" width="15" height="15" fill="none" stroke="currentColor"
+                   strokeWidth="1.7" strokeLinejoin="round" aria-hidden>
+                {maximised
+                  ? <path d="M7 7V4h9v9h-3M4 7h9v9H4z" />
+                  : <rect x="4" y="4" width="12" height="12" rx="1" />}
+              </svg>
+            </button>
+            <button className="vy-icon-btn" aria-label="Close" title="Close" onClick={onClose}>
+              <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor"
+                   strokeWidth="1.8" strokeLinecap="round" aria-hidden><path d="m5 5 10 10M15 5 5 15" /></svg>
+            </button>
+          </div>
         </header>
 
         <div className="vy-vs-actions">

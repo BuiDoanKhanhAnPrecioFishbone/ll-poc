@@ -224,7 +224,10 @@ export function Quotations() {
     <DataGrid
       data={sorted}
       columns={allColumns}
-      title="Quotations"
+      /* "Project Requirement", as the guideline specifies and the nav says —
+         not "Quotations". A screen whose heading disagrees with the menu item
+         you clicked to reach it is the same defect as the renamed tabs. */
+      title="Project Requirement"
       subtitle={withheld > 0
         /* Says that something is hidden without saying what — the count alone
            is not export-controlled, the records are. Silence here would make a
@@ -232,7 +235,7 @@ export function Quotations() {
         ? <>Customer RFQs and the quotes sent back · <strong>{withheld} not shown (ITAR)</strong></>
         : 'Customer RFQs and the quotes sent back'}
       leadAction={
-        <Button variant="filled"
+        <Button variant="filled" title="Create a new Project Requirement"
                 onClick={() => toast.notImplemented('open the New Project Requirement modal')}>
           Add New
         </Button>
@@ -271,7 +274,8 @@ export function Quotations() {
             Both were in this group before, so "left" meant "left of Export"
             rather than left of anything — the two sat together in the right
             corner with a stretched gap between them. */}
-        <Button onClick={() => toast.notImplemented(`export these ${data.length} RFQs to Excel`)}>
+        <Button title="Export the filtered list to Excel"
+                onClick={() => toast.notImplemented(`export these ${data.length} RFQs to Excel`)}>
           Export
         </Button>
       </>}

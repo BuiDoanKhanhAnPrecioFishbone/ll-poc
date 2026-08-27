@@ -134,6 +134,33 @@ confirming.
 
 ---
 
+## 9. Should a record open as a modal, and should dialogs minimise?
+
+Two parts, both from running your `PR - PR List` test sheet against the build.
+
+**The record.** Your guideline says the detail opens as a modal, three times.
+Ours opens as a full page. The reason written down at the time was that a modal
+has no URL, so you cannot send a colleague a link to an RFQ.
+
+**That reason was wrong.** Checking the live system on 27 August, the record
+dialog *does* have its own URL. So the decision rested on something untrue. A
+page may still be better — it gives a browser back button and a breadcrumb — but
+that is now a preference, not a correction, and it is yours to make.
+
+**Minimise.** Your guideline asks every dialog for Minimize, Maximize/Restore
+Down and Close. We have built Maximize and Close.
+
+Minimize we have left out, and want to check rather than guess. In Kendo it
+collapses a *draggable* window down to its title bar, in place. Our dialogs are
+centred and modal, so minimising one would leave a title bar floating in the
+middle of a dimmed screen — which does not achieve what minimising is for.
+
+If your users minimise a dialog to read the list underneath it, the real answer
+is a non-modal draggable window. That is a different component, and worth
+knowing before it gets built rather than after.
+
+---
+
 ## Two defects in the live system, for your backlog
 
 Not questions, just things we noticed and you may not have:

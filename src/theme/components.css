@@ -881,3 +881,12 @@
 .vy-column-list label[data-required] { cursor: default; color: var(--vy-grey-600); }
 .vy-column-list label[data-required]:hover { background: none; }
 .vy-column-req { margin-left: auto; font-style: normal; font-size: var(--vy-text-2xs); color: var(--vy-grey-500); }
+
+/* Window actions — Maximize / Restore Down, then Close. The guideline also asks
+   for Minimize; see the note in Overlays.tsx and question 9 for why it is not
+   built. */
+.vy-window-actions { display: flex; gap: var(--vy-space-1); flex: 0 0 auto; }
+.vy-dialog[data-maximised] {
+  width: 96vw; max-width: none;
+  height: 94vh; max-height: none;
+}
