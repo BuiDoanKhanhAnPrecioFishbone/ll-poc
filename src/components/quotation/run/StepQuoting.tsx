@@ -149,8 +149,12 @@ export function StepQuoting({ cfg, set, lines, setLines, hasRun, onRun, onApply,
  * yellow is not "half of red", it is a different problem with a different fix.
  */
 export function rowTone(l: BomLine, hasRun = true): string | undefined {
-  /* Grey applies immediately — a line excluded on step 2 is excluded now. */
-  if (l.excluded) return 'excluded';
+  /* Grey applies immediately — a line excluded on step 2 is excluded now.
+     It also covers a line that became NO BID on leaving step 3 for want of a
+     supplier: same status, so the same colour. They arrive at it by different
+     routes, but "this line is not being quoted" is one fact and showing it two
+     ways would make the reader look for a difference that is not there. */
+  if (l.excluded || l.status === 'NO BID') return 'excluded';
   /* The other three describe what the RUN found, and the guideline lists them
      under "6.3. After Run Quote". Before it, every line sits at the default
      Status = N/A, so colouring by status painted the entire grid red and made

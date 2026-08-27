@@ -219,8 +219,11 @@ export function ConfirmQuoteDialog({ open, lines, onClose, onAccept }: {
  * Packaging." Description, MFG and MPN fill themselves from the chosen part and
  * are read-only; quantity, unit price and notes are the user's.
  */
-export function AddPackageDialog({ open, onClose, onAdd }: {
-  open: boolean; onClose: () => void;
+export function AddPackageDialog({ open, buildQty, onClose, onAdd }: {
+  open: boolean;
+  /** Needed to turn a per-board package quantity into a total. */
+  buildQty: number;
+  onClose: () => void;
   onAdd: (line: { part: string; description: string; mfg: string; mpn: string;
                   qty: number; unitPrice: number; notes: string }) => void;
 }) {
@@ -230,10 +233,21 @@ export function AddPackageDialog({ open, onClose, onAdd }: {
   const [notes, setNotes] = useState('');
 
   const chosen = PACKAGING_PARTS.find(p => p.part === part);
-  /* "Total Quantity: ... default value is 1 when the dialog is opened
-     (read-only). After the user enters Select Quantity, this field is
-     automatically updated accordingly." */
-  const totalQty = Number(qty) > 0 ? Number(qty) : 1;
+  /**
+   * "Total Quantity: ... default value is 1 when the dialog is opened
+   * (read-only). After the user enters Select Quantity, this field is
+   * automatically updated accordingly."
+   *
+   * "Accordingly" is not spelled out, so this reads Select Quantity as PER
+   * BOARD and multiplies by Build Qty — the same relationship every other line
+   * on the BoM has. The alternative, Total Quantity simply echoing Select
+   * Quantity, would make one of the two fields pointless, and it broke the cost
+   * summary: a package entered as 50 raised Cost/Board by the whole $21 rather
+   * than by the $0.42 one board actually consumes. Flagged in
+   * docs/testing/quick-quote-results.md — the guideline does not state it.
+   */
+  const perBoard = Number(qty) > 0 ? Number(qty) : 1;
+  const totalQty = perBoard * Math.max(1, buildQty);
   const amount = totalQty * (Number(unitPrice) || 0);
 
   function reset() { setPart(''); setQty('1'); setUnitPrice('0'); setNotes(''); }
@@ -255,7 +269,7 @@ export function AddPackageDialog({ open, onClose, onAdd }: {
                 onClick={() => {
                   if (!chosen) return;
                   onAdd({ part: chosen.part, description: chosen.description, mfg: chosen.mfg,
-                          mpn: chosen.mpn, qty: totalQty, unitPrice: Number(unitPrice) || 0, notes });
+                          mpn: chosen.mpn, qty: perBoard, unitPrice: Number(unitPrice) || 0, notes });
                   reset(); onClose();
                 }}>
           Add
@@ -282,8 +296,9 @@ export function AddPackageDialog({ open, onClose, onAdd }: {
           <TextField type="number" min={1} aria-label="Select Quantity" value={qty}
                      onChange={e => setQty(e.target.value)}
                      onBlur={e => { if (!(Number(e.target.value) > 0)) setQty('1'); }} />
+          <span className="vy-field-hint">Per board.</span>
         </div>
-        <ReadOnly label="Total Quantity" value={String(totalQty)} />
+        <ReadOnly label="Total Quantity" value={`${totalQty.toLocaleString()}  (${perBoard} × ${buildQty} boards)`} />
 
         <div className="vy-quote-config-field">
           <span className="vy-quote-fact-label">Unit Price</span>

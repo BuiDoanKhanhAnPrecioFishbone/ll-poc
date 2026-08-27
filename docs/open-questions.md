@@ -198,6 +198,27 @@ list". We have built it as selectable. Worth a correction in your document.
 
 ---
 
+## 11. Two things Quick Quote does not tell us
+
+**a. Add: Packages — what is "Total Quantity"?** The sheet says it updates
+"accordingly" when Select Quantity is entered, without saying how. We have read
+Select Quantity as *per board* and Total Quantity as that times Build Qty, which
+is the same relationship every other BoM line has. Read the other way — Total
+Quantity simply echoing Select Quantity — the two fields are redundant and the
+cost summary comes out wrong: a package entered as 50 raised Cost/Board by the
+whole $21 instead of the $0.42 one board consumes. Please confirm.
+
+**b. Did the MFG Mismatch Review panel move, or go?** The shipped system has a
+panel on the Review BoM step listing BoM manufacturers that disagree with Z2Data,
+offering *Link to an existing Manufacturer*, *Create a new Manufacturer* and *Add
+to Alias*. Your Quick Quote sheet has no such panel — it has a *Missing
+Manufacturer* filter instead. We have followed the sheet and removed the panel,
+but this is us removing something that exists in your live system on the strength
+of a document that does not mention it, which is the wrong way round if the sheet
+is simply silent rather than deliberate. Tell us and it comes back.
+
+---
+
 ## Two defects in the live system, for your backlog
 
 Not questions, just things we noticed and you may not have:

@@ -365,15 +365,9 @@
 .vy-run { display: flex; flex-direction: column; gap: var(--vy-space-7); }
 .vy-run-context { display: flex; align-items: baseline; gap: var(--vy-space-6); flex-wrap: wrap; font-size: var(--vy-text-base); color: var(--vy-grey-600); background: var(--vy-grey-50); border-radius: var(--vy-radius-md); padding: var(--vy-space-4) var(--vy-space-6); }
 .vy-run-step { display: flex; flex-direction: column; gap: var(--vy-space-6); }
-.vy-run-cols { display: grid; grid-template-columns: 1fr 1fr; gap: var(--vy-space-9); }
 .vy-run-banner { font-size: var(--vy-text-base); border-radius: var(--vy-radius-md); padding: var(--vy-space-5) var(--vy-space-6); }
 .vy-run-banner[data-tone="warn"] { background: var(--vy-status-open-bg); color: var(--vy-status-open-fg); }
 .vy-run-banner[data-tone="ok"] { background: var(--vy-status-done-bg); color: var(--vy-status-done-fg); }
-.vy-match { font-size: var(--vy-text-xs); font-weight: var(--vy-weight-semibold); border-radius: var(--vy-radius-pill); padding: 1px var(--vy-space-4); white-space: nowrap; }
-.vy-match[data-match="Matched"] { background: var(--vy-status-done-bg); color: var(--vy-status-done-fg); }
-.vy-match[data-match="No Match"] { background: var(--vy-red-50); color: var(--vy-red-700); }
-.vy-match[data-match="Matches Another Supplier"] { background: var(--vy-status-open-bg); color: var(--vy-status-open-fg); }
-.vy-match[data-match="No Bid"] { background: var(--vy-grey-100); color: var(--vy-grey-600); }
 
 
 /* Marks content this mockup could not verify against the live system, so a
@@ -521,26 +515,15 @@
 
 /* Manufacturer mismatch: BOM spelling on the left, Z2Data's on the right, with
    the arrow between them saying which way the rename would go. */
-.vy-mismatch { list-style: none; margin: var(--vy-space-6) 0 0; padding: 0; display: flex; flex-direction: column; gap: var(--vy-space-5); }
-.vy-mismatch li { display: flex; flex-wrap: wrap; align-items: center; gap: var(--vy-space-4); padding: var(--vy-space-5) var(--vy-space-6); background: var(--vy-grey-25); border: 1px solid var(--vy-grey-200); border-radius: var(--vy-radius-md); }
-.vy-mismatch-arrow { color: var(--vy-grey-500); }
-.vy-mismatch-actions { display: flex; flex-wrap: wrap; gap: var(--vy-space-3); margin-left: auto; }
 
 /* Line states. There is no "matched" state in the live product — a line with no
    flag is simply fine, so only the problems get colour. */
-.vy-match[data-match="No Match"]            { background: var(--vy-status-blocked-bg);   color: var(--vy-status-blocked-fg); }
-.vy-match[data-match="Not Enough Qty"]      { background: var(--vy-status-open-bg);      color: var(--vy-status-open-fg); }
-.vy-match[data-match="Out Stock"]           { background: var(--vy-status-open-bg);      color: var(--vy-status-open-fg); }
-.vy-match[data-match="Unselected Supplier"] { background: var(--vy-status-draft-bg);     color: var(--vy-status-draft-fg); }
 
 .vy-empty-state--inline { padding: var(--vy-space-10) var(--vy-space-8); margin: var(--vy-space-6) 0 0; }
 
 /* ---- Step 4: Cost Estimation -------------------------------------------- */
-.vy-run-summary-step { display: grid; grid-template-columns: 2fr 1fr; gap: var(--vy-space-8); align-items: start; }
-.vy-summary-detail { display: grid; grid-template-columns: repeat(auto-fit, minmax(var(--vy-field-group-min), 1fr)); gap: var(--vy-space-8); padding: var(--vy-space-8); border: 1px solid var(--vy-grey-200); border-radius: var(--vy-radius-lg); }
 .vy-cost-card { padding: var(--vy-space-8); background: var(--vy-grey-50); border: 1px solid var(--vy-grey-200); border-radius: var(--vy-radius-lg); }
 .vy-cost-title { margin: 0 0 var(--vy-space-6); font-size: var(--vy-text-sm); font-weight: var(--vy-weight-semibold); color: var(--vy-grey-600); text-transform: uppercase; letter-spacing: .04em; }
-.vy-cost-list { margin: 0; display: flex; flex-direction: column; gap: var(--vy-space-4); }
 .vy-cost-row { display: flex; justify-content: space-between; align-items: baseline; gap: var(--vy-space-6); }
 .vy-cost-row dt { font-size: var(--vy-text-sm); color: var(--vy-grey-600); }
 .vy-cost-row dd { margin: 0; font-family: var(--vy-font-mono); font-size: var(--vy-text-base); color: var(--vy-grey-900); font-variant-numeric: tabular-nums; }

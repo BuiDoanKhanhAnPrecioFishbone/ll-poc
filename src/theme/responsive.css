@@ -48,7 +48,6 @@
   .vy-search kbd { display: none; }
   .vy-field-groups { grid-template-columns: 1fr; gap: var(--vy-space-8); }
   .vy-bom-panes { grid-template-columns: 1fr; }
-  .vy-run-cols { grid-template-columns: 1fr; }
   /* Below this the left panel has no width to spare: assignees go back to a
      band above the lists rather than squeezing both. */
   .vy-checklist-layout { grid-template-columns: 1fr; }
@@ -132,7 +131,6 @@
    ("Total Cost / With / MarkUp") and the numbers stop lining up, which is the
    one thing a column of figures has to do. Stack instead. */
 @media (max-width: 900px) {
-  .vy-run-summary-step { grid-template-columns: 1fr; }
 }
 
 /* ---- Global header: shed the optional widgets before the essential ones ---

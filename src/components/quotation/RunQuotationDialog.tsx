@@ -265,16 +265,21 @@ export function RunQuotationDialog({ q, onClose }: { q: Quotation; onClose: () =
 
       <AddPackageDialog
         open={packageOpen}
+        buildQty={cfg.buildQty}
         onClose={() => setPackageOpen(false)}
         onAdd={p => setLines(ls => [...ls, {
           id: Math.max(0, ...ls.map(l => l.id)) + 1,
           number: ls.length + 1,
           part: p.part, revision: '—', description: p.description,
+          /* `qty` is PER BOARD everywhere in this model, so the package's total
+             comes out of the same formula as every other line rather than
+             being stored separately. */
           partSource: 'PACKAGING', qty: p.qty, level: 1,
           mfg: p.mfg, mpn: p.mpn,
           attrition: 0, supplier: '—',
-          orderQty: p.qty, stock: 0, outStock: 0, lt: 0, pkg: '', moq: 0,
-          excessQty: 0, unitPrice: p.unitPrice, amount: p.unitPrice * p.qty,
+          orderQty: p.qty * cfg.buildQty, stock: 0, outStock: 0, lt: 0, pkg: '', moq: 0,
+          excessQty: 0, unitPrice: p.unitPrice,
+          amount: p.unitPrice * p.qty * cfg.buildQty,
           excessAmt: 0, status: 'COVER', notes: p.notes,
           excluded: false, isPackage: true,
         }])}
