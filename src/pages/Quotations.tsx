@@ -7,7 +7,7 @@ import { DataGrid, fmtDate } from '../ui/DataGrid';
 import { useToast } from '../ui/Toast';
 import { usePrefs } from '../ui/prefs';
 import { generateQuotations, QUOTATION_COLUMNS, daysUntil, type Quotation } from '../data/quotations';
-import { measureFor, scopeFilter } from '../data/queues';
+import { measureFor, scopeFilter, ME } from '../data/queues';
 import { applyItarVisibility } from '../data/itar';
 import { FilterToolbar } from '../ui/FilterToolbar';
 import { applyView, activeCount, type FilterValues } from '../ui/views';
@@ -16,8 +16,19 @@ import { ViewSetting } from '../ui/ViewSetting';
 import { useViews, draftFrom } from '../ui/useViews';
 import { applySort, type SavedView } from '../ui/views';
 
-/** Which quick filters are worth a tile. Not all of them — five tiles is a
- *  dashboard, and the row stops being read. */
+/**
+ * The four measures. These are the ONLY quick filters, and they live in the KPI
+ * row — there is no chip row beside it saying the same four things again.
+ *
+ * There was, briefly. The chips came first; the review then asked for a KPI
+ * summary that doubles as the filter; the tiles were added and the chips were
+ * never removed. The screen ended up offering every measure twice, in two
+ * shapes, three inches apart.
+ *
+ * "Assigned to me" is deliberately NOT here. It is a scope — whose records you
+ * are looking at — not a state a record can be in, and mixing the two in one
+ * row makes the tiles read as though they combine the same way.
+ */
 const KPI_KEYS = ['open', 'overdue', 'due-week', 'waiting-doc'];
 
 /**
@@ -57,7 +68,10 @@ export function Quotations() {
   /* Quick filters default to the two an estimator wants on arrival. They are
      one click to drop, and the bar states what is applied rather than filtering
      silently. */
-  const [quickOn, setQuickOn] = useState<string[]>(['mine', 'open']);
+  const [quickOn, setQuickOn] = useState<string[]>(['open']);
+  /* Whose records. Separate from the measures, and matching the Mine/Team
+     toggle on My Queues — the same question deserves the same control. */
+  const [mine, setMine] = useState(true);
   /* One value per field. No operators — see docs/filter-spec.md. */
   const [values, setValues] = useState<FilterValues>({});
   const { dateStyle } = usePrefs();
@@ -106,10 +120,11 @@ export function Quotations() {
     }
     /* Quick filters are conjunctive with each other and with the advanced
        conditions: every chip you turn on narrows further. */
-    const quickMatched = all.filter(q =>
+    const inScope = mine ? all.filter(q => q.assignedTo === ME) : all;
+    const quickMatched = inScope.filter(q =>
       QUOTATION_QUICK.filter(f => quickOn.includes(f.key)).every(f => f.match(q)));
     return applyView(quickMatched, fields, values);
-  }, [all, queue, scope, quickOn, values, fields]);
+  }, [all, queue, scope, quickOn, values, fields, mine]);
 
 
   /* Priority and Date Needed carry bespoke cells; every other column is
@@ -206,7 +221,9 @@ export function Quotations() {
            you cannot act on is decoration. */
         <>
           {QUOTATION_QUICK.filter(f => KPI_KEYS.includes(f.key)).map(f => {
-            const n = all.filter(f.match).length;
+            /* Counted within the current scope. A tile reading 66 above a grid
+               showing 15 rows is not a summary of anything on screen. */
+            const n = (mine ? all.filter(q => q.assignedTo === ME) : all).filter(f.match).length;
             const on = quickOn.includes(f.key);
             return (
               <button key={f.key} type="button" className="vy-kpi" data-key={f.key}
@@ -243,19 +260,21 @@ export function Quotations() {
           <Button variant="text" onClick={clearQueue}>Clear</Button>
         </div>
       ) : (
-        /* The QUICK tier: named sets, one click. The field panel behind the
-           funnel is the other tier. The review requires both. */
+        /* Scope only. The measures are the KPI tiles above — putting them here
+           as well is what this row used to do. */
         <div className="vy-filter-row-main">
-          <span className="vy-filter-label">Show</span>
-          {QUOTATION_QUICK.map(f => (
-            <Chip key={f.key} label={f.label}
-                  selected={quickOn.includes(f.key)}
-                  onClick={() => toggleQuick(f.key)} />
-          ))}
+          <div className="vy-scope" role="group" aria-label="Whose records to show">
+            {[true, false].map(v => (
+              <button key={String(v)} type="button" className="vy-scope-btn"
+                      aria-pressed={mine === v} onClick={() => setMine(v)}>
+                {v ? 'Mine' : 'Everyone'}
+              </button>
+            ))}
+          </div>
           {(quickOn.length > 0 || active > 0) && (
             <Button variant="text"
                     onClick={() => { setQuickOn([]); setValues({}); }}>
-              Clear
+              Clear filters
             </Button>
           )}
         </div>
