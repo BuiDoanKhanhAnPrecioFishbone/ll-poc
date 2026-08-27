@@ -67,7 +67,7 @@ export const findings: Finding[] = [
     impact: 'A 60px column and an extra pointer trip on every record open.',
     fix: 'Make the IDENTIFIER the link, not the row. REVISED 22 Aug 2026 — this first read "make the row open the record", which is wrong: users copy values out of the grid daily, and a drag to select ends in mouseup on the row, firing the click and navigating away. Linking the identifier costs no column, keeps every cell selectable, and gives a visible affordance. Verified against the customer, who raised the copy case.',
     status: 'fixed',
-    note: 'Built — but not as first proposed. Making the whole ROW clickable broke text selection, which estimators rely on to copy part numbers into email. The identifier cell is the link instead.'
+    note: 'Built — but not as first proposed, and now standing against a client document. Making the whole ROW clickable broke text selection, which estimators rely on to copy part numbers into email, so the identifier cell is the link. The customer\'s Testing Guideline lists a leading "View Detail" column and the live system has one; it was built to match and then removed, because that column is a KendoReact default rather than a design decision and their own notes plan a second row action. Raised as question 1 in docs/open-questions.md rather than decided quietly.'
   },
   {
     id: 'T5', area: 'Tables', effort: 'Low', value: 'Medium',

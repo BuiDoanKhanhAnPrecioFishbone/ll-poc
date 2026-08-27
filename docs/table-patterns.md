@@ -73,6 +73,15 @@ effectively impossible.
 The identifier is already the record's name. Making *it* the link:
 
 - costs no extra column, so the eye icon still does not come back
+
+**Standing against a client document, knowingly.** The customer's Testing
+Guideline lists a leading "View Detail" column, and the live system has one. It
+was built to match on 27 Aug and removed the same day, once it was clear the
+column is a KendoReact command-column default rather than a design decision —
+and that the customer's own notes plan a SECOND row action ("duplicate record
+(clone)", replacing Historical RFQ). A leading icon column does not survive a
+second icon. Raised as question 1 in `docs/open-questions.md`; if they want it
+back, it comes back.
 - leaves every other cell as inert, selectable text
 - reads as an affordance without needing to be explained
 - renders as a real anchor where the record has a URL, so middle-click,

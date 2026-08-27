@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import type { ColumnSpec } from '../components/column-model';
+import { useSearchParams } from 'react-router-dom';
 import { Button } from '../ui/Button';
 import { Chip } from '../ui/Chip';
 import { Priority } from '../ui/Priority';
@@ -113,33 +112,6 @@ export function Quotations() {
   }, [all, queue, scope, quickOn, values, fields]);
 
 
-  /**
-   * "View Detail: provides an action for the user to open the detail modal of
-   * the selected project requirement." The guideline lists it as a column, so
-   * it is one.
-   *
-   * It sits ALONGSIDE the link on the RFQ number rather than replacing it. The
-   * two are different affordances: this is the discoverable one, matching the
-   * control users already know, and the link on the identifier is the fast one
-   * that also supports middle-click and open-in-new-tab. Neither is redundant
-   * with the other, and the row itself stays inert so text can still be
-   * selected and copied — which is the daily task on this screen.
-   */
-  const viewDetailColumn: ColumnSpec<Quotation> = {
-    field: 'id', title: 'View', role: 'code', width: 56,
-    widthNote: 'Holds one icon button; the 96px code default is twice what it needs.',
-    render: (q: Quotation) => (
-      <Link className="vy-view-detail" to={`/sales-management/quotation/${q.id}`}
-            aria-label={`View detail for RFQ${q.no}`} title="View detail">
-        <svg viewBox="0 0 20 20" width="15" height="15" fill="none" stroke="currentColor"
-             strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-          <path d="M1.8 10S4.6 4.8 10 4.8 18.2 10 18.2 10 15.4 15.2 10 15.2 1.8 10 1.8 10" />
-          <circle cx="10" cy="10" r="2.2" />
-        </svg>
-      </Link>
-    ),
-  };
-
   /* Priority and Date Needed carry bespoke cells; every other column is
      rendered by its role. Widths still come from the role in both cases. */
   const columns = useMemo(() => QUOTATION_COLUMNS.map(c => {
@@ -174,9 +146,22 @@ export function Quotations() {
 
   /**
    * The view decides which columns appear, in what order, under what name and
-   * at what width. View Detail is prepended and is not part of the view — it is
-   * an action, not data, and a view that could hide it would leave rows with no
-   * way to open.
+   * at what width.
+   *
+   * NO LEADING ACTION COLUMN. The customer's Testing Guideline lists a "View
+   * Detail" column first, and the live system has one — a KendoReact command
+   * column, which is that component's default rather than a design decision.
+   * It is deliberately not built here; see docs/open-questions.md, question 1.
+   *
+   * The short of it: every major system opens a row from its title or
+   * identifier (Jira, Linear, GitHub, Asana, Salesforce, HubSpot), and where
+   * they carry row actions those sit in a TRAILING overflow menu. That matters
+   * here because the customer's own notes plan a second row action — "duplicate
+   * record (clone)" is replacing Historical RFQ — and a leading icon column
+   * does not survive a second icon, let alone a third.
+   *
+   * This is a knowing deviation from a client document, raised with them rather
+   * than taken silently.
    */
   const allColumns = useMemo(() => {
     const byField = new Map(columns.map(c => [String(c.field), c]));
@@ -191,7 +176,7 @@ export function Quotations() {
         };
       })
       .filter(Boolean) as typeof columns;
-    return [viewDetailColumn, ...ordered];
+    return ordered;
   }, [columns, view.columns]);
 
   /* The view's sort runs before the grid's own header sorting, so a saved view

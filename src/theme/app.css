@@ -1006,17 +1006,6 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
 /* A status change is the entry people scan for, so it keeps a marker. */
 .vy-activity-item[data-action="Status"] .vy-activity-summary { font-weight: var(--vy-weight-medium); }
 
-/* The View Detail action, one per row. Quiet at rest: it repeats down every
-   row, so anything heavier turns the leftmost column into a stripe of buttons
-   and pulls the eye away from the data it is meant to open. */
-.vy-view-detail {
-  display: inline-grid; place-items: center;
-  width: var(--vy-space-10); height: var(--vy-space-10);
-  border-radius: var(--vy-radius-sm);
-  color: var(--vy-grey-500);
-}
-.vy-view-detail:hover { background: var(--vy-blue-50); color: var(--vy-blue-700); }
-.vy-view-detail:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
 
 /* =============================================================================
    FILTER TOOLBAR — the panel behind the funnel
