@@ -2,6 +2,7 @@ import { TextField, TextArea } from '../../ui/Field';
 import { Select, Checkbox, RadioGroup } from '../../ui/Overlays';
 import { Priority, priorityLevel, PRIORITY_LEVELS, type PriorityLevel } from '../../ui/Priority';
 import { OPTION_MEANINGS } from '../../data/metadata';
+import { fmtDate } from '../../ui/renderCell';
 
 const LEVEL_TO_N: Record<PriorityLevel, number> = { High: 3, Medium: 2, Low: 1 };
 
@@ -35,6 +36,18 @@ export type FieldKind =
   /** A reference to another record. Options depend on the rest of the form. */
   | { kind: 'lookup'; optionsFor: (row: any) => readonly string[] }
   | { kind: 'number'; suffix?: string; min?: number; max?: number }
+  /**
+   * A calendar date, held as a Date and read back in the system's one format.
+   *
+   * Due Date and Created Date used to be hand-written rows on the record page
+   * rather than field declarations, which is how they escaped every rule the
+   * other fields obey: Due Date carried a required marker with no control
+   * behind it in edit mode, and Created Date — which the system stamps — never
+   * got the read-only treatment the customer signed off on. Anything with a
+   * label and a value is a field; hand-rolling one opts it out of the
+   * conventions rather than exempting it from needing them.
+   */
+  | { kind: 'date' }
   | { kind: 'flag' }
   /** High / Medium / Low, stored 1-3. Rendered as a dot and a word, not stars. */
   | { kind: 'priority' };
@@ -188,6 +201,20 @@ export function RecordField<T extends Record<string, any>>({
           </dd>
         </div>
       );
+    case 'date':
+      return (
+        <div className="vy-field vy-field--editing" data-invalid={missing || undefined}>
+          <dt><label htmlFor={`f-${def.name}`}>{def.label}{def.required && <RequiredMark />}</label></dt>
+          <dd>
+            <TextField id={`f-${def.name}`} type="date" value={toDateInput(value)}
+                       aria-invalid={missing || undefined}
+                       onBlur={() => onBlur?.(def.name)}
+                       onChange={e => onChange(def.name, fromDateInput(e.target.value))} />
+            {err}
+            {def.hint && !missing && <span className="vy-field-hint">{def.hint}</span>}
+          </dd>
+        </div>
+      );
     case 'number':
       return (
         <div className="vy-field vy-field--editing" data-invalid={missing || undefined}>
@@ -278,6 +305,18 @@ function ReadField<T>({ def, value, editing }: { def: FieldDef<T>; value: unknow
       </div>
     );
   }
+  if (def.kind === 'date') {
+    const d = value instanceof Date ? value : undefined;
+    return (
+      <div className="vy-field" data-locked={editing && def.readOnly || undefined}>
+        <dt>{def.label}{def.required && <RequiredMark />}</dt>
+        <dd className={d ? undefined : 'is-empty'}>
+          {d ? fmtDate(d) : 'Not set'}
+          {editing && def.readOnly && <LockNote def={def} />}
+        </dd>
+      </div>
+    );
+  }
   const empty = value === undefined || value === null || value === '';
   /* "42%" but "12 days": a symbol binds to its number, a word does not. */
   const shown = def.kind === 'number' && !empty && def.suffix
@@ -309,4 +348,24 @@ function LockNote<T>({ def }: { def: FieldDef<T> }) {
       {def.derivedFrom ? `follows ${def.derivedFrom}` : 'set by the system'}
     </span>
   );
+}
+
+
+/* ---- Date <-> <input type="date"> ------------------------------------------
+   Built from LOCAL parts, not toISOString(). An ISO string is UTC, so for any
+   user east of Greenwich — which is all of them, this customer being in
+   Ho Chi Minh City — a date at midnight local renders as the PREVIOUS day in
+   the input. The field would show one date while the record held another. */
+function toDateInput(v: unknown): string {
+  if (!(v instanceof Date) || Number.isNaN(v.getTime())) return '';
+  const p = (n: number) => String(n).padStart(2, '0');
+  return `${v.getFullYear()}-${p(v.getMonth() + 1)}-${p(v.getDate())}`;
+}
+
+/** Parsed as local midnight for the same reason, rather than `new Date(str)`,
+ *  which reads a bare yyyy-mm-dd as UTC. */
+function fromDateInput(s: string): Date | undefined {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
+  if (!m) return undefined;
+  return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
 }

@@ -3,7 +3,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Tabs } from '../ui/Overlays';
 import { Button } from '../ui/Button';
 import { StatusBadge } from '../ui/Badge';
-import { fmtDate } from '../ui/DataGrid';
 import { generateQuotations, daysUntil, findCustomer, contactsFor, type Quotation } from '../data/quotations';
 import { ChecklistsTab } from '../components/quotation/ChecklistsTab';
 import { ResultTab } from '../components/quotation/ResultTab';
@@ -12,7 +11,7 @@ import { ActivityTab } from '../components/quotation/ActivityTab';
 import { BomComparisonDialog } from '../components/quotation/BomComparisonDialog';
 import { RunQuotationDialog } from '../components/quotation/RunQuotationDialog';
 import { useToast } from '../ui/Toast';
-import { RecordField, RequiredMark, isMissing } from '../components/quotation/RecordField';
+import { RecordField, isMissing } from '../components/quotation/RecordField';
 import { smartButtonsFor, SmartIcon } from '../components/quotation/SmartButtons';
 import { HISTORICAL_RFQ_FIELD, showsHistoricalRfq, HEADER_GROUPS, COMMERCIAL, TECHNICAL, INVENTORY, NOTES, ALL_FIELDS,
          setHistoricalRfqOptions } from '../components/quotation/requirementFields';
@@ -295,19 +294,6 @@ export function QuotationDetail() {
                                editing={editing} onChange={setField} row={draft ?? q}
                                touched={touched.has('historicalRfq')} onBlur={markTouched} />
                 )}
-                {/* Two system-stamped dates and a rating, which have no FieldDef
-                    because nothing about them is typed. They belong with the
-                    owner: a due date means little without knowing whose it is. */}
-                {/* Two system-stamped dates, which have no FieldDef because
-                    nothing about them is typed. Priority is a real field and
-                    lives in the group's own list, editable. */}
-                {g.id === 'schedule' && <>
-                  {/* Required per the Testing Guideline's list of seven. It has
-                      no FieldDef because the date itself is not typed here, so
-                      the marker has to be passed in. */}
-                  <Fact label="Due Date" required value={fmtDate(q.dateNeeded)} />
-                  <Fact label="Created Date" value={fmtDate(q.createdDate)} />
-                </>}
               </dl>
             </section>
           ))}
@@ -403,17 +389,6 @@ function RequirementsTab({ q, editing, onChange, touched, onBlur }: {
  * for "label above value" in one header was half the reason it read as two
  * separate cards.
  */
-function Fact({ label, value, required }: {
-  label: string; value: React.ReactNode; required?: boolean;
-}) {
-  return (
-    <div className="vy-field">
-      <dt>{label}{required && <RequiredMark />}</dt>
-      <dd>{value}</dd>
-    </div>
-  );
-}
-
 function FieldGroup({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="vy-field-group">

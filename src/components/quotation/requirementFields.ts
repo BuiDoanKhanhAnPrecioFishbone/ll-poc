@@ -109,13 +109,32 @@ export type HeaderGroup = {
 };
 
 /**
+ * Due Date — the record form's name for `dateNeeded`.
+ *
+ * Required per the Testing Guideline, and now editable. It spent this build
+ * carrying a required marker with nothing behind it: the record page printed
+ * it as static text in both modes, so the one field the guideline says the
+ * user must set was the one field they could not.
+ */
+const DUE_DATE_FIELD: FieldDef<Quotation> = {
+  name: 'dateNeeded', label: 'Due Date', kind: 'date', required: true,
+  hint: 'When the customer needs the quotation back.',
+};
+
+/**
+ * Created Date — stamped when the RFQ is saved, never typed.
+ *
+ * `readOnly`, which is what earns it the grey box while editing and a plain
+ * white one while reading, per the customer's 25 Aug answer.
+ */
+const CREATED_DATE_FIELD: FieldDef<Quotation> = {
+  name: 'createdDate', label: 'Created Date', kind: 'date', readOnly: true,
+};
+
+/**
  * The header's three regions. Field ORDER inside a group is unchanged from the
  * live screen; only the grouping is added, so nothing a user has learned moves
  * relative to anything else in its own section.
- *
- * The `schedule` group also carries Due Date, Created Date and Priority. Those
- * have no FieldDef because two are system-stamped and one is a rating, so the
- * record page renders them itself and this group's `id` is how it knows where.
  */
 export const HEADER_GROUPS: HeaderGroup[] = [
   {
@@ -132,7 +151,7 @@ export const HEADER_GROUPS: HeaderGroup[] = [
        because they are read as a set: a due date means little without knowing
        who owns it and how urgent it is. */
     id: 'schedule', title: 'Schedule & ownership', icon: 'insight',
-    fields: [byName('assignedTo'), byName('priority')],
+    fields: [byName('assignedTo'), byName('priority'), DUE_DATE_FIELD, CREATED_DATE_FIELD],
   },
 ];
 
