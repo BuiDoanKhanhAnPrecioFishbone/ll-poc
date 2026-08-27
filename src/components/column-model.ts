@@ -43,6 +43,21 @@ export type ColumnSpec<T> = {
   /** Bespoke cell content (a Rating, a link). Roles still drive width. */
   render?: (row: T) => ReactNode;
 
+  /** Bespoke HEADER content — a select-all checkbox, a unit. */
+  headerRender?: () => ReactNode;
+
+  /**
+   * A per-CELL state, rendered as `data-tone` and coloured by the stylesheet.
+   *
+   * The quoting grids need this and nothing else does yet. The guideline
+   * assigns meaning to cell colour rather than using it for emphasis — a red
+   * ROCKET_PN means the part is missing from Part Master and blocks the RFQ, a
+   * yellow MFG means the manufacturer is already known — so the colour is
+   * carried as a named state, not a class, and the vocabulary lives in one
+   * place in the stylesheet.
+   */
+  tone?: (row: T) => string | undefined;
+
   /** Included in the toolbar search. */
   searchable?: boolean;
 

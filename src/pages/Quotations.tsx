@@ -7,7 +7,7 @@ import { DataGrid, fmtDate } from '../ui/DataGrid';
 import { useToast } from '../ui/Toast';
 import { usePrefs } from '../ui/prefs';
 import { generateQuotations, QUOTATION_COLUMNS, daysUntil, type Quotation } from '../data/quotations';
-import { measureFor, scopeFilter, ME } from '../data/queues';
+import { measureFor, scopeFilter } from '../data/queues';
 import { applyItarVisibility } from '../data/itar';
 import { FilterToolbar } from '../ui/FilterToolbar';
 import { applyView, activeCount, type FilterValues } from '../ui/views';
@@ -72,7 +72,6 @@ export function Quotations() {
   const [quickOn, setQuickOn] = useState<string[]>(['open']);
   /* Whose records. Separate from the measures, and matching the Mine/Team
      toggle on My Queues — the same question deserves the same control. */
-  const [mine, setMine] = useState(true);
   /* One value per field. No operators — see docs/filter-spec.md. */
   const [values, setValues] = useState<FilterValues>({});
   const { dateStyle } = usePrefs();
@@ -141,11 +140,11 @@ export function Quotations() {
     }
     /* Quick filters are conjunctive with each other and with the advanced
        conditions: every chip you turn on narrows further. */
-    const inScope = mine ? all.filter(q => q.assignedTo === ME) : all;
+    const inScope = all;
     const quickMatched = inScope.filter(q =>
       QUOTATION_QUICK.filter(f => quickOn.includes(f.key)).every(f => f.match(q)));
     return applyView(quickMatched, fields, values);
-  }, [all, queue, scope, quickOn, values, fields, mine]);
+  }, [all, queue, scope, quickOn, values, fields]);
 
 
   /* Priority and Date Needed carry bespoke cells; every other column is
@@ -236,12 +235,6 @@ export function Quotations() {
            compliance filter look like missing data. */
         ? <>Customer RFQs and the quotes sent back · <strong>{withheld} not shown (ITAR)</strong></>
         : 'Customer RFQs and the quotes sent back'}
-      leadAction={
-        <Button variant="filled" title="Create a new Project Requirement"
-                onClick={() => setCreating(true)}>
-          Add New
-        </Button>
-      }
       kpis={
         /* The review: "if you want to highlight it, a KPI summary would be
            better than those numbers... This KPI can also be the filter. When
@@ -253,7 +246,7 @@ export function Quotations() {
           {QUOTATION_QUICK.filter(f => KPI_KEYS.includes(f.key)).map(f => {
             /* Counted within the current scope. A tile reading 66 above a grid
                showing 15 rows is not a summary of anything on screen. */
-            const n = (mine ? all.filter(q => q.assignedTo === ME) : all).filter(f.match).length;
+            const n = all.filter(f.match).length;
             const on = quickOn.includes(f.key);
             return (
               <button key={f.key} type="button" className="vy-kpi" data-key={f.key}
@@ -267,15 +260,19 @@ export function Quotations() {
       }
       searchPlaceholder="Search RFQ number, project or customer"
       actions={<>
-        {/* Only Export lives here, in the far corner, because it is the rare
-            action. "Add New" is NOT in this group — it sits at the left of the
-            screen beside the title, which is what the 25 Aug review asked for:
-            users read left to right and the most frequent action should be met
-            first.
+        {/* ONE group, in one place. Add New spent a version under the page
+            heading — an attempt to honour the 25 Aug review's "create on the
+            left" — which fixed the wrong problem: the complaint was a wide gap
+            between the two buttons, and moving one of them out of the group
+            turned a spacing bug into two separate action areas on one screen.
 
-            Both were in this group before, so "left" meant "left of Export"
-            rather than left of anything — the two sat together in the right
-            corner with a stretched gap between them. */}
+            Together on the right, with Add New first: it is the frequent one,
+            so it is met first reading left to right, and Export sits in the
+            corner where the rare action belongs. */}
+        <Button variant="filled" title="Create a new Project Requirement"
+                onClick={() => setCreating(true)}>
+          Add New
+        </Button>
         <Button title="Export the filtered list to Excel"
                 onClick={() => toast.notImplemented(`export these ${data.length} RFQs to Excel`)}>
           Export
@@ -291,24 +288,23 @@ export function Quotations() {
           <Button variant="text" onClick={clearQueue}>Clear</Button>
         </div>
       ) : (
-        /* Scope only. The measures are the KPI tiles above — putting them here
-           as well is what this row used to do. */
-        <div className="vy-filter-row-main">
-          <div className="vy-scope" role="group" aria-label="Whose records to show">
-            {[true, false].map(v => (
-              <button key={String(v)} type="button" className="vy-scope-btn"
-                      aria-pressed={mine === v} onClick={() => setMine(v)}>
-                {v ? 'Mine' : 'Everyone'}
-              </button>
-            ))}
-          </div>
-          {(quickOn.length > 0 || active > 0) && (
+        /* No "Mine / Everyone" here any more.
+           It was ours, not the customer's — the guideline's list screen has no
+           such control — and it did the same job as the "Assigned to Huyen NTN"
+           quick filter that already exists, in a second idiom. Worse, it
+           defaulted to Mine, so the list opened showing 15 of 330 records with
+           nothing in the heading to say so: a list hiding 95% of itself by
+           default is indistinguishable from a list that failed to load.
+
+           Whose records you are looking at is what My Queues answers. */
+        (quickOn.length > 0 || active > 0) ? (
+          <div className="vy-filter-row-main">
             <Button variant="text"
                     onClick={() => { setQuickOn([]); setValues({}); }}>
               Clear filters
             </Button>
-          )}
-        </div>
+          </div>
+        ) : null
       )}
       filterPanel={
         <FilterToolbar fields={fields} values={values} onChange={setValues}

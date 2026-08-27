@@ -95,6 +95,37 @@
 .vy-page-title { font-size: var(--vy-text-2xl); font-weight: var(--vy-weight-bold); margin: 0; color: var(--vy-grey-900); letter-spacing: -.01em; }
 .vy-page-sub { margin: var(--vy-space-2) 0 0; color: var(--vy-grey-500); font-size: var(--vy-text-base); }
 .vy-page-actions { display: flex; gap: var(--vy-space-4); flex-shrink: 0; }
+/* The record actions at the toolbar's left corner, per the guideline's
+   left/right split. `flex-shrink: 0` so they never compress into the search
+   field beside them. */
+.vy-toolbar-actions { display: flex; gap: var(--vy-space-4); flex-shrink: 0; }
+
+.vy-scope {
+  display: inline-flex;
+  /* Used by My Queues only. The Quotations list had one too, defaulting to
+     "Mine", which silently hid most of the list; whose-work-is-this is the
+     question My Queues exists to answer, so it lives there alone now.
+
+     flex-start, not stretch: the row is a flex row, and a segmented control
+     that spans the page reads as a banner rather than a control. */
+  flex: 0 0 auto; align-self: flex-start;
+  background: var(--vy-grey-100); border-radius: var(--vy-radius-pill);
+  padding: var(--vy-space-1);
+}
+.vy-scope-btn {
+  appearance: none; border: 0; background: none; cursor: pointer;
+  padding: var(--vy-space-3) var(--vy-space-7);
+  border-radius: var(--vy-radius-pill);
+  font-size: var(--vy-text-sm); font-weight: var(--vy-weight-medium);
+  color: var(--vy-grey-600);
+}
+.vy-scope-btn:hover { color: var(--vy-grey-900); }
+.vy-scope-btn[aria-pressed="true"] {
+  background: var(--vy-grey-0); color: var(--vy-grey-900);
+  font-weight: var(--vy-weight-semibold); box-shadow: var(--vy-shadow-sm);
+}
+.vy-scope-btn:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
+
 
 /* ---- Grid ----------------------------------------------------------------- */
 .vy-grid-toolbar { display: flex; align-items: center; gap: var(--vy-space-5); width: 100%; flex-wrap: wrap; }
@@ -468,27 +499,6 @@
    A segmented control, because the two states are a scope and both are always
    available. A dropdown would hide one behind a click; a checkbox labelled
    "show team" would imply Team is an add-on to Mine rather than a wider view. */
-.vy-scope {
-  display: inline-flex;
-  /* flex-start, not stretch: .vy-page-head is a flex row, and a segmented
-     control that spans the page reads as a banner rather than a control. */
-  flex: 0 0 auto; align-self: flex-start;
-  background: var(--vy-grey-100); border-radius: var(--vy-radius-pill);
-  padding: var(--vy-space-1);
-}
-.vy-scope-btn {
-  appearance: none; border: 0; background: none; cursor: pointer;
-  padding: var(--vy-space-3) var(--vy-space-7);
-  border-radius: var(--vy-radius-pill);
-  font-size: var(--vy-text-sm); font-weight: var(--vy-weight-medium);
-  color: var(--vy-grey-600);
-}
-.vy-scope-btn:hover { color: var(--vy-grey-900); }
-.vy-scope-btn[aria-pressed="true"] {
-  background: var(--vy-grey-0); color: var(--vy-grey-900);
-  font-weight: var(--vy-weight-semibold); box-shadow: var(--vy-shadow-sm);
-}
-.vy-scope-btn:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
 
 /* ---- Who is carrying the most ------------------------------------------- */
 .vy-load { margin-top: var(--vy-space-10); }
@@ -1147,7 +1157,6 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
 
 /* The screen's primary action, beside the title. Left, where the eye starts —
    the rare actions keep the far corner. */
-.vy-lead-action { margin-top: var(--vy-space-6); }
 
 /* Maximised, the sidebar becomes a full-height panel wide enough for the Column
    tab's three-column table to breathe. */

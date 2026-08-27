@@ -39,7 +39,7 @@ export function DataGrid<T extends { id: string | number }>({
   data, columns, title, subtitle, actions, filters,
   searchPlaceholder = 'Search', rowHref, onOpenRow, emptyHint, loading, kpis,
   filterPanel, filterActive = 0, views, viewSetting,
-  allColumns, onToggleColumn, onResetColumns, leadAction,
+  allColumns, onToggleColumn, onResetColumns,
 }: {
   data: T[];
   columns: ColumnSpec<T>[];
@@ -72,7 +72,6 @@ export function DataGrid<T extends { id: string | number }>({
    * Separate from `actions` so the frequent one is met first and the rare ones
    * keep the far corner.
    */
-  leadAction?: ReactNode;
   searchPlaceholder?: string;
   /**
    * Opening a record hangs off the IDENTIFIER, not the row.
@@ -217,9 +216,7 @@ export function DataGrid<T extends { id: string | number }>({
               beside the control that moves through it. What is worth
               highlighting goes in the KPI row below, where it can be clicked. */}
           {subtitle && <p className="vy-page-sub">{subtitle}</p>}
-          {leadAction && <div className="vy-lead-action">{leadAction}</div>}
         </div>
-        {actions && <div className="vy-page-actions">{actions}</div>}
       </div>
 
       {kpis && <div className="vy-kpi-row">{kpis}</div>}
@@ -228,6 +225,18 @@ export function DataGrid<T extends { id: string | number }>({
 
       <div className="vy-grid-shell">
         <div className="vy-grid-toolbar">
+          {/* ONE action bar, split by what the controls act on. The guideline
+              (PR List, r7): "The action buttons are displayed in the following
+              order from left to right: Left corner: Add New. Right corner:
+              Select View, Filter Toolbar, Setup View Template."
+
+              So the record actions occupy the left corner and the view controls
+              the right corner of the SAME row. Add New spent two versions
+              elsewhere — first in the page-actions group beside Export, then on
+              its own under the page heading — and the second was worse: it read
+              as a third action area on a screen that already had two. */}
+          {actions && <div className="vy-toolbar-actions">{actions}</div>}
+
           <SearchField value={search} placeholder={searchPlaceholder} aria-label={searchPlaceholder}
                        onChange={e => setSearch(e.target.value)} />
           <span className="vy-toolbar-spacer" />
