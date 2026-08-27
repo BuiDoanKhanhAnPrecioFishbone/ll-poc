@@ -72,6 +72,29 @@
   --vy-status-cancelled-fg:  var(--vy-grey-500);
   --vy-status-cancelled-bg:  var(--vy-grey-100);
 
+  /* --- BoM line tones -------------------------------------------------------
+     Colour as DATA, for the Run Quotation grids. The Testing Guideline assigns
+     a meaning to each background and each one changes what the user does next,
+     so they are named for the meaning rather than the colour — and mapped onto
+     the status ramp above, so a "short" row and a "waiting" badge cannot drift
+     to two different yellows.
+
+     Deliberately NOT a severity scale. `short` is not "half of `no-supplier`":
+     one is a part nobody sells you, the other is a part you cannot get enough
+     of, and the fixes are different. */
+  --vy-tone-excluded-bg:     var(--vy-grey-100);
+  --vy-tone-excluded-fg:     var(--vy-grey-500);
+  /* No supplier found, and the same red as a part missing from Part Master —
+     both mean "this line cannot proceed as it stands". */
+  --vy-tone-missing-bg:      var(--vy-red-50);
+  --vy-tone-missing-fg:      var(--vy-red-700);
+  /* A supplier exists but cannot cover the quantity. */
+  --vy-tone-short-bg:        var(--vy-status-open-bg);
+  /* Priced and covered, and a part already in Part Master. */
+  --vy-tone-covered-bg:      var(--vy-status-done-bg);
+  /* A manufacturer already in Manufacturer Management. */
+  --vy-tone-known-mfg-bg:    var(--vy-status-open-bg);
+
   /* --- Typography -----------------------------------------------------------
      The legacy app declared NO font stack at all (computed font-family was the
      bare keyword `sans-serif`), so it rendered in the browser default and
@@ -168,6 +191,11 @@
      Named because they are component dimensions, not spacing. */
   --vy-control-sm:        28px;  /* avatar, brand mark */
   --vy-control-md:        34px;  /* input / locked-field height */
+  --vy-quote-fact-wide:   220px; /* an assembly number or a description */
+  --vy-quote-qty-w:       120px; /* Build Qty / Attrition Set */
+  --vy-quote-field-min:   240px; /* one field on the Config BoM grid */
+  --vy-cost-col-min:      170px; /* one figure in the cost summary */
+  --vy-vs-preview-max-h:  260px; /* the filter-toolbar preview in View Setting */
   --vy-icon-sm:           16px;  /* nav and toolbar glyphs */
   --vy-dot-size:           6px;  /* unread indicator */
   --vy-accent-bar-w:       3px;  /* left accent rule on queue cards */

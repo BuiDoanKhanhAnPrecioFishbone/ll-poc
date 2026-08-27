@@ -5,6 +5,7 @@ import { useToast } from '../../../ui/Toast';
 import { QtyField } from './QuoteContext';
 import { BOM_TEMPLATES, COLUMN_DETECTION } from '../../../data/bom';
 import { findCustomer, type Quotation } from '../../../data/quotations';
+import { MATERIAL_PACKAGE_TYPE, QUOTE_FOCUS } from '../../../data/metadata';
 import type { RunConfig } from './state';
 
 /**
@@ -67,15 +68,18 @@ export function StepConfigBom({ q, cfg, set }: {
 
           <Field label="Quote Focus">
             <Select label="Quote Focus" value={cfg.quoteFocus}
-                    options={[q.quoteFocus, 'Stock High Cost', 'Stock-Low Cost',
-                              'Production-Competitive Cost', 'Other']
-                      .filter((v, i, a) => v && a.indexOf(v) === i)}
+                    options={[...QUOTE_FOCUS]}
                     onChange={v => set({ quoteFocus: v })} />
           </Field>
 
           <Field label="Material Package Type">
+            {/* The customer's own two sheets disagree: this one lists "Reel",
+                the Create PR sheet lists "Reels". The shared constant wins,
+                because the value arrives here from the Project Requirement — a
+                second spelling would blank the field on open, which is exactly
+                what it did. Raised as part of open question 3. */}
             <Select label="Material Package Type" value={cfg.materialPackageType}
-                    options={['Cut Tape', 'Reel', '$25 Reels', '$50 Reels']}
+                    options={[...MATERIAL_PACKAGE_TYPE]}
                     onChange={v => set({ materialPackageType: v })} />
           </Field>
 
@@ -204,8 +208,13 @@ export function StepConfigBom({ q, cfg, set }: {
                           0CustomerCode-Part Number (for example: 0455-3032606)."
                           On blur, and only once — re-prefixing an already
                           prefixed value on every blur would grow it forever. */
-                       onBlur={() => {
-                         const raw = cfg.assemblyPartNumber.trim();
+                       onBlur={e => {
+                         /* Reads the FIELD, not the state. The handler closes
+                            over whatever `cfg` held when it was created, so a
+                            value typed and blurred in the same tick prefixed
+                            an empty string. The input's own value is always
+                            the current one. */
+                         const raw = e.target.value.trim();
                          const code = customer?.code ?? '';
                          if (!raw || !code) return;
                          const prefix = `0${code.replace(/^0+/, '')}-`;

@@ -21,12 +21,22 @@ import type { FilterValues, ViewField } from './views';
  * open filter panel costs vertical space on every visit to serve the minority
  * of visits that filter.
  */
-export function FilterToolbar({ fields, values, onChange, onClear, activeCount }: {
+export function FilterToolbar({ fields, values, onChange, onClear, activeCount, onEditFields }: {
   fields: ViewField[];
   values: FilterValues;
   onChange: (next: FilterValues) => void;
   onClear: () => void;
   activeCount: number;
+  /**
+   * Opens View Setting on its Filter tab — where these fields are chosen.
+   *
+   * The two screens are easy to confuse because both are called "Filter". A
+   * user who wants a field that is not here has no way to guess that the answer
+   * lives behind a button called "Setup View Template" at the other end of the
+   * toolbar. The link goes from the place the problem is noticed to the place
+   * it is fixed. Omitted in the View Setting preview, which is already there.
+   */
+  onEditFields?: () => void;
 }) {
   const set = (key: string, v: string) => onChange({ ...values, [key]: v });
 
@@ -77,6 +87,12 @@ export function FilterToolbar({ fields, values, onChange, onClear, activeCount }
           <span className="vy-filter-active">
             {activeCount} {activeCount === 1 ? 'filter' : 'filters'} applied
           </span>
+        )}
+        {onEditFields && (
+          <button type="button" className="vy-filter-edit-fields" onClick={onEditFields}
+                  title="Choose which fields appear in this toolbar">
+            Edit fields
+          </button>
         )}
       </div>
     </div>

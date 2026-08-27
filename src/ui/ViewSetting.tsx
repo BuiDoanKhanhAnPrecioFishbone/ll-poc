@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button } from './Button';
 import { Select } from './Overlays';
+import { FilterToolbar } from './FilterToolbar';
 import { TextField } from './Field';
 import type { ColumnSpec } from '../components/column-model';
 import type { SavedView, ViewField, ViewSort } from './views';
@@ -143,6 +144,7 @@ export function ViewSetting<T>({
             <>
               <h3 className="vy-vs-heading">Filter options</h3>
               <p className="vy-vs-hint">Which fields appear in the filter toolbar.</p>
+
               <ul className="vy-vs-list">
                 {draft.fields.map(f => (
                   <li key={f} className="vy-vs-row">
@@ -160,6 +162,37 @@ export function ViewSetting<T>({
                   .map(f => ({ value: f.field, label: f.label }))}
                 onAdd={f => set({ fields: [...draft.fields, f] })}
               />
+
+              {/* THE PREVIEW.
+                  Two screens on this app say "filter" and they do different
+                  things: the toolbar over the grid is where you filter, this
+                  tab decides what that toolbar contains. Naming alone never
+                  carried that — both are "Filter", and a list of field names
+                  gives no hint that a toolbar comes out the other end.
+
+                  So the panel shows the result. It is not a mock-up of the
+                  toolbar; it IS the toolbar component, rendered inert, so it
+                  cannot drift from the real one. Cause and effect end up in the
+                  same view and the distinction stops needing to be explained. */}
+              <div className="vy-vs-preview">
+                <span className="vy-vs-preview-label">The toolbar you get</span>
+                <div className="vy-vs-preview-frame" aria-hidden>
+                  {draft.fields.length ? (
+                    <FilterToolbar
+                      fields={allFields.filter(f => draft.fields.includes(f.field))
+                        /* In the order this list is in, not the order the
+                           fields were declared — otherwise dragging a row here
+                           would change nothing the user can see. */
+                        .sort((a, b) => draft.fields.indexOf(a.field) - draft.fields.indexOf(b.field))}
+                      values={{}} onChange={() => {}} onClear={() => {}} activeCount={0}
+                    />
+                  ) : (
+                    <p className="vy-vs-hint">
+                      No fields, so the grid shows no filter toolbar at all — only the search box.
+                    </p>
+                  )}
+                </div>
+              </div>
             </>
           )}
 
@@ -278,16 +311,34 @@ export function ViewSetting<T>({
 }
 
 /** Pick something, then add it — so the list never grows a blank row. */
+/**
+ * Pick a field, then add it.
+ *
+ * `pick` holds the LABEL, which is what the Select's options are.
+ *
+ * It used to hold the field KEY while the options were labels, so the value
+ * never matched any option and the trigger stayed blank after every choice —
+ * the user picked "Project Name" and the box went on reading as empty, with no
+ * way to tell whether the click had registered. A select's value and its
+ * options have to be in the same vocabulary; translating to the key happens
+ * once, on add.
+ *
+ * The empty first option is gone too. It rendered as a blank row that selected
+ * nothing, and Radix treats an empty item value as a reset rather than a value.
+ */
 function AddRow({ label, options, onAdd }: {
   label: string; options: { value: string; label: string }[]; onAdd: (v: string) => void;
 }) {
   const [pick, setPick] = useState('');
   if (!options.length) return <p className="vy-vs-hint">Everything available is already in the list.</p>;
+  const chosen = options.find(o => o.label === pick);
   return (
     <div className="vy-vs-add">
-      <Select label={label} value={pick} options={['', ...options.map(o => o.label)]}
-              onChange={l => setPick(options.find(o => o.label === l)?.value ?? '')} />
-      <Button size="sm" disabled={!pick} onClick={() => { onAdd(pick); setPick(''); }}>
+      <Select label={label} value={pick} options={options.map(o => o.label)}
+              onChange={setPick} />
+      <Button size="sm" disabled={!chosen}
+              title={chosen ? `${label}: ${chosen.label}` : 'Choose a field first'}
+              onClick={() => { if (chosen) { onAdd(chosen.value); setPick(''); } }}>
         {label}
       </Button>
     </div>

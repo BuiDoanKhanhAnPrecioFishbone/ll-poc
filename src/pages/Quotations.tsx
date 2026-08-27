@@ -308,7 +308,8 @@ export function Quotations() {
       )}
       filterPanel={
         <FilterToolbar fields={fields} values={values} onChange={setValues}
-                       onClear={() => setValues({})} activeCount={active} />
+                       onClear={() => setValues({})} activeCount={active}
+                       onEditFields={() => setSettingOpen(true)} />
       }
       filterActive={active}
       views={

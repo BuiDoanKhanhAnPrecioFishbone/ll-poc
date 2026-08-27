@@ -21,6 +21,13 @@ import { addCreatedQuotation, nextRfqNo } from '../../data/createdQuotations';
 /**
  * New Project Requirement.
  *
+ * THREE tabs, not four. The record has an Activity Logs tab and this form does
+ * not, because on a record that does not exist yet it can only ever be empty:
+ * creating the RFQ IS its first entry. The guideline lists the tab under Create
+ * PR but attaches no expected result to it, which is consistent — there is
+ * nothing to expect. A permanently empty tab on a form with seventeen required
+ * fields is one more thing to open and rule out.
+ *
  * A MODAL, unlike the record screen, which is a page. That is not an
  * inconsistency: the guideline is explicit — "Display the New Project
  * Requirement modal" — and the two cases genuinely differ. An existing RFQ is
@@ -231,15 +238,6 @@ export function NewRequirementDialog({ open, onClose }: {
                   onBlur={markTouched}
                 />
               ) },
-            { value: 'activity', label: 'Activity Logs', content: (
-              /* The guideline lists this tab with no expected results, which is
-                 consistent: nothing has happened to an RFQ that does not exist
-                 yet. Saying so beats an empty grid. */
-              <div className="vy-empty-inline">
-                <strong>Nothing to log yet.</strong> Creating this RFQ is the first entry;
-                edits, quote runs and status changes appear here afterwards.
-              </div>
-            ) },
           ]}
         />
       </div>

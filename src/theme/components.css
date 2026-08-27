@@ -952,3 +952,175 @@
   gap: var(--vy-space-5);
   align-items: end;
 }
+
+/* =============================================================================
+   RUN QUOTATION — the quoting grids
+   -----------------------------------------------------------------------------
+   Colour here is DATA, not emphasis. The Testing Guideline assigns a meaning to
+   every background in these grids, and each one changes what the user does
+   next — a red part number blocks confirming the RFQ, a yellow row is a
+   quantity shortfall, a grey row will not be quoted at all. So the vocabulary
+   is declared once, as named tones, rather than as ad-hoc classes per grid.
+   ========================================================================== */
+
+/* ---- The facts carried from step to step -------------------------------- */
+.vy-quote-context {
+  display: flex; flex-wrap: wrap; gap: var(--vy-space-5) var(--vy-space-8);
+  padding: var(--vy-space-6);
+  background: var(--vy-grey-50);
+  border: 1px solid var(--vy-grey-200);
+  border-radius: var(--vy-shape-md);
+}
+.vy-quote-fact { display: flex; flex-direction: column; gap: var(--vy-space-1); min-width: 0; }
+.vy-quote-fact[data-wide] { flex: 1 1 var(--vy-quote-fact-wide); }
+.vy-quote-fact--input { min-width: var(--vy-quote-qty-w); }
+.vy-quote-fact-label {
+  font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .05em;
+  color: var(--vy-grey-500); font-weight: var(--vy-weight-medium);
+}
+.vy-quote-fact-value { font-size: var(--vy-text-base); color: var(--vy-grey-900); }
+
+/* ---- Step 1 -------------------------------------------------------------- */
+.vy-quote-config-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--vy-quote-field-min), 1fr));
+  gap: var(--vy-space-6) var(--vy-space-8);
+  margin-top: var(--vy-space-6);
+}
+.vy-quote-config-field { display: flex; flex-direction: column; gap: var(--vy-space-2); min-width: 0; }
+.vy-quote-config-field[data-wide] { grid-column: 1 / -1; }
+
+/* A value the step did not ask for — carried from the RFQ, or filled by the
+   system. `data-locked` is the same grey the record form uses for a field the
+   system owns, so the two screens teach the same thing. */
+.vy-read-value {
+  margin: 0; min-height: var(--vy-control-md);
+  display: flex; align-items: center;
+  padding: var(--vy-space-3) var(--vy-space-5);
+  background: var(--vy-grey-0);
+  border: 1px solid var(--vy-grey-200);
+  border-radius: var(--vy-radius-sm);
+  font-size: var(--vy-text-base); color: var(--vy-grey-900);
+}
+.vy-read-value[data-locked] { background: var(--vy-grey-100); border-color: var(--vy-grey-300); color: var(--vy-grey-600); }
+.vy-read-value[data-empty] { color: var(--vy-grey-400); font-style: italic; }
+
+.vy-attachments { margin-top: var(--vy-space-7); }
+.vy-attachments ul { list-style: none; margin: var(--vy-space-3) 0 0; padding: 0; display: flex; flex-direction: column; gap: var(--vy-space-2); }
+.vy-attachments li { display: flex; align-items: baseline; gap: var(--vy-space-4); opacity: .5; }
+.vy-attachments li[data-usable] { opacity: 1; }
+
+/* ---- Search and filters, shared by steps 2, 3 and 4 ---------------------- */
+.vy-quote-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--vy-space-5) var(--vy-space-8); }
+.vy-quote-filters { display: flex; flex-wrap: wrap; gap: var(--vy-space-6); }
+
+.vy-quote-run-bar {
+  display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
+  gap: var(--vy-space-6);
+}
+.vy-quote-run-bar .vy-run-actions { margin: 0; }
+
+/* ---- An editable cell ---------------------------------------------------- */
+/* Borderless until touched: twenty-one columns of bordered inputs is a wall of
+   boxes, and the guideline makes only five of them editable. The hover and
+   focus states are what say "this one you can change". */
+.vy-cell-input {
+  background: transparent; border-color: transparent;
+  padding: var(--vy-space-2) var(--vy-space-3);
+}
+.vy-cell-input:hover { border-color: var(--vy-grey-300); background: var(--vy-grey-0); }
+.vy-cell-input:focus { border-color: var(--vy-blue-500); background: var(--vy-grey-0); }
+
+/* ---- The tone vocabulary ------------------------------------------------- */
+/* ROW tones — what happened to the whole line. */
+.vy-minitable-row[data-tone="excluded"]    { background: var(--vy-tone-excluded-bg); color: var(--vy-tone-excluded-fg); }
+.vy-minitable-row[data-tone="no-supplier"] { background: var(--vy-tone-missing-bg); }
+.vy-minitable-row[data-tone="short"]       { background: var(--vy-tone-short-bg); }
+.vy-minitable-row[data-tone="covered"]     { background: var(--vy-tone-covered-bg); }
+
+/* CELL tones — what is true of one value. */
+.vy-td[data-tone="known"]     { background: var(--vy-tone-covered-bg); }
+.vy-td[data-tone="missing"]   { background: var(--vy-tone-missing-bg); color: var(--vy-tone-missing-fg); }
+.vy-td[data-tone="known-mfg"] { background: var(--vy-tone-known-mfg-bg); }
+/* Waiting on the quote run. */
+.vy-td[data-tone="pending"]   { background: var(--vy-tone-missing-bg); }
+
+.vy-line-status {
+  font-size: var(--vy-text-xs); font-weight: var(--vy-weight-semibold);
+  letter-spacing: .04em; padding: 1px var(--vy-space-3); border-radius: var(--vy-radius-sm);
+}
+.vy-line-status[data-status="COVER"]  { background: var(--vy-status-done-bg); color: var(--vy-status-done-fg); }
+.vy-line-status[data-status="NO"]     { background: var(--vy-status-open-bg); color: var(--vy-status-open-fg); }
+.vy-line-status[data-status="N/A"]    { background: var(--vy-tone-missing-bg); color: var(--vy-tone-missing-fg); }
+.vy-line-status[data-status="NO BID"] { background: var(--vy-grey-200); color: var(--vy-grey-600); }
+
+/* ---- Frozen columns ------------------------------------------------------ */
+.vy-minitable[data-frozen] { overflow-x: auto; }
+.vy-minitable[data-frozen] .vy-th[data-stick],
+.vy-minitable[data-frozen] .vy-td[data-stick] { position: sticky; }
+/* A frozen cell must be opaque or the scrolling columns show through it, so it
+   inherits its row's tone — a grey excluded row stays grey all the way across.
+
+   `:not([data-tone])` matters: ROCKET_PN is both frozen AND carries its own
+   green/red Part Master colour, and without the guard this rule painted over
+   it. The whole point of that column's colour is that a red part blocks
+   confirming the RFQ, and it was invisible. */
+.vy-minitable[data-frozen] .vy-td[data-stick]:not([data-tone]) { background: inherit; }
+.vy-minitable-row { background: var(--vy-grey-0); }
+.vy-minitable[data-frozen] .vy-th[data-stick] { background: var(--vy-grey-50); }
+/* The last frozen column casts the edge, so the split is visible while scrolling. */
+.vy-minitable[data-frozen] .vy-th[data-stick]:last-of-type,
+.vy-minitable[data-frozen] .vy-td[data-stick]:last-of-type { box-shadow: 1px 0 0 var(--vy-grey-300); }
+
+/* ---- Step 4 cost summary ------------------------------------------------- */
+.vy-cost-card--wide { display: flex; flex-direction: column; align-items: flex-start; gap: var(--vy-space-6); }
+.vy-cost-grid {
+  margin: 0; width: 100%;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(var(--vy-cost-col-min), 1fr));
+  gap: var(--vy-space-5) var(--vy-space-9);
+}
+.vy-cost-grid .vy-cost-row { flex-direction: column; align-items: flex-start; gap: var(--vy-space-1); }
+.vy-cost-grid .vy-cost-row[data-emphasis] { margin: 0; padding: 0; border: 0; }
+/* Excess is the one figure in red: it is money spent on material the build
+   does not consume, which is a different kind of number from the other four. */
+.vy-cost-row[data-tone="excess"] dd { color: var(--vy-red-700); }
+
+/* ---- View Setting: the filter preview ------------------------------------
+   Two screens on this app say "filter". The toolbar over the grid is where you
+   filter; the Filter tab of View Setting decides what that toolbar contains.
+   Names alone never carried the difference, so the panel shows the result —
+   the real FilterToolbar, rendered inert. */
+.vy-vs-preview { margin: var(--vy-space-6) 0 var(--vy-space-8); }
+.vy-vs-preview-label {
+  display: block; margin-bottom: var(--vy-space-3);
+  font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .05em;
+  color: var(--vy-grey-500); font-weight: var(--vy-weight-medium);
+}
+.vy-vs-preview-frame {
+  padding: var(--vy-space-5);
+  background: var(--vy-grey-50);
+  border: 1px dashed var(--vy-grey-300);
+  border-radius: var(--vy-radius-md);
+  /* Inert: it is a picture of the toolbar, not a second copy to filter with.
+     Two working filter toolbars on screen at once is the confusion this is
+     meant to end, not deepen. */
+  pointer-events: none;
+  /* Scaled down so a nine-field toolbar still fits the 460px panel, and capped
+     — the preview is the payoff, not the workspace, and at full height it
+     pushed the list you actually edit off the bottom of the panel. */
+  zoom: .85;
+  max-height: var(--vy-vs-preview-max-h);
+  overflow-y: auto;
+}
+
+/* The route from where the gap is noticed to where it is fixed. */
+.vy-filter-edit-fields {
+  appearance: none; border: 0; background: none; cursor: pointer;
+  margin-left: auto;
+  padding: var(--vy-space-2) var(--vy-space-3);
+  font-size: var(--vy-text-sm); font-weight: var(--vy-weight-medium);
+  color: var(--vy-blue-700);
+  border-radius: var(--vy-radius-sm);
+}
+.vy-filter-edit-fields:hover { background: var(--vy-blue-50); }
+.vy-filter-edit-fields:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
