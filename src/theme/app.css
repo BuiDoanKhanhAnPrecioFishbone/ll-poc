@@ -342,12 +342,18 @@
 .vy-empty-state--tab p { max-width: 60ch; margin-inline: auto; }
 
 /* --- Conversations ----------------------------------------------------------- */
-/* Capped, because comment text is prose and a 1400px line of it is genuinely
-   hard to read. Widened and tokenised, though: the cap was 78ch — the measure
-   for long-form reading — while the empty-state box nested inside it capped at
-   72ch, so the two ended at different points and the whole tab read as an
-   accident rather than a decision. One measure now, shared. */
-.vy-conv { max-width: var(--vy-prose-max); }
+/* The PANEL fills, like every sibling tab. It used to cap — first at 78ch, then
+   at 96ch — which made it the only tab root in the app with a max-width. Next
+   to Activity Logs that was indefensible: .vy-comment and .vy-activity-item
+   share a rule, so the two tabs render the same list, and capping one of them
+   showed the same component at two widths on adjacent tabs.
+
+   The reading measure moves to the PROSE instead, which is where line length
+   actually matters. Containers fill; text caps. The empty state is scoped here
+   so it shares the composer's edge on this tab without changing the other eight
+   places .vy-empty-inline is used. */
+.vy-conv > .vy-empty-inline { max-width: none; }
+.vy-comment-text { max-width: var(--vy-prose-max); }
 .vy-thread { list-style: none; margin: 0 0 var(--vy-space-9); padding: 0; display: flex; flex-direction: column; gap: var(--vy-space-7); }
 .vy-comment, .vy-activity-item { display: grid; grid-template-columns: auto 1fr; gap: var(--vy-space-5); }
 .vy-comment-meta { display: flex; align-items: baseline; gap: var(--vy-space-4); flex-wrap: wrap; font-size: var(--vy-text-xs); color: var(--vy-grey-500); margin-bottom: var(--vy-space-2); }

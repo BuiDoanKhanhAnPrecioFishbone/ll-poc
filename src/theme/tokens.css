@@ -196,14 +196,13 @@
   --vy-quote-field-min:   240px; /* one field on the Config BoM grid */
   --vy-cost-col-min:      170px; /* one figure in the cost summary */
   --vy-vs-preview-max-h:  260px; /* the filter-toolbar preview in View Setting */
-  /* ONE reading measure, for every block of prose in the app.
-     There were two — 78ch on the Conversations panel and 72ch on the empty-state
-     box nested inside it — so the two ended at different points and the tab read
-     as broken rather than measured. The value is up from both: 78ch is the
-     measure for long-form reading, and this tab holds short notes and a compose
-     box, not an article. The record page caps at 1180px, so at 78ch the panel
-     was 640px with 540px of empty space beside it — wide enough to read as a
-     layout fault. At 96ch it is 787px. In `ch` so it tracks the font. */
+  /* ONE reading measure, and it caps TEXT — never a container.
+     Panels, cards and dialogs take their width from the layout they sit in; only
+     the prose inside them is capped, because line length is a property of text.
+     Capping a container instead is what left the Conversations panel as the only
+     tab root in the app with a max-width, sitting visibly narrower than the
+     identical list on Activity Logs beside it.
+     In `ch` so it tracks the font rather than freezing a pixel count. */
   --vy-prose-max:          96ch;
   --vy-icon-sm:           16px;  /* nav and toolbar glyphs */
   --vy-dot-size:           6px;  /* unread indicator */
