@@ -123,7 +123,21 @@
 
 
 /* ---- Grid ----------------------------------------------------------------- */
-.vy-grid-toolbar { display: flex; align-items: center; gap: var(--vy-space-5); width: 100%; flex-wrap: wrap; }
+/* The toolbar is its own band, and needs to look like one.
+
+   It had a gap between its controls and no padding at all, so the search field
+   pressed against the shell's left border, Columns against the right, and the
+   whole row sat directly on the column headings with nothing between them. Three
+   tiers of control — search, view controls, headings — were touching.
+
+   Padding gives it room inside the shell; the rule under it separates it from
+   the headings, which carry their own heavier border below. */
+.vy-grid-toolbar {
+  display: flex; align-items: center; gap: var(--vy-space-6);
+  width: 100%; flex-wrap: wrap;
+  padding: var(--vy-space-7) var(--vy-space-8);
+  border-bottom: 1px solid var(--vy-grey-200);
+}
 /* The search box is the toolbar's primary control, so it gets a floor and takes
    the slack. Without a min-width it was the first thing flexbox squeezed, and at
    800px it collapsed to about six characters — "Sear…" — while the density
@@ -132,7 +146,6 @@
 /* The spacer only earns its keep on one line; once the toolbar wraps it would
    push the density control onto a row of its own. */
 .vy-toolbar-spacer { flex: 1 1 0; min-width: 0; }
-.vy-toolbar-spacer { flex: 1; }
 .vy-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .vy-code { font-family: var(--vy-font-mono); font-size: var(--vy-text-xs); background: var(--vy-grey-100); border-radius: var(--vy-radius-sm); padding: 1px var(--vy-space-3); color: var(--vy-grey-700); }
 .vy-empty { color: var(--vy-grey-300); }
@@ -319,7 +332,7 @@
 .vy-checklist-head .vy-progress { width: 100%; margin-bottom: var(--vy-space-4); }
 
 .vy-doc-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--vy-space-4); margin-bottom: var(--vy-space-4); }
-.vy-empty-inline { color: var(--vy-grey-500); font-size: var(--vy-text-base); background: var(--vy-grey-25); border: 1px dashed var(--vy-grey-300); border-radius: var(--vy-radius-md); padding: var(--vy-space-8); max-width: 72ch; }
+.vy-empty-inline { color: var(--vy-grey-500); font-size: var(--vy-text-base); background: var(--vy-grey-25); border: 1px dashed var(--vy-grey-300); border-radius: var(--vy-radius-md); padding: var(--vy-space-8); max-width: var(--vy-prose-max); }
 
 /* --- Quotation Result -------------------------------------------------------- */
 .vy-result-summary { display: flex; align-items: flex-end; gap: var(--vy-space-10); flex-wrap: wrap; background: var(--vy-grey-0); border: 1px solid var(--vy-grey-200); border-radius: var(--vy-radius-md); padding: var(--vy-space-7) var(--vy-space-8); margin-bottom: var(--vy-space-7); box-shadow: var(--vy-shadow-sm); }
@@ -329,7 +342,12 @@
 .vy-empty-state--tab p { max-width: 60ch; margin-inline: auto; }
 
 /* --- Conversations ----------------------------------------------------------- */
-.vy-conv { max-width: 78ch; }
+/* Capped, because comment text is prose and a 1400px line of it is genuinely
+   hard to read. Widened and tokenised, though: the cap was 78ch — the measure
+   for long-form reading — while the empty-state box nested inside it capped at
+   72ch, so the two ended at different points and the whole tab read as an
+   accident rather than a decision. One measure now, shared. */
+.vy-conv { max-width: var(--vy-prose-max); }
 .vy-thread { list-style: none; margin: 0 0 var(--vy-space-9); padding: 0; display: flex; flex-direction: column; gap: var(--vy-space-7); }
 .vy-comment, .vy-activity-item { display: grid; grid-template-columns: auto 1fr; gap: var(--vy-space-5); }
 .vy-comment-meta { display: flex; align-items: baseline; gap: var(--vy-space-4); flex-wrap: wrap; font-size: var(--vy-text-xs); color: var(--vy-grey-500); margin-bottom: var(--vy-space-2); }
@@ -914,9 +932,13 @@
 /* =============================================================================
    PAGER
    ========================================================================== */
+/* Same padding and gap as the toolbar above it. They are the two bands of one
+   shell, and at 8px/12px against the toolbar's 14px/16px the grid sat lower in
+   its frame than it sat high — an asymmetry that reads as a rendering fault
+   rather than a choice. */
 .vy-pager {
-  display: flex; align-items: center; flex-wrap: wrap; gap: var(--vy-space-5);
-  padding: var(--vy-space-4) var(--vy-space-6);
+  display: flex; align-items: center; flex-wrap: wrap; gap: var(--vy-space-6);
+  padding: var(--vy-space-7) var(--vy-space-8);
   border-top: 1px solid var(--vy-grey-200);
   background: var(--vy-grey-25);
   font-size: var(--vy-text-sm); color: var(--vy-grey-600);
