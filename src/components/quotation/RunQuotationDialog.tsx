@@ -103,7 +103,7 @@ export function RunQuotationDialog({ q, onClose }: { q: Quotation; onClose: () =
        "Select assembly first!". Quoted rather than rewritten, because a tester
        matching the sheet against the build is looking for those strings. */
     const err = step1Error(cfg);
-    if (err) { toast.success(err); return; }
+    if (err) { toast.error(err); return; }
     goTo(1);
   }
 

@@ -10,10 +10,19 @@ import { createContext, useCallback, useContext, useMemo, useState, type ReactNo
  * a live region so screen readers announce it, and pausing the timer while the
  * pointer is over it.
  */
-type T = { id: number; text: string; kind: 'info' | 'success'; undo?: () => void };
+type T = { id: number; text: string; kind: 'info' | 'success' | 'error'; undo?: () => void };
 const Ctx = createContext<{
   notImplemented: (w: string) => void;
   success: (t: string) => void;
+  /**
+   * Something did NOT happen. Kept separate from `success` because the app used
+   * to announce failures through it: a validation message telling you which
+   * required fields were still empty arrived on the green success toast, as did
+   * "Select assembly first!". The words were right and the colour said the
+   * opposite, which is worse than saying nothing — a user who trusts the colour
+   * carries on believing the step worked.
+   */
+  error: (t: string) => void;
   /**
    * A change that committed immediately, with the way back.
    *
@@ -23,7 +32,7 @@ const Ctx = createContext<{
    */
   undoable: (text: string, undo: () => void) => void;
 }>({
-  notImplemented: () => {}, success: () => {}, undoable: () => {},
+  notImplemented: () => {}, success: () => {}, error: () => {}, undoable: () => {},
 });
 export const useToast = () => useContext(Ctx);
 
@@ -36,6 +45,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     /** `what` completes the sentence "This would …". */
     notImplemented: (what: string) => push(`Not in this prototype — this would ${what}.`, 'info'),
     success: (text: string) => push(text, 'success'),
+    error: (text: string) => push(text, 'error'),
     undoable: (text: string, undo: () => void) => push(text, 'success', undo),
   }), [push]);
 
@@ -44,7 +54,14 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       <RToast.Provider swipeDirection="down" duration={4500}>
         {children}
         {items.map(t => (
+          /* A failure gets longer on screen and an assertive announcement. The
+             default 4.5s is tuned for "that worked" — a message you can miss
+             without cost. A message naming what you must fix before continuing
+             is one you cannot, and the user is usually still reading the form
+             rather than watching the corner. */
           <RToast.Root key={t.id} className="vy-toast" data-kind={t.kind}
+                       duration={t.kind === 'error' ? 9000 : undefined}
+                       type={t.kind === 'error' ? 'foreground' : 'background'}
                        onOpenChange={o => !o && setItems(v => v.filter(x => x.id !== t.id))}>
             <RToast.Description className="vy-toast-text">{t.text}</RToast.Description>
             {t.undo && (

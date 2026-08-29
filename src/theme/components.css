@@ -229,6 +229,10 @@
   animation: vy-toast-in var(--vy-dur-medium) var(--vy-ease-decelerate);
 }
 .vy-toast[data-kind="success"] { background: var(--vy-accent-positive); }
+/* red-600 rather than the red-500 accent: this carries white text, and the
+   accent red is reserved for destructive CONTROLS, where it sits under a label
+   rather than behind one. */
+.vy-toast[data-kind="error"] { background: var(--vy-red-600); }
 .vy-toast[data-swipe="end"] { animation: vy-toast-out var(--vy-dur-short) var(--vy-ease-accelerate); }
 .vy-toast-text { margin: 0; }
 .vy-toast-close { background: none; border: 0; color: inherit; opacity: .7; cursor: pointer; padding: 0; display: inline-flex; }

@@ -110,7 +110,7 @@ export function NewRequirementDialog({ open, onClose }: {
   function save() {
     if (missingCount) {
       setTouched(new Set([...ALL_FIELDS.map(f => f.name), 'programManager', 'buyer']));
-      toast.success(`${missingCount} required ${missingCount === 1 ? 'field is' : 'fields are'} still empty.`);
+      toast.error(`${missingCount} required ${missingCount === 1 ? 'field is' : 'fields are'} still empty.`);
       return;
     }
     const created: Quotation = { ...draft, newCustomer, createdDate: new Date(), lastUpdated: new Date() };
