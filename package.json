@@ -8,7 +8,9 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "css:orphans": "node scripts/css-orphans.js"
+    "css:orphans": "node scripts/css-orphans.js",
+    "css:consistency": "node scripts/css-consistency.js",
+    "css:check": "npm run css:orphans && npm run css:consistency"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",

@@ -317,7 +317,7 @@
 }
 /* Empty stays a stated absence rather than an empty box, which reads as a
    field that failed to load. */
-.vy-field dd.is-empty { color: var(--vy-grey-400); font-style: italic; }
+.vy-field dd.is-empty { color: var(--vy-grey-500); font-style: italic; }
 /* A notes field holds a paragraph, so its box grows with the text. */
 .vy-field--wide dd { min-height: calc(var(--vy-control-md) * 2); }
 
@@ -1007,7 +1007,7 @@
   font-size: var(--vy-text-base); color: var(--vy-grey-900);
 }
 .vy-read-value[data-locked] { background: var(--vy-grey-100); border-color: var(--vy-grey-300); color: var(--vy-grey-600); }
-.vy-read-value[data-empty] { color: var(--vy-grey-400); font-style: italic; }
+.vy-read-value[data-empty] { color: var(--vy-grey-500); font-style: italic; }
 
 .vy-attachments { margin-top: var(--vy-space-7); }
 .vy-attachments ul { list-style: none; margin: var(--vy-space-3) 0 0; padding: 0; display: flex; flex-direction: column; gap: var(--vy-space-2); }

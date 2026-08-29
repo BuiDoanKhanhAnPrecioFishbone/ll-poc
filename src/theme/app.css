@@ -317,9 +317,13 @@
 /* An unset field says so once, quietly. The production screen renders an empty
    read-only input, which reads as a control that failed to load. */
 
-.vy-flag-row { display: flex; align-items: baseline; gap: var(--vy-space-3); font-size: var(--vy-text-base); color: var(--vy-grey-400); }
+.vy-flag-row { display: flex; align-items: baseline; gap: var(--vy-space-3); font-size: var(--vy-text-base); color: var(--vy-grey-500); }
 .vy-flag-row[data-on="true"] { color: var(--vy-grey-800); }
-.vy-flag-mark { font-weight: var(--vy-weight-heavy); width: var(--vy-space-5); color: var(--vy-grey-300); }
+/* grey-300 measured 1.5:1 — the mark that says a flag is OFF was the least
+   legible thing on the record. It is not decoration: the dash and the tick are
+   the entire difference between "export-controlled" and "not", so it has to be
+   as readable as the label beside it. */
+.vy-flag-mark { font-weight: var(--vy-weight-heavy); width: var(--vy-space-5); color: var(--vy-grey-500); }
 .vy-flag-row[data-on="true"] .vy-flag-mark { color: var(--vy-accent-positive); }
 
 .vy-note-inline { font-size: var(--vy-text-xs); color: var(--vy-blue-700); background: var(--vy-blue-50); border-radius: var(--vy-radius-sm); padding: var(--vy-space-2) var(--vy-space-4); margin: var(--vy-space-2) 0; }
@@ -608,7 +612,10 @@
 .vy-chart-seg { display: block; width: 100%; height: var(--seg-h); min-height: 2px; }
 .vy-chart-stack > .vy-chart-seg:last-child { border-radius: var(--vy-radius-sm) var(--vy-radius-sm) 0 0; }
 .vy-chart-n { margin-top: var(--vy-space-3); font-size: var(--vy-text-xs); font-weight: var(--vy-weight-semibold); color: var(--vy-grey-700); font-variant-numeric: tabular-nums; }
-.vy-chart-n[data-zero] { color: var(--vy-grey-300); font-weight: var(--vy-weight-regular); }
+/* A zero is de-emphasised by dropping the weight, not by fading to grey-300 —
+   at 1.6:1 the count for an empty month was the one number on the chart you
+   could not read, and "no RFQs that month" is a fact worth reading. */
+.vy-chart-n[data-zero] { color: var(--vy-grey-500); font-weight: var(--vy-weight-regular); }
 .vy-chart-month { margin-top: var(--vy-space-1); font-size: var(--vy-text-xs); color: var(--vy-grey-500); }
 
 .vy-chart-seg[data-status="draft"],     .vy-chart-key[data-status="draft"]     { background: var(--vy-status-draft-fg); }
@@ -683,8 +690,12 @@
 
 /* Back is an exit, not an action on the record. It sits above the action row and
    carries no button chrome, so it stops competing with Run Quotation. */
+/* min-height meets the 24px minimum target size (WCAG 2.2, 2.5.8). At
+   `font-size: sm` and no padding this control was 17px tall — the one way out
+   of a record, and the smallest thing to hit on the page. */
 .vy-back {
   display: inline-flex; align-items: center; gap: var(--vy-space-3);
+  min-height: var(--vy-space-10);
   margin-bottom: var(--vy-space-5); padding: 0;
   background: none; border: 0; cursor: pointer;
   font: inherit; font-size: var(--vy-text-sm); color: var(--vy-grey-600);
@@ -788,7 +799,7 @@
 /* A zero keeps its place in the row — a row whose buttons appear and disappear
    cannot be learned by position — but stops competing for attention. */
 .vy-smart-btn[data-empty] { color: var(--vy-grey-500); }
-.vy-smart-btn[data-empty] .vy-smart-n { color: var(--vy-grey-400); font-weight: var(--vy-weight-regular); }
+.vy-smart-btn[data-empty] .vy-smart-n { color: var(--vy-grey-500); font-weight: var(--vy-weight-regular); }
 
 /* =============================================================================
    HEADER GROUPS
@@ -969,7 +980,7 @@
   color: var(--vy-grey-0); font-weight: var(--vy-weight-semibold);
 }
 .vy-pager-page:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
-.vy-pager-gap { padding: 0 var(--vy-space-2); color: var(--vy-grey-400); }
+.vy-pager-gap { padding: 0 var(--vy-space-2); color: var(--vy-grey-500); }
 
 /* =============================================================================
    ACTIVITY LOG — grouped by day, then by person

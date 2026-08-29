@@ -40,7 +40,13 @@
   --vy-grey-200: #dde2e9;
   --vy-grey-300: #c3cbd6;
   --vy-grey-400: #97a2b2;
-  --vy-grey-500: #6b7688;
+  /* Darkened from #6b7688 after a contrast sweep. This is the workhorse
+     secondary-text colour — field labels, group titles, placeholders, meta —
+     and at the old value it cleared AA on WHITE (4.59) but failed on every
+     tinted surface it actually sits on: cards 4.47, grey-50 4.28, grey-100
+     3.98. It looked fine because the page it was designed against was white.
+     #626d7e is the least change that clears 4.5 on all four. */
+  --vy-grey-500: #626d7e;
   --vy-grey-600: #4d5766;
   --vy-grey-700: #363e4b;
   --vy-grey-800: #232a34;
