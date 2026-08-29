@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Tabs } from '../ui/Overlays';
+import { Dialog, Tabs } from '../ui/Overlays';
 import { Button } from '../ui/Button';
 import { StatusBadge } from '../ui/Badge';
 import { generateQuotations, daysUntil, findCustomer, contactsFor, type Quotation } from '../data/quotations';
@@ -139,11 +139,40 @@ export function QuotationDetail() {
     );
   }
 
+  /* Discarding work silently is how people lose it, so this asks — but it asks
+     in the app's own dialog rather than the browser's `confirm()`.
+
+     A native confirm was the wrong control at the worst moment. It is the one
+     modal in the app that does not look like the app: unstyled, OS-dependent,
+     blocking, unfocusable by our own rules, and impossible to say anything
+     useful in. It also could not name what was about to be lost — "Discard 3
+     unsaved changes?" tells you the count and leaves you to remember WHICH
+     three, which is exactly what someone reaching for Cancel is unsure about.
+
+     This lists the changed fields, so the choice is made against the facts. */
+  const [confirmDiscard, setConfirmDiscard] = useState(false);
+
   function cancelEdit() {
-    /* Discarding work silently is how people lose it. Only ask when there is
-       something to lose. */
-    if (dirty && !confirm(`Discard ${changeCount} unsaved ${changeCount === 1 ? 'change' : 'changes'}?`)) return;
+    /* Only ask when there is something to lose. */
+    if (dirty) { setConfirmDiscard(true); return; }
     setDraft(null);
+  }
+
+  /* The dialog is the guard; this is the second net under it. Undo is normally
+     BETTER than a confirmation — it lets the common case, where the user meant
+     it, happen without interruption. It is not enough on its own here, because
+     the undo lives in a toast: Cancel leaves edit mode, the user may leave the
+     page, and the closure holding the draft goes with it. So both, each doing
+     the job the other cannot — the dialog stops the accident, the undo forgives
+     the confirmation clicked too fast. */
+  function discardEdit() {
+    const discarded = draft;
+    setConfirmDiscard(false);
+    setDraft(null);
+    toast.undoable(
+      `Discarded ${changeCount} unsaved ${changeCount === 1 ? 'change' : 'changes'}.`,
+      () => setDraft(discarded),
+    );
   }
   /* Tab labels carry counts so the record's state is legible without opening
      each tab. The live TabStrip gives five bare nouns. */
@@ -359,6 +388,27 @@ export function QuotationDetail() {
           { value: 'activity',     label: 'Activity Logs', content: <ActivityTab q={q} /> },
         ]}
       />
+
+      {/* Names the fields, which is the whole reason this is not a confirm().
+          Someone reaching for Cancel is usually unsure what they touched; a
+          count answers a question they were not asking. */}
+      <Dialog
+        open={confirmDiscard}
+        onClose={() => setConfirmDiscard(false)}
+        title={`Discard ${changeCount} unsaved ${changeCount === 1 ? 'change' : 'changes'}?`}
+        subtitle="This cannot be recovered once you leave the record."
+        actions={
+          <>
+            <Button variant="text" onClick={() => setConfirmDiscard(false)}>Keep editing</Button>
+            <Button variant="danger" onClick={discardEdit}>Discard changes</Button>
+          </>
+        }
+      >
+        <p className="vy-dialog-lead">You changed:</p>
+        <ul className="vy-discard-list">
+          {changed.map(label => <li key={label}>{label}</li>)}
+        </ul>
+      </Dialog>
 
       {contactOpen && (
         <AddContactDialog

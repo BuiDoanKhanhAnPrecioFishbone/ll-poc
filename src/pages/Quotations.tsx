@@ -94,6 +94,15 @@ export function Quotations() {
 
   const { views: savedViews, active: view, activeId, setActiveId, save, remove } =
     useViews('quotation', systemView);
+  /* The flagship grid was the ONLY one of the three without a loading state.
+     Part Master and My Queues both render one; this screen went straight from
+     nothing to 66 rows, so the pattern the other two demonstrate was
+     contradicted on the screen most people open first. Same short delay and
+     same reason as Part Master: the mockup's data is synchronous, and a state
+     that never renders cannot be reviewed. */
+  const [loading, setLoading] = useState(true);
+  useEffect(() => { const t = setTimeout(() => setLoading(false), 700); return () => clearTimeout(t); }, []);
+
   const [settingOpen, setSettingOpen] = useState(false);
   const [creating, setCreating] = useState(false);
 
@@ -226,6 +235,7 @@ export function Quotations() {
     <DataGrid
       data={sorted}
       columns={allColumns}
+      loading={loading}
       /* "Project Requirement", as the guideline specifies and the nav says —
          not "Quotations". A screen whose heading disagrees with the menu item
          you clicked to reach it is the same defect as the renamed tabs. */

@@ -129,6 +129,22 @@
 .vy-dialog-title { font-size: var(--vy-text-lg); font-weight: var(--vy-weight-bold); color: var(--vy-grey-900); margin: 0; }
 .vy-dialog-sub { font-size: var(--vy-text-base); color: var(--vy-grey-500); margin: var(--vy-space-2) 0 0; }
 .vy-dialog-body { padding: var(--vy-space-9); overflow-y: auto; flex: 1; }
+/* The discard confirmation lists what would be lost. The list is the content of
+   that dialog, not decoration, so it gets the same weight as a field value —
+   this is the thing the user is being asked to read before choosing. */
+.vy-dialog-lead { margin: 0 0 var(--vy-space-4); font-size: var(--vy-text-base); color: var(--vy-grey-600); }
+.vy-discard-list {
+  margin: 0; padding: 0; list-style: none;
+  display: flex; flex-direction: column; gap: var(--vy-space-2);
+  max-height: 40vh; overflow-y: auto;
+}
+.vy-discard-list li {
+  padding: var(--vy-space-3) var(--vy-space-5);
+  background: var(--vy-grey-25);
+  border: 1px solid var(--vy-grey-200);
+  border-radius: var(--vy-radius-sm);
+  font-size: var(--vy-text-base); color: var(--vy-grey-900);
+}
 .vy-dialog-actions { display: flex; justify-content: flex-end; gap: var(--vy-space-4); padding: var(--vy-space-5) var(--vy-space-9) var(--vy-space-8); border-top: 1px solid var(--vy-grey-200); }
 @keyframes vy-fade { from { opacity: 0 } to { opacity: 1 } }
 @keyframes vy-rise { from { opacity: 0; transform: translate(-50%, calc(-50% + var(--vy-space-6))) } to { opacity: 1; transform: translate(-50%, -50%) } }
