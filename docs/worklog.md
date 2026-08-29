@@ -140,10 +140,11 @@ Converted four free-text fields to lookups, matching the real system.
 ### WP11 · Design review response, round 1
 **25 Aug · 5–6 h**
 
-Response to internal design review. Smart buttons (related-record navigation,
-previously absent), header fields grouped into labelled regions, priority
-indicator changed from a star rating to a dot and label, quick and advanced
-filters, and a column chooser.
+Response to the customer's design report of 25 Aug 2026 — a tier-1 source under
+`docs/precedence.md`, not an internal review. Smart buttons (related-record
+navigation, previously absent), header fields grouped into labelled regions,
+priority indicator changed from a star rating to a dot and label, quick and
+advanced filters, and a column chooser.
 
 ### WP12 · Design review response, round 2
 **25 Aug · 6–7 h**
