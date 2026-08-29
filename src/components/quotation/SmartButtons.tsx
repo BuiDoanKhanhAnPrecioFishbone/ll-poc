@@ -40,7 +40,10 @@ export function smartButtonsFor(q: Quotation): SmartButton[] {
     { icon: 'doc', label: 'Document', plural: 'Documents',
       count: q.tasks.filter(t => t.documentName).length },
     { icon: 'chat', label: 'Conversation', plural: 'Conversations', count: q.comments.length },
-    { icon: 'log', label: 'Activity entry', plural: 'Activity log', count: q.activity.length },
+    /* "Activity log" is the name of the TAB, not the plural of an entry, so it
+       cannot go here — the row renders `${count} ${plural}` and printed the
+       ungrammatical "2 Activity log". */
+    { icon: 'log', label: 'Activity entry', plural: 'Activity entries', count: q.activity.length },
   ];
 }
 

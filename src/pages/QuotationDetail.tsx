@@ -182,9 +182,16 @@ export function QuotationDetail() {
           {smartButtonsFor(q).map(b => (
             <button key={b.label} type="button" className="vy-smart-btn"
                     data-empty={b.count === 0 || undefined}
-                    onClick={() => b.count
-                      ? toast.notImplemented(`open the ${b.count === 1 ? b.label.toLowerCase() : b.plural.toLowerCase()} linked to RFQ${q.no}`)
-                      : toast.notImplemented(`create a ${b.label.toLowerCase()} for RFQ${q.no}`)}>
+                    /* Always GOES somewhere — never creates. The branch here
+                       used to call create when the count was falsy, which made
+                       one row mix navigation with a record-modifying action,
+                       against the rule this component is built on. It also
+                       caught Customer, whose count is null rather than 0, so
+                       the single most-clicked button in the row offered to
+                       create a second customer for the RFQ. An empty
+                       destination is still a destination. */
+                    onClick={() => toast.notImplemented(
+                      `open the ${b.count === 1 ? b.label.toLowerCase() : b.plural.toLowerCase()} linked to RFQ${q.no}`)}>
               <SmartIcon name={b.icon} />
               {b.count !== null && <span className="vy-smart-n">{b.count}</span>}
               <span>{b.count === 1 ? b.label : b.plural}</span>
