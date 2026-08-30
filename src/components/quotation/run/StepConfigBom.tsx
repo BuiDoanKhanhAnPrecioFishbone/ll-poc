@@ -3,6 +3,8 @@ import { RadioGroup, Select } from '../../../ui/Overlays';
 import { Button } from '../../../ui/Button';
 import { TextField, TextArea } from '../../../ui/Field';
 import { useToast } from '../../../ui/Toast';
+import { DraftsTable } from './DraftsTable';
+import { draftQuotesFor, type DraftQuote } from '../../../data/draftQuotes';
 import { QtyField } from './QuoteContext';
 import { ImportFileDialog } from './dialogs';
 import { BOM_TEMPLATES, COLUMN_DETECTION, assembliesFor } from '../../../data/bom';
@@ -28,6 +30,12 @@ import type { RunConfig } from './state';
 export const ACTIONS = [
   { value: 'import-new', label: 'Import New BoM' },
   { value: 'load-existing', label: 'Load Existing Assembly' },
+  /* Resume Draft Quote is a third ENTRY POINT, not a third kind of quote — the
+     draft it resumes was created through one of the two above. It belongs on
+     this control because this is where the user already answers "which way am I
+     starting", and a separate button elsewhere would ask the same question in
+     two places. */
+  { value: 'resume-draft', label: 'Continue from drafts' },
 ];
 
 /**
@@ -67,14 +75,17 @@ const ATTACHMENTS = [
  * the Action that decides everything below it, then BoM Options and Assembly
  * Details, whose contents follow from the Action.
  */
-export function StepConfigBom({ q, cfg, set }: {
+export function StepConfigBom({ q, cfg, set, onContinueDraft }: {
   q: Quotation; cfg: RunConfig; set: (patch: Partial<RunConfig>) => void;
+  /** Resume Draft Quote: jumps straight to step 3 with the chosen draft loaded. */
+  onContinueDraft: (d: DraftQuote) => void;
 }) {
   const toast = useToast();
   const [importOpen, setImportOpen] = useState(false);
   const customer = findCustomer(q.customer);
   const xlsx = ATTACHMENTS.filter(a => a.ok);
   const assemblies = assembliesFor(q.customer);
+  const drafts = draftQuotesFor(q.customer);
 
   return (
     <div className="vy-run-step">
@@ -149,7 +160,9 @@ export function StepConfigBom({ q, cfg, set }: {
         <p className="vy-hint">
           {cfg.action === 'import-new'
             ? 'Quote a BoM file attached to this Project Requirement, against an assembly you name.'
-            : 'Quote an assembly already approved and loaded in the system through the ECO process.'}
+            : cfg.action === 'load-existing'
+              ? 'Quote an assembly already approved and loaded in the system through the ECO process.'
+              : 'Pick up quoting work saved earlier. Continue goes straight to Quoting — the BoM was already configured when the draft was saved.'}
         </p>
         {/* "Precondition: Only show this option when user attach at least 1 file
             in this corresponding project requirements." Saying why beats the
@@ -162,6 +175,18 @@ export function StepConfigBom({ q, cfg, set }: {
         )}
       </section>
 
+      {/* ---- Continue from drafts ------------------------------------------
+          Replaces BoM Options and Assembly Details rather than joining them:
+          both of those configure a BoM, and a draft's BoM was configured when
+          it was saved. Leaving them on screen would invite the user to set a
+          template for a run that will not read it. */}
+      {cfg.action === 'resume-draft' ? (
+        <section className="vy-run-section">
+          <h3 className="vy-field-group-title">Continue from drafts</h3>
+          <DraftsTable drafts={drafts} customer={q.customer} onContinue={onContinueDraft} />
+        </section>
+      ) : (
+      <>
       {/* ---- BoM Options ---------------------------------------------------- */}
       <section className="vy-run-section">
         <h3 className="vy-field-group-title">BoM Options</h3>
@@ -365,6 +390,8 @@ export function StepConfigBom({ q, cfg, set }: {
           </div>
         )}
       </section>
+      </>
+      )}
 
       <ImportFileDialog
         open={importOpen}

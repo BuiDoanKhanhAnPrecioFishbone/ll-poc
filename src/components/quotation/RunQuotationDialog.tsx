@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { saveDraftQuote, type DraftQuote } from '../../data/draftQuotes';
 import { Dialog } from '../../ui/Overlays';
 import { Button } from '../../ui/Button';
 import { Stepper } from '../../ui/Stepper';
@@ -159,8 +160,53 @@ export function RunQuotationDialog({ q, onClose }: { q: Quotation; onClose: () =
       : 'No line matched a different price range.');
   }
 
+  /* Save draft used to show the guideline's success message and do nothing
+     else, which made Resume Draft Quote unreachable: the flow named after
+     resuming a draft had no draft to resume. It now writes one.
+
+     The message itself is unchanged — "Save draft quotation successfully!" is
+     quoted verbatim from the guideline, which specifies that exact string for
+     this step, and a tester matching the sheet is looking for it. What follows
+     the message is ours: where the draft went, and the same session-only
+     caveat every other write in this prototype carries. */
   function saveDraft() {
+    const assemblyName = cfg.assembly || cfg.assemblyPartNumber || q.projectName;
+    const replaced = saveDraftQuote({
+      id: `draft-${q.id}-${assemblyName}-${cfg.partRev}`,
+      rfqId: q.id,
+      customer: q.customer,
+      assemblyName,
+      revision: cfg.partRev || '—',
+      description: cfg.partDesc || q.projectName,
+      buildQty: cfg.buildQty,
+      attritionSet: cfg.attritionSet,
+      createdDate: new Date(),
+      cfg, lines, hasRun, runVersion, runDate,
+    });
     toast.success('Save draft quotation successfully!');
+    toast.success(replaced
+      ? `Draft for ${assemblyName} updated. Reopen Run Quotation and choose "Continue from drafts" to pick it up. Held in this browser session only.`
+      : `Draft saved for ${assemblyName}. Reopen Run Quotation and choose "Continue from drafts" to pick it up. Held in this browser session only.`);
+  }
+
+  /* ---- Resume a draft ----------------------------------------------------
+     "Redirect to Step 3 - Quoting for the selected draft." Steps 1 and 2 are
+     skipped because the draft already holds their output — the BoM was
+     configured and reviewed in the sitting that saved it.
+
+     `furthest` is set to 2 as well, so the stepper shows steps 1 and 2 as
+     reachable rather than as work still to do. Someone who resumes a draft and
+     then wants to look at the parsed BoM should be able to step back to it;
+     leaving furthest at 0 would strand them on step 3. */
+  function continueDraft(d: DraftQuote) {
+    setCfg(d.cfg);
+    setLinesState(d.lines);
+    setHasRun(d.hasRun);
+    setRunVersion(d.runVersion);
+    setRunDate(d.runDate);
+    setStep(2);
+    setFurthest(f => Math.max(f, 2));
+    toast.success(`Resumed the draft for ${d.assemblyName}, saved ${d.createdDate.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}.`);
   }
 
   /* ---- Step 3 -> 4 ------------------------------------------------------- */
@@ -194,7 +240,16 @@ export function RunQuotationDialog({ q, onClose }: { q: Quotation; onClose: () =
             Previous
           </Button>
 
-          {step === 0 && <Button variant="filled" onClick={leaveStep1}>Next</Button>}
+          {/* Continue from drafts has no Next. The way forward is the Continue
+              button on the row the user chooses, because WHICH draft is the
+              question this step is asking — a Next here would have to either
+              guess a row or refuse, and refusing through a disabled primary
+              button teaches nothing. Hidden rather than disabled: a disabled
+              Next reads as "you have not finished this step yet", which is the
+              wrong story when the step is finished by a control beside it. */}
+          {step === 0 && cfg.action !== 'resume-draft' && (
+            <Button variant="filled" onClick={leaveStep1}>Next</Button>
+          )}
           {step === 1 && <Button variant="filled" onClick={leaveStep2}>Next</Button>}
           {step === 2 && (
             <Button variant="filled" disabled={!canLeaveStep3}
@@ -223,7 +278,7 @@ export function RunQuotationDialog({ q, onClose }: { q: Quotation; onClose: () =
             <span className="vy-code">{q.rfqType}</span>
           </div>
 
-          {step === 0 && <StepConfigBom q={q} cfg={cfg} set={set} />}
+          {step === 0 && <StepConfigBom q={q} cfg={cfg} set={set} onContinueDraft={continueDraft} />}
           {step === 1 && <StepReviewBom cfg={cfg} set={set} lines={lines} setLines={setLines} />}
           {step === 2 && (
             <StepQuoting

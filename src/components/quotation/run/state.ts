@@ -17,12 +17,15 @@ export type RunConfig = {
    *   load-existing   Standard Quote — the BoM is already approved and loaded
    *                   through the ECO process, so the assembly is chosen from
    *                   the customer's own list.
+   *   resume-draft    Resume Draft Quote — neither: the BoM was configured in
+   *                   an earlier sitting and the user is picking that work back
+   *                   up, so this entry point skips straight to step 3.
    *
    * The two sheets treat these as separate flows; the product treats them as one
    * wizard with two entry points, which is what the Action radio on step 1 is.
    * Steps 2, 3 and 4 are identical for both — verified row by row.
    */
-  action: 'import-new' | 'load-existing';
+  action: 'import-new' | 'load-existing' | 'resume-draft';
 
   /**
    * Only for `load-existing`: what to do with the BoM already on file.
