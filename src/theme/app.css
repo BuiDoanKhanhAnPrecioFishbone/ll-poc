@@ -1230,3 +1230,62 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
 /* Maximised, the sidebar becomes a full-height panel wide enough for the Column
    tab's three-column table to breathe. */
 .vy-viewsetting[data-maximised] { width: min(var(--vy-viewsetting-max-w), 96vw); }
+
+
+/* ---- Login -------------------------------------------------------------------
+   Answers the two faults the kick-off deck names on this screen: "Too much empty
+   space" and "Lack of contrast".
+
+   The space is given a JOB rather than filled. A form is the one element here
+   that must not be wide — a 900px username field is worse than a 360px one — so
+   the page splits, and the half the form does not need carries the brand. That
+   split is also what supplies the contrast, at the scale of the page rather than
+   of a single button: a dark ground against a light one, which is the same pair
+   the sidebar and content area already use, so the login agrees with the app
+   before anyone has signed in.
+
+   Below 860px it becomes one column and the brand panel keeps only its mark —
+   on a phone the form is the whole point and a tall banner above it is a scroll
+   before a task. */
+.vy-login { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); min-height: 100vh; }
+
+.vy-login-brand {
+  background: var(--vy-grey-900);
+  padding: var(--vy-space-14) var(--vy-space-12);
+  display: flex; flex-direction: column; justify-content: center; gap: var(--vy-space-8);
+}
+.vy-login-brandmark { display: flex; align-items: center; gap: var(--vy-space-6); }
+.vy-login-brandmark > div { display: flex; flex-direction: column; line-height: 1.25; }
+.vy-login-brandmark strong { color: var(--vy-on-dark-fg); font-size: var(--vy-text-xl); letter-spacing: .08em; }
+/* Scoped to the text block, NOT to every span in the lockup. Written as
+   `.vy-login-brandmark span` it also caught .vy-brand-mark, repainting the white
+   "V" in muted grey — 3.07:1 on its blue tile, and looking like a mistake rather
+   than a logo. */
+.vy-login-brandmark > div > span { color: var(--vy-on-dark-muted); font-size: var(--vy-text-base); }
+.vy-login-pitch { margin: 0; color: var(--vy-on-dark-fg); font-size: var(--vy-text-2xl); font-weight: var(--vy-weight-bold); line-height: 1.25; max-width: 18ch; }
+/* on-dark-muted rather than a dimmer grey: this is a caveat people need to be
+   able to read, not decoration. */
+.vy-login-note { margin: 0; color: var(--vy-on-dark-muted); font-size: var(--vy-text-base); max-width: 42ch; line-height: 1.5; }
+
+.vy-login-panel { display: flex; align-items: center; justify-content: center; padding: var(--vy-space-12); background: var(--vy-grey-0); }
+.vy-login-form { width: 100%; max-width: var(--vy-login-form-w); display: flex; flex-direction: column; gap: var(--vy-space-6); }
+.vy-login-title { margin: 0; font-size: var(--vy-text-3xl); font-weight: var(--vy-weight-bold); color: var(--vy-grey-900); }
+.vy-login-sub { margin: 0 0 var(--vy-space-6); color: var(--vy-grey-600); font-size: var(--vy-text-md); }
+.vy-login-row { display: flex; align-items: center; justify-content: space-between; gap: var(--vy-space-6); flex-wrap: wrap; }
+/* Full width and taller than a toolbar button: it is the only action on the
+   page, and the live one is a pale bar that reads as disabled. */
+.vy-login-submit { width: 100%; min-height: var(--vy-space-14); font-size: var(--vy-text-md); }
+.vy-login-forgot { font-size: var(--vy-text-base); }
+.vy-login-legal { margin: var(--vy-space-6) 0 0; display: flex; align-items: center; justify-content: center; gap: var(--vy-space-4); font-size: var(--vy-text-sm); color: var(--vy-grey-500); }
+
+@media (max-width: 860px) {
+  /* `auto 1fr`, not the default stretch. Without it the two rows split the
+     viewport evenly and the brand panel took 480px of an 812px phone before the
+     form began — reproducing, one axis over, the "too much empty space" this
+     screen exists to fix. The brand takes what it needs; the form gets the
+     rest. */
+  .vy-login { grid-template-columns: 1fr; grid-template-rows: auto 1fr; min-height: 100dvh; }
+  .vy-login-brand { padding: var(--vy-space-10) var(--vy-space-9); gap: var(--vy-space-5); }
+  .vy-login-pitch, .vy-login-note { display: none; }
+  .vy-login-panel { padding: var(--vy-space-10) var(--vy-space-9); align-items: flex-start; }
+}

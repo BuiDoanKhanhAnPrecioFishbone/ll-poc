@@ -250,6 +250,7 @@
   --vy-tz-w:             180px;  /* timezone select in the global header */
   --vy-kpi-min-w:        140px;
   --vy-record-max-w:     1180px;
+  --vy-login-form-w:      380px;  /* the login form, held to a readable width */
   --vy-status-slot-w:    104px;  /* GAP-01 — see docs/gap-register.md */
   --vy-note-min-w:       320px;
   /* One short contact field — name, job title, email or phone. */

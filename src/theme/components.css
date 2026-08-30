@@ -94,7 +94,12 @@
 .vy-menu-item[data-highlighted] { background: var(--vy-blue-50); }
 
 /* --- Checkbox / radio ------------------------------------------------------ */
-.vy-check, .vy-radio { display: flex; align-items: center; gap: var(--vy-space-4); font-size: var(--vy-text-base); color: var(--vy-grey-800); cursor: pointer; }
+/* The LABEL carries the 24px minimum target, not the box. The whole label is
+   clickable, so it is the target — and it was 20px tall because that is the box
+   height and nothing asked for more. Growing the box instead would make every
+   checkbox in the app visually heavier to fix a number; growing the label costs
+   nothing visible and is the thing a pointer actually hits (WCAG 2.2, 2.5.8). */
+.vy-check, .vy-radio { display: flex; align-items: center; min-height: var(--vy-space-10); gap: var(--vy-space-4); font-size: var(--vy-text-base); color: var(--vy-grey-800); cursor: pointer; }
 .vy-check-box, .vy-radio-dot {
   display: grid; place-items: center; flex: 0 0 auto;
   width: var(--vy-space-9); height: var(--vy-space-9);
@@ -536,6 +541,13 @@
 .vy-link {
   display: inline-flex; align-items: center; min-height: var(--vy-space-10);
   color: var(--vy-blue-700); text-decoration: none; width: fit-content;
+  /* Resets the button chrome, because this class is used on BOTH <a> and
+     <button>. It was written against the two <Link>s that first needed it, so
+     the first <button> to take it — Forgot Password? on the login — rendered as
+     a bordered grey button in the middle of a sentence. A link that performs an
+     action rather than navigating is still correctly a button; it just must not
+     look like one. */
+  background: none; border: 0; padding: 0; font: inherit; cursor: pointer;
 }
 .vy-link:hover { text-decoration: underline; }
 

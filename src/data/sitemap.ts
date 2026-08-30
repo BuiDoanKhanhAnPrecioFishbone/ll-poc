@@ -385,6 +385,10 @@ export const reviewPages: NavItem[] = [
   { title: 'UX Audit', path: '/audit', hint: 'Findings measured from the live system' },
   { title: 'Sitemap', path: '/sitemap', hint: 'The live menu, and the restructure that was declined' },
   { title: 'Design System', path: '/design-system', hint: 'Tokens, status vocabulary and column roles' },
+  /* Sits with the review pages rather than behind a Sign out item in the user
+     menu. There is no reading of the live system's sign-out, so adding one
+     would be inventing a flow to reach a screen that exists to be reviewed. */
+  { title: 'Login', path: '/login', hint: 'The redesigned sign-in screen' },
 ];
 
 /** Flattened, for the command palette. Live destinations only. */

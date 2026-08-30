@@ -8,6 +8,7 @@ import { SitemapPage } from './pages/Sitemap';
 import { DesignSystemPage } from './pages/DesignSystem';
 import { AuditPage } from './pages/Audit';
 import { Placeholder } from './pages/Placeholder';
+import { Login } from './pages/Login';
 import { Queues } from './pages/Queues';
 import { ToastProvider } from './ui/Toast';
 import { PrefsProvider } from './ui/prefs';
@@ -25,6 +26,11 @@ export default function App() {
       <PrefsProvider>
       <ToastProvider>
       <Routes>
+        {/* OUTSIDE the AppShell. The login has no sidebar, no top bar and no
+            navigation — rendering it inside the shell would put a menu on the
+            screen you reach before you have signed in. */}
+        <Route path="/login" element={<Login />} />
+
         <Route element={<AppShell />}>
           {/* Every route mirrors the production URL exactly, so this mockup and
               the live system can be opened side by side and compared at the same
