@@ -18,7 +18,11 @@ import type { Quotation } from '../data/quotations';
 
 export type FilterKind = 'select' | 'date-range';
 
-export type ViewField = {
+/* Generic over the row, defaulting to Quotation so every existing call site
+   reads unchanged. Nothing in the filtering machinery was ever Quotation-
+   specific — `applyView` only calls `f.value(row)` — but the types said
+   otherwise, which is what stopped Part Master from reusing any of it. */
+export type ViewField<T = Quotation> = {
   /** Matches the record property, or the base name for a date range. */
   field: string;
   /** Verbatim from the live screen. */
@@ -26,7 +30,7 @@ export type ViewField = {
   kind: FilterKind;
   options?: readonly string[];
   /** Pulls the comparable value out of a row. */
-  value: (q: Quotation) => string | Date | null | undefined;
+  value: (row: T) => string | Date | null | undefined;
 };
 
 /** A date range is two inputs and one concept, so it stores two values. */
@@ -117,7 +121,7 @@ const dayOf = (v: unknown) => {
  * with no end means everything since. Requiring both would make the common case
  * — an open-ended window — impossible to express.
  */
-export function applyView(rows: Quotation[], fields: ViewField[], values: FilterValues): Quotation[] {
+export function applyView<T>(rows: T[], fields: ViewField<T>[], values: FilterValues): T[] {
   const active = fields.filter(f =>
     f.kind === 'date-range'
       ? values[f.field + 'From'] || values[f.field + 'To']
@@ -141,7 +145,7 @@ export function applyView(rows: Quotation[], fields: ViewField[], values: Filter
 }
 
 /** How many fields are actually filtering, for the badge on the funnel. */
-export function activeCount(fields: ViewField[], values: FilterValues): number {
+export function activeCount<T>(fields: ViewField<T>[], values: FilterValues): number {
   return fields.filter(f =>
     f.kind === 'date-range'
       ? values[f.field + 'From'] || values[f.field + 'To']

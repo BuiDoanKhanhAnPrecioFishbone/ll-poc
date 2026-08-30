@@ -22,7 +22,7 @@ import type { FilterValues, ViewField } from './views';
  * of visits that filter.
  */
 export function FilterToolbar({ fields, values, onChange, onClear, activeCount, onEditFields }: {
-  fields: ViewField[];
+  fields: ViewField<any>[];
   values: FilterValues;
   onChange: (next: FilterValues) => void;
   onClear: () => void;

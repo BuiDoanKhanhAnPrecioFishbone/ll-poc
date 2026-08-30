@@ -28,11 +28,20 @@ import type { SavedView, ViewField, ViewSort } from './views';
 type Tab = 'filter' | 'column' | 'sort';
 
 export function ViewSetting<T>({
-  view, allColumns, allFields, canDelete, onSave, onDiscard, onDelete, onClose,
+  view, screen, allColumns, allFields, canDelete, onSave, onDiscard, onDelete, onClose,
 }: {
   view: SavedView;
+  /**
+   * The screen this panel belongs to, for its heading.
+   *
+   * Was hardcoded "Request For Quotation", which was invisible while this
+   * component had exactly one caller and wrong the moment it had two — Part
+   * Master opened a panel announcing itself as Request For Quotation, to
+   * sighted users and screen readers alike.
+   */
+  screen: string;
   allColumns: ColumnSpec<T>[];
-  allFields: ViewField[];
+  allFields: ViewField<any>[];
   canDelete: boolean;
   onSave: (v: SavedView, asNew: boolean) => void;
   onDiscard: () => void;
@@ -69,9 +78,9 @@ export function ViewSetting<T>({
     <>
       <div className="vy-scrim" onClick={onClose} aria-hidden />
       <aside className="vy-viewsetting" role="dialog" data-maximised={maximised || undefined}
-             aria-label="Request For Quotation - View Setting">
+             aria-label={`${screen} - View Setting`}>
         <header className="vy-vs-head">
-          <h2>Request For Quotation - View Setting</h2>
+          <h2>{screen} - View Setting</h2>
           <div className="vy-window-actions">
             <button className="vy-icon-btn" aria-pressed={maximised}
                     aria-label={maximised ? 'Restore down' : 'Maximize'}

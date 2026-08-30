@@ -351,6 +351,7 @@ export function Quotations() {
 
     {settingOpen && (
       <ViewSetting
+        screen="Request For Quotation"
         view={{ ...view, columns: workingCols }}
         allColumns={columns}
         allFields={quotationFilterFields(all)}

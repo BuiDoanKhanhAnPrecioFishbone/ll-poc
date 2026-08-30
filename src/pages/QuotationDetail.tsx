@@ -65,6 +65,12 @@ export function QuotationDetail() {
   const base = useMemo(() => all.find(x => x.id === id), [all, id]);
   const q = saved ?? base;
 
+  /* Declared with the other hooks, ABOVE the not-found return. It began life
+     beside cancelEdit, which reads better and is wrong: a bad :id returns
+     early, so on that render the hook was never reached, and navigating from a
+     missing RFQ to a real one changed the hook order between renders. */
+  const [confirmDiscard, setConfirmDiscard] = useState(false);
+
   if (!q || !base) {
     return (
       <div className="vy-page">
@@ -150,8 +156,6 @@ export function QuotationDetail() {
      three, which is exactly what someone reaching for Cancel is unsure about.
 
      This lists the changed fields, so the choice is made against the facts. */
-  const [confirmDiscard, setConfirmDiscard] = useState(false);
-
   function cancelEdit() {
     /* Only ask when there is something to lose. */
     if (dirty) { setConfirmDiscard(true); return; }
