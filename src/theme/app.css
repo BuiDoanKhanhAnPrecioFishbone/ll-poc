@@ -1001,6 +1001,7 @@
   font: inherit; font-size: var(--vy-text-sm); color: var(--vy-grey-800);
   background: var(--vy-grey-0); border: 1px solid var(--vy-grey-200);
   border-radius: var(--vy-radius-sm); padding: var(--vy-space-1) var(--vy-space-3); cursor: pointer;
+  min-height: var(--vy-space-10);   /* 24px minimum target, as above */
 }
 .vy-pager-nav { display: flex; align-items: center; gap: var(--vy-space-1); }
 .vy-pager-page {

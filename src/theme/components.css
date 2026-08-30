@@ -16,7 +16,14 @@
               border-color var(--vy-dur-short) var(--vy-ease-standard),
               box-shadow var(--vy-dur-short) var(--vy-ease-standard);
 }
-.vy-btn--sm { padding: var(--vy-space-1) var(--vy-space-5); font-size: var(--vy-text-sm); }
+/* min-height carries this to the 24px minimum target size (WCAG 2.2, 2.5.8).
+   Padding alone left the pager's « ‹ › » at 23px — one pixel short, which is the
+   least useful way to fail a threshold: invisible to review, and a real miss for
+   anyone aiming with a coarse pointer. */
+.vy-btn--sm {
+  padding: var(--vy-space-1) var(--vy-space-5); font-size: var(--vy-text-sm);
+  min-height: var(--vy-space-10);
+}
 .vy-btn:disabled { opacity: var(--vy-state-disabled); cursor: not-allowed; }
 .vy-btn:disabled::after { display: none; }
 
@@ -521,6 +528,17 @@
    to select and copy works anywhere in the grid — which is what the row-level
    click handler took away. Rendered as an anchor where the record has a URL,
    so middle-click and open-in-new-tab behave as expected. */
+/* Used on Home and My Queues and never declared, so these two links took the
+   browser's default: body colour with an underline. Legible, but not the link
+   style the rest of the app uses — a class in the markup that no rule answers.
+   Follows .vy-cell-link below rather than inventing a second convention, and
+   takes the same 24px floor. */
+.vy-link {
+  display: inline-flex; align-items: center; min-height: var(--vy-space-10);
+  color: var(--vy-blue-700); text-decoration: none; width: fit-content;
+}
+.vy-link:hover { text-decoration: underline; }
+
 .vy-cell-link {
   background: none; border: 0; padding: 0; font: inherit; text-align: left;
   color: var(--vy-blue-700); text-decoration: none; cursor: pointer;
@@ -576,6 +594,9 @@
 .vy-about > summary:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
 .vy-about-links { display: flex; flex-direction: column; padding: var(--vy-space-1) 0 var(--vy-space-2) var(--vy-space-6); }
 .vy-about-link {
+  /* Same 24px floor. These are 236px wide and easy to hit horizontally, but the
+     rule is about the smaller dimension. */
+  display: flex; align-items: center; min-height: var(--vy-space-10);
   padding: var(--vy-space-1) var(--vy-space-2);
   font-size: var(--vy-text-xs);
   color: var(--vy-on-dark-muted);
