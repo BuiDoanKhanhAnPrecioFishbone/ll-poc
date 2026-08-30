@@ -753,6 +753,41 @@
   margin-bottom: var(--vy-space-2);
 }
 .vy-record-fields .vy-field dd { font-size: var(--vy-text-md); line-height: 1.35; }
+
+/* ---- Motion -----------------------------------------------------------------
+   Motion here is orientation, not decoration. Each of these three marks a moment
+   where the content under the user's eyes is REPLACED, and the replacement was
+   previously instantaneous — the screen simply held different things than it had
+   a frame earlier, which is the moment a person loses their place.
+
+   Nothing travels far and nothing is slow. The whole budget is one fade at
+   `--vy-dur-medium`; a transition long enough to notice as an effect is a
+   transition being paid for twice, once in time and once in attention.
+
+   The reduced-motion reset near the top of this file already flattens all of it
+   to .001ms, so none of this needs its own guard. */
+
+/* 1. Entering edit, and leaving it. The field region swaps 23 values for 23
+      controls; without this it is a hard cut between two similar-looking screens.
+      Two keyframe names for one effect because CSS restarts an animation only
+      when the NAME changes — same name on both rules and the switch plays
+      nothing. The edit direction lifts 2px as the controls arrive; reading
+      settles without it. */
+@keyframes vy-mode-read { from { opacity: 0 } to { opacity: 1 } }
+@keyframes vy-mode-edit { from { opacity: 0; transform: translateY(2px) } to { opacity: 1; transform: none } }
+.vy-record-fields { animation: vy-mode-read var(--vy-dur-medium) var(--vy-ease-standard); }
+.vy-record-fields[data-editing] { animation: vy-mode-edit var(--vy-dur-medium) var(--vy-ease-decelerate); }
+
+/* 2. Tab panels. Radix unmounts the inactive panel, so this runs on each switch.
+      Fade only — the tab strip already has its own moving indicator, and content
+      sliding under a sliding marker gives two things to track at once. */
+.vy-tabpanel { animation: vy-mode-read var(--vy-dur-medium) var(--vy-ease-standard); }
+
+/* 3. Skeleton to rows. The grid went from 14 shimmering placeholders to 20 real
+      records in one frame. Fading the body in lets the eye keep the shape it was
+      already looking at. The BODY, not the rows — the grid is virtualised, and
+      animating each row would restart mid-scroll every time one recycles. */
+.vy-grid-body { animation: vy-mode-read var(--vy-dur-medium) var(--vy-ease-decelerate); }
 /* Editing puts a real control in the value slot, which sets its own height. */
 .vy-record-fields[data-editing] .vy-field dd { font-size: var(--vy-text-base); }
 /* Editing needs room for controls, so the grid loosens rather than the labels
