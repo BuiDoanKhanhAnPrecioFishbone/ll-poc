@@ -2,8 +2,10 @@
 
 Assessed 30 Aug 2026 against `BoM Part MFG MPN` (guideline §6600–7160, 416
 lines). This is an **assessment, not a test run** — the other four documents in
-this folder record packages that were built and then exercised. Nothing here
-was built; this says what the sheet asks for and what exists today.
+this folder record packages that were built and then exercised.
+
+**Updated 30 Aug 2026 (`d8ea831`).** Requirements 3, 4 and 5 have since been
+wired and are marked built below. Everything else stands as first assessed.
 
 **Headline: the section is largely unbuilt, and the part it is named after is
 entirely absent.** MFG–MPN (AML) — the Approved Manufacturer List, MPN mapping
@@ -19,20 +21,34 @@ popups), MFG–MPN (AML), and a Bill of Materials list.
 |---|---|---|
 | 1 | Navigate to Inventory Management » Part Master | **built** — `/inventory-management/part-mst` |
 | 2 | Search by description or part number | **built** — also searches customer, a superset |
-| 3 | Filter tools: multi-criteria, column visibility, flexible sorting | **not wired** |
-| 4 | Setup View Template (Filter, Column, Sort) | **not wired** |
-| 5 | Select View Template | **not wired** |
+| 3 | Filter tools: multi-criteria, column visibility, flexible sorting | **built** — `d8ea831` |
+| 4 | Setup View Template (Filter, Column, Sort) | **built** — `d8ea831` |
+| 5 | Select View Template | **built** — `d8ea831` |
 | 6 | "Add new Part" → *Add Part Master Detail* form | **absent** — the button exists and reports not-implemented |
 | 7 | "Eye" button on each row → Part detail | **partial** — the row opens a summary dialog; there is no Eye control and the dialog is not the form the sheet describes |
 | 8 | Import: *Import All* / *Import by Customer* | **absent** — one Import button, no choice |
 | 9–10 | Per-row checkboxes, multi-select, Export selected to Excel | **absent** — no row selection; Export offers all rows |
 
-**3, 4 and 5 are a wiring gap, not a capability gap**, which makes them much
-cheaper than the table suggests. `DataGrid` already accepts `filters`,
-`filterPanel`, `filterActive`, `views`, `viewSetting`, `allColumns`,
-`onToggleColumn` and `onResetColumns`, and all of them work on Project
-Requirements today. Part Master passes none of them, so its toolbar holds a
-search box and nothing else.
+**3, 4 and 5 were a wiring gap, not a capability gap**, and are now done.
+`DataGrid` already accepted `filters`, `filterPanel`, `filterActive`, `views`,
+`viewSetting`, `allColumns`, `onToggleColumn` and `onResetColumns`, all working
+on Project Requirements; Part Master passed none of them, so its toolbar held a
+search box and nothing else. It now carries search, a view picker, the filter
+toggle, Setup View Template and Columns — the same toolbar as Project
+Requirements, deliberately.
+
+The eight filter fields are **my judgement, tier 3** (`src/data/partFilters.ts`).
+The guideline asks for multi-criteria filtering here without naming the fields,
+and unlike Project Requirements — whose eleven controls were read off the live
+toolbar on 25 Aug — there is no reading of the live Part Master filter to take
+them from. If one is taken later and disagrees, it wins.
+
+Two defects surfaced only because these components gained a second caller,
+both invisible while they had one: `ViewSetting` hardcoded its heading as
+"Request For Quotation — View Setting" in the `h2` and the `aria-label`, so
+Part Master announced itself as Request For Quotation to sighted users and
+screen readers alike; and the filter machinery — `ViewField.value`, `applyView`
+— was typed over `Quotation` despite nothing in it being Quotation-specific.
 
 ## Create New Part
 
@@ -96,13 +112,19 @@ missing from the data, neither rule can be expressed even once the popups
 exist. Widening the type is a precondition for that work rather than part of
 it.
 
+The Part Source filter added in `d8ea831` reads its options off the rows rather
+than hard-coding the pair, so it will offer all six the day the type is widened
+instead of becoming a second place that has to be found and corrected.
+
 ## Summary
 
-Of roughly nineteen distinct requirements in this section: **two are built**
-(navigate, search), **two are partial** (row detail, and Export in the sense
-that a button exists), **three are unwired machinery that already works
-elsewhere**, and **the remainder — including the whole of MFG–MPN and Create
-New Part — is absent**.
+Of roughly nineteen distinct requirements in this section: **five are built**
+(navigate, search, filter tools, Setup View Template, Select View Template),
+**two are partial** (row detail, and Export in the sense that a button exists),
+and **the remainder — including the whole of MFG–MPN and Create New Part — is
+absent**.
 
-The cheapest real progress is the three unwired items, which are configuration
-of an existing, working component rather than new construction.
+The three cheap ones are done. Everything left is genuine construction: Create
+New Part, the MFG–MPN tab and its three popups, BoM detail, Where PN Used,
+Import All / Import by Customer, row-selection export, and the Bill of
+Materials route — plus widening `Part.partSource`, which gates two of them.
