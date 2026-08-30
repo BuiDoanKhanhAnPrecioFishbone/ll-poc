@@ -539,10 +539,23 @@
 }
 .vy-link:hover { text-decoration: underline; }
 
+/* Fills its cell rather than just its text. The link was 17px tall in a 27px
+   cell, leaving 10px where the pointer is already over the part number and
+   nothing happens — on the most-clicked element of a 21,941-row grid.
+
+   This is not a conformance fix. At compact density the rows are 28px apart,
+   so the links already satisfy SC 2.5.8 through its spacing exception: a 24px
+   circle centred on each does not reach the next one. It is simply a bigger
+   target for nothing, and it scales with the row — 27px compact, and more at
+   the other two densities — so it stops depending on that exception at all.
+
+   min-width: 0 because a flex item will not shrink below its content by
+   default, which would break the ellipsis on a long part number. */
 .vy-cell-link {
   background: none; border: 0; padding: 0; font: inherit; text-align: left;
   color: var(--vy-blue-700); text-decoration: none; cursor: pointer;
   border-radius: var(--vy-shape-xs);
+  display: flex; align-items: center; height: 100%; min-width: 0;
 }
 .vy-cell-link:hover { text-decoration: underline; }
 .vy-tr:hover .vy-cell-link { color: var(--vy-blue-800); }
