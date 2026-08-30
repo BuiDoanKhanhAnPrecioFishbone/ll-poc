@@ -3,7 +3,7 @@
 Three sources describe what to build, and they disagree. The order is:
 
 ### 1. Customer requirements — HIGHEST
-Two documents, plus anything the customer says after them:
+Three documents, plus anything the customer says after them:
 
 - **`docs/testing/testing-guideline.md`** — the customer's official Testing
   Guideline. It reads as a QA checklist but it is a functional specification:
@@ -12,11 +12,17 @@ Two documents, plus anything the customer says after them:
   system disagree, **this wins** — the live build is what exists, this is what
   it is supposed to do.
 - The reviewer's design report (25 Aug 2026).
+- **`VIQ – Design Improvement_1.pptx`**, the kick-off deck. The OLDEST of the
+  three, so where it and a later source disagree, the later one wins — twice
+  already: it asks for KendoUI (no licence, see question 2 below) and for the
+  Form View to distinguish read-only from editable values, which the customer's
+  own 25 Aug instruction then overrode in favour of one white box in view mode.
+  Coverage and gaps: `docs/kickoff-deck-gaps.md`.
 
 **Where these ask for a change, they win outright**, even against the live
-system. Where the two disagree with each other, ask — one such conflict is
-already open, over whether the date format is a user preference or a system
-setting.
+system. Where they disagree with each other, the more recent and more specific
+wins, and if that is unclear, ask — one such conflict is already open, over
+whether the date format is a user preference or a system setting.
 
 Examples it overrides: priority becomes a dot and a label though live uses stars;
 breadcrumbs go; the record count leaves the module name; density moves to user
