@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, useParams } from 'react-router-dom';
 import { AppShell } from './components/AppShell';
 import { Home } from './pages/Home';
 import { PartMaster } from './pages/PartMaster';
+import { BomList } from './pages/BomList';
 import { Quotations } from './pages/Quotations';
 import { QuotationDetail } from './pages/QuotationDetail';
 import { SitemapPage } from './pages/Sitemap';
@@ -47,6 +48,9 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/my-queues" element={<Queues />} />
           <Route path="/inventory-management/part-mst" element={<PartMaster />} />
+          {/* The sitemap already named this path; nothing served it, so it fell
+              through to the placeholder. */}
+          <Route path="/inventory-management/bom-list" element={<BomList />} />
           <Route path="/parts" element={<Navigate to="/inventory-management/part-mst" replace />} />
           <Route path="/sales-management/quotation" element={<Quotations />} />
           <Route path="/sales-management/quotation/:id" element={<QuotationDetail />} />

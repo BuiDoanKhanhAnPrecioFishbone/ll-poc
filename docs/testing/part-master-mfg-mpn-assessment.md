@@ -112,13 +112,29 @@ On-Hand, Safety Stock, AVG Cost, Last Purchased Cost — plus a mapping detail
 popup that can view, edit and delete; a Stock Report popup with Update Quantity
 and Replenishment; and an *Add a line* modal.
 
-## Bill of Materials
+## Bill of Materials — **list built**, `BomList.tsx`
 
-**No route.** The sheet wants Inventory Management » Bill of Materials with a
-list, a search over description or part number, and a BoM Comparison button.
-`data/sitemap.ts` already names the path `/inventory-management/bom-list`, but
-`App.tsx` has no route for it, so it falls through to the placeholder. BoM
-Comparison itself is built, on the RFQ record rather than here.
+Inventory Management » Bill of Materials now serves a real screen: the list, the
+search over part number and description, and a BoM Comparison button that opens
+the dialog the RFQ record already uses rather than a second copy of it. Opening
+a row goes straight to that assembly's BoM.
+
+**One inference, and it needs confirming.** The sheet says "Show the list of all
+parts", which reads like the Part Master line it was copied from. This screen
+lists parts that HAVE a BoM — the MAKE parts — for two reasons: the section's own
+context paragraph says BoM "manages the product structure for each ASSEMBLY",
+and the sheet elsewhere gates the BoM button on a part being MAKE or MAKE/PHAN,
+so a Bill of Materials list containing the BUY components that sit inside those
+BoMs would contradict a rule the same document sets. 1,325 of the 2,000 parts
+qualify. **If the customer means every part, it is a one-line change** — asked
+rather than assumed.
+
+**Not built:** *Create the new BoM*, the four-step form behind the Upload BoM
+button — RFQ Information, Select Action with Import New / Load Existing,
+Assembly Info, Component Info, the MFG mapping validation and the submit rules
+for existing versus new parts and MFG-MPN pairs. The button is on this screen
+because the sheet puts it here, and reports what it would do. It is a package of
+its own, comparable to Create New Part.
 
 ## A data gap that blocks two rules
 
