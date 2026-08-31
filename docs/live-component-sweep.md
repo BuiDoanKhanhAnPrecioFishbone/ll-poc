@@ -57,16 +57,34 @@ prove ABSENCE when it misses, because a minified bundle may name a component in
 neither form. Every "zero" below is evidence of not-found, not proof of
 not-there — and one of them was wrong within a day.
 
-## Absent from the live app — not found across all 239 chunks
+## SECOND CORRECTION — ComboBox ships too, and the sweep was thin
 
-Read with the caveat above.
+An then asked whether the live Customer control is a ComboBox. It is used:
 
-- **`ComboBox`** — no occurrences, under any of the spellings tried, including
-  the `component: "…"` telemetry form that caught MultiSelect. The pickers are
-  DropDownLists that filter; they never accept a value outside the list, which
-  matches `bundle-evidence.md`'s "Customer is a lookup, not text".
-- **`NumericTextBox`** — none found. Numbers appear to be plain inputs, as ours
-  are.
+- `onComboBoxKeyDown` in `chunk-CDBoflLe.js` — the APP's own handler, beside
+  `setSearchText` and `setSearchMpn`, so a ComboBox is wired to something
+- the implementation with `allowCustom` in `chunk-BoMtsEp6.js`
+
+My earlier zero came from searching only the entry bundle for that spelling.
+
+Worse, extracting every name Kendo passes to its own licence telemetry turned up
+**seven components this sweep never mentioned** — `Barcode`, `DateRangePicker`,
+`ExcelExport`, `Form`, `ListView`, `MultiViewCalendar`, `TimePicker` — while
+omitting `Grid` and `DropDownList`, which certainly ship. No single marker
+enumerates what this app uses.
+
+**Treat the table above as a floor, not an inventory.** Everything listed is
+present. Nothing is absent because this document does not name it, and it has
+now under-reported twice in one day.
+
+**What would settle it** is a look at the live screens, or a read-only account.
+The bundle can prove a component exists; it cannot say which field uses it, and
+that is the question that actually decides a build.
+
+## Not found, and no longer claimed as absent
+
+- **`NumericTextBox`** — not found under any spelling tried. Given the record
+  above, that is worth no more than "not found".
 
 ## The one real gap: per-column filter cells
 

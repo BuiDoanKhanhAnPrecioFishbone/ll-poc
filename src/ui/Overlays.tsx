@@ -1,11 +1,11 @@
 import * as RDialog from '@radix-ui/react-dialog';
+import * as RPopover from '@radix-ui/react-popover';
 import * as RTabs from '@radix-ui/react-tabs';
 import * as RToggle from '@radix-ui/react-toggle-group';
 import * as RProgress from '@radix-ui/react-progress';
 import * as RCheckbox from '@radix-ui/react-checkbox';
 import * as RRadio from '@radix-ui/react-radio-group';
-import * as RSelect from '@radix-ui/react-select';
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 
 /* =============================================================================
    Radix primitives, styled from tokens.
@@ -167,99 +167,126 @@ export function RadioGroup({ options, value, onChange, label }: {
 }
 
 /**
- * Above this many options the list gets a filter box.
+ * A combobox: the field IS the input, and the list filters as you type.
  *
- * The live system uses KendoReact's DropDownList with `filterable` — confirmed
- * in the shipped bundle, which contains `KendoReactDropDownList` and a filter
- * handler emitting `{ operator, ignoreCase: true, value }`, and contains no
- * ComboBox at all. That distinction matters: a ComboBox accepts arbitrary text,
- * and `docs/bundle-evidence.md` already established that Customer is a lookup —
- * you cannot name a customer that does not exist. Filter, then choose.
+ * Rebuilt from Radix Select onto Popover, for two reasons that turned out to be
+ * the same reason.
  *
- * The threshold is mine. The bundle says filtering exists; it does not say which
- * fields switch it on, and the mock data flatters the question — six customers
- * here against the hundreds `custMsts` returns in production. Eight is the point
- * where scanning stops being faster than typing.
+ * FOCUS. The previous version put a filter box inside Radix Select's content and
+ * it could never hold focus — Select keeps a focus scope on its listbox and
+ * returns focus to the selected option. autoFocus, a frame and a macrotask after
+ * it were all beaten. Popover has no such scope.
+ *
+ * SHAPE. Checking the live bundle after An asked about the Customer control
+ * settled what it should have been anyway: `onComboBoxKeyDown` appears in the
+ * app's own code, and the ComboBox implementation with `allowCustom` ships. A
+ * ComboBox's trigger is the text input — you type in the FIELD, as An's Assigned
+ * To screenshot shows — not in a box that appears after opening a button. So the
+ * filter box was never the right shape; the field itself is.
+ *
+ * IT STILL WILL NOT ACCEPT A VALUE OUTSIDE THE LIST. Kendo's `allowCustom`
+ * permits that and this does not, because `docs/bundle-evidence.md` established
+ * that Customer is a lookup: typing a customer who does not exist has to be
+ * impossible. Type to narrow, then choose.
  */
-const FILTER_ABOVE = 8;
-
-export function Select({ options, value, onChange, label, id, required, invalid, filterable }: {
+export function Select({ options, value, onChange, label, id, required, invalid }: {
   options: string[]; value: string; onChange: (v: string) => void;
   label?: string; id?: string; required?: boolean; invalid?: boolean;
-  /** Forces the filter box on or off, overriding the length threshold. */
+  /** Accepted and ignored: every list filters now. Kept so call sites compile. */
   filterable?: boolean;
 }) {
+  const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
-  const showFilter = filterable ?? options.length > FILTER_ABOVE;
+  const [active, setActive] = useState(0);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const listId = `${id ?? label ?? 'sel'}-list`;
 
-  /* KNOWN SHORTFALL: the filter box does not take focus when the list opens, so
-     it has to be clicked before typing. The live Kendo DropDownList focuses its
-     filter immediately.
-     
-     Not for want of trying — autoFocus, a rAF and a macrotask after it were all
-     beaten. Radix Select keeps a focus scope on the listbox and returns focus to
-     the selected OPTION; it is built to contain options, not a text field, and
-     does not expose the `onOpenAutoFocus` escape hatch that Dialog and Popover
-     do. Focus placed by hand sticks and typing then works, so this is purely
-     about who goes last, and winning that race by guessing at a delay would be
-     a hack that breaks on a slower machine.
-     
-     The real fix is a combobox built from Popover + a listbox rather than
-     Select, which is a component change touching every picker in the app. Left
-     as a deliberate limitation rather than an unreliable timer. */
+  /* Contains and case-insensitive, matching the live filter descriptor. */
   const shown = useMemo(() => {
     const q = query.trim().toLowerCase();
-    /* ignoreCase and a "contains" match, as the bundle's own filter descriptor
-       specifies — not "starts with", which would hide "00848 - KT Controls" from
-       someone typing the name rather than the code. */
     return q ? options.filter(o => o.toLowerCase().includes(q)) : options;
   }, [options, query]);
 
+  /* While closed the field shows the VALUE; open, it shows what is being typed.
+     One input doing both is what makes it a combobox rather than a button that
+     happens to sit above a list. */
+  const shownText = open ? query : value;
+
+  const commit = (v: string) => { onChange(v); setQuery(''); setOpen(false); };
+
+  function onKeyDown(e: React.KeyboardEvent) {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (!open) { setOpen(true); return; }
+      const d = e.key === 'ArrowDown' ? 1 : -1;
+      setActive(i => (i + d + shown.length) % Math.max(shown.length, 1));
+    } else if (e.key === 'Enter') {
+      if (open && shown[active] !== undefined) { e.preventDefault(); commit(shown[active]); }
+    } else if (e.key === 'Escape') {
+      setQuery(''); setOpen(false);
+    } else if (e.key === 'Home' && open) { e.preventDefault(); setActive(0); }
+    else if (e.key === 'End' && open) { e.preventDefault(); setActive(shown.length - 1); }
+  }
+
   return (
-    <RSelect.Root value={value} onValueChange={onChange}
-                  /* The query is per-opening. Reopening a list still holding the
-                     last search would show a filtered set the user did not ask
-                     for and cannot see the cause of. */
-                  onOpenChange={o => { if (!o) setQuery(''); }}>
-      <RSelect.Trigger className="vy-select" aria-label={label} id={id}
-                       aria-required={required || undefined}
-                       aria-invalid={invalid || undefined} data-state-layer>
-        <RSelect.Value />
-        <RSelect.Icon>
-          <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor"
-               strokeWidth="1.8" strokeLinecap="round" aria-hidden><path d="m5 8 5 5 5-5" /></svg>
-        </RSelect.Icon>
-      </RSelect.Trigger>
-      <RSelect.Portal>
-        <RSelect.Content className="vy-menu" position="popper" sideOffset={4}>
-          {showFilter && (
-            /* Outside the Viewport, so it stays put while the list scrolls, and
-               keydown is stopped from reaching Radix — otherwise typing "c"
-               jumps the selection to the first option starting with C, which is
-               Radix's own typeahead fighting the filter box. */
-            <div className="vy-menu-filter" onKeyDown={e => e.stopPropagation()}>
-              <input
-                className="vy-input"
-                value={query}
-                placeholder="Filter"
-                aria-label={label ? `Filter ${label}` : 'Filter options'}
-                onChange={e => setQuery(e.target.value)}
-              />
-            </div>
-          )}
-          <RSelect.Viewport>
-            {shown.map(o => (
-              <RSelect.Item key={o} value={o} className="vy-menu-item" data-state-layer>
-                <RSelect.ItemText>{o}</RSelect.ItemText>
-              </RSelect.Item>
+    <RPopover.Root open={open} onOpenChange={o => { setOpen(o); if (!o) setQuery(''); }}>
+      <RPopover.Anchor asChild>
+        <div className="vy-select" data-invalid={invalid || undefined} data-open={open || undefined}>
+          <input
+            ref={inputRef}
+            id={id}
+            className="vy-select-input"
+            /* The ARIA a combobox owes: what it controls, whether it is open,
+               and which option is current — the last via activedescendant, so
+               focus can stay in the input while the highlight moves. */
+            role="combobox"
+            aria-expanded={open}
+            aria-controls={listId}
+            aria-autocomplete="list"
+            aria-label={label}
+            aria-required={required || undefined}
+            aria-invalid={invalid || undefined}
+            aria-activedescendant={open && shown[active] ? `${listId}-${active}` : undefined}
+            value={shownText}
+            placeholder={open && value ? value : undefined}
+            onChange={e => { setQuery(e.target.value); setActive(0); if (!open) setOpen(true); }}
+            onKeyDown={onKeyDown}
+            onMouseDown={() => setOpen(true)}
+          />
+          <button type="button" className="vy-select-caret" tabIndex={-1} aria-hidden
+                  onMouseDown={e => { e.preventDefault(); setOpen(o => !o); inputRef.current?.focus(); }}>
+            <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor"
+                 strokeWidth="1.8" strokeLinecap="round"><path d="m5 8 5 5 5-5" /></svg>
+          </button>
+        </div>
+      </RPopover.Anchor>
+
+      <RPopover.Portal>
+        <RPopover.Content
+          className="vy-menu vy-select-menu" sideOffset={4} align="start"
+          /* Focus stays in the field. Without this Popover moves it into the
+             content and the next keystroke goes nowhere useful. */
+          onOpenAutoFocus={e => e.preventDefault()}
+          onCloseAutoFocus={e => e.preventDefault()}
+        >
+          <ul className="vy-select-list" role="listbox" id={listId} aria-label={label}>
+            {shown.map((o, i) => (
+              <li key={o || `blank-${i}`}>
+                <button type="button" role="option" id={`${listId}-${i}`}
+                        aria-selected={o === value}
+                        className="vy-menu-item" data-active={i === active || undefined}
+                        onMouseEnter={() => setActive(i)}
+                        onClick={() => commit(o)}>
+                  {o || <span className="vy-empty">—</span>}
+                </button>
+              </li>
             ))}
-            {showFilter && shown.length === 0 && (
-              /* An empty list with no explanation reads as a broken control. */
-              <p className="vy-menu-empty">No option matches “{query}”.</p>
+            {shown.length === 0 && (
+              <li className="vy-menu-empty">No option matches “{query}”.</li>
             )}
-          </RSelect.Viewport>
-        </RSelect.Content>
-      </RSelect.Portal>
-    </RSelect.Root>
+          </ul>
+        </RPopover.Content>
+      </RPopover.Portal>
+    </RPopover.Root>
   );
 }

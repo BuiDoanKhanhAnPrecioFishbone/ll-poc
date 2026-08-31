@@ -1467,3 +1467,31 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
 /* Read mode: the same chips, without the remove control. */
 .vy-people-read { display: flex; align-items: center; gap: var(--vy-space-3); flex-wrap: wrap; }
 .vy-people-read .vy-people-chip { padding-right: var(--vy-space-4); }
+
+
+/* ---- Select, now a combobox --------------------------------------------------
+   The field is the input. The caret is decoration with a click target, not the
+   control — you type into the same box that shows the value. */
+.vy-select { display: flex; align-items: center; gap: var(--vy-space-2); }
+.vy-select-input {
+  flex: 1; min-width: 0; font: inherit; font-size: var(--vy-text-base);
+  color: var(--vy-grey-900); background: none; border: 0; padding: 0;
+}
+.vy-select-input:focus { outline: none; }
+/* While open the field shows what is being typed and the CURRENT value moves to
+   the placeholder, so choosing does not first require remembering what was
+   there. */
+.vy-select-input::placeholder { color: var(--vy-grey-500); }
+.vy-select-caret {
+  flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
+  width: var(--vy-space-10); height: var(--vy-space-10);
+  background: none; border: 0; padding: 0; cursor: pointer; color: var(--vy-grey-500);
+}
+.vy-select[data-open] .vy-select-caret { transform: rotate(180deg); }
+.vy-select-menu { min-width: var(--vy-select-menu-min); max-height: 300px; overflow: auto; }
+.vy-select-list { list-style: none; margin: 0; padding: var(--vy-space-2); }
+.vy-select-list .vy-menu-item { width: 100%; text-align: left; }
+/* Keyboard highlight and pointer hover are the SAME state — two different
+   highlights on one list is how a user loses track of which one Enter takes. */
+.vy-select-list .vy-menu-item[data-active] { background: var(--vy-grey-100); }
+.vy-select-list .vy-menu-item[aria-selected="true"] { font-weight: var(--vy-weight-semibold); }
