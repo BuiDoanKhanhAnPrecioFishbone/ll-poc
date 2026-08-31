@@ -5,7 +5,7 @@ import * as RProgress from '@radix-ui/react-progress';
 import * as RCheckbox from '@radix-ui/react-checkbox';
 import * as RRadio from '@radix-ui/react-radio-group';
 import * as RSelect from '@radix-ui/react-select';
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 
 /* =============================================================================
    Radix primitives, styled from tokens.
@@ -166,12 +166,61 @@ export function RadioGroup({ options, value, onChange, label }: {
   );
 }
 
-export function Select({ options, value, onChange, label, id, required, invalid }: {
+/**
+ * Above this many options the list gets a filter box.
+ *
+ * The live system uses KendoReact's DropDownList with `filterable` — confirmed
+ * in the shipped bundle, which contains `KendoReactDropDownList` and a filter
+ * handler emitting `{ operator, ignoreCase: true, value }`, and contains no
+ * ComboBox at all. That distinction matters: a ComboBox accepts arbitrary text,
+ * and `docs/bundle-evidence.md` already established that Customer is a lookup —
+ * you cannot name a customer that does not exist. Filter, then choose.
+ *
+ * The threshold is mine. The bundle says filtering exists; it does not say which
+ * fields switch it on, and the mock data flatters the question — six customers
+ * here against the hundreds `custMsts` returns in production. Eight is the point
+ * where scanning stops being faster than typing.
+ */
+const FILTER_ABOVE = 8;
+
+export function Select({ options, value, onChange, label, id, required, invalid, filterable }: {
   options: string[]; value: string; onChange: (v: string) => void;
   label?: string; id?: string; required?: boolean; invalid?: boolean;
+  /** Forces the filter box on or off, overriding the length threshold. */
+  filterable?: boolean;
 }) {
+  const [query, setQuery] = useState('');
+  const showFilter = filterable ?? options.length > FILTER_ABOVE;
+
+  /* KNOWN SHORTFALL: the filter box does not take focus when the list opens, so
+     it has to be clicked before typing. The live Kendo DropDownList focuses its
+     filter immediately.
+     
+     Not for want of trying — autoFocus, a rAF and a macrotask after it were all
+     beaten. Radix Select keeps a focus scope on the listbox and returns focus to
+     the selected OPTION; it is built to contain options, not a text field, and
+     does not expose the `onOpenAutoFocus` escape hatch that Dialog and Popover
+     do. Focus placed by hand sticks and typing then works, so this is purely
+     about who goes last, and winning that race by guessing at a delay would be
+     a hack that breaks on a slower machine.
+     
+     The real fix is a combobox built from Popover + a listbox rather than
+     Select, which is a component change touching every picker in the app. Left
+     as a deliberate limitation rather than an unreliable timer. */
+  const shown = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    /* ignoreCase and a "contains" match, as the bundle's own filter descriptor
+       specifies — not "starts with", which would hide "00848 - KT Controls" from
+       someone typing the name rather than the code. */
+    return q ? options.filter(o => o.toLowerCase().includes(q)) : options;
+  }, [options, query]);
+
   return (
-    <RSelect.Root value={value} onValueChange={onChange}>
+    <RSelect.Root value={value} onValueChange={onChange}
+                  /* The query is per-opening. Reopening a list still holding the
+                     last search would show a filtered set the user did not ask
+                     for and cannot see the cause of. */
+                  onOpenChange={o => { if (!o) setQuery(''); }}>
       <RSelect.Trigger className="vy-select" aria-label={label} id={id}
                        aria-required={required || undefined}
                        aria-invalid={invalid || undefined} data-state-layer>
@@ -183,12 +232,31 @@ export function Select({ options, value, onChange, label, id, required, invalid 
       </RSelect.Trigger>
       <RSelect.Portal>
         <RSelect.Content className="vy-menu" position="popper" sideOffset={4}>
+          {showFilter && (
+            /* Outside the Viewport, so it stays put while the list scrolls, and
+               keydown is stopped from reaching Radix — otherwise typing "c"
+               jumps the selection to the first option starting with C, which is
+               Radix's own typeahead fighting the filter box. */
+            <div className="vy-menu-filter" onKeyDown={e => e.stopPropagation()}>
+              <input
+                className="vy-input"
+                value={query}
+                placeholder="Filter"
+                aria-label={label ? `Filter ${label}` : 'Filter options'}
+                onChange={e => setQuery(e.target.value)}
+              />
+            </div>
+          )}
           <RSelect.Viewport>
-            {options.map(o => (
+            {shown.map(o => (
               <RSelect.Item key={o} value={o} className="vy-menu-item" data-state-layer>
                 <RSelect.ItemText>{o}</RSelect.ItemText>
               </RSelect.Item>
             ))}
+            {showFilter && shown.length === 0 && (
+              /* An empty list with no explanation reads as a broken control. */
+              <p className="vy-menu-empty">No option matches “{query}”.</p>
+            )}
           </RSelect.Viewport>
         </RSelect.Content>
       </RSelect.Portal>

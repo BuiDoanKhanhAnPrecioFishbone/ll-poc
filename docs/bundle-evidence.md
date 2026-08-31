@@ -195,6 +195,22 @@ is a product name, a system name or a customer is still not answered by the code
 From `chunk-DtT2PYYA.js` (the RFQ reducer payload) and `chunk-Dqkhv0o_.js` (its
 GraphQL query). These settle four fields this mockup had as free text.
 
+### The pickers FILTER as you type — `KendoReactDropDownList`, not a ComboBox
+Read from the current bundle on 31 Aug 2026, after An pointed out our Customer
+picker was a plain dropdown where the live one is searchable. Note the entry
+bundle had been redeployed since this document's original capture —
+`lib-bundle-BxbBltK-.js`, not `lib-bundle-D109_KxB.js` — so read the hash out of
+`index.html` rather than trusting one written down here.
+
+- `KendoReactDropDownList` is present; **`ComboBox` does not appear at all**.
+- The filter handler emits
+  `{ filter: { field: textField, operator: …, ignoreCase: true, value } }`.
+
+That distinction is the point. A ComboBox accepts arbitrary text; a filterable
+DropDownList makes you type to NARROW and then choose from the list — which is
+what "Customer is a lookup, not text" below already required. So the behaviour we
+were missing was the filtering, not free entry.
+
 ### Customer is a lookup, not text
 The form loads `custMsts { custId custNumId custCode custName custNo custAddress …
 custType creditLimit creditStatus custTerms isItar isActive priceMarkup discount

@@ -17,7 +17,12 @@ export function renderCell<T>(spec: ColumnSpec<T>, row: T): ReactNode {
   const v = row[spec.field] as unknown;
 
   if (v === null || v === undefined || v === '') {
-    return <span className="vy-empty">—</span>;
+    /* aria-hidden, so a screen reader gets a genuinely empty cell rather than
+       "em dash" repeated for every blank on the page — 47 of them on one screen
+       of Part Master. The dash is a VISUAL placeholder: it tells a sighted
+       reader the cell is empty rather than narrow, and that job does not
+       survive being read aloud. */
+    return <span className="vy-empty" aria-hidden>—</span>;
   }
 
   switch (spec.role) {

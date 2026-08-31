@@ -147,7 +147,13 @@
 .vy-toolbar-spacer { flex: 1 1 0; min-width: 0; }
 .vy-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .vy-code { font-family: var(--vy-font-mono); font-size: var(--vy-text-xs); background: var(--vy-grey-100); border-radius: var(--vy-radius-sm); padding: 1px var(--vy-space-3); color: var(--vy-grey-700); }
-.vy-empty { color: var(--vy-grey-300); }
+/* grey-500, not grey-300. At grey-300 this measured 1.64:1 on white and 1.48
+   on a selected row — the lowest contrast anywhere in the app, on a mark that
+   carries meaning: it says the cell is EMPTY rather than narrow, which is a
+   fact about the data. De-emphasis does not require illegibility; the dash
+   reads as absence by its shape, and grey-500 is the same tier every other
+   piece of secondary text uses. */
+.vy-empty { color: var(--vy-grey-500); }
 
 
 .vy-empty-state { text-align: center; padding: var(--vy-space-14); color: var(--vy-grey-500); }
@@ -1396,3 +1402,10 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
   background: var(--vy-blue-50);
   box-shadow: inset var(--vy-accent-bar-w) 0 0 0 var(--vy-blue-600);
 }
+
+
+/* The dropdown's filter box. Sits above the scrolling list and stays put, so a
+   long list scrolls under a search that remains reachable. */
+.vy-menu-filter { padding: var(--vy-space-4); border-bottom: 1px solid var(--vy-grey-200); }
+.vy-menu-filter .vy-input { width: 100%; }
+.vy-menu-empty { margin: 0; padding: var(--vy-space-7) var(--vy-space-6); color: var(--vy-grey-500); font-size: var(--vy-text-base); text-align: center; }
