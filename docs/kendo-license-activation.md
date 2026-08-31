@@ -1,5 +1,15 @@
 # KendoReact — how licensing and activation work
 
+> **Update, 30 Aug 2026 — a licence key now exists.** The customer supplied one,
+> and it is stored locally in `.env.local` as `TELERIK_LICENSE` (gitignored via
+> `*.local`; it is not in the repository and must never be).
+>
+> **It activates nothing today.** This project installs no `@progress/*`
+> packages, so there is no Kendo component to watermark and nothing that reads
+> the variable. The key removes the *blocker* described in section 6 — it does
+> not by itself change a single pixel. Section 7 covers deployment for when the
+> migration is actually made.
+
 Prepared for the client, 25 Aug 2026, in answer to:
 
 > *"Tôi chưa hình dung việc activate license như thế nào. Về code thì các bạn có
@@ -144,3 +154,54 @@ That rebuild is done and working. Moving *back* to Kendo is possible but is not
 a small change — it would replace the grid, dialogs, dropdowns, date inputs and
 form controls. **It is worth deciding the licence question before that work is
 scheduled, not after.**
+
+
+---
+
+## 7. Deployment (Vercel), for when Kendo is actually adopted
+
+Nothing below has any effect until `@progress/kendo-react-*` packages are
+installed. Recorded now so the key does not have to be found again.
+
+### What to set in Vercel
+
+**Project → Settings → Environment Variables**
+
+| Field | Value |
+|---|---|
+| Key | `TELERIK_LICENSE` |
+| Value | the licence key, pasted whole — it is one long line, no quotes, no line breaks |
+| Environments | Production, Preview **and** Development |
+
+Tick all three. The licence is checked **at build time**, and Vercel builds
+preview deployments the same way it builds production — a key set only on
+Production gives every pull-request preview a watermark.
+
+Mark it **Sensitive** if the option is offered. It is a paid, per-developer
+credential; it should not be readable back out of the dashboard by anyone who
+can open the project.
+
+### What must also be true
+
+1. `@progress/kendo-licensing` installed as a dependency.
+2. The activation step runs during build. Current Kendo reads `TELERIK_LICENSE`
+   from the environment automatically during install/build; older versions need
+   `npx kendo-ui-license activate` in a `postinstall` or in the build command.
+   **Confirm which against the version actually installed** — this is the step
+   most likely to have changed since this note was written.
+3. `.env.local` stays out of git. It is covered by `*.local` in `.gitignore`;
+   Vercel never reads it, which is exactly why the dashboard variable is needed.
+
+### Verifying it worked
+
+A licensed build has **no watermark on Kendo components and no licence warning
+in the build log**. Check the Vercel build log for a Telerik licence line — an
+unlicensed build says so there before anyone sees the page. Do not verify by
+looking at production only; check a preview deployment too, since that is the
+build most likely to be missing the variable.
+
+### Rotation
+
+The key is tied to the licence holder's Telerik account and expires with the
+subscription. When it is renewed the Vercel variable has to be updated by hand —
+nothing warns you, the watermark simply comes back.
