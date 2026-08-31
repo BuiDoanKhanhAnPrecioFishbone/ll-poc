@@ -6,6 +6,7 @@ import { Button } from '../ui/Button';
 import { useToast } from '../ui/Toast';
 import { PartDetail } from '../components/PartDetail';
 import { ImportPartsDialog } from '../components/ImportPartsDialog';
+import { AddPartDialog } from '../components/AddPartDialog';
 import { FilterToolbar } from '../ui/FilterToolbar';
 import { ViewSetting } from '../ui/ViewSetting';
 import { useViews, draftFrom } from '../ui/useViews';
@@ -14,7 +15,10 @@ import { SmartIcon } from '../components/quotation/SmartButtons';
 
 export function PartMaster() {
   const toast = useToast();
-  const data = useMemo(() => generateParts(2000), []);
+  /* Re-read after a part is created, so the new row is in the list behind the
+     detail dialog rather than appearing only on the next visit. */
+  const [created, setCreated] = useState(0);
+  const data = useMemo(() => generateParts(2000), [created]);
   const [selectedPart, setSelectedPart] = useState<Part | null>(null);
 
   /* The mockup's data is synchronous, so there is nothing to wait for. This
@@ -40,6 +44,7 @@ export function PartMaster() {
   const [values, setValues] = useState<FilterValues>({});
   const [settingOpen, setSettingOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
   /* Held by id rather than by row, so a selection survives sorting, filtering
      and paging — the user picks parts, not positions. */
   const [selected, setSelected] = useState<Set<string | number>>(new Set());
@@ -120,7 +125,7 @@ export function PartMaster() {
               ? `Export ${selected.size} selected`
               : 'Export Part Master Data'}
           </Button>
-          <Button variant="filled" onClick={() => toast.notImplemented('open a blank part record')}>New Part</Button>
+          <Button variant="filled" onClick={() => setAddOpen(true)}>New Part</Button>
         </>}
         filterPanel={
           <FilterToolbar fields={fields} values={values} onChange={setValues}
@@ -178,6 +183,14 @@ export function PartMaster() {
       )}
 
       {importOpen && <ImportPartsDialog parts={data} onClose={() => setImportOpen(false)} />}
+
+      {/* "Create the new Part successfully" then "Display the details of the
+          newly created part" — the list refreshes and the record opens. */}
+      <AddPartDialog
+        open={addOpen} parts={data}
+        onClose={() => setAddOpen(false)}
+        onCreated={p => { setCreated(c => c + 1); setSelectedPart(p); }}
+      />
 
       {selectedPart && <PartDetail part={selectedPart} onClose={() => setSelectedPart(null)} />}
 

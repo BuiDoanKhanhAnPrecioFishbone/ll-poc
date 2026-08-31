@@ -219,6 +219,59 @@ is simply silent rather than deliberate. Tell us and it comes back.
 
 ---
 
+## 12. Part Source — your two lists differ, and we found a third
+
+Create New Part (§2.3) offers **BUY, CONSG, FLSTK, MAKE, MAKE/BUY, MAKE/PHAN**.
+Quick Quote step 2 offers **BUY, MAKE, MAKE/PHAN, FLRSTK, MAKE/BUY, PACKAGING**.
+
+We read the enumeration out of your live system rather than guess, and it holds
+**nine** values: SERVICE, MAKE, BUY, CONSG, MAKE/PHAN, **MAKE/PHANT**, FLRSTK,
+MAKE/BUY, PROG.
+
+That answers two of the three differences on its own — `FLSTK` is a typo for
+`FLRSTK`, and `MAKE/PHAN` and `MAKE/PHANT` are two real, separate values rather
+than one misspelt one. Three things still need you:
+
+1. **`PACKAGING` is not in your live system.** Should the Quick Quote sheet say
+   `CONSG`, or does PACKAGING exist somewhere we cannot see?
+2. **Should Create New Part offer SERVICE, MAKE/PHANT and PROG?** It offers the
+   six your sheet names. A create form that cannot produce a value the system
+   accepts is a limitation; adding three you did not ask for is not our call.
+3. **Does the auto-exclusion rule cover MAKE/PHAN as well as MAKE/PHANT?** Your
+   rule (Quick Quote r81) names MAKE/PHANT only. Both are phantom assemblies and
+   neither is physically stocked, so excluding both looks right — but that is an
+   inference, and it changes which lines get quoted.
+
+## 13. Purchase Lead Time — days or weeks?
+
+Your Testing Guideline says **"Purchase Lead Time (Days)"**. Your live form
+labels the same field **"Purchase lead time (weeks)"**.
+
+We built days, because your written requirement governs. A units mismatch on a
+lead time is a seven-fold planning error in either direction, so please confirm
+which is right — and if it is weeks, whether Kitting and Production Lead Time
+(which your sheet gives in days, and which we have built in days) follow it.
+
+## 14. Part Class and Part Type — what maps to what?
+
+Your sheet requires that "only valid Part Type options mapped to the selected
+Part Class are displayed", and we built that behaviour. **The mapping itself is
+our guess**, because it is in neither document and your live form reads it from
+the server.
+
+We used the classes and types already in the prototype's data:
+
+| Part Class | Part Types offered |
+|---|---|
+| ASSEMBLY | ELEC-PCB, MECH-FMA |
+| COMPONENT | ELEC-PAS, 0402, 0603 |
+| RAW | MECH-MCH |
+| CONSUMABLE | MECH-MCH, ELEC-PAS |
+
+Send us the real table and we will swap it in — it is one object in one file.
+The same goes for **Order Policy**, where your sheet defines the field but names
+no values; we offer Lot for lot, Fixed order quantity and Min/Max.
+
 ## Two defects in the live system, for your backlog
 
 Not questions, just things we noticed and you may not have:

@@ -6,6 +6,13 @@ import { useToast } from '../ui/Toast';
 import { SmartIcon } from './quotation/SmartButtons';
 import { fmtDate } from '../ui/renderCell';
 import { PartBomDialog, WhereUsedDialog } from './PartBomDialog';
+import { BOM_SOURCES } from '../data/partMetadata';
+import { RecordField } from './quotation/RecordField';
+import {
+  PART_SALES_PURCHASE, PART_REQUESTS, PART_DIMENSIONS,
+  PART_REORDERING, PART_DEMAND, PART_LEAD_TIME,
+} from './partFields';
+import type { FieldDef } from './quotation/RecordField';
 import type { Part } from '../data/parts';
 
 /**
@@ -44,12 +51,15 @@ export function PartDetail({ part, onClose }: { part: Part; onClose: () => void 
   const [whereOpen, setWhereOpen] = useState(false);
   const available = part.onHand - part.allocated;
 
-  /* The guideline gates these two on part source: BoM for MAKE and MAKE/PHAN,
-     Where PN Used for BUY and MAKE sub-assemblies. Only MAKE and BUY exist in
-     the data today — the other four values are the gap noted in the assessment —
-     so the rule is expressed for the two that do, and will widen with the type
-     rather than needing to be found again. */
-  const isMake = part.partSource === 'MAKE';
+  /* "The 'BoM' button (top right corner) should be displayed only when Part
+     Source = MAKE, MAKE/BUY or MAKE/PHAN."
+
+     This read `=== 'MAKE'`, which was right only while MAKE and BUY were the
+     only two values the generator produced. Create New Part offers all six, so
+     a MAKE/BUY part created through the form would have had its BoM button
+     silently withheld. The set is in partMetadata.ts, next to the vocabulary
+     that made it necessary. */
+  const isMake = BOM_SOURCES.includes(part.partSource);
 
   return (
     <Dialog
@@ -129,6 +139,15 @@ export function PartDetail({ part, onClose }: { part: Part; onClose: () => void 
                     ['Material Type', part.materialType],
                     ['Unit of measure', part.uom],
                   ]} />
+                  {/* The sheet's own General Info sections, read from the same
+                      declarations the create form fills in. Hand-listing them
+                      here instead is how a field gains a label in one place and
+                      not the other — and without them a part created through
+                      Add Part Master Detail would show none of the thirty
+                      values just entered. */}
+                  <ReadGroup title="Sales & Purchase" defs={PART_SALES_PURCHASE} part={part} />
+                  <ReadGroup title="Requests & Controls" defs={PART_REQUESTS} part={part} />
+                  <ReadGroup title="Dimensions & Packages" defs={PART_DIMENSIONS} part={part} />
                 </div>
               ),
             },
@@ -150,6 +169,9 @@ export function PartDetail({ part, onClose }: { part: Part; onClose: () => void 
                   <Section title="History" rows={[
                     ['Last Changed', fmtDate(part.lastChange)],
                   ]} />
+                  <ReadGroup title="Reordering rule" defs={PART_REORDERING} part={part} />
+                  <ReadGroup title="Demand & forecast planning" defs={PART_DEMAND} part={part} />
+                  <ReadGroup title="Lead time & Policies" defs={PART_LEAD_TIME} part={part} />
                 </div>
               ),
             },
@@ -160,6 +182,29 @@ export function PartDetail({ part, onClose }: { part: Part; onClose: () => void 
       {bomOpen && <PartBomDialog part={part} onClose={() => setBomOpen(false)} />}
       {whereOpen && <WhereUsedDialog part={part} onClose={() => setWhereOpen(false)} />}
     </Dialog>
+  );
+}
+
+/**
+ * One titled section rendered from field declarations, read-only.
+ *
+ * `RecordField` with `editing` false is the codebase's own rule — "one field
+ * declaration drives both reading and editing" — so these sections cannot say
+ * something different here from what the create form collects.
+ */
+function ReadGroup({ title, defs, part }: {
+  title: string; defs: FieldDef<Part>[]; part: Part;
+}) {
+  return (
+    <section>
+      <h3 className="vy-field-group-title">{title}</h3>
+      <dl className="vy-record-fields">
+        {defs.map(def => (
+          <RecordField key={def.name} def={def} value={part[def.name]}
+                       editing={false} onChange={() => {}} row={part} />
+        ))}
+      </dl>
+    </section>
   );
 }
 

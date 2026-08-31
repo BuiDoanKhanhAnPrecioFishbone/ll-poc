@@ -50,9 +50,73 @@ Part Master announced itself as Request For Quotation to sighted users and
 screen readers alike; and the filter machinery — `ViewField.value`, `applyView`
 — was typed over `Quotation` despite nothing in it being Quotation-specific.
 
-## Create New Part
+## Create New Part — **built**, 31 Aug 2026
 
-**Absent in full.** The sheet specifies an *Add Part Master Detail* modal with
+`AddPartDialog.tsx`, declarations in `components/partFields.ts`, vocabularies in
+`data/partMetadata.ts`. All fifteen sub-steps, thirty-one fields, six sections
+across two tabs plus attachments — the sheet's own structure, which is both the
+specification and the better screen.
+
+**The live bundle settled a contradiction the sheets could not.** The guideline
+enumerates Part Source twice and the two lists differ — `FLSTK` against
+`FLRSTK`, and `CONSG` against `PACKAGING` as the sixth value — which
+`open-questions.md` carried as unresolved. `chunk-AeZ_bNMa.js` exports the
+enumeration itself, decoded 31 Aug (self-validating: the same pass returns
+"MAKE" for MAKE and "BUY" for BUY):
+
+    SERVICE "SERVICE"   MAKE "MAKE"           BUY "BUY"
+    CONSG   "CONSG"     MAKE_PHAN "MAKE/PHAN" MAKE_PHANT "MAKE/PHANT"
+    FLOORSTOCK "FLRSTK" MAKE_BUY "MAKE/BUY"   PROGRAM "PROG"
+
+So `FLSTK` is a typo for `FLRSTK`; **`MAKE/PHAN` and `MAKE/PHANT` are both real
+and distinct**, so neither sheet was wrong and `bom.ts` is right to auto-exclude
+MAKE/PHANT; and `PACKAGING` does not exist in the live system, while `SERVICE`
+and `PROG` do without appearing on either sheet. The form offers the Create New
+Part sheet's six with `FLSTK` corrected — tier 1 governs the vocabulary, tier 2
+resolved the customer's document against itself.
+
+**Behaviours built and verified on screen:**
+
+- **Customer prefixes the Part Number.** `ABC-9001` + customer 00848 becomes
+  `00848-ABC-9001`; changing to 01455 gives `01455-ABC-9001` and not both codes
+  stacked. Placed in Part identification rather than Sales & Purchase where the
+  sheet lists it, because a field that rewrites the identifier cannot sit a tab
+  away from it.
+- **Part Type filtered by Part Class, cleared "if not applicable".** ASSEMBLY →
+  ELEC-PCB, MECH-FMA. Changing ASSEMBLY→COMPONENT clears ELEC-PCB; changing
+  COMPONENT→CONSUMABLE **keeps** ELEC-PAS, which is valid for both. Clearing a
+  still-correct answer would make the user retype what they already said.
+- **Part Number + Part Revision unique together.** Checked live rather than on
+  submit — finding out after thirty fields is the worst moment. Verified all
+  four ways: number alone is not a clash, number+B is, number+Z is not, and a
+  blank revision clashes only with another blank.
+- **Save → "Create the new Part successfully" → "Display the details of the
+  newly created part".** Both Expected lines happen: the part appears at the top
+  of the list and its record opens.
+
+**The BoM button gating was wrong and is fixed.** "The 'BoM' button should be
+displayed only when Part Source = MAKE, MAKE/BUY or MAKE/PHAN"; `PartDetail`
+tested `=== 'MAKE'`, correct only while MAKE and BUY were the only two values
+the generator produced. A MAKE/BUY part created through this form would have had
+its BoM button silently withheld. Now `BOM_SOURCES` in `partMetadata.ts`.
+
+**`PartDetail` renders the six new sections** from the same declarations, so a
+created part's thirty values are visible and the two screens cannot list
+different fields. The consequence, worth the customer's eye: the 2,000 generated
+parts show these fields as "Not set", because that is the truth about the back
+catalogue — the same reasoning already recorded for `abc` and `partClass`.
+
+**Not built:** attachments upload (no file storage in this prototype — the
+button reports what it would do), and the form is create-only. The sheet says
+one form serves view, edit and create; `PartDetail` is the view, and making the
+record editable in place is its own piece of work rather than a side effect of
+this one.
+
+**Three open questions raised by this build**, in `open-questions.md`.
+
+### The original assessment
+
+**Was absent in full.** The sheet specifies an *Add Part Master Detail* modal with
 fifteen numbered sub-steps: Part Number, Part Revision and Description; Part
 Source; Part Class and Part Type, where Part Type is filtered by Part Class and
 cleared when Class changes; Package, ABC and Material Type; a required Customer

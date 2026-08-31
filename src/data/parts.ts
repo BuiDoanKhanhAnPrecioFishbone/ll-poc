@@ -9,6 +9,7 @@
    No customer data is reproduced; names and numbers are synthetic.
    ========================================================================== */
 
+import { createdParts } from './createdParts';
 import type { ColumnSpec } from '../components/column-model';
 
 export type Part = {
@@ -17,7 +18,10 @@ export type Part = {
   customer: string;
   rev: string;
   description: string;
-  partSource: 'MAKE' | 'BUY';
+  /* Was 'MAKE' | 'BUY' — the only two the generator produces. Widened to a
+     string so the form can create the six the guideline offers; the vocabulary
+     lives in data/partMetadata.ts, and the two-value generator is unchanged. */
+  partSource: string;
   partClass: string;
   partType: string;
   abc: string;
@@ -35,6 +39,65 @@ export type Part = {
   unitCost: number;
   lastChange: Date;
   status: 'Active' | 'Inactive' | 'Obsolete' | 'Pending';
+
+  /* ---- Create New Part -------------------------------------------------
+     Everything below is named by the Testing Guideline's Create New Part
+     sub-steps 2.9 to 2.14, and every one of the field NAMES is confirmed
+     against the live bundle rather than invented: `salesPriceTaxes`,
+     `certRequest`, `productionLeadTime`, `partWidth`, `targetCost`,
+     `customerCost`, `lastReceivePoCost`, `orderPolicy`, `dayOfWeek`,
+     `minOrderQty`, `orderMultiple`, `kittingLeadTime`, `purchaseLeadTime`,
+     `pullIn`, `pushOut`, `inspRequest`, `snRequest`, `ncnr`, `firstArticle`,
+     `lotCodeRequest` all appear in the live app's own form state.
+
+     OPTIONAL, because they are optional on the form and because 2,000
+     generated parts predate them. A part read from the list has none of
+     these; a part created through the form has whichever were filled in. */
+
+  /* Sales & Purchase (2.9) */
+  customerSalesPrice?: number;
+  salesPriceTaxes?: number;
+  materialPrice?: number;
+  highestCost?: number;
+  lowestCost?: number;
+  lastPoCost?: number;
+  lastReceivedCost?: number;
+
+  /* Requests & Controls (2.10) — six independent flags */
+  inspRequest?: boolean;
+  snRequest?: boolean;
+  ncnr?: boolean;
+  firstArticle?: boolean;
+  lotCodeRequest?: boolean;
+  certRequest?: boolean;
+
+  /* Dimensions & Packages (2.11). `uom` above is this section's Unit of
+     Measure — it already existed, so it is not duplicated here. */
+  length?: number;
+  width?: number;
+  depth?: number;
+
+  /* Reordering rule (2.12) */
+  orderPolicy?: string;
+  dayOfWeek?: string;
+  minOrderQty?: number;
+  orderMultiple?: number;
+
+  /* Demand & forecast planning (2.13) */
+  eau?: number;
+  attrition?: number;
+  mrpRequest?: number;
+
+  /* Lead time & Policies (2.14) */
+  pullIn?: number;
+  pushOut?: number;
+  purchaseLeadTime?: number;
+  kittingLeadTime?: number;
+  productionLeadTime?: number;
+
+  /* Attachments (2.15). Names only — this prototype has no file storage, so
+     the upload reports what it would do. */
+  attachments?: string[];
 };
 
 const CUSTOMERS = [
@@ -66,6 +129,12 @@ function mulberry32(seed: number) {
 }
 
 export function generateParts(count = 2000): Part[] {
+  /* Parts created this session come first, so a part the user just made is at
+     the top of the list they are returned to rather than 2,000 rows down. */
+  return [...createdParts(), ...generated(count)];
+}
+
+function generated(count: number): Part[] {
   const rnd = mulberry32(20260819);
   const pick = <T,>(a: T[]) => a[Math.floor(rnd() * a.length)];
   const out: Part[] = [];
