@@ -1,6 +1,6 @@
 import { Button } from '../../ui/Button';
 import { MiniTable } from '../../ui/MiniTable';
-import { fmtDate } from '../../ui/DataGrid';
+import { fmtDateTime } from '../../ui/renderCell';
 import { useToast } from '../../ui/Toast';
 import type { ColumnSpec } from '../column-model';
 import type { Quotation, QuoteResult } from '../../data/quotations';
@@ -37,7 +37,7 @@ function resultColumns(onOpen: (r: QuoteResult) => void): ColumnSpec<QuoteResult
     widthNote: 'The headline number; the role default clips the heading.',
     render: r => <strong>{money(r.totalWithMarkup)}</strong> },
   { field: 'lastRunBy', title: 'Last Run By', role: 'code', width: 140, widthNote: 'Full names.' },
-  { field: 'lastRunDate', title: 'Last Run Date', role: 'date', render: r => fmtDate(r.lastRunDate) },
+  { field: 'lastRunDate', title: 'Last Run Date', role: 'date', render: r => fmtDateTime(r.lastRunDate) },
   /* "Last Run Version displays the corresponding assembly run number", and
      re-running against the same BoM increments it — so it is a counter, not a
      label, and reads better right-aligned with the other numbers. */
@@ -97,7 +97,7 @@ export function ResultTab({ q, onRun }: { q: Quotation; onRun: () => void }) {
         </div>
         <div className="vy-fact">
           <div className="vy-fact-label">Last run</div>
-          <div className="vy-fact-value">{fmtDate(latest.lastRunDate)} · {latest.lastRunBy}</div>
+          <div className="vy-fact-value">{fmtDateTime(latest.lastRunDate)} · {latest.lastRunBy}</div>
         </div>
         <div className="vy-page-actions">
           <Button onClick={() => toast.notImplemented('export the costed lines as the customer-facing quote')}>

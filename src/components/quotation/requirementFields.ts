@@ -156,7 +156,7 @@ const DUE_DATE_FIELD: FieldDef<Quotation> = {
  * white one while reading, per the customer's 25 Aug answer.
  */
 const CREATED_DATE_FIELD: FieldDef<Quotation> = {
-  name: 'createdDate', label: 'Created Date', kind: 'date', readOnly: true,
+  name: 'createdDate', label: 'Created Date', kind: 'datetime', readOnly: true,
 };
 
 /**

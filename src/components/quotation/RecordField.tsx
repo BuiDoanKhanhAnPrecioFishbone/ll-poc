@@ -4,7 +4,7 @@ import { Priority, priorityLevel, PRIORITY_LEVELS, type PriorityLevel } from '..
 import { OPTION_MEANINGS } from '../../data/metadata';
 import { PEOPLE_DIRECTORY } from '../../data/quotations';
 import { PeoplePicker } from '../../ui/PeoplePicker';
-import { fmtDate } from '../../ui/renderCell';
+import { fmtDate, fmtDateTime } from '../../ui/renderCell';
 
 const LEVEL_TO_N: Record<PriorityLevel, number> = { High: 3, Medium: 2, Low: 1 };
 
@@ -68,6 +68,15 @@ export type FieldKind =
    * conventions rather than exempting it from needing them.
    */
   | { kind: 'date' }
+  /**
+   * A stamp the system writes, shown with its time.
+   *
+   * Separate from `date` because the two are not the same field. Due Date is a
+   * day the user picks; Created Date is a moment the system recorded, and the
+   * guideline says so — "displays the date and time when the RFQ was created".
+   * Formatting both with one helper is how the time got dropped.
+   */
+  | { kind: 'datetime' }
   | { kind: 'flag' }
   /** High / Medium / Low, stored 1-3. Rendered as a dot and a word, not stars. */
   | { kind: 'priority' }
@@ -408,6 +417,18 @@ function ReadField<T>({ def, value, editing }: { def: FieldDef<T>; value: unknow
           {chosen && OPTION_MEANINGS[chosen] && (
             <span className="vy-option-meaning">{OPTION_MEANINGS[chosen]}</span>
           )}
+        </dd>
+      </div>
+    );
+  }
+  if (def.kind === 'datetime') {
+    const d = value instanceof Date ? value : undefined;
+    return (
+      <div className="vy-field" data-locked={editing && def.readOnly || undefined}>
+        <dt>{def.label}{def.required && <RequiredMark />}</dt>
+        <dd className={d ? undefined : 'is-empty'}>
+          {d ? fmtDateTime(d) : 'Not set'}
+          {editing && def.readOnly && <LockNote def={def} />}
         </dd>
       </div>
     );
