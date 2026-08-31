@@ -254,7 +254,17 @@
 
 
 /* --- Toast ----------------------------------------------------------------- */
-.vy-toasts { position: fixed; left: 50%; bottom: var(--vy-space-9); transform: translateX(-50%); display: flex; flex-direction: column; gap: var(--vy-space-4); z-index: var(--vy-z-palette); margin: 0; padding: 0; list-style: none; max-width: 92vw; }
+/* BOTTOM-RIGHT, which the guideline states eleven separate times: "The success
+   message is shown at the bottom-right corner of the screen with a green
+   highlight." Ours sat bottom-centre, where it also covered whatever was in the
+   middle of the screen — usually the thing the message was about.
+
+   Full width on a narrow screen, because a corner on a 375px phone is most of
+   the width anyway and a right-anchored strip would read as clipped. */
+.vy-toasts { position: fixed; right: var(--vy-space-9); bottom: var(--vy-space-9); display: flex; flex-direction: column; gap: var(--vy-space-4); z-index: var(--vy-z-palette); margin: 0; padding: 0; list-style: none; max-width: min(92vw, 420px); }
+@media (max-width: 560px) {
+  .vy-toasts { left: var(--vy-space-6); right: var(--vy-space-6); max-width: none; }
+}
 .vy-toast {
   display: flex; align-items: flex-start; gap: var(--vy-space-5);
   background: var(--vy-grey-900); color: var(--vy-on-dark-fg);
