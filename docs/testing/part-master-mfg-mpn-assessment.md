@@ -27,7 +27,7 @@ popups), MFG–MPN (AML), and a Bill of Materials list.
 | 6 | "Add new Part" → *Add Part Master Detail* form | **absent** — the button exists and reports not-implemented |
 | 7 | "Eye" button on each row → Part detail | **mostly built** — the record is now the sheet's form; there is still no Eye control, the row opens from its part number |
 | 8 | Import: *Import All* / *Import by Customer* | **built** — the choice, with the file step declared unspecified |
-| 9–10 | Per-row checkboxes, multi-select, Export selected to Excel | **absent** — no row selection; Export offers all rows |
+| 9–10 | Per-row checkboxes, multi-select, Export selected to Excel | **built** — selection by id, Export names its scope |
 
 **3, 4 and 5 were a wiring gap, not a capability gap**, and are now done.
 `DataGrid` already accepted `filters`, `filterPanel`, `filterActive`, `views`,
@@ -138,7 +138,7 @@ instead of becoming a second place that has to be found and corrected.
 
 ## Summary
 
-Of roughly nineteen distinct requirements in this section: **nine are built**
+Of roughly nineteen distinct requirements in this section: **eleven are built**
 (navigate, search, filter tools, Setup View Template, Select View Template, the
 Part Master Detail record, the BoM detail and Where-Used popups, and the Import
 scope choice), **one is partial** (Export, in the sense that a button exists),

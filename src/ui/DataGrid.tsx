@@ -38,6 +38,7 @@ const ROW_H: Record<Density, number> = { compact: 28, comfortable: 36, relaxed: 
 export function DataGrid<T extends { id: string | number }>({
   data, columns, title, subtitle, actions, filters,
   searchPlaceholder = 'Search', rowHref, onOpenRow, emptyHint, loading, kpis,
+  selected, onSelectedChange,
   filterPanel, filterActive = 0, views, viewSetting,
   allColumns, onToggleColumn, onResetColumns,
 }: {
@@ -92,6 +93,16 @@ export function DataGrid<T extends { id: string | number }>({
   emptyHint?: string;
   /** Loading, empty and error are three distinct states, not one. */
   loading?: boolean;
+  /**
+   * Row selection, opt-in.
+   *
+   * Passing `selected` turns on a leading checkbox column — "by checking on 1st
+   * column on part's row", as the Part Master sheet puts it. Every grid that
+   * does not pass it is untouched: no extra column, no extra width, and the
+   * template it already had.
+   */
+  selected?: ReadonlySet<string | number>;
+  onSelectedChange?: (next: Set<string | number>) => void;
 }) {
   /* Density is a USER PREFERENCE, not a per-screen control (25 Aug review):
      "do not show settings in the list view, move this into User Preference...
@@ -204,7 +215,11 @@ export function DataGrid<T extends { id: string | number }>({
   /* One grid template, derived from the column roles, shared by the header and
      every row — so a cell can never drift out of alignment with its heading.
      The px values come from the token layer (COLUMN_WIDTH), not from here. */
-  const template = visible.map(c => `${widthOf(c)}px`).join(' ');
+  const selectable = !!selected && !!onSelectedChange;
+  /* The checkbox track is fixed and narrow — it holds one control whose size
+     never changes, so a role width would only make it wider than its content. */
+  const template = (selectable ? 'var(--vy-select-col-w) ' : '')
+    + visible.map(c => `${widthOf(c)}px`).join(' ');
 
   return (
     <div className="vy-page vy-page--grid" data-density={density}>
@@ -288,6 +303,32 @@ export function DataGrid<T extends { id: string | number }>({
         <div className="vy-grid-scroll" ref={scrollRef}>
           <div className="vy-grid-table">
             <div className="vy-grid-head" role="row" style={{ gridTemplateColumns: template }}>
+              {/* Select-all covers THIS PAGE, and says so. Across 2,000
+                  virtualised rows a bare "all" would select records the user
+                  has never seen and cannot check before exporting them; the
+                  page is the set they are actually looking at. */}
+              {selectable && (
+                <div className="vy-th vy-th--select" role="columnheader">
+                  <label className="vy-check" title={`Select all ${rows.length} on this page`}>
+                    <input
+                      type="checkbox"
+                      aria-label={`Select all ${rows.length} rows on this page`}
+                      checked={rows.length > 0 && rows.every(r => selected!.has((r.original as { id: string | number }).id))}
+                      ref={el => { if (el) el.indeterminate =
+                        rows.some(r => selected!.has((r.original as { id: string | number }).id)) &&
+                        !rows.every(r => selected!.has((r.original as { id: string | number }).id)); }}
+                      onChange={e => {
+                        const next = new Set(selected!);
+                        for (const r of rows) {
+                          const id = (r.original as { id: string | number }).id;
+                          if (e.target.checked) next.add(id); else next.delete(id);
+                        }
+                        onSelectedChange!(next);
+                      }}
+                    />
+                  </label>
+                </div>
+              )}
               {table.getHeaderGroups()[0].headers.map(h => {
                 const spec = visible.find(v => v.field === h.id)!;
                 const sorted = h.column.getIsSorted();
@@ -348,7 +389,28 @@ export function DataGrid<T extends { id: string | number }>({
                   const row = rows[vi.index];
                   return (
                     <div key={row.id} className="vy-tr" role="row"
+                         data-selected={selectable && selected!.has((row.original as { id: string | number }).id) || undefined}
                          style={{ transform: `translateY(${vi.start}px)`, height: rowH, gridTemplateColumns: template }}>
+                      {selectable && (() => {
+                        const id = (row.original as { id: string | number }).id;
+                        const on = selected!.has(id);
+                        return (
+                          <div className="vy-td vy-td--select" role="cell">
+                            <label className="vy-check">
+                              {/* Named by the row, not "Select row" — a screen
+                                  reader moving down 20 identical labels learns
+                                  nothing about which one it is on. */}
+                              <input type="checkbox" checked={on}
+                                     aria-label={`Select ${String(id)}`}
+                                     onChange={() => {
+                                       const next = new Set(selected!);
+                                       if (on) next.delete(id); else next.add(id);
+                                       onSelectedChange!(next);
+                                     }} />
+                            </label>
+                          </div>
+                        );
+                      })()}
                       {row.getVisibleCells().map(cell => {
                         const spec = visible.find(v => v.field === cell.column.id)!;
                         return (

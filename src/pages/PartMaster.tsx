@@ -15,7 +15,7 @@ import { SmartIcon } from '../components/quotation/SmartButtons';
 export function PartMaster() {
   const toast = useToast();
   const data = useMemo(() => generateParts(2000), []);
-  const [selected, setSelected] = useState<Part | null>(null);
+  const [selectedPart, setSelectedPart] = useState<Part | null>(null);
 
   /* The mockup's data is synchronous, so there is nothing to wait for. This
      short delay exists to DEMONSTRATE the loading state, because a pattern
@@ -40,6 +40,9 @@ export function PartMaster() {
   const [values, setValues] = useState<FilterValues>({});
   const [settingOpen, setSettingOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  /* Held by id rather than by row, so a selection survives sorting, filtering
+     and paging — the user picks parts, not positions. */
+  const [selected, setSelected] = useState<Set<string | number>>(new Set());
 
   /** Every column the screen has, and every field its filter panel offers. */
   const systemView = useMemo<SavedView>(() => ({
@@ -103,7 +106,20 @@ export function PartMaster() {
               Import by Customer — rather than reporting one unspecified action
               for two different outcomes. */}
           <Button onClick={() => setImportOpen(true)}>Import</Button>
-          <Button onClick={() => toast.notImplemented(`export these ${rows.length} parts to Excel`)}>Export</Button>
+          {/* Named as the guideline names it. The label changes only to state
+              the SCOPE once a selection exists, because that is the moment the
+              two possible outcomes diverge — export what I picked, or export
+              everything I can see. A button that reads the same either way
+              makes the user check the grid to find out which it will do. */}
+          <Button
+            title="Export Part Master Data"
+            onClick={() => toast.notImplemented(selected.size
+              ? `export the ${selected.size} selected ${selected.size === 1 ? 'part' : 'parts'} to Excel`
+              : `export these ${rows.length} parts to Excel`)}>
+            {selected.size
+              ? `Export ${selected.size} selected`
+              : 'Export Part Master Data'}
+          </Button>
           <Button variant="filled" onClick={() => toast.notImplemented('open a blank part record')}>New Part</Button>
         </>}
         filterPanel={
@@ -134,7 +150,9 @@ export function PartMaster() {
           </button>
         }
         loading={loading}
-        onOpenRow={setSelected}
+        selected={selected}
+        onSelectedChange={setSelected}
+        onOpenRow={setSelectedPart}
       />
 
       {settingOpen && (
@@ -161,7 +179,7 @@ export function PartMaster() {
 
       {importOpen && <ImportPartsDialog parts={data} onClose={() => setImportOpen(false)} />}
 
-      {selected && <PartDetail part={selected} onClose={() => setSelected(null)} />}
+      {selectedPart && <PartDetail part={selectedPart} onClose={() => setSelectedPart(null)} />}
 
     </>
   );
