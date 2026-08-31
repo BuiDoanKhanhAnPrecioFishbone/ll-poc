@@ -26,7 +26,7 @@ popups), MFG–MPN (AML), and a Bill of Materials list.
 | 5 | Select View Template | **built** — `d8ea831` |
 | 6 | "Add new Part" → *Add Part Master Detail* form | **absent** — the button exists and reports not-implemented |
 | 7 | "Eye" button on each row → Part detail | **mostly built** — the record is now the sheet's form; there is still no Eye control, the row opens from its part number |
-| 8 | Import: *Import All* / *Import by Customer* | **absent** — one Import button, no choice |
+| 8 | Import: *Import All* / *Import by Customer* | **built** — the choice, with the file step declared unspecified |
 | 9–10 | Per-row checkboxes, multi-select, Export selected to Excel | **absent** — no row selection; Export offers all rows |
 
 **3, 4 and 5 were a wiring gap, not a capability gap**, and are now done.
@@ -138,11 +138,18 @@ instead of becoming a second place that has to be found and corrected.
 
 ## Summary
 
-Of roughly nineteen distinct requirements in this section: **six are built**
-(navigate, search, filter tools, Setup View Template, Select View Template, and
-the Part Master Detail record), **one is partial** (Export, in the sense that a
-button exists), and **the remainder — including the whole of MFG–MPN and Create
-New Part — is absent**.
+Of roughly nineteen distinct requirements in this section: **nine are built**
+(navigate, search, filter tools, Setup View Template, Select View Template, the
+Part Master Detail record, the BoM detail and Where-Used popups, and the Import
+scope choice), **one is partial** (Export, in the sense that a button exists),
+and **the remainder — including the whole of MFG–MPN and Create New Part — is
+absent**.
+
+**Three places now say "not specified yet" on screen** rather than guessing: the
+BoM popup's *Other Information* tab, the import file step, and — implicitly —
+Export. In each case the sheet names the thing and defines nothing beneath it.
+They are the cheapest items left to finish, and they need a sentence from the
+customer rather than a decision from us.
 
 The three cheap ones are done. Everything left is genuine construction: Create
 New Part, the MFG–MPN tab and its three popups, BoM detail, Where PN Used,

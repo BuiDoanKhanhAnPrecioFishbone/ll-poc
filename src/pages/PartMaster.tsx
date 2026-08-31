@@ -5,6 +5,7 @@ import { DataGrid } from '../ui/DataGrid';
 import { Button } from '../ui/Button';
 import { useToast } from '../ui/Toast';
 import { PartDetail } from '../components/PartDetail';
+import { ImportPartsDialog } from '../components/ImportPartsDialog';
 import { FilterToolbar } from '../ui/FilterToolbar';
 import { ViewSetting } from '../ui/ViewSetting';
 import { useViews, draftFrom } from '../ui/useViews';
@@ -38,6 +39,7 @@ export function PartMaster() {
      more than either layout saves. */
   const [values, setValues] = useState<FilterValues>({});
   const [settingOpen, setSettingOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
 
   /** Every column the screen has, and every field its filter panel offers. */
   const systemView = useMemo<SavedView>(() => ({
@@ -97,7 +99,10 @@ export function PartMaster() {
         subtitle="parts"
         searchPlaceholder="Search part number, description or customer"
         actions={<>
-          <Button onClick={() => toast.notImplemented('import parts from a spreadsheet')}>Import</Button>
+          {/* Opens the scope choice the guideline asks for — Import All or
+              Import by Customer — rather than reporting one unspecified action
+              for two different outcomes. */}
+          <Button onClick={() => setImportOpen(true)}>Import</Button>
           <Button onClick={() => toast.notImplemented(`export these ${rows.length} parts to Excel`)}>Export</Button>
           <Button variant="filled" onClick={() => toast.notImplemented('open a blank part record')}>New Part</Button>
         </>}
@@ -153,6 +158,8 @@ export function PartMaster() {
           }}
         />
       )}
+
+      {importOpen && <ImportPartsDialog parts={data} onClose={() => setImportOpen(false)} />}
 
       {selected && <PartDetail part={selected} onClose={() => setSelected(null)} />}
 
