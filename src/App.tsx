@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, useParams } from 'react-router-dom';
 import { AppShell } from './components/AppShell';
 import { Home } from './pages/Home';
@@ -9,6 +10,12 @@ import { DesignSystemPage } from './pages/DesignSystem';
 import { AuditPage } from './pages/Audit';
 import { Placeholder } from './pages/Placeholder';
 import { Login } from './pages/Login';
+/* LAZY. The Kendo grid and its theme are ~650KB that the rest of the app has no
+   use for — statically imported they doubled the main bundle, so every user
+   downloaded a licence test they will never open. Split out, they load only for
+   whoever visits /kendo-check. */
+const KendoCheck = lazy(() => import('./pages/KendoCheck').then(m => ({ default: m.KendoCheck })));
+
 import { Queues } from './pages/Queues';
 import { ToastProvider } from './ui/Toast';
 import { PrefsProvider } from './ui/prefs';
@@ -48,6 +55,12 @@ export default function App() {
           <Route path="/sitemap" element={<SitemapPage />} />
           <Route path="/design-system" element={<DesignSystemPage />} />
           <Route path="/audit" element={<AuditPage />} />
+          {/* A licence check, not a migration — see the page's own note. */}
+          <Route path="/kendo-check" element={
+            <Suspense fallback={<div className="vy-page"><p className="vy-empty-inline">Loading the Kendo check…</p></div>}>
+              <KendoCheck />
+            </Suspense>
+          } />
           <Route path="*" element={<Placeholder />} />
         </Route>
       </Routes>

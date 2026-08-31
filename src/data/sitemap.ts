@@ -389,6 +389,7 @@ export const reviewPages: NavItem[] = [
      menu. There is no reading of the live system's sign-out, so adding one
      would be inventing a flow to reach a screen that exists to be reviewed. */
   { title: 'Login', path: '/login', hint: 'The redesigned sign-in screen' },
+  { title: 'Kendo licence check', path: '/kendo-check', hint: 'One licensed Kendo grid, to prove a build is clean' },
 ];
 
 /** Flattened, for the command palette. Live destinations only. */

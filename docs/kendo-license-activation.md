@@ -194,11 +194,36 @@ can open the project.
 
 ### Verifying it worked
 
-A licensed build has **no watermark on Kendo components and no licence warning
-in the build log**. Check the Vercel build log for a Telerik licence line — an
-unlicensed build says so there before anyone sees the page. Do not verify by
-looking at production only; check a preview deployment too, since that is the
-build most likely to be missing the variable.
+**Look at the INSTALL step, not the build step.** Corrected after testing this
+directly on 31 Aug 2026: Vite's build log is silent about licensing either way —
+`npm run build` produced identical output with a valid key and with the
+licensing package reset to unactivated. Watching the build log for a licence
+line would have meant watching the wrong thing.
+
+The signal is in `@progress/kendo-licensing`'s **postinstall**, which runs
+during `npm install` and prints:
+
+```
+[INFO][Telerik and Kendo UI Licensing] Telerik and Kendo UI License Key found at: TELERIK_LICENSE
+[INFO][Telerik and Kendo UI Licensing] KendoReact: Your KendoReact subscription is active. Expiration in 980 days - 5/6/2029.
+```
+
+No key, and it says so there instead. In Vercel this appears in the deployment
+log under **Installing dependencies**, above the build output.
+
+The second check is the page itself: open `/kendo-check` on the deployment. A
+licensed grid renders plainly; an unlicensed one carries a watermark and a
+console warning.
+
+Do not verify on production alone — check a preview deployment too, since that
+is the build most likely to be missing the variable.
+
+**Activation writes into `node_modules`.** `kendo-ui-license activate` bakes the
+key into `@progress/kendo-licensing/dist`, which is why it has to run on every
+machine and every CI run rather than once: `node_modules` is not committed. It
+is also why a local `npm run build` alone does not activate anything — the
+variable has to be in the environment at install time, or exported before
+running the activate step by hand.
 
 ### Rotation
 
