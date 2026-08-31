@@ -28,6 +28,14 @@ export type ColumnSpec<T> = {
   width?: number;
   widthNote?: string;
 
+  /**
+   * Set false for a column of CONTROLS.
+   *
+   * A column holding buttons has no order to put them in, and several borrow an
+   * unrelated field to satisfy the type — so "sort by Actions" would quietly
+   * sort by whichever field that happened to be.
+   */
+  sortable?: boolean;
   /** Hidden by default; still offered in the column chooser, with `note` shown. */
   hiddenByDefault?: boolean;
   /**

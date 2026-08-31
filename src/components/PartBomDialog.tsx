@@ -116,7 +116,7 @@ export function PartBomDialog({ part, onClose }: { part: Part; onClose: () => vo
  * the list but its size, including when the size is zero.
  */
 function whereUsedColumns(onView: (r: WhereUsedRow) => void): ColumnSpec<WhereUsedRow>[] { return [
-  { field: 'id', title: 'View', role: 'code', width: 72,
+  { field: 'id', title: 'View', role: 'code', width: 72, sortable: false,
     widthNote: 'Holds one icon-sized control, narrower than a code cell assumes.',
     render: r => (
       <button type="button" className="vy-cell-link" onClick={() => onView(r)}

@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { widthOf, type ColumnSpec } from '../components/column-model';
 import { renderCell } from './renderCell';
 
@@ -34,6 +34,40 @@ export function MiniTable<T extends { id: string | number }>({
    */
   freeze?: number;
 }) {
+  /* "Each column is fully interactive, supporting bidirectional sorting, a
+     'Clear' reset function" — the guideline, of the BoM Components tab. This
+     table had none at all, and it backs five lists: BoM components, Where-Used,
+     quotation results, checklist tasks and saved drafts.
+
+     A third click clears, which IS the reset — the same asc → desc → none cycle
+     the main DataGrid already uses, so the two tables in this app do not sort by
+     different rules. A separate Clear control would be a second way to do one
+     thing. */
+  const [sort, setSort] = useState<{ field: string; dir: 'asc' | 'desc' } | null>(null);
+
+  const rows = useMemo(() => {
+    if (!sort) return data;
+    const col = columns.find(c => String(c.field) === sort.field);
+    if (!col) return data;
+    const dir = sort.dir === 'asc' ? 1 : -1;
+    return [...data].sort((a, b) => {
+      const x = a[col.field] as unknown, y = b[col.field] as unknown;
+      /* Blanks sink to the bottom in BOTH directions. A column sorted to bring
+         the largest to the top should not open with a screen of empties. */
+      const xe = x === null || x === undefined || x === '';
+      const ye = y === null || y === undefined || y === '';
+      if (xe || ye) return xe && ye ? 0 : xe ? 1 : -1;
+      if (x instanceof Date && y instanceof Date) return (x.getTime() - y.getTime()) * dir;
+      if (typeof x === 'number' && typeof y === 'number') return (x - y) * dir;
+      return String(x).localeCompare(String(y), undefined, { numeric: true }) * dir;
+    });
+  }, [data, columns, sort]);
+
+  const toggle = (field: string) => setSort(s =>
+    s?.field !== field ? { field, dir: 'asc' }
+    : s.dir === 'asc' ? { field, dir: 'desc' }
+    : null);
+
   if (data.length === 0 && empty) return <>{empty}</>;
   const widths = columns.map(widthOf);
   const template = widths.map(w => `${w}px`).join(' ');
@@ -50,13 +84,28 @@ export function MiniTable<T extends { id: string | number }>({
       <div className="vy-minitable-head" role="row" style={{ gridTemplateColumns: template }}>
         {columns.map((c, i) => (
           <div key={c.field} role="columnheader" className="vy-th" data-role={c.role}
-               data-stick={i < freeze || undefined} style={stick(i)}>
-            {c.headerRender ? c.headerRender() : c.title}
+               data-stick={i < freeze || undefined} style={stick(i)}
+               /* Only on a column that CAN sort. `aria-sort="none"` does not mean
+                  "not sortable" — it means sortable and currently unsorted, which
+                  would announce the control columns as something they are not. */
+               aria-sort={c.sortable === false ? undefined
+                 : sort?.field === String(c.field)
+                   ? (sort.dir === 'asc' ? 'ascending' : 'descending') : 'none'}>
+            {c.headerRender ? c.headerRender() : c.sortable === false ? c.title : (
+              <button type="button" className="vy-minitable-sort"
+                      data-sorted={sort?.field === String(c.field) ? sort.dir : undefined}
+                      onClick={() => toggle(String(c.field))}>
+                <span>{c.title}</span>
+                {sort?.field === String(c.field) && (
+                  <span aria-hidden>{sort.dir === 'asc' ? '↑' : '↓'}</span>
+                )}
+              </button>
+            )}
           </div>
         ))}
       </div>
       <div role="rowgroup">
-        {data.map(row => (
+        {rows.map(row => (
           <div key={row.id} className="vy-minitable-row" role="row"
                data-tone={rowTone?.(row)} style={{ gridTemplateColumns: template }}>
             {columns.map((c, i) => (

@@ -19,7 +19,7 @@ function draftColumns(onContinue: (d: DraftQuote) => void): ColumnSpec<DraftQuot
      only control in the row and the row is otherwise inert, so there is nothing
      for an icon to be disambiguated against and nothing gained by making the
      user hover to learn what it does. */
-  { field: 'id', title: 'Action', role: 'code', width: 104,
+  { field: 'id', title: 'Action', role: 'code', width: 104, sortable: false,
     widthNote: 'Holds the Continue button, which is wider than a code cell assumes.',
     render: d => (
       <Button variant="outlined" size="sm" onClick={() => onContinue(d)}>

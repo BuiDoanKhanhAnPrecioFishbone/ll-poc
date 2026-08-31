@@ -165,7 +165,7 @@ export function ChecklistsTab({ q, people: controlled, onPeopleChange, touched, 
       } },
     /* "The Actions column provides available actions for document handling,
        including action buttons in the following order: Upload and Approve." */
-    { field: 'uploadedBy', title: 'Actions', role: 'code', width: 170,
+    { field: 'uploadedBy', title: 'Actions', role: 'code', width: 170, sortable: false,
       widthNote: 'Holds two buttons.',
       render: t => (
         <span className="vy-task-actions">
