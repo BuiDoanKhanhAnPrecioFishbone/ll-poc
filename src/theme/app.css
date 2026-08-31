@@ -83,7 +83,6 @@
 .vy-topbar-right { display: flex; align-items: center; gap: var(--vy-space-5); }
 .vy-icon-btn { position: relative; background: none; border: 0; color: var(--vy-grey-500); cursor: pointer; padding: var(--vy-space-2); border-radius: var(--vy-radius-md); }
 .vy-icon-btn:hover { background: var(--vy-grey-100); color: var(--vy-grey-800); }
-.vy-dot { position: absolute; top: var(--vy-space-2); right: var(--vy-space-2); width: var(--vy-dot-size); height: var(--vy-dot-size); border-radius: 50%; background: var(--vy-red-500); }
 .vy-avatar { width: var(--vy-control-sm); height: var(--vy-control-sm); border-radius: 50%; background: var(--vy-blue-100); color: var(--vy-blue-800); display: grid; place-items: center; font-weight: var(--vy-weight-semibold); font-size: var(--vy-text-sm); }
 
 .vy-content { flex: 1; overflow: auto; min-height: 0; }

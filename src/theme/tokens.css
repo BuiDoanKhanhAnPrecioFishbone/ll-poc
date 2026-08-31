@@ -211,7 +211,6 @@
      In `ch` so it tracks the font rather than freezing a pixel count. */
   --vy-prose-max:          96ch;
   --vy-icon-sm:           16px;  /* nav and toolbar glyphs */
-  --vy-dot-size:           6px;  /* unread indicator */
   --vy-accent-bar-w:       3px;  /* left accent rule on queue cards */
   --vy-border-emphasis:    2px;  /* active tab underline, checked radio, focus ring */
   --vy-swatch-w:          78px;

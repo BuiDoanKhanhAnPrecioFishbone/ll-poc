@@ -7,6 +7,7 @@ import { UserMenu } from './UserMenu';
 import { generateQuotations } from '../data/quotations';
 import { MEASURES, ME } from '../data/queues';
 import { Icon } from '../ui/icons';
+import { useToast } from '../ui/Toast';
 
 /**
  * One glyph per destination. The collapsed rail is icon-only, so these ARE the
@@ -30,6 +31,7 @@ import { Icon } from '../ui/icons';
  */
 
 export function AppShell() {
+  const toast = useToast();
   const [collapsed, setCollapsed] = useState(false);
   const { pathname } = useLocation();
 
@@ -223,11 +225,24 @@ export function AppShell() {
             <LanguagePicker value={lang} onChange={setLang} />
             <span className="vy-topbar-sep" aria-hidden />
             <QueueBell count={overdueForMe} />
-            <button className="vy-icon-btn" aria-label="Notifications">
+            {/* Says what it would do, like every other unimplemented control
+                here. It was the one exception: a dead button, which is the
+                thing that convention exists to stop — a reviewer cannot tell a
+                missing feature from a broken one.
+
+                THE UNREAD DOT IS GONE, and that was the worse half. It was
+                rendered unconditionally, backed by no data, so it told every
+                user on every screen forever that something needed attention,
+                and no action could ever clear it. QueueBell beside it sets the
+                standard: its badge appears only when the count is real, and it
+                says "nothing overdue" out loud when there is nothing. A signal
+                that is always on is not a signal. */}
+            <button className="vy-icon-btn" aria-label="Notifications, nothing new"
+                    title="Notifications, nothing new"
+                    onClick={() => toast.notImplemented('open the notifications panel')}>
               <svg viewBox="0 0 20 20" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
                 <path d="M6 8a4 4 0 1 1 8 0c0 3 1 4 1 4H5s1-1 1-4M8.5 15a1.5 1.5 0 0 0 3 0" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-              <span className="vy-dot" />
             </button>
             {/* Row density moved here from every list toolbar (25 Aug review).
                 It is set once and applies to every grid, which is the point:

@@ -86,13 +86,23 @@ scratch. It is deliberately not changed — the disabled-Save-with-a-count is an
 existing decision on this record, and replacing it is a call to make on its own
 merits, not a side effect of adding a panel.
 
-### 3. The Notifications bell does nothing
+### 3. The Notifications bell — **DONE**, `AppShell.tsx`
 
-`AppShell.tsx` renders it with an unread dot and no handler. Every other
-unimplemented control in this prototype says what it would do —
-`toast.notImplemented('…')` — precisely so a reviewer can tell a missing
-feature from a broken one. This one is silent, which is the failure that
-convention exists to prevent. A one-line fix.
+It rendered with an unread dot and no handler. Every other unimplemented
+control in this prototype says what it would do — `toast.notImplemented('…')` —
+precisely so a reviewer can tell a missing feature from a broken one. This one
+was silent, which is the failure that convention exists to prevent.
+
+**The dot was the worse half**, and it was not in the one-line fix I expected.
+It rendered unconditionally, backed by no data, so it told every user on every
+screen forever that something needed attention, and nothing could ever clear
+it. `QueueBell` sits beside it and sets the standard: its badge appears only
+when the count is real, and its label says "nothing overdue" out loud when
+there is nothing. A signal that is always on is not a signal.
+
+Removed, along with the `.vy-dot` rule and the `--vy-dot-size` token it was the
+only user of — dead CSS is what `npm run css:orphans` exists to prevent, and
+leaving it would have failed that check on the next run.
 
 ### 4. Brand: "Voyager IQ"
 
