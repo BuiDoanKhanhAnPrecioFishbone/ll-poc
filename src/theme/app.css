@@ -1490,7 +1490,6 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
 .vy-select[data-open] .vy-select-caret { transform: rotate(180deg); }
 .vy-select-menu { min-width: var(--vy-select-menu-min); max-height: 300px; overflow: auto; }
 .vy-select-list { list-style: none; margin: 0; padding: var(--vy-space-2); }
-.vy-select-list .vy-menu-item { width: 100%; text-align: left; }
 /* Keyboard highlight and pointer hover are the SAME state — two different
    highlights on one list is how a user loses track of which one Enter takes. */
 .vy-select-list .vy-menu-item[data-active] { background: var(--vy-grey-100); }

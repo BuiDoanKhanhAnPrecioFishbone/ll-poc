@@ -90,7 +90,19 @@
   border-radius: var(--vy-shape-sm); padding: var(--vy-space-4) var(--vy-space-5); cursor: pointer; min-width: var(--vy-card-min-w);
 }
 .vy-menu { background: var(--vy-grey-0); border: 1px solid var(--vy-grey-200); border-radius: var(--vy-shape-md); box-shadow: var(--vy-elev-3); padding: var(--vy-space-2); z-index: var(--vy-z-palette); }
-.vy-menu-item { font-size: var(--vy-text-base); color: var(--vy-grey-800); padding: var(--vy-space-3) var(--vy-space-5); border-radius: var(--vy-shape-sm); cursor: pointer; outline: none; }
+/* Resets the button chrome, because this class is used on BOTH div items (Radix
+   menus) and <button> options (the combobox list). Written for the divs, it left
+   the buttons wearing the browser's own `buttonface` grey and a 2px outset
+   border — which read as a stack of inset grey blocks rather than a list, and
+   which coincidentally sat close enough to grey-100 to look almost deliberate.
+   Second time this exact class of bug has appeared; see .vy-link. */
+.vy-menu-item {
+  appearance: none; background: none; border: 0; width: 100%; text-align: left;
+  font: inherit;
+  font-size: var(--vy-text-base); color: var(--vy-grey-800);
+  padding: var(--vy-space-3) var(--vy-space-5); border-radius: var(--vy-shape-sm);
+  cursor: pointer; outline: none;
+}
 .vy-menu-item[data-highlighted] { background: var(--vy-blue-50); }
 
 /* --- Checkbox / radio ------------------------------------------------------ */

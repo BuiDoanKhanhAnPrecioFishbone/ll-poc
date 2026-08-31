@@ -32,6 +32,23 @@ button, input, textarea, select, optgroup {
   letter-spacing: inherit;
 }
 
+/* A CLASSED button starts from nothing. Twice now a class written for a div has
+   been put on a <button> and the browser's own chrome showed through — a 2px
+   outset border and `buttonface` grey, which in the combobox list read as a
+   stack of inset blocks rather than a list of options. Each time the fix was the
+   same three properties, added after someone noticed.
+
+   Wrapped in `:where()`, which is the whole trick. Written plainly,
+   `button[class]` scores (0,1,1) and beats a single class like `.vy-btn--filled`
+   at (0,1,0) — tried it, and every filled button went transparent and every
+   bordered one lost its border. `:where()` contributes ZERO specificity, so this
+   is a floor that any class rule overrides without needing to think about it.
+
+   Scoped to classed buttons deliberately: a bare <button> with none of our
+   classes is not ours to restyle, and stripping its affordance would be worse
+   than the bug this prevents. */
+:where(button[class]) { appearance: none; background: none; border: 0; }
+
 h1, h2, h3, h4, h5, h6, p, figure, blockquote, dl, dd { margin: 0; }
 ul[class], ol[class] { list-style: none; margin: 0; padding: 0; }
 img, svg, video { max-width: 100%; display: block; }
