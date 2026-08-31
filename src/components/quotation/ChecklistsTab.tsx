@@ -8,10 +8,9 @@ import { useToast } from '../../ui/Toast';
 import type { ColumnSpec } from '../column-model';
 import {
   PROGRAM_CHECKLIST, ENGINEERING_CHECKLIST, PEOPLE,
-  type Quotation, type ChecklistTask, type TaskStatus,
+  type Quotation, type ChecklistTask, taskStatus,
 } from '../../data/quotations';
 
-const STATUSES: TaskStatus[] = ['To do', 'In progress', 'Done'];
 
 /**
  * Which project types bring an engineering stage with them.
@@ -90,9 +89,17 @@ export function ChecklistsTab({ q, people: controlled, onPeopleChange, touched, 
   function toggle(type: string, on: boolean) {
     const before = tasks;
     if (on) {
+      /* "If the checklist item belongs to Program Checklists, the default
+         assignee is the selected Program Manager ... If ... Engineering
+         Checklists, the default assignee is the selected Engineer." The group
+         the item came from decides which. It was left blank, so every new row
+         arrived unassigned and someone had to set what the system already
+         knew. */
+      const fromEngineering = (ENGINEERING_CHECKLIST as readonly string[]).includes(type);
       setTasks(t => [...t, {
         type, documentName: '', uploadedBy: '', uploadedDate: null,
-        assignee: '', status: 'To do',
+        assignee: (fromEngineering ? people.engineer : people.programManager) || '',
+        approved: false,
       }]);
       toast.undoable(`"${type}" now applies to this RFQ.`, () => setTasks(before));
       return;
@@ -110,13 +117,6 @@ export function ChecklistsTab({ q, people: controlled, onPeopleChange, touched, 
     );
   }
 
-  const setStatus = (type: string, status: TaskStatus) => {
-    const before = tasks;
-    const was = tasks.find(x => x.type === type)?.status;
-    if (was === status) return;
-    setTasks(t => t.map(x => (x.type === type ? { ...x, status } : x)));
-    toast.undoable(`${type} moved to ${status}.`, () => setTasks(before));
-  };
 
   /* Assignment is the one change here that is quietly damaging when wrong: work
      lands in someone else's queue and neither person is told. It says WHO, and
@@ -134,6 +134,12 @@ export function ChecklistsTab({ q, people: controlled, onPeopleChange, touched, 
     );
   };
 
+  const approve = (type: string) => {
+    const before = tasks;
+    setTasks(t => t.map(x => (x.type === type ? { ...x, approved: true } : x)));
+    toast.undoable(`${type} approved.`, () => setTasks(before));
+  };
+
   const columns: ColumnSpec<ChecklistTask & { id: string }>[] = [
     { field: 'type', title: 'Task', role: 'text' },
     { field: 'documentName', title: 'Document', role: 'text',
@@ -148,13 +154,39 @@ export function ChecklistsTab({ q, people: controlled, onPeopleChange, touched, 
       render: t => <Select label={`Assignee for ${t.type}`} value={t.assignee || 'Unassigned'}
                            options={['Unassigned', ...PEOPLE]}
                            onChange={v => setAssignee(t.type, v === 'Unassigned' ? '' : v)} /> },
-    { field: 'status', title: 'Status', role: 'status', width: 160,
-      widthNote: 'Holds a picker, not a badge.',
-      render: t => <Select label={`Status for ${t.type}`} value={t.status}
-                           options={STATUSES} onChange={v => setStatus(t.type, v as TaskStatus)} /> },
+    /* A READOUT, not a picker. The guideline derives all three from the
+       document — To do with none attached, In Progress once one is, Completed
+       once it is approved — so offering the user a dropdown let them assert a
+       state the document contradicted. */
+    { field: 'approved', title: 'Status', role: 'status', width: 130,
+      render: t => {
+        const st = taskStatus(t);
+        return <span className="vy-task-status" data-status={st}>{st}</span>;
+      } },
+    /* "The Actions column provides available actions for document handling,
+       including action buttons in the following order: Upload and Approve." */
+    { field: 'uploadedBy', title: 'Actions', role: 'code', width: 170,
+      widthNote: 'Holds two buttons.',
+      render: t => (
+        <span className="vy-task-actions">
+          <Button size="sm" disabled={t.approved}
+                  title={t.approved ? 'Approved documents cannot be replaced' : undefined}
+                  onClick={() => toast.notImplemented(`attach a document to ${t.type}`)}>
+            Upload
+          </Button>
+          {/* Disabled with nothing to approve, and again once approved — the
+              sheet's three states, in order. */}
+          <Button size="sm" disabled={!t.documentName || t.approved}
+                  title={!t.documentName ? 'Attach a document first'
+                        : t.approved ? 'Already approved' : undefined}
+                  onClick={() => approve(t.type)}>
+            Approve
+          </Button>
+        </span>
+      ) },
   ];
 
-  const done = tasks.filter(t => t.status === 'Done').length;
+  const done = tasks.filter(t => taskStatus(t) === 'Completed').length;
 
   return (
     <div className="vy-checklist-layout">

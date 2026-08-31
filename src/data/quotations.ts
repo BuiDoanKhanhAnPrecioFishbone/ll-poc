@@ -117,7 +117,24 @@ export type Quotation = {
  * done/not-done, and a separate list of documents — and reported progress as
  * "3 of 5 done", which measured something the system does not track.
  */
-export type TaskStatus = 'To do' | 'In progress' | 'Done';
+/**
+ * DERIVED from the document, never chosen.
+ *
+ * The guideline states all three and what causes each: "The default status is
+ * To do ... The status is In Progress ... when a file has been uploaded but has
+ * not yet been approved ... The status is Completed ... when a file has been
+ * uploaded and approved." So it is a readout of the document's state, and
+ * `taskStatus()` below is the only thing that produces it.
+ *
+ * "Completed", not "Done" — the sheet's word. And "In Progress" with a capital
+ * P, likewise.
+ */
+export type TaskStatus = 'To do' | 'In Progress' | 'Completed';
+
+export function taskStatus(t: { documentName: string; approved: boolean }): TaskStatus {
+  if (!t.documentName) return 'To do';
+  return t.approved ? 'Completed' : 'In Progress';
+}
 
 export type ChecklistTask = {
   /** The checklist item this task came from. */
@@ -126,7 +143,8 @@ export type ChecklistTask = {
   uploadedBy: string;
   uploadedDate: Date | null;
   assignee: string;
-  status: TaskStatus;
+  /** Whether the attached document has been approved. Drives the status. */
+  approved: boolean;
 };
 
 
@@ -324,7 +342,6 @@ const OWNERS = [...PEOPLE];
 
 /** The mockup's "now". One constant, so dates cannot disagree between screens. */
 export const TODAY = new Date(2026, 7, 19);
-const TASK_STATUSES: TaskStatus[] = ['To do', 'To do', 'In progress', 'Done'];
 const RESULT_DESC = [
   'Main controller assembly', 'Power distribution board', 'Sensor interface PCBA',
   'Backplane assembly', 'RF front-end module',
@@ -475,15 +492,19 @@ export function generateQuotations(count = 330): Quotation[] {
       tasks: [...PROGRAM_CHECKLIST, ...ENGINEERING_CHECKLIST]
         .filter(() => rnd() > 0.62)
         .map((type, j) => {
-          const status = pick(TASK_STATUSES);
-          const hasDoc = status !== 'To do' && rnd() > 0.35;
+          /* The DOCUMENT is generated and the status follows it, which is the
+             direction the guideline states. This used to pick a status first
+             and derive the document from it — so a row could read "Done" with
+             nothing attached, a state the real system cannot produce. */
+          const hasDoc = rnd() > 0.45;
+          const approved = hasDoc && rnd() > 0.4;
           return {
             type,
             documentName: hasDoc ? `${type.replace(/[^A-Za-z]+/g, '-')}-${cust.slice(0, 5)}.xlsx` : '',
             uploadedBy: hasDoc ? pick(OWNERS) : '',
             uploadedDate: hasDoc ? withHour(new Date(created.getTime() + (j + 1) * 86400000), 10 + j) : null,
             assignee: pick(OWNERS),
-            status,
+            approved,
           };
         }),
       /* Only quoted/completed RFQs have results — a New one has never been run. */

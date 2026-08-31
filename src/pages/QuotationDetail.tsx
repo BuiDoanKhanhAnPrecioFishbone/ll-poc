@@ -4,7 +4,7 @@ import { Dialog, Tabs } from '../ui/Overlays';
 import { ValidationPanel } from '../components/quotation/ValidationPanel';
 import { Button } from '../ui/Button';
 import { StatusBadge } from '../ui/Badge';
-import { generateQuotations, daysUntil, findCustomer, contactsFor, type Quotation } from '../data/quotations';
+import { generateQuotations, daysUntil, findCustomer, contactsFor, taskStatus, type Quotation } from '../data/quotations';
 import { ChecklistsTab } from '../components/quotation/ChecklistsTab';
 import { ResultTab } from '../components/quotation/ResultTab';
 import { ConversationsTab } from '../components/quotation/ConversationsTab';
@@ -194,7 +194,7 @@ export function QuotationDetail() {
   }
   /* Tab labels carry counts so the record's state is legible without opening
      each tab. The live TabStrip gives five bare nouns. */
-  const checklistOutstanding = q.tasks.filter(t => t.status !== 'Done').length;
+  const checklistOutstanding = q.tasks.filter(t => taskStatus(t) !== 'Completed').length;
 
   return (
     <div className="vy-page vy-page--record">

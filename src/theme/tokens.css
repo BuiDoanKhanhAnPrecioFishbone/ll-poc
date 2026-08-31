@@ -73,6 +73,12 @@
      specifies. Measures 7.3:1. */
   --vy-status-waiting-fg:    #5b21b6;
   --vy-status-waiting-bg:    #ede9fe;
+  /* Cyan, because the guideline names it for a checklist document that has been
+     uploaded and is awaiting approval: "In Progress, displayed with a cyan
+     label". Deliberately not one of the blues — beside the primary blue a blue
+     badge reads as a link. 5.15:1. */
+  --vy-status-review-fg:     #0e7490;
+  --vy-status-review-bg:     #ecfeff;
   --vy-status-blocked-fg:    var(--vy-red-700);
   --vy-status-blocked-bg:    var(--vy-red-50);
   --vy-status-cancelled-fg:  var(--vy-grey-500);

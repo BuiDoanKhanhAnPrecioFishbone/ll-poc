@@ -1494,3 +1494,32 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
    highlights on one list is how a user loses track of which one Enter takes. */
 .vy-select-list .vy-menu-item[data-active] { background: var(--vy-grey-100); }
 .vy-select-list .vy-menu-item[aria-selected="true"] { font-weight: var(--vy-weight-semibold); }
+
+
+/* Checklist document status — a readout, coloured as the guideline specifies:
+   "To do, displayed with a red label ... In Progress, displayed with a cyan
+   label ... Completed, displayed with a green label."
+
+   Red for To do is unusual — red normally means broken, and this only means
+   "not started". It is the customer's own vocabulary on their own screen, so it
+   stands; the surrounding UI keeps red rare enough that it still reads as
+   attention rather than alarm.
+
+   Tinted rather than solid so eight rows of these do not turn the table into a
+   colour chart. Each pairs a dark foreground with its own pale ground. */
+.vy-task-status {
+  display: inline-flex; align-items: center; min-height: var(--vy-space-10);
+  padding: var(--vy-space-1) var(--vy-space-5);
+  border-radius: var(--vy-radius-pill);
+  font-size: var(--vy-text-sm); font-weight: var(--vy-weight-medium);
+  white-space: nowrap;
+}
+/* red-700 on red-50 — 6.78:1. */
+.vy-task-status[data-status="To do"] { background: var(--vy-red-50); color: var(--vy-red-700); }
+/* Cyan, via the token — see --vy-status-review-* for why not a blue. 5.15:1. */
+.vy-task-status[data-status="In Progress"] { background: var(--vy-status-review-bg); color: var(--vy-status-review-fg); }
+/* Reuses the done token, which is already the green every other Completed in
+   the app uses — a second green would make one screen disagree with the rest. */
+.vy-task-status[data-status="Completed"] { background: var(--vy-status-done-bg); color: var(--vy-status-done-fg); }
+
+.vy-task-actions { display: inline-flex; align-items: center; gap: var(--vy-space-3); }

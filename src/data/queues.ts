@@ -48,9 +48,17 @@ export const MEASURES: Measure[] = [
   {
     key: 'waiting-doc', label: 'Waiting on a document', tone: 'waiting',
     meaning: 'A checklist task is started but its document has not arrived',
-    /* A task that applies, has been picked up, and still has no file. Tasks left
-       at "To do" are not waiting on anything — they have not begun. */
-    match: q => isOpen(q) && q.tasks.some(t => t.status === 'In progress' && !t.documentName),
+    /* A checklist task that applies and has no file attached.
+       
+       This used to read `status === 'In progress' && !documentName`, which is
+       now a CONTRADICTION and quietly matched nothing: status is derived from
+       the document, and "In Progress" means a file exists but is unapproved. The
+       old predicate leaned on a user-set status to mean "picked up", and that
+       status no longer exists — the guideline derives all three from the
+       document. So the honest reading of "waiting on a document" is the tasks
+       that have none, which is exactly To do. Slightly broader than before,
+       because "started but no file" is a state the real system cannot express. */
+    match: q => isOpen(q) && q.tasks.some(t => !t.documentName),
   },
 ];
 
