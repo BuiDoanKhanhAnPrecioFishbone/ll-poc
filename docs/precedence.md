@@ -29,7 +29,15 @@ breadcrumbs go; the record count leaves the module name; density moves to user
 preferences.
 
 ### 2. The live system — the baseline
-`erp.linhlongengineering.com`, read directly (`docs/live-spec-25aug.md`).
+`erp.linhlongengineering.com`, read directly (`docs/live-spec-25aug.md`,
+`docs/bundle-evidence.md`, `docs/live-component-sweep.md`).
+
+**Read it before building an interactive control, not only before choosing a
+field.** The written sources describe data and rules well and are nearly silent
+on behaviour: bundle-evidence established that Customer is a lookup and never
+said the picker filters as you type, so we built a control that was right about
+the data and wrong to use. The app is reachable read-only and its bundle can be
+searched.
 Governs **everything the requirements do not mention**: field names, section
 names, option values, capabilities, which fields exist, what each control does.
 
