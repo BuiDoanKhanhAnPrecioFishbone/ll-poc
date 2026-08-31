@@ -24,7 +24,7 @@ Counts are occurrences across entry + 239 chunks.
 | **Grid**, with a pager | `KendoReactGrid` ×8, `k-grid` ×23, `k-pager` ×6 | `DataGrid` — TanStack table + virtualiser |
 | **Per-column filter cells** | `k-filtercell` ×4 | **absent** — see below |
 | **DropDownList**, filterable | `KendoReactDropDownList`, filter descriptor with `ignoreCase` | `Select` — now filters above 8 options |
-| **MultiSelect**, chips + avatars | `component: "MultiSelect"`, `tagRender`, option `avatar` | **absent** — Assigned To is a single-value `Select`; see the correction below |
+| **MultiSelect**, chips + avatars | `component: "MultiSelect"`, `tagRender`, option `avatar` | `PeoplePicker` — chips, avatar + email, filters both |
 | **DatePicker** | `k-datepicker` ×1 | native `<input type="date">` |
 | **Dialog / Window** | `KendoReactDialog`, `k-window` ×5, `k-dialog` ×4 | `Dialog` on Radix |
 | **TabStrip** | `k-tabstrip` ×12 | `Tabs` on Radix |

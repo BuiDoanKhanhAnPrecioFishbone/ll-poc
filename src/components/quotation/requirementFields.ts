@@ -1,6 +1,6 @@
 import type { FieldDef } from './RecordField';
 import type { Quotation } from '../../data/quotations';
-import { CUSTOMER_OPTIONS, contactsFor, findCustomer, PEOPLE } from '../../data/quotations';
+import { CUSTOMER_OPTIONS, contactsFor, findCustomer } from '../../data/quotations';
 import {
   PROJECT_TYPE, ORDER_TYPE, CUSTOMER_TYPE, APPLICATION, QUOTE_FOCUS,
   MATERIAL_PACKAGE_TYPE, TEST_REQUIREMENTS, EXCESS_AND_MOQ,
@@ -118,7 +118,7 @@ export const HEADER: FieldDef<Quotation>[] = [
   { name: 'customerType', label: 'Customer Type', kind: 'select', options: CUSTOMER_TYPE,
     required: true,
     hint: 'Defaults to the customer\u2019s usual supply model. Change it if this RFQ differs.' },
-  { name: 'assignedTo', label: 'Assigned To', kind: 'select', options: PEOPLE, required: true },
+  { name: 'assignedTo', label: 'Assigned To', kind: 'people', required: true },
   /* Editable, and a dropdown rather than a star rating. The 25 Aug review:
      "priority indicator: unclear interaction -> change to a dropdown with
      dot+label options". It was read-only here, so the one field that says how

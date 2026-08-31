@@ -60,7 +60,7 @@ export function AppShell() {
      being read. */
   const overdueForMe = useMemo(() => {
     const isOverdue = MEASURES.find(m => m.key === 'overdue')!.match;
-    return generateQuotations(330).filter(q => q.assignedTo === ME && isOverdue(q)).length;
+    return generateQuotations(330).filter(q => q.assignedTo.includes(ME) && isOverdue(q)).length;
   }, []);
 
   const [paletteOpen, setPaletteOpen] = useState(false);

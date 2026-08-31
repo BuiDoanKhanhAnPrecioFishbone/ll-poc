@@ -251,6 +251,7 @@
   --vy-record-max-w:     1180px;
   --vy-login-form-w:      380px;  /* the login form, held to a readable width */
   --vy-select-col-w:       40px;  /* the row-selection checkbox column */
+  --vy-people-menu-w:     320px;  /* the people picker's list, sized for name + email */
   --vy-status-slot-w:    104px;  /* GAP-01 — see docs/gap-register.md */
   --vy-note-min-w:       320px;
   /* One short contact field — name, job title, email or phone. */

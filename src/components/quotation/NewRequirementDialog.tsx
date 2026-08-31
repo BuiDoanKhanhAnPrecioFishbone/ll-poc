@@ -342,7 +342,7 @@ function blankRfq(no: string): Quotation {
     rfqType: 'Turnkey',
     orderType: '' as Quotation['orderType'],
     status: 'New',
-    assignedTo: ME,
+    assignedTo: [ME],
     dateNeeded: undefined as unknown as Date,
     createdDate: now,
     lastUpdated: now,

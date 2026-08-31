@@ -2,6 +2,8 @@ import { TextField, TextArea } from '../../ui/Field';
 import { Select, Checkbox, RadioGroup } from '../../ui/Overlays';
 import { Priority, priorityLevel, PRIORITY_LEVELS, type PriorityLevel } from '../../ui/Priority';
 import { OPTION_MEANINGS } from '../../data/metadata';
+import { PEOPLE_DIRECTORY } from '../../data/quotations';
+import { PeoplePicker } from '../../ui/PeoplePicker';
 import { fmtDate } from '../../ui/renderCell';
 
 const LEVEL_TO_N: Record<PriorityLevel, number> = { High: 3, Medium: 2, Low: 1 };
@@ -68,7 +70,16 @@ export type FieldKind =
   | { kind: 'date' }
   | { kind: 'flag' }
   /** High / Medium / Low, stored 1-3. Rendered as a dot and a word, not stars. */
-  | { kind: 'priority' };
+  | { kind: 'priority' }
+  /**
+   * SEVERAL people, held as an array of names.
+   *
+   * Assigned To was a single-value select of bare names until An sent the live
+   * control: a multi-select whose options carry an avatar and an email. The
+   * guideline lists the field only among the required ones and never says how
+   * many, so the live system governs.
+   */
+  | { kind: 'people' };
 
 export type FieldDef<T> = FieldKind & {
   name: Extract<keyof T, string>;
@@ -124,6 +135,11 @@ export function RequiredMark() {
 export function isMissing<T>(def: FieldDef<T>, value: unknown): boolean {
   if (!def.required) return false;
   if (def.kind === 'flag') return false;
+  /* An empty ARRAY is empty. Without this a required people field counted an
+     unassigned RFQ as filled — [] is neither undefined, null nor "", so the
+     three checks below all passed it and Save would have accepted a record with
+     nobody on it. */
+  if (Array.isArray(value)) return value.length === 0;
   return value === undefined || value === null || value === '';
 }
 
@@ -174,6 +190,18 @@ export function RecordField<T extends Record<string, any>>({
                         onChange={v => { onChange(def.name, v); onBlur?.(def.name); }} />
             {err}
             {def.hint && !missing && <span className="vy-field-hint">{def.hint}</span>}
+          </dd>
+        </div>
+      );
+    case 'people':
+      return (
+        <div className="vy-field vy-field--editing" data-invalid={missing || undefined}>
+          <dt><label htmlFor={`f-${def.name}`}>{def.label}{def.required && <RequiredMark />}</label></dt>
+          <dd>
+            <PeoplePicker id={`f-${def.name}`} label={def.label} invalid={missing}
+                          value={Array.isArray(value) ? (value as string[]) : []}
+                          onChange={next => onChange(def.name, next as unknown as T[keyof T])} />
+            {def.hint && <span className="vy-field-hint">{def.hint}</span>}
           </dd>
         </div>
       );
@@ -336,6 +364,29 @@ function ReadField<T>({ def, value, editing }: { def: FieldDef<T>; value: unknow
         <span className="vy-flag-mark" aria-hidden>{value ? '✓' : '–'}</span>
         <span>{def.label}{def.required && <RequiredMark />}</span>
         {editing && def.readOnly && <LockNote def={def} />}
+      </div>
+    );
+  }
+  if (def.kind === 'people') {
+    const names = Array.isArray(value) ? (value as string[]) : [];
+    return (
+      <div className="vy-field" data-locked={editing && def.readOnly || undefined}>
+        <dt>{def.label}{def.required && <RequiredMark />}</dt>
+        <dd className={names.length ? undefined : 'is-empty'}>
+          {names.length ? (
+            <span className="vy-people-read">
+              {names.map(n => {
+                const p = PEOPLE_DIRECTORY.find(x => x.name === n);
+                return (
+                  <span className="vy-people-chip" key={n}>
+                    <span className="vy-avatar vy-avatar--sm" aria-hidden>{p?.initials ?? '?'}</span>
+                    <span className="vy-people-chip-name">{n}</span>
+                  </span>
+                );
+              })}
+            </span>
+          ) : 'Unassigned'}
+        </dd>
       </div>
     );
   }

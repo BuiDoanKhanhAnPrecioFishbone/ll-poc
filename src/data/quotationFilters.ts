@@ -57,7 +57,7 @@ export function quotationFilterFields(rows: Quotation[]): ViewField[] {
  * screens.
  */
 export const QUOTATION_QUICK = [
-  { key: 'mine', label: `Assigned to ${ME}`, match: (q: Quotation) => q.assignedTo === ME },
+  { key: 'mine', label: `Assigned to ${ME}`, match: (q: Quotation) => q.assignedTo.includes(ME) },
   { key: 'open', label: 'Open only', match: isOpen },
   ...MEASURES
     /* "Unassigned" is dropped from this row: it contradicts "mine", and a chip

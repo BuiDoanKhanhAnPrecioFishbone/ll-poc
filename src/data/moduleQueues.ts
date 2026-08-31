@@ -71,7 +71,7 @@ function seeded(n: number, salt: number) {
 }
 
 function rfqQueues(rows: Quotation[], scope: 'mine' | 'team'): ModuleQueue[] {
-  const inScope = scope === 'mine' ? rows.filter(q => q.assignedTo === ME) : rows;
+  const inScope = scope === 'mine' ? rows.filter(q => q.assignedTo.includes(ME)) : rows;
   return MEASURES.map((m: Measure) => ({
     key: m.key,
     label: m.label,

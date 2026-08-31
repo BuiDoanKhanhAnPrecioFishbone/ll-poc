@@ -45,7 +45,7 @@ export function Queues() {
   useEffect(load, []);
 
   const scoped = useMemo(
-    () => (scope === 'mine' ? rows.filter(q => q.assignedTo === ME) : rows),
+    () => (scope === 'mine' ? rows.filter(q => q.assignedTo.includes(ME)) : rows),
     [rows, scope],
   );
 
@@ -61,8 +61,8 @@ export function Queues() {
     return PEOPLE
       .map(p => ({
         person: p,
-        open: open.filter(q => q.assignedTo === p).length,
-        overdue: open.filter(q => q.assignedTo === p && daysUntil(q.dateNeeded) < 0).length,
+        open: open.filter(q => q.assignedTo.includes(p)).length,
+        overdue: open.filter(q => q.assignedTo.includes(p) && daysUntil(q.dateNeeded) < 0).length,
       }))
       .sort((a, b) => b.open - a.open || b.overdue - a.overdue);
   }, [scoped]);

@@ -1409,3 +1409,61 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
 .vy-menu-filter { padding: var(--vy-space-4); border-bottom: 1px solid var(--vy-grey-200); }
 .vy-menu-filter .vy-input { width: 100%; }
 .vy-menu-empty { margin: 0; padding: var(--vy-space-7) var(--vy-space-6); color: var(--vy-grey-500); font-size: var(--vy-text-base); text-align: center; }
+
+
+/* ---- People picker -----------------------------------------------------------
+   A multi-select of colleagues: chips in the field, avatar and email in the list.
+   Built from the live control, where the email is the line that separates two
+   people with the same name. */
+.vy-people { display: flex; align-items: center; gap: var(--vy-space-3); flex-wrap: wrap; min-height: var(--vy-control-md); }
+.vy-people[data-invalid] .vy-people-add { border-color: var(--vy-red-500); }
+
+.vy-people-chip {
+  display: inline-flex; align-items: center; gap: var(--vy-space-3);
+  padding: var(--vy-space-1) var(--vy-space-2) var(--vy-space-1) var(--vy-space-1);
+  background: var(--vy-blue-50); border: 1px solid var(--vy-blue-200);
+  border-radius: var(--vy-radius-pill);
+  font-size: var(--vy-text-base); color: var(--vy-grey-900);
+}
+.vy-people-chip-name { white-space: nowrap; }
+.vy-people-chip-x {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: var(--vy-space-10); height: var(--vy-space-10); min-width: var(--vy-space-10);
+  background: none; border: 0; border-radius: 50%; cursor: pointer;
+  color: var(--vy-blue-700); font-size: var(--vy-text-md); line-height: 1;
+}
+.vy-people-chip-x:hover { background: var(--vy-blue-100); }
+.vy-people-chip-x:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
+
+.vy-people-add {
+  min-height: var(--vy-space-10); padding: var(--vy-space-2) var(--vy-space-5);
+  background: var(--vy-grey-0); border: 1px dashed var(--vy-grey-300);
+  border-radius: var(--vy-radius-sm); cursor: pointer;
+  font-size: var(--vy-text-base); color: var(--vy-grey-600);
+}
+.vy-people-add:hover { border-color: var(--vy-grey-400); color: var(--vy-grey-900); }
+.vy-people-add:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
+.vy-people-clear { min-height: var(--vy-space-10); background: none; border: 0; padding: 0 var(--vy-space-3); cursor: pointer; font-size: var(--vy-text-sm); color: var(--vy-grey-600); }
+.vy-people-clear:hover { color: var(--vy-red-700); }
+
+.vy-people-menu { width: var(--vy-people-menu-w); max-height: 320px; overflow: auto; }
+.vy-people-list { list-style: none; margin: 0; padding: var(--vy-space-2); display: flex; flex-direction: column; }
+.vy-people-option {
+  display: flex; align-items: center; gap: var(--vy-space-5); width: 100%;
+  padding: var(--vy-space-4) var(--vy-space-5);
+  background: none; border: 0; border-radius: var(--vy-radius-sm);
+  cursor: pointer; text-align: left; font: inherit;
+}
+.vy-people-option:hover { background: var(--vy-grey-50); }
+.vy-people-option[data-on] { background: var(--vy-blue-50); }
+.vy-people-option:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
+.vy-people-text { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.vy-people-name { font-size: var(--vy-text-base); color: var(--vy-grey-900); }
+/* The email is the disambiguator, so it stays legible rather than being greyed
+   into decoration — grey-500 on white is 5.24:1. */
+.vy-people-email { font-size: var(--vy-text-sm); color: var(--vy-grey-500); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vy-people-tick { color: var(--vy-blue-700); flex: 0 0 auto; }
+
+/* Read mode: the same chips, without the remove control. */
+.vy-people-read { display: flex; align-items: center; gap: var(--vy-space-3); flex-wrap: wrap; }
+.vy-people-read .vy-people-chip { padding-right: var(--vy-space-4); }

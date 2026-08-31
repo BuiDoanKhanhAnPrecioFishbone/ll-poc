@@ -43,7 +43,7 @@ export const MEASURES: Measure[] = [
   {
     key: 'unassigned', label: 'Unassigned', tone: 'open',
     meaning: 'Open, with nobody carrying it',
-    match: q => isOpen(q) && !q.assignedTo,
+    match: q => isOpen(q) && q.assignedTo.length === 0,
   },
   {
     key: 'waiting-doc', label: 'Waiting on a document', tone: 'waiting',
@@ -59,4 +59,4 @@ export const measureFor = (key: string | null) =>
 
 /** Mine narrows to the signed-in user; Team is everyone. */
 export const scopeFilter = (scope: string | null) =>
-  scope === 'team' ? () => true : (q: Quotation) => q.assignedTo === ME;
+  scope === 'team' ? () => true : (q: Quotation) => q.assignedTo.includes(ME);

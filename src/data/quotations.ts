@@ -34,7 +34,15 @@ export type Quotation = {
   rfqType: RfqType;
   orderType: OrderType;
   status: QuotationStatus;
-  assignedTo: string;
+  /**
+   * Assignees. PLURAL, because the live control is a MultiSelect — An's
+   * screenshot of 31 Aug 2026, confirmed in the bundle. The Testing Guideline
+   * lists Assigned To only among the required fields and never says single or
+   * multiple, so the live system governs per docs/precedence.md tier 2.
+   *
+   * Empty means unassigned, which the Unassigned queue depends on.
+   */
+  assignedTo: string[];
   dateNeeded: Date;
   createdDate: Date;
   lastUpdated: Date;
@@ -262,6 +270,29 @@ export const contactsFor = (label: string) => findCustomer(label)?.contacts ?? [
 const CUSTOMERS = CUSTOMER_OPTIONS;
 /** Who can be assigned. Exported so the record can offer the same list. */
 export const PEOPLE = ['Toan Dinh', 'Huyen NTN', 'Mai Pham', 'Duc Le', 'Linh Tran'] as const;
+
+/**
+ * The people an RFQ can be assigned to, with what the live picker shows.
+ *
+ * An sent the live Assigned To control on 31 Aug 2026: a multi-select whose
+ * options carry an AVATAR and an EMAIL under the name, not a bare list of
+ * names. Confirmed in the bundle — `component: "MultiSelect"` with `tagRender`,
+ * and an option `avatar`.
+ *
+ * The email is the reason the avatar is not decoration. Two of the live users
+ * are "Linh Tran 1" and "Linh Tran 5"; on this data "Linh Tran" and "Toan Dinh"
+ * both initialise to nothing useful. A list of colleagues is exactly where names
+ * collide, and the email is what tells them apart.
+ */
+export type Person = { name: string; email: string; initials: string };
+
+export const PEOPLE_DIRECTORY: Person[] = PEOPLE.map(name => ({
+  name,
+  /* first.last@ — the shape of the two real addresses in the live screenshot
+     (`linh.ttt@linhlongengineering.com`). */
+  email: name.toLowerCase().replace(/\s+/g, '.') + '@linhlongengineering.com',
+  initials: name.split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase(),
+}));
 const OWNERS = [...PEOPLE];
 
 
@@ -378,7 +409,15 @@ export function generateQuotations(count = 330): Quotation[] {
       rfqType: pick(META.RFQ_TYPE),
       orderType,
       status,
-      assignedTo: pick(OWNERS),
+      /* Most RFQs have one owner and some have two — a single-element array
+         would make the plural shape true and never exercised. A few have none,
+         which is what the Unassigned queue is for. */
+      assignedTo: (() => {
+        const r = rnd();
+        if (r < 0.08) return [];
+        if (r > 0.82) return [pick(OWNERS), pick(OWNERS)].filter((v, i, a) => a.indexOf(v) === i);
+        return [pick(OWNERS)];
+      })(),
       dateNeeded: needed,
       createdDate: created,
       lastUpdated: new Date(Math.min(created.getTime() + Math.floor(rnd() * 20) * 86400000, TODAY.getTime())),
