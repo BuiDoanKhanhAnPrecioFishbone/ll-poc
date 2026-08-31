@@ -1243,3 +1243,36 @@
   border-radius: var(--vy-radius-md);
 }
 .vy-voyager-files li > div { display: flex; flex-direction: column; gap: var(--vy-space-1); min-width: 0; }
+
+/* ---- Create the new BoM --------------------------------------------------- */
+/* A button with its current value beside it, rather than under it — "Upload
+   file" and the file it chose are one statement, and stacking them reads as two
+   unrelated things. */
+.vy-inline-actions { display: flex; align-items: center; gap: var(--vy-space-4); flex-wrap: wrap; }
+
+.vy-aml { margin-block: var(--vy-space-5); }
+.vy-aml .vy-radios { margin-top: var(--vy-space-3); }
+
+/* One row per manufacturer the file names and the system does not know: the
+   name, what to map it to, a create button, and what will happen. The outcome
+   is spelled out per row because "Not resolved" on five rows is the only thing
+   standing between the user and a blocked Submit. */
+.vy-mfg-map { list-style: none; margin: var(--vy-space-4) 0 0; padding: 0; display: flex; flex-direction: column; gap: var(--vy-space-4); }
+.vy-mfg-map li {
+  display: grid; align-items: center; gap: var(--vy-space-5);
+  grid-template-columns: minmax(120px, 1fr) minmax(180px, 1.4fr) auto minmax(140px, 1fr);
+}
+@media (max-width: 900px) {
+  .vy-mfg-map li { grid-template-columns: 1fr; gap: var(--vy-space-3); }
+}
+
+/* The normalised MFG | MPN pairs. Green when the manufacturer is known and red
+   when it is not — the sheet's rule, carried on the pair rather than the whole
+   cell because a row may hold one of each. */
+.vy-pairs { display: flex; flex-direction: column; gap: var(--vy-space-2); min-width: 0; }
+.vy-pair {
+  display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  padding: 0 var(--vy-space-2); border-radius: var(--vy-radius-sm);
+  background: var(--vy-tone-missing-bg); color: var(--vy-tone-missing-fg);
+}
+.vy-pair[data-known] { background: var(--vy-tone-covered-bg); color: inherit; }

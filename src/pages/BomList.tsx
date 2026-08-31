@@ -2,9 +2,10 @@ import { useEffect, useMemo, useState } from 'react';
 import { generateParts, PART_COLUMNS, type Part } from '../data/parts';
 import { DataGrid } from '../ui/DataGrid';
 import { Button } from '../ui/Button';
-import { useToast } from '../ui/Toast';
 import { BomComparisonDialog } from '../components/quotation/BomComparisonDialog';
 import { PartBomDialog } from '../components/PartBomDialog';
+import { CreateBomDialog } from '../components/CreateBomDialog';
+import { BOM_SOURCES } from '../data/partMetadata';
 
 /**
  * Bill of Materials list — Inventory Management » Bill of Materials.
@@ -28,17 +29,21 @@ import { PartBomDialog } from '../components/PartBomDialog';
  *
  * `Upload BoM` is on this screen because the sheet puts it here ("Navigate to
  * Inventory Management >> Bill of Materials >> Click on the Upload BoM button"),
- * but the four-step Create BoM form behind it is a package of its own and is not
- * built, so the button says what it would do.
+ * and the two-step Create BoM form behind it is now built — `CreateBomDialog`.
  */
 export function BomList() {
-  const toast = useToast();
   const [compareOpen, setCompareOpen] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
   const [selected, setSelected] = useState<Part | null>(null);
 
-  /* Same seed as Part Master, so a part shows the same data on both screens. */
+  /* Same seed as Part Master, so a part shows the same data on both screens.
+     Gated on the same set as the BoM button rather than on MAKE alone — the two
+     were the same test while MAKE and BUY were the only values the generator
+     produced, and Create New Part now offers six. A MAKE/BUY assembly that
+     shows a BoM button on its record but is absent from the Bill of Materials
+     list would be one screen contradicting another. */
   const assemblies = useMemo(
-    () => generateParts(2000).filter(p => p.partSource === 'MAKE'), []);
+    () => generateParts(2000).filter(p => BOM_SOURCES.includes(p.partSource)), []);
 
   const [loading, setLoading] = useState(true);
   useEffect(() => { const t = setTimeout(() => setLoading(false), 700); return () => clearTimeout(t); }, []);
@@ -54,10 +59,7 @@ export function BomList() {
         searchPlaceholder="Search part number or description"
         actions={<>
           <Button onClick={() => setCompareOpen(true)}>BoM Comparison</Button>
-          <Button variant="filled"
-                  onClick={() => toast.notImplemented('open the Create BoM form at Step 1 - Config BoM')}>
-            Upload BoM
-          </Button>
+          <Button variant="filled" onClick={() => setCreateOpen(true)}>Upload BoM</Button>
         </>}
         loading={loading}
         emptyHint="No assembly matches. Only parts that have a BoM appear on this screen."
@@ -65,6 +67,7 @@ export function BomList() {
       />
 
       {compareOpen && <BomComparisonDialog onClose={() => setCompareOpen(false)} />}
+      <CreateBomDialog open={createOpen} onClose={() => setCreateOpen(false)} />
       {/* Opening a row goes straight to that assembly's BoM, which is the thing
           this screen is a list of — the part record would be a step sideways. */}
       {selected && <PartBomDialog part={selected} onClose={() => setSelected(null)} />}

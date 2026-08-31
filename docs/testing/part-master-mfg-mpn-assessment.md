@@ -176,6 +176,92 @@ On-Hand, Safety Stock, AVG Cost, Last Purchased Cost — plus a mapping detail
 popup that can view, edit and delete; a Stock Report popup with Update Quantity
 and Replenishment; and an *Add a line* modal.
 
+## Create the new BoM — **built**, 31 Aug 2026
+
+`CreateBomDialog.tsx`, parsed-file model in `data/bomImport.ts`. Two steps, as
+the sheet names them: **Step 1 — Config BoM**, **Step 2 — Review BoM**. Not four:
+the quoting wizard has four steps and this is a different job — quoting prices a
+BoM, this one loads it.
+
+### The labels came out of the live app, and one contradicts the sheet
+
+`chunk-CqZKuw2K.js` holds the live app's own **plaintext** resource bundle — not
+obfuscated, unlike the Part form. It gives this screen's labels verbatim: Select
+Action, Import New BoM, Load Existing BoM, Assembly Info, Component Info,
+Assembly Part Number, BoM Version, Quantity, Run by, Created Date, Last Updated
+Date, Select AML Format, Vertical, Horizontal, Customer Template.
+
+**The guideline says "Create Customer Template". The live app says "Create
+Custom Template"** — sitting right beside a separate field called Customer
+Template. Decision D2 puts the live wording on screen; the difference is
+question 15.
+
+Two labels in the live BoM set are **not** in the sheet's Assembly Info list —
+`Material_Type` and `Bom_Type`. Not added: the sheet enumerates this section and
+tier 1 governs a field list. Recorded in question 15.
+
+### Built and verified on screen
+
+- **Select Action** is a radio, not two checkboxes. The sheet calls them
+  checkboxes with Import New BoM "default selected", but they are mutually
+  exclusive — the whole of Assembly Info and Component Info changes with the
+  choice — and a pair of checkboxes that cannot both be ticked is a radio group
+  wearing the wrong control.
+- **Import New BoM**: seven Assembly Info fields with BoM Version and Quantity
+  read-only, Part Type filtered by Part Class (the same rule as Create New
+  Part), Select AML Format, and both Download template links.
+- **Load Existing BoM**: Assembly Part Number as a dropdown scoped to the
+  customer, and **five fields auto-populated read-only** from it — verified
+  filling with `KT Drive Module / v2 / 1 / ASSEMBLY / ELEC-PCB`. Create Custom
+  Template is disabled until a file is attached, and enables when one is.
+- **Assembly (Part Number + Rev + Customer) uniqueness** blocks Next. The
+  *triple*, not Part Master's pair — the same assembly number may legitimately
+  belong to two customers.
+- **Step 2** normalises to `MFG1 | MPN1 | MFG2 | MPN2`, adds the Customer Code
+  to every component that arrived without it, and colours parts and
+  manufacturers green/red — reusing the `known`/`missing` tones the quoting
+  wizard already uses for the same question rather than inventing a second pair.
+- **MFG Mapping** blocks Submit with the sheet's own predicted message —
+  *"Manufacturers don't exist: KEMETA"* — because KEMETA is the sheet's example
+  and is therefore the unknown manufacturer in the mock file. Each is resolved
+  by mapping to an existing manufacturer or creating it.
+- **Submit** reports the sheet's four-case matrix: verified as *2 parts created,
+  5 already existed; 5 MFG-MPN mappings created, 3 skipped*.
+
+### Two bugs the build surfaced, both the same shape
+
+The assembly number gains its customer-code prefix **on blur**, because
+prefixing every keystroke fights the typist — they would watch `184` become
+`00848-184` and keep typing into the middle of it. Two things then read the
+un-prefixed value:
+
+1. the duplicate check compared `184-6456` against the stored
+   `00848-184-6456` and found no clash, so **a duplicate assembly passed
+   validation for as long as the field had focus**;
+2. Submit reported the un-prefixed name, so the assembly was named one way on
+   screen and stored another.
+
+Both now normalise at the point of use rather than relying on a blur that
+Next can be reached without.
+
+### One thing the sheet's rules could not do on their own
+
+`{MFG-MPN} must be unique in every Part` is a rule about the **file's** contents,
+and the sheet blocks Submit on it. With nothing on screen that changes the file,
+that is a dead end — the remedy would be to fix the spreadsheet and start over,
+which nothing says. The duplicate banner therefore carries **Remove the repeat**,
+which keeps the first occurrence. The rule is the customer's; the way out of it
+is ours, and it is the smallest one that does not invent a file editor.
+
+### Not built
+
+No file is actually parsed — the mock BoM is fixed, so choosing a different file
+or AML format gives the same rows. That is why the screen says plainly that the
+format describes the file and not the result, which is true of the real system
+too and is the thing a user picking between two options would not assume.
+Submit counts what the rules produce rather than writing to a Part Master this
+prototype does not have.
+
 ## Bill of Materials — **list built**, `BomList.tsx`
 
 Inventory Management » Bill of Materials now serves a real screen: the list, the

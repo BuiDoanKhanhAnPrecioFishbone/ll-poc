@@ -272,6 +272,25 @@ Send us the real table and we will swap it in — it is one object in one file.
 The same goes for **Order Policy**, where your sheet defines the field but names
 no values; we offer Lot for lot, Fixed order quantity and Min/Max.
 
+## 15. Create BoM — three label questions
+
+We read this form's labels out of your live system's own resource bundle, so
+they are verbatim. Three need you:
+
+1. **"Create Custom Template" or "Create Customer Template"?** Your Testing
+   Guideline writes the second; your live app shows the first — beside a
+   separate field it calls *Customer Template*. We used your live wording. If
+   the button creates a template *for a customer*, the live label may be the
+   typo rather than the sheet.
+2. **Material Type and BoM Type** are in your live BoM form's label set and not
+   in the sheet's Assembly Info list. We built the sheet's list. Should either
+   appear on Create BoM?
+3. **Select Action is two checkboxes on your sheet** ("Import New BoM
+   (checkbox, default selected)", "Load Existing BoM (checkbox)"). They are
+   mutually exclusive in every other line of the same sheet — the whole form
+   changes with the choice — so we built a radio group. Confirm that is right;
+   if they really are checkboxes, what does ticking both mean?
+
 ## Two defects in the live system, for your backlog
 
 Not questions, just things we noticed and you may not have:
