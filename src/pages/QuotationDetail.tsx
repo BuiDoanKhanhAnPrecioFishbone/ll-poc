@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Dialog, Tabs } from '../ui/Overlays';
+import { ValidationPanel } from '../components/quotation/ValidationPanel';
 import { Button } from '../ui/Button';
 import { StatusBadge } from '../ui/Badge';
 import { generateQuotations, daysUntil, findCustomer, contactsFor, type Quotation } from '../data/quotations';
@@ -321,6 +322,34 @@ export function QuotationDetail() {
             Pattern follows the reviewed Customer Invoice mockup, which divides
             its header into Customer & references, Invoice info, and Documents &
             shipping. */}
+        {/* Above the fields and below the actions, where the deck puts it.
+
+            Shown for as long as edit mode has a blocking field, NOT gated on a
+            save attempt. There is no save attempt to gate on: Save is disabled
+            while anything is missing, so the branch in saveEdit that marks
+            everything touched cannot be reached by clicking, and a panel waiting
+            for that moment would never appear.
+
+            Which leaves the disabled button saying "1 field still needed" and
+            declining to say which — the exact gap this panel exists to close. On
+            an EXISTING record being edited, naming the blocker on arrival is
+            help rather than nagging; the record already cannot be saved, and the
+            user finds that out either now or after hunting for it. */}
+        {editing && missingRequired.length > 0 && (
+          <ValidationPanel
+            missing={missingRequired}
+            onGoTo={name => {
+              const el = document.getElementById(`f-${name}`);
+              if (!el) return;
+              /* Scroll THEN focus. Focusing alone jumps the field into view with
+                 no animation and often under the sticky header; centring it
+                 first means the user sees where they were taken. */
+              el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              if (el instanceof HTMLElement) el.focus({ preventScroll: true });
+            }}
+          />
+        )}
+
         <div className="vy-header-groups" data-editing={editing || undefined}>
           {HEADER_GROUPS.map(g => (
             <section className="vy-header-group" key={g.id}>

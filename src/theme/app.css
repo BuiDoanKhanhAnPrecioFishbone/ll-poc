@@ -1289,3 +1289,41 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
   .vy-login-pitch, .vy-login-note { display: none; }
   .vy-login-panel { padding: var(--vy-space-10) var(--vy-space-9); align-items: flex-start; }
 }
+
+
+/* ---- Validation panel --------------------------------------------------------
+   The deck's last slide: what is wrong, in words, each with a way to the field
+   at fault.
+
+   Red-50 ground with a red-700 rule, not a solid red block. This panel can be
+   eight rows long and sits directly above the form the user is about to work
+   in — a saturated red band that size stops reading as "attend to this" and
+   starts reading as "something broke". The accent stays rare so it stays loud;
+   the tint carries the meaning and the text does the talking. */
+.vy-validation {
+  margin-bottom: var(--vy-space-9);
+  padding: var(--vy-space-8) var(--vy-space-9);
+  background: var(--vy-red-50);
+  border: 1px solid var(--vy-red-500);
+  /* A heavier left edge, so the block is identifiable at a glance down the page
+     without the whole border shouting. */
+  border-left-width: var(--vy-accent-bar-w);
+  border-radius: var(--vy-radius-md);
+}
+/* red-700 on red-50 is 7.4:1. The accent red-500 would be 3.9 and fail. */
+.vy-validation-title { margin: 0 0 var(--vy-space-6); font-size: var(--vy-text-base); color: var(--vy-red-700); line-height: 1.5; }
+
+.vy-validation-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--vy-space-3); }
+.vy-validation-list li {
+  display: flex; align-items: baseline; gap: var(--vy-space-5); flex-wrap: wrap;
+  font-size: var(--vy-text-base); color: var(--vy-grey-800);
+}
+/* The problem in grey-800 and the fix in link blue: the eye separates the two
+   columns without a table, and the row stays readable if the link wraps. */
+.vy-validation-what { flex: 1 1 auto; min-width: 0; }
+.vy-validation-goto { flex: 0 0 auto; }
+
+@media (max-width: 700px) {
+  .vy-validation { padding: var(--vy-space-7) var(--vy-space-8); }
+  .vy-validation-list li { gap: var(--vy-space-2); }
+}

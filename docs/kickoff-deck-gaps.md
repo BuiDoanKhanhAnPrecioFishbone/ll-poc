@@ -38,18 +38,22 @@ Form View, plus the alert pattern on the last slide.
 
 Ranked by value against risk, not by size.
 
-### 1. Login page — absent entirely
+### 1. Login page — **DONE**, `cec8463`, at `/login`
 
 The deck spends two slides on it and names two faults: **"Too much empty
-space"** and **"Lack of contrast"**. Both are fair on the screenshot — a small
+space"** and **"Lack of contrast"**. Both were fair on the screenshot — a small
 card adrift in a large white field, and a pale blue Sign In button on white.
 
-There is no `/login` route in `App.tsx` and no login component anywhere. This
-is the only screen the deck criticises directly and it is the first thing
-anyone sees in a demo. Self-contained, nothing else depends on it, and the two
-faults are specific enough to be answered rather than interpreted.
+Answered by splitting the page so the width the form must not have carries the
+brand instead, on the dark ground the sidebar already owns — which supplies the
+contrast at the scale of the page rather than of one button. Sign In is blue-600
+on white, 8.6:1. Content is unchanged, per tier 2: every field, label and link
+is the live page's.
 
-### 2. The alert pattern (slide 16), listed as "Alert warning" on slide 10
+The **"Voyager IQ" rename on slide 2 is deliberately not part of it** — see
+item 4, which is still open.
+
+### 2. The alert pattern (slide 16) — **DONE**, `ValidationPanel.tsx`
 
 Slide 16 is titled "Notification Form" but is not a notifications inbox. It is
 an **inline validation panel**: a red region at the top of a form listing each
@@ -58,10 +62,29 @@ each with a link that takes you to the field at fault (*Adjust Schedule Qty*).
 
 We have validation, and it is decent: required fields are marked, Save is
 disabled and counts what is outstanding ("Save · 17 left"), and failures now
-speak on an error toast. What we do not have is a **persistent list of what is
+speak on an error toast. What we did not have is a **persistent list of what is
 wrong, with a route to each one**. A toast says it once and disappears; a
 disabled button says how many but not which. On a form of 23 fields those are
 different things.
+
+Built on the Project Requirement record: a red-tinted panel above the fields
+listing each blocking field, every row carrying a *"Go to {field}"* link that
+scrolls it to centre and focuses it. Rows disappear as fields are satisfied and
+the panel removes itself when nothing is left, so it is a live worklist rather
+than a snapshot.
+
+**It raised a question worth deciding separately.** The panel normally keys off
+"you pressed Save and it refused" — and that moment does not exist here, because
+Save is *disabled* while anything is missing. The branch in `saveEdit` that marks
+every field touched cannot be reached by clicking at all. So the panel shows for
+as long as a blocking field exists instead.
+
+That works, but the underlying oddity remains: a disabled button cannot explain
+itself, and "1 field still needed" states a count while withholding the
+identity. **Enabling Save and letting it refuse** is what I would design from
+scratch. It is deliberately not changed — the disabled-Save-with-a-count is an
+existing decision on this record, and replacing it is a call to make on its own
+merits, not a side effect of adding a panel.
 
 ### 3. The Notifications bell does nothing
 
@@ -120,9 +143,16 @@ most in need of a scope decision before any work starts.
 
 Recorded so nobody reads these as oversights and reopens them.
 
-**"Use KendoUI" (slide 7).** We build on licence-free MIT components because
-there is no KendoReact licence. Already raised — `open-questions.md`, item 2.
-Unchanged by this deck.
+**"Use KendoUI" (slide 7).** We build on licence-free MIT components. The
+original reason — no licence — **no longer holds**: the customer supplied a key
+on 31 Aug 2026, it is active until 5/6/2029, and `/kendo-check` proves a
+licensed Kendo grid renders clean on the deployment.
+
+So this is now a live question rather than a settled constraint. Adopting
+KendoReact means replacing the grid, dialogs, dropdowns, date inputs and form
+controls, which is a decision to take deliberately and not a consequence of
+holding a licence. `open-questions.md` item 2 and
+`kendo-license-activation.md` section 6.
 
 **"Value (read-only/editable)" (slide 10).** The deck lists read-only versus
 editable as a distinction the Form View should express. Our view mode does not
