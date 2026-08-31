@@ -25,7 +25,7 @@ popups), MFG–MPN (AML), and a Bill of Materials list.
 | 4 | Setup View Template (Filter, Column, Sort) | **built** — `d8ea831` |
 | 5 | Select View Template | **built** — `d8ea831` |
 | 6 | "Add new Part" → *Add Part Master Detail* form | **absent** — the button exists and reports not-implemented |
-| 7 | "Eye" button on each row → Part detail | **partial** — the row opens a summary dialog; there is no Eye control and the dialog is not the form the sheet describes |
+| 7 | "Eye" button on each row → Part detail | **mostly built** — the record is now the sheet's form; there is still no Eye control, the row opens from its part number |
 | 8 | Import: *Import All* / *Import by Customer* | **absent** — one Import button, no choice |
 | 9–10 | Per-row checkboxes, multi-select, Export selected to Excel | **absent** — no row selection; Export offers all rows |
 
@@ -60,17 +60,30 @@ that prefixes its code onto the Part Number; then sections for Sales &
 Purchase, Request & Control, Dimensions & Packages, Reordering Rule, Demand &
 Forecast, Lead Time & Policies, and attachments.
 
-## Part Master Detail
+## Part Master Detail — **mostly built**, `PartDetail.tsx`
 
-**Partial.** The sheet asks for Part Number–Revision, Part Source, Description,
-Part Class, Part Type, ABC, Package, Material Type, a General Info section, a
-Quantity Info section, and the actions QR Code Generator, Edit and Approve,
-with everything read-only until Edit.
+The sheet asks for Part Number–Revision, Part Source, Description, Part Class,
+Part Type, ABC, Package, Material Type, a General Info section, a Quantity Info
+section, and the actions QR Code Generator, Edit and Approve, with everything
+read-only until Edit. **All of that is now present.**
 
-The dialog shows Customer, Revision, Source, UoM, On Hand, Allocated,
-Available, Unit Cost and Last Changed. Missing: Part Class, Part Type, ABC,
-Package, Material Type, both named sections, QR Code and Approve. Edit closes
-the dialog without editing anything.
+Built as the kick-off deck's "Data Form View" archetype (slide 14) carrying the
+guideline's fields: caption over a large identifier, status chips, actions left
+and reference links right, tabs, three-column sections. The deck gives the
+shape; the guideline gives the content. Building the deck's own screenshot
+instead — a Manufacturer Part Number record — would have meant inventing the MPN
+data model, which is a package of its own and still absent (below).
+
+`Package` and `Material Type` did not exist on the `Part` type and were added.
+The vocabulary is the guideline's own examples; the fill rate is my judgement,
+noted in `data/parts.ts`, since there is no reading of production for these two.
+
+**Still outstanding here:** no "Eye" control — the row opens from its part
+number, which is `open-questions.md` question 1 rather than an oversight. Edit,
+QR Code and Approve report what they would do rather than doing it; a working
+edit mode for parts is separate scope. The BoM and Where-Used links are present
+and correctly gated on part source (MAKE → BoM, BUY → Where used), but the
+popups they would open are still absent.
 
 Two popups reached from this screen are absent entirely:
 
@@ -118,11 +131,11 @@ instead of becoming a second place that has to be found and corrected.
 
 ## Summary
 
-Of roughly nineteen distinct requirements in this section: **five are built**
-(navigate, search, filter tools, Setup View Template, Select View Template),
-**two are partial** (row detail, and Export in the sense that a button exists),
-and **the remainder — including the whole of MFG–MPN and Create New Part — is
-absent**.
+Of roughly nineteen distinct requirements in this section: **six are built**
+(navigate, search, filter tools, Setup View Template, Select View Template, and
+the Part Master Detail record), **one is partial** (Export, in the sense that a
+button exists), and **the remainder — including the whole of MFG–MPN and Create
+New Part — is absent**.
 
 The three cheap ones are done. Everything left is genuine construction: Create
 New Part, the MFG–MPN tab and its three popups, BoM detail, Where PN Used,

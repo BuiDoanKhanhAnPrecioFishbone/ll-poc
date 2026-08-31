@@ -2,10 +2,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { generateParts, PART_COLUMNS, type Part } from '../data/parts';
 import { partFilterFields } from '../data/partFilters';
 import { DataGrid } from '../ui/DataGrid';
-import { Dialog } from '../ui/Overlays';
 import { Button } from '../ui/Button';
-import { StatusBadge } from '../ui/Badge';
 import { useToast } from '../ui/Toast';
+import { PartDetail } from '../components/PartDetail';
 import { FilterToolbar } from '../ui/FilterToolbar';
 import { ViewSetting } from '../ui/ViewSetting';
 import { useViews, draftFrom } from '../ui/useViews';
@@ -155,35 +154,8 @@ export function PartMaster() {
         />
       )}
 
-      {selected && (
-        <Dialog open title={selected.partNumber} subtitle={selected.description}
-                onClose={() => setSelected(null)}
-                actions={<>
-                  <Button onClick={() => setSelected(null)}>Close</Button>
-                  <Button variant="filled" onClick={() => setSelected(null)}>Edit part</Button>
-                </>}>
-          <div className="vy-record">
-            <div className="vy-record-head">
-              <div>
-                <div className="vy-record-ident">{selected.partNumber}</div>
-                <div className="vy-record-desc">{selected.description}</div>
-              </div>
-              <StatusBadge value={selected.status} />
-            </div>
-            <dl className="vy-record-grid">
-              <div><dt>Customer</dt><dd>{selected.customer}</dd></div>
-              <div><dt>Revision</dt><dd>{selected.rev || '—'}</dd></div>
-              <div><dt>Source</dt><dd>{selected.partSource}</dd></div>
-              <div><dt>Unit of measure</dt><dd>{selected.uom || '—'}</dd></div>
-              <div><dt>On hand</dt><dd className="vy-num">{selected.onHand.toLocaleString()}</dd></div>
-              <div><dt>Allocated</dt><dd className="vy-num">{selected.allocated.toLocaleString()}</dd></div>
-              <div><dt>Available</dt><dd className="vy-num">{(selected.onHand - selected.allocated).toLocaleString()}</dd></div>
-              <div><dt>Unit cost</dt><dd className="vy-num">{selected.unitCost.toLocaleString('en-GB', { style: 'currency', currency: 'USD' })}</dd></div>
-              <div><dt>Last changed</dt><dd>{selected.lastChange.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</dd></div>
-            </dl>
-          </div>
-        </Dialog>
-      )}
+      {selected && <PartDetail part={selected} onClose={() => setSelected(null)} />}
+
     </>
   );
 }

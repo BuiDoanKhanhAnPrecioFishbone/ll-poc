@@ -212,7 +212,17 @@
 .vy-th[data-role="number"], .vy-th[data-role="money"], .vy-th[data-role="date"] { justify-content: flex-end; }
 .vy-sort { flex: 0 0 auto; }
 
-.vy-grid-body { position: relative; width: 100%; }
+/* The animation lives HERE, with the base rule, not in app.css. Split across
+   two files the class had two homes and `npm run css:orphans` flagged it —
+   correctly: app.css loads later, so a future property set in both would be
+   decided by file order rather than by intent, which is how the checklist rows
+   collapsed and the edit-mode layout broke. Nothing was overridden this time;
+   the point is that it could not be seen from either file. */
+.vy-grid-body {
+  position: relative; width: 100%;
+  /* Skeleton to rows: the body fades, not the rows — the grid is virtualised. */
+  animation: vy-mode-read var(--vy-dur-medium) var(--vy-ease-decelerate);
+}
 .vy-tr {
   display: grid; position: absolute; top: 0; left: 0; width: 100%;
   align-items: center; border-bottom: 1px solid var(--vy-grey-100);
@@ -454,7 +464,6 @@
 .vy-fact { min-width: 0; }
 .vy-assignee { min-width: 0; }
 .vy-checklist { min-width: 0; }
-.vy-record { min-width: 0; }
 .vy-tabpanel:focus-visible { outline: none; }
 
 /* --- Checklist --------------------------------------------------------------

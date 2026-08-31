@@ -22,6 +22,14 @@ export type Part = {
   partType: string;
   abc: string;
   uom: string;
+  /* Both named by the guideline's Part Master Detail list and absent from this
+     model until now. The VOCABULARY is the guideline's own examples — "Cut Tape,
+     Reels, Tray" and "RoHS, Non-RoHS, Lead-Free". The FILL RATE is my judgement:
+     unlike partClass and abc, whose emptiness was measured against production, I
+     have no reading of how often these are set, so they are populated for most
+     parts and left blank for some rather than asserting either extreme. */
+  packageType: string;
+  materialType: string;
   onHand: number;
   allocated: number;
   unitCost: number;
@@ -36,6 +44,8 @@ const CUSTOMERS = [
 const CLASSES = ['ASSEMBLY', 'COMPONENT', 'RAW', 'CONSUMABLE'];
 const TYPES = ['MECH-FMA', 'ELEC-PCB', 'ELEC-PAS', 'MECH-MCH', '0402', '0603'];
 const UOMS = ['EACH', 'EACH', 'EACH', 'METRE', 'KG', 'ROLL'];
+const PACKAGES = ['Cut Tape', 'Reels', 'Tray', 'Tube', 'Bulk'];
+const MATERIAL_TYPES = ['RoHS', 'RoHS', 'RoHS', 'Non-RoHS', 'Lead-Free'];
 const STATUSES: Part['status'][] = ['Active', 'Active', 'Active', 'Active', 'Inactive', 'Obsolete', 'Pending'];
 const DESCRIPTORS = [
   'RES-CHIP_THICK FILM 10K 1% 0603', 'CAP_CER-X7R 100NF 50V 0402',
@@ -78,6 +88,8 @@ export function generateParts(count = 2000): Part[] {
       partType: hasClass ? pick(TYPES) : '',
       abc: '',                        // 100% empty in production — kept, to be hidden by default
       uom: rnd() > 0.1 ? pick(UOMS) : '',
+      packageType: rnd() > 0.25 ? pick(PACKAGES) : '',
+      materialType: rnd() > 0.2 ? pick(MATERIAL_TYPES) : '',
       onHand,
       allocated: Math.floor(onHand * rnd() * 0.6),
       unitCost: Math.round(rnd() * 24000) / 100,

@@ -155,12 +155,6 @@
 .vy-empty-state p { margin: 0 0 var(--vy-space-7); }
 
 /* ---- Record dialog -------------------------------------------------------- */
-.vy-record-head { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--vy-space-8); padding-bottom: var(--vy-space-6); border-bottom: 1px solid var(--vy-grey-200); margin-bottom: var(--vy-space-6); }
-.vy-record-ident { font-family: var(--vy-font-mono); font-size: var(--vy-text-lg); font-weight: var(--vy-weight-semibold); color: var(--vy-grey-900); }
-.vy-record-desc { color: var(--vy-grey-500); font-size: var(--vy-text-base); margin-top: var(--vy-space-1); }
-.vy-record-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--vy-space-7) var(--vy-space-9); margin: 0; }
-.vy-record-grid dt { font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .05em; color: var(--vy-grey-500); margin-bottom: var(--vy-space-1); }
-.vy-record-grid dd { margin: 0; font-size: var(--vy-text-md); color: var(--vy-grey-800); }
 
 /* ---- Command palette ------------------------------------------------------ */
 .vy-palette-backdrop { position: fixed; inset: 0; background: var(--vy-overlay-scrim); display: flex; justify-content: center; padding-top: 12vh; z-index: var(--vy-z-palette); }
@@ -786,7 +780,6 @@
       records in one frame. Fading the body in lets the eye keep the shape it was
       already looking at. The BODY, not the rows — the grid is virtualised, and
       animating each row would restart mid-scroll every time one recycles. */
-.vy-grid-body { animation: vy-mode-read var(--vy-dur-medium) var(--vy-ease-decelerate); }
 /* Editing puts a real control in the value slot, which sets its own height. */
 .vy-record-fields[data-editing] .vy-field dd { font-size: var(--vy-text-base); }
 /* Editing needs room for controls, so the grid loosens rather than the labels
@@ -1325,4 +1318,36 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
 @media (max-width: 700px) {
   .vy-validation { padding: var(--vy-space-7) var(--vy-space-8); }
   .vy-validation-list li { gap: var(--vy-space-2); }
+}
+
+
+/* ---- Data Form View ----------------------------------------------------------
+   The deck's master-data record: caption, identifier, states, then actions left
+   and reference links right.
+
+   The identifier is the largest text in the dialog because confirming it is why
+   the reader opened the record — everything else is checked against it. The
+   caption above stays small: it names the field, and a label the same size as
+   its value makes the reader work out which is which. */
+.vy-datarec { display: flex; flex-direction: column; gap: var(--vy-space-9); }
+.vy-datarec-head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: var(--vy-space-9); flex-wrap: wrap;
+  padding-bottom: var(--vy-space-8); border-bottom: 1px solid var(--vy-grey-200);
+}
+.vy-datarec-ident { display: flex; flex-direction: column; gap: var(--vy-space-3); min-width: 0; }
+.vy-datarec-caption { font-size: var(--vy-text-sm); color: var(--vy-grey-500); }
+.vy-datarec-ident > strong {
+  font-size: var(--vy-text-2xl); font-weight: var(--vy-weight-bold);
+  color: var(--vy-grey-900); font-family: var(--vy-font-mono); letter-spacing: -.01em;
+}
+/* The revision is part of the identity but not the identity — quieter, so the
+   part number reads first and the two do not fight at the same weight. */
+.vy-datarec-rev { color: var(--vy-grey-500); font-weight: var(--vy-weight-regular); }
+.vy-datarec-chips { display: flex; align-items: center; gap: var(--vy-space-4); flex-wrap: wrap; margin-top: var(--vy-space-2); }
+
+@media (max-width: 700px) {
+  /* Links under the identity rather than beside it: side by side at this width
+     each gets about 140px and both wrap mid-label. */
+  .vy-datarec-head { flex-direction: column; gap: var(--vy-space-7); }
 }
