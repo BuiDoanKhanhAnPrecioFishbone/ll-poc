@@ -24,6 +24,7 @@ Counts are occurrences across entry + 239 chunks.
 | **Grid**, with a pager | `KendoReactGrid` ×8, `k-grid` ×23, `k-pager` ×6 | `DataGrid` — TanStack table + virtualiser |
 | **Per-column filter cells** | `k-filtercell` ×4 | **absent** — see below |
 | **DropDownList**, filterable | `KendoReactDropDownList`, filter descriptor with `ignoreCase` | `Select` — now filters above 8 options |
+| **MultiSelect**, chips + avatars | `component: "MultiSelect"`, `tagRender`, option `avatar` | **absent** — Assigned To is a single-value `Select`; see the correction below |
 | **DatePicker** | `k-datepicker` ×1 | native `<input type="date">` |
 | **Dialog / Window** | `KendoReactDialog`, `k-window` ×5, `k-dialog` ×4 | `Dialog` on Radix |
 | **TabStrip** | `k-tabstrip` ×12 | `Tabs` on Radix |
@@ -36,14 +37,36 @@ Counts are occurrences across entry + 239 chunks.
 | **Draggable** | `KendoReactDraggable` | **absent** |
 | Form primitives | `Field`, `FormElement`, `Label`, `Hint`, `Error` | `Field.tsx`, `RecordField.tsx` |
 
-## Absent from the live app, confirmed across all 239 chunks
+## CORRECTION, same day — "MultiSelect: zero" was WRONG
 
-- **`ComboBox`** — zero occurrences. The pickers are DropDownLists that filter;
-  they never accept a value that is not in the list. This matters because
-  "combobox" in conversation suggests free text, and free text would contradict
-  `bundle-evidence.md`'s "Customer is a lookup, not text".
-- **`MultiSelect`** — zero. No multi-value picker anywhere.
-- **`NumericTextBox`** — zero. Numbers are plain inputs, as ours are.
+An sent a screenshot of the live **Assigned To** field: a multi-select of users,
+each option carrying an avatar and an email, with the picks shown as removable
+chips. This document had just claimed no multi-value picker existed anywhere.
+
+The claim came from probing two spellings — `KendoReactMultiSelect` and
+`k-multiselect` — finding neither, and reporting absence. The real markers are
+different and unambiguous:
+
+- `{ component: "MultiSelect", features: […] }` — the licence telemetry naming it
+- `tagRender` / `onTagDelete` ×3 — Kendo MultiSelect's custom chip rendering
+- an option `avatar` with `src` / `alt`, rendered inside the item
+
+**The method's limit, now stated rather than discovered twice.** Searching for a
+component's displayName and CSS class proves PRESENCE when it hits. It does not
+prove ABSENCE when it misses, because a minified bundle may name a component in
+neither form. Every "zero" below is evidence of not-found, not proof of
+not-there — and one of them was wrong within a day.
+
+## Absent from the live app — not found across all 239 chunks
+
+Read with the caveat above.
+
+- **`ComboBox`** — no occurrences, under any of the spellings tried, including
+  the `component: "…"` telemetry form that caught MultiSelect. The pickers are
+  DropDownLists that filter; they never accept a value outside the list, which
+  matches `bundle-evidence.md`'s "Customer is a lookup, not text".
+- **`NumericTextBox`** — none found. Numbers appear to be plain inputs, as ours
+  are.
 
 ## The one real gap: per-column filter cells
 
