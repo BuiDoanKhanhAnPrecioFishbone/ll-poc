@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { RadioGroup, Select } from '../../../ui/Overlays';
 import { Button } from '../../../ui/Button';
 import { TextField, TextArea } from '../../../ui/Field';
@@ -425,19 +425,45 @@ function ReadValue({ children, locked }: { children: React.ReactNode; locked?: b
   );
 }
 
-/** "User can view less or more files by clicking on View More". */
+/**
+ * Attachments, shortened until asked.
+ *
+ * "If there is more than one attachment, the system initially shows a shortened
+ * list with a View more option to expand and display all files. Clicking again
+ * changes it to View less to collapse the list."
+ *
+ * MORE THAN ONE is the customer's condition, so a single attachment gets no
+ * control — a View more that reveals nothing is a button that lies. At exactly
+ * two, "shortened" can only mean one, which is why the collapsed list is the
+ * first file rather than a fixed handful.
+ */
 function Attachments() {
+  const [expanded, setExpanded] = useState(false);
+  const listId = useId();
+  /* Read-only reference on a step about choosing a file to quote FROM. The
+     list is worth having; three lines of it above the choice is not. */
+  const many = ATTACHMENTS.length > 1;
+  const shown = many && !expanded ? ATTACHMENTS.slice(0, 1) : ATTACHMENTS;
+
   return (
     <div className="vy-attachments">
       <span className="vy-quote-fact-label">Attachments</span>
-      <ul>
-        {ATTACHMENTS.map(a => (
+      <ul id={listId}>
+        {shown.map(a => (
           <li key={a.name} data-usable={a.ok || undefined}>
             <span className="vy-code">{a.name}</span>
             {!a.ok && <span className="vy-field-hint">not .xlsx — cannot be quoted from</span>}
           </li>
         ))}
       </ul>
+      {many && (
+        /* The count goes in the label. "View more" alone makes you click to find
+           out whether it is worth clicking. */
+        <button type="button" className="vy-link" aria-expanded={expanded}
+                aria-controls={listId} onClick={() => setExpanded(e => !e)}>
+          {expanded ? 'View less' : `View more (${ATTACHMENTS.length - 1} more)`}
+        </button>
+      )}
     </div>
   );
 }

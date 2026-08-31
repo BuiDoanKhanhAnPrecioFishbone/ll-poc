@@ -36,6 +36,8 @@ export function StepQuoting({ cfg, set, lines, setLines, hasRun, onRun, onApply,
   const [noSupplier, setNoSupplier] = useState(false);
   const [notEnough, setNotEnough] = useState(false);
   const [missingAttr, setMissingAttr] = useState(false);
+  /* Quote Focus = Other: the run computes but does not choose. See runQuote. */
+  const manual = cfg.quoteFocus === 'OTHER';
 
   const quoted = lines.filter(l => !l.excluded);
 
@@ -86,7 +88,9 @@ export function StepQuoting({ cfg, set, lines, setLines, hasRun, onRun, onApply,
             Price Range are displayed as secondary buttons." */}
         <div className="vy-run-actions">
           <Button variant="filled" onClick={onRun}
-                  title={`Price every line through ${cfg.provider}, falling back to the other provider`}>
+                  title={manual
+                    ? `Compute quantities through ${cfg.provider}. Quote Focus is ${cfg.quoteFocus}, so no supplier is selected for you.`
+                    : `Price every line through ${cfg.provider}, falling back to the other provider`}>
             {hasRun ? 'Re-run Quote' : 'Run Quote'}
           </Button>
           <Button onClick={onApply} title="Recalculate Total Qty from Build Qty and Attrition Set">
@@ -101,16 +105,27 @@ export function StepQuoting({ cfg, set, lines, setLines, hasRun, onRun, onApply,
         </div>
       </div>
 
-      <div className="vy-run-banner" data-tone={hasRun ? 'ok' : 'info'}>
+      {/* Three states, because Quote Focus = Other makes a fourth reading of the
+          same numbers. "0 of 20 covered, 20 without a supplier" is true after a
+          run in that mode and reads as total failure, when it is in fact the
+          mode working exactly as asked. */}
+      <div className="vy-run-banner" data-tone={hasRun ? (manual ? 'info' : 'ok') : 'info'}>
         {!hasRun
           ? <><strong>Please run quotation for continue process!</strong>{' '}
               Pricing, availability and suppliers stay blank until the quote runs — the columns
               in red below are the ones waiting on it.</>
-          : <><strong>{quoted.filter(l => l.status === 'COVER').length} of {quoted.length} lines
-              covered.</strong>{' '}
-              {quoted.filter(l => l.status === 'N/A').length} without a supplier,{' '}
-              {quoted.filter(l => l.status === 'NO').length} short on quantity. Anything left
-              unselected becomes NO BID when you continue.</>}
+          : manual
+            ? <><strong>Quote Focus is {cfg.quoteFocus} — suppliers are yours to choose.</strong>{' '}
+                Quantities are computed; the system selected none.{' '}
+                {quoted.filter(l => !l.supplier).length} of {quoted.length} lines still need one,
+                and the Unselected Supplier filter below lists them. Choose a supplier, then
+                Apply to price the line. Anything left unselected becomes NO BID when you
+                continue.</>
+            : <><strong>{quoted.filter(l => l.status === 'COVER').length} of {quoted.length} lines
+                covered.</strong>{' '}
+                {quoted.filter(l => l.status === 'N/A').length} without a supplier,{' '}
+                {quoted.filter(l => l.status === 'NO').length} short on quantity. Anything left
+                unselected becomes NO BID when you continue.</>}
       </div>
 
       <QuoteToolbar

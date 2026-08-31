@@ -113,11 +113,16 @@ export function RunQuotationDialog({ q, onClose }: { q: Quotation; onClose: () =
 
   /* ---- The run ----------------------------------------------------------- */
   function run() {
-    setLines(ls => runQuote(ls, cfg.buildQty, cfg.attritionSet, cfg.provider));
+    setLines(ls => runQuote(ls, cfg.buildQty, cfg.attritionSet, cfg.provider, cfg.quoteFocus));
     setHasRun(true);
     setRunVersion(v => v + 1);
     setRunDate(new Date().toLocaleString('en-GB'));
-    toast.success(`Quote run complete for RFQ${q.no} via ${cfg.provider}.`);
+    /* "Complete" would be a lie under Other — the run deliberately leaves every
+       Supplier empty, and a success message that does not say so sends the user
+       looking for the bug. */
+    toast.success(cfg.quoteFocus === 'OTHER'
+      ? `Quantities computed for RFQ${q.no}. Quote Focus is OTHER, so no suppliers were selected — choose them per line.`
+      : `Quote run complete for RFQ${q.no} via ${cfg.provider}.`);
   }
 
   /**
@@ -132,7 +137,7 @@ export function RunQuotationDialog({ q, onClose }: { q: Quotation; onClose: () =
    */
   function apply() {
     if (!hasRun) { toast.success('Total Qty updated.'); return; }
-    setLines(ls => runQuote(ls, cfg.buildQty, cfg.attritionSet, cfg.provider));
+    setLines(ls => runQuote(ls, cfg.buildQty, cfg.attritionSet, cfg.provider, cfg.quoteFocus));
     toast.success('Total Qty and supplier quantities recalculated.');
   }
 

@@ -264,7 +264,26 @@ export function buildBomLines(): BomLine[] {
  * difference a mockup can honestly offer.
  */
 export function runQuote(lines: BomLine[], buildQty: number, attritionSet: number,
-                         provider: PrimaryProvider): BomLine[] {
+                         provider: PrimaryProvider, quoteFocus?: string): BomLine[] {
+  /* "Other: Allows the user to manually select suppliers; the system will not
+     auto-select suppliers in Step 3 - Run Quote."
+
+     The other three Quote Focus values each tell the system how to CHOOSE —
+     availability, cost, or the balance of the two. Other is the value that says
+     don't choose; the quoter has a reason the system does not know. Running the
+     quote still computes the quantities, and the Supplier column is left for
+     them.
+
+     Lines then come back with no supplier, which the guideline already covers:
+     "BOM lines without a Supplier are displayed with a red background color and
+     Status = N/A". Under Other the red grid is not a failure report — it is the
+     to-do list, and the Unselected Supplier filter counts it down.
+
+     A supplier already chosen SURVIVES this. Apply re-runs the pricing, and
+     wiping the manual selections it exists to support would make the button
+     destroy the work of the mode. */
+  const manual = quoteFocus === 'OTHER';
+
   return lines.map(line => {
     if (line.excluded) {
       /* "Excluded BOM lines have Status = NO BID" and carry no pricing. */
@@ -272,7 +291,14 @@ export function runQuote(lines: BomLine[], buildQty: number, attritionSet: numbe
     }
     const seed = SEEDS[line.id - 1];
     /* Z2data finds the 22uF cap that Nexar does not. */
-    const found = seed.supplier || (provider === 'Z2data' && line.part === 'CAP-1206-22U' ? 'Arrow' : '');
+    const auto = seed.supplier || (provider === 'Z2data' && line.part === 'CAP-1206-22U' ? 'Arrow' : '');
+    /* Under Other the only supplier a line can have is one the user picked.
+       The price is still the seed's: this mock holds one price per part, so
+       choosing a different supplier changes WHO, not HOW MUCH. Prices that
+       differ by supplier belong to the supplier dropdown — the control that
+       carries UP, MOQ, Stock and LT per supplier — which is recorded as
+       deliberately unbuilt in docs/testing/quick-quote-results.md. */
+    const found = manual ? line.supplier : auto;
     if (!found) {
       return { ...line, status: 'N/A' as LineStatus, supplier: '', orderQty: 0, moq: 0,
                excessQty: 0, excessAmt: 0, stock: 0, lt: 0, pkg: '', unitPrice: 0, amount: 0 };
