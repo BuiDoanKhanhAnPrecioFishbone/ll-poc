@@ -92,6 +92,20 @@ export function NewRequirementDialog({ open, onClose }: {
         customerType: cust.custType,
         itar: cust.isItar,
         markup: d.markup || cust.priceMarkup,
+        /* The three Assignee roles default from the customer's own
+           configuration, per the guideline: "If a [role] has been configured
+           for the corresponding customer ... that user is displayed as the
+           default selected value."
+
+           `||` not `??`, so an unconfigured role leaves whoever is already
+           there rather than blanking a choice the user made. And a customer
+           with no configuration at all changes none of the three — the
+           guideline's "if" is per ROLE, which is why one of the mock customers
+           configures only a Buyer. */
+        programManager: cust.roles?.programManager || d.programManager,
+        buyer: cust.roles?.buyer || d.buyer,
+        engineer: cust.roles?.engineer || d.engineer,
+
         projectName: '',
       };
     });

@@ -126,6 +126,19 @@ export function QuotationDetail() {
         /* Only suggested, never overwritten: the live code writes the customer's
            markup solely when the field is still unset. */
         markup: d.markup || cust.priceMarkup,
+        /* The three Assignee roles default from the customer's own
+           configuration, per the guideline: "If a [role] has been configured
+           for the corresponding customer ... that user is displayed as the
+           default selected value."
+
+           `||` not `??`, so an unconfigured role leaves whoever is already
+           there rather than blanking a choice the user made. And a customer
+           with no configuration at all changes none of the three — the
+           guideline's "if" is per ROLE, which is why one of the mock customers
+           configures only a Buyer. */
+        programManager: cust.roles?.programManager || d.programManager,
+        buyer: cust.roles?.buyer || d.buyer,
+        engineer: cust.roles?.engineer || d.engineer,
         /* The old project belonged to the old customer. */
         projectName: '',
       };
@@ -415,7 +428,23 @@ export function QuotationDetail() {
               touched={touched}
               onBlur={markTouched}
             /> },
-          { value: 'checklists',   label: 'Checklists & Assignment', count: checklistOutstanding, content: <ChecklistsTab q={q} /> },
+          { value: 'checklists',   label: 'Checklists & Assignment', count: checklistOutstanding, content: (
+            /* CONTROLLED by the draft while editing, so the tab follows the
+               record instead of a copy it took when it mounted. Its own state is
+               seeded once from `q`, which meant the customer-configured Program
+               Manager, Buyer and Engineer landed in the draft and never reached
+               the screen — and, before that change, that editing a record and
+               saving left this tab showing the people it loaded with. */
+            <ChecklistsTab
+              q={q}
+              people={editing && draft
+                ? { programManager: draft.programManager, buyer: draft.buyer, engineer: draft.engineer }
+                : undefined}
+              onPeopleChange={editing && draft
+                ? p => setDraft(d => (d ? { ...d, ...p } : d))
+                : undefined}
+            />
+          ) },
           { value: 'result',       label: 'Quotation Result', count: q.results.length,     content: <ResultTab q={q} onRun={() => setRunOpen(true)} /> },
           { value: 'conversations',label: 'Conversations',count: q.comments.length,    content: <ConversationsTab q={q} /> },
           { value: 'activity',     label: 'Activity Logs', content: <ActivityTab q={q} /> },

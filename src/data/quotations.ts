@@ -224,6 +224,21 @@ export type Customer = {
   custType: string;
   isItar: boolean;
   priceMarkup: number;
+  /**
+   * The roles this customer has configured, if any.
+   *
+   * The guideline, for each of Program Manager, Buyer and Engineer: "If a
+   * [role] has been configured for the corresponding customer in Sales
+   * Management > Customer Management, that user is displayed as the DEFAULT
+   * selected value" — and "the user can change the selected [role] to another
+   * active user". So this is a default, never a restriction: the picker still
+   * offers everyone.
+   *
+   * Optional per role, because the guideline's "if" only makes sense when some
+   * customers have none — and a customer with nobody configured is what proves
+   * the field still works without one.
+   */
+  roles?: { programManager?: string; buyer?: string; engineer?: string };
   /** Project names already used by this customer. The live form fetches these. */
   projectNames: string[];
 };
@@ -232,10 +247,14 @@ export const CUSTOMER_MASTER: Customer[] = [
   { code: '00455', name: 'Cerelogic Systems Inc.', label: '00455 - Cerelogic Systems Inc.',
     contacts: ['Dana Whitfield', 'Marc Oyelaran', 'Priya Raghunathan'],
     custType: 'Turnkey', isItar: false, priceMarkup: 12,
+    roles: { programManager: 'Toan Dinh', buyer: 'Mai Pham', engineer: 'Duc Le' },
     projectNames: ['Halo Controller', 'Halo Backplane', 'Orion Sensor Board'] },
   { code: '00848', name: 'KT Controls Ltd', label: '00848 - KT Controls Ltd',
     contacts: ['Steven Achebe', 'Lena Brandt'],
     custType: 'Consigned', isItar: false, priceMarkup: 9,
+    /* Buyer only — the guideline's "if configured" has to be exercised per role,
+       not just per customer. */
+    roles: { buyer: 'Huyen NTN' },
     projectNames: ['KT Drive Module', 'KT Panel Interface'] },
   { code: '00378', name: 'Nokia Networks Oy', label: '00378 - Nokia Networks Oy',
     contacts: ['Aino Virtanen', 'Petri Laaksonen', 'Sanna Koskinen'],
