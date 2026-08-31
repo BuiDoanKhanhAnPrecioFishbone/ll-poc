@@ -85,16 +85,23 @@ edit mode for parts is separate scope. The BoM and Where-Used links are present
 and correctly gated on part source (MAKE → BoM, BUY → Where used), but the
 popups they would open are still absent.
 
-Two popups reached from this screen are absent entirely:
+Both popups reached from this screen are now **built** (`PartBomDialog.tsx`):
 
-- **BoM detail** (for parts sourced MAKE or MAKE/PHAN) — Customer, Part
-  Number–Revision, BoM Version, ITAR, Quantity, BoM Type, Run By, Created Date,
-  Last Updated Date, an Update BOM upload that increments the version, and a
-  *Components Part* tab listing Component Part, Revision, Part Source,
-  Quantity, Manufacturer and MPN with sorting and filtering.
-- **Where PN Used** (for BUY, or MAKE sub-assemblies) — a search over top
-  assembly or description, and columns View, Top Assembly, Revision,
-  Description, Index, Quantity, BoM Status.
+- **BoM detail** (MAKE parts) — all nine header facts, read-only as the sheet
+  requires, with Update BOM naming the version it would create. The *Components
+  Part* tab lists the six specified columns, reusing the seeded BoM rather than
+  generating a second near-identical one.
+- **Where PN Used** (BUY parts) — the search over top assembly or description,
+  and all seven columns.
+
+**Two things deliberately not invented.** The *Other Information* tab exists
+because the sheet names it, and says so instead of guessing: the sheet's entry
+for it is, in full, `Under Tab "Other Information": .....`. And the Components
+grid does not implement the per-column operator menu the sheet describes
+("Contains, Does not contain, Is [not] equal to, Starts/Ends with, Is null") —
+that is KendoReact's column filter, so it arrives with KendoReact or not at all;
+`docs/filter-spec.md` governs the *list* filter toolbar and is a different
+control, so the two do not conflict.
 
 ## MFG–MPN (AML)
 

@@ -5,6 +5,7 @@ import { StatusBadge } from '../ui/Badge';
 import { useToast } from '../ui/Toast';
 import { SmartIcon } from './quotation/SmartButtons';
 import { fmtDate } from '../ui/renderCell';
+import { PartBomDialog, WhereUsedDialog } from './PartBomDialog';
 import type { Part } from '../data/parts';
 
 /**
@@ -39,6 +40,8 @@ import type { Part } from '../data/parts';
 export function PartDetail({ part, onClose }: { part: Part; onClose: () => void }) {
   const toast = useToast();
   const [tab, setTab] = useState('general');
+  const [bomOpen, setBomOpen] = useState(false);
+  const [whereOpen, setWhereOpen] = useState(false);
   const available = part.onHand - part.allocated;
 
   /* The guideline gates these two on part source: BoM for MAKE and MAKE/PHAN,
@@ -88,9 +91,7 @@ export function PartDetail({ part, onClose }: { part: Part; onClose: () => void 
               distinction, and the same shape, as the RFQ record's smart buttons. */}
           <nav className="vy-smart-buttons" aria-label="Related records">
             <button type="button" className="vy-smart-btn"
-                    onClick={() => toast.notImplemented(
-                      isMake ? `open the BoM for ${part.partNumber}`
-                             : `show where ${part.partNumber} is used`)}>
+                    onClick={() => (isMake ? setBomOpen(true) : setWhereOpen(true))}>
               <SmartIcon name={isMake ? 'quote' : 'doc'} />
               <span>{isMake ? 'BoM' : 'Where used'}</span>
             </button>
@@ -155,6 +156,9 @@ export function PartDetail({ part, onClose }: { part: Part; onClose: () => void 
           ]}
         />
       </div>
+
+      {bomOpen && <PartBomDialog part={part} onClose={() => setBomOpen(false)} />}
+      {whereOpen && <WhereUsedDialog part={part} onClose={() => setWhereOpen(false)} />}
     </Dialog>
   );
 }

@@ -1351,3 +1351,18 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
      each gets about 140px and both wrap mid-label. */
   .vy-datarec-head { flex-direction: column; gap: var(--vy-space-7); }
 }
+
+
+/* The BoM popup's nine header facts. Three columns rather than the record's
+   auto-fit: this is a fixed, known set that never grows, so a column count that
+   reflows with the viewport would only move the same nine facts around. */
+.vy-bomhead {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--vy-space-6) var(--vy-space-9); margin: 0;
+  padding-bottom: var(--vy-space-8); border-bottom: 1px solid var(--vy-grey-200);
+}
+.vy-whereused { display: flex; flex-direction: column; gap: var(--vy-space-8); }
+.vy-whereused .vy-search-field { max-width: var(--vy-search-w); }
+
+@media (max-width: 900px) { .vy-bomhead { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 620px) { .vy-bomhead { grid-template-columns: 1fr; } }
