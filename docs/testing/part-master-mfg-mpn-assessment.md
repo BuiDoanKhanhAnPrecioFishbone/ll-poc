@@ -167,9 +167,81 @@ that is KendoReact's column filter, so it arrives with KendoReact or not at all;
 `docs/filter-spec.md` governs the *list* filter toolbar and is a different
 control, so the two do not conflict.
 
-## MFG–MPN (AML)
+## MFG–MPN (AML) — **built**, 31 Aug 2026
 
-**Absent in full**, and it is the subject the section is named for. The sheet
+`MpnMapping.tsx`, model in `data/mpnMapping.ts`. On the Part record's **Quantity
+Info** tab, where the sheet puts it. The section the whole chapter is named for
+is no longer absent.
+
+### Labels came from the live system
+
+`chunk-CqZKuw2K.js` gave them verbatim: Order Preference, Rocket OH, Customer
+OH, **Total On Hand**, Safety Stock, AVG Cost, Last Purchased Cost, "Add a
+line", "Add MPN Mapping", "Stock Report", "Update Quantity", "Replenishment",
+and the Stock Report's own columns — Date, Location, Manufacturer, MPN, Owner,
+Quantity, Available Qty, Unit — plus Allocate Qty and Owner Type, which the live
+Update Quantity popup adds and the guideline never mentions.
+
+Two label notes:
+
+- The sheet writes **"Total On-Hand"**, the live system **"Total On Hand"**. D2
+  puts the live wording on screen.
+- The live Add MPN Mapping modal has a field labelled **"Is Exsisting Mfg"**.
+  D2 corrects outright misspellings, so it reads **Is Existing Mfg** here.
+
+### Built and verified on screen
+
+- **The ten columns in the sheet's order**, plus the Stock icon. Verified
+  against a real record.
+- **Total On Hand is computed**, not stored — `Rocket OH + Customer OH`, checked
+  on screen (4,255 + 1,992 = 6,247). A stored total is a third number that can
+  disagree with the two beside it.
+- **Detail popup** shows all five fields the sheet lists and makes three
+  editable — everything **except Part Number and Description**, exactly as
+  specified. Those two are shown rather than hidden: a dialog that edits a
+  mapping without naming the part it belongs to is one you can apply to the
+  wrong record.
+- **Delete** is confirmed, and the confirm says what depends on the mapping.
+  Nothing else on the screen is destructive.
+- **Stock Report** reconciles with the row that opened it — the Rocket-owned
+  line equals Rocket OH and the consigned line equals Customer OH, so the report
+  and its summary cannot disagree. Available Qty is `Quantity − Allocate Qty`.
+- **Update Quantity** carries all ten live fields and blocks an Allocate Qty
+  above the quantity held — stock cannot be committed twice.
+- **Replenishment** is the same form on a new line, and adds to the totals.
+- **Add a line** enforces `{MFG-MPN} must be unique in every Part` — the rule
+  Create BoM applies to an uploaded file, applied here to a line typed by hand.
+  A new mapping starts at zero stock and zero cost, because one that has never
+  been bought has no history; those zeroes are facts, not placeholders.
+- **Edits survive closing and reopening the record** (session store, as
+  `createdParts.ts`). An edit that vanished on close would read as a failed save
+  rather than a prototype's limit.
+
+### Two judgement calls, both flagged rather than decided
+
+**It is not gated on Part Source.** The sheet's step 1 reads "Open a Part detail
+(Part has Part Source is MAKE, MAKE/BUY)" — a precondition for reaching the
+screen, not a display rule. The same document states display rules explicitly
+where it means them ("the BoM button should be displayed **only when** Part
+Source = …") and does not here. Gating would take the Approved Manufacturer List
+away from BUY parts, which are the ones actually purchased. Question 16.
+
+**One Primary is not enforced.** Order Preference exists to guide buyers, so a
+part where everything is an Alternate guides nobody — but the sheet states no
+constraint and inventing one could reject a combination the business allows. The
+generated data takes the shape (one Primary, rest Alternate), the Add form
+*defaults* to Primary when the part has none, and a hint appears when a part
+ends up with no Primary at all. Suggested, never enforced. Question 16.
+
+### Not built
+
+The mapping's cost and stock figures are generated, not sourced from purchase
+history, because there are no purchase orders or receipts in this prototype.
+Replenishment adds a stock line rather than raising a receipt.
+
+### The original assessment
+
+**Was absent in full**, and it is the subject the section is named for. The sheet
 asks for a Quantity Info tab holding an MPN Mapping table of ten columns —
 Manufacturer, MPN, Description, Order Preference, Rocket OH, Customer OH, Total
 On-Hand, Safety Stock, AVG Cost, Last Purchased Cost — plus a mapping detail

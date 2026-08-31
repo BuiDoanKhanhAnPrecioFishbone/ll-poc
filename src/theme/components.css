@@ -1276,3 +1276,25 @@
   background: var(--vy-tone-missing-bg); color: var(--vy-tone-missing-fg);
 }
 .vy-pair[data-known] { background: var(--vy-tone-covered-bg); color: inherit; }
+
+/* ---- MFG-MPN (AML) -------------------------------------------------------- */
+/* The field groups around it are an auto-fit grid of columns; a ten-column table
+   is not one of those, so it takes the whole row. Without this it becomes a
+   third column roughly 320px wide and scrolls horizontally inside it. */
+.vy-field-groups > .vy-mpn { grid-column: 1 / -1; min-width: 0; }
+.vy-mpn { margin-top: var(--vy-space-4); }
+
+/* The section title and its Add control on one line: "Add a line" acts on the
+   table below it, and putting it under the table would make the empty state and
+   the populated state disagree about where the button lives. */
+.vy-mpn-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: var(--vy-space-5); margin-bottom: var(--vy-space-4);
+}
+.vy-mpn-head .vy-field-group-title { margin: 0; }
+
+/* Primary is the one buyers order against; Alternate is approved but second
+   choice. Weight rather than colour, because the table already spends its
+   colour on stock levels and a second scheme would compete with it. */
+.vy-pref { color: var(--vy-grey-600); }
+.vy-pref[data-primary] { color: var(--vy-grey-900); font-weight: var(--vy-weight-medium); }

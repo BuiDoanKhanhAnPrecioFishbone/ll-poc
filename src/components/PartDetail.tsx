@@ -8,6 +8,7 @@ import { fmtDate } from '../ui/renderCell';
 import { PartBomDialog, WhereUsedDialog } from './PartBomDialog';
 import { BOM_SOURCES } from '../data/partMetadata';
 import { RecordField } from './quotation/RecordField';
+import { MpnMappingSection } from './MpnMapping';
 import {
   PART_SALES_PURCHASE, PART_REQUESTS, PART_DIMENSIONS,
   PART_REORDERING, PART_DEMAND, PART_LEAD_TIME,
@@ -172,6 +173,16 @@ export function PartDetail({ part, onClose }: { part: Part; onClose: () => void 
                   <ReadGroup title="Reordering rule" defs={PART_REORDERING} part={part} />
                   <ReadGroup title="Demand & forecast planning" defs={PART_DEMAND} part={part} />
                   <ReadGroup title="Lead time & Policies" defs={PART_LEAD_TIME} part={part} />
+                  {/* "Navigate to Quantity Info tab → Displays the MPN Mapping
+                      table." On this tab because the sheet says so. It was
+                      briefly its own tab, on the reasoning that a ten-column
+                      grid with three controls sits oddly under three sections
+                      of label/value pairs — which is a presentation opinion
+                      against an explicit instruction, and the instruction
+                      wins. It is placed last so the field groups above it stay
+                      a block, and it spans the full width rather than becoming
+                      a fourth column of the grid. */}
+                  <MpnMappingSection part={part} />
                 </div>
               ),
             },

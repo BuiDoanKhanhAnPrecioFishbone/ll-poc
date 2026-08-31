@@ -291,6 +291,29 @@ they are verbatim. Three need you:
    changes with the choice — so we built a radio group. Confirm that is right;
    if they really are checkboxes, what does ticking both mean?
 
+## 16. MFG–MPN (AML) — two rules your sheet does not state
+
+1. **Should the MPN Mapping table appear on every part, or only MAKE and
+   MAKE/BUY?** Your step 1 says "Open a Part detail (Part has Part Source is
+   MAKE, MAKE/BUY)", which reads as how to reach the screen rather than a rule
+   about when it shows — elsewhere you write display rules explicitly ("the BoM
+   button should be displayed **only when** Part Source = MAKE, MAKE/BUY or
+   MAKE/PHAN"). We show it on every part, because an Approved Manufacturer List
+   is most obviously needed on BUY parts, which are the ones you purchase. Tell
+   us if it should be hidden on those.
+
+2. **Can a part have more than one Primary, or none?** Order Preference is
+   "purchasing priority (Primary/Alternate) guiding buyers", which implies one
+   default — but you state no constraint, so we have not enforced one. The form
+   *defaults* to Primary for a part's first manufacturer and warns when a part
+   ends up with none. If the rule is exactly one Primary, we will enforce it.
+
+Also, two label notes from your live system, for confirmation rather than
+decision: it writes **"Total On Hand"** where the sheet writes "Total On-Hand"
+(we used yours), and its Add MPN Mapping modal has a field labelled **"Is
+Exsisting Mfg"** — a misspelling we have corrected to "Is Existing Mfg" on
+screen, and one worth fixing in the live app too.
+
 ## Two defects in the live system, for your backlog
 
 Not questions, just things we noticed and you may not have:
