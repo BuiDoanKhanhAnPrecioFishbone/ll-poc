@@ -104,7 +104,7 @@ Removed, along with the `.vy-dot` rule and the `--vy-dot-size` token it was the
 only user of — dead CSS is what `npm run css:orphans` exists to prevent, and
 leaving it would have failed that check on the next run.
 
-### 4. Brand: "Voyager IQ"
+### 4. Brand: "Voyager IQ" — **BLOCKED**, on the answer sheet in `open-questions.md`
 
 Slide 2 asks for the name **Voyager IQ**, colour "inspired by Rocket colour"
 (Rocket EMS, Inc. — red and navy, which the existing Voyager mark already
@@ -118,7 +118,7 @@ reads both ways — and if it is the new one, whether "completed" should be
 "complete". Guessing at a company's own product name and strapline is not a
 decision to take quietly.
 
-### 5. Setting Form View (slide 15)
+### 5. Setting Form View (slide 15) — **BLOCKED**, on the answer sheet in `open-questions.md`
 
 A Configuration screen: top-level tabs, collapsible sections each with its own
 Edit, number-plus-unit compound fields, help text under every field, and an
@@ -141,7 +141,7 @@ design side rather than the requirements side. Cross-reference rather than
 duplicate: that document has the detail, including the `Part.partSource` data
 gap that blocks two of its behaviours.
 
-### 7. Dark mode / light mode (slide 7)
+### 7. Dark mode / light mode (slide 7) — **BLOCKED**, on the answer sheet in `open-questions.md`
 
 `tokens.css` carries on-dark tokens, but only for the sidebar; there is no
 theme switch and no dark palette. This touches every colour token in the

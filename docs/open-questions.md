@@ -1,11 +1,64 @@
 # Open questions for the client
 
-Eight things the prototype cannot settle on its own. Each states what we found,
-what we did in the meantime, and what we need from you.
+Nineteen things the prototype cannot settle on its own. Each states what we
+found, what we did in the meantime, and what we need from you.
 
-Nothing here is blocking — the prototype works under a stated assumption in
-every case. But each assumption is one we would rather you confirmed than
-discovered later.
+**Most are not blocking.** The prototype works under a stated assumption in
+every case, and where we chose we said why. But three of them now block work
+that cannot start without an answer, and two would be expensive to discover
+late.
+
+---
+
+## Answer sheet
+
+One line per decision. **If you answer nothing, we keep the "our assumption"
+column** — none of it is guesswork we are hiding, but all of it is ours rather
+than yours.
+
+Ordered by what an answer unblocks, not by number.
+
+### Blocking — work cannot start until you answer
+
+| # | Decision | Our assumption | What it unblocks |
+|---|---|---|---|
+| 2 | Do we adopt KendoReact? A licence key now exists. | MIT components; every requirement met either way | Whether the remaining screens are built twice |
+| — | **Brand.** Is "The completed ERP/MES Solution" the tagline you *want*, or the one you want *improved*? If new, is "completed" meant to be "complete"? Rename to **Voyager IQ** now? | We render `VOYAGER` unchanged | The rename, the palette, every screen's header |
+| — | **Setting Form View** (deck slide 15) — no guideline section defines it. What is in scope? | Not built; four Configuration paths fall through to a placeholder | An entire screen archetype |
+| — | **Dark mode** (deck slide 7) — no source but the deck mentions it. In scope? | Not built; on-dark tokens exist for the sidebar only | Touches every colour token in the system |
+
+### Expensive to get wrong — please confirm early
+
+| # | Decision | Our assumption | Why it matters |
+|---|---|---|---|
+| 13 | Purchase Lead Time — **days** (your sheet) or **weeks** (your live form)? | Days | A sevenfold planning error either way |
+| 12 | Part Source: `PACKAGING` is not in your live system. Should Create New Part also offer SERVICE, MAKE/PHANT, PROG? Does auto-exclusion cover MAKE/PHAN as well as MAKE/PHANT? | The sheet's six, `FLSTK` corrected to `FLRSTK` | Changes which BoM lines get quoted |
+| 4 | Date format — your two sources disagree | One format, stated in the doc | Every date on every screen |
+| 3 | Rocket Consigned Inventory — your two documents disagree | The shared constant | A field that blanks on open if wrong |
+| 7 | Where does the "Quoted" status come from? It is on the list and not in the enumeration. | Shown as-is | The status model |
+
+### Vocabularies we guessed and will swap on sight
+
+| # | Decision | Our assumption |
+|---|---|---|
+| 14 | Part Class → Part Type mapping; Order Policy values | Our table, in `partMetadata.ts` — one object, one file |
+| 8 | What does "Build Requirement" choose from? No metadata code exists | Free text |
+| 11 | Two things Quick Quote does not tell us | Stated in the doc |
+
+### Design calls — tell us if you disagree
+
+| # | Decision | Our assumption |
+|---|---|---|
+| 1 | Where should row actions live? | Identifier opens the record |
+| 9 | Record as a modal? Should dialogs minimise? | Full page; no minimise |
+| 6 | Priority — stars or a label? | Label |
+| 5 | "Assigned To" is not available on the list | Added |
+| 10 | Are "RFQ Type" and "Customer Type" the same field? | Treated as distinct |
+| 15 | Create BoM: "Create Custom Template" (live) or "Create Customer Template" (sheet)? Add Material Type and BoM Type? Is Select Action really two checkboxes? | Live label; sheet's field list; radio |
+| 16 | MFG–MPN: gate the AML on Part Source? Exactly one Primary per part? | Shown on every part; not enforced |
+
+**Two defects in your live system** are listed at the end of this document for
+your own backlog. They need nothing from us.
 
 ---
 
