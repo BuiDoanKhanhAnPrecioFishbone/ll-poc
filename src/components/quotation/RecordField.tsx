@@ -5,6 +5,11 @@ import { OPTION_MEANINGS } from '../../data/metadata';
 import { PEOPLE_DIRECTORY } from '../../data/quotations';
 import { PeoplePicker } from '../../ui/PeoplePicker';
 import { fmtDate, fmtDateTime } from '../../ui/renderCell';
+import { FieldRow, RequiredMark } from '../../ui/FieldRow';
+
+/* Re-exported: four screens import the marker from here, which is where they
+   learned to look for it. It now lives beside the row that renders it. */
+export { RequiredMark };
 
 const LEVEL_TO_N: Record<PriorityLevel, number> = { High: 3, Medium: 2, Low: 1 };
 
@@ -115,25 +120,6 @@ export type FieldDef<T> = FieldKind & {
   required?: boolean;
 };
 
-/**
- * The required marker.
- *
- * Rendered as the live system writes it — a trailing `(*)` — rather than the
- * more usual bare asterisk, because that is the convention users here have
- * learned and the customer's requirements do not ask for it to change.
- *
- * `aria-hidden` on the glyph with the word "required" for screen readers: a
- * reader announcing "open paren star close paren" is noise, and the field also
- * carries `aria-required` where it is a real control.
- */
-export function RequiredMark() {
-  return (
-    <>
-      <span className="vy-required" aria-hidden>(*)</span>
-      <span className="vy-sr-only"> required</span>
-    </>
-  );
-}
 
 /**
  * Is this field empty in a way that fails validation?
@@ -182,186 +168,152 @@ export function RecordField<T extends Record<string, any>>({
      is decided elsewhere. The derivation note says where. */
   if (!editing || def.readOnly) return <ReadField def={def} value={value} editing={editing} />;
 
+  /* Every case below is the SAME row with a different control in it. That row
+     used to be written out ten times here, which is how three of them drifted:
+     `people` never rendered the required error, `flag` rendered neither the
+     error nor the hint — so the six explanatory hints on Create New Part's
+     Requests & Controls checkboxes ("NCNR — once ordered, it cannot be
+     cancelled or returned") were invisible — and only `radio` labelled its
+     group correctly. `FieldRow` is that row, once. */
+  const rowProps = {
+    editing: true as const,
+    invalid: missing || undefined,
+    label: def.label,
+    required: def.required,
+    htmlFor: `f-${def.name}`,
+    error: err,
+    hint: def.hint,
+  };
+
   switch (def.kind) {
     case 'radio':
       return (
-        <div className="vy-field vy-field--editing vy-field--radio" data-invalid={missing || undefined}>
-          <dt id={`f-${def.name}`}>{def.label}{def.required && <RequiredMark />}</dt>
-          <dd>
-            <RadioGroup label={def.label} value={String(value ?? '')}
-                        options={def.options.map(o => ({
-                          value: o,
-                          /* The meaning rides with the option, so the difference
-                             between "Low" and "OK" is legible at the point of
-                             choosing rather than in a tooltip nobody opens. */
-                          label: o,
-                        }))}
-                        onChange={v => { onChange(def.name, v); onBlur?.(def.name); }} />
-            {err}
-            {def.hint && !missing && <span className="vy-field-hint">{def.hint}</span>}
-          </dd>
-        </div>
+        /* Labelled BY the heading rather than by a label pointing at one of the
+           options, which is what a group of radios needs. */
+        <FieldRow {...rowProps} variant="radio" htmlFor={undefined} labelId={`f-${def.name}`}>
+          <RadioGroup label={def.label} value={String(value ?? '')}
+                      options={def.options.map(o => ({
+                        value: o,
+                        /* The meaning rides with the option, so the difference
+                           between "Low" and "OK" is legible at the point of
+                           choosing rather than in a tooltip nobody opens. */
+                        label: o,
+                      }))}
+                      onChange={v => { onChange(def.name, v); onBlur?.(def.name); }} />
+        </FieldRow>
       );
     case 'people':
       return (
-        <div className="vy-field vy-field--editing" data-invalid={missing || undefined}>
-          <dt><label htmlFor={`f-${def.name}`}>{def.label}{def.required && <RequiredMark />}</label></dt>
-          <dd>
-            <PeoplePicker id={`f-${def.name}`} label={def.label} invalid={missing}
-                          value={Array.isArray(value) ? (value as string[]) : []}
-                          onChange={next => onChange(def.name, next as unknown as T[keyof T])} />
-            {def.hint && <span className="vy-field-hint">{def.hint}</span>}
-          </dd>
-        </div>
+        <FieldRow {...rowProps}>
+          <PeoplePicker id={`f-${def.name}`} label={def.label} invalid={missing}
+                        value={Array.isArray(value) ? (value as string[]) : []}
+                        onChange={next => onChange(def.name, next as unknown as T[keyof T])} />
+        </FieldRow>
       );
     case 'priority':
       return (
-        <div className="vy-field vy-field--editing" data-invalid={missing || undefined}>
-          <dt><label htmlFor={`f-${def.name}`}>{def.label}{def.required && <RequiredMark />}</label></dt>
-          <dd>
-            <Select id={`f-${def.name}`} label={def.label}
-                    value={priorityLevel(Number(value))}
-                    options={[...PRIORITY_LEVELS]}
-                    onChange={v => { onChange(def.name, LEVEL_TO_N[v as PriorityLevel]); onBlur?.(def.name); }} />
-            {err}
-            {def.hint && !missing && <span className="vy-field-hint">{def.hint}</span>}
-          </dd>
-        </div>
+        <FieldRow {...rowProps}>
+          <Select id={`f-${def.name}`} label={def.label}
+                  value={priorityLevel(Number(value))}
+                  options={[...PRIORITY_LEVELS]}
+                  onChange={v => { onChange(def.name, LEVEL_TO_N[v as PriorityLevel]); onBlur?.(def.name); }} />
+        </FieldRow>
       );
     case 'combo': {
       const list = def.optionsFor(row ?? {});
       return (
-        <div className="vy-field vy-field--editing" data-invalid={missing || undefined}>
-          <dt><label htmlFor={`f-${def.name}`}>{def.label}{def.required && <RequiredMark />}</label></dt>
-          <dd>
-            <TextField id={`f-${def.name}`} value={String(value ?? '')}
-                       list={list.length ? `dl-${def.name}` : undefined}
-                       aria-invalid={missing || undefined}
-                       onBlur={() => onBlur?.(def.name)}
-                       onChange={e => onChange(def.name, e.target.value)} />
-            {list.length > 0 && (
-              <datalist id={`dl-${def.name}`}>
-                {list.map(o => <option key={o} value={o} />)}
-              </datalist>
-            )}
-            {err}
-            {def.hint && !missing && <span className="vy-field-hint">{def.hint}</span>}
-          </dd>
-        </div>
+        <FieldRow {...rowProps}>
+          <TextField id={`f-${def.name}`} value={String(value ?? '')}
+                     list={list.length ? `dl-${def.name}` : undefined}
+                     aria-invalid={missing || undefined}
+                     onBlur={() => onBlur?.(def.name)}
+                     onChange={e => onChange(def.name, e.target.value)} />
+          {list.length > 0 && (
+            <datalist id={`dl-${def.name}`}>
+              {list.map(o => <option key={o} value={o} />)}
+            </datalist>
+          )}
+        </FieldRow>
       );
     }
     case 'lookup':
       if (def.freeTextWhen?.(row ?? {})) {
         return (
-          <div className="vy-field vy-field--editing" data-invalid={missing || undefined}>
-            <dt><label htmlFor={`f-${def.name}`}>{def.label}{def.required && <RequiredMark />}</label></dt>
-            <dd>
-              <TextField id={`f-${def.name}`} value={String(value ?? '')}
-                         placeholder={def.placeholder}
-                         aria-invalid={missing || undefined}
-                         onBlur={() => onBlur?.(def.name)}
-                         onChange={e => onChange(def.name, e.target.value)} />
-              {err}
-              {def.hint && !missing && <span className="vy-field-hint">{def.hint}</span>}
-            </dd>
-          </div>
-        );
-      }
-      return (
-        <div className="vy-field vy-field--editing" data-invalid={missing || undefined}>
-          <dt><label htmlFor={`f-${def.name}`}>{def.label}{def.required && <RequiredMark />}</label></dt>
-          <dd>
-            <Select id={`f-${def.name}`} label={def.label} value={String(value ?? '')}
-                    required={def.required} invalid={Boolean(missing)}
-                    options={[...def.optionsFor(row ?? {})]}
-                    onChange={v => { onChange(def.name, v); onBlur?.(def.name); }} />
-            {err}
-            {def.hint && !missing && <span className="vy-field-hint">{def.hint}</span>}
-          </dd>
-        </div>
-      );
-    case 'select':
-      return (
-        <div className="vy-field vy-field--editing" data-invalid={missing || undefined}>
-          <dt><label htmlFor={`f-${def.name}`}>{def.label}{def.required && <RequiredMark />}</label></dt>
-          <dd>
-            <Select id={`f-${def.name}`} label={def.label} value={String(value ?? '')}
-                    required={def.required} invalid={Boolean(missing)}
-                    options={[...def.options]}
-                    onChange={v => { onChange(def.name, v); onBlur?.(def.name); }} />
-            {err}
-            {def.hint && !missing && <span className="vy-field-hint">{def.hint}</span>}
-          </dd>
-        </div>
-      );
-    case 'date':
-      return (
-        <div className="vy-field vy-field--editing" data-invalid={missing || undefined}>
-          <dt><label htmlFor={`f-${def.name}`}>{def.label}{def.required && <RequiredMark />}</label></dt>
-          <dd>
-            <TextField id={`f-${def.name}`} type="date" value={toDateInput(value)}
-                       aria-invalid={missing || undefined}
-                       onBlur={() => onBlur?.(def.name)}
-                       onChange={e => onChange(def.name, fromDateInput(e.target.value))} />
-            {err}
-            {def.hint && !missing && <span className="vy-field-hint">{def.hint}</span>}
-          </dd>
-        </div>
-      );
-    case 'number':
-      return (
-        <div className="vy-field vy-field--editing" data-invalid={missing || undefined}>
-          <dt><label htmlFor={`f-${def.name}`}>{def.label}{def.required && <RequiredMark />}</label></dt>
-          <dd>
-            <div className="vy-suffixed">
-              <TextField id={`f-${def.name}`} type="number" value={String(value ?? '')}
-                         min={def.min} max={def.max} aria-invalid={missing || undefined}
-                         onBlur={() => onBlur?.(def.name)}
-                         onChange={e => onChange(def.name, Number(e.target.value))} />
-              {def.suffix && <span className="vy-suffix">{def.suffix}</span>}
-            </div>
-            {err}
-            {def.hint && !missing && <span className="vy-field-hint">{def.hint}</span>}
-          </dd>
-        </div>
-      );
-    case 'flag':
-      return (
-        <div className="vy-field vy-field--editing" data-invalid={missing || undefined}>
-          <dt />
-          <dd>
-            <Checkbox checked={Boolean(value)} onCheckedChange={c => onChange(def.name, c)}
-                      label={def.label} />
-          </dd>
-        </div>
-      );
-    case 'notes':
-      return (
-        <div className="vy-field vy-field--editing vy-field--wide" data-invalid={missing || undefined}>
-          <dt><label htmlFor={`f-${def.name}`}>{def.label}{def.required && <RequiredMark />}</label></dt>
-          <dd>
-            <TextArea id={`f-${def.name}`} rows={3} value={String(value ?? '')}
-                      aria-invalid={missing || undefined}
-                      onBlur={() => onBlur?.(def.name)}
-                      onChange={e => onChange(def.name, e.target.value)} />
-            {err}
-            {def.hint && !missing && <span className="vy-field-hint">{def.hint}</span>}
-          </dd>
-        </div>
-      );
-    default:
-      return (
-        <div className="vy-field vy-field--editing" data-invalid={missing || undefined}>
-          <dt><label htmlFor={`f-${def.name}`}>{def.label}{def.required && <RequiredMark />}</label></dt>
-          <dd>
+          <FieldRow {...rowProps}>
             <TextField id={`f-${def.name}`} value={String(value ?? '')}
+                       placeholder={def.placeholder}
                        aria-invalid={missing || undefined}
                        onBlur={() => onBlur?.(def.name)}
                        onChange={e => onChange(def.name, e.target.value)} />
-            {err}
-            {def.hint && !missing && <span className="vy-field-hint">{def.hint}</span>}
-          </dd>
-        </div>
+          </FieldRow>
+        );
+      }
+      return (
+        <FieldRow {...rowProps}>
+          <Select id={`f-${def.name}`} label={def.label} value={String(value ?? '')}
+                  required={def.required} invalid={Boolean(missing)}
+                  options={[...def.optionsFor(row ?? {})]}
+                  onChange={v => { onChange(def.name, v); onBlur?.(def.name); }} />
+        </FieldRow>
+      );
+    case 'select':
+      return (
+        <FieldRow {...rowProps}>
+          <Select id={`f-${def.name}`} label={def.label} value={String(value ?? '')}
+                  required={def.required} invalid={Boolean(missing)}
+                  options={[...def.options]}
+                  onChange={v => { onChange(def.name, v); onBlur?.(def.name); }} />
+        </FieldRow>
+      );
+    case 'date':
+      return (
+        <FieldRow {...rowProps}>
+          <TextField id={`f-${def.name}`} type="date" value={toDateInput(value)}
+                     aria-invalid={missing || undefined}
+                     onBlur={() => onBlur?.(def.name)}
+                     onChange={e => onChange(def.name, fromDateInput(e.target.value))} />
+        </FieldRow>
+      );
+    case 'number':
+      return (
+        <FieldRow {...rowProps}>
+          <div className="vy-suffixed">
+            <TextField id={`f-${def.name}`} type="number" value={String(value ?? '')}
+                       min={def.min} max={def.max} aria-invalid={missing || undefined}
+                       onBlur={() => onBlur?.(def.name)}
+                       onChange={e => onChange(def.name, Number(e.target.value))} />
+            {def.suffix && <span className="vy-suffix">{def.suffix}</span>}
+          </div>
+        </FieldRow>
+      );
+    case 'flag':
+      return (
+        /* No heading — the Checkbox carries the label itself, and a `dt`
+           repeating it would announce the field twice. The HINT still shows,
+           which it did not before: these are the fields whose consequences most
+           need explaining. */
+        <FieldRow {...rowProps} label={undefined} htmlFor={undefined}>
+          <Checkbox checked={Boolean(value)} onCheckedChange={c => onChange(def.name, c)}
+                    label={def.label} />
+        </FieldRow>
+      );
+    case 'notes':
+      return (
+        <FieldRow {...rowProps} variant="wide">
+          <TextArea id={`f-${def.name}`} rows={3} value={String(value ?? '')}
+                    aria-invalid={missing || undefined}
+                    onBlur={() => onBlur?.(def.name)}
+                    onChange={e => onChange(def.name, e.target.value)} />
+        </FieldRow>
+      );
+    default:
+      return (
+        <FieldRow {...rowProps}>
+          <TextField id={`f-${def.name}`} value={String(value ?? '')}
+                     aria-invalid={missing || undefined}
+                     onBlur={() => onBlur?.(def.name)}
+                     onChange={e => onChange(def.name, e.target.value)} />
+        </FieldRow>
       );
   }
 }
@@ -372,77 +324,56 @@ function ReadField<T>({ def, value, editing }: { def: FieldDef<T>; value: unknow
       <div className="vy-flag-row" data-on={Boolean(value)} data-locked={editing && def.readOnly || undefined}>
         <span className="vy-flag-mark" aria-hidden>{value ? '✓' : '–'}</span>
         <span>{def.label}{def.required && <RequiredMark />}</span>
-        {editing && def.readOnly && <LockNote def={def} />}
+        {editing && def.readOnly && <span className="vy-field-locked">{lockReason(def)}</span>}
       </div>
     );
   }
+  /* The lock note appears only while EDITING — when you are just reading, every
+     field is read-only and the note would be noise on all of them. Computed once
+     because six branches used to spell out the same condition. */
+  const note = editing && def.readOnly ? lockReason(def) : undefined;
+  const base = { label: def.label, required: def.required, note };
+
   if (def.kind === 'people') {
     const names = Array.isArray(value) ? (value as string[]) : [];
     return (
-      <div className="vy-field" data-locked={editing && def.readOnly || undefined}>
-        <dt>{def.label}{def.required && <RequiredMark />}</dt>
-        <dd className={names.length ? undefined : 'is-empty'}>
-          {names.length ? (
-            <span className="vy-people-read">
-              {names.map(n => {
-                const p = PEOPLE_DIRECTORY.find(x => x.name === n);
-                return (
-                  <span className="vy-people-chip" key={n}>
-                    <span className="vy-avatar vy-avatar--sm" aria-hidden>{p?.initials ?? '?'}</span>
-                    <span className="vy-people-chip-name">{n}</span>
-                  </span>
-                );
-              })}
-            </span>
-          ) : 'Unassigned'}
-        </dd>
-      </div>
+      <FieldRow {...base} empty={names.length === 0}>
+        {names.length ? (
+          <span className="vy-people-read">
+            {names.map(n => {
+              const p = PEOPLE_DIRECTORY.find(x => x.name === n);
+              return (
+                <span className="vy-people-chip" key={n}>
+                  <span className="vy-avatar vy-avatar--sm" aria-hidden>{p?.initials ?? '?'}</span>
+                  <span className="vy-people-chip-name">{n}</span>
+                </span>
+              );
+            })}
+          </span>
+        ) : 'Unassigned'}
+      </FieldRow>
     );
   }
   if (def.kind === 'priority') {
-    return (
-      <div className="vy-field" data-locked={editing && def.readOnly || undefined}>
-        <dt>{def.label}{def.required && <RequiredMark />}</dt>
-        <dd><Priority value={Number(value)} /></dd>
-      </div>
-    );
+    return <FieldRow {...base}><Priority value={Number(value)} /></FieldRow>;
   }
   if (def.kind === 'radio') {
     const chosen = String(value ?? '');
     return (
-      <div className="vy-field">
-        <dt>{def.label}{def.required && <RequiredMark />}</dt>
-        <dd className={chosen ? undefined : 'is-empty'}>
-          {chosen || 'Not set'}
-          {chosen && OPTION_MEANINGS[chosen] && (
-            <span className="vy-option-meaning">{OPTION_MEANINGS[chosen]}</span>
-          )}
-        </dd>
-      </div>
+      <FieldRow {...base} empty={!chosen}>
+        {chosen || 'Not set'}
+        {chosen && OPTION_MEANINGS[chosen] && (
+          <span className="vy-option-meaning">{OPTION_MEANINGS[chosen]}</span>
+        )}
+      </FieldRow>
     );
   }
-  if (def.kind === 'datetime') {
+  if (def.kind === 'datetime' || def.kind === 'date') {
     const d = value instanceof Date ? value : undefined;
     return (
-      <div className="vy-field" data-locked={editing && def.readOnly || undefined}>
-        <dt>{def.label}{def.required && <RequiredMark />}</dt>
-        <dd className={d ? undefined : 'is-empty'}>
-          {d ? fmtDateTime(d) : 'Not set'}
-          {editing && def.readOnly && <LockNote def={def} />}
-        </dd>
-      </div>
-    );
-  }
-  if (def.kind === 'date') {
-    const d = value instanceof Date ? value : undefined;
-    return (
-      <div className="vy-field" data-locked={editing && def.readOnly || undefined}>
-        <dt>{def.label}{def.required && <RequiredMark />}</dt>
-        <dd className={d ? undefined : 'is-empty'}>
-          {d ? fmtDate(d) : 'Not set'}
-          {editing && def.readOnly && <LockNote def={def} />}
-        </dd>
-      </div>
+      <FieldRow {...base} empty={!d}>
+        {d ? (def.kind === 'datetime' ? fmtDateTime(d) : fmtDate(d)) : 'Not set'}
+      </FieldRow>
     );
   }
   const empty = value === undefined || value === null || value === '';
@@ -451,31 +382,22 @@ function ReadField<T>({ def, value, editing }: { def: FieldDef<T>; value: unknow
     ? `${value}${/^[%°]/.test(def.suffix) ? '' : ' '}${def.suffix}`
     : value;
   return (
-    <div className={'vy-field' + (def.kind === 'notes' ? ' vy-field--wide' : '')}
-         data-locked={editing && def.readOnly || undefined}>
-      <dt>{def.label}{def.required && <RequiredMark />}</dt>
-      <dd className={empty ? 'is-empty' : undefined}>
-        {empty ? 'Not set' : String(shown)}
-        {editing && def.readOnly && <LockNote def={def} />}
-      </dd>
-    </div>
+    <FieldRow {...base} empty={empty} variant={def.kind === 'notes' ? 'wide' : undefined}>
+      {empty ? 'Not set' : String(shown)}
+    </FieldRow>
   );
 }
 
 /**
- * Says WHY a field cannot be edited, and only while editing — when you are just
- * reading, every field is read-only and the note would be noise on all of them.
+ * WHY a field cannot be edited.
  *
  * "Set by the system" and "follows Customer" are different answers to the same
  * question, and a user who gets neither will assume the form is broken or that
- * they lack a permission.
+ * they lack a permission. Returns the words; `FieldRow` renders them, and its
+ * presence is what marks the row locked.
  */
-function LockNote<T>({ def }: { def: FieldDef<T> }) {
-  return (
-    <span className="vy-field-locked">
-      {def.derivedFrom ? `follows ${def.derivedFrom}` : 'set by the system'}
-    </span>
-  );
+function lockReason<T>(def: FieldDef<T>): string {
+  return def.derivedFrom ? `follows ${def.derivedFrom}` : 'set by the system';
 }
 
 

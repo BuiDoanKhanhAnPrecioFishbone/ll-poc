@@ -4,7 +4,8 @@ import { Dialog, Tabs, Checkbox, Select } from '../../ui/Overlays';
 import { Button } from '../../ui/Button';
 import { TextField } from '../../ui/Field';
 import { useToast } from '../../ui/Toast';
-import { RecordField, RequiredMark, isMissing } from './RecordField';
+import { RecordField, isMissing } from './RecordField';
+import { FieldRow } from '../../ui/FieldRow';
 import { SmartIcon } from './SmartButtons';
 import { ChecklistsTab } from './ChecklistsTab';
 import {
@@ -167,17 +168,11 @@ export function NewRequirementDialog({ open, onClose }: {
                       what the two fields under it even are. Asking it after the
                       Customer field would mean answering it twice. */}
                   {g.id === 'customer' && (
-                    <div className="vy-field vy-field--editing">
-                      <dt />
-                      <dd>
-                        <Checkbox checked={newCustomer} onCheckedChange={toggleNewCustomer}
-                                  label="New Customer?" />
-                        <span className="vy-field-hint">
-                          Tick this if the customer is not in Customer Management yet. You can add
-                          their contacts once the RFQ is saved.
-                        </span>
-                      </dd>
-                    </div>
+                    <FieldRow editing
+                              hint="Tick this if the customer is not in Customer Management yet. You can add their contacts once the RFQ is saved.">
+                      <Checkbox checked={newCustomer} onCheckedChange={toggleNewCustomer}
+                                label="New Customer?" />
+                    </FieldRow>
                   )}
 
                   {g.fields.map(def => {
@@ -277,9 +272,7 @@ function CustomerField({ newCustomer, value, invalid, onChange, onBlur }: {
   onChange: (v: string) => void; onBlur: () => void;
 }) {
   return (
-    <div className="vy-field vy-field--editing" data-invalid={invalid || undefined}>
-      <dt><label htmlFor="f-customer">Customer<RequiredMark /></label></dt>
-      <dd>
+    <FieldRow editing invalid={invalid} label="Customer" required htmlFor="f-customer">
         {newCustomer ? (
           <TextField id="f-customer" value={value} placeholder="Customer name"
                      aria-invalid={invalid || undefined}
@@ -298,8 +291,7 @@ function CustomerField({ newCustomer, value, invalid, onChange, onBlur }: {
             ? 'Typed in full, because this customer is not in the system yet.'
             : 'Sets the contact list, Customer Type and the ITAR flag, and suggests a markup.'}
         </span>
-      </dd>
-    </div>
+    </FieldRow>
   );
 }
 
@@ -316,9 +308,7 @@ function ContactField({ newCustomer, customer, value, onChange }: {
 }) {
   const options = newCustomer ? [] : contactsFor(customer);
   return (
-    <div className="vy-field vy-field--editing">
-      <dt><label htmlFor="f-contact">Customer Contact</label></dt>
-      <dd>
+    <FieldRow editing label="Customer Contact" htmlFor="f-contact">
         {options.length > 0 ? (
           <Select id="f-contact" label="Customer Contact" value={value}
                   options={options} onChange={onChange} />
@@ -329,8 +319,7 @@ function ContactField({ newCustomer, customer, value, onChange }: {
               : 'Choose a customer first.'}
           </p>
         )}
-      </dd>
-    </div>
+    </FieldRow>
   );
 }
 

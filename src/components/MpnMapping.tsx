@@ -13,7 +13,13 @@ import {
   type MpnMapping, type OrderPreference, type StockLine,
 } from '../data/mpnMapping';
 import type { Part } from '../data/parts';
+import { FieldRow } from '../ui/FieldRow';
 import type { ColumnSpec } from './column-model';
+
+/* Why Part Number and Description cannot be edited here: the record owns them,
+   and they identify what is being edited. Written once because eight rows say
+   it. */
+const RECORD_NOTE = 'Set by the record — not editable here.';
 
 const money = (n: number) =>
   n.toLocaleString('en-GB', { style: 'currency', currency: 'USD' });
@@ -237,24 +243,24 @@ function MappingDetailDialog({ mapping, onClose, onSave, onDelete }: {
       }
     >
       <dl className="vy-record-fields">
-        <Row label="Part Number" locked>{mapping.partNumber}</Row>
-        <Row label="Description" locked>{mapping.description}</Row>
+        <FieldRow label="Part Number" note={RECORD_NOTE}>{mapping.partNumber}</FieldRow>
+        <FieldRow label="Description" note={RECORD_NOTE}>{mapping.description}</FieldRow>
 
-        <EditRow label="Manufacturer">
+        <FieldRow editing label="Manufacturer">
           <Select label="Manufacturer" value={draft.manufacturer}
                   options={[...KNOWN_MANUFACTURERS].sort()}
                   onChange={v => setDraft(d => ({ ...d, manufacturer: v }))} />
-        </EditRow>
-        <EditRow label="MPN">
+        </FieldRow>
+        <FieldRow editing label="MPN">
           <TextField value={draft.mpn} aria-label="MPN"
                      onChange={e => setDraft(d => ({ ...d, mpn: e.target.value }))} />
-        </EditRow>
-        <EditRow label="Order Preference"
+        </FieldRow>
+        <FieldRow editing label="Order Preference"
                  hint="Primary is what buyers order against; Alternate is approved but second choice.">
           <Select label="Order Preference" value={draft.orderPreference}
                   options={[...ORDER_PREFERENCE]}
                   onChange={v => setDraft(d => ({ ...d, orderPreference: v as OrderPreference }))} />
-        </EditRow>
+        </FieldRow>
       </dl>
 
       {confirmDelete && (
@@ -348,10 +354,10 @@ function AddMappingDialog({ part, existing, onClose, onAdd }: {
       }
     >
       <dl className="vy-record-fields">
-        <Row label="Part Number" locked>{part.partNumber}</Row>
-        <Row label="Description" locked>{part.description}</Row>
+        <FieldRow label="Part Number" note={RECORD_NOTE}>{part.partNumber}</FieldRow>
+        <FieldRow label="Description" note={RECORD_NOTE}>{part.description}</FieldRow>
 
-        <EditRow label="Is Existing Mfg"
+        <FieldRow editing label="Is Existing Mfg"
                  hint="Off if this manufacturer is not in Manufacturer Management yet.">
           <div className="vy-radios">
             <label className="vy-radio">
@@ -365,9 +371,9 @@ function AddMappingDialog({ part, existing, onClose, onAdd }: {
               <span>No — name a new one</span>
             </label>
           </div>
-        </EditRow>
+        </FieldRow>
 
-        <EditRow label="Manufacturer">
+        <FieldRow editing label="Manufacturer">
           {isExisting
             ? <Select label="Manufacturer" value={manufacturer}
                       options={[...KNOWN_MANUFACTURERS].sort()}
@@ -375,20 +381,20 @@ function AddMappingDialog({ part, existing, onClose, onAdd }: {
             : <TextField value={newMfg} aria-label="Manufacturer"
                          placeholder="New manufacturer name"
                          onChange={e => setNewMfg(e.target.value)} />}
-        </EditRow>
+        </FieldRow>
 
-        <EditRow label="MPN" hint="The exact manufacturer part number used for purchasing.">
+        <FieldRow editing label="MPN" hint="The exact manufacturer part number used for purchasing.">
           <TextField value={mpn} aria-label="MPN"
                      onChange={e => setMpn(e.target.value)} />
-        </EditRow>
+        </FieldRow>
 
-        <EditRow label="Order Preference"
+        <FieldRow editing label="Order Preference"
                  hint={hasPrimary
                    ? 'This part already has a Primary.'
                    : 'The first approved manufacturer, so Primary by default.'}>
           <Select label="Order Preference" value={pref} options={[...ORDER_PREFERENCE]}
                   onChange={v => setPref(v as OrderPreference)} />
-        </EditRow>
+        </FieldRow>
       </dl>
 
       {duplicate && (
@@ -546,46 +552,46 @@ function UpdateQuantityDialog({ line, replenish, onClose, onSave }: {
       }
     >
       <dl className="vy-record-fields">
-        <Row label="Manufacturer" locked>{draft.manufacturer}</Row>
-        <Row label="MPN" locked>{draft.mpn}</Row>
+        <FieldRow label="Manufacturer" note={RECORD_NOTE}>{draft.manufacturer}</FieldRow>
+        <FieldRow label="MPN" note={RECORD_NOTE}>{draft.mpn}</FieldRow>
 
-        <EditRow label="Date">
+        <FieldRow editing label="Date">
           <TextField type="date" aria-label="Date"
                      value={toDateInput(draft.date)}
                      onChange={e => setDraft(d => ({ ...d, date: new Date(e.target.value) }))} />
-        </EditRow>
-        <EditRow label="Location">
+        </FieldRow>
+        <FieldRow editing label="Location">
           <TextField value={draft.location} aria-label="Location"
                      placeholder="A-01-03"
                      onChange={e => setDraft(d => ({ ...d, location: e.target.value }))} />
-        </EditRow>
-        <EditRow label="Owner Type"
+        </FieldRow>
+        <FieldRow editing label="Owner Type"
                  hint="Rocket stock serves any project; customer stock is consigned and restricted.">
           <Select label="Owner Type" value={draft.ownerType} options={['Rocket', 'Customer']}
                   onChange={v => setDraft(d => ({ ...d, ownerType: v as StockLine['ownerType'] }))} />
-        </EditRow>
-        <EditRow label="Owner">
+        </FieldRow>
+        <FieldRow editing label="Owner">
           <TextField value={draft.owner} aria-label="Owner"
                      onChange={e => setDraft(d => ({ ...d, owner: e.target.value }))} />
-        </EditRow>
-        <EditRow label="Quantity">
+        </FieldRow>
+        <FieldRow editing label="Quantity">
           <TextField type="number" min={0} aria-label="Quantity" value={String(draft.quantity)}
                      onChange={e => setDraft(d => ({ ...d, quantity: Number(e.target.value) }))} />
-        </EditRow>
-        <EditRow label="Allocate Qty"
+        </FieldRow>
+        <FieldRow editing label="Allocate Qty"
                  hint="Already committed to orders. Available Qty is what is left.">
           <TextField type="number" min={0} aria-label="Allocate Qty"
                      value={String(draft.allocatedQty)}
                      onChange={e => setDraft(d => ({ ...d, allocatedQty: Number(e.target.value) }))} />
-        </EditRow>
-        <EditRow label="Unit">
+        </FieldRow>
+        <FieldRow editing label="Unit">
           <Select label="Unit" value={draft.unit} options={['EACH', 'REEL', 'TRAY']}
                   onChange={v => setDraft(d => ({ ...d, unit: v }))} />
-        </EditRow>
+        </FieldRow>
         {/* Derived, so it is shown and not asked for. */}
-        <Row label="Available Qty" note="Quantity − Allocate Qty. Computed, not stored.">
+        <FieldRow label="Available Qty" note="Quantity − Allocate Qty. Computed, not stored.">
           {availableQty(draft).toLocaleString()}
-        </Row>
+        </FieldRow>
       </dl>
 
       {draft.allocatedQty > draft.quantity && (
@@ -598,44 +604,6 @@ function UpdateQuantityDialog({ line, replenish, onClose, onSave }: {
 }
 
 /* ---- Small shared bits ---------------------------------------------------- */
-
-/**
- * A value you cannot edit — and WHY, which is not one reason but two.
- *
- * `locked` means the record owns it: Part Number and Description identify what
- * is being edited. `note` carries anything else. Available Qty is neither
- * stored nor owned — it is arithmetic on two fields in the same dialog — and
- * telling the user it was "set by the record" would send them looking for a
- * record that holds it.
- */
-function Row({ label, locked, note, children }: {
-  label: string; locked?: boolean; note?: string; children: React.ReactNode;
-}) {
-  const hint = note ?? (locked ? 'Set by the record — not editable here.' : undefined);
-  return (
-    <div className="vy-field">
-      <dt>{label}</dt>
-      <dd>
-        {children}
-        {hint && <span className="vy-field-hint">{hint}</span>}
-      </dd>
-    </div>
-  );
-}
-
-function EditRow({ label, hint, children }: {
-  label: string; hint?: string; children: React.ReactNode;
-}) {
-  return (
-    <div className="vy-field vy-field--editing">
-      <dt>{label}</dt>
-      <dd>
-        {children}
-        {hint && <span className="vy-field-hint">{hint}</span>}
-      </dd>
-    </div>
-  );
-}
 
 function toDateInput(d: Date): string {
   const p = (n: number) => String(n).padStart(2, '0');

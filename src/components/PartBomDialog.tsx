@@ -5,6 +5,7 @@ import { MiniTable } from '../ui/MiniTable';
 import { SearchField } from '../ui/Field';
 import { useToast } from '../ui/Toast';
 import { fmtDate } from '../ui/renderCell';
+import { FieldRow } from '../ui/FieldRow';
 import type { ColumnSpec } from './column-model';
 import { bomFor, whereUsed, type WhereUsedRow } from '../data/partBom';
 import type { BomLine } from '../data/bom';
@@ -193,9 +194,6 @@ export function WhereUsedDialog({ part, onClose }: { part: Part; onClose: () => 
 
 function Fact({ label, value }: { label: string; value: string }) {
   return (
-    <div className="vy-field">
-      <dt>{label}</dt>
-      <dd className={value ? undefined : 'is-empty'}>{value || 'Not set'}</dd>
-    </div>
+    <FieldRow label={label} empty={!value}>{value || 'Not set'}</FieldRow>
   );
 }

@@ -8,6 +8,7 @@ import { fmtDate } from '../ui/renderCell';
 import { PartBomDialog, WhereUsedDialog } from './PartBomDialog';
 import { BOM_SOURCES } from '../data/partMetadata';
 import { RecordField } from './quotation/RecordField';
+import { FieldRow } from '../ui/FieldRow';
 import { MpnMappingSection } from './MpnMapping';
 import {
   PART_SALES_PURCHASE, PART_REQUESTS, PART_DIMENSIONS,
@@ -226,13 +227,13 @@ function Section({ title, rows }: { title: string; rows: [string, string][] }) {
       <h3 className="vy-field-group-title">{title}</h3>
       <dl className="vy-record-fields">
         {rows.map(([label, value]) => (
-          <div className="vy-field" key={label}>
-            <dt>{label}</dt>
-            {/* "Not set" rather than an empty box. Half these fields are blank
-                on a real record, and an empty bordered box reads as a control
-                that failed to load rather than a value nobody entered. */}
-            <dd className={value ? undefined : 'is-empty'}>{value || 'Not set'}</dd>
-          </div>
+          /* "Not set" rather than an empty box. Half these fields are blank on a
+             real record, and an empty bordered box reads as a control that
+             failed to load rather than a value nobody entered. `FieldRow` is
+             what renders that, here and everywhere else. */
+          <FieldRow key={label} label={label} empty={!value}>
+            {value || 'Not set'}
+          </FieldRow>
         ))}
       </dl>
     </section>

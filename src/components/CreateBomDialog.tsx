@@ -4,6 +4,7 @@ import { Button } from '../ui/Button';
 import { TextField } from '../ui/Field';
 import { useToast } from '../ui/Toast';
 import { MiniTable } from '../ui/MiniTable';
+import { FieldRow, ReadValue } from '../ui/FieldRow';
 import { ImportFileDialog } from './quotation/run/dialogs';
 import { withPrefix } from './AddPartDialog';
 import { PART_CLASS, PART_CLASS_TYPES } from '../data/partMetadata';
@@ -219,16 +220,16 @@ export function CreateBomDialog({ open, onClose }: { open: boolean; onClose: () 
           <section className="vy-run-section">
             <h3 className="vy-field-group-title">RFQ Information</h3>
             <div className="vy-quote-config-grid">
-              <Labelled label="Customer" required>
+              <FieldRow editing label="Customer" required>
                 <Select label="Customer" value={customer} options={CUSTOMER_OPTIONS}
                         onChange={pickCustomer} />
-              </Labelled>
+              </FieldRow>
               {/* Three read-only stamps. The system owns them, so they are shown
                   as values rather than as disabled inputs — a greyed box reads
                   as a control that failed, not as a fact. */}
-              <Labelled label="Run by"><ReadValue>An Bui</ReadValue></Labelled>
-              <Labelled label="Created Date"><ReadValue>{stamp()}</ReadValue></Labelled>
-              <Labelled label="Last Updated Date"><ReadValue>{stamp()}</ReadValue></Labelled>
+              <FieldRow editing label="Run by"><ReadValue>An Bui</ReadValue></FieldRow>
+              <FieldRow editing label="Created Date"><ReadValue>{stamp()}</ReadValue></FieldRow>
+              <FieldRow editing label="Last Updated Date"><ReadValue>{stamp()}</ReadValue></FieldRow>
             </div>
           </section>
 
@@ -260,37 +261,37 @@ export function CreateBomDialog({ open, onClose }: { open: boolean; onClose: () 
             {action === 'import-new' ? (
               <>
                 <div className="vy-quote-config-grid">
-                  <Labelled label="Assembly Part Number" required
+                  <FieldRow editing label="Assembly Part Number" required
                             hint="The Customer Code is added as a prefix if it is not already there.">
                     <TextField value={assemblyPn} aria-label="Assembly Part Number"
                                onChange={e => setAssemblyPn(e.target.value)}
                                onBlur={() => code && setAssemblyPn(pn =>
                                  pn ? withCustomerCode(pn.trim(), code) : pn)} />
-                  </Labelled>
-                  <Labelled label="Revision">
+                  </FieldRow>
+                  <FieldRow editing label="Revision">
                     <TextField value={rev} aria-label="Revision"
                                onChange={e => setRev(e.target.value)} />
-                  </Labelled>
-                  <Labelled label="Description" required>
+                  </FieldRow>
+                  <FieldRow editing label="Description" required>
                     <TextField value={description} aria-label="Description"
                                onChange={e => setDescription(e.target.value)} />
-                  </Labelled>
+                  </FieldRow>
                   {/* Read-only on a new assembly, and the sheet says so: a BoM
                       that does not exist yet is version 0 and the quantity the
                       recipe is scaled for is 1. */}
-                  <Labelled label="BoM Version"><ReadValue>0</ReadValue></Labelled>
-                  <Labelled label="Quantity"><ReadValue>1</ReadValue></Labelled>
-                  <Labelled label="Part Class" required>
+                  <FieldRow editing label="BoM Version"><ReadValue>0</ReadValue></FieldRow>
+                  <FieldRow editing label="Quantity"><ReadValue>1</ReadValue></FieldRow>
+                  <FieldRow editing label="Part Class" required>
                     <Select label="Part Class" value={partClass} options={PART_CLASS}
                             onChange={setClass} />
-                  </Labelled>
-                  <Labelled label="Part Type" required
+                  </FieldRow>
+                  <FieldRow editing label="Part Type" required
                             hint={partClass ? `Types valid for ${partClass}.`
                                             : 'Choose a Part Class first.'}>
                     <Select label="Part Type" value={partType}
                             options={[...(PART_CLASS_TYPES[partClass] ?? [])]}
                             onChange={setPartType} />
-                  </Labelled>
+                  </FieldRow>
                 </div>
                 {duplicate && (
                   <p className="vy-field-error" role="alert">
@@ -301,19 +302,19 @@ export function CreateBomDialog({ open, onClose }: { open: boolean; onClose: () 
               </>
             ) : (
               <div className="vy-quote-config-grid">
-                <Labelled label="Assembly Part Number" required
+                <FieldRow editing label="Assembly Part Number" required
                           hint={customer ? undefined : 'Choose a Customer first.'}>
                   <Select label="Assembly Part Number" value={existingAssembly}
                           options={assemblies.map(a => a.label)}
                           onChange={setExistingAssembly} />
-                </Labelled>
+                </FieldRow>
                 {/* "Auto-populate value based on the option chosen in Assembly
                     Part Number" — five fields, all of them. */}
-                <Labelled label="Description"><ReadValue>{effective.description}</ReadValue></Labelled>
-                <Labelled label="BoM Version"><ReadValue>{effective.version}</ReadValue></Labelled>
-                <Labelled label="Quantity"><ReadValue>{effective.quantity}</ReadValue></Labelled>
-                <Labelled label="Part Class"><ReadValue>{effective.partClass}</ReadValue></Labelled>
-                <Labelled label="Part Type"><ReadValue>{effective.partType}</ReadValue></Labelled>
+                <FieldRow editing label="Description"><ReadValue>{effective.description}</ReadValue></FieldRow>
+                <FieldRow editing label="BoM Version"><ReadValue>{effective.version}</ReadValue></FieldRow>
+                <FieldRow editing label="Quantity"><ReadValue>{effective.quantity}</ReadValue></FieldRow>
+                <FieldRow editing label="Part Class"><ReadValue>{effective.partClass}</ReadValue></FieldRow>
+                <FieldRow editing label="Part Type"><ReadValue>{effective.partType}</ReadValue></FieldRow>
               </div>
             )}
           </section>
@@ -323,7 +324,7 @@ export function CreateBomDialog({ open, onClose }: { open: boolean; onClose: () 
             <h3 className="vy-field-group-title">Component Info</h3>
 
             <div className="vy-quote-config-grid">
-              <Labelled label="Upload file" required>
+              <FieldRow editing label="Upload file" required>
                 <div className="vy-inline-actions">
                   <Button onClick={() => setFileOpen(true)}>
                     {file ? 'Change file' : 'Upload file'}
@@ -332,7 +333,7 @@ export function CreateBomDialog({ open, onClose }: { open: boolean; onClose: () 
                     ? <span className="vy-code">{file}</span>
                     : <span className="vy-field-hint">No file chosen yet.</span>}
                 </div>
-              </Labelled>
+              </FieldRow>
             </div>
 
             {action === 'import-new' ? (
@@ -372,10 +373,10 @@ export function CreateBomDialog({ open, onClose }: { open: boolean; onClose: () 
               </>
             ) : (
               <div className="vy-quote-config-grid">
-                <Labelled label="Customer Template">
+                <FieldRow editing label="Customer Template">
                   <ReadValue>{customer ? `${code} — default BoM template` : ''}</ReadValue>
-                </Labelled>
-                <Labelled label="Create Custom Template"
+                </FieldRow>
+                <FieldRow editing label="Create Custom Template"
                           hint="Enabled once a file is attached — the template is built from it.">
                   {/* "Default disabled, enable when attach file via upload file."
                       The live label is "Create Custom Template"; the sheet writes
@@ -386,7 +387,7 @@ export function CreateBomDialog({ open, onClose }: { open: boolean; onClose: () 
                             `create a customer template from ${file}`)}>
                     Create Custom Template
                   </Button>
-                </Labelled>
+                </FieldRow>
               </div>
             )}
           </section>
@@ -557,33 +558,6 @@ function reviewColumns(code: string): ColumnSpec<ImportedRow>[] { return [
 ]; }
 
 /* ---- Small shared bits ---------------------------------------------------- */
-
-function Labelled({ label, required, hint, children }: {
-  label: string; required?: boolean; hint?: string; children: React.ReactNode;
-}) {
-  return (
-    <div className="vy-field vy-field--editing">
-      <div className="vy-field-label">
-        {label}
-        {required && <>
-          <span className="vy-required" aria-hidden>(*)</span>
-          <span className="vy-sr-only"> required</span>
-        </>}
-      </div>
-      <div>
-        {children}
-        {hint && <span className="vy-field-hint">{hint}</span>}
-      </div>
-    </div>
-  );
-}
-
-function ReadValue({ children }: { children: React.ReactNode }) {
-  const empty = children === '' || children === undefined || children === null;
-  return <div className={empty ? 'vy-read-value is-empty' : 'vy-read-value'}>
-    {empty ? 'Not set' : children}
-  </div>;
-}
 
 /** The moment the form was opened, in the system's one format. */
 function stamp() {

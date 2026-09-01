@@ -1,4 +1,5 @@
 import { useId, useState } from 'react';
+import { ReadValue } from '../../../ui/FieldRow';
 import { RadioGroup, Select } from '../../../ui/Overlays';
 import { Button } from '../../../ui/Button';
 import { TextField, TextArea } from '../../../ui/Field';
@@ -416,15 +417,6 @@ function Field({ label, required, wide, children }: {
 }
 
 /** A value carried from elsewhere. `locked` marks the ones the system fills. */
-function ReadValue({ children, locked }: { children: React.ReactNode; locked?: boolean }) {
-  const empty = !children || children === '';
-  return (
-    <p className="vy-read-value" data-locked={locked || undefined} data-empty={empty || undefined}>
-      {empty ? 'Not set' : children}
-    </p>
-  );
-}
-
 /**
  * Attachments, shortened until asked.
  *
