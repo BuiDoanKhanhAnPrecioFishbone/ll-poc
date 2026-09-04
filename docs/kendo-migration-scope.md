@@ -143,7 +143,7 @@ ordering — not one big-bang branch.
 | Phase | Work | Size | Risk |
 |---|---|---|---|
 | **0** | ~~Theme spike~~ — **DONE, passed.** `kendo-bridge.css`, 40 lines, on `/kendo-check` | small | — |
-| **1** | ~~`Button` (109) + `Checkbox`, `RadioGroup`~~ — **ATTEMPTED, BLOCKED.** See §9 | one file | **blocker found** |
+| **1** | ~~`Button`~~ — **DONE.** The §9 blocker was misdiagnosed; see §16 | one file | — |
 | **2** | `TextField` (40) → Input/NumericTextBox/DatePicker | medium | low |
 | **3** | `Select` (37) → DropDownList/ComboBox | medium | **medium** — must preserve the filter-as-you-type behaviour An specifically caught |
 | **4** | `Dialog` (21) → Dialog/Window | medium | medium — three-deep nesting must keep working |
@@ -828,3 +828,72 @@ fail**, then removing it — a check that has never failed is not yet a check.
   measurement.
 - **Tab ORDER within the grid** was checked for containment and for the roving
   model, not for whether the sequence is sensible on a 15-column row.
+
+
+---
+
+# 16. Phase 1, unblocked. 31 Aug 2026. **My diagnosis in §9 was wrong.**
+
+§9 concluded "KendoReact 16's Button breaks the app under React 19", having
+ruled out the Vite dep cache, duplicate React, missing peers and dep-graph
+splitting, and having watched a **production** build fail with React error #185.
+Every one of those observations was accurate. The conclusion drawn from them was
+not.
+
+## The evidence was on screen the whole time
+
+Phases 5 and 6 put Kendo Grids into this app, and Kendo's Grid renders **Kendo
+Buttons** in its own filter cells. Twelve of them were on screen, working, with
+no console errors, while the scope still said the Button was broken. Checking
+that took one query and would have reopened the phase a day earlier.
+
+## The actual cause: one prop
+
+Found by bisection — minimal props rendered fine, `{...rest}` looped, `{...rest}`
+minus `ref` rendered fine.
+
+`rest` carried a **`ref`**. In React 19 `ref` is an ordinary prop, so when
+`Popover.Trigger asChild` clones our Button it injects its ref along with
+`data-radix-popper-*`, and the spread handed all of it to Kendo.
+
+**Kendo's Button does not forward a DOM node.** Its `useImperativeHandle` exposes
+`{ element, selected }`. Radix took that object as the element to position its
+popover against and re-measured it forever — "Maximum update depth exceeded", in
+dev and in production alike, which is exactly why the production build failing
+looked like proof of a library fault.
+
+## The fix
+
+Not dropping the ref, which would break the popovers that need it: **unwrapping
+Kendo's handle to the node underneath.** A DOM node is what our Button's own
+contract promises anyone who asks for its ref; Kendo's handle is an
+implementation detail and now stops at that boundary.
+
+Verified: the ColumnChooser popover — a `Popover.Trigger asChild` around our
+Button, the exact path that broke — opens and anchors to its trigger, with zero
+console errors.
+
+## A second thing this uncovered
+
+`tonal` was mapped to Kendo's `flat` fill. `.k-button-flat` sets
+`background: initial **!important**`, so the tint could never land there however
+specific the selector. The giveaway was precise: the text colour from my rule
+applied while the background from the *same rule* did not.
+
+Tonal now rides on Kendo's `solid`, whose background is set normally — and that
+is the better mapping anyway, because MD3's tonal **is** a filled button at low
+emphasis rather than a flat one. Verified: `rgb(238,244,252)`, our blue-50, with
+blue-800 text. No `!important` anywhere.
+
+## The lesson worth keeping
+
+Ruling out four causes is not the same as finding one. §9 listed everything the
+fault was *not* and then named a culprit that none of the evidence pointed at —
+and the contradicting evidence was already rendering on screen. **A negative
+result is not a diagnosis.**
+
+## All eight phases are now complete
+
+Phase 1 was the last one open. What remains is not engineering: **open question
+2, whether to adopt KendoReact at all, is still unanswered.** TanStack Table and
+Virtual stay in `package.json` unimported so that this is still reversible.

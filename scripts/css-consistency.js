@@ -133,7 +133,11 @@ for (const path of FILES) {
           exists to keep the boundary visible rather than remembered. */
     const selector = line.split('{')[0];
     if (/\.k-[a-z0-9-]/.test(selector) && /\{/.test(line)) {
-      const scoped = /\.vy-[a-z0-9-]+[^{]*\.k-/.test(selector);
+      /* Scoped means a `.vy-` class appears ANYWHERE in the selector, not just
+         to the left: `.k-button.vy-btn--tonal` is a compound on one element and
+         is every bit as scoped as `.vy-grid-k .k-grid`. The first version of
+         this check only looked leftwards and flagged its own codebase. */
+      const scoped = /\.vy-[a-z0-9-]+/.test(selector);
       if (!scoped) add(path, n, 'kendo-scope', line,
         'styles a Kendo class without a .vy- ancestor — this reaches every screen');
     }

@@ -29,6 +29,18 @@
 
 .vy-btn--filled   { background: var(--vy-blue-600); color: var(--vy-on-dark-fg); box-shadow: var(--vy-elev-1); }
 .vy-btn--filled:hover  { box-shadow: var(--vy-elev-2); }
+/* The one place we paint over Kendo. MD3's tonal is a filled button at low
+   emphasis — a tinted surface with dark text — and Kendo's ladder has no such
+   rung between `solid` and transparent `flat`. Scoped to `.k-button` so it
+   cannot reach anything else; see the mapping table in ui/Button.tsx. */
+/* Tonal rides on Kendo's SOLID button, not its flat one: `.k-button-flat` sets
+   `background: initial !important`, so the tint could never land there however
+   specific the selector — the giveaway was the text colour from the same rule
+   applying while the background did not. On solid, an ordinary override works. */
+.k-button.k-button-solid.vy-btn--tonal {
+  background-color: var(--vy-blue-50); color: var(--vy-blue-800); border-color: var(--vy-blue-100);
+}
+.k-button.k-button-solid.vy-btn--tonal:hover { background-color: var(--vy-blue-100); }
 .vy-btn--tonal    { background: var(--vy-blue-50); color: var(--vy-blue-800); }
 .vy-btn--outlined { background: var(--vy-grey-0); color: var(--vy-grey-800); border-color: var(--vy-grey-300); }
 .vy-btn--outlined:hover { border-color: var(--vy-grey-400); }
