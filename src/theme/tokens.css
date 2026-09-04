@@ -236,7 +236,36 @@
   --vy-doc-max-w:       1180px;
 
   /* --- Elevation layers ------------------------------------------------------ */
-  --vy-z-palette: 10050;
+/* ---- Layering ---------------------------------------------------------------
+   ONE VALUE FOR EVERYTHING WAS THE BUG. Every overlay in the app — the dialog
+   scrim, the dialog itself, menus, popovers, the command palette, the View
+   Setting drawer, the skip link and the toasts — all carried
+   `--vy-z-palette: 10050`. At equal z-index the DOM order decides, so what sat
+   on top was an accident of which portal mounted last. An found it as an error
+   toast rendering BEHIND the Run Quotation dialog and dimmed by its scrim —
+   the one message telling you why the thing you just did failed.
+
+   The order below is by what has to be readable ON TOP of what:
+
+     drawer  <  scrim  <  dialog  <  menu  <  palette  <  toast  <  skip link
+
+   MENUS ABOVE DIALOGS is the non-obvious one, and it is not a preference: every
+   Select in this app is a portalled menu, and most of them are inside dialogs.
+   Below the dialog they would open behind it.
+
+   TOASTS ABOVE EVERYTHING (bar the skip link) because a toast reports the
+   outcome of the action you just took, and the action is usually taken in a
+   dialog. A confirmation you cannot see is worse than none.
+
+   THE SKIP LINK IS LAST because it is only visible while focused, and when it
+   is focused nothing else matters. */
+  --vy-z-drawer:  10020;
+  --vy-z-scrim:   10040;
+  --vy-z-dialog:  10050;
+  --vy-z-menu:    10060;
+  --vy-z-palette: 10070;
+  --vy-z-toast:   10080;
+  --vy-z-skip:    10090;
 
   /* --- Record screen ---------------------------------------------------------
      Field-list column widths and the label column of a definition list. */

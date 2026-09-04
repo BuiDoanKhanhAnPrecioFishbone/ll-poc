@@ -60,7 +60,7 @@
   /* Sidebar leaves the flow. It overlays when opened rather than squeezing the
      content, because below this width there is no width to give it. */
   .vy-sidebar {
-    position: fixed; inset-block: 0; inset-inline-start: 0; z-index: calc(var(--vy-z-palette) - 1);
+    position: fixed; inset-block: 0; inset-inline-start: 0; z-index: var(--vy-z-drawer);
     transform: translateX(-100%);
     transition: transform var(--vy-dur-medium) var(--vy-ease-emphasised);
     width: var(--vy-shell-sidebar-w); flex-basis: var(--vy-shell-sidebar-w);
@@ -73,7 +73,11 @@
   .vy-shell[data-nav-open="true"] .vy-nav-chevron { display: revert; }
   .vy-shell[data-nav-open="true"] .vy-nav-item { justify-content: flex-start; padding-inline: var(--vy-space-8); }
   .vy-nav-toggle { display: inline-flex; }
-  .vy-nav-scrim { position: fixed; inset: 0; background: var(--vy-overlay-scrim); z-index: calc(var(--vy-z-palette) - 2); }
+  /* The mobile nav is a DRAWER, so it sits on the drawer layer rather than one
+     less than the command palette. Deriving it by arithmetic from an unrelated
+     token meant it moved whenever that token did — and when the layering scale
+     was introduced it would have floated above dialogs. */
+  .vy-nav-scrim { position: fixed; inset: 0; background: var(--vy-overlay-scrim); z-index: calc(var(--vy-z-drawer) - 1); }
 
   .vy-search span { display: none; }        /* icon-only search */
   .vy-search { width: auto; padding-inline: var(--vy-space-4); }

@@ -446,7 +446,7 @@
    tabs through the whole nav on every page load. */
 .vy-skip {
   position: absolute; left: var(--vy-space-4); top: var(--vy-space-4);
-  transform: translateY(-200%); z-index: var(--vy-z-palette);
+  transform: translateY(-200%); z-index: var(--vy-z-skip);
   background: var(--vy-grey-0); color: var(--vy-blue-700);
   border: 1px solid var(--vy-blue-600); border-radius: var(--vy-radius-md);
   padding: var(--vy-space-4) var(--vy-space-6); font-size: var(--vy-text-base);
@@ -1145,7 +1145,11 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
    VIEW SETTING — a right sidebar, per the customer's guideline
    ========================================================================== */
 .vy-viewsetting {
-  position: fixed; inset: 0 0 0 auto; z-index: var(--vy-z-palette);
+  /* The DIALOG layer, not the drawer layer. This is `role="dialog"` and it
+     renders its own `.vy-scrim`, so on the drawer layer it sat BELOW its own
+     scrim — dimmed and unclickable. A drawer that dims itself is not a drawer;
+     the mobile nav is the only thing on that layer. */
+  position: fixed; inset: 0 0 0 auto; z-index: var(--vy-z-dialog);
   width: min(var(--vy-viewsetting-w), 96vw);
   display: flex; flex-direction: column;
   background: var(--vy-grey-0);

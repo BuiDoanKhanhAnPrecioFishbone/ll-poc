@@ -89,7 +89,7 @@
   background: var(--vy-grey-0); border: 1px solid var(--vy-grey-300);
   border-radius: var(--vy-shape-sm); padding: var(--vy-space-4) var(--vy-space-5); cursor: pointer; min-width: var(--vy-card-min-w);
 }
-.vy-menu { background: var(--vy-grey-0); border: 1px solid var(--vy-grey-200); border-radius: var(--vy-shape-md); box-shadow: var(--vy-elev-3); padding: var(--vy-space-2); z-index: var(--vy-z-palette); }
+.vy-menu { background: var(--vy-grey-0); border: 1px solid var(--vy-grey-200); border-radius: var(--vy-shape-md); box-shadow: var(--vy-elev-3); padding: var(--vy-space-2); z-index: var(--vy-z-menu); }
 /* Resets the button chrome, because this class is used on BOTH div items (Radix
    menus) and <button> options (the combobox list). Written for the divs, it left
    the buttons wearing the browser's own `buttonface` grey and a 2px outset
@@ -140,12 +140,12 @@
 .vy-progress-bar { height: 100%; background: var(--vy-accent-positive); border-radius: inherit; transition: width var(--vy-dur-medium) var(--vy-ease-decelerate); }
 
 /* --- Dialog ---------------------------------------------------------------- */
-.vy-scrim { position: fixed; inset: 0; background: var(--vy-overlay-scrim); z-index: var(--vy-z-palette); animation: vy-fade var(--vy-dur-medium) var(--vy-ease-standard); }
+.vy-scrim { position: fixed; inset: 0; background: var(--vy-overlay-scrim); z-index: var(--vy-z-scrim); animation: vy-fade var(--vy-dur-medium) var(--vy-ease-standard); }
 .vy-dialog {
   position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);
   width: min(var(--vy-dialog-md), 94vw); max-height: 88vh; display: flex; flex-direction: column;
   background: var(--vy-grey-0); border-radius: var(--vy-shape-lg); box-shadow: var(--vy-elev-5);
-  z-index: var(--vy-z-palette); animation: vy-rise var(--vy-dur-long) var(--vy-ease-emphasised);
+  z-index: var(--vy-z-dialog); animation: vy-rise var(--vy-dur-long) var(--vy-ease-emphasised);
 }
 .vy-dialog[data-size="lg"] { width: min(var(--vy-dialog-lg), 94vw); }
 .vy-dialog[data-size="xl"] { width: min(var(--vy-dialog-xl), 96vw); }
@@ -261,7 +261,7 @@
 
    Full width on a narrow screen, because a corner on a 375px phone is most of
    the width anyway and a right-anchored strip would read as clipped. */
-.vy-toasts { position: fixed; right: var(--vy-space-9); bottom: var(--vy-space-9); display: flex; flex-direction: column; gap: var(--vy-space-4); z-index: var(--vy-z-palette); margin: 0; padding: 0; list-style: none; max-width: min(92vw, 420px); }
+.vy-toasts { position: fixed; right: var(--vy-space-9); bottom: var(--vy-space-9); display: flex; flex-direction: column; gap: var(--vy-space-4); z-index: var(--vy-z-toast); margin: 0; padding: 0; list-style: none; max-width: min(92vw, 420px); }
 @media (max-width: 560px) {
   .vy-toasts { left: var(--vy-space-6); right: var(--vy-space-6); max-width: none; }
 }
@@ -728,7 +728,7 @@
   border-radius: var(--vy-radius-md);
   box-shadow: var(--vy-shadow-lg);
   padding: var(--vy-space-5);
-  z-index: var(--vy-z-palette);
+  z-index: var(--vy-z-menu);
 }
 .vy-popover-arrow { fill: var(--vy-grey-0); }
 .vy-popover-head {
@@ -959,7 +959,7 @@
 .vy-rt-swatches > summary::-webkit-details-marker { display: none; }
 .vy-rt-swatches[open] > summary { background: var(--vy-blue-50); color: var(--vy-blue-700); }
 .vy-rt-swatch-list {
-  position: absolute; z-index: var(--vy-z-palette); top: calc(100% + var(--vy-space-2)); left: 0;
+  position: absolute; z-index: var(--vy-z-menu); top: calc(100% + var(--vy-space-2)); left: 0;
   display: flex; gap: var(--vy-space-2);
   padding: var(--vy-space-3);
   background: var(--vy-grey-0);
