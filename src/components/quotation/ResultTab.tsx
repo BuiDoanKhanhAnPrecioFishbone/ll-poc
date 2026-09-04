@@ -2,6 +2,7 @@ import { Button } from '../../ui/Button';
 import { MiniTable } from '../../ui/MiniTable';
 import { fmtDateTime } from '../../ui/renderCell';
 import { useToast } from '../../ui/Toast';
+import { useExcelExport } from '../../ui/useExcelExport';
 import type { ColumnSpec } from '../column-model';
 import type { Quotation, QuoteResult } from '../../data/quotations';
 
@@ -66,6 +67,7 @@ function resultColumns(onOpen: (r: QuoteResult) => void): ColumnSpec<QuoteResult
  */
 export function ResultTab({ q, onRun }: { q: Quotation; onRun: () => void }) {
   const toast = useToast();
+  const { exportRows, excel } = useExcelExport<QuoteResult>();
 
   if (q.results.length === 0) {
     return (
@@ -100,12 +102,21 @@ export function ResultTab({ q, onRun }: { q: Quotation; onRun: () => void }) {
           <div className="vy-fact-value">{fmtDateTime(latest.lastRunDate)} · {latest.lastRunBy}</div>
         </div>
         <div className="vy-page-actions">
-          <Button onClick={() => toast.notImplemented('export the costed lines as the customer-facing quote')}>
+          {/* The costed lines, in the columns the tab shows. Kendo writes real
+              numbers with a currency format, so the totals are summable rather
+              than a column of text. */}
+          <Button onClick={() => exportRows(
+            q.results,
+            resultColumns(() => {}),
+            `QuotationResult-RFQ${q.no}.xlsx`,
+          )}>
             Export
           </Button>
           <Button variant="filled" onClick={onRun}>Re-run quotation</Button>
         </div>
       </div>
+
+      {excel}
 
       <MiniTable
         data={q.results}

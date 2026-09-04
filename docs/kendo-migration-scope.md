@@ -149,7 +149,7 @@ ordering — not one big-bang branch.
 | **4** | `Dialog` (21) → Dialog/Window | medium | medium — three-deep nesting must keep working |
 | **5** | ~~`MiniTable` (16) → Grid~~ — **DONE.** Filter cells taken. See §10 | one file | — |
 | **6** | ~~`DataGrid` → Grid~~ — **DONE.** See §13 | one file | — |
-| **7** | ExcelExport + Upload — the two capability wins | medium | low |
+| **7** | ~~ExcelExport + Upload~~ — **DONE.** See §14 | medium | — |
 | **8** | Re-run the a11y audit, `css:check` rethink, responsive re-check | medium | — |
 
 **Phase 0 is the gate — and it has now been run. It passes.** See §8.
@@ -681,3 +681,77 @@ The translator is what that fix lacked; applying it is now a small, known job.
 `MiniTable`'s custom `headerCell` returned a bare fragment rather than a `<th>`.
 No column ships a `headerRender` today, so it had never fired — found because
 the identical mistake in `DataGrid`'s select-all header did.
+
+
+---
+
+# 14. Phase 7 — ExcelExport and Upload. Run 31 Aug 2026. **Done.**
+
+The two capability wins. Between them they close nine `notImplemented` toasts —
+there are now **none left** for export or upload.
+
+## Export — four places, one hook
+
+`ui/useExcelExport.tsx`. Each caller passes the rows and the `ColumnSpec[]` it is
+already rendering, so the spreadsheet has the same columns, in the same order,
+under the same headings as the screen. A second column list would drift from the
+first the moment anyone added a column.
+
+| Where | Scope |
+|---|---|
+| Part Master | the SELECTION when there is one, the filtered view otherwise |
+| Quotations list | the filtered set |
+| Quotation Result tab | the costed lines |
+| BoM Comparison | flattened to one row per difference |
+
+**Values, not rendered cells.** `ColumnSpec.render` returns JSX — a link, a
+badge, a formatted price — which is right for a screen and useless in a
+spreadsheet. The export takes the raw field value and hands Excel a number
+format by column role, so a money column arrives as a **number you can sum**
+rather than the text "US$131.15". Columns that exist only as a control carry no
+data and are dropped; `sortable: false` already marks them.
+
+**BoM Comparison is flattened.** On screen it is grouped by part, one expandable
+block each. A spreadsheet wants one row per difference — Part, Column, BoM 1,
+BoM 2, Status — which is also the shape the live system's own result has.
+
+## Verified, and how
+
+The preview pane **blocks a download the page starts itself**, so `save()`
+succeeds and nothing appears — which looks exactly like a broken export. The
+proof is `toDataURL(rows, cols)`, which returns the same workbook as a string:
+
+- all 2,000 parts → a **231 KB** data URL, MIME
+  `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`, with the
+  `PK` zip header of a real xlsx
+- one row selected → **7.6 KB**, and the button's label changes to "Export 1
+  selected"
+
+That note is in the hook, because the next person to test this will otherwise
+conclude it does not work.
+
+## Upload — five places, one control
+
+`ui/FileDrop.tsx`, over Kendo's `Upload`. The sweep recorded the gap plainly:
+"`k-upload` ships and we have no file input at all — every upload in this
+prototype reports what it would do." Now there is a real `<input type="file">`
+with drag and drop, the file's name and size on screen, and removal — on the
+Run Quotation BoM file, Create BoM, BoM Comparison, checklist documents and new
+part attachments.
+
+**Nothing is uploaded, and the control says so.** `autoUpload` is off and no
+`saveUrl` is set, because there is no server; a `saveUrl` pointing at nothing
+would show every file as failed. The hint reads "Chosen files stay in this
+browser — this prototype has nowhere to send them."
+
+Parsing the spreadsheet — column detection, merge rules, MFG/MPN pairs — remains
+unbuilt and is recorded as such in the testing docs. **Choosing the file is the
+part that was missing from the UI**, and that is what this adds.
+
+## A mistake worth recording
+
+The first install ran as a background command, which does **not** inherit the
+shell's working directory. It created a `package.json`, a lock file and 30 MB of
+`node_modules` in `/Users/nguyenhuyen/development/LL` — the parent of the
+project. Removed, and reinstalled with an explicit `cd` inside the background
+command. Anything backgrounded from now on states its own directory.

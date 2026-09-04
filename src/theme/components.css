@@ -1363,3 +1363,9 @@
 .vy-grid-k .vy-td--select,
 .vy-grid-k .k-grid th:has(.vy-check) { text-align: center; padding-inline: 0; }
 .vy-grid-k tr[data-selected] { background: var(--vy-blue-50); }
+
+/* ---- File upload (phase 7) ----------------------------------------------- */
+.vy-filedrop .k-upload { border-radius: var(--vy-radius-md); }
+.vy-filedrop .vy-field-hint { margin-top: var(--vy-space-3); display: block; }
+.vy-attach-tab { padding-block: var(--vy-space-4); }
+.vy-attach-tab .vy-hint { margin-bottom: var(--vy-space-5); }

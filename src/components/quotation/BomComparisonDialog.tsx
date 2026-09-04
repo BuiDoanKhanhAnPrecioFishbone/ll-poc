@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { Button } from '../../ui/Button';
 import { Dialog, RadioGroup, Select } from '../../ui/Overlays';
-import { useToast } from '../../ui/Toast';
+import { useExcelExport } from '../../ui/useExcelExport';
+import type { ColumnSpec } from '../column-model';
+import { FileDrop } from '../../ui/FileDrop';
 
 /**
  * BoM Comparison.
@@ -32,6 +34,16 @@ const COMPARED = ['PART_NUMBER', 'PART_REV', 'QTY', 'REF_DESIG', 'MANUFACTURER',
 type Status = 'Added' | 'Removed' | 'Changed';
 type Diff = { columnName: string; bom1: string; bom2: string; status: Status };
 type PartDiff = { partId: string; differences: Diff[] };
+
+/** One row per difference — the flat shape a spreadsheet can filter and pivot. */
+type ExportRow = { partId: string; columnName: string; bom1: string; bom2: string; status: Status };
+const EXPORT_COLUMNS: ColumnSpec<ExportRow>[] = [
+  { field: 'partId', title: 'Part', role: 'ident', width: 190 },
+  { field: 'columnName', title: 'Column', role: 'code', width: 150 },
+  { field: 'bom1', title: 'BoM 1', role: 'text', width: 170 },
+  { field: 'bom2', title: 'BoM 2', role: 'text', width: 170 },
+  { field: 'status', title: 'Status', role: 'code', width: 110 },
+];
 
 /* Shaped exactly as the live comparison returns it: flat rows of
    { partId, columnName, bom1, bom2, change, status } grouped by partId. */
@@ -81,7 +93,6 @@ export function BomComparisonDialog({ onClose }: { onClose: () => void }) {
   const [action, setAction] = useState('COMPARE_FILES');
   const [compared, setCompared] = useState(false);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
-  const toast = useToast();
 
   const oldUpload = action === 'COMPARE_FILES';
   const newUpload = action === 'COMPARE_FILES' || action === 'COMPARE_ASSEMBLY';
@@ -93,6 +104,7 @@ export function BomComparisonDialog({ onClose }: { onClose: () => void }) {
     setExpanded(s => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
 
   const totalDiffs = RESULT.reduce((n, p) => n + p.differences.length, 0);
+  const { exportRows, excel } = useExcelExport<ExportRow>();
 
   return (
     <Dialog
@@ -103,7 +115,22 @@ export function BomComparisonDialog({ onClose }: { onClose: () => void }) {
       onClose={onClose}
       actions={compared ? <>
         <Button onClick={() => setCompared(false)}>Change selection</Button>
-        <Button onClick={() => toast.notImplemented('export the comparison as BOMCompare-<file>.xlsx')}>
+        {/* The comparison is grouped by part on screen — one expandable block
+            per part — and that shape does not belong in a spreadsheet. It is
+            FLATTENED to one row per difference, which is how you would filter
+            or pivot it, and how the live system's own flat result is shaped
+            (see the note on RESULT). */}
+        <Button onClick={() => exportRows(
+          RESULT.flatMap(part => part.differences.map(d => ({
+            partId: part.partId,
+            columnName: d.columnName,
+            bom1: d.bom1,
+            bom2: d.bom2,
+            status: d.status,
+          }))),
+          EXPORT_COLUMNS,
+          'BOMCompare.xlsx',
+        )}>
           Export
         </Button>
         <Button variant="filled" onClick={onClose}>Done</Button>
@@ -112,6 +139,8 @@ export function BomComparisonDialog({ onClose }: { onClose: () => void }) {
         <Button variant="filled" onClick={() => setCompared(true)}>Compare</Button>
       </>}
     >
+      {excel}
+
       {compared ? (
         <ComparisonResult
           rows={RESULT} expanded={expanded} onToggle={toggle}
@@ -146,7 +175,6 @@ function BomPane({ title, upload }: { title: string; upload: boolean }) {
   const [sheet, setSheet] = useState('');
   const [template, setTemplate] = useState('');
   const [assembly, setAssembly] = useState('');
-  const toast = useToast();
   return (
     <section className="vy-bom-pane">
       <h3 className="vy-field-group-title">{title}</h3>
@@ -155,9 +183,10 @@ function BomPane({ title, upload }: { title: string; upload: boolean }) {
           <div className="vy-dropzone">
             <strong>Drop a BoM file here</strong>
             <span>or</span>
-            <Button onClick={() => toast.notImplemented('open a file picker for the BoM spreadsheet')}>
-              Upload File
-            </Button>
+            {/* A real picker. The comparison still runs against the seeded
+                result — parsing an uploaded BoM is unbuilt — so this chooses
+                the file and names it, and nothing more is claimed. */}
+            <FileDrop accept=".xlsx" onPick={() => {}} />
             <p className="vy-hint">.xlsx or .xls</p>
           </div>
           <label className="vy-inline-field vy-inline-field--stack">

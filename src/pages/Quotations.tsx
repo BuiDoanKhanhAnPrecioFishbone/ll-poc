@@ -7,6 +7,7 @@ import { DataGrid, fmtDate } from '../ui/DataGrid';
 import { useToast } from '../ui/Toast';
 import { usePrefs } from '../ui/prefs';
 import { generateQuotations, QUOTATION_COLUMNS, daysUntil, type Quotation } from '../data/quotations';
+import { useExcelExport } from '../ui/useExcelExport';
 import { measureFor, scopeFilter } from '../data/queues';
 import { applyItarVisibility } from '../data/itar';
 import { FilterToolbar } from '../ui/FilterToolbar';
@@ -130,6 +131,7 @@ export function Quotations() {
     [all, view.fields]);
   const active = activeCount(fields, values);
   const toast = useToast();
+  const { exportRows, excel } = useExcelExport<Quotation>();
 
   const toggleQuick = (key: string) =>
     setQuickOn(v => (v.includes(key) ? v.filter(k => k !== key) : [...v, key]));
@@ -285,7 +287,7 @@ export function Quotations() {
           Add New
         </Button>
         <Button title="Export the filtered list to Excel"
-                onClick={() => toast.notImplemented(`export these ${data.length} RFQs to Excel`)}>
+                onClick={() => exportRows(data, QUOTATION_COLUMNS, 'ProjectRequirements.xlsx')}>
           Export
         </Button>
       </>}
@@ -372,6 +374,9 @@ export function Quotations() {
     )}
 
     {creating && <NewRequirementDialog open onClose={() => setCreating(false)} />}
+      {/* Renders nothing; owns the workbook and the download. */}
+      {excel}
+
     </>
   );
 }

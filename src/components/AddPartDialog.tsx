@@ -3,6 +3,7 @@ import { Dialog, Tabs } from '../ui/Overlays';
 import { Button } from '../ui/Button';
 import { useToast } from '../ui/Toast';
 import { RecordField, RequiredMark, isMissing } from './quotation/RecordField';
+import { FileDrop } from '../ui/FileDrop';
 import {
   PART_IDENTITY, PART_CLASSIFICATION, PART_HANDLING,
   PART_SALES_PURCHASE, PART_REQUESTS, PART_DIMENSIONS,
@@ -236,15 +237,18 @@ export function AddPartDialog({ open, parts, onClose, onCreated }: {
           {
             value: 'attachments', label: 'Attachments',
             content: (
-              <div className="vy-empty-state vy-empty-state--tab">
-                <strong>No files attached</strong>
-                <p>
+              <div className="vy-attach-tab">
+                <p className="vy-hint">
+                  {/* The sheet: "Display the 'Upload File(s)' button (optional)
+                      allowing users to attach local files to centralize
+                      essential part documents (e.g., drawings, specs,
+                      certificates) as a single reference for all departments." */}
                   Drawings, specifications and certificates attached here are the single
                   reference for every department that uses this part.
                 </p>
-                <Button onClick={() => toast.notImplemented('attach files to a new part')}>
-                  Upload File(s)
-                </Button>
+                <FileDrop multiple accept=".xlsx,.pdf,.png,.jpg,.doc,.docx"
+                          hint="Drawings, specifications and certificates."
+                          onPick={names => setDraft(d => ({ ...d, attachments: names }))} />
               </div>
             ),
           },

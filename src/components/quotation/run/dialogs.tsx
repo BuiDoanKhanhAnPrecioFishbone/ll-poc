@@ -3,7 +3,7 @@ import { Dialog, Select } from '../../../ui/Overlays';
 import { Button } from '../../../ui/Button';
 import { TextField } from '../../../ui/Field';
 import { MiniTable } from '../../../ui/MiniTable';
-import { useToast } from '../../../ui/Toast';
+import { FileDrop } from '../../../ui/FileDrop';
 import type { ColumnSpec } from '../../column-model';
 import {
   PACKAGING_PARTS, totalQtyOf, money, money3, type BomLine,
@@ -353,7 +353,6 @@ const VOYAGER_FILES = [
 export function ImportFileDialog({ open, onClose, onPick }: {
   open: boolean; onClose: () => void; onPick: (name: string) => void;
 }) {
-  const toast = useToast();
   return (
     <Dialog
       open={open} onClose={onClose} size="lg"
@@ -378,10 +377,12 @@ export function ImportFileDialog({ open, onClose, onPick }: {
 
       <div className="vy-dropzone">
         <strong>Or upload from this machine</strong>
-        <span>.xlsx only</span>
-        <Button onClick={() => toast.notImplemented('open a file picker for the BoM spreadsheet')}>
-          Choose a file
-        </Button>
+        {/* A real picker now, with drag and drop. Choosing a file here returns
+            its NAME to the caller, exactly as picking a Voyager file above
+            does — so the two paths end in the same place and the wizard cannot
+            tell them apart. Parsing the spreadsheet is still unbuilt, and the
+            docs say so. */}
+        <FileDrop accept=".xlsx" onPick={names => { if (names.length) onPick(names[0]); }} />
       </div>
     </Dialog>
   );

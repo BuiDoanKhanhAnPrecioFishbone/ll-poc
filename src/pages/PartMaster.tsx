@@ -12,6 +12,7 @@ import { ViewSetting } from '../ui/ViewSetting';
 import { useViews, draftFrom } from '../ui/useViews';
 import { applyView, activeCount, type FilterValues, type SavedView } from '../ui/views';
 import { SmartIcon } from '../components/quotation/SmartButtons';
+import { useExcelExport } from '../ui/useExcelExport';
 
 export function PartMaster() {
   const toast = useToast();
@@ -45,6 +46,7 @@ export function PartMaster() {
   const [settingOpen, setSettingOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
+  const { exportRows, excel } = useExcelExport<Part>();
   /* Held by id rather than by row, so a selection survives sorting, filtering
      and paging — the user picks parts, not positions. */
   const [selected, setSelected] = useState<Set<string | number>>(new Set());
@@ -118,9 +120,17 @@ export function PartMaster() {
               makes the user check the grid to find out which it will do. */}
           <Button
             title="Export Part Master Data"
-            onClick={() => toast.notImplemented(selected.size
-              ? `export the ${selected.size} selected ${selected.size === 1 ? 'part' : 'parts'} to Excel`
-              : `export these ${rows.length} parts to Excel`)}>
+            /* "Allow to select single or multi part before exporting by
+               checking on 1st column on part's row" and "when clicking on
+               Export download the Part Master data as an Excel file for
+               selected part(s)". The SCOPE is the selection when there is one
+               and the filtered view otherwise — which is what the label has
+               always promised and now what it does. */
+            onClick={() => exportRows(
+              selected.size ? rows.filter(r => selected.has(r.id)) : rows,
+              view.columns.map(c => PART_COLUMNS.find(p => String(p.field) === c.field)!).filter(Boolean),
+              selected.size ? `PartMaster-selected-${selected.size}.xlsx` : 'PartMaster.xlsx',
+            )}>
             {selected.size
               ? `Export ${selected.size} selected`
               : 'Export Part Master Data'}
@@ -181,6 +191,9 @@ export function PartMaster() {
           }}
         />
       )}
+
+      {/* Renders nothing; it owns the workbook and triggers the download. */}
+      {excel}
 
       {importOpen && <ImportPartsDialog parts={data} onClose={() => setImportOpen(false)} />}
 

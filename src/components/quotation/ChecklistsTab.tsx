@@ -3,6 +3,8 @@ import { Button } from '../../ui/Button';
 import { Select } from '../../ui/Overlays';
 import { RequiredMark } from './RecordField';
 import { MiniTable } from '../../ui/MiniTable';
+import { FileDrop } from '../../ui/FileDrop';
+import { Dialog } from '../../ui/Overlays';
 import { fmtDate } from '../../ui/DataGrid';
 import { useToast } from '../../ui/Toast';
 import type { ColumnSpec } from '../column-model';
@@ -61,6 +63,7 @@ export function ChecklistsTab({ q, people: controlled, onPeopleChange, touched, 
   onBlur?: (name: string) => void;
 }) {
   const toast = useToast();
+  const [uploadOpen, setUploadOpen] = useState(false);
   const [tasks, setTasks] = useState<ChecklistTask[]>(q.tasks);
   const [ownPeople, setOwnPeople] = useState({
     programManager: q.programManager, buyer: q.buyer, engineer: q.engineer,
@@ -221,8 +224,18 @@ export function ChecklistsTab({ q, people: controlled, onPeopleChange, touched, 
           <h2 className="vy-field-group-title">
             Tasks {tasks.length > 0 && <span className="vy-pill">{done} of {tasks.length} done</span>}
           </h2>
-          <Button onClick={() => toast.notImplemented('attach a document to a task')}>Upload</Button>
+          <Button onClick={() => setUploadOpen(true)}>Upload</Button>
         </div>
+
+        {uploadOpen && (
+          <Dialog open onClose={() => setUploadOpen(false)} title="Upload a document"
+                  subtitle="Attach a document to this Project Requirement's checklist"
+                  actions={<Button variant="filled" onClick={() => setUploadOpen(false)}>Done</Button>}>
+            <FileDrop multiple accept=".xlsx,.pdf,.png,.jpg,.doc,.docx"
+                      hint="Drawings, reports and signed checklists."
+                      onPick={names => { if (names.length) toast.success(`${names.join(', ')} chosen.`); }} />
+          </Dialog>
+        )}
 
         <MiniTable
           data={tasks.map(t => ({ ...t, id: t.type }))}
