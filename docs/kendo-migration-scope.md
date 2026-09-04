@@ -448,5 +448,76 @@ has 23 lines and gets them. Callers can still force it either way.
 - **Column widths** are passed through but Kendo distributes leftover space
   differently; `Part Sour…` truncates in a narrow dialog where it did not
   before. Cosmetic, and worth a pass.
-- **Accessibility is not re-verified** on the Kendo grid. §3.3 still stands: the
-  audit was measured against our DOM and this is a different one.
+- ~~**Accessibility is not re-verified**~~ — **done, see §11.** One defect found
+  and fixed, one found and left, one regression recorded.
+
+
+---
+
+# 11. Accessibility pass on the Kendo Grid. Run 31 Aug 2026.
+
+§3.3 said the audit would have to be redone because it was measured against
+*our* DOM. It was. Measured on the BoM Components tab (23 rows, 6 columns) and
+the Checklists tab (which has a control column).
+
+## What is right
+
+**The ARIA structure is correct**, and better than the one it replaced. A
+`div[role=grid]` owns the whole thing, the tables inside are
+`role="presentation"`, and rows, rowgroups, column headers and cells all carry
+proper roles — 6 `columnheader`, 144 `gridcell`, `aria-rowcount` and
+`aria-colcount` on the grid.
+
+**Every interactive control has an accessible name.** 30 controls in the grid,
+**0 unnamed**.
+
+**`aria-sort` is present and correct** on sortable headers, and control columns
+declared `sortable: false` are correctly `k-sortable=false`.
+
+**Contrast is 16.77:1** on both header and cell text — far above the 4.5:1 floor.
+
+## Fixed: the grid was MOUSE-ONLY for sorting
+
+Kendo puts the sort handler on a `<span class="k-link">` inside the `<th>`,
+which is not focusable. Before this pass the only tabbable things in the grid
+were the filter inputs — **a keyboard user could filter but could never sort.**
+
+`navigatable` on the Grid turns on Kendo's own roving-tabindex model: one
+`tabindex="0"` entry point, 174 cells and headers at `-1`, arrow keys between
+them, Enter to sort. Verified: focusing a header and pressing Enter sorts it
+ascending and the rows reorder.
+
+That is a genuine WCAG 2.1 **2.1.1 Keyboard** failure that shipped in phase 5
+and was found only because this pass happened.
+
+## Found and NOT fixed: filter inputs are named by the field
+
+The filter boxes announce as **"part Filter"**, **"revision Filter"**,
+**"partSource Filter"** — Kendo builds the label from the FIELD name, so a
+screen reader reads camelCase identifiers aloud where a sighted user sees
+"Component Part" and "Part Source".
+
+`filterTitle` does not change it; it names the filter menu. The label comes from
+`ariaLabel` on the filter cell, so I wrapped `GridFilterCell` in a custom
+`cells.filterCell` to supply the column title. **It worked** — the names became
+"Component Part filter", "Part Source filter" — **and it was reverted**, because
+a custom filter cell replaces Kendo's `<td>` wrapper as well as its contents,
+which put a `<div>` directly inside a `<tr>`, and restoring the `<td>` then
+leaked Kendo's internal props (`columnId`, `ariaColumnIndex`, `navigatable`)
+onto the DOM as React warnings on every render.
+
+Trading a poor label for a console full of invalid-DOM warnings is not a trade.
+The route is right and needs more care than the end of a session: pass only the
+props `GridFilterCell` declares, rather than spreading the rest.
+
+## Regression against our own previous behaviour
+
+The old `MiniTable` deliberately **omitted** `aria-sort` on control columns,
+because `aria-sort="none"` does not mean "not sortable" — it means sortable and
+currently unsorted, which is a claim about a column of buttons. Kendo puts
+`aria-sort="none"` on every column header including the ones it correctly marks
+`k-sortable=false`.
+
+Small, and inconsistent within Kendo's own output rather than something we
+introduced — but it is a thing this prototype used to get right and now does
+not.

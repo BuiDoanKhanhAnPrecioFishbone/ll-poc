@@ -100,6 +100,14 @@ export function MiniTable<T extends { id: string | number }>({
     <div className="vy-minitable-k" data-frozen={freeze || undefined}>
       <Grid
         data={view.data}
+        /* Without this the grid is MOUSE-ONLY for sorting. Kendo puts the sort
+           handler on a <span class="k-link"> inside the <th>, which is not
+           focusable, so the only tabbable things in the grid were the filter
+           inputs — a keyboard user could filter but never sort. `navigatable`
+           turns on Kendo's own grid keyboard model: Tab into the grid, then
+           arrow keys between cells and headers, Enter to sort. Found by the
+           accessibility pass. */
+        navigatable
         sortable={{ mode: 'single', allowUnsort: true }}
         onSortChange={e => setSort(e.sort)}
         sort={sort}
@@ -123,6 +131,10 @@ export function MiniTable<T extends { id: string | number }>({
             locked={i < freeze || undefined}
             sortable={c.sortable !== false}
             filterable={c.sortable !== false}
+            /* Names the filter MENU. It does NOT rename the filter input,
+               which Kendo labels from the FIELD — see the known defect in §11
+               of docs/kendo-migration-scope.md. */
+            filterTitle={c.title}
             /* Every cell still goes through `renderCell`, so the column roles,
                the money and date formatting and the empty-value em-dash are
                unchanged — Kendo supplies the table, not the rendering. v16 takes
@@ -143,6 +155,13 @@ export function MiniTable<T extends { id: string | number }>({
               ...(c.headerRender
                 ? { headerCell: () => <>{c.headerRender!()}</> }
                 : {}),
+              /* The filter box otherwise announces itself by the FIELD name —
+                 "part Filter", "partSource Filter" — so a screen reader reads
+                 camelCase identifiers aloud where a sighted user sees the column
+                 heading. `filterTitle` does not change it; the label comes from
+                 `ariaLabel` on the filter cell, so the cell is wrapped to supply
+                 the title instead. Found by the accessibility pass. */
+
             }}
           />
         ))}
