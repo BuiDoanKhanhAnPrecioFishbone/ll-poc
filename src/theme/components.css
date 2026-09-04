@@ -143,20 +143,34 @@
 
 /* --- Dialog ---------------------------------------------------------------- */
 .vy-scrim { position: fixed; inset: 0; background: var(--vy-overlay-scrim); z-index: var(--vy-z-dialog); animation: vy-fade var(--vy-dur-medium) var(--vy-ease-standard); }
-.vy-dialog {
-  position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);
-  width: min(var(--vy-dialog-md), 94vw); max-height: 88vh; display: flex; flex-direction: column;
-  background: var(--vy-grey-0); border-radius: var(--vy-shape-lg); box-shadow: var(--vy-elev-5);
-  /* +1 puts the panel above its own scrim. Nested dialogs override both
-     inline with their depth — see ui/Overlays.tsx. */
-  z-index: calc(var(--vy-z-dialog) + 1); animation: vy-rise var(--vy-dur-long) var(--vy-ease-emphasised);
+/* PHASE D. `.vy-dialog` is now the class Kendo puts on its WRAPPER — the
+   full-screen layer holding the scrim and the panel — not on the panel itself.
+   That caught me out: the old rules here (fixed, centred, sized, shadowed) were
+   written for the panel, and landing them on the wrapper produced a 457px column
+   3288px tall with no scrim and no centring. The panel is `.k-dialog` inside it,
+   so every box rule moves one level down. Kendo's wrapper already centres with
+   flex, which is why the old `translate(-50%, -50%)` is gone. */
+.vy-dialog .k-dialog {
+  width: min(var(--vy-dialog-md), 94vw); max-height: 88vh;
+  border-radius: var(--vy-shape-lg); box-shadow: var(--vy-elev-5);
+  animation: vy-rise var(--vy-dur-long) var(--vy-ease-emphasised);
 }
-.vy-dialog[data-size="lg"] { width: min(var(--vy-dialog-lg), 94vw); }
-.vy-dialog[data-size="xl"] { width: min(var(--vy-dialog-xl), 96vw); }
-.vy-dialog-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--vy-space-8); padding: var(--vy-space-8) var(--vy-space-9) var(--vy-space-5); border-bottom: 1px solid var(--vy-grey-200); }
+.vy-dialog--lg .k-dialog { width: min(var(--vy-dialog-lg), 94vw); }
+.vy-dialog--xl .k-dialog { width: min(var(--vy-dialog-xl), 96vw); }
+/* `opacity: 1` is not redundant. Kendo puts `opacity: .5` on the overlay and
+   lets a flat colour carry the rest; our token already encodes its own alpha
+   (`rgba(19,24,32,.45)`), so leaving Kendo's opacity in place multiplied the two
+   and dimmed the page half as much as the token says. */
+.vy-dialog .k-overlay { background: var(--vy-overlay-scrim); opacity: 1; }
+
+/* Kendo's titlebar holds the close button; the title slot holds everything else,
+   so our title, subtitle and maximise button live inside it as one row. */
+.vy-dialog .k-dialog-titlebar { padding: var(--vy-space-8) var(--vy-space-9) var(--vy-space-5); }
+.vy-dialog .k-dialog-title { flex: 1; min-width: 0; }
+.vy-dialog-titlewrap { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--vy-space-8); width: 100%; }
 .vy-dialog-title { font-size: var(--vy-text-lg); font-weight: var(--vy-weight-bold); color: var(--vy-grey-900); margin: 0; }
-.vy-dialog-sub { font-size: var(--vy-text-base); color: var(--vy-grey-500); margin: var(--vy-space-2) 0 0; }
-.vy-dialog-body { padding: var(--vy-space-9); overflow-y: auto; flex: 1; }
+.vy-dialog-sub { font-size: var(--vy-text-base); color: var(--vy-grey-500); margin: var(--vy-space-2) 0 0; font-weight: var(--vy-weight-regular); }
+.vy-dialog .k-dialog-content { padding: var(--vy-space-9); }
 /* The discard confirmation lists what would be lost. The list is the content of
    that dialog, not decoration, so it gets the same weight as a field value —
    this is the thing the user is being asked to read before choosing. */
@@ -173,9 +187,15 @@
   border-radius: var(--vy-radius-sm);
   font-size: var(--vy-text-base); color: var(--vy-grey-900);
 }
-.vy-dialog-actions { display: flex; justify-content: flex-end; gap: var(--vy-space-4); padding: var(--vy-space-5) var(--vy-space-9) var(--vy-space-8); border-top: 1px solid var(--vy-grey-200); }
+/* Kendo's actions bar gives every child `flex: 1 0 0%`, which is right for its
+   own stretched button rows and wrong here: one Save button grew to the full
+   1140px width of the dialog. Ours are ordinary buttons sitting to the right. */
+.vy-dialog .k-dialog-actions > * { flex: 0 0 auto; }
+.vy-dialog .k-dialog-actions { display: flex; justify-content: flex-end; gap: var(--vy-space-4); padding: var(--vy-space-5) var(--vy-space-9) var(--vy-space-8); border-top: 1px solid var(--vy-grey-200); }
 @keyframes vy-fade { from { opacity: 0 } to { opacity: 1 } }
-@keyframes vy-rise { from { opacity: 0; transform: translate(-50%, calc(-50% + var(--vy-space-6))) } to { opacity: 1; transform: translate(-50%, -50%) } }
+/* No `translate(-50%, …)` any more: Kendo centres the panel with flex, so the
+   animation only has to carry the rise, not the centring. */
+@keyframes vy-rise { from { opacity: 0; transform: translateY(var(--vy-space-6)) } to { opacity: 1; transform: none } }
 
 /* --- Tabs ------------------------------------------------------------------ */
 /* The strip itself is Kendo's now (phase B of the Radix scope), drawn by the
@@ -983,7 +1003,7 @@
    for Minimize; see the note in Overlays.tsx and question 9 for why it is not
    built. */
 .vy-window-actions { display: flex; gap: var(--vy-space-1); flex: 0 0 auto; }
-.vy-dialog[data-maximised] {
+.vy-dialog--max .k-dialog {
   width: 96vw; max-width: none;
   height: 94vh; max-height: none;
 }

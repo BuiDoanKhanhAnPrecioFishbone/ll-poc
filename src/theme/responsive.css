@@ -84,7 +84,7 @@
   .vy-page-head { flex-direction: column; align-items: stretch; gap: var(--vy-space-5); }
   .vy-page-actions { flex-wrap: wrap; }
   .vy-record-bar { flex-direction: column; align-items: stretch; }
-  .vy-dialog { width: 96vw; max-height: 92vh; }
+  .vy-dialog .k-dialog { width: 96vw; max-height: 92vh; }
 }
 
 

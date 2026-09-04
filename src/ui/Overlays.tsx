@@ -1,8 +1,8 @@
+import { Dialog as KendoDialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
 import { TabStrip, TabStripTab } from '@progress/kendo-react-layout';
-import * as RDialog from '@radix-ui/react-dialog';
 import * as RPopover from '@radix-ui/react-popover';
 import * as RRadio from '@radix-ui/react-radio-group';
-import { createContext, type ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { createContext, type ReactNode, useContext, useEffect, useId, useMemo, useRef, useState } from 'react';
 
 /* =============================================================================
    Radix primitives, styled from tokens.
@@ -59,51 +59,68 @@ export function Dialog({ open, onClose, title, subtitle, children, actions, size
      unrelated dialogs would surprise whoever opens the next one. */
   useEffect(() => { if (!open) setMaximised(false); }, [open]);
 
+  /* A UNIQUE ID, and it is an accessibility fix rather than bookkeeping.
+
+     Kendo builds its ARIA ids as `${props.id ?? "accessibility"}-id`, so with no
+     `id` passed EVERY dialog on the page gets `dialog-title-accessibility-id`.
+     Measured with a BoM dialog open inside a Part record: that id appeared
+     twice, and `aria-labelledby` resolves to the first match in the document —
+     so the nested dialog announced itself with its PARENT's title. This app
+     stacks dialogs three deep, so it is not a corner case. */
+  const uid = useId();
+
   const parentDepth = useContext(DialogDepth);
   const depth = parentDepth + 1;
   /* Ten a level: enough room for the scrim to sit under its own panel and above
      everything below, and still far short of the next token up. */
   const step = (depth - 1) * 10;
 
+  if (!open) return null;
+
   return (
     <DialogDepth.Provider value={depth}>
-    <RDialog.Root open={open} onOpenChange={o => !o && onClose()}>
-      <RDialog.Portal>
-        <RDialog.Overlay className="vy-scrim"
-                         style={{ zIndex: `calc(var(--vy-z-dialog) + ${step})` }} />
-        <RDialog.Content className="vy-dialog" data-size={size} data-maximised={maximised || undefined}
-                         style={{ zIndex: `calc(var(--vy-z-dialog) + ${step + 1})` }}>
-          <header className="vy-dialog-head">
+      <KendoDialog
+        id={uid}
+        className={`vy-dialog vy-dialog--${size}${maximised ? ' vy-dialog--max' : ''}`}
+        onClose={onClose}
+        /* ONE z-index a level now, where Radix needed two. Kendo puts the scrim
+           and the panel inside a single positioned wrapper, and `style` lands on
+           that wrapper — so raising it lifts both together, and a child's scrim
+           dims its parent's panel because the whole child wrapper sits above the
+           whole parent one. The two-value scheme this replaces existed because
+           Radix portals the overlay and the content as siblings. */
+        style={{ zIndex: `calc(var(--vy-z-dialog) + ${step})` }}
+        title={
+          <div className="vy-dialog-titlewrap">
             <div>
-              <RDialog.Title className="vy-dialog-title">{title}</RDialog.Title>
-              {subtitle && <RDialog.Description className="vy-dialog-sub">{subtitle}</RDialog.Description>}
+              <div className="vy-dialog-title">{title}</div>
+              {subtitle && <div className="vy-dialog-sub">{subtitle}</div>}
             </div>
-            <div className="vy-window-actions">
-              <button type="button" className="vy-icon-btn"
-                      aria-pressed={maximised}
-                      aria-label={maximised ? 'Restore down' : 'Maximize'}
-                      title={maximised ? 'Restore down' : 'Maximize'}
-                      onClick={() => setMaximised(m => !m)}>
-                <svg viewBox="0 0 20 20" width="15" height="15" fill="none" stroke="currentColor"
-                     strokeWidth="1.7" strokeLinejoin="round" aria-hidden>
-                  {maximised
-                    ? <path d="M7 7V4h9v9h-3M4 7h9v9H4z" />
-                    : <rect x="4" y="4" width="12" height="12" rx="1" />}
-                </svg>
-              </button>
-              <RDialog.Close className="vy-icon-btn" aria-label="Close" title="Close" data-state-layer>
-                <svg viewBox="0 0 20 20" width="17" height="17" fill="none" stroke="currentColor"
-                     strokeWidth="1.8" strokeLinecap="round" aria-hidden>
-                  <path d="m5 5 10 10M15 5 5 15" />
-                </svg>
-              </RDialog.Close>
-            </div>
-          </header>
-          <div className="vy-dialog-body">{children}</div>
-          {actions && <footer className="vy-dialog-actions">{actions}</footer>}
-        </RDialog.Content>
-      </RDialog.Portal>
-    </RDialog.Root>
+            <button type="button" className="vy-icon-btn vy-dialog-max"
+                    aria-pressed={maximised}
+                    aria-label={maximised ? 'Restore down' : 'Maximize'}
+                    title={maximised ? 'Restore down' : 'Maximize'}
+                    onClick={() => setMaximised(m => !m)}>
+              <svg viewBox="0 0 20 20" width="15" height="15" fill="none" stroke="currentColor"
+                   strokeWidth="1.7" strokeLinejoin="round" aria-hidden>
+                {maximised
+                  ? <path d="M7 7V4h9v9h-3M4 7h9v9H4z" />
+                  : <rect x="4" y="4" width="12" height="12" rx="1" />}
+              </svg>
+            </button>
+          </div>
+        }
+      >
+        {/* No wrapper of our own: `.k-dialog-content` IS the scroll box, and
+            nesting a second padded, scrolling div inside it doubled the padding
+            and gave the dialog two scrollbars in the same axis. */}
+        {children}
+        {/* `DialogActionsBar` rather than our own footer. Kendo renders it as a
+            SIBLING of the content, so it stays pinned; our footer was inside the
+            content and scrolled away with the form, which is the one place a
+            dialog's buttons must not go. */}
+        {actions && <DialogActionsBar>{actions}</DialogActionsBar>}
+      </KendoDialog>
     </DialogDepth.Provider>
   );
 }

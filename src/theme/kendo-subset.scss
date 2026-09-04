@@ -27,6 +27,7 @@
 @use "@progress/kendo-theme-default/scss/upload/index.scss" as upload;
 @use "@progress/kendo-theme-default/scss/tabstrip/index.scss" as tabstrip;
 @use "@progress/kendo-theme-default/scss/checkbox/index.scss" as checkbox;
+@use "@progress/kendo-theme-default/scss/dialog/index.scss" as dialog;
 
 /* The Grid pulls button, progressbar, icons and the input chain in as its own
    dependencies, so this one include is the whole of what phase 5 needs.
@@ -41,3 +42,6 @@
    (grid/_index.scss:43) so the include emits nothing — it is here to say
    this app uses the checkbox on its own account, not by inheritance. */
 @include checkbox.kendo-checkbox--styles();
+/* Phase D. Also already pulled in by the Grid (grid/_index.scss:51), which in
+   turn pulls kendo-window--styles(); declared here for the same reason. */
+@include dialog.kendo-dialog--styles();

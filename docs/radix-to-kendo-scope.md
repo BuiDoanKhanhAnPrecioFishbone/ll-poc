@@ -174,7 +174,7 @@ everything.
 | **A** | ~~Delete dead deps and dead exports; fix the three checkboxes to one~~ **DONE 4 Sep** | none | Independent of the decision. Done regardless. |
 | **B** | ~~`Tabs` → TabStrip~~ **DONE 4 Sep** | low | Strongest evidence, smallest surface, proved the pattern |
 | **C** | ~~`Checkbox` → Kendo Checkbox~~ **DONE 4 Sep** | low | Finished A properly |
-| **D** | `Dialog` → Kendo Dialog | **high** | Best parity, re-opens layering — alone, with a keyboard pass |
+| **D** | ~~`Dialog` → Kendo Dialog~~ **DONE 4 Sep** | **high** | Best parity, re-opened layering — done alone, with a keyboard pass |
 | **E** | Reassess `Select`, Popover menus, `Toast` | — | Decide with D's result in hand, not before |
 
 **A is worth doing this week whatever is decided about B–E.** It removes four
@@ -415,3 +415,94 @@ declared required, so there was no live disabled box to inspect.
 
 Build clean, lint 0 errors, `css:check` 0 off-scale in owned stylesheets — the
 bridge findings rise from 7 to 11, all of them the deliberate rules above.
+
+---
+
+# Phase D — done, 4 September 2026
+
+`Dialog` is Kendo's. Radix is **four packages**. This was the risky one and it
+earned the label: six things needed fixing, and one of them was an accessibility
+bug that only appears when dialogs nest — which this app does, three deep.
+
+## The layering came out simpler, not harder
+
+The scope's main fear was the z-index scale. It turned out Kendo makes it
+**easier**: scrim and panel live inside one positioned `.k-dialog-wrapper`, and
+`style` lands on that wrapper. So a level needs **one** z-index where Radix
+needed two, and a child's scrim dims its parent's panel automatically because
+the whole child wrapper sits above the whole parent one. The `DialogDepth`
+context is unchanged.
+
+Measured with a BoM dialog open inside a Part record: wrappers at **10040** and
+**10050**, each its own stacking context, so Kendo's internal `z-index: 11500` on
+the panel stays contained. The toast that started all of this still lands at
+**12500**, above both — verified by triggering a real one with two dialogs open.
+
+## `className` lands on the wrapper, not the panel
+
+This broke the layout immediately and visibly: every box rule we had — fixed
+position, centring transform, width, max-height, background, radius, shadow —
+was written for the panel and was now being applied to the full-screen layer.
+The result was a 457px column 3288px tall with no scrim and no centring. Every
+one of those rules moved down a level to `.vy-dialog .k-dialog`, and the
+`translate(-50%, -50%)` centring is simply gone, because Kendo's wrapper centres
+with flex.
+
+## What Kendo's defaults would otherwise have shipped
+
+- **The footer scrolled away with the form.** Our `<footer>` sat inside
+  `.k-dialog-content`, which is the scroll box. `DialogActionsBar` renders as a
+  sibling of the content and stays pinned. A dialog's buttons are the one thing
+  that must not scroll out of reach.
+- **Two scrollbars and doubled padding.** `.k-dialog-content` is already a
+  padded, scrolling box; our `.vy-dialog-body` was a second one inside it. The
+  wrapper div is gone.
+- **The Save button stretched to 1140px.** Kendo gives every actions-bar child
+  `flex: 1 0 0%`, which is right for its own stretched button rows and wrong for
+  one button sitting to the right.
+- **The scrim was half as dark as the token says.** Kendo puts `opacity: .5` on
+  the overlay and expects a flat colour; our `--vy-overlay-scrim` already carries
+  its own alpha, so the two multiplied.
+
+## The bug worth the phase
+
+**Every Kendo dialog had the same ARIA id.** Kendo builds them as
+`` `${props.id ?? "accessibility"}-id` ``, so with no `id` passed, two open
+dialogs both carry `dialog-title-accessibility-id`. `aria-labelledby` resolves to
+the first match in the document — so the nested BoM dialog **announced itself
+with its parent's title**. Confirmed by counting ids with both open: two of each.
+
+Fixed by passing React's `useId()`. Both dialogs now resolve `aria-labelledby` to
+their own titlebar and `aria-describedby` to their own content, `role="dialog"`,
+`aria-modal="true"`.
+
+## The Escape false alarm
+
+Escape appeared not to close the dialog, through several attempts. It closes
+fine. **Kendo tests `e.keyCode === 27`, and the harness delivers `keyCode: 0`**
+(with `which: 0` and `code: ""`) — the same class of gap as the space key in
+phase C. Reading Kendo's source rather than trusting the symptom is what caught
+it; a dispatched event carrying a real `keyCode` closes the dialog, and adding a
+handler would have shipped a redundant one and a possible double-close.
+
+That test misled once more before it was believed: the check immediately after
+the dispatch still said "open", because React had not re-rendered inside the same
+tick. The dialog was gone a moment later.
+
+## Verified
+
+Focus lands inside on open and is still inside after **25 tabs** — the trap
+holds. Focus returns to the triggering button on close. Maximise works:
+1180 → 1228.8px wide, 676.8px tall (96vw × 94vh), `aria-pressed` and the label
+flipping to "Restore down". Nested dialogs layer correctly, the toast sits above
+both, and a **fresh tab shows zero console errors** with two dialogs open.
+
+One caution about that last check: the reused tab reported "Invalid hook call"
+and a null `useContext` — alarming, and entirely stale buffer from the
+optimize-dep failure caused by installing a package while the dev server ran. A
+new tab showed nothing. Console buffers survive restarts; read them in a fresh
+tab or not at all.
+
+**Not verified:** only the `xl` and default sizes were exercised on screen; `lg`
+rests on the same base rule. And the harness cannot press Escape for real, so
+that path is argued from Kendo's source rather than observed.
