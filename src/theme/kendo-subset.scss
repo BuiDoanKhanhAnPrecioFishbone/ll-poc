@@ -1,11 +1,7 @@
 /* =============================================================================
    KENDO SUBSET — only the components this app actually uses
    -----------------------------------------------------------------------------
-   Phase 1 of docs/kendo-migration-scope.md. **NOT IMPORTED BY THE APP** —
-   phase 1 is blocked (§9 of that document), and importing this would add 14 KB
-   gzipped to render nothing. Kept because the recipe below is the expensive
-   part to rediscover and it is correct; the blocker is in the React package,
-   not here.
+   Phase 5 of docs/kendo-migration-scope.md — the Grid behind `MiniTable`.
 
    WHY A SUBSET AND NOT `all.css`. The compiled theme is 729 KB raw / **97 KB
    gzipped**. The whole of this application's CSS is 31 KB gzipped, so importing
@@ -13,9 +9,8 @@
    payload on every page — to render buttons that look the same as before.
 
    Kendo ships per-component Sass, so the theme can be built to what is used.
-   Measured: button + checkbox + radio compiles to **13 KB gzipped**. Each later
-   phase adds its own component here, and the total only approaches 97 KB if
-   every component is eventually adopted — at which point it is paying for
+   Each phase adds its own component here, and the total only approaches 97 KB
+   if every component is eventually adopted — at which point it is paying for
    itself.
 
    Vite compiles this because `sass` is a devDependency. Nothing is generated
@@ -28,10 +23,9 @@
    `_index.scss`, at the bottom, under `// Expose`.
    ========================================================================== */
 
-@use "@progress/kendo-theme-default/scss/button/index.scss" as button;
-@use "@progress/kendo-theme-default/scss/checkbox/index.scss" as checkbox;
-@use "@progress/kendo-theme-default/scss/radio/index.scss" as radio;
+@use "@progress/kendo-theme-default/scss/grid/index.scss" as grid;
 
-@include button.kendo-button--styles();
-@include checkbox.kendo-checkbox--styles();
-@include radio.kendo-radio--styles();
+/* The Grid pulls button, progressbar, icons and the input chain in as its own
+   dependencies, so this one include is the whole of what phase 5 needs.
+   Measured: 344 KB raw, **40 KB gzipped**, against 97 KB for the full theme. */
+@include grid.kendo-grid--styles();

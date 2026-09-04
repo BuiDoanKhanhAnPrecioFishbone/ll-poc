@@ -147,7 +147,7 @@ ordering — not one big-bang branch.
 | **2** | `TextField` (40) → Input/NumericTextBox/DatePicker | medium | low |
 | **3** | `Select` (37) → DropDownList/ComboBox | medium | **medium** — must preserve the filter-as-you-type behaviour An specifically caught |
 | **4** | `Dialog` (21) → Dialog/Window | medium | medium — three-deep nesting must keep working |
-| **5** | `MiniTable` (16) → Grid, **and take per-column filter cells** | large | medium |
+| **5** | ~~`MiniTable` (16) → Grid~~ — **DONE.** Filter cells taken. See §10 | one file | — |
 | **6** | `DataGrid` (3 call sites, 438 lines) → Grid + virtualisation, re-wiring views, density, column chooser, selection | **large** | **high** — the most feature-dense component in the app |
 | **7** | ExcelExport + Upload — the two capability wins | medium | low |
 | **8** | Re-run the a11y audit, `css:check` rethink, responsive re-check | medium | — |
@@ -366,3 +366,87 @@ In cost order:
 - `sass` (dev) and `@progress/kendo-react-buttons` stay installed. Neither is
   imported by the app; both are needed the moment this resumes, and reinstalling
   them takes minutes.
+
+
+---
+
+# 10. Phase 5 — MiniTable on the Kendo Grid. Run 31 Aug 2026. **Done.**
+
+Taken out of order because phase 1 is blocked and this is where the capability
+win is. One file — `ui/MiniTable.tsx` — as phase 1 established. All eleven
+callers still pass `ColumnSpec` and know nothing about Kendo.
+
+## The gap is closed
+
+`live-component-sweep.md` recorded per-column filter cells as **the one real
+gap** between the live system and this prototype, and the Testing Guideline asks
+for them by name on the BoM Components tab. Measured on that exact tab — 23
+rows, 6 filter cells — the operator menu offers:
+
+> Contains · Does not contain · Is equal to · Is not equal to · Starts with ·
+> Ends with · Is null · Is not null · Is empty · Is not empty
+
+That is the guideline's list — *"Contains, Does not contain, Is [not] equal to,
+Starts/Ends with, Is null"* — with three more. Filtering verified working:
+typing `DFM` cut a three-row list to one and clearing restored it.
+
+**And the Grid works app-wide where the Button did not.** Imported into a module
+eleven files depend on, with a clean dep cache: no invalid hook call, no render
+loop, zero console errors. Phase 1's blocker does not generalise.
+
+## Everything that had to survive, did
+
+| Behaviour | State |
+|---|---|
+| asc → desc → **none** | Works — verified all three clicks; the third restores the original order, which is the guideline's "Clear" |
+| Row tones (excluded/no-supplier/short/covered) | Works — `rows.data` puts `data-tone` back on the `<tr>` |
+| Cell tones (green/red part and MFG) | Works — verified on Create BoM step 2, `missing` painting `rgb(253,236,235)` |
+| Column roles (mono idents, right-aligned money) | Works — re-expressed for a real `<table>` |
+| Control columns opting out | Works — `sortable: false` now also suppresses the filter cell |
+| Frozen columns | Mapped to Kendo `locked` |
+
+## Two bugs I introduced, and one false alarm
+
+**`.vy-td` destroyed the table layout.** That class is `display:flex;
+height:100%` — correct for the CSS-grid table it was written for, fatal inside a
+real `<td>`, where columns stopped aligning with their headers entirely. Roles
+now ride on `data-role` and are styled under `.vy-minitable-k`.
+
+**`overflow: hidden` clipped Kendo's own scroller.** Added for the border
+radius, it silently ate the right-hand columns of a wide grid with no way to
+reach them. `overflow-x: auto` rounds the corners and keeps the scrollbar.
+
+**The false alarm cost the most time.** I twice concluded sorting was broken —
+`aria-sort` stayed `none` after clicking a header, with a real browser click,
+not a synthetic one. It was not broken: Kendo binds the handler to the `.k-link`
+*inside* the `th`, and both clicks landed on the th's padding. The rule this
+project already wrote down after the virtualised-grid false zeros applies
+exactly: **when a check reports "nothing happens anywhere", doubt the check
+first.**
+
+## What it costs
+
+The app's CSS goes from **31 KB to 71 KB gzipped**. The grid subset is 40 KB and
+pulls button, progressbar and the input chain in as its own dependencies — so
+phase 1's components are now paid for whether or not phase 1 ever lands.
+
+That is a real 2.3× on the stylesheet, and it is the honest price of the filter
+cells. It is also most of what full adoption would ever cost: the full theme is
+97 KB, so the remaining phases add roughly 26 KB between them.
+
+## One judgement call
+
+A filter row appears only at **8 rows or more**. This component backs both a
+23-line BoM and a one-line Where-Used, and a filter row over three rows spends a
+row of chrome to search three things. The threshold is mine, not the
+guideline's — which asks for filter cells on the BoM Components tab, and that
+has 23 lines and gets them. Callers can still force it either way.
+
+## Not done
+
+- **`DataGrid` is untouched** — phase 6, the 21-prop component, still ours.
+- **Column widths** are passed through but Kendo distributes leftover space
+  differently; `Part Sour…` truncates in a narrow dialog where it did not
+  before. Cosmetic, and worth a pass.
+- **Accessibility is not re-verified** on the Kendo grid. §3.3 still stands: the
+  audit was measured against our DOM and this is a different one.

@@ -1298,3 +1298,40 @@
    colour on stock levels and a second scheme would compete with it. */
 .vy-pref { color: var(--vy-grey-600); }
 .vy-pref[data-primary] { color: var(--vy-grey-900); font-weight: var(--vy-weight-medium); }
+
+/* ---- MiniTable on the Kendo Grid ----------------------------------------- */
+/* The column-role model, re-expressed for a real <table>. The old `.vy-td` is
+   `display:flex; height:100%` — correct for the CSS-grid table it was written
+   for, fatal inside a <td>, where it stops columns aligning with their headers.
+   Roles now ride on `data-role` and are styled here instead, so
+   `docs/table-patterns.md` still describes what happens. */
+.vy-minitable-k {
+  border: 1px solid var(--vy-grey-200);
+  border-radius: var(--vy-shape-md);
+  /* `hidden` would round the corners and then CLIP Kendo's own horizontal
+     scroller, so a wide grid simply lost its right-hand columns with no way to
+     reach them. `auto` still clips to the radius and keeps the scrollbar. */
+  overflow-x: auto;
+  background: var(--vy-grey-0);
+}
+.vy-minitable-k .k-grid { border: 0; font-size: var(--vy-text-base); }
+
+.vy-minitable-k td[data-role="number"],
+.vy-minitable-k td[data-role="money"],
+.vy-minitable-k td[data-role="date"] { text-align: right; font-variant-numeric: tabular-nums; }
+.vy-minitable-k td[data-role="ident"] {
+  font-family: var(--vy-font-mono); font-size: var(--vy-text-sm); color: var(--vy-grey-900);
+}
+
+/* Row and cell states. The vocabulary is the guideline's — grey excluded, red
+   no-supplier, yellow short, green covered — and only the selector changes:
+   Kendo renders a <tr>, so the old `.vy-minitable-row[data-tone]` no longer
+   matches anything. */
+.vy-minitable-k tr[data-tone="excluded"]    { background: var(--vy-tone-excluded-bg); color: var(--vy-tone-excluded-fg); }
+.vy-minitable-k tr[data-tone="no-supplier"] { background: var(--vy-tone-missing-bg); }
+.vy-minitable-k tr[data-tone="short"]       { background: var(--vy-tone-short-bg); }
+.vy-minitable-k tr[data-tone="covered"]     { background: var(--vy-tone-covered-bg); }
+.vy-minitable-k td[data-tone="known"]       { background: var(--vy-tone-covered-bg); }
+.vy-minitable-k td[data-tone="missing"]     { background: var(--vy-tone-missing-bg); color: var(--vy-tone-missing-fg); }
+.vy-minitable-k td[data-tone="known-mfg"]   { background: var(--vy-tone-known-mfg-bg); }
+.vy-minitable-k td[data-tone="pending"]     { background: var(--vy-tone-missing-bg); }
