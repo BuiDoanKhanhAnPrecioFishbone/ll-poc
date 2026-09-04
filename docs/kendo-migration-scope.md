@@ -143,7 +143,7 @@ ordering — not one big-bang branch.
 | Phase | Work | Size | Risk |
 |---|---|---|---|
 | **0** | ~~Theme spike~~ — **DONE, passed.** `kendo-bridge.css`, 40 lines, on `/kendo-check` | small | — |
-| **1** | `Button` (109) + `Checkbox`, `RadioGroup` | medium | low — mechanical |
+| **1** | ~~`Button` (109) + `Checkbox`, `RadioGroup`~~ — **ATTEMPTED, BLOCKED.** See §9 | one file | **blocker found** |
 | **2** | `TextField` (40) → Input/NumericTextBox/DatePicker | medium | low |
 | **3** | `Select` (37) → DropDownList/ComboBox | medium | **medium** — must preserve the filter-as-you-type behaviour An specifically caught |
 | **4** | `Dialog` (21) → Dialog/Window | medium | medium — three-deep nesting must keep working |
@@ -271,3 +271,98 @@ Honest limits, so nobody reads more into this than it earned:
 - **Density.** Our compact/default/comfortable model has no Kendo equivalent
   wired here.
 - **Nothing was migrated.** No app screen uses Kendo. That is still phases 1–8.
+
+
+---
+
+# 9. Phase 1 — attempted 31 Aug 2026. **Blocked, and reverted.**
+
+The app is exactly as it was before, and passes build, lint and `css:check`.
+Three things were learned; the third stops the phase.
+
+## 1. This phase is ONE FILE, not 109 call sites
+
+The scope sized phase 1 as "109 uses across 29 files". That was wrong, and the
+correction applies to **every** later phase.
+
+`Button` is already the only way this app makes a button, so the swap belongs
+BEHIND that boundary — `ui/Button.tsx` keeps its own API (`variant`, `size`,
+`icon`, `asChild`) and renders KendoReact underneath. Nothing outside that file
+changes. It is reversible by reverting one file, the variant mapping is stated
+once where it can be argued with rather than as 109 individual judgements, and
+`asChild` survives — it has no call sites today, which is exactly why a
+call-site migration would have dropped it silently.
+
+**Re-estimate every phase on this basis.** The real work is not the call sites;
+it is the mapping and the behaviours in §3.2.
+
+## 2. The theme must be built as a subset, and can be
+
+Importing `all.css` app-wide costs **97 KB gzipped** against an app whose entire
+stylesheet is **31 KB**. Tripling the payload to render buttons that look the
+same is not a trade worth making.
+
+Kendo ships per-component Sass. `src/theme/kendo-subset.scss` compiles button +
+checkbox + radio to **13 KB gzipped** — measured, and confirmed end-to-end: with
+it wired in, the app's CSS went from 31 KB to 45 KB gzipped and nothing else
+moved. The file is kept and **not imported**, since importing it now would add
+14 KB to render nothing.
+
+One trap, recorded because it costs an hour and produces a *silent* wrong
+answer: `@include button.styles()` — the obvious spelling — fails with
+"Undefined mixin" on v14 and emits a stylesheet that looks fine but contains no
+component CSS. The real names are `kendo-button--styles()` etc., listed at the
+bottom of each component's `_index.scss` under `// Expose`.
+
+## 3. THE BLOCKER: KendoReact 16's Button breaks the app under React 19
+
+With the adapter in place, every page renders **nothing**:
+
+```
+Invalid hook call … more than one copy of React
+Cannot read properties of null (reading 'useRef')
+Maximum update depth exceeded          ← the real one
+```
+
+What was ruled out, in order:
+
+| Suspected | Result |
+|---|---|
+| Stale Vite pre-bundle | Cleared `node_modules/.vite`, restarted — **no change** |
+| Duplicate React on disk | One copy, 19.2.8. Kendo peer range is `^18 \|\| ^19` — **satisfied** |
+| Missing peer packages | All seven present at matching versions — **not it** |
+| Vite splitting the dep graph | Same dist file appeared under three `?v=` hashes; added `resolve.dedupe` + `optimizeDeps.include` — **no change** |
+| Vite dev pre-bundling itself | **Production build fails too** — React error #185, "maximum update depth". Rollup, no pre-bundling. Not a dev-server artefact. |
+
+**And it is not KendoReact wholesale.** In the *same* production build,
+`/kendo-check` renders its Kendo **Grid** with 12 rows. The Grid is fine under
+React 19; the Button is not.
+
+That distinction matters for the decision: the component that carries the
+capability wins — the Grid, with its per-column filter cells — is the one that
+works.
+
+## What I would do next, if this resumes
+
+In cost order:
+
+1. **Reproduce in isolation** — a bare Vite + React 19 app with one
+   `<KendoButton>`. Five minutes, and it either confirms the incompatibility or
+   points back at something in this app.
+2. **Check KendoReact's own React 19 support matrix and changelog** for v16, and
+   whether a later patch fixes it.
+3. **Try React 18** in a branch. This is a prototype, so downgrading is possible
+   — but it is a large decision to take for a button.
+4. **Re-sequence.** Since the Grid works and the Button does not, phase 5
+   (`MiniTable` → Grid, taking the per-column filter cells) could go first. It
+   is where the actual capability win is, and it would prove the migration on
+   the component that justifies it.
+
+## What is left in the tree
+
+- `src/theme/kendo-subset.scss` — proven recipe, not imported.
+- `vite.config.ts` gains `resolve.dedupe: ['react', 'react-dom']` — correct
+  regardless, and the first thing to rule out if this is revisited.
+- `sass` (dev) and `@progress/kendo-react-buttons` stay installed. Neither is
+  imported by the app; both are needed the moment this resumes, and reinstalling
+  them takes minutes.

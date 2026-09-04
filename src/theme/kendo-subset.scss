@@ -1,0 +1,37 @@
+/* =============================================================================
+   KENDO SUBSET — only the components this app actually uses
+   -----------------------------------------------------------------------------
+   Phase 1 of docs/kendo-migration-scope.md. **NOT IMPORTED BY THE APP** —
+   phase 1 is blocked (§9 of that document), and importing this would add 14 KB
+   gzipped to render nothing. Kept because the recipe below is the expensive
+   part to rediscover and it is correct; the blocker is in the React package,
+   not here.
+
+   WHY A SUBSET AND NOT `all.css`. The compiled theme is 729 KB raw / **97 KB
+   gzipped**. The whole of this application's CSS is 31 KB gzipped, so importing
+   the full theme to get three components would have TRIPLED the stylesheet
+   payload on every page — to render buttons that look the same as before.
+
+   Kendo ships per-component Sass, so the theme can be built to what is used.
+   Measured: button + checkbox + radio compiles to **13 KB gzipped**. Each later
+   phase adds its own component here, and the total only approaches 97 KB if
+   every component is eventually adopted — at which point it is paying for
+   itself.
+
+   Vite compiles this because `sass` is a devDependency. Nothing is generated
+   and committed, so this file cannot drift from what ships.
+
+   THE MIXIN NAMES ARE NOT GUESSABLE. `@include button.styles()` — the obvious
+   spelling and the one the docs suggest for older versions — fails with
+   "Undefined mixin" on v14 and emits an empty stylesheet that looks like a
+   successful build. The real names are read out of each component's
+   `_index.scss`, at the bottom, under `// Expose`.
+   ========================================================================== */
+
+@use "@progress/kendo-theme-default/scss/button/index.scss" as button;
+@use "@progress/kendo-theme-default/scss/checkbox/index.scss" as checkbox;
+@use "@progress/kendo-theme-default/scss/radio/index.scss" as radio;
+
+@include button.kendo-button--styles();
+@include checkbox.kendo-checkbox--styles();
+@include radio.kendo-radio--styles();
