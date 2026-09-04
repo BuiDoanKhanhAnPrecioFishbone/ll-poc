@@ -85,7 +85,18 @@
 .vy-icon-btn:hover { background: var(--vy-grey-100); color: var(--vy-grey-800); }
 .vy-avatar { width: var(--vy-control-sm); height: var(--vy-control-sm); border-radius: 50%; background: var(--vy-blue-100); color: var(--vy-blue-800); display: grid; place-items: center; font-weight: var(--vy-weight-semibold); font-size: var(--vy-text-sm); }
 
-.vy-content { flex: 1; overflow: auto; min-height: 0; }
+/* `position: relative` is LOAD-BEARING, not decoration.
+   `.vy-sr-only` hides text with `position: absolute`, and an absolutely
+   positioned element with no positioned ancestor resolves against the document
+   rather than against its scroll container. So every screen-reader-only span
+   inside a long record — the `(*) required` markers, mostly — sat at its
+   absolute DOCUMENT coordinate, and the deepest one stretched the page's own
+   scroll height past the viewport.
+   The visible symptom was a band of blank page under the app: the shell is
+   exactly 100vh with `overflow: hidden`, so scrolling the document slid the
+   whole thing — sidebar included — upwards and exposed the background beneath.
+   Making the scroller a containing block keeps those spans inside it. */
+.vy-content { flex: 1; overflow: auto; min-height: 0; position: relative; }
 
 /* ---- Page ----------------------------------------------------------------- */
 .vy-page { padding: var(--vy-space-9) var(--vy-space-10); }
