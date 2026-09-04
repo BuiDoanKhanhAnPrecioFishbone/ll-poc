@@ -521,3 +521,81 @@ currently unsorted, which is a claim about a column of buttons. Kendo puts
 Small, and inconsistent within Kendo's own output rather than something we
 introduced — but it is a thing this prototype used to get right and now does
 not.
+
+
+---
+
+# 12. Overlay and stacking audit. Run 31 Aug 2026.
+
+Prompted by An finding an error toast behind the Run Quotation dialog. That one
+fix exposed a class of fault, so the whole app's layering was swept rather than
+patched at the point of complaint.
+
+## The root cause was one value for everything
+
+Every overlay — dialog scrim, dialog, menus, popovers, command palette, View
+Setting, skip link, toasts — carried `--vy-z-palette: 10050`. At equal z-index
+DOM order decides, so what sat on top was an accident of portal mount order.
+Three things were wrong because of it and one more was wrong by luck.
+
+## The scale now
+
+    drawer   10020
+    dialogs  10040+   a BAND: level n takes scrim 10040+2(n-1), panel +1
+    menu     10070    above any dialog depth — Selects live inside dialogs
+    palette  10075
+    toast    12500    above Kendo's popups, see below
+    skip     12600
+
+## Fixed
+
+**Toasts behind dialogs.** The reported fault. A toast reports the outcome of
+the action you just took, and that action is usually taken in a dialog.
+
+**Nested dialogs did not dim their parents.** This app stacks three deep — Part
+record → Stock Report → Update Quantity — and all three panels and all three
+scrims shared one value, so every dialog rendered at full brightness with
+nothing to say which was live. Worse, the correct front-to-back order held only
+because portals mount in order: correct by accident, the same fault as the
+toast. `ui/Overlays.tsx` now counts nesting depth and steps each level's scrim
+above the parent's panel. Verified: scrims 10040/10050/10060, panels
+10041/10051/10061, and the parent is now visibly dimmed.
+
+**The mobile nav derived its z-index as `calc(palette - 1)`**, so it moved
+whenever an unrelated token did — and would have floated above dialogs.
+
+**Toasts sat below Kendo's popups.** Kendo ships its own ladder, and
+`.k-animation-container` — the filter operator menu — is at 12001. A dropdown
+inside a grid would have covered a toast: the same fault again, across a library
+boundary. Toast and skip link now clear Kendo's range.
+
+## One I got wrong on the way
+
+I first put the View Setting on the drawer layer. It is `role="dialog"` and
+renders its own `.vy-scrim`, so it sat **below its own scrim** — dimmed and
+unclickable. It is a modal surface and belongs in the dialog band. Caught by
+hit-testing, not by eye.
+
+A second miss: the first depth step was ten a level, which put a third dialog
+at 10070 — the menu layer — so a Select inside it would have opened behind the
+dialog it belongs to. Two a level, with fourteen levels of headroom.
+
+## Checked and correct
+
+- **Kendo popups render above our dialogs** (12001 over 10041), so the filter
+  operator menu works inside the BoM dialog — verified with all ten operators
+  visible. An earlier screenshot appeared to show it clipped; that was the
+  open animation caught mid-flight, not a fault.
+- **No accidental stacking contexts.** Swept every element for
+  transform/filter/opacity/will-change/contain that also contains an overlay.
+  One hit: `.vy-dialog` trapping its own header while animating, which is its
+  own child and belongs there.
+- **Sticky grid headers** (z-index 1 and 2) are inside their own scroll
+  containers and do not interact with the overlay band.
+
+## Method note
+
+Every claim here is hit-tested with `elementsFromPoint` rather than read off a
+computed z-index. Two of the faults above — the View Setting under its own
+scrim, and the toast — had perfectly sensible-looking z-index values and were
+still wrong.

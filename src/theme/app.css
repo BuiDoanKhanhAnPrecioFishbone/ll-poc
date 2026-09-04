@@ -1149,7 +1149,7 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
      renders its own `.vy-scrim`, so on the drawer layer it sat BELOW its own
      scrim — dimmed and unclickable. A drawer that dims itself is not a drawer;
      the mobile nav is the only thing on that layer. */
-  position: fixed; inset: 0 0 0 auto; z-index: var(--vy-z-dialog);
+  position: fixed; inset: 0 0 0 auto; z-index: calc(var(--vy-z-dialog) + 1);
   width: min(var(--vy-viewsetting-w), 96vw);
   display: flex; flex-direction: column;
   background: var(--vy-grey-0);

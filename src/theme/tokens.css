@@ -260,12 +260,27 @@
    THE SKIP LINK IS LAST because it is only visible while focused, and when it
    is focused nothing else matters. */
   --vy-z-drawer:  10020;
-  --vy-z-scrim:   10040;
-  --vy-z-dialog:  10050;
-  --vy-z-menu:    10060;
-  --vy-z-palette: 10070;
-  --vy-z-toast:   10080;
-  --vy-z-skip:    10090;
+  /* DIALOGS ARE A BAND, not a single value, because this app stacks them three
+     deep. Each level takes two steps — its scrim, then its panel — so a child's
+     scrim covers its parent's panel and the live dialog is the bright one:
+
+       level 1   scrim 10040, panel 10041
+       level 2   scrim 10042, panel 10043
+       level 3   scrim 10044, panel 10045
+
+     Fourteen levels fit before the menu layer, which is thirteen more than
+     anything here needs. `ui/Overlays.tsx` counts the depth. */
+  --vy-z-dialog:  10040;
+  --vy-z-menu:    10070;
+  --vy-z-palette: 10075;
+  /* ABOVE KENDO. Everything above is ours and stacks among itself, but Kendo
+     ships its own ladder and its popups sit at 12000-12001 — a filter operator
+     menu inside a grid would have covered a toast, which is the same fault as
+     a dialog covering one. These two clear Kendo's whole range (its highest
+     non-scrollbar layer is .k-dock-indicator at 100001, which this app has no
+     component for). Recorded in docs/kendo-migration-scope.md §12. */
+  --vy-z-toast:   12500;
+  --vy-z-skip:    12600;
 
   /* --- Record screen ---------------------------------------------------------
      Field-list column widths and the label column of a definition list. */

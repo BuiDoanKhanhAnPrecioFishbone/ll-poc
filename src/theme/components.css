@@ -140,12 +140,14 @@
 .vy-progress-bar { height: 100%; background: var(--vy-accent-positive); border-radius: inherit; transition: width var(--vy-dur-medium) var(--vy-ease-decelerate); }
 
 /* --- Dialog ---------------------------------------------------------------- */
-.vy-scrim { position: fixed; inset: 0; background: var(--vy-overlay-scrim); z-index: var(--vy-z-scrim); animation: vy-fade var(--vy-dur-medium) var(--vy-ease-standard); }
+.vy-scrim { position: fixed; inset: 0; background: var(--vy-overlay-scrim); z-index: var(--vy-z-dialog); animation: vy-fade var(--vy-dur-medium) var(--vy-ease-standard); }
 .vy-dialog {
   position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);
   width: min(var(--vy-dialog-md), 94vw); max-height: 88vh; display: flex; flex-direction: column;
   background: var(--vy-grey-0); border-radius: var(--vy-shape-lg); box-shadow: var(--vy-elev-5);
-  z-index: var(--vy-z-dialog); animation: vy-rise var(--vy-dur-long) var(--vy-ease-emphasised);
+  /* +1 puts the panel above its own scrim. Nested dialogs override both
+     inline with their depth — see ui/Overlays.tsx. */
+  z-index: calc(var(--vy-z-dialog) + 1); animation: vy-rise var(--vy-dur-long) var(--vy-ease-emphasised);
 }
 .vy-dialog[data-size="lg"] { width: min(var(--vy-dialog-lg), 94vw); }
 .vy-dialog[data-size="xl"] { width: min(var(--vy-dialog-xl), 96vw); }

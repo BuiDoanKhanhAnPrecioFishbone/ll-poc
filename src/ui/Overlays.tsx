@@ -5,7 +5,7 @@ import * as RToggle from '@radix-ui/react-toggle-group';
 import * as RProgress from '@radix-ui/react-progress';
 import * as RCheckbox from '@radix-ui/react-checkbox';
 import * as RRadio from '@radix-ui/react-radio-group';
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { createContext, type ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
 /* =============================================================================
    Radix primitives, styled from tokens.
@@ -35,6 +35,24 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
  * to compare against the list underneath, the answer is a non-modal draggable
  * window, which is a different component and worth knowing before it is built.
  */
+/**
+ * How deep the dialog we are inside is. 0 means "not in one".
+ *
+ * This app stacks dialogs three deep — a Part record opens a Stock Report,
+ * which opens Update Quantity — and every one of them used to carry the same
+ * z-index, as did every scrim. Two consequences, both invisible until you look:
+ *
+ *   1. The innermost dialog was on top only because its portal MOUNTED LAST.
+ *      Correct by accident is the same fault that put an error toast behind the
+ *      Run Quotation dialog.
+ *   2. A child's scrim (below every dialog) could not dim its parent, so three
+ *      stacked dialogs all rendered at full brightness with nothing to say
+ *      which one was live.
+ *
+ * Each level now steps its own scrim and panel above the level before it.
+ */
+const DialogDepth = createContext(0);
+
 export function Dialog({ open, onClose, title, subtitle, children, actions, size = 'md' }: {
   open: boolean; onClose: () => void; title: string; subtitle?: ReactNode;
   children: ReactNode; actions?: ReactNode; size?: 'md' | 'lg' | 'xl';
@@ -44,11 +62,20 @@ export function Dialog({ open, onClose, title, subtitle, children, actions, size
      unrelated dialogs would surprise whoever opens the next one. */
   useEffect(() => { if (!open) setMaximised(false); }, [open]);
 
+  const parentDepth = useContext(DialogDepth);
+  const depth = parentDepth + 1;
+  /* Ten a level: enough room for the scrim to sit under its own panel and above
+     everything below, and still far short of the next token up. */
+  const step = (depth - 1) * 10;
+
   return (
+    <DialogDepth.Provider value={depth}>
     <RDialog.Root open={open} onOpenChange={o => !o && onClose()}>
       <RDialog.Portal>
-        <RDialog.Overlay className="vy-scrim" />
-        <RDialog.Content className="vy-dialog" data-size={size} data-maximised={maximised || undefined}>
+        <RDialog.Overlay className="vy-scrim"
+                         style={{ zIndex: `calc(var(--vy-z-dialog) + ${step})` }} />
+        <RDialog.Content className="vy-dialog" data-size={size} data-maximised={maximised || undefined}
+                         style={{ zIndex: `calc(var(--vy-z-dialog) + ${step + 1})` }}>
           <header className="vy-dialog-head">
             <div>
               <RDialog.Title className="vy-dialog-title">{title}</RDialog.Title>
@@ -80,6 +107,7 @@ export function Dialog({ open, onClose, title, subtitle, children, actions, size
         </RDialog.Content>
       </RDialog.Portal>
     </RDialog.Root>
+    </DialogDepth.Provider>
   );
 }
 
