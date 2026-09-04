@@ -18,11 +18,16 @@ than yours.
 
 Ordered by what an answer unblocks, not by number.
 
+### Answered
+
+| # | Decision | Answer | What it settled |
+|---|---|---|---|
+| 2 | Do we adopt KendoReact? | **Yes — 4 Sep 2026.** "The main on the original is Kendo also, so the mockup should not be too different." | All eight migration phases; TanStack removed; the bridge becomes the design system rather than a spike |
+
 ### Blocking — work cannot start until you answer
 
 | # | Decision | Our assumption | What it unblocks |
 |---|---|---|---|
-| 2 | Do we adopt KendoReact? A licence key now exists and is proven working. | MIT components; every requirement met either way. **Scoped in `kendo-migration-scope.md` — 358 usages, 8 phases, phase 0 is a theme spike that gates the rest** | Per-column filter cells, ExcelExport, Upload, visual parity |
 | — | **Brand.** Is "The completed ERP/MES Solution" the tagline you *want*, or the one you want *improved*? If new, is "completed" meant to be "complete"? Rename to **Voyager IQ** now? | We render `VOYAGER` unchanged | The rename, the palette, every screen's header |
 | — | **Setting Form View** (deck slide 15) — no guideline section defines it. What is in scope? | Not built; four Configuration paths fall through to a placeholder | An entire screen archetype |
 | — | **Dark mode** (deck slide 7) — no source but the deck mentions it. In scope? | Not built; on-dark tokens exist for the sidebar only | Touches every colour token in the system |
@@ -99,18 +104,34 @@ We would suggest (c), decided before clone ships rather than after.
 
 ---
 
-## 2. KendoReact licence
+## 2. KendoReact — answered: adopt
 
-We have no licence, so the prototype is built on licence-free (MIT) components.
-Every functional requirement in your review is met either way.
+**Answered 4 September 2026: yes.** The reason you gave shapes the work as much
+as the answer does — the system you run today is Kendo, so the revamp should
+read as the same product improved rather than as a different one.
 
-See `docs/kendo-license-activation.md` for how activation works. In short we need
-either a licence key file, or named developer seats — **only the licence holder
-can generate the key**, so we cannot do it for you.
+All eight migration phases are complete; `docs/kendo-migration-scope.md` is the
+record, including the two places we got it wrong and how they were caught.
 
-If you want to move to KendoReact, it is worth deciding **before** that work is
-scheduled: it would replace the grid, dialogs, dropdowns, date inputs and form
-controls.
+**What the answer changed beyond finishing the migration:**
+
+- **TanStack Table and Virtual are removed.** They stayed in `package.json`,
+  unimported, through all eight phases so the work could be reversed on a "no".
+  That hedge is spent, and an unused dependency that nobody can explain later is
+  a liability rather than an option.
+- **The bridge stopped being a spike and became the design system.** While
+  adoption was undecided, `kendo-bridge.css` deliberately left elevation, motion
+  and disabled unmapped — each was "a design call, not a mapping", and the call
+  could not be made. It is made now. See §17 of the migration scope.
+- **It found a real defect.** Kendo's focus indicator is 2px of 8% of the text
+  colour, which on this app computes to fully transparent. Since phase 1 turned
+  every button into a Kendo button, every button in the app had no visible focus
+  ring — a WCAG 2.4.7 failure we introduced and did not catch. Fixed.
+
+**The licence is separate and already settled**: the key is present and proven
+working (`TELERIK_LICENSE`, held in `.env.local`, which is gitignored and has
+been checked absent from every commit). `docs/kendo-license-activation.md` has
+the detail.
 
 ---
 

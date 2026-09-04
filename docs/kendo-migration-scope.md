@@ -897,3 +897,184 @@ result is not a diagnosis.**
 Phase 1 was the last one open. What remains is not engineering: **open question
 2, whether to adopt KendoReact at all, is still unanswered.** TanStack Table and
 Virtual stay in `package.json` unimported so that this is still reversible.
+
+---
+
+# §17 — The customer said yes, and the bridge became the design system
+
+**4 September 2026.** Open question 2 is answered: adopt KendoReact. The reason
+given is not incidental and it governs everything below — *the system they run
+today is Kendo, so the revamp should read as the same product improved rather
+than as a different one.*
+
+That rules out the obvious reading of "improve the design system on top of
+Kendo". This is **not** a re-skin. Kendo stays recognisably Kendo. What changes
+is that it stops speaking two design languages at once.
+
+## What being undecided had been costing
+
+Phase 0 mapped 18 of Kendo's 453 variables and deliberately stopped, recording
+three things as "a design call, not a mapping": elevation, motion, and disabled
+state. That was the right call at the time — you cannot decide how two systems
+should merge while it is still open whether one of them is being kept.
+
+The cost was that the app ran **two complete parallel systems**:
+
+| | ours | Kendo's |
+|---|---|---|
+| elevation | `--vy-elev-1..5`, blue-tinted | `--kendo-elevation-1..5`, neutral black |
+| easing | 4 curves | 8 curves |
+| duration | 3 rungs | 13 rungs, all deriving from one kill switch |
+| disabled | `.38` (MD3) | `.6` |
+| focus | one ring token | per component |
+
+These are not abstract. A Kendo dropdown opens inside our dialog; a disabled
+Kendo button sits beside a disabled Save. Adjacent components were visibly
+different, and the disabled opacity gap — `.38` against `.6` — is the kind of
+thing that reads as sloppiness rather than as a decision.
+
+## The principle, stated once
+
+> **Our token wins where ours is demonstrably better for this app.
+> Kendo wins where Kendo's system is more complete than ours.**
+
+Both directions appear in the file. A bridge that only ever pushed our values
+onto Kendo would be a re-skin wearing a map's clothing.
+
+- **Elevation → ours.** Rung for rung; both scales are 1..5 ordered by height,
+  so this is a map rather than an interpretation. Ours is tinted with the house
+  blue so a shadow on a blue-grey surface reads as depth rather than as dirt.
+- **Motion → ours for easing, Kendo's for the switch.** See the trap below.
+- **Disabled → Kendo's number**, and `--vy-state-disabled` moves from `.38` to
+  `.6` to meet it. MD3's `.38` assumes comfortable type; the house body size is
+  13px, and a disabled button here carries the *reason* it is disabled in a
+  tooltip the user first has to notice is worth hovering.
+
+## The trap in the motion mapping
+
+Worth recording because the obvious mapping silently breaks accessibility.
+Kendo declares every duration as
+
+```css
+--kendo-duration-brief: var(--kendo-duration-global, 100ms);
+```
+
+`--kendo-duration-global` is normally **unset**, so the 100ms fallback applies.
+Its one declaration is inside `@media (prefers-reduced-motion: reduce)`, where
+it becomes `0.01ms` — collapsing all thirteen durations at once. It is a good
+design and we have no equal to it.
+
+So `--kendo-duration-brief: var(--vy-dur-short)` would pin the duration and
+**discard the switch**: reduced-motion users would keep every animation. The
+mapping puts our value in the *fallback slot*, where Kendo put its own, and the
+switch survives untouched.
+
+## The defect this pass found
+
+Kendo's focus indicator for a button is:
+
+```css
+outline: 0;
+box-shadow: 0 0 0 2px color-mix(in srgb, var(--kendo-color-on-app-surface) 8%, transparent);
+```
+
+Eight per cent of the text colour is a hairline at best. On this app it computes
+to `oklab(0 0 0 / 0)` — **fully transparent**. Measured with the bridge both on
+and off: identical, so this is Kendo's own design and not something the variable
+map caused.
+
+**It is a regression we introduced.** `md3.css` gives the whole app a ring:
+
+```css
+:where(button, a, input, …):focus-visible { box-shadow: var(--vy-focus-ring); }
+```
+
+`:where()` contributes **zero specificity** — chosen so a component could
+override the ring without a fight. That choice is exactly what makes it lose
+here: the rule weighs (0,1,0) and Kendo's `.k-button.k-button-solid.k-button-base.k-focus`
+weighs (0,4,0). **Phase 1 turned every Button in the app into a `.k-button`, and
+every button quietly stopped showing focus.** Neither the phase 1 check nor the
+phase 8 accessibility pass caught it, because both looked at what was *on* the
+screen rather than at what a keyboard could *reach*.
+
+### Why `!important`, when nothing else in the theme uses it
+
+The honest alternative is to out-specify Kendo, and that was measured: the
+deepest Kendo focus selector in the stylesheet carries **six** classes. Winning
+by stacking means writing `.k-button.k-button.k-button…` today and re-counting
+on every Kendo upgrade — a race where losing is silent and invisible by
+definition. A focus indicator is not a style preference; it is the floor that
+lets someone use the app without a mouse, and it should not be overridable by a
+third-party rule we do not control. Scope is kept to `.k-*` elements and to the
+two focus properties, so it can never reach our own components.
+
+Grid cells take an **inset outline** instead of the ring: the ring is two
+spreading shadows, and on a cell inside a scrolling grid the outer 4px is
+clipped by the viewport edge and the neighbouring cell's border, so it reads as
+a smear on the leading edge only.
+
+## Verifying it cost four false negatives
+
+Every one of them said "the fix does not work", and every one was the check
+rather than the code. Recorded because the pattern is now unmistakable:
+
+1. **Tab presses did nothing** — the Browser pane was hidden, so key events
+   never landed. The log came back empty.
+2. **`fv: true` on a first probe** — read as proof of keyboard modality; it was
+   not, and the same probe after a reload returned `false` for `.vy-input`,
+   which certainly *does* have a ring. A check that contradicts a known-good
+   control is measuring itself.
+3. **`getComputedStyle` inside a `focusin` handler** returns the style before
+   the focus state is applied, while `matches(':focus-visible')` in the same
+   handler evaluates live. The two disagreed, and the disagreement was the tell.
+4. **The real one.** With the pane hidden, `document.visibilityState` is
+   `"hidden"`, which freezes CSS transitions. `getAnimations()` showed a
+   `CSSTransition` on `box-shadow`, `playState: "running"`, `currentTime: 0` —
+   **stuck on the first frame of the ring's own 150ms fade-in, forever.** The
+   computed value was our ring's exact two-shadow shape with every value zeroed.
+   Setting `transition: none` returned
+   `rgb(255,255,255) 0 0 0 2px, rgb(42,99,184) 0 0 0 4px` — the ring, correct
+   all along.
+
+Visual proof was then obtained by neutralising transitions and screenshotting:
+the Import button carries the ring.
+
+**The lesson is the same one phase 1 taught and is now earned twice: when a
+check reports that nothing happens anywhere, doubt the check first.**
+
+## What `css:check` now reports
+
+Seven findings in `kendo-bridge.css` — five `important`, two `kendo-scope`. All
+seven are deliberate and none is counted as a failure, because the checker
+treats bridge files as reported-not-failed. The `kendo-scope` pair is flagged as
+"reaches every screen", which for a focus ring is the point rather than the
+problem. `0 off-scale in owned stylesheets` is unchanged.
+
+## Also done
+
+**TanStack Table and Virtual removed.** They stayed in `package.json`,
+unimported, through all eight phases so a "no" could be honoured. That hedge is
+spent, and an unused dependency nobody can explain later is a liability rather
+than an option.
+
+**The bridge header was lying.** It said "NOT IN USE by the app. Loaded only by
+`/kendo-check`". That stopped being true at phase 5, when the first Kendo Grid
+shipped, and `main.tsx` has set `data-kendo-bridged` on the root all along.
+Corrected.
+
+## What this pass did not do
+
+- **Contrast was not re-measured** on the new focus ring against every Kendo
+  surface. The ring is unchanged from the one already passing on our own
+  components, but "unchanged token" is not the same as "measured in a new place".
+- **The 150ms fade-in on the focus ring is left as Kendo designed it.** Tabbing
+  quickly means a ring that never reaches full strength before focus moves on.
+  It is short enough to read, and shortening it is a taste call nobody asked for
+  — but it is a real question, not an oversight.
+- **The remaining 11 durations and the expressive easings stay unmapped.** We
+  have no counterpart in a three-rung scale, and an invented rung is a guess
+  that later reads as a decision.
+- **Radix still owns Dialog, Tabs, Checkbox, Toast and the rest.** Adoption
+  answered "do we use Kendo", not "does Kendo replace every primitive". Those
+  are working, accessible and layered correctly; swapping them is its own piece
+  of work with its own risk, and would need a reason better than symmetry.

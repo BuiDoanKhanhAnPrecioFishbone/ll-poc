@@ -1,10 +1,13 @@
 /* =============================================================================
    KENDO BRIDGE — phase 0 spike, 31 Aug 2026
    -----------------------------------------------------------------------------
-   NOT IN USE by the app. Loaded only by /kendo-check, alongside the Kendo theme
-   and by the same dynamic import, so nothing here reaches a real screen.
+   LIVE, ON EVERY SCREEN. `main.tsx` sets `data-kendo-bridged` on the root at
+   startup, so this file styles every Kendo component in the app. It began as a
+   phase 0 spike that reached nothing; that stopped being true at phase 5, when
+   the first Kendo Grid shipped, and this header went on saying otherwise until
+   the customer confirmed adoption.
 
-   THE QUESTION PHASE 0 ASKS: can our design tokens drive KendoReact, or would
+   THE QUESTION PHASE 0 ASKED: can our design tokens drive KendoReact, or would
    adoption mean abandoning them and re-skinning 493 classes?
 
    THE ANSWER IS IN THIS FILE'S LENGTH. Kendo's theme is entirely
@@ -78,16 +81,176 @@ html[data-kendo-bridged] {
   --kendo-spacing-base: var(--vy-space-2);
 }
 
+/* =============================================================================
+   PASS 2 — ONE LANGUAGE, AFTER ADOPTION                          4 Sep 2026
+   -----------------------------------------------------------------------------
+   The customer has chosen KendoReact, and the reason shapes every decision
+   below: the system they run today IS Kendo, and they want the revamp to read
+   as the same product improved rather than as a different one. So this is not
+   a re-skin. Kendo stays recognisably Kendo; what changes is that it stops
+   speaking two languages at once.
+
+   Phase 0 left elevation, motion and disabled unmapped and said each was "a
+   design call, not a mapping". That call could not be made while adoption was
+   undecided. It is decided, so they are made here, and the principle is stated
+   once rather than re-argued per line:
+
+       OUR TOKEN WINS where ours is demonstrably better for this app.
+       KENDO WINS where Kendo's system is more complete than ours.
+
+   Both directions appear below. A bridge that only ever pushed our values onto
+   Kendo would be a re-skin wearing a map's clothing.
+   ========================================================================== */
+
+html[data-kendo-bridged] {
+
+  /* ---- Elevation: ours, because the surfaces underneath are ours -----------
+     Two five-step scales were running side by side — `--vy-elev-1..5` on our
+     dialogs, drawers and cards, `--kendo-elevation-1..5` on Kendo's popups and
+     dropdowns. They are not interchangeable: Kendo's are neutral black, ours
+     are tinted with the house blue so a shadow on a blue-grey surface reads as
+     depth rather than as dirt.
+
+     It matters because the two MEET. A Kendo dropdown opens inside our dialog;
+     a Kendo popup anchors to our toolbar. Adjacent shadows from two systems is
+     exactly the kind of difference nobody names and everybody feels.
+
+     Both scales are 1..5 and both ordered by height, so this is a rung-for-rung
+     map rather than an interpretation. */
+  --kendo-elevation-1: var(--vy-elev-1);
+  --kendo-elevation-2: var(--vy-elev-2);
+  --kendo-elevation-3: var(--vy-elev-3);
+  --kendo-elevation-4: var(--vy-elev-4);
+  --kendo-elevation-5: var(--vy-elev-5);
+
+  /* ---- Motion: our easing, Kendo's kill switch ----------------------------
+     THE TRAP HERE IS WORTH SPELLING OUT, because the obvious mapping silently
+     breaks accessibility. Kendo declares every duration as
+
+         --kendo-duration-brief: var(--kendo-duration-global, 100ms);
+
+     `--kendo-duration-global` is normally UNSET, so the 100ms fallback applies.
+     Its one declaration is inside `@media (prefers-reduced-motion: reduce)`,
+     where it becomes 0.01ms — collapsing all thirteen durations at once. It is
+     a good design and we do not have its equal.
+
+     So `--kendo-duration-brief: var(--vy-dur-short)` would pin the duration and
+     DISCARD the switch: reduced-motion users would keep every animation. The
+     mapping therefore puts our value in the FALLBACK slot, where Kendo put its
+     own, and the switch survives untouched.
+
+     The two rungs mapped already hold the same milliseconds as ours. That is
+     the point: the map states the agreement so it SURVIVES a retune of either
+     scale, exactly as `--kendo-spacing-base` does above. */
+  --kendo-duration-brief: var(--kendo-duration-global, var(--vy-dur-short));
+  --kendo-duration-rapid: var(--kendo-duration-global, var(--vy-dur-medium));
+
+  /* Easing is where the two genuinely differ. Kendo's `standard` is symmetric
+     ease-in-out; ours is MD3's asymmetric curve, which starts fast and settles
+     — what makes a menu feel like it arrives rather than drifts. Only the three
+     with true counterparts are mapped. `bounce`, `elastic` and `stretchy` are
+     left alone: we have no equivalent, and inventing one to fill the row would
+     be worse than the mismatch. */
+  --kendo-easing-standard:   var(--vy-ease-standard);
+  --kendo-easing-decelerate: var(--vy-ease-decelerate);
+  --kendo-easing-accelerate: var(--vy-ease-accelerate);
+
+  /* ---- Disabled: KENDO'S NUMBER, and ours moves to meet it ----------------
+     This is the mapping that runs the other way, and it was a real defect
+     rather than a tidying. `--vy-state-disabled` is MD3's .38; Kendo's
+     `--kendo-disabled-opacity` is .6. A disabled Save button and a disabled
+     Kendo toolbar button sat side by side at visibly different weights.
+
+     KENDO'S IS THE BETTER NUMBER HERE, and the reason is this app rather than
+     the spec. MD3 assumes comfortable type; the house body size is 13px, and
+     .38 of 13px grey is at the edge of legible. Our disabled buttons carry the
+     REASON in a tooltip — "Still needed: Part Number, Customer" — so a user who
+     cannot read the label has no way to know what is worth hovering. .6 stays
+     readable while still reading as unavailable.
+
+     `--vy-state-disabled` moves to .6 in md3.css so the two agree at the
+     source; this line states the agreement so it survives a retune of either.
+     One token in each file, if the customer prefers MD3's value after all. */
+  --kendo-disabled-opacity: var(--vy-state-disabled);
+}
+
+/* =============================================================================
+   FOCUS — the one thing a variable map cannot fix, and the one real defect
+   this pass found.
+   -----------------------------------------------------------------------------
+   MEASURED, NOT ASSUMED. Kendo's focus indicator for a button is
+
+       box-shadow: 0 0 0 2px color-mix(in srgb, var(--kendo-color-on-app-surface) 8%, transparent);
+
+   preceded by `outline: 0`. Eight per cent of the text colour is a hairline at
+   best; on this app it computes to `oklab(0 0 0 / 0)` — fully transparent. So a
+   keyboard user tabbing through the app sees NOTHING. Checked with the bridge
+   both on and off: identical, so this is Kendo's own design and not something
+   the map above caused.
+
+   WORSE, IT IS A REGRESSION WE INTRODUCED. `md3.css` gives the whole app a ring:
+
+       :where(button, a, input, …):focus-visible { box-shadow: var(--vy-focus-ring); }
+
+   `:where()` contributes ZERO specificity — chosen so a component can override
+   the ring without a fight. That choice is what makes it lose here: the rule
+   weighs (0,1,0) and Kendo's `.k-button.k-button-solid.k-button-base.k-focus`
+   weighs (0,4,0). Phase 1 turned every Button in the app into a `.k-button`,
+   and every button quietly stopped showing focus. Nothing in the phase 1 or
+   phase 8 checks caught it, because both looked at what was ON the screen
+   rather than at what a keyboard could reach.
+
+   WHY `!important`, WHEN NOTHING ELSE HERE USES IT. The honest alternative is
+   to out-specify Kendo, and that was measured too: the deepest Kendo focus
+   selector in the stylesheet carries SIX classes. Winning by stacking means
+   writing `.k-button.k-button.k-button…` today and re-counting on every Kendo
+   upgrade — a race where losing is silent and invisible by definition. A focus
+   indicator is not a style preference; it is WCAG 2.4.7, the floor that lets
+   someone use the app without a mouse. It should not be overridable by a
+   third-party rule we do not control. That is what `!important` is for, and
+   the scope is kept to `.k-*` elements and to the two focus properties, so it
+   can never reach our own components.
+   ========================================================================== */
+
+/* Controls: our ring, unchanged, so focus looks identical whether the control
+   underneath is Kendo's or ours — which the user cannot see and should not
+   have to care about. */
+html[data-kendo-bridged] .k-button:focus-visible,
+html[data-kendo-bridged] .k-checkbox:focus-visible,
+html[data-kendo-bridged] .k-radio:focus-visible,
+html[data-kendo-bridged] .k-input-inner:focus-visible,
+html[data-kendo-bridged] .k-dropdownlist:focus-visible,
+html[data-kendo-bridged] .k-upload-button:focus-visible,
+html[data-kendo-bridged] .k-upload .k-file:focus-visible {
+  outline: none !important;
+  box-shadow: var(--vy-focus-ring) !important;
+}
+
+/* Grid cells are the exception, and the reason is geometry rather than taste.
+   The ring is two spreading shadows; on a cell inside a scrolling grid the
+   outer 4px is clipped by the viewport edge and by the neighbouring cell's
+   border, so it reads as a smear on the leading edge only. An INSET outline
+   draws inside the cell's own box, cannot be clipped, and survives both the
+   sticky header and horizontal scroll. Same colour, so it is recognisably the
+   same indicator. */
+html[data-kendo-bridged] .k-grid td:focus-visible,
+html[data-kendo-bridged] .k-grid th:focus-visible,
+html[data-kendo-bridged] .k-table-td:focus-visible,
+html[data-kendo-bridged] .k-table-th:focus-visible {
+  outline: 2px solid var(--vy-blue-500) !important;
+  outline-offset: -2px !important;
+  box-shadow: none !important;
+}
+
 /* -----------------------------------------------------------------------------
-   NOT MAPPED, ON PURPOSE — each of these is a decision, not an oversight.
+   STILL NOT MAPPED, ON PURPOSE — each of these is a decision, not an oversight.
 
    - `--kendo-color-on-app-surface` and every `*-on-subtle` / `*-emphasis`
      variant: Kendo derives them with oklch relative-colour maths that carries
      its own contrast floor. Overriding them by hand is how a themed library
      quietly loses its accessibility guarantees.
-   - Elevation: our shadows are tuned to our surfaces. Deciding whether Kendo's
-     five-step elevation replaces ours or sits beside it is a design call, not a
-     mapping.
-   - Durations: `md3.css` owns motion. Two motion systems is a question for
-     whoever owns the motion spec.
+   - The other eleven durations (`quick`, `prompt`, `languid` …) and the
+     expressive easings: no counterpart in our three-rung scale. Mapping them
+     would mean inventing the counterpart, and an invented rung is a guess that
+     later reads as a decision.
    -------------------------------------------------------------------------- */

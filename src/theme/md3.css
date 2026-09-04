@@ -38,7 +38,11 @@
   --vy-state-focus:    .12;
   --vy-state-press:    .12;
   --vy-state-drag:     .16;
-  --vy-state-disabled: .38;   /* MD3 disabled content opacity */
+  /* .6, and deliberately NOT MD3's .38 — see the disabled note in
+     kendo-bridge.css. At the house 13px body size .38 grey is at the edge of
+     legible, and a disabled button here carries the REASON it is disabled in
+     a tooltip the user first has to notice is worth hovering. */
+  --vy-state-disabled: .6;
 
   --vy-state-on-light: 27, 79, 156;   /* brand blue, as an rgb triplet */
   --vy-state-on-dark:  255, 255, 255;
