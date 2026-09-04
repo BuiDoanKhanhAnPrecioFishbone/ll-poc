@@ -175,17 +175,23 @@
 @keyframes vy-rise { from { opacity: 0; transform: translate(-50%, calc(-50% + var(--vy-space-6))) } to { opacity: 1; transform: translate(-50%, -50%) } }
 
 /* --- Tabs ------------------------------------------------------------------ */
-.vy-tablist { display: flex; gap: var(--vy-space-1); border-bottom: 1px solid var(--vy-grey-200); margin-bottom: var(--vy-space-9); overflow-x: auto; }
-.vy-tab {
-  font-family: inherit; font-size: var(--vy-text-base); font-weight: var(--vy-weight-medium);
-  color: var(--vy-grey-600); background: transparent; border: 0;
-  border-bottom: var(--vy-border-emphasis) solid transparent; padding: var(--vy-space-5) var(--vy-space-7);
-  cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: var(--vy-space-3);
-  transition: color var(--vy-dur-short) var(--vy-ease-standard);
-}
-.vy-tab[data-state="active"] { color: var(--vy-blue-700); border-bottom-color: var(--vy-blue-600); }
+/* The strip itself is Kendo's now (phase B of the Radix scope), drawn by the
+   tabstrip subset and coloured by the bridge, because `k-tabstrip` ×12 is what
+   the customer's own system shows them. `.vy-tablist` and `.vy-tab` are gone
+   with the Radix version — they styled elements nothing renders any more.
+
+   What stays is the COUNT BADGE, which Kendo has no equivalent for. It rides
+   inside Kendo's `title` node, so it needs Kendo's active class rather than
+   Radix's `data-state` to know when to switch to the emphasised palette. */
 .vy-tab-count { font-size: var(--vy-text-xs); background: var(--vy-grey-100); color: var(--vy-grey-600); border-radius: var(--vy-shape-full); padding: 0 var(--vy-space-3); }
-.vy-tab[data-state="active"] .vy-tab-count { background: var(--vy-blue-100); color: var(--vy-blue-800); }
+.vy-tabs .k-tabstrip-item.k-active .vy-tab-count { background: var(--vy-blue-100); color: var(--vy-blue-800); }
+
+/* Kendo draws its own panel border and padding; ours sat inside a plain div and
+   the surrounding screens are built to that spacing. Reset only the box, not
+   the tab strip above it, so the strip keeps Kendo's appearance. */
+.vy-tabs .k-tabstrip-content, .vy-tabs .k-content {
+  border: 0; padding: var(--vy-space-9) 0 0; background: transparent;
+}
 
 /* =============================================================================
    DATA GRID — virtualised

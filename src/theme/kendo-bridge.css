@@ -226,17 +226,25 @@ html[data-kendo-bridged] .k-upload .k-file:focus-visible {
   box-shadow: var(--vy-focus-ring) !important;
 }
 
-/* Grid cells are the exception, and the reason is geometry rather than taste.
-   The ring is two spreading shadows; on a cell inside a scrolling grid the
-   outer 4px is clipped by the viewport edge and by the neighbouring cell's
-   border, so it reads as a smear on the leading edge only. An INSET outline
-   draws inside the cell's own box, cannot be clipped, and survives both the
-   sticky header and horizontal scroll. Same colour, so it is recognisably the
-   same indicator. */
+/* Grid cells and tab items are the exception, and the reason is geometry rather
+   than taste. The ring is two spreading shadows; on a cell inside a scrolling
+   grid the outer 4px is clipped by the viewport edge and by the neighbouring
+   cell's border, so it reads as a smear on the leading edge only. A tab item
+   sits in `.k-tabstrip-items-wrapper-scroll`, which clips it the same way. An
+   INSET outline draws inside the element's own box, cannot be clipped, and
+   survives sticky headers and horizontal scroll. Same colour, so it is
+   recognisably the same indicator.
+
+   TAB ITEMS ALSO FAIL CONTRAST WITHOUT THIS, which the phase B keyboard pass
+   found. Kendo's own tab focus ring is `rgb(195,203,214)` inset — visible,
+   unlike the button's transparent one, but grey on a near-white tab is about
+   **1.6:1**, under the 3:1 that WCAG 1.4.11 requires of a focus indicator. So
+   this is conformance as well as consistency. */
 html[data-kendo-bridged] .k-grid td:focus-visible,
 html[data-kendo-bridged] .k-grid th:focus-visible,
 html[data-kendo-bridged] .k-table-td:focus-visible,
-html[data-kendo-bridged] .k-table-th:focus-visible {
+html[data-kendo-bridged] .k-table-th:focus-visible,
+html[data-kendo-bridged] .k-tabstrip-item:focus-visible {
   outline: 2px solid var(--vy-blue-500) !important;
   outline-offset: -2px !important;
   box-shadow: none !important;

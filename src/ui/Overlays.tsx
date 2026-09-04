@@ -1,6 +1,6 @@
+import { TabStrip, TabStripTab } from '@progress/kendo-react-layout';
 import * as RDialog from '@radix-ui/react-dialog';
 import * as RPopover from '@radix-ui/react-popover';
-import * as RTabs from '@radix-ui/react-tabs';
 import * as RCheckbox from '@radix-ui/react-checkbox';
 import * as RRadio from '@radix-ui/react-radio-group';
 import { createContext, type ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'react';
@@ -109,29 +109,63 @@ export function Dialog({ open, onClose, title, subtitle, children, actions, size
   );
 }
 
+/**
+ * Tabs — our API, Kendo's TabStrip underneath.
+ *
+ * PHASE B of docs/radix-to-kendo-scope.md, and the swap chosen to go first
+ * because it is the one with the strongest evidence and the smallest surface:
+ * `k-tabstrip` is the second-most-common marker in the live bundle (×12), so
+ * these are tabs the customer already looks at every day, and all six call
+ * sites go through this wrapper.
+ *
+ * THE API DOES NOT CHANGE, so none of those six were touched. Ours is keyed by
+ * VALUE — `'general'`, `'quantity'` — and Kendo's is keyed by INDEX. Translating
+ * here rather than at the call sites keeps the tab identity in the caller's own
+ * vocabulary: a reordered tab array would silently change which tab an index
+ * selects, and a string cannot drift that way.
+ *
+ * THE UNKNOWN-VALUE CASE IS A REAL DIFFERENCE, not a rounding error. Radix
+ * showed no panel when `value` matched no tab; `findIndex` returns -1, which
+ * Kendo would treat as "none selected" and render an empty strip. Clamping to
+ * the first tab is the better failure: a mistyped value shows the wrong tab,
+ * which someone notices, rather than an empty box, which reads as a broken
+ * screen. No current caller can reach it — every one initialises from its own
+ * tab list — so this is a guard, not a behaviour anyone relies on.
+ *
+ * The count badge stays ours. Kendo's `title` takes a ReactNode, so it rides
+ * along inside the tab label with no wrapper of its own.
+ */
 export function Tabs({ tabs, value, onValueChange }: {
   tabs: { value: string; label: string; count?: number; content: ReactNode }[];
   value: string; onValueChange: (v: string) => void;
 }) {
+  const found = tabs.findIndex(t => t.value === value);
+  const selected = found === -1 ? 0 : found;
+
   return (
-    <RTabs.Root value={value} onValueChange={onValueChange} className="vy-tabs">
-      <RTabs.List className="vy-tablist">
-        {tabs.map(t => (
-          <RTabs.Trigger key={t.value} value={t.value} className="vy-tab" data-state-layer>
-            {t.label}
-            {t.count !== undefined && t.count > 0 && <span className="vy-tab-count">{t.count}</span>}
-          </RTabs.Trigger>
-        ))}
-      </RTabs.List>
+    <TabStrip
+      selected={selected}
+      onSelect={e => { const t = tabs[e.selected]; if (t) onValueChange(t.value); }}
+      className="vy-tabs"
+    >
       {tabs.map(t => (
-        <RTabs.Content key={t.value} value={t.value} className="vy-tabpanel">{t.content}</RTabs.Content>
+        <TabStripTab
+          key={t.value}
+          contentClassName="vy-tabpanel"
+          title={
+            <>
+              {t.label}
+              {t.count !== undefined && t.count > 0 && <span className="vy-tab-count">{t.count}</span>}
+            </>
+          }
+        >
+          {t.content}
+        </TabStripTab>
       ))}
-    </RTabs.Root>
+    </TabStrip>
   );
 }
 
-/** Segmented control. One click, current state always visible — the reason the
- *  density control stopped being a dropdown in the first place. */
 export function Checkbox({ checked, onCheckedChange, label }: {
   checked: boolean; onCheckedChange: (c: boolean) => void; label: ReactNode;
 }) {

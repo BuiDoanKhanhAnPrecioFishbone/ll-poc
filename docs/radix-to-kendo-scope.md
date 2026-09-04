@@ -172,7 +172,7 @@ everything.
 | | Work | Risk | Why here |
 |---|---|---|---|
 | **A** | ~~Delete dead deps and dead exports; fix the three checkboxes to one~~ **DONE 4 Sep** | none | Independent of the decision. Done regardless. |
-| **B** | `Tabs` → TabStrip | low | Strongest evidence, smallest surface, proves the pattern |
+| **B** | ~~`Tabs` → TabStrip~~ **DONE 4 Sep** | low | Strongest evidence, smallest surface, proved the pattern |
 | **C** | `Checkbox` → Kendo Checkbox | low | Finishes A properly |
 | **D** | `Dialog` → Kendo Dialog | **high** | Best parity, re-opens layering — alone, with a keyboard pass |
 | **E** | Reassess `Select`, Popover menus, `Toast` | — | Decide with D's result in hand, not before |
@@ -244,3 +244,73 @@ Verified overall: 21 of 21 grid checkboxes styled and none left bare, the
 ColumnChooser's 14 all blue, the checklist still green (`rgb(4,120,87)`) against
 a normal checked box (`rgb(27,79,156)`), build clean, lint 0 errors, `css:check`
 0 off-scale in owned stylesheets.
+
+---
+
+# Phase B — done, 4 September 2026
+
+`Tabs` now renders Kendo's TabStrip. **None of the six call sites changed**: the
+wrapper keeps our value-keyed API and translates to Kendo's index internally,
+because a reordered tab array would silently change which tab an index selects
+and a string cannot drift that way. Radix is **six packages**, `react-tabs` gone
+with the swap.
+
+## The CSS cost is zero, and not for the reason expected
+
+Measuring it turned up something worth knowing: **the Grid subset has been
+pulling the whole TabStrip stylesheet in since phase 5.**
+`grid/_index.scss:57` includes `kendo-tabstrip--styles()`, so 555 TabStrip rules
+have been shipping all along for a component nothing used. Our explicit
+`@include` is a no-op under Kendo's `import-once` guard — byte-identical builds
+with and without it, 486,838 raw either way.
+
+The include stays anyway. It declares that this app uses TabStrip rather than
+inheriting it by accident from the Grid, and if the Grid subset ever changed its
+dependencies the tabs would keep their styling.
+
+Also clarified while measuring: the build emits **two** CSS chunks, and reading
+the wrong one made three consecutive measurements meaningless.
+
+| chunk | size | when it loads |
+|---|---|---|
+| `index-*.css` | 486,838 raw / **73,792 gzip** | every page — the app plus the subset |
+| `all-*.css` | 724,787 raw / 99,487 gzip | `/kendo-check` only, via dynamic import |
+
+The full theme is **not** on the critical path. `ls dist/assets/*.css | head -1`
+picks `all-*` alphabetically, which is how "the subset is the size of the full
+theme" briefly looked true.
+
+## Two defects the keyboard pass caught
+
+The scope said every swap needs its own keyboard pass rather than a visual
+check. It earned its place twice:
+
+**1. The count badge rule never matched.** Kendo's tab is `.k-tabstrip-item`,
+not `.k-item` — the class I had written from memory. The rule built, linted and
+passed `css:check` while doing nothing at all, which is the exact failure mode
+that hid the focus regression for two phases. Found by reading the rendered DOM
+rather than trusting the selector.
+
+**2. Kendo's tab focus ring fails contrast.** It is `rgb(195,203,214)` inset —
+*visible*, unlike the button's transparent one, so it would have passed a glance.
+But grey on a near-white tab is about **1.6:1**, under the 3:1 that WCAG 1.4.11
+requires of a focus indicator. Tab items now take the same inset blue the grid
+cells use — measured `2px solid rgb(42,99,184)` at `-2px`, about **5.9:1**.
+
+Inset rather than the two-shadow ring for the same geometric reason as cells:
+`.k-tabstrip-items-wrapper-scroll` clips a spreading shadow.
+
+## Verified
+
+Keyboard: focus lands on `role="tab"`, ArrowRight moves the selection, the panel
+content changes with it and `aria-selected` follows — which also proves the
+value↔index round trip through the caller's state. Structure: `role=tablist` /
+`tab` / `tabpanel` intact, `.vy-tabpanel` still on the content element.
+
+The count badge was verified by **selector resolution** — active `blue-100` on
+`blue-800`, inactive `grey-100` on `grey-600` — rather than in a live dialog with
+a real count. The only caller passing one is `PartBomDialog`, and the JSX is a
+direct port of the Radix version, so the risk is low; it is worth a look next
+time that dialog is open.
+
+Build clean, lint 0 errors, `css:check` 0 off-scale in owned stylesheets.
