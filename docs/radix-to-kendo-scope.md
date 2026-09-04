@@ -173,7 +173,7 @@ everything.
 |---|---|---|---|
 | **A** | ~~Delete dead deps and dead exports; fix the three checkboxes to one~~ **DONE 4 Sep** | none | Independent of the decision. Done regardless. |
 | **B** | ~~`Tabs` → TabStrip~~ **DONE 4 Sep** | low | Strongest evidence, smallest surface, proved the pattern |
-| **C** | `Checkbox` → Kendo Checkbox | low | Finishes A properly |
+| **C** | ~~`Checkbox` → Kendo Checkbox~~ **DONE 4 Sep** | low | Finished A properly |
 | **D** | `Dialog` → Kendo Dialog | **high** | Best parity, re-opens layering — alone, with a keyboard pass |
 | **E** | Reassess `Select`, Popover menus, `Toast` | — | Decide with D's result in hand, not before |
 
@@ -314,3 +314,104 @@ direct port of the Radix version, so the risk is low; it is worth a look next
 time that dialog is open.
 
 Build clean, lint 0 errors, `css:check` 0 off-scale in owned stylesheets.
+
+---
+
+# Phase C — done, 4 September 2026
+
+Every checkbox in the app is Kendo's now. Radix is **five packages**. Phase A
+collapsed three treatments into two; this leaves one.
+
+## Kendo's class, deliberately not Kendo's component
+
+`<Checkbox>` from `kendo-react-inputs` cannot express two things this app needs:
+
+- **`indeterminate`** — there is no prop for it, and the grid's select-all box
+  needs it to mean "some rows on this page, not all".
+- **`aria-label`** — only `ariaLabelledBy` / `ariaDescribedBy` are offered, and
+  the grid names every row's box individually ("Select 8"), because a screen
+  reader moving down twenty identical labels learns nothing from "Select row".
+
+Kendo's component renders exactly the markup we now write by hand: a native
+input carrying `k-checkbox`. Using the class keeps both capabilities, gives the
+same pixels, and avoids a React wrapper around each of the ~300 checkboxes a
+full grid page renders. Kendo styles `.k-checkbox:indeterminate` — the native
+pseudo-class — so that state needs no help.
+
+The package was installed to read its API and then **uninstalled**, because
+nothing imports it. Leaving it would have added the fifth dead dependency in a
+session that removed four.
+
+`k-checkbox-lg` is **20px measured**, exactly the size of the box it replaced.
+`md` is 16px and would have shrunk every checkbox in the app by a fifth —
+including the grid's, where the label's 24px target is switched off and the box
+itself is the pointer target.
+
+## Three regressions Kendo's defaults would have shipped
+
+None of these are visible in a build, a lint, or `css:check`. All three were
+found by measuring the rendered control.
+
+**1. The unchecked border, 1.30:1.** Kendo draws the box with the global
+`--kendo-color-border`, which the bridge maps to grey-200 — right for a table
+rule, far too faint for a control boundary. The hand-written box was grey-400 at
+**2.58:1**. Restored to grey-400 by an element-scoped rule, because remapping
+that variable would darken every grid line and panel edge in the app.
+
+> **Left for the customer:** grey-400 is *also* non-conformant. WCAG 1.4.11 asks
+> 3:1 of a control boundary; grey-400 is 2.58:1 and grey-500 would be 5.24:1.
+> That is a pre-existing near-miss this phase did not introduce, and darkening
+> every checkbox in the app is a visible change that should be asked for rather
+> than slipped into a swap.
+
+**2. Indeterminate kept the faint border.** The first fix excluded
+`:indeterminate`, on the assumption Kendo coloured that state itself. It does
+colour the dash — blue-600, 5.9:1 — but the box outline still came from
+`--kendo-color-border`, so the select-all header kept the 1.30:1 edge the fix
+was written to remove. An indeterminate box is not a checked one and needs the
+same visible boundary as an empty one.
+
+**3. Disabled did nothing at all.** Kendo styles disabled by the `.k-disabled`
+CLASS its React component applies, not by the `:disabled` attribute. Measured, a
+`<input disabled class="k-checkbox">` is pixel-identical to an enabled one:
+opacity 1, same border, same background. The column chooser shows a required
+column as ticked-and-disabled, and it would have looked like an ordinary tick
+the user can clear.
+
+Fixed with `--vy-state-disabled` opacity rather than the grey wash the old rule
+used. That rule put `:disabled` after `:checked` at equal specificity, so a
+disabled *ticked* box went grey and took its white tick with it — the tick all
+but vanished on precisely the control whose job is to show "this column is
+always shown".
+
+## And one Kendo simply does not have
+
+`:hover`. Not one `.k-checkbox:hover` selector exists in the compiled
+stylesheet. The customer's review asked that checkboxes "display an outer border
+and update their value immediately when toggled"; the hover edge was added
+because the target gave no feedback before the click, and adopting Kendo's
+unchanged would have dropped it silently. It is a bridge rule for the same
+reason the focus ring is — it belongs to every checkbox, and no single `.vy-`
+container holds them all.
+
+## Verified
+
+Measured on the running app: 21 grid checkboxes, **0 legacy classes left**,
+20×20px, grey-400 border, checked `rgb(27,79,156)`, header `indeterminate: true`
+with a grey-400 border and a blue-600 dash, and `aria-label="Select 8"` intact.
+Focus lands with our ring — `rgb(255,255,255) 0 0 0 2px, rgb(42,99,184) 0 0 0
+4px` — because the bridge's focus rule already listed `.k-checkbox`. Checklist
+tick still `rgb(4,120,87)` against a normal `rgb(27,79,156)`. 27 form checkboxes
+and 14 in the column chooser, all on the shared class.
+
+**Not verified, and worth saying:** the harness cannot dispatch a space key —
+every spelling arrives as `key: ""` — so Space toggling was never exercised.
+These are native inputs, so toggling is the browser's own behaviour, and the only
+`onKeyDown` in the files holding checkboxes is on the Select. The Radix control
+this replaced was a `<button role="checkbox">` that implemented Space itself, so
+the swap moves toward the browser's behaviour rather than away from it. The
+disabled treatment is verified by construction: no column on Part Master is
+declared required, so there was no live disabled box to inspect.
+
+Build clean, lint 0 errors, `css:check` 0 off-scale in owned stylesheets — the
+bridge findings rise from 7 to 11, all of them the deliberate rules above.

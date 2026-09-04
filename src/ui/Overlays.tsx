@@ -1,7 +1,6 @@
 import { TabStrip, TabStripTab } from '@progress/kendo-react-layout';
 import * as RDialog from '@radix-ui/react-dialog';
 import * as RPopover from '@radix-ui/react-popover';
-import * as RCheckbox from '@radix-ui/react-checkbox';
 import * as RRadio from '@radix-ui/react-radio-group';
 import { createContext, type ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -166,20 +165,43 @@ export function Tabs({ tabs, value, onValueChange }: {
   );
 }
 
+/**
+ * Checkbox — Kendo's, and deliberately NOT Kendo's React component.
+ *
+ * PHASE C of docs/radix-to-kendo-scope.md. Phase A found three checkboxes in
+ * this app and collapsed the unstyled one into our own; this finishes the job
+ * by making all of them Kendo's, which is what the customer's live system uses.
+ *
+ * WHY THE CLASS AND NOT `<Checkbox>` FROM `kendo-react-inputs`. Kendo's React
+ * component cannot express two things this app needs:
+ *
+ *   - `indeterminate`. There is no prop for it. The grid's select-all box needs
+ *     it to mean "some rows on this page, not all", and it is set through the
+ *     DOM node either way.
+ *   - `aria-label`. Only `ariaLabelledBy` / `ariaDescribedBy` are offered, and
+ *     the grid names every row's box individually — "Select 01455-387-9552" —
+ *     because a screen reader moving down twenty identical labels learns
+ *     nothing from "Select row".
+ *
+ * Kendo's component renders exactly this markup: a native input carrying
+ * `k-checkbox`. Using the class directly gives the same pixels, keeps both
+ * capabilities, and avoids a React wrapper around each of the ~300 checkboxes a
+ * full grid page renders. Kendo styles `.k-checkbox:indeterminate` — the native
+ * pseudo-class — so the state comes through with no help from us.
+ *
+ * `k-checkbox-lg` is 20px, measured, which is exactly the size the hand-written
+ * box was. `md` is 16px and would have quietly shrunk every checkbox in the app
+ * by a fifth — including the grid's, where the label's 24px target is switched
+ * off and the box IS the pointer target.
+ */
 export function Checkbox({ checked, onCheckedChange, label }: {
   checked: boolean; onCheckedChange: (c: boolean) => void; label: ReactNode;
 }) {
   return (
     <label className="vy-check">
-      <RCheckbox.Root checked={checked} onCheckedChange={c => onCheckedChange(Boolean(c))}
-                      className="vy-check-box" data-state-layer>
-        <RCheckbox.Indicator>
-          <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden>
-            <path d="M3 8.5 6.2 11.5 13 4.5" fill="none" stroke="currentColor"
-                  strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </RCheckbox.Indicator>
-      </RCheckbox.Root>
+      <input type="checkbox" className="k-checkbox k-checkbox-lg"
+             checked={checked}
+             onChange={e => onCheckedChange(e.target.checked)} />
       <span>{label}</span>
     </label>
   );

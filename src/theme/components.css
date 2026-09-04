@@ -124,15 +124,18 @@
    checkbox in the app visually heavier to fix a number; growing the label costs
    nothing visible and is the thing a pointer actually hits (WCAG 2.2, 2.5.8). */
 .vy-check, .vy-radio { display: flex; align-items: center; min-height: var(--vy-space-10); gap: var(--vy-space-4); font-size: var(--vy-text-base); color: var(--vy-grey-800); cursor: pointer; }
-.vy-check-box, .vy-radio-dot {
+/* Only the RADIO is drawn here now. The checkbox is Kendo's (phase C), so the
+   two no longer share a rule — RadioGroup is still Radix, and the scope holds it
+   there until the customer says which of those fields are switches in their own
+   system. Kept at the same 20px so a radio and a checkbox in the same form still
+   line up. */
+.vy-radio-dot {
   display: grid; place-items: center; flex: 0 0 auto;
   width: var(--vy-space-9); height: var(--vy-space-9);
   background: var(--vy-grey-0); border: 1px solid var(--vy-grey-400); color: var(--vy-on-dark-fg);
   cursor: pointer; transition: background-color var(--vy-dur-short) var(--vy-ease-standard);
+  border-radius: var(--vy-shape-full);
 }
-.vy-check-box { border-radius: var(--vy-shape-xs); }
-.vy-radio-dot { border-radius: var(--vy-shape-full); }
-.vy-check-box[data-state="checked"] { background: var(--vy-blue-600); border-color: var(--vy-blue-600); }
 .vy-radio-dot[data-state="checked"] { border-color: var(--vy-blue-600); border-width: var(--vy-border-emphasis); }
 .vy-radio-fill { width: var(--vy-space-4); height: var(--vy-space-4); border-radius: var(--vy-shape-full); background: var(--vy-blue-600); }
 .vy-radios { display: flex; flex-direction: column; gap: var(--vy-space-4); }
@@ -511,60 +514,12 @@
   font-size: var(--vy-text-base); color: var(--vy-grey-800);
 }
 .vy-check-row:hover { background: var(--vy-blue-50); }
-.vy-check-input {
-  appearance: none; flex: 0 0 auto; margin: 0;
-  width: var(--vy-space-9); height: var(--vy-space-9);
-  border: 1px solid var(--vy-grey-400); border-radius: var(--vy-shape-xs);
-  background: var(--vy-grey-0); cursor: pointer;
-  display: grid; place-content: center;
-  transition: background-color var(--vy-dur-short) var(--vy-ease-standard),
-              border-color var(--vy-dur-short) var(--vy-ease-standard);
-}
-.vy-check-input::before {
-  content: ''; width: var(--vy-space-5); height: var(--vy-space-5);
-  transform: scale(0); transform-origin: center;
-  clip-path: polygon(14% 44%, 0 60%, 39% 100%, 100% 22%, 84% 6%, 39% 68%);
-  background: var(--vy-on-dark-fg);
-  transition: transform var(--vy-dur-short) var(--vy-ease-decelerate);
-}
-/* BLUE, not green, and the change is the point of this pass.
-
-   There were three checkboxes in this app. Two were styled — this one in
-   `--vy-accent-positive` green, and the Radix `.vy-check-box` in blue — and the
-   third, in the grid's selection column and the column chooser, was a bare
-   `<input>` that nothing styled at all, so the most-seen checkbox in the whole
-   application was rendering as a browser default beside two custom ones.
-
-   Green was never a decision here. It is right in ONE place — a checklist item,
-   where a tick means *done* — and everywhere else it was inherited from sharing
-   a class with that checklist. Selecting a grid row is not a positive outcome.
-   So the shared default becomes blue, matching the form checkbox, and green
-   survives only where it carries the meaning: `.vy-check-input--done`. */
-.vy-check-input:checked { background: var(--vy-blue-600); border-color: var(--vy-blue-600); }
-.vy-check-input:checked::before { transform: scale(1); }
-.vy-check-input:hover:not(:disabled) { border-color: var(--vy-grey-600); }
-.vy-check-input:checked:hover:not(:disabled) { background: var(--vy-blue-700); border-color: var(--vy-blue-700); }
-
-/* INDETERMINATE, and it is not decoration. The grid's select-all box uses the
-   native `indeterminate` property to say "some rows on this page, not all".
-   `appearance: none` above erases the browser's own dash, so styling this state
-   is not optional — without it the header box reads as UNCHECKED while rows are
-   selected, which is worse than the browser default it replaced. Same tick
-   element, clipped to a bar instead of a check. */
-.vy-check-input:indeterminate { background: var(--vy-blue-600); border-color: var(--vy-blue-600); }
-.vy-check-input:indeterminate::before {
-  transform: scale(1);
-  clip-path: polygon(0 38%, 100% 38%, 100% 62%, 0 62%);
-}
-
-/* The one place green means something: a checklist tick is a completion, not a
-   selection. Opt in, so nothing inherits it by accident again. */
-.vy-check-input--done:checked,
-.vy-check-input--done:checked:hover:not(:disabled) {
-  background: var(--vy-accent-positive); border-color: var(--vy-accent-positive);
-}
-
-.vy-check-input:disabled { background: var(--vy-grey-100); border-color: var(--vy-grey-300); cursor: not-allowed; }
+/* The checkbox that used to be drawn here is Kendo's now (phase C). What stays
+   is the one case where its colour carries meaning: a tick in a CHECKLIST is a
+   completion, not a selection. Keyed off the row rather than a modifier class,
+   because the row already says which context this is — and scoped under a `.vy-`
+   ancestor so it cannot reach any other checkbox in the app. */
+.vy-check-row .k-checkbox:checked { background-color: var(--vy-accent-positive); border-color: var(--vy-accent-positive); }
 
 .vy-check-name { flex: 1; min-width: 0; }
 /* Completed items step back so the outstanding ones read first. */
@@ -823,8 +778,8 @@
    when toggled." The border was already there (see .vy-check-box above) and the
    value already commits on change; what was missing was a hover edge, so the
    target had no feedback before the click. */
-.vy-check-box:hover { border-color: var(--vy-grey-600); }
-.vy-check-box[data-state="checked"]:hover { border-color: var(--vy-blue-700); background: var(--vy-blue-700); }
+/* Moved to kendo-bridge.css — Kendo ships no `:hover` for checkboxes at all,
+   so this had to become a bridge rule rather than a component one. */
 
 /* ---- Required marker -----------------------------------------------------
    `(*)` in RED. The customer's Testing Guideline is explicit: "A red asterisk

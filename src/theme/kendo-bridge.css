@@ -174,6 +174,77 @@ html[data-kendo-bridged] {
   --kendo-disabled-opacity: var(--vy-state-disabled);
 }
 
+/* -----------------------------------------------------------------------------
+   HOVER ON CHECKBOXES — a requirement Kendo does not meet.
+
+   The customer's review asked that "checkboxes should display an outer border
+   and update their value immediately when toggled". The border and the immediate
+   commit are both Kendo's own behaviour; what Kendo has NO rule for, in any
+   state, is `:hover`. Measured against the compiled stylesheet: not one
+   `.k-checkbox:hover` selector exists.
+
+   The hand-written checkbox had this edge, added because the target gave no
+   feedback before the click, and adopting Kendo's would have dropped it
+   silently. It is a bridge rule rather than a component one for the same reason
+   the focus ring is: it belongs to every checkbox in the app, and there is no
+   single `.vy-` container that all of them share.
+   -------------------------------------------------------------------------- */
+
+/* THE UNCHECKED BORDER, and this one is a measurement rather than a preference.
+
+   Kendo draws the box with the GLOBAL `--kendo-color-border`, which the map
+   above sends to our grey-200. That is right for a table rule or a panel edge
+   and much too faint for a control boundary: measured against white it is
+   **1.30:1**, where the hand-written checkbox it replaced was grey-400 at
+   **2.58:1**. Adopting Kendo's unchanged would have left every unchecked
+   checkbox in the app close to invisible.
+
+   It cannot be fixed by remapping `--kendo-color-border` — that variable also
+   draws every grid line and panel edge, and darkening those to fix a checkbox
+   would be a far larger change than the one being made.
+
+   NOTE FOR THE NEXT PASS: grey-400 restores what was there and is NOT
+   conformant either. WCAG 1.4.11 asks 3:1 of a control boundary and grey-400 is
+   2.58:1 — a pre-existing near-miss, not something this phase introduced.
+   grey-500 would be 5.24:1. That is a visible change to every checkbox in the
+   app, so it is the customer's call rather than a side effect of a swap that was
+   only supposed to collapse three implementations into one. */
+/* `:not(:checked)` and NOT `:not(:checked):not(:indeterminate)`, which was the
+   first attempt. Kendo's indeterminate box is a WHITE box with a blue dash — the
+   dash carries the state at 5.9:1, but the box outline still came from
+   `--kendo-color-border`, so the select-all header kept the faint 1.30:1 edge
+   the rule below was written to fix. An indeterminate box is not a checked one;
+   it needs the same visible boundary as an empty one. */
+html[data-kendo-bridged] .k-checkbox:not(:checked) {
+  border-color: var(--vy-grey-400);
+}
+
+/* DISABLED, which Kendo styles by CLASS and not by attribute. Its rules key off
+   `.k-disabled`, applied by the React component; a plain `<input disabled>`
+   carrying `k-checkbox` renders IDENTICALLY to an enabled one — measured:
+   opacity 1, same border, same background. The column chooser shows a required
+   column as ticked-and-disabled, and without this it would look like an ordinary
+   tick the user can clear.
+
+   Opacity rather than the grey wash the hand-written checkbox used. That rule
+   put `:disabled` after `:checked` at equal specificity, so a disabled TICKED
+   box went grey and took its white tick with it — the tick all but vanished on
+   exactly the control whose whole job was to show "this column is always
+   shown". Opacity keeps the tick legible and matches `--vy-state-disabled`, the
+   one disabled treatment the rest of the app already uses. */
+html[data-kendo-bridged] .k-checkbox:disabled {
+  opacity: var(--vy-state-disabled);
+  cursor: not-allowed;
+}
+
+html[data-kendo-bridged] .k-checkbox:hover:not(:disabled) {
+  border-color: var(--vy-grey-600);
+}
+html[data-kendo-bridged] .k-checkbox:checked:hover:not(:disabled) {
+  border-color: var(--vy-blue-700);
+  background-color: var(--vy-blue-700);
+}
+
 /* =============================================================================
    FOCUS — the one thing a variable map cannot fix, and the one real defect
    this pass found.

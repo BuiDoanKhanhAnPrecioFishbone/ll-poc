@@ -26,6 +26,7 @@
 @use "@progress/kendo-theme-default/scss/grid/index.scss" as grid;
 @use "@progress/kendo-theme-default/scss/upload/index.scss" as upload;
 @use "@progress/kendo-theme-default/scss/tabstrip/index.scss" as tabstrip;
+@use "@progress/kendo-theme-default/scss/checkbox/index.scss" as checkbox;
 
 /* The Grid pulls button, progressbar, icons and the input chain in as its own
    dependencies, so this one include is the whole of what phase 5 needs.
@@ -36,3 +37,7 @@
 /* Phase B of the Radix scope. The live system ships `k-tabstrip` twelve times
    over, so these are the tabs the customer already uses every day. */
 @include tabstrip.kendo-tabstrip--styles();
+/* Phase C. Like the tabstrip above, the Grid already pulls this in
+   (grid/_index.scss:43) so the include emits nothing — it is here to say
+   this app uses the checkbox on its own account, not by inheritance. */
+@include checkbox.kendo-checkbox--styles();

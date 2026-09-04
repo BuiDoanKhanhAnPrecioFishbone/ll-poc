@@ -118,7 +118,7 @@ export function ViewSetting<T>({
 
         <div className="vy-vs-form">
           <label className="vy-check">
-            <input type="checkbox" className="vy-check-input" checked={asNew}
+            <input type="checkbox" className="k-checkbox k-checkbox-lg" checked={asNew}
                    disabled={Boolean(view.system)}
                    onChange={e => setAsNew(e.target.checked)} />
             <span>New View</span>
@@ -133,7 +133,7 @@ export function ViewSetting<T>({
           </label>
 
           <label className="vy-check">
-            <input type="checkbox" className="vy-check-input" checked={draft.isDefault}
+            <input type="checkbox" className="k-checkbox k-checkbox-lg" checked={draft.isDefault}
                    onChange={e => set({ isDefault: e.target.checked })} />
             <span>Set as my default view</span>
           </label>
