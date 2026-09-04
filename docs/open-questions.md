@@ -22,7 +22,7 @@ Ordered by what an answer unblocks, not by number.
 
 | # | Decision | Our assumption | What it unblocks |
 |---|---|---|---|
-| 2 | Do we adopt KendoReact? A licence key now exists. | MIT components; every requirement met either way | Whether the remaining screens are built twice |
+| 2 | Do we adopt KendoReact? A licence key now exists and is proven working. | MIT components; every requirement met either way. **Scoped in `kendo-migration-scope.md` — 358 usages, 8 phases, phase 0 is a theme spike that gates the rest** | Per-column filter cells, ExcelExport, Upload, visual parity |
 | — | **Brand.** Is "The completed ERP/MES Solution" the tagline you *want*, or the one you want *improved*? If new, is "completed" meant to be "complete"? Rename to **Voyager IQ** now? | We render `VOYAGER` unchanged | The rename, the palette, every screen's header |
 | — | **Setting Form View** (deck slide 15) — no guideline section defines it. What is in scope? | Not built; four Configuration paths fall through to a placeholder | An entire screen archetype |
 | — | **Dark mode** (deck slide 7) — no source but the deck mentions it. In scope? | Not built; on-dark tokens exist for the sidebar only | Touches every colour token in the system |
