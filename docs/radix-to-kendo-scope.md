@@ -171,7 +171,7 @@ everything.
 
 | | Work | Risk | Why here |
 |---|---|---|---|
-| **A** | Delete dead deps and dead exports; fix the three checkboxes to one | none | Independent of the decision. Do it regardless. |
+| **A** | ~~Delete dead deps and dead exports; fix the three checkboxes to one~~ **DONE 4 Sep** | none | Independent of the decision. Done regardless. |
 | **B** | `Tabs` → TabStrip | low | Strongest evidence, smallest surface, proves the pattern |
 | **C** | `Checkbox` → Kendo Checkbox | low | Finishes A properly |
 | **D** | `Dialog` → Kendo Dialog | **high** | Best parity, re-opens layering — alone, with a keyboard pass |
@@ -193,3 +193,54 @@ twice in one day:
   the customer, not for the bundle.
 - **The real bundle cost**, which needs the packages installed to measure rather
   than estimated.
+
+---
+
+# Phase A — done, 4 September 2026
+
+Radix is **eleven packages down to seven**, and every remaining one is imported.
+Removed: `react-select` and `react-tooltip` (never imported), plus
+`react-progress` and `react-toggle-group`, retired along with the `Progress` and
+`SegmentedControl` exports and their now-dead CSS.
+
+**The bundle did not shrink** — 490.42 kB gzip against 490.40 kB before. Worth
+saying plainly rather than claiming a win: tree-shaking had already excluded all
+four, so they cost nothing at runtime. The gain is that nobody inherits four
+dependencies they cannot account for, which is the same reason TanStack went.
+
+## The checkbox, and the two things measuring changed
+
+The scope said "three checkboxes, one of them unstyled". Reading the code first
+corrected the detail twice, and both corrections mattered:
+
+1. **The bare inputs are wrapped in `<label class="vy-check">`**, which the scope
+   did not mention — so it was worth checking whether they were styled after
+   all. They were not: `.vy-check` is a layout class (flex, gap, min-height) and
+   never touches the input. The finding held.
+2. **The two styled treatments were different colours.** `.vy-check-box` (Radix,
+   forms) is blue; `.vy-check-input` (native) is `--vy-accent-positive` green.
+   Not in the scope at all, because it is only visible by reading the rules.
+
+Green turned out to be right in exactly **one** place — a checklist item, where
+a tick means *done* — and inherited everywhere else from sharing a class with
+it. Selecting a grid row is not a positive outcome. So the shared default is now
+blue, matching the form checkbox, and green survives as an opt-in modifier,
+`.vy-check-input--done`, used only by `ChecklistsTab`.
+
+## The regression this nearly introduced
+
+`.vy-check-input` sets `appearance: none`. The grid's select-all box uses the
+native `indeterminate` property to mean "some rows on this page, not all" — and
+`appearance: none` **erases the browser's own dash**. Applying the shared class
+without styling `:indeterminate` would have left the header box reading as
+UNCHECKED while rows were selected: worse than the browser default it replaced,
+and invisible to any check that only looks at the unselected state.
+
+`:indeterminate` now reuses the same tick element with the clip-path swapped for
+a bar. Verified with a real click on a row: header `indeterminate: true`,
+background `rgb(27,79,156)`, dash at `scale(1)` with the bar clip-path.
+
+Verified overall: 21 of 21 grid checkboxes styled and none left bare, the
+ColumnChooser's 14 all blue, the checklist still green (`rgb(4,120,87)`) against
+a normal checked box (`rgb(27,79,156)`), build clean, lint 0 errors, `css:check`
+0 off-scale in owned stylesheets.

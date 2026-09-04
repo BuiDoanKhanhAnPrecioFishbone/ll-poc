@@ -1,8 +1,6 @@
 import * as RDialog from '@radix-ui/react-dialog';
 import * as RPopover from '@radix-ui/react-popover';
 import * as RTabs from '@radix-ui/react-tabs';
-import * as RToggle from '@radix-ui/react-toggle-group';
-import * as RProgress from '@radix-ui/react-progress';
 import * as RCheckbox from '@radix-ui/react-checkbox';
 import * as RRadio from '@radix-ui/react-radio-group';
 import { createContext, type ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'react';
@@ -134,29 +132,6 @@ export function Tabs({ tabs, value, onValueChange }: {
 
 /** Segmented control. One click, current state always visible — the reason the
  *  density control stopped being a dropdown in the first place. */
-export function SegmentedControl<T extends string>({ options, value, onChange, label }: {
-  options: { value: T; label: string }[]; value: T; onChange: (v: T) => void; label: string;
-}) {
-  return (
-    <RToggle.Root type="single" value={value} aria-label={label} className="vy-segmented"
-                  onValueChange={v => v && onChange(v as T)}>
-      {options.map(o => (
-        <RToggle.Item key={o.value} value={o.value} className="vy-segment" data-state-layer>
-          {o.label}
-        </RToggle.Item>
-      ))}
-    </RToggle.Root>
-  );
-}
-
-export function Progress({ value, label }: { value: number; label?: string }) {
-  return (
-    <RProgress.Root className="vy-progress" value={value} aria-label={label}>
-      <RProgress.Indicator className="vy-progress-bar" data-value={value} />
-    </RProgress.Root>
-  );
-}
-
 export function Checkbox({ checked, onCheckedChange, label }: {
   checked: boolean; onCheckedChange: (c: boolean) => void; label: ReactNode;
 }) {

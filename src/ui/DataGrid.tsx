@@ -375,6 +375,7 @@ export function DataGrid<T extends { id: string | number }>({
                       <label className="vy-check" title={`Select all ${rows.length} on this page`}>
                         <input
                           type="checkbox"
+                          className="vy-check-input"
                           aria-label={`Select all ${rows.length} rows on this page`}
                           checked={rows.length > 0 && rows.every(r => selected!.has(r.id))}
                           ref={el => { if (el) el.indeterminate =
@@ -400,7 +401,8 @@ export function DataGrid<T extends { id: string | number }>({
                             {/* Named by the row, not "Select row" — a screen
                                 reader moving down 20 identical labels learns
                                 nothing about which one it is on. */}
-                            <input type="checkbox" checked={on}
+                            <input type="checkbox" className="vy-check-input"
+                                   checked={on}
                                    aria-label={`Select ${String(id)}`}
                                    onChange={() => {
                                      const next = new Set(selected!);

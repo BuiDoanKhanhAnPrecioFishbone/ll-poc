@@ -268,7 +268,9 @@ function ChecklistGroup({ title, items, selected, onToggle }: {
         {items.map(i => (
           <li key={i} data-selected={selected.has(i) || undefined}>
             <label className="vy-check-row">
-              <input type="checkbox" className="vy-check-input"
+              {/* `--done` keeps the green tick: here it means the item is
+                  complete, which is the one place that colour carries meaning. */}
+              <input type="checkbox" className="vy-check-input vy-check-input--done"
                      checked={selected.has(i)}
                      onChange={e => onToggle(i, e.target.checked)} />
               <span className="vy-check-name">{i}</span>

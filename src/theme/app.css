@@ -343,7 +343,6 @@
    ========================================================================== */
 .vy-avatar--sm { width: var(--vy-space-11); height: var(--vy-space-11); font-size: var(--vy-text-xs); }
 
-.vy-checklist-head .vy-progress { width: 100%; margin-bottom: var(--vy-space-4); }
 
 .vy-doc-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--vy-space-4); margin-bottom: var(--vy-space-4); }
 .vy-empty-inline { color: var(--vy-grey-500); font-size: var(--vy-text-base); background: var(--vy-grey-25); border: 1px dashed var(--vy-grey-300); border-radius: var(--vy-radius-md); padding: var(--vy-space-8); max-width: var(--vy-prose-max); }

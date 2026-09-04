@@ -137,19 +137,6 @@
 .vy-radio-fill { width: var(--vy-space-4); height: var(--vy-space-4); border-radius: var(--vy-shape-full); background: var(--vy-blue-600); }
 .vy-radios { display: flex; flex-direction: column; gap: var(--vy-space-4); }
 
-/* --- Segmented control ----------------------------------------------------- */
-.vy-segmented { display: inline-flex; border: 1px solid var(--vy-grey-300); border-radius: var(--vy-shape-sm); overflow: hidden; background: var(--vy-grey-0); }
-.vy-segment {
-  font-family: inherit; font-size: var(--vy-text-sm); color: var(--vy-grey-700);
-  background: transparent; border: 0; border-right: 1px solid var(--vy-grey-200);
-  padding: var(--vy-space-3) var(--vy-space-6); cursor: pointer;
-}
-.vy-segment:last-child { border-right: 0; }
-.vy-segment[data-state="on"] { background: var(--vy-blue-600); color: var(--vy-on-dark-fg); font-weight: var(--vy-weight-medium); }
-
-/* --- Progress -------------------------------------------------------------- */
-.vy-progress { position: relative; overflow: hidden; width: 100%; height: var(--vy-space-3); background: var(--vy-grey-200); border-radius: var(--vy-shape-full); }
-.vy-progress-bar { height: 100%; background: var(--vy-accent-positive); border-radius: inherit; transition: width var(--vy-dur-medium) var(--vy-ease-decelerate); }
 
 /* --- Dialog ---------------------------------------------------------------- */
 .vy-scrim { position: fixed; inset: 0; background: var(--vy-overlay-scrim); z-index: var(--vy-z-dialog); animation: vy-fade var(--vy-dur-medium) var(--vy-ease-standard); }
@@ -534,8 +521,43 @@
   background: var(--vy-on-dark-fg);
   transition: transform var(--vy-dur-short) var(--vy-ease-decelerate);
 }
-.vy-check-input:checked { background: var(--vy-accent-positive); border-color: var(--vy-accent-positive); }
+/* BLUE, not green, and the change is the point of this pass.
+
+   There were three checkboxes in this app. Two were styled — this one in
+   `--vy-accent-positive` green, and the Radix `.vy-check-box` in blue — and the
+   third, in the grid's selection column and the column chooser, was a bare
+   `<input>` that nothing styled at all, so the most-seen checkbox in the whole
+   application was rendering as a browser default beside two custom ones.
+
+   Green was never a decision here. It is right in ONE place — a checklist item,
+   where a tick means *done* — and everywhere else it was inherited from sharing
+   a class with that checklist. Selecting a grid row is not a positive outcome.
+   So the shared default becomes blue, matching the form checkbox, and green
+   survives only where it carries the meaning: `.vy-check-input--done`. */
+.vy-check-input:checked { background: var(--vy-blue-600); border-color: var(--vy-blue-600); }
 .vy-check-input:checked::before { transform: scale(1); }
+.vy-check-input:hover:not(:disabled) { border-color: var(--vy-grey-600); }
+.vy-check-input:checked:hover:not(:disabled) { background: var(--vy-blue-700); border-color: var(--vy-blue-700); }
+
+/* INDETERMINATE, and it is not decoration. The grid's select-all box uses the
+   native `indeterminate` property to say "some rows on this page, not all".
+   `appearance: none` above erases the browser's own dash, so styling this state
+   is not optional — without it the header box reads as UNCHECKED while rows are
+   selected, which is worse than the browser default it replaced. Same tick
+   element, clipped to a bar instead of a check. */
+.vy-check-input:indeterminate { background: var(--vy-blue-600); border-color: var(--vy-blue-600); }
+.vy-check-input:indeterminate::before {
+  transform: scale(1);
+  clip-path: polygon(0 38%, 100% 38%, 100% 62%, 0 62%);
+}
+
+/* The one place green means something: a checklist tick is a completion, not a
+   selection. Opt in, so nothing inherits it by accident again. */
+.vy-check-input--done:checked,
+.vy-check-input--done:checked:hover:not(:disabled) {
+  background: var(--vy-accent-positive); border-color: var(--vy-accent-positive);
+}
+
 .vy-check-input:disabled { background: var(--vy-grey-100); border-color: var(--vy-grey-300); cursor: not-allowed; }
 
 .vy-check-name { flex: 1; min-width: 0; }

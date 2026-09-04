@@ -43,7 +43,8 @@ export function ColumnChooser({ columns, hiddenCount, onToggle, onReset }: {
                     being absent — otherwise its row is missing from a list that
                     claims to be every column. */}
                 <label data-required={c.required || undefined}>
-                  <input type="checkbox" checked={c.on} disabled={c.required}
+                  <input type="checkbox" className="vy-check-input"
+                         checked={c.on} disabled={c.required}
                          onChange={() => onToggle(c.field)} />
                   <span>{c.title}</span>
                   {c.required && <em className="vy-column-req">always shown</em>}
