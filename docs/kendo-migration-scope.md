@@ -150,7 +150,7 @@ ordering — not one big-bang branch.
 | **5** | ~~`MiniTable` (16) → Grid~~ — **DONE.** Filter cells taken. See §10 | one file | — |
 | **6** | ~~`DataGrid` → Grid~~ — **DONE.** See §13 | one file | — |
 | **7** | ~~ExcelExport + Upload~~ — **DONE.** See §14 | medium | — |
-| **8** | Re-run the a11y audit, `css:check` rethink, responsive re-check | medium | — |
+| **8** | ~~Re-run the a11y audit, `css:check` rethink, responsive re-check~~ — **DONE.** See §15 | medium | — |
 
 **Phase 0 is the gate — and it has now been run. It passes.** See §8.
 
@@ -755,3 +755,76 @@ shell's working directory. It created a `package.json`, a lock file and 30 MB of
 `node_modules` in `/Users/nguyenhuyen/development/LL` — the parent of the
 project. Removed, and reinstalled with an explicit `cd` inside the background
 command. Anything backgrounded from now on states its own directory.
+
+
+---
+
+# 15. Phase 8 — audits re-run against the Kendo DOM. 31 Aug 2026. **Done.**
+
+§3.3 said the accessibility work would have to be redone because it was measured
+against **our** DOM. Phases 5, 6 and 7 replaced that DOM three times. This is the
+pass over what they left.
+
+## The §11 defect is fixed
+
+Filter inputs announced themselves by the FIELD — "part Filter", "partSource
+Filter" — so a screen reader read camelCase identifiers aloud where a sighted
+user saw the column heading. §11 recorded the fix as attempted and reverted,
+because wrapping the filter cell leaked Kendo's internal props onto the DOM as
+React warnings on every render.
+
+`kendoDomProps`, written in phase 6 for a different reason, is exactly what that
+attempt was missing. The wrap is now in place and the inputs read **"Component
+Part filter"**, **"Part Source filter"**. Filtering and the ten-operator menu
+both still work — checked, because replacing a library's own cell is how you
+silently lose its behaviour.
+
+## The regression from §11 is closed
+
+Kendo puts `aria-sort` on **every** column header, including ones it correctly
+marks unsortable — and `aria-sort="none"` does not mean "not sortable", it means
+sortable and currently unsorted. So a column of checkboxes or buttons announced
+itself as something you could order by. The hand-written tables deliberately
+omitted it; §11 recorded losing that as a regression.
+
+`kendoHeaderProps` drops it, and both grids now supply a header cell for their
+control columns. Verified: on the Checklists tab, `Actions` has **no**
+`aria-sort` while the six real columns keep theirs.
+
+## DataGrid, audited on its new DOM
+
+| | Result |
+|---|---|
+| ARIA structure | `role=grid` owning presentation tables — 15 columnheaders, 300 gridcells, 21 rows |
+| Interactive controls | **41, none unnamed** |
+| Keyboard | header takes focus, **Enter sorts**; one `tabindex=0` entry point, 313 at `-1` |
+| Row checkboxes | all 21 reachable |
+| Responsive @375 | page does not scroll sideways; the grid scrolls inside itself; pager visible |
+
+The `.k-table` sitting past the right edge at 375px is **inside** that scroller,
+which is the required behaviour: fifteen fixed-width columns cannot fit a phone
+and should not try.
+
+## `css:check` gained a sixth check
+
+The script asked two questions — "does this rule use the scale" and, in its
+sibling, "does this rule still describe real markup". Since the migration there
+is a third: **does this rule style a third-party class without saying where.**
+
+Every Kendo override in this app is scoped to one of our containers —
+`.vy-grid-k .k-grid`, never a bare `.k-grid` — because an unscoped one reaches
+every Kendo component on every screen, including ones nobody was thinking about.
+That is how two systems end up fighting, and phase 5 spent an afternoon on the
+mirror image of it when `.vy-td` met a real `<table>`.
+
+Check 6 enforces it. **Verified by planting a bare `.k-grid { }` and watching it
+fail**, then removing it — a check that has never failed is not yet a check.
+
+## What phase 8 did not do
+
+- **Contrast was not re-measured** on the new DataGrid surfaces. The tokens
+  driving them were measured when they were set, and the Kendo bridge maps our
+  values rather than introducing new ones — but that is an argument, not a
+  measurement.
+- **Tab ORDER within the grid** was checked for containment and for the roving
+  model, not for whether the sequence is sensible on a 15-column row.

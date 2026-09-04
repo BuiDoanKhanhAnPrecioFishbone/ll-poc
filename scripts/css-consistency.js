@@ -10,8 +10,12 @@
  *   node scripts/css-consistency.js
  *
  * tokens.css is the ONE file allowed to hold raw values; it is the definition of
- * the scale, so it is skipped. md3.css and base.css are bridges to third-party
- * and browser defaults, reported separately and not counted as failures.
+ * the scale, so it is skipped. md3.css, base.css and kendo-bridge.css are
+ * bridges to third-party and browser defaults, reported separately and not
+ * counted as failures.
+ *
+ * Since the Kendo migration it also answers a third question: "does this rule
+ * style a third-party class without saying WHERE" — see check 6.
  */
 import fs from 'node:fs';
 
@@ -115,6 +119,24 @@ for (const path of FILES) {
     /* 5. !important — always a specificity failure worth seeing. */
     if (/!important/.test(line) && !inReducedMotion)
       add(path, n, 'important', line, 'overrides by force');
+
+    /* 6. UNSCOPED KENDO OVERRIDES.
+          Since the migration this app styles a third-party library, and the
+          rule is that it only ever does so INSIDE one of our own containers —
+          `.vy-grid-k .k-grid`, not `.k-grid`. A bare `.k-*` selector reaches
+          every Kendo component on every screen, including ones nobody was
+          thinking about, and that is how the two systems end up fighting: our
+          paint on their box, in a place no one tested.
+
+          Phase 5 spent an afternoon on exactly this in reverse — `.vy-td` was
+          written for a CSS-grid table and destroyed a real one — so the check
+          exists to keep the boundary visible rather than remembered. */
+    const selector = line.split('{')[0];
+    if (/\.k-[a-z0-9-]/.test(selector) && /\{/.test(line)) {
+      const scoped = /\.vy-[a-z0-9-]+[^{]*\.k-/.test(selector);
+      if (!scoped) add(path, n, 'kendo-scope', line,
+        'styles a Kendo class without a .vy- ancestor — this reaches every screen');
+    }
   });
 }
 

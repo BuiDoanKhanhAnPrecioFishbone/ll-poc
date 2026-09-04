@@ -12,7 +12,7 @@ import { usePrefs } from './prefs';
 import { Button } from './Button';
 import { widthOf, type ColumnSpec } from '../components/column-model';
 import { GridSkeleton } from './GridSkeleton';
-import { kendoDomProps } from './kendoDomProps';
+import { kendoDomProps, kendoHeaderProps } from './kendoDomProps';
 import { renderCell, fmtDate } from './renderCell';
 
 export type Density = 'compact' | 'comfortable' | 'relaxed';
@@ -368,7 +368,10 @@ export function DataGrid<T extends { id: string | number }>({
                          replaces Kendo's wrapper as well as its contents, so
                          returning a bare <label> put one directly inside a
                          <tr>. Same lesson as the phase 5 filter cell. */
-                      <th {...kendoDomProps(thProps)}>
+                      /* `kendoHeaderProps` drops the `aria-sort` Kendo puts on
+                         every header: this column holds checkboxes and cannot
+                         be ordered by, and "none" would claim it can. */
+                      <th {...kendoHeaderProps(thProps)}>
                       <label className="vy-check" title={`Select all ${rows.length} on this page`}>
                         <input
                           type="checkbox"

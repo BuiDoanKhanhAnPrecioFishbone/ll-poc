@@ -50,3 +50,19 @@ export function kendoDomProps(props: object | null | undefined) {
   }
   return out;
 }
+
+/**
+ * The same, minus `aria-sort`.
+ *
+ * Kendo puts `aria-sort` on EVERY column header, including the ones it
+ * correctly marks unsortable. `aria-sort="none"` does not mean "not sortable" —
+ * it means sortable and currently unsorted — so a column of checkboxes or
+ * buttons announces itself as something a user can order by. The old
+ * hand-written tables deliberately omitted it; §11 recorded losing that as a
+ * regression, and this is how it comes back.
+ */
+export function kendoHeaderProps(props: object | null | undefined) {
+  const out = kendoDomProps(props);
+  delete out['aria-sort'];
+  return out;
+}

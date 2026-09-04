@@ -1,11 +1,12 @@
 import { useMemo, useState, type ReactNode } from 'react';
 import {
-  Grid, GridColumn,
+  Grid, GridColumn, GridFilterCell,
   type GridCustomCellProps, type GridCustomRowProps, type GridCustomHeaderCellProps,
+  type GridCustomFilterCellProps,
 } from '@progress/kendo-react-grid';
 import { process, type CompositeFilterDescriptor, type SortDescriptor } from '@progress/kendo-data-query';
 import { widthOf, type ColumnSpec } from '../components/column-model';
-import { kendoDomProps } from './kendoDomProps';
+import { kendoDomProps, kendoHeaderProps } from './kendoDomProps';
 import { renderCell } from './renderCell';
 
 /**
@@ -132,9 +133,6 @@ export function MiniTable<T extends { id: string | number }>({
             locked={i < freeze || undefined}
             sortable={c.sortable !== false}
             filterable={c.sortable !== false}
-            /* Names the filter MENU. It does NOT rename the filter input,
-               which Kendo labels from the FIELD — see the known defect in §11
-               of docs/kendo-migration-scope.md. */
             filterTitle={c.title}
             /* Every cell still goes through `renderCell`, so the column roles,
                the money and date formatting and the empty-value em-dash are
@@ -153,14 +151,35 @@ export function MiniTable<T extends { id: string | number }>({
                   {renderCell(c, dataItem as T)}
                 </td>
               ),
-              ...(c.headerRender
-                ? { headerCell: ({ thProps }: GridCustomHeaderCellProps) =>
-                      /* The <th> is ours: a custom header cell replaces Kendo's
-                         wrapper too, and a bare fragment leaves its contents
-                         directly inside the <tr>. Latent here — no column ships
-                         a headerRender today — and fixed with the same fault
-                         found for real in DataGrid. */
-                      <th {...kendoDomProps(thProps)}>{c.headerRender!()}</th> }
+              /* Kendo labels the filter input from the FIELD — "part Filter",
+                 "partSource Filter" — so a screen reader reads camelCase
+                 identifiers aloud where a sighted user sees the column heading.
+                 `filterTitle` names the MENU, not the input; the label comes
+                 from `ariaLabel` on the filter cell.
+
+                 §11 found this and reverted the fix, because wrapping the cell
+                 leaked Kendo's internal props onto the DOM as React warnings.
+                 `kendoDomProps` is what that attempt was missing. */
+              filterCell: ({ tdProps, ...fp }: GridCustomFilterCellProps) => (
+                <td {...kendoDomProps(tdProps)}>
+                  <GridFilterCell {...fp} ariaLabel={`${c.title} filter`} />
+                </td>
+              ),
+              /* The <th> is OURS whenever we supply a header cell: a custom
+                 one replaces Kendo's wrapper too, so a bare fragment would
+                 leave its contents directly inside the <tr>.
+
+                 A control column also gets a header here for a second reason —
+                 to drop the `aria-sort` Kendo puts on every column, including
+                 ones it marks unsortable. "none" means sortable-and-unsorted,
+                 which is a claim about a column of buttons. §11 recorded losing
+                 that behaviour as a regression against the hand-written table. */
+              ...(c.headerRender || c.sortable === false
+                ? { headerCell: ({ thProps }: GridCustomHeaderCellProps) => (
+                      <th {...kendoHeaderProps(thProps)}>
+                        {c.headerRender ? c.headerRender() : c.title}
+                      </th>
+                    ) }
                 : {}),
               /* The filter box otherwise announces itself by the FIELD name —
                  "part Filter", "partSource Filter" — so a screen reader reads
