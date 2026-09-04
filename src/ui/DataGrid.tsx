@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  flexRender, getCoreRowModel, getSortedRowModel, useReactTable,
-  type ColumnDef, type SortingState,
-} from '@tanstack/react-table';
-import { useVirtualizer } from '@tanstack/react-virtual';
+  Grid, GridColumn,
+  type GridCustomCellProps, type GridCustomRowProps, type GridCustomHeaderCellProps,
+} from '@progress/kendo-react-grid';
+import { orderBy, type SortDescriptor } from '@progress/kendo-data-query';
 import { SearchField } from './Field';
 import { ColumnChooser } from './ColumnChooser';
 import { Pager } from './Pager';
@@ -12,28 +12,47 @@ import { usePrefs } from './prefs';
 import { Button } from './Button';
 import { widthOf, type ColumnSpec } from '../components/column-model';
 import { GridSkeleton } from './GridSkeleton';
+import { kendoDomProps } from './kendoDomProps';
 import { renderCell, fmtDate } from './renderCell';
 
 export type Density = 'compact' | 'comfortable' | 'relaxed';
-const ROW_H: Record<Density, number> = { compact: 28, comfortable: 36, relaxed: 44 };
+/* The density scale, kept here because it is the app's row-height vocabulary
+   and `GridSkeleton` sizes its placeholder rows from it. The GRID itself gets
+   density from `[data-density]` in the stylesheet — see the note on `rowHeight`
+   below for why it is not passed to Kendo. */
+export const ROW_H: Record<Density, number> = { compact: 28, comfortable: 36, relaxed: 44 };
+/* The checkbox track is fixed and narrow — it holds one control whose size never
+   changes, so a role width would only make it wider than its content. */
+const SELECT_COL_W = 40;
 
 
 /**
- * THE STANDARD LIST PATTERN — headless build.
+ * THE STANDARD LIST PATTERN — KendoReact Grid underneath, our chrome on top.
  *
- * Same rules as before; the rules were never Kendo's. Column width still
- * follows from column role, sparse columns still hide with a stated reason,
- * density is still a user setting, the row is still the affordance.
+ * PHASE 6 of docs/kendo-migration-scope.md, and the one it called high risk:
+ * twenty-one props, each of them a requirement somebody signed off. The rules
+ * are unchanged and none of them were ever Kendo's — column width still follows
+ * from column role, sparse columns still hide with a stated reason, density is
+ * still a user preference, the identifier is still the affordance.
  *
- * What changes by dropping the component library:
+ * WHAT KENDO TOOK OVER: the table itself — header, rows, cells, sort controls.
  *
- *   - ROW VIRTUALISATION. Every row used to be in the DOM, so the Part Master
- *     paged at 50. This renders only what fits the viewport plus a small
- *     overscan, so all 21,941 rows can be one scroll with no pager at all.
- *   - No 28px floor fight. A Rating used to force 36px rows (GAP-02) because
- *     the library's internals set their own padding. Our cells inherit density.
- *   - Sticky header for free, rather than depending on a library's internal
- *     wrapper class.
+ * WHAT IT DID NOT: everything around it. The title, KPIs, actions, search,
+ * filter panel, view picker, column chooser, empty state, loading skeleton and
+ * pager are ours and untouched. Kendo's own pager, filter row and column menu
+ * are all switched off, because each already exists here answering a written
+ * requirement, and two of a thing is worse than either.
+ *
+ * VIRTUALISATION IS GONE, AND THAT IS NOT A LOSS. It existed to make 21,941
+ * rows one scroll — then the 25 Aug review replaced infinite scroll with a
+ * pager, and `Pager` offers 20, 50 or 100. Virtualising 100 rows is machinery
+ * with nothing to do, and it cost a `useEffect` to re-measure on every density
+ * change. The page slice goes straight to the Grid.
+ *
+ * SELECTION STAYS OURS. Kendo has its own selection model, but the guideline's
+ * is specific — select-all covers THIS PAGE, because across 2,000 rows a bare
+ * "all" selects records the user has never seen and is about to export. It is a
+ * normal column here, with our checkbox in it.
  */
 export function DataGrid<T extends { id: string | number }>({
   data, columns, title, subtitle, actions, filters,
@@ -122,8 +141,7 @@ export function DataGrid<T extends { id: string | number }>({
    * the quick path (on/off), View Setting is the full one (order, name, width).
    * Two doors into one room, rather than two rooms.
    */
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const [sort, setSort] = useState<SortDescriptor[]>([]);
 
   const visible = useMemo(
     () => columns,
@@ -142,37 +160,28 @@ export function DataGrid<T extends { id: string | number }>({
      inert text so it can be selected and copied. */
   const identField = visible.find(c => c.role === 'ident')?.field;
 
-  const tableColumns = useMemo<ColumnDef<T>[]>(() => visible.map(spec => ({
-    id: spec.field,
-    accessorKey: spec.field,
-    header: spec.title,
-    size: widthOf(spec),
-    cell: ctx => {
-      const row = ctx.row.original;
-      if (spec.field === identField && !spec.render) {
-        const label = String(row[spec.field]);
-        if (rowHref) return <Link className="vy-cell-link vy-ident" to={rowHref(row)}>{label}</Link>;
-        if (onOpenRow) return (
-          <button type="button" className="vy-cell-link vy-ident" onClick={() => onOpenRow(row)}>
-            {label}
-          </button>
-        );
-      }
-      return renderCell(spec, row);
-    },
-    sortingFn: spec.role === 'date' ? 'datetime' : 'auto',
-  })), [visible]);
+  /* One cell renderer for every column. The identifier column becomes the open
+     affordance; every other cell stays inert text so it can be selected and
+     copied — the rule `docs/table-patterns.md` states and the reason row-wide
+     click targets were rejected. */
+  const cellFor = (spec: ColumnSpec<T>) => (row: T) => {
+    if (spec.field === identField && !spec.render) {
+      const label = String(row[spec.field]);
+      if (rowHref) return <Link className="vy-cell-link vy-ident" to={rowHref(row)}>{label}</Link>;
+      if (onOpenRow) return (
+        <button type="button" className="vy-cell-link vy-ident" onClick={() => onOpenRow(row)}>
+          {label}
+        </button>
+      );
+    }
+    return renderCell(spec, row);
+  };
 
-  const table = useReactTable({
-    data: filtered,
-    columns: tableColumns,
-    state: { sorting },
-    onSortingChange: setSorting,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-  });
-
-  const allRows = table.getRowModel().rows;
+  /* Search, then sort, then page — in that order, because sorting a page rather
+     than the set would sort twenty rows out of two thousand. */
+  const allRows = useMemo(
+    () => (sort.length ? orderBy(filtered as object[], sort) as T[] : filtered),
+    [filtered, sort]);
 
   /* Paging replaces infinite scroll (25 Aug review). Virtualisation stays
      underneath, so a 100-row page is still cheap; what the pager adds is a
@@ -190,36 +199,11 @@ export function DataGrid<T extends { id: string | number }>({
      pager had when a filter narrowed the set while you were on page 7. */
   const safePage = Math.min(page, pageCount - 1);
   const rows = allRows.slice(safePage * pageSize, safePage * pageSize + pageSize);
-
-  const rowH = ROW_H[density];
-
-  const virt = useVirtualizer({
-    count: rows.length,
-    getScrollElement: () => scrollRef.current,
-    estimateSize: () => rowH,
-    overscan: 12,
-  });
-
-  /* Density changes the row height, so previously-measured offsets are stale. */
-  useEffect(() => { virt.measure(); }, [density]);
-
-  /* A narrower result set should start at the top, not wherever the last scroll
-     left you — the scroll equivalent of the pager bug this replaced. */
-  useEffect(() => { scrollRef.current?.scrollTo({ top: 0 }); }, [filtered, safePage, pageSize]);
   /* A narrower result set starts at page one. Staying on page 7 of a set that
      now has two pages is how a grid ends up looking empty for no reason. */
   useEffect(() => { setPage(0); }, [filtered]);
 
-  const items = virt.getVirtualItems();
-
-  /* One grid template, derived from the column roles, shared by the header and
-     every row — so a cell can never drift out of alignment with its heading.
-     The px values come from the token layer (COLUMN_WIDTH), not from here. */
   const selectable = !!selected && !!onSelectedChange;
-  /* The checkbox track is fixed and narrow — it holds one control whose size
-     never changes, so a role width would only make it wider than its content. */
-  const template = (selectable ? 'var(--vy-select-col-w) ' : '')
-    + visible.map(c => `${widthOf(c)}px`).join(' ');
 
   return (
     <div className="vy-page vy-page--grid" data-density={density}>
@@ -300,131 +284,153 @@ export function DataGrid<T extends { id: string | number }>({
 
         {filterOpen && filterPanel}
 
-        <div className="vy-grid-scroll" ref={scrollRef}>
-          <div className="vy-grid-table">
-            <div className="vy-grid-head" role="row" style={{ gridTemplateColumns: template }}>
-              {/* Select-all covers THIS PAGE, and says so. Across 2,000
-                  virtualised rows a bare "all" would select records the user
-                  has never seen and cannot check before exporting them; the
-                  page is the set they are actually looking at. */}
-              {selectable && (
-                <div className="vy-th vy-th--select" role="columnheader">
-                  <label className="vy-check" title={`Select all ${rows.length} on this page`}>
-                    <input
-                      type="checkbox"
-                      aria-label={`Select all ${rows.length} rows on this page`}
-                      checked={rows.length > 0 && rows.every(r => selected!.has((r.original as { id: string | number }).id))}
-                      ref={el => { if (el) el.indeterminate =
-                        rows.some(r => selected!.has((r.original as { id: string | number }).id)) &&
-                        !rows.every(r => selected!.has((r.original as { id: string | number }).id)); }}
-                      onChange={e => {
-                        const next = new Set(selected!);
-                        for (const r of rows) {
-                          const id = (r.original as { id: string | number }).id;
-                          if (e.target.checked) next.add(id); else next.delete(id);
-                        }
-                        onSelectedChange!(next);
-                      }}
-                    />
-                  </label>
-                </div>
-              )}
-              {table.getHeaderGroups()[0].headers.map(h => {
-                const spec = visible.find(v => v.field === h.id)!;
-                const sorted = h.column.getIsSorted();
-                return (
-                  <button key={h.id} type="button" role="columnheader" className="vy-th"
-                          data-role={spec.role} data-sorted={sorted || undefined}
-                          aria-sort={sorted === 'asc' ? 'ascending' : sorted === 'desc' ? 'descending' : 'none'}
-                          onClick={h.column.getToggleSortingHandler()}>
-                    <span>{flexRender(h.column.columnDef.header, h.getContext())}</span>
-                    {sorted && (
-                      <svg viewBox="0 0 12 12" width="11" height="11" aria-hidden className="vy-sort">
-                        <path d={sorted === 'asc' ? 'M6 3 9.5 8h-7z' : 'M6 9 2.5 4h7z'} fill="currentColor" />
-                      </svg>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-
-            {loading ? (
-              <GridSkeleton columns={visible} rows={14} />
-            ) : rows.length === 0 ? (
-              /* An empty grid has to say WHICH of the two things emptied it,
-                 and offer the matching way out. It previously always blamed the
-                 search — offering to "clear the search to see all 0 records"
-                 when the search was empty, the filters were doing the work, and
-                 the count it quoted was the filtered one. Three wrong things in
-                 one sentence. */
-              <div className="vy-empty-state">
-                <strong>
-                  {search
-                    ? <>Nothing matches “{search}”</>
-                    : filterActive > 0
-                      ? <>Nothing matches these filters</>
-                      : <>Nothing to show</>}
-                </strong>
-                <p>
-                  {emptyHint ?? (
-                    search && filterActive > 0
-                      ? 'Both a search and a filter are narrowing this list.'
-                      : search
-                        ? 'No record contains that text.'
-                        : filterActive > 0
-                          ? `${filterActive} ${filterActive === 1 ? 'filter is' : 'filters are'} applied. Clear them to see every record.`
-                          : 'There are no records here yet.'
-                  )}
-                </p>
-                {search && <Button variant="filled" onClick={() => setSearch('')}>Clear search</Button>}
-                {!search && filterActive > 0 && (
-                  <Button variant="filled" onClick={() => setFilterOpen(true)}>Show filters</Button>
+        <div className="vy-grid-k" data-density={density}>
+          {loading ? (
+            <GridSkeleton columns={visible} rows={14} />
+          ) : rows.length === 0 ? (
+            /* An empty grid has to say WHICH of the two things emptied it, and
+               offer the matching way out. It previously always blamed the
+               search — offering to "clear the search to see all 0 records" when
+               the search was empty, the filters were doing the work, and the
+               count it quoted was the filtered one. Three wrong things in one
+               sentence. Kendo has a no-records template; this says more than it
+               can, so it stays. */
+            <div className="vy-empty-state">
+              <strong>
+                {search
+                  ? <>Nothing matches “{search}”</>
+                  : filterActive > 0
+                    ? <>Nothing matches these filters</>
+                    : <>Nothing to show</>}
+              </strong>
+              <p>
+                {emptyHint ?? (
+                  search && filterActive > 0
+                    ? 'Both a search and a filter are narrowing this list.'
+                    : search
+                      ? 'No record contains that text.'
+                      : filterActive > 0
+                        ? `${filterActive} ${filterActive === 1 ? 'filter is' : 'filters are'} applied. Clear them to see every record.`
+                        : 'There are no records here yet.'
                 )}
-              </div>
-            ) : (
-              /* Virtualiser geometry: computed layout, not design values.
-                 See working-agreement.md section 4. */
-              <div className="vy-grid-body" style={{ height: virt.getTotalSize() }}>
-                {items.map(vi => {
-                  const row = rows[vi.index];
-                  return (
-                    <div key={row.id} className="vy-tr" role="row"
-                         data-selected={selectable && selected!.has((row.original as { id: string | number }).id) || undefined}
-                         style={{ transform: `translateY(${vi.start}px)`, height: rowH, gridTemplateColumns: template }}>
-                      {selectable && (() => {
-                        const id = (row.original as { id: string | number }).id;
-                        const on = selected!.has(id);
-                        return (
-                          <div className="vy-td vy-td--select" role="cell">
-                            <label className="vy-check">
-                              {/* Named by the row, not "Select row" — a screen
-                                  reader moving down 20 identical labels learns
-                                  nothing about which one it is on. */}
-                              <input type="checkbox" checked={on}
-                                     aria-label={`Select ${String(id)}`}
-                                     onChange={() => {
-                                       const next = new Set(selected!);
-                                       if (on) next.delete(id); else next.add(id);
-                                       onSelectedChange!(next);
-                                     }} />
-                            </label>
-                          </div>
-                        );
-                      })()}
-                      {row.getVisibleCells().map(cell => {
-                        const spec = visible.find(v => v.field === cell.column.id)!;
-                        return (
-                          <div key={cell.id} className="vy-td" role="cell" data-role={spec.role}>
-                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+              </p>
+              {search && <Button variant="filled" onClick={() => setSearch('')}>Clear search</Button>}
+              {!search && filterActive > 0 && (
+                <Button variant="filled" onClick={() => setFilterOpen(true)}>Show filters</Button>
+              )}
+            </div>
+          ) : (
+            <Grid
+              data={rows}
+              sortable={{ mode: 'single', allowUnsort: true }}
+              sort={sort}
+              onSortChange={e => setSort(e.sort)}
+              /* Kendo's own pager, filter row and column menu stay OFF: this
+                 screen already has all three, each answering a written
+                 requirement, and two of a thing is worse than either. */
+              pageable={false}
+              filterable={false}
+              /* Keyboard: Kendo puts the sort handler on a span inside the th,
+                 which is not focusable. Without this the grid is mouse-only for
+                 sorting — the WCAG 2.1.1 failure the phase 5 audit found. */
+              navigatable
+              /* NO `rowHeight`. Setting it puts Kendo into its virtual-scroll
+                 mode, which needs `skip`/`take`/`total` and an `onPageChange`
+                 to feed it — none of which this grid supplies, because OUR
+                 pager already did the slicing. The symptom was silent and ugly:
+                 a 100-row page reserved 4,400px of scroll and rendered only the
+                 first 20 rows, so eighty records were unreachable while the
+                 scrollbar said they were there. Row height comes from the
+                 density CSS instead. */
+              style={{ height: '100%' }}
+              rows={{
+                data: ({ dataItem, trProps, children }: GridCustomRowProps) => (
+                  <tr {...kendoDomProps(trProps)}
+                      data-selected={(selectable && selected!.has((dataItem as T).id)) || undefined}>
+                    {children}
+                  </tr>
+                ),
+              }}
+            >
+              {selectable && (
+                <GridColumn
+                  field="__select"
+                  width={SELECT_COL_W}
+                  sortable={false}
+                  title=" "
+                  cells={{
+                    /* Select-all covers THIS PAGE, and says so. Across 2,000
+                       rows a bare "all" would select records the user has never
+                       seen and cannot check before exporting them; the page is
+                       the set they are actually looking at. */
+                    headerCell: ({ thProps }: GridCustomHeaderCellProps) => (
+                      /* The <th> is OURS to render. A custom header cell
+                         replaces Kendo's wrapper as well as its contents, so
+                         returning a bare <label> put one directly inside a
+                         <tr>. Same lesson as the phase 5 filter cell. */
+                      <th {...kendoDomProps(thProps)}>
+                      <label className="vy-check" title={`Select all ${rows.length} on this page`}>
+                        <input
+                          type="checkbox"
+                          aria-label={`Select all ${rows.length} rows on this page`}
+                          checked={rows.length > 0 && rows.every(r => selected!.has(r.id))}
+                          ref={el => { if (el) el.indeterminate =
+                            rows.some(r => selected!.has(r.id)) &&
+                            !rows.every(r => selected!.has(r.id)); }}
+                          onChange={e => {
+                            const next = new Set(selected!);
+                            for (const r of rows) {
+                              if (e.target.checked) next.add(r.id); else next.delete(r.id);
+                            }
+                            onSelectedChange!(next);
+                          }}
+                        />
+                      </label>
+                      </th>
+                    ),
+                    data: ({ dataItem, tdProps }: GridCustomCellProps) => {
+                      const id = (dataItem as T).id;
+                      const on = selected!.has(id);
+                      return (
+                        <td {...kendoDomProps(tdProps)} className="vy-td--select">
+                          <label className="vy-check">
+                            {/* Named by the row, not "Select row" — a screen
+                                reader moving down 20 identical labels learns
+                                nothing about which one it is on. */}
+                            <input type="checkbox" checked={on}
+                                   aria-label={`Select ${String(id)}`}
+                                   onChange={() => {
+                                     const next = new Set(selected!);
+                                     if (on) next.delete(id); else next.add(id);
+                                     onSelectedChange!(next);
+                                   }} />
+                          </label>
+                        </td>
+                      );
+                    },
+                  }}
+                />
+              )}
+              {visible.map(spec => (
+                <GridColumn
+                  key={spec.field}
+                  field={spec.field}
+                  title={spec.title}
+                  width={widthOf(spec)}
+                  cells={{
+                    data: ({ dataItem, tdProps }: GridCustomCellProps) => (
+                      /* `data-role` carries the column role through, so width
+                         and alignment still come from the role model rather
+                         than from Kendo's defaults. */
+                      <td {...kendoDomProps(tdProps)} data-role={spec.role}>
+                        {cellFor(spec)(dataItem as T)}
+                      </td>
+                    ),
+                  }}
+                />
+              ))}
+            </Grid>
+          )}
         </div>
 
         <Pager page={safePage} pageSize={pageSize} total={allRows.length}

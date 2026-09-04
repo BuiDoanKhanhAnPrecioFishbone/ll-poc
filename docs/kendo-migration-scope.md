@@ -148,7 +148,7 @@ ordering — not one big-bang branch.
 | **3** | `Select` (37) → DropDownList/ComboBox | medium | **medium** — must preserve the filter-as-you-type behaviour An specifically caught |
 | **4** | `Dialog` (21) → Dialog/Window | medium | medium — three-deep nesting must keep working |
 | **5** | ~~`MiniTable` (16) → Grid~~ — **DONE.** Filter cells taken. See §10 | one file | — |
-| **6** | `DataGrid` (3 call sites, 438 lines) → Grid + virtualisation, re-wiring views, density, column chooser, selection | **large** | **high** — the most feature-dense component in the app |
+| **6** | ~~`DataGrid` → Grid~~ — **DONE.** See §13 | one file | — |
 | **7** | ExcelExport + Upload — the two capability wins | medium | low |
 | **8** | Re-run the a11y audit, `css:check` rethink, responsive re-check | medium | — |
 
@@ -599,3 +599,85 @@ Every claim here is hit-tested with `elementsFromPoint` rather than read off a
 computed z-index. Two of the faults above — the View Setting under its own
 scrim, and the toast — had perfectly sensible-looking z-index values and were
 still wrong.
+
+
+---
+
+# 13. Phase 6 — DataGrid on the Kendo Grid. Run 31 Aug 2026. **Done.**
+
+The phase the scope called **high risk**: twenty-one props, each of them a
+requirement somebody signed off. One file again, as phase 1 established — all
+three call sites are untouched.
+
+## What Kendo took over, and what it did not
+
+**Took over:** the table — header, rows, cells, sort controls.
+
+**Did not:** everything around it. Title, KPIs, actions, search, filter panel,
+view picker, column chooser, empty state, loading skeleton and pager are ours
+and unchanged. Kendo's own pager, filter row and column menu are switched **off**
+— each already exists here answering a written requirement, and two of a thing
+is worse than either.
+
+## Every requirement re-verified on screen
+
+| Requirement | Source | Result |
+|---|---|---|
+| asc → desc → none | guideline | works, `aria-sort` follows |
+| Density, three levels, a USER preference | 25 Aug review | `relaxed` gives 44px rows |
+| Paging, 20/50/100, our Pager | 25 Aug review | works; Kendo's pager stays off |
+| Selection held BY ID, surviving paging | ours | select on page 1, page away, return — still selected |
+| Select-all covers THIS PAGE | guideline | label says so; indeterminate at 1 of 20 |
+| Identifier is the affordance, not the row | `table-patterns.md` | `<a>` on Quotations, `<button>` on Part Master |
+| Column roles → width and alignment | `table-patterns.md` | money right-aligned, idents monospace |
+| Column chooser edits the page's list | guideline | untick → 15 columns to 14, live |
+| Empty state names WHICH thing emptied it | ours | "Nothing matches "zzzznothing"" |
+
+All three call sites checked: Part Master, Quotations, Bill of Materials.
+
+## TanStack Table and TanStack Virtual are now unused
+
+Nothing in `src/` imports either. **They stay in `package.json` deliberately** —
+open question 2, whether to adopt Kendo at all, is still unanswered, and
+removing them would make reverting this work harder than it needs to be. When
+the customer answers, they either come out or the question is moot.
+
+## The bug this phase nearly shipped
+
+I passed `rowHeight` to the Grid, reasoning that Kendo should know the density's
+row height. That puts Kendo into its **virtual-scroll mode**, which needs
+`skip`/`take`/`total` and an `onPageChange` to feed it — none of which this grid
+supplies, because our own pager already did the slicing.
+
+The symptom was silent: a 100-row page reserved 4,400px of scrollbar and
+rendered only the first twenty rows. Eighty records were unreachable while the
+scrollbar said they were there. Removing `rowHeight` fixed it, and Kendo then
+virtualises correctly on its own — a 23-row window that moves as you scroll and
+reaches the end. Virtualisation came back for free, having been dropped as
+redundant.
+
+**It was only caught by scrolling to the bottom and comparing the last row.**
+Row counts and totals all looked right.
+
+## `kendoDomProps`, and a debt from phase 5 repaid
+
+A custom cell component replaces Kendo's own wrapper, so it must render the
+`<td>`/`<th>` itself and spread the props Kendo hands it — which are written for
+Kendo's internal element factory, not React DOM: camelCase ARIA (`ariaSort`,
+`ariaColumnIndex`) and bookkeeping that is not an attribute at all (`columnId`,
+`navigatable`). Spread raw, React warns for each, on every render, for every
+cell.
+
+`ui/kendoDomProps.ts` translates them: ARIA is converted rather than dropped,
+because it carries real semantics, and the bookkeeping is removed.
+
+**This is the fix phase 5 was missing.** §11 records the filter inputs still
+being named by their field — "partSource Filter" read aloud — because the
+wrapper needed to correct it produced exactly these warnings and was reverted.
+The translator is what that fix lacked; applying it is now a small, known job.
+
+## Also fixed: a latent copy of the same fault in MiniTable
+
+`MiniTable`'s custom `headerCell` returned a bare fragment rather than a `<th>`.
+No column ships a `headerRender` today, so it had never fired — found because
+the identical mistake in `DataGrid`'s select-all header did.

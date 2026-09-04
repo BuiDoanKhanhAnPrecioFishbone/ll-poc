@@ -1,10 +1,11 @@
 import { useMemo, useState, type ReactNode } from 'react';
 import {
   Grid, GridColumn,
-  type GridCustomCellProps, type GridCustomRowProps,
+  type GridCustomCellProps, type GridCustomRowProps, type GridCustomHeaderCellProps,
 } from '@progress/kendo-react-grid';
 import { process, type CompositeFilterDescriptor, type SortDescriptor } from '@progress/kendo-data-query';
 import { widthOf, type ColumnSpec } from '../components/column-model';
+import { kendoDomProps } from './kendoDomProps';
 import { renderCell } from './renderCell';
 
 /**
@@ -118,7 +119,7 @@ export function MiniTable<T extends { id: string | number }>({
            This puts our row state back on the row Kendo renders. */
         rows={{
           data: ({ dataItem, trProps, children }: GridCustomRowProps) => (
-            <tr {...trProps} data-tone={rowTone?.(dataItem as T)}>{children}</tr>
+            <tr {...kendoDomProps(trProps)} data-tone={rowTone?.(dataItem as T)}>{children}</tr>
           ),
         }}
       >
@@ -147,13 +148,19 @@ export function MiniTable<T extends { id: string | number }>({
                    with their headers entirely. The role rides on the data
                    attribute instead, and the stylesheet picks it up under
                    `.vy-minitable-k`. */
-                <td {...tdProps} data-role={c.role}
+                <td {...kendoDomProps(tdProps)} data-role={c.role}
                     data-tone={c.tone?.(dataItem as T)}>
                   {renderCell(c, dataItem as T)}
                 </td>
               ),
               ...(c.headerRender
-                ? { headerCell: () => <>{c.headerRender!()}</> }
+                ? { headerCell: ({ thProps }: GridCustomHeaderCellProps) =>
+                      /* The <th> is ours: a custom header cell replaces Kendo's
+                         wrapper too, and a bare fragment leaves its contents
+                         directly inside the <tr>. Latent here — no column ships
+                         a headerRender today — and fixed with the same fault
+                         found for real in DataGrid. */
+                      <th {...kendoDomProps(thProps)}>{c.headerRender!()}</th> }
                 : {}),
               /* The filter box otherwise announces itself by the FIELD name —
                  "part Filter", "partSource Filter" — so a screen reader reads

@@ -1337,3 +1337,29 @@
 .vy-minitable-k td[data-tone="missing"]     { background: var(--vy-tone-missing-bg); color: var(--vy-tone-missing-fg); }
 .vy-minitable-k td[data-tone="known-mfg"]   { background: var(--vy-tone-known-mfg-bg); }
 .vy-minitable-k td[data-tone="pending"]     { background: var(--vy-tone-missing-bg); }
+
+/* ---- DataGrid on the Kendo Grid ------------------------------------------ */
+/* The role model and the density preference, re-expressed for a real <table>.
+   The old `.vy-grid-*` rules laid out a CSS grid — `display: grid` rows and a
+   shared `grid-template-columns` — which is exactly what a <td> must not
+   inherit; that mistake cost phase 5 an afternoon. */
+.vy-grid-k { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.vy-grid-k .k-grid { border: 0; height: 100%; font-size: var(--vy-text-base); }
+
+/* Density is a user preference and applies to every grid (25 Aug review). Kendo
+   is told the row height for its own measurements; this makes the cells agree. */
+.vy-grid-k[data-density="compact"]     .k-grid td { padding-block: var(--vy-space-1); }
+.vy-grid-k[data-density="comfortable"] .k-grid td { padding-block: var(--vy-space-3); }
+.vy-grid-k[data-density="relaxed"]     .k-grid td { padding-block: var(--vy-space-5); }
+
+/* Column roles: the same alignment and typography the CSS-grid build had. */
+.vy-grid-k td[data-role="number"],
+.vy-grid-k td[data-role="money"],
+.vy-grid-k td[data-role="date"] { text-align: right; font-variant-numeric: tabular-nums; }
+.vy-grid-k td[data-role="ident"] { font-family: var(--vy-font-mono); font-size: var(--vy-text-sm); }
+.vy-grid-k td[data-role="status"] { overflow: visible; }
+
+/* The selection column holds one checkbox and nothing else. */
+.vy-grid-k .vy-td--select,
+.vy-grid-k .k-grid th:has(.vy-check) { text-align: center; padding-inline: 0; }
+.vy-grid-k tr[data-selected] { background: var(--vy-blue-50); }
