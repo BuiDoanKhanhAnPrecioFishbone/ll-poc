@@ -1,0 +1,93 @@
+/* =============================================================================
+   KENDO BRIDGE — phase 0 spike, 31 Aug 2026
+   -----------------------------------------------------------------------------
+   NOT IN USE by the app. Loaded only by /kendo-check, alongside the Kendo theme
+   and by the same dynamic import, so nothing here reaches a real screen.
+
+   THE QUESTION PHASE 0 ASKS: can our design tokens drive KendoReact, or would
+   adoption mean abandoning them and re-skinning 493 classes?
+
+   THE ANSWER IS IN THIS FILE'S LENGTH. Kendo's theme is entirely
+   custom-property driven — 453 `--kendo-*` variables, every colour, size,
+   radius and duration among them, all defined on `:root`. So the bridge is a
+   VARIABLE MAP, loaded after the theme, and it is about forty lines rather
+   than a re-skin.
+
+   IT MUST BE ON THE ROOT, AND THE SPIKE PROVED WHY. Kendo declares its 72
+   derived variants — every `-hover`, `-active`, `-subtle`, `-emphasis` — on
+   `:root`, each as `oklch(from var(--kendo-color-primary) …)`. A custom
+   property resolves where it is DECLARED, not where it is inherited, so an
+   override on a subtree leaves all 72 still deriving from Kendo's own red
+   while the element merely inherits the already-resolved value. Measured: with
+   the map on a wrapper div, `--kendo-color-primary-hover` stayed
+   `oklch(from oklch(69.85% 0.1923 27.19deg) …)`; moved to the root it became
+   `oklch(from #1b4f9c …)`.
+
+   Hence `html[data-kendo-bridged]` — the root element, with an attribute only
+   so the check page can show both states. Real adoption drops the attribute.
+
+   Only the roots are mapped, and that is enough: all 72 derived colour
+   variables reference a root var, so ONE override moves an entire family.
+   Verified — setting `--kendo-color-primary` to our blue re-derived both
+   `-hover` and `-subtle` from it. That is what makes this cheap, and it is
+   also why the derived variants are left alone below rather than pinned by
+   hand.
+   ========================================================================== */
+
+html[data-kendo-bridged] {
+  /* ---- Colour ------------------------------------------------------------
+     Kendo ships these in oklch() and derives variants from them. Hex is
+     accepted in the same slots — the derivations are relative-colour functions
+     that work from whatever the root value is. */
+  --kendo-color-primary: var(--vy-blue-600);
+  --kendo-color-error: var(--vy-red-600);
+
+  /* Neutral surfaces. `app-surface` is the page, `surface` the raised areas,
+     `base` the controls. Kendo computes `on-app-surface` from `app-surface`
+     for contrast, so it is deliberately NOT set here — letting it derive is
+     what keeps its own contrast guarantees intact. */
+  --kendo-color-app-surface: var(--vy-grey-0);
+  --kendo-color-surface: var(--vy-grey-50);
+  --kendo-color-base: var(--vy-grey-50);
+  --kendo-color-base-subtle: var(--vy-grey-100);
+  --kendo-color-border: var(--vy-grey-200);
+  --kendo-color-border-alt: var(--vy-grey-300);
+
+  /* ---- Typography --------------------------------------------------------
+     13px is the house body size, set as the grid and form default in
+     tokens.css. Kendo's own default is 14px, so leaving this unmapped is the
+     single most visible difference between a bridged and an unbridged grid. */
+  --kendo-font-family: var(--vy-font-sans);
+  --kendo-font-family-monospace: var(--vy-font-mono);
+  --kendo-font-size: var(--vy-text-base);
+  --kendo-font-size-md: var(--vy-text-base);
+  --kendo-font-size-sm: var(--vy-text-sm);
+  --kendo-font-size-lg: var(--vy-text-md);
+
+  /* ---- Shape -------------------------------------------------------------
+     4px is the house radius. Kendo's md is 4px too, which is luck rather than
+     agreement, so it is stated rather than assumed. */
+  --kendo-border-radius-md: var(--vy-radius-md);
+  --kendo-border-radius-sm: var(--vy-radius-sm);
+  --kendo-border-radius-lg: var(--vy-radius-lg);
+
+  /* ---- Spacing -----------------------------------------------------------
+     Kendo multiplies everything from one base. Ours is a 2px scale where
+     space-2 is 4px, so the bases already agree; mapping it keeps them agreeing
+     if either scale is ever retuned. */
+  --kendo-spacing-base: var(--vy-space-2);
+}
+
+/* -----------------------------------------------------------------------------
+   NOT MAPPED, ON PURPOSE — each of these is a decision, not an oversight.
+
+   - `--kendo-color-on-app-surface` and every `*-on-subtle` / `*-emphasis`
+     variant: Kendo derives them with oklch relative-colour maths that carries
+     its own contrast floor. Overriding them by hand is how a themed library
+     quietly loses its accessibility guarantees.
+   - Elevation: our shadows are tuned to our surfaces. Deciding whether Kendo's
+     five-step elevation replaces ours or sits beside it is a design call, not a
+     mapping.
+   - Durations: `md3.css` owns motion. Two motion systems is a question for
+     whoever owns the motion spec.
+   -------------------------------------------------------------------------- */

@@ -16,8 +16,8 @@
 import fs from 'node:fs';
 
 const SKIP = new Set(['tokens.css']);
-const SOFT = new Set(['md3.css', 'base.css']);   // reported, not counted
-const FILES = ['tokens', 'base', 'md3', 'components', 'app', 'responsive']
+const SOFT = new Set(['md3.css', 'base.css', 'kendo-bridge.css']);   // reported, not counted
+const FILES = ['tokens', 'base', 'md3', 'kendo-bridge', 'components', 'app', 'responsive']
   .map(f => `src/theme/${f}.css`);
 
 /* The scales, read out of tokens.css itself rather than duplicated here — a

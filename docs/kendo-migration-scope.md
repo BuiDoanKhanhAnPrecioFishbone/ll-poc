@@ -1,8 +1,12 @@
 # Scoping the KendoReact migration
 
-Written 31 Aug 2026, at An's request, **before** any code is changed. Nothing in
-this document has been done. It exists so the decision — open question 2 — can be
+Written 31 Aug 2026, at An's request, so the decision — open question 2 — can be
 taken on numbers rather than on impression.
+
+**Phase 0 has since been run and passed (§8).** No app screen has been migrated;
+the only code it added is a 40-line variable bridge loaded on `/kendo-check`
+alone. Two of this document's original cost estimates were wrong and are struck
+through where they stand.
 
 The licence key is installed and proven: `/kendo-check` renders a licensed Grid
 with no watermark and Vercel builds clean. That settles **can we**. This document
@@ -69,25 +73,23 @@ customer requirement or a recorded gap.
 
 ## 3. What adoption costs
 
-### 3.1 The stylesheet is the real number
+### 3.1 The stylesheet — **two of the three worries were wrong, see §8**
 
 493 `.vy-` classes and 160 tokens are written against **our** DOM. Kendo renders
 its own `.k-` structure. Every rule targeting a component's internals stops
-applying the moment that component is swapped.
+applying the moment that component is swapped — that part stands.
 
-This is not a find-and-replace. Three sub-problems:
+The three sub-problems as first written, with what phase 0 found:
 
-- **Theme.** Kendo ships `@progress/kendo-theme-default`. Matching our tokens to
-  it means either re-skinning Kendo with our 160 variables, or abandoning them
-  and accepting Kendo's defaults. The first is a real piece of work; the second
-  discards the design system the customer has already reviewed.
-- **Global leakage.** `KendoCheck.tsx` already dodges this: it loads the Kendo
-  theme by **dynamic import** precisely so `.k-*` rules do not go global. Adopt
-  Kendo app-wide and the theme is global — and it will collide with 493 existing
-  classes. Expect a shake-out period.
-- **`css:check` will go red.** The consistency script that has caught six
-  duplicate-class bugs works on our stylesheets. It needs rethinking, not
-  deleting.
+- ~~**Theme.** Matching our tokens means re-skinning Kendo with our 160
+  variables — a real piece of work.~~ **Wrong.** It is a 40-line variable map.
+- ~~**Global leakage.** Adopt Kendo app-wide and the theme collides with 493
+  existing classes. Expect a shake-out period.~~ **Wrong.** Measured collision:
+  zero.
+- **`css:check`.** Stands, but smaller than feared — the bridge is now scanned
+  as a third-party bridge alongside `md3.css` and `base.css`, and passes. The
+  script will still need rethinking for whatever `.k-` overrides adoption
+  produces.
 
 ### 3.2 What we would have to re-achieve, not inherit
 
@@ -140,7 +142,7 @@ ordering — not one big-bang branch.
 
 | Phase | Work | Size | Risk |
 |---|---|---|---|
-| **0** | Theme spike: map our 160 tokens onto the Kendo theme on ONE screen. Decide re-skin vs adopt-defaults. **Stop and review.** | small | — |
+| **0** | ~~Theme spike~~ — **DONE, passed.** `kendo-bridge.css`, 40 lines, on `/kendo-check` | small | — |
 | **1** | `Button` (109) + `Checkbox`, `RadioGroup` | medium | low — mechanical |
 | **2** | `TextField` (40) → Input/NumericTextBox/DatePicker | medium | low |
 | **3** | `Select` (37) → DropDownList/ComboBox | medium | **medium** — must preserve the filter-as-you-type behaviour An specifically caught |
@@ -150,9 +152,7 @@ ordering — not one big-bang branch.
 | **7** | ExcelExport + Upload — the two capability wins | medium | low |
 | **8** | Re-run the a11y audit, `css:check` rethink, responsive re-check | medium | — |
 
-**Phase 0 is the gate.** If the theme spike shows our tokens cannot be mapped
-cleanly, the whole calculus changes and the customer should hear that before
-phases 1–8 are booked.
+**Phase 0 is the gate — and it has now been run. It passes.** See §8.
 
 **Phase 6 is where the risk lives.** `DataGrid` carries 21 props and every one is
 a requirement someone signed off. If the project has to stop early, stopping
@@ -160,12 +160,15 @@ after phase 5 leaves a coherent app: Kendo forms and small tables, our big grid.
 
 ---
 
-## 6. My recommendation
+## 6. My recommendation — updated after phase 0
 
-**Do phase 0, then decide.** Not because the migration is wrong — the filter
-cells and ExcelExport are real wins against real requirements — but because the
-theme question determines whether this is a tidy 8-phase job or a re-skin of 493
-classes, and that answer is cheap to get and expensive to assume.
+**The theme risk is gone.** Phase 0 was the gate on exactly that question and it
+passes cleanly (§8). What remains is component-swap work, which is the tidy
+8-phase job rather than the re-skin.
+
+That does not by itself decide adoption — the argument is still the one below —
+but the biggest unknown has been priced and it came in far cheaper than the
+scope assumed.
 
 Two things worth saying plainly to the customer either way:
 
@@ -188,3 +191,83 @@ Two things worth saying plainly to the customer either way:
 - **Effort in days.** Deliberately absent. The phases are ordered by risk and
   dependency; putting hours against them before the phase-0 spike would be a
   number with nothing behind it.
+
+
+---
+
+# 8. Phase 0 — theme spike. Run 31 Aug 2026. **Passed.**
+
+The question: *can our design tokens drive KendoReact, or does adoption mean
+abandoning them?*
+
+**Answer: they can, from a 40-line variable map.** `src/theme/kendo-bridge.css`,
+loaded on `/kendo-check` only, with a toggle so both states can be compared.
+
+## What was measured
+
+**1. The theme is entirely custom-property driven.** 453 `--kendo-*` variables
+— every colour, size, radius, duration and elevation — declared on `:root`. A
+bridge loaded after the theme overrides any of them on cascade order alone: no
+specificity tricks, no `!important`.
+
+**2. One override moves a whole colour family.** All **72** derived colour
+variables (`-hover`, `-active`, `-subtle`, `-emphasis`, `-on-subtle`…) are
+written as `oklch(from var(--kendo-color-…) …)`. Not one bakes in a literal.
+Setting `--kendo-color-primary` to our `#1b4f9c` re-derived both:
+
+    --kendo-color-primary-hover   oklch(from #1b4f9c calc(l - 0.044) …)
+    --kendo-color-primary-subtle  oklch(from #1b4f9c 0.958 calc(c * 0.11) h)
+
+**3. Collision with our 493 classes: zero.** Of 8,549 selectors in the compiled
+theme (keyframes excluded), **8,535 are Kendo-namespaced**, 8 are `:root`
+blocks containing *only* custom properties, and 6 could touch our DOM —
+`[hidden]`, `script`, and RTL fragments. We set neither `[hidden]` nor `script`.
+
+Verified on screen rather than only in the file: `.vy-page-title` and
+`.vy-nav-link` compute **byte-identically** on a route with the Kendo theme
+loaded and one without.
+
+## The one real constraint found
+
+**The bridge must be on the root element.** Kendo declares its 72 derived
+variants on `:root`, and a custom property resolves where it is DECLARED, not
+where it is inherited. With the map on a wrapper div, `--kendo-color-primary`
+changed and `--kendo-color-primary-hover` did not — it still derived from
+Kendo's red while the element merely inherited the resolved value. Moved to the
+root, everything followed.
+
+This cost the spike a wrong intermediate reading before it was caught, and it is
+the kind of thing that would have been debugged for a day during phase 1. It is
+now in the bridge's own comment.
+
+## What this changes in the scope above
+
+| §3.1 said | Phase 0 found |
+|---|---|
+| "re-skinning Kendo with our 160 variables… a real piece of work" | 40 lines |
+| "the theme is global — it will collide with 493 existing classes. Expect a shake-out period" | Zero collision, measured two ways |
+| "`css:check` will go red" | Passes; the bridge is scanned as a third-party bridge |
+
+## Deliberately still unmapped
+
+Each is a decision rather than an oversight, and each is listed in the bridge:
+
+- **Derived contrast colours** (`-on-surface`, `-on-subtle`). Kendo computes
+  these with oklch maths carrying its own contrast floor. Pinning them by hand
+  is how a themed library quietly loses its accessibility guarantees.
+- **Elevation.** Our shadows are tuned to our surfaces. Whether Kendo's
+  five-step scale replaces or sits beside ours is a design call.
+- **Motion.** `md3.css` owns it; Kendo ships 51 duration variables. Two motion
+  systems is a question for whoever owns the motion spec.
+
+## What phase 0 did NOT test
+
+Honest limits, so nobody reads more into this than it earned:
+
+- **One component.** A Grid. Dialogs, dropdowns and form controls may surface
+  variables this map does not cover — though all of them draw from the same 453.
+- **Dark mode.** Kendo ships `default-main-dark`. Untouched, and it interacts
+  with open question 7.
+- **Density.** Our compact/default/comfortable model has no Kendo equivalent
+  wired here.
+- **Nothing was migrated.** No app screen uses Kendo. That is still phases 1–8.

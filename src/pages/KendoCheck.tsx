@@ -24,11 +24,31 @@ import { generateParts } from '../data/parts';
  */
 export function KendoCheck() {
   const [themeReady, setThemeReady] = useState(false);
+  /* Phase 0 of the migration scope: can our tokens drive Kendo? The toggle is
+     the experiment — the same grid, the same theme, with and without the
+     bridge — because the only honest way to answer "does it look like ours" is
+     to look at both. See docs/kendo-migration-scope.md. */
+  const [bridged, setBridged] = useState(true);
+
+  /* On the ROOT ELEMENT, not a wrapper. Kendo declares its derived colour
+     variants on `:root`, and a custom property resolves where it is declared —
+     so an override on a subtree moves the base colour and leaves every hover,
+     active and subtle variant deriving from Kendo's own. The spike measured
+     exactly that before this line existed. */
+  useEffect(() => {
+    document.documentElement.toggleAttribute('data-kendo-bridged', bridged);
+    return () => document.documentElement.removeAttribute('data-kendo-bridged');
+  }, [bridged]);
   const rows = generateParts(12);
 
   useEffect(() => {
     let live = true;
-    import('@progress/kendo-theme-default/dist/all.css')
+    Promise.all([
+      import('@progress/kendo-theme-default/dist/all.css'),
+      /* Loaded AFTER the theme, so its :root wins on cascade order alone —
+         no specificity tricks, no !important. */
+      import('../theme/kendo-bridge.css'),
+    ])
       .then(() => { if (live) setThemeReady(true); })
       .catch(() => { if (live) setThemeReady(true); });   /* unstyled still proves the licence */
     return () => { live = false; };
@@ -67,7 +87,22 @@ export function KendoCheck() {
       {!themeReady ? (
         <p className="vy-empty-inline">Loading the Kendo theme…</p>
       ) : (
+        /* The toggle sets `data-kendo-bridged` on <html> — see the effect
+           above and kendo-bridge.css. Off, the grid wears Kendo's own
+           defaults; on, it wears our tokens. */
         <div className="vy-kendo-check">
+          <div className="vy-inline-actions" style={{ marginBottom: 'var(--vy-space-5)' }}>
+            <label className="vy-radio">
+              <input type="checkbox" checked={bridged}
+                     onChange={e => setBridged(e.target.checked)} />
+              <span>Drive Kendo from our design tokens</span>
+            </label>
+            <span className="vy-field-hint">
+              {bridged
+                ? 'Our blue, our greys, 13px Inter, our 4px radius — from a 40-line variable map.'
+                : 'Kendo defaults: its own red, 14px, its own neutrals.'}
+            </span>
+          </div>
           <Grid data={rows} style={{ height: 420 }}>
             <GridColumn field="partNumber" title="Part Number" width="200px" />
             <GridColumn field="description" title="Description" />
