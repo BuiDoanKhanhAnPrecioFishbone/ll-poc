@@ -11,7 +11,8 @@ export function StatusBadge({ value }: { value: string }) {
   return <span className="vy-badge" data-token={token}>{value}</span>;
 }
 
-/** Neutral count/label pill, for tab counts and inline metadata. */
-export function Pill({ children }: { children: React.ReactNode }) {
-  return <span className="vy-pill">{children}</span>;
-}
+/* `Pill` lived here and nothing ever rendered it — five screens write
+   `className="vy-pill"` directly instead, so the CSS stays and the component
+   does not. Worth a line rather than a silent deletion: if a Pill component is
+   wanted later, the callers to convert are in PartDetail, ChecklistsTab,
+   ConversationsTab and StepSummary. */

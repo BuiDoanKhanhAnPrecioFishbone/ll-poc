@@ -381,9 +381,6 @@
 @keyframes vy-toast-out { to { opacity: 0; transform: translateY(var(--vy-space-6)) } }
 
 /* --- Rating ---------------------------------------------------------------- */
-.vy-rating { display: inline-flex; gap: var(--vy-space-1); align-items: center; line-height: 1; }
-.vy-star { color: var(--vy-grey-300); flex: 0 0 auto; }
-.vy-star[data-on] { color: var(--vy-accent-caution); }
 
 /* --- Design-system page: elevation demo ------------------------------------ */
 .vy-elev-row { display: flex; gap: var(--vy-space-9); flex-wrap: wrap; padding: var(--vy-space-4) 0; }
