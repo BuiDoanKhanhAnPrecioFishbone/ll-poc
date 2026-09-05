@@ -1,6 +1,6 @@
 # Open questions for the client
 
-Nineteen things the prototype cannot settle on its own. Each states what we
+Twenty things the prototype cannot settle on its own. Each states what we
 found, what we did in the meantime, and what we need from you.
 
 **Most are not blocking.** The prototype works under a stated assumption in
@@ -61,6 +61,7 @@ Ordered by what an answer unblocks, not by number.
 | 10 | Are "RFQ Type" and "Customer Type" the same field? | Treated as distinct |
 | 15 | Create BoM: "Create Custom Template" (live) or "Create Customer Template" (sheet)? Add Material Type and BoM Type? Is Select Action really two checkboxes? | Live label; sheet's field list; radio |
 | 16 | MFG–MPN: gate the AML on Part Source? Exactly one Primary per part? | Shown on every part; not enforced |
+| 17 | **Switches.** Your system ships four; we have none. Which four fields are they? | Flags stay checkboxes, choices stay radios |
 
 **Two defects in your live system** are listed at the end of this document for
 your own backlog. They need nothing from us.
@@ -387,6 +388,51 @@ decision: it writes **"Total On Hand"** where the sheet writes "Total On-Hand"
 (we used yours), and its Add MPN Mapping modal has a field labelled **"Is
 Exsisting Mfg"** — a misspelling we have corrected to "Is Existing Mfg" on
 screen, and one worth fixing in the live app too.
+
+## 17. Switches — your system has four and we have none
+
+Your bundle ships Kendo's **Switch**, four times (`k-switch` ×4). Nothing in the
+prototype is a switch, so somewhere your users are flicking something ours makes
+them tick. We cannot tell from the bundle *which* four fields, and that is the
+whole question — it can say a component exists, never where it is used.
+
+**Why we did not simply guess.** A switch is an **on/off** control, and we have
+two families it could mean, only one of which it can actually be:
+
+**a) The ten on/off flags** — currently checkboxes. This is what a switch
+normally replaces, and our first guess if you tell us nothing more than "four".
+
+> Insp Request · SN Request · NCNR · First Article · ITAR · Broker ·
+> Cert Request · Lot Code Request · Conformal Coating ·
+> Provide Alt AML For Out of Stock
+
+**b) The seven either/or choices** — currently radio groups. We think a switch is
+**wrong** for these, and would want to be talked into it:
+
+| where | the choice |
+|---|---|
+| Import Parts | Import All / Import by Customer |
+| Create BoM | Import New BoM / Load Existing BoM |
+| Create BoM | AML format: Vertical / Horizontal |
+| BoM Comparison | three ways to compare — **a switch cannot express three** |
+| Run Quotation | Action |
+| Run Quotation | BoM Options |
+| Part records | any field whose values are a short fixed list |
+
+Two reasons we would push back on (b). A switch has **one** label and an on/off
+state, so "Import All / Import by Customer" would have to lose one of its two
+names — the user reads one option and has to infer the other from the switch
+being off. And three of these have **three** options, which a switch cannot hold
+at all.
+
+**What we need:** the four field names, or the screens they are on. If a switch
+turns out to be one of the flags in (a), it is a small change and we will make
+it. If your four are in (b), tell us and we will do it your way — but we would
+rather ask than quietly ship a control that hides half of a choice.
+
+**Until you answer:** flags stay checkboxes and choices stay radios. Nothing is
+blocked; this is the last thing standing between us and retiring the final piece
+of the old component library, which is our housekeeping rather than your problem.
 
 ## Two defects in the live system, for your backlog
 

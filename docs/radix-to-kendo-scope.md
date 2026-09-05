@@ -688,3 +688,28 @@ delivers **0** — the third time this exact gap has appeared, after Space in C 
 Escape in D. Dispatching events carrying a real `keyCode` drives it correctly.
 And a popup seen rendering in the top-left corner was a stale one left by focus
 juggling, not a positioning bug; re-opening cleanly measured flush.
+
+---
+
+# What is left, and who it is waiting on
+
+`Select`, `Tabs`, `Checkbox` and `Dialog` are Kendo's. Radix is **four
+packages**, each held for a stated reason rather than by omission:
+
+| package | why it stays |
+|---|---|
+| `react-popover` | the menus — held in E: bespoke panels, no visible gain, and it re-opens anchoring |
+| `react-toast` | held in E: Kendo's Notification has no action slot, and our undo is used at 29 call sites |
+| `react-slot` | not a UI component — it is what lets `Button asChild` render as a router `Link` |
+| `react-radio-group` | **waiting on the customer** — now question 17 |
+
+Question 17 asks which four fields are the `k-switch` ×4 the live bundle ships.
+It is written to be answerable: the ten on/off flags are listed by name, the
+seven either/or choices are listed by screen, and it says plainly that we think a
+switch is wrong for the second group — a switch carries one label and an on/off
+state, so a choice between two *named* options would lose one of its names, and
+three of those groups have three options, which a switch cannot hold at all.
+
+Nothing is blocked by it. It is the last thing between this app and retiring the
+final piece of the library the migration replaced, which is our housekeeping
+rather than the customer's problem — and the question says so.
