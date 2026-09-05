@@ -599,11 +599,23 @@ export const QUOTATION_COLUMNS: ColumnSpec<Quotation>[] = [
   { field: 'projectName', title: 'Project Name', role: 'text', searchable: true, width: 220, priority: 1, required: true,
     widthNote: 'Project names observed run to ~22 characters; 280px over-reserves.' },
   { field: 'customer', title: 'Customer Name', role: 'text', searchable: true, priority: 2, required: true },
-  { field: 'application', title: 'Application', role: 'code', width: 150, priority: 3,
-    widthNote: 'Longest member is "Sub-assy Box Build" — the 96px role default clips it.' },
-  { field: 'rfqType', title: 'RFQ Type', role: 'code', width: 140, priority: 3,
-    widthNote: 'Longest value "Managed Consigned" measures 127px; the 96px code default wraps it and makes the row taller than every other.' },
-  { field: 'orderType', title: 'Order Type', role: 'code', priority: 3 },
+  /* 160, not 150. The widest chip is "Sub-assy Box Build" at 131px, and a cell
+     spends 24px of its width on padding — so 150 leaves 126px of content space
+     and the chip wraps to a second line, by five pixels. The width here is a
+     DENSITY constraint, not an aesthetic one — see RFQ Type below. */
+  { field: 'application', title: 'Application', role: 'code', width: 160, priority: 3,
+    widthNote: 'Longest member "Sub-assy Box Build" measures 131px; +24px cell padding = 155 minimum.' },
+  /* THE NOTE BELOW WAS RIGHT AND THE NUMBER WAS STILL SHORT, which is worth
+     keeping as a warning. It diagnosed the exact fault — a wrapped chip makes the
+     row taller than every other — measured the text at 127px and set 140. But a
+     cell spends 24px on padding, so 140 gave the chip 116px and it went on
+     wrapping. Every code column here was sized to the TEXT and none to the CELL. */
+  { field: 'rfqType', title: 'RFQ Type', role: 'code', width: 156, priority: 3,
+    widthNote: 'Longest value "Managed Consigned" measures 125px; +24px cell padding = 149 minimum.' },
+  /* Explicit, because the 96px `code` default has the same fault: "Rev Change"
+     is 78px and 96 leaves only 72px of content space. */
+  { field: 'orderType', title: 'Order Type', role: 'code', width: 108, priority: 3,
+    widthNote: 'Longest value "Rev Change" measures 78px; +24px cell padding = 102 minimum.' },
   { field: 'status', title: 'Status', role: 'status' },
   { field: 'dateNeeded', title: 'Date Needed', role: 'date', required: true },
   { field: 'createdDate', title: 'Created Date', role: 'date' },

@@ -1431,6 +1431,19 @@
 
 /* Density is a user preference and applies to every grid (25 Aug review). Kendo
    is told the row height for its own measurements; this makes the cells agree. */
+/* A CHIP IN A GRID CELL MAY NOT WRAP, and this is about density rather than
+   tidiness. Density promises a row height; a chip that wraps to two lines
+   silently overrides it, and only on the screens whose values happen to be long.
+   That is how "comfortable" came to mean 46px on Project Requirement and 32px on
+   Part Master — a 14px difference at every density level, from one column.
+
+   The columns are now sized so nothing wraps today. This is the guard for
+   tomorrow: a value longer than its column clips at the cell edge, which someone
+   sees and reports, instead of quietly making one screen's rows taller than
+   another's. Widths live with the column definitions, where the note beside each
+   states the measurement AND the 24px of cell padding the first pass forgot. */
+.vy-grid-k .k-grid td .vy-code { white-space: nowrap; }
+
 .vy-grid-k[data-density="compact"]     .k-grid td { padding-block: var(--vy-space-1); }
 .vy-grid-k[data-density="comfortable"] .k-grid td { padding-block: var(--vy-space-3); }
 .vy-grid-k[data-density="relaxed"]     .k-grid td { padding-block: var(--vy-space-5); }

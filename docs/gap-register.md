@@ -54,18 +54,44 @@ rendered identically and the density control promised something it could not del
 **Measured after.** Compact row **28px** (Rating 24px, padding 0) — exactly the token value,
 15 rows visible where 9 fit before. Comfortable and relaxed correctly revert to Kendo's 32px.
 
-### Residual, not covered by this approval
+### Residual — CLOSED 5 September 2026
 
-On screens with a Rating, `comfortable` renders **44px** and `relaxed` **52px**, because the
-untouched 32px Rating plus that density's padding exceeds the row-height token. Part Master
-(no Rating) renders comfortable at 36px. So "comfortable" is not the same height on every
-screen, which is the kind of drift a design system exists to prevent.
+The note here said `comfortable` rendered 44px on screens with a **Rating** and
+36px on Part Master, and proposed reducing that density's padding.
 
-Extending the padding reduction to comfortable (`padding: 2px`) would bring it to 36px and make
-density consistent across screens. **Not written — it is beyond what was approved here.**
+**Both halves were wrong by the time anyone came back to it.**
 
+`Rating` is no longer rendered anywhere — it survives only as a file and two
+comments. And the drift was not padding: measured, Project Requirement ran
+**38 / 46 / 54** against Part Master's **24 / 32 / 40** — a flat **14px** at
+every level, so "comfortable" on one screen was taller than "relaxed" on the
+other. Reducing padding would have papered over it at one density and left the
+other two wrong.
 
----
+**The cause was one wrapped chip.** Three `code` columns were each a few pixels
+too narrow, so their widest value wrapped to a second line and set the row
+height floor:
+
+| column | widest chip | content space it had | needed |
+|---|---|---|---|
+| Application | 131px | 126px | 155px |
+| RFQ Type | 125px | 116px | 149px |
+| Order Type | 78px | 72px | 102px |
+
+Every one of them was sized to the **text** and none to the **cell**, which
+spends 24px on padding. The RFQ Type note is the one to read: it had already
+diagnosed the fault exactly — *"wraps it and makes the row taller than every
+other"* — measured the text at 127px, set 140, and still came up nine pixels
+short. A correct diagnosis and a wrong number, which is a more dangerous
+combination than being wrong twice, because the note reads as settled.
+
+Widened to 160 / 156 / 108. Project Requirement now measures **24 / 32 / 40** —
+identical to Part Master, and no cell wraps on either.
+
+A guard came with it: `.vy-grid-k .k-grid td .vy-code { white-space: nowrap }`.
+A value longer than its column now clips at the cell edge, which someone sees,
+instead of quietly making one screen's rows taller than another's. Zero chips
+clip today.
 
 ## Both gaps retired, 22 Aug 2026
 
