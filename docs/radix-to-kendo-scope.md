@@ -751,14 +751,23 @@ and want shrink-to-fit — are untouched.
 | Part record | 1140 / 1140 | measured |
 | BoM, nested inside the part record | 1140 / 1140 | measured |
 | New Project Requirement | three columns restored | measured |
-| Add Contact | — | **not measured** |
+| Add Contact ("Create New Customer") | 920 / 920, both tabs | measured |
 
-**Add Contact is inferred, not verified.** Its trigger only renders when
-`q.newCustomer` is true and no seeded quotation sets it, so reaching the dialog
-means creating a seventeen-field RFQ first. It renders the same `<Tabs>`
-component and therefore the same `.vy-tabs` class the rule keys on, which is why
-this is a low-risk inference rather than a guess — but it is an inference, and
-worth a look the first time anyone opens that dialog.
+**Add Contact was the one inference, and it is now measured.** Its trigger only
+renders when `q.newCustomer` is true, and no seeded quotation sets it — so
+reaching it meant creating a new-customer RFQ through the UI first. Done: ticked
+"New Customer?", filled nineteen required fields, saved, and opened the dialog
+from the created record. Titled **"Create New Customer"**, 960px wide, panel and
+container both **920px** on BOTH tabs. Six of six, all measured.
+
+Two things fell out of doing it rather than reasoning about it. The whole create
+flow works end to end — the RFQ saved, routed to
+`/sales-management/quotation/rfq-new-0000000359`, and came back carrying its
+**New Customer** badge, which is what makes the Add Contact button appear at all.
+And filling the form was only possible by dispatching events with a real
+`keyCode`: all seven ComboBoxes needed `ArrowDown(40)` + `Enter(13)`, the same
+harness gap phase F recorded. A future automated pass over this form will need
+the same trick.
 
 Also checked: every `.k-animation-container` present on screen belongs to a tab
 panel, is `display: block`, and matches its parent's width exactly. Nothing else
