@@ -826,8 +826,10 @@ fail**, then removing it — a check that has never failed is not yet a check.
   driving them were measured when they were set, and the Kendo bridge maps our
   values rather than introducing new ones — but that is an argument, not a
   measurement.
-- **Tab ORDER within the grid** was checked for containment and for the roving
-  model, not for whether the sequence is sensible on a 15-column row.
+- ~~**Tab ORDER within the grid**~~ **CLOSED 5 Sep** — swept, and clean. The
+  grid is one tab stop with a correct roving tabindex (1 cell at 0, 313 at -1),
+  a row costs two stops rather than fifteen, and the derived order was checked
+  against real Tab presses. See `docs/focus-order.md`.
 
 
 ---

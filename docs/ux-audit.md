@@ -108,4 +108,6 @@ That is the hardest case in the new work and it behaves.
 
 Colour contrast on the new surfaces was not re-measured; the tokens they use
 were measured when they were set. Keyboard traversal was checked for focus
-containment, not for tab ORDER within each dialog.
+containment, not for tab ORDER within each dialog — **closed 5 Sep**: dialogs run
+column by column, matching their headings, with no group left and returned to.
+See `docs/focus-order.md`.
