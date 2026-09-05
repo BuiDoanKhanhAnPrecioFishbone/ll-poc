@@ -77,14 +77,41 @@ is required. So this was never fixable by "pick the next grey" — which is
 presumably why the checkbox was left at grey-400 in phase C, and why it stayed
 at 2.55 after being explicitly flagged.
 
-**Proposed:** one new token at the minimum that conforms — `#8a94a3`, measured
-**3.07:1**, one shade darker than grey-400 and in the same blue-grey family —
-used for the input, combobox and checkbox boundary. Previewed in the browser and
-reverted; nothing in the app has been changed by this sweep.
+**Applied** — `--vy-border-control: #8a94a3`, measured **3.07:1**: the lightest
+value that conforms, one shade off grey-400 and in the same blue-grey family, so
+it buys the conformance and changes as little as possible about how the app
+looks. It governs boundaries only — input, textarea, combobox, checkbox, radio.
+Panel edges, card outlines, table rules and dashed drop zones stay on the grey
+scale, because 1.4.11 does not cover structure.
 
-It is a visible change to every input, dropdown and checkbox in the application,
-which is why it is proposed rather than applied. It is also one token, so it is
-one line to revert.
+`.vy-input:hover` moved from grey-400 to grey-500 with it. The resting border is
+now darker than grey-400, so the old hover was lighter than the state it was
+meant to emphasise.
+
+### Verified after applying
+
+| boundary | before | after |
+|---|---|---|
+| Combobox / picker | 1.30 | **3.07** |
+| Text input, textarea | 1.64 | **3.07** |
+| Checkbox, unchecked | 2.55 | **3.03** |
+| Radio, unchecked | 2.58 | **3.07** |
+
+Text re-swept on the same page afterwards: 40 combinations, **0 failures** — the
+change is confined to borders.
+
+## A fifth failure, found while verifying rather than by the sweep
+
+`.vy-chip` renders on one screen, conditionally, so it was on neither page
+swept — it only appears when a queue filter is active, and always in its
+selected state. Its border was **blue-300 at 2.50**.
+
+It is a real failure rather than a technicality: the chip's fill is blue-50,
+which measures **1.11:1** against the page — effectively white — so the border
+is the only thing defining the chip's shape.
+
+Unlike the grey scale, the blue scale already had a conforming step, so this
+needed no new token: **blue-400 at 3.88**.
 
 ## One thing that is weak rather than failing
 

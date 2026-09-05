@@ -74,7 +74,14 @@
   border-radius: var(--vy-shape-sm); padding: var(--vy-space-2) var(--vy-space-5); cursor: pointer;
   transition: background-color var(--vy-dur-short) var(--vy-ease-standard);
 }
-.vy-chip[data-selected] { background: var(--vy-blue-50); border-color: var(--vy-blue-300); color: var(--vy-blue-800); font-weight: var(--vy-weight-medium); }
+/* blue-400, not blue-300, and found while verifying the border token rather
+   than by the sweep — the chip renders on one screen, conditionally, so it was
+   on neither page swept. Its fill is blue-50 at 1.11:1 against the page, which
+   is to say effectively white, so the BORDER is what defines the chip's shape
+   and 1.4.11 applies to it. blue-300 measures 2.50. Unlike the grey scale, the
+   blue scale has a conforming step already: blue-400 is 3.88, so this needed no
+   new token. */
+.vy-chip[data-selected] { background: var(--vy-blue-50); border-color: var(--vy-blue-400); color: var(--vy-blue-800); font-weight: var(--vy-weight-medium); }
 .vy-chip-check { color: var(--vy-blue-600); }
 
 /* --- Fields ---------------------------------------------------------------- */
@@ -83,11 +90,13 @@
 .vy-field-hint  { font-size: var(--vy-text-xs); color: var(--vy-grey-500); }
 .vy-input {
   font-family: inherit; font-size: var(--vy-text-base); color: var(--vy-grey-900);
-  background: var(--vy-grey-0); border: 1px solid var(--vy-grey-300);
+  background: var(--vy-grey-0); border: 1px solid var(--vy-border-control);
   border-radius: var(--vy-shape-sm); padding: var(--vy-space-4) var(--vy-space-5); width: 100%;
   transition: border-color var(--vy-dur-short) var(--vy-ease-standard);
 }
-.vy-input:hover { border-color: var(--vy-grey-400); }
+/* grey-500, not grey-400. The resting border is now darker than grey-400, so
+   the old hover was lighter than the state it was meant to emphasise. */
+.vy-input:hover { border-color: var(--vy-grey-500); }
 .vy-input:focus { border-color: var(--vy-blue-500); outline: none; box-shadow: var(--vy-focus-ring); }
 .vy-textarea { resize: vertical; min-height: calc(var(--vy-space-14) * 2); line-height: 1.5; }
 .vy-search-field { position: relative; display: flex; align-items: center; flex: 1; max-width: var(--vy-search-w); }
@@ -147,7 +156,7 @@
 .vy-radio-dot {
   display: grid; place-items: center; flex: 0 0 auto;
   width: var(--vy-space-9); height: var(--vy-space-9);
-  background: var(--vy-grey-0); border: 1px solid var(--vy-grey-400); color: var(--vy-on-dark-fg);
+  background: var(--vy-grey-0); border: 1px solid var(--vy-border-control); color: var(--vy-on-dark-fg);
   cursor: pointer; transition: background-color var(--vy-dur-short) var(--vy-ease-standard);
   border-radius: var(--vy-shape-full);
 }

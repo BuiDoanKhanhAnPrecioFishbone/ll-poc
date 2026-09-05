@@ -216,7 +216,19 @@ html[data-kendo-bridged] {
    the rule below was written to fix. An indeterminate box is not a checked one;
    it needs the same visible boundary as an empty one. */
 html[data-kendo-bridged] .k-checkbox:not(:checked) {
-  border-color: var(--vy-grey-400);
+  border-color: var(--vy-border-control);
+}
+
+/* THE PICKER AND INPUT BOUNDARY, for the same reason and from the same sweep.
+   Kendo draws these with the global `--kendo-color-border`, which the map above
+   sends to grey-200 — right for a grid line, and **1.30:1** for the outline of a
+   combobox, the lowest reading anywhere in the app. Remapping that variable is
+   not the fix: it also draws every table rule and panel edge, and darkening
+   those to correct a control boundary would be a far larger change than the one
+   being made. So the controls are named here instead. */
+html[data-kendo-bridged] .k-input,
+html[data-kendo-bridged] .k-picker {
+  border-color: var(--vy-border-control);
 }
 
 /* DISABLED, which Kendo styles by CLASS and not by attribute. Its rules key off

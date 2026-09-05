@@ -47,6 +47,24 @@
      3.98. It looked fine because the page it was designed against was white.
      #626d7e is the least change that clears 4.5 on all four. */
   --vy-grey-500: #626d7e;
+
+  /* THE BOUNDARY OF AN INTERACTIVE CONTROL, and it is not one of the greys above
+     because none of them works. WCAG 1.4.11 asks 3:1 of a control boundary
+     against what is next to it; measured against white, grey-400 is 2.58 — short
+     by 0.42 — and the next step, grey-500, is 5.24, nearly double what is asked.
+     There is no rung in between, which is why the checkbox sat at a failing
+     grey-400 even after the phase C review flagged it: there was nothing to move
+     it to.
+
+     #8a94a3 measures **3.07:1** on white. It is deliberately the LIGHTEST value
+     that conforms — one shade off grey-400, in the same blue-grey family — so it
+     buys the conformance and changes as little as possible about how the app
+     looks. See docs/contrast-sweep.md.
+
+     For boundaries only: inputs, dropdowns, checkboxes, radios. Panel edges,
+     card outlines, table rules and dashed drop zones are structure rather than
+     controls, 1.4.11 does not cover them, and they stay on the grey scale. */
+  --vy-border-control: #8a94a3;
   --vy-grey-600: #4d5766;
   --vy-grey-700: #363e4b;
   --vy-grey-800: #232a34;
