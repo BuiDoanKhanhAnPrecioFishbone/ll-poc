@@ -121,10 +121,56 @@ non-colour cue does exist — Kendo boxes the active tab on three sides — but 
 box is grey-200 at **1.21:1**, so it carries very little of the load. Not a hard
 1.4.1 failure, because the cue is present; worth knowing that it is thin.
 
-## Not covered
+## Run Quotation wizard — swept 5 September
 
-Only two surfaces were swept — the Part Master grid and a large form dialog.
-They cover the grid, toolbar, pager, filter row, form fields, tabs, buttons and
-dialog chrome, which is most of the component surface. The quotation Run
-wizard, the Result tab and the checklist screens were not walked, and dark mode
-does not exist to sweep.
+| step | combinations | failures among ACTIVE content |
+|---|---|---|
+| 1 — Config BoM | 58 | **0** |
+| 2 — Review BoM | 60 | **0** |
+| Review Excluded Parts (nested) | 64 | **0** |
+| 3 — Quoting | 67 | **0** |
+
+The amber "excluded parts cannot be recovered" banner passes. So does the
+validation toast — white on red-600, **5.52:1**.
+
+**Every failure the wizard produces is a dimmed INACTIVE control**, and the same
+three every time: the steps you have not reached yet. Measured at effective
+opacity 0.55 — step name **3.00**, step description **2.20** — plus a disabled
+`Next` at **3.96**.
+
+WCAG 1.4.3 exempts text that is part of an inactive user-interface component, and
+these are disabled buttons, so they are **conformant as they stand**. Recording
+them anyway because the exemption is a technicality here: "Cost estimation and
+submission" is a sentence describing what the user is about to do, and at 2.2:1
+it is hard to read while it is still useful to read.
+
+Worth knowing if it is ever addressed: **opacity cannot fix it**. Raising 0.55 to
+0.7 gives roughly 2.9 and 3.9 — still short of 4.5. Conformance would mean not
+dimming the text at all and signalling "not reached" some other way, e.g. through
+the pip alone. That is a design change, not a defect fix.
+
+### Not reached
+
+**Step 4, Summary.** It unlocks only once a supplier is chosen on all 21 quoted
+lines, and the browser pane clamps timers on a hidden page, so scripting that is
+about twenty round trips. Three steps and the nested dialog all produced the same
+single pattern, so the marginal value was low — but it is unswept, and said so
+rather than assumed.
+
+The Result tab, the checklist screens and dark mode are still unswept.
+
+## A harness gap, found and closed mid-sweep
+
+The first version of the probe composited background alpha but **ignored ancestor
+`opacity`** — so text dimmed by a parent was measured at full strength. It found
+the wizard's stepper only after being taught to multiply opacity up the tree.
+
+**The earlier results were re-checked rather than assumed still valid.** With the
+corrected probe, Part Master and the Add Part dialog contain three dimmed texts
+between them — the two pager arrows at 3.01 and the disabled Save at 3.96 — all
+inactive, all exempt. The published "0 failures" for both stands.
+
+One more artefact worth recording: measured while the dialog's entrance animation
+was frozen, **every element in it reads `opacity: 0`**. A hidden browser pane
+does not advance CSS animations, so the whole dialog appeared to fail at 1.00:1.
+Disabling animations before measuring is not optional here.
