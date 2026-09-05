@@ -265,12 +265,32 @@ export function RadioGroup({ options, value, onChange, label }: {
  * that Customer is a lookup: typing a customer who does not exist has to be
  * impossible. Type to narrow, then choose.
  */
+/** An option may be a bare string, or a value distinct from what is shown. */
+export type SelectOption = string | { value: string; label: string };
+
 export function Select({ options, value, onChange, label, id, required, invalid }: {
-  options: string[]; value: string; onChange: (v: string) => void;
+  /**
+   * Strings where the text IS the value — which is most of this app — or
+   * `{ value, label }` where it is not.
+   *
+   * THE PAIR FORM EXISTS BECAUSE OF THE VIEW PICKERS. A saved view is chosen by
+   * `id` and shown by `name`, and view names are user-typed with no uniqueness
+   * check, so two views may legitimately read "My view". Keying the control on
+   * the label would make one of them unreachable — a bug the plain `<select>`
+   * this replaced did not have, because it carried `value={v.id}`.
+   */
+  options: readonly SelectOption[];
+  value: string; onChange: (v: string) => void;
   label?: string; id?: string; required?: boolean; invalid?: boolean;
   /** Accepted and ignored: every list filters now. Kept so call sites compile. */
   filterable?: boolean;
 }) {
+  /* Normalised to pairs immediately, so there is ONE code path below rather than
+     a string branch and an object branch. A bare string becomes its own value. */
+  const opts = useMemo(
+    () => options.map(o => (typeof o === 'string' ? { value: o, label: o } : o)),
+    [options],
+  );
   /* FILTERING IS CONTROLLED, on purpose. Kendo can filter its own data, but its
      default operator is not ours: `bundle-evidence.md` read a `contains` filter
      descriptor with `ignoreCase` off the live app, and that is what this does.
@@ -279,15 +299,21 @@ export function Select({ options, value, onChange, label, id, required, invalid 
   const [filter, setFilter] = useState('');
   const shown = useMemo(() => {
     const q = filter.trim().toLowerCase();
-    return q ? options.filter(o => o.toLowerCase().includes(q)) : options;
-  }, [options, filter]);
+    return q ? opts.filter(o => o.label.toLowerCase().includes(q)) : opts;
+  }, [opts, filter]);
+
+  /* Kendo wants the ITEM, not the key. `null` rather than undefined so it reads
+     as "nothing chosen" instead of "uncontrolled". */
+  const selected = useMemo(() => opts.find(o => o.value === value) ?? null, [opts, value]);
 
   return (
     <ComboBox
       id={id}
       className="vy-select"
       data={shown}
-      value={value}
+      textField="label"
+      dataItemKey="value"
+      value={selected}
       /* `e.value` is null when the field is cleared; the 37 call sites are typed
          for a string and several write it straight into a record. */
       /* NULL IS IGNORED, and this is a data-loss fix rather than a preference.
@@ -303,7 +329,7 @@ export function Select({ options, value, onChange, label, id, required, invalid 
          leaving it on would be a button that does nothing. Neither is a loss:
          where empty is a legal answer the option list already carries a blank
          entry, which renders as an em dash below. */
-      onChange={e => { if (e.value != null) onChange(e.value); setFilter(''); }}
+      onChange={e => { if (e.value != null) onChange(e.value.value); setFilter(''); }}
       clearButton={false}
       filterable
       /* NOTE: `filter` is deliberately NOT passed back as a prop, though Kendo
@@ -333,7 +359,7 @@ export function Select({ options, value, onChange, label, id, required, invalid 
       /* An empty option is a real choice in this data — "no package type" — and
          rendering it as a blank row gives the user nothing to aim at. */
       itemRender={(li, itemProps) =>
-        itemProps.dataItem === ''
+        itemProps.dataItem.value === ''
           ? cloneElement(li, li.props, <span className="vy-empty">—</span>)
           : li}
       listNoDataRender={() => (

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { ViewPicker } from '../ui/ViewPicker';
 import { Button } from '../ui/Button';
 import { Chip } from '../ui/Chip';
 import { Priority } from '../ui/Priority';
@@ -326,16 +327,7 @@ export function Quotations() {
       }
       filterActive={active}
       views={
-        <label className="vy-view-picker">
-          <span className="vy-sr-only">Select View</span>
-          <select value={activeId} onChange={e => setActiveId(e.target.value)}>
-            {savedViews.map(v => (
-              <option key={v.id} value={v.id}>
-                {v.name}{v.isDefault ? ' (default)' : ''}
-              </option>
-            ))}
-          </select>
-        </label>
+        <ViewPicker views={savedViews} activeId={activeId} onChange={setActiveId} />
       }
       allColumns={columns}
       onToggleColumn={toggleColumn}

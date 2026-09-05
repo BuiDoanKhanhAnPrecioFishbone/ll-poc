@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { generateParts, PART_COLUMNS, type Part } from '../data/parts';
 import { partFilterFields } from '../data/partFilters';
+import { ViewPicker } from '../ui/ViewPicker';
 import { DataGrid } from '../ui/DataGrid';
 import { Button } from '../ui/Button';
 import { useToast } from '../ui/Toast';
@@ -144,16 +145,7 @@ export function PartMaster() {
         }
         filterActive={active}
         views={
-          <label className="vy-view-picker">
-            <span className="vy-sr-only">Select View</span>
-            <select value={activeId} onChange={e => setActiveId(e.target.value)}>
-              {savedViews.map(v => (
-                <option key={v.id} value={v.id}>
-                  {v.name}{v.isDefault ? ' (default)' : ''}
-                </option>
-              ))}
-            </select>
-          </label>
+          <ViewPicker views={savedViews} activeId={activeId} onChange={setActiveId} />
         }
         allColumns={PART_COLUMNS}
         onToggleColumn={toggleColumn}

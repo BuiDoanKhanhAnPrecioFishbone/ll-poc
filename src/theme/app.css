@@ -1250,12 +1250,12 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
 }
 .vy-vs-foot { padding: var(--vy-space-5) var(--vy-space-7); border-top: 1px solid var(--vy-grey-200); font-size: var(--vy-text-xs); color: var(--vy-grey-500); }
 
-.vy-view-picker select {
-  font: inherit; font-size: var(--vy-text-sm); color: var(--vy-grey-800);
-  background: var(--vy-grey-0); border: 1px solid var(--vy-grey-200);
-  border-radius: var(--vy-radius-md); padding: var(--vy-space-3) var(--vy-space-5);
-  cursor: pointer; max-width: var(--vy-view-picker-w);
-}
+/* The chrome here was a hand-styled native `<select>` — font, border, radius,
+   padding, all of it — and it is Kendo's now. What is left is the one thing
+   Kendo cannot know: how wide this control should be in a toolbar, which is
+   narrower than a form field wants to be. */
+.vy-view-picker { max-width: var(--vy-view-picker-w); }
+.vy-view-picker .k-input-inner { font-size: var(--vy-text-sm); }
 
 /* The screen's primary action, beside the title. Left, where the eye starts —
    the rare actions keep the far corner. */
