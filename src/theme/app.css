@@ -344,7 +344,28 @@
 .vy-avatar--sm { width: var(--vy-space-11); height: var(--vy-space-11); font-size: var(--vy-text-xs); }
 
 
-.vy-doc-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--vy-space-4); margin-bottom: var(--vy-space-4); }
+/* THE ACTION SITS BESIDE ITS HEADING, not at the far edge of the panel.
+
+   `space-between` was fine while the tab panel was narrow. Once it filled the
+   dialog properly the Tasks column became ~900px, and Upload ended up stranded
+   in the corner a long way from the word it belongs to, over an empty table.
+   A heading and its one action read as a pair; the panel's right edge is not
+   where that pair lives.
+
+   `.vy-doc-head` is used by the Tasks panel and nothing else, so this is scoped
+   by construction — the section headers that DO want their action at the right
+   edge (`.vy-mpn-head`, `.vy-checklist-head`) are untouched. */
+.vy-doc-head { display: flex; align-items: baseline; justify-content: flex-start; gap: var(--vy-space-6); margin-bottom: var(--vy-space-4); }
+
+/* And the empty state under it, tightened. `.vy-empty-inline` is shared with a
+   dozen other screens, so the smaller padding is scoped to this panel rather
+   than pushed onto all of them.
+
+   60ch rather than the shared `--vy-prose-max` of 96ch. Ninety-six characters is
+   a measure for a document, not for two sentences explaining an empty table —
+   it was what made the box run nearly the full width of the panel. 60ch is the
+   figure `.vy-empty-state--tab p` already uses for exactly this kind of prose. */
+.vy-tasks .vy-empty-inline { padding: var(--vy-space-6) var(--vy-space-7); max-width: 60ch; }
 .vy-empty-inline { color: var(--vy-grey-500); font-size: var(--vy-text-base); background: var(--vy-grey-25); border: 1px dashed var(--vy-grey-300); border-radius: var(--vy-radius-md); padding: var(--vy-space-8); max-width: var(--vy-prose-max); }
 
 /* --- Quotation Result -------------------------------------------------------- */
