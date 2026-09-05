@@ -157,7 +157,35 @@ about twenty round trips. Three steps and the nested dialog all produced the sam
 single pattern, so the marginal value was low — but it is unswept, and said so
 rather than assumed.
 
-The Result tab, the checklist screens and dark mode are still unswept.
+## Result tab and checklist screens — swept 5 September
+
+Both were swept in **two states each**, because an empty state and a populated
+table are different surfaces and only one of them was reachable by default.
+
+| surface | combinations | failures among ACTIVE content |
+|---|---|---|
+| Checklists & Assignment — 4 open tasks | 51 | **0** |
+| Checklists & Assignment — 3 of 3 done, documents attached | 47 | **0** |
+| Quotation Result — empty state | 38 | **0** |
+| Quotation Result — populated, US$2,083.62 summary and cost table | 44 | **0** |
+
+180 combinations, and the same single pattern as everywhere else: the only
+failures are **disabled controls** — a greyed `Approve` on one record and a
+greyed `Upload` on the other, both at opacity 0.6, measuring 3.30 and 3.41.
+Inactive components, exempt under 1.4.3.
+
+Everything that carries meaning passes, including the parts most likely not to:
+the red **"179 days late"** badge, the `Quoted` status pill, the money figures in
+the results summary, and the document links in the task table.
+
+**Reaching the populated Result tab is worth writing down**, because it is not
+obvious: results exist only for RFQs whose status is `Quoted` or `Completed`, and
+the Project Requirement list opens filtered to the **Open only** queue, which
+excludes exactly those. Clear the queue filter, then filter Status = Quoted —
+four records — and any of them has a costed result.
+
+Dark mode does not exist to sweep. The Run Quotation wizard's step 4 remains the
+only surface still unreached, for the reason given above.
 
 ## A harness gap, found and closed mid-sweep
 
