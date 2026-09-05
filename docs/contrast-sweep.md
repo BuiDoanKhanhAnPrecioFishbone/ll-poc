@@ -149,13 +149,36 @@ Worth knowing if it is ever addressed: **opacity cannot fix it**. Raising 0.55 t
 dimming the text at all and signalling "not reached" some other way, e.g. through
 the pip alone. That is a design change, not a defect fix.
 
-### Not reached
+### Step 4 and the second nested dialog — reached 5 September
 
-**Step 4, Summary.** It unlocks only once a supplier is chosen on all 21 quoted
-lines, and the browser pane clamps timers on a hidden page, so scripting that is
-about twenty round trips. Three steps and the nested dialog all produced the same
-single pattern, so the marginal value was low — but it is unswept, and said so
-rather than assumed.
+| surface | combinations | failures among ACTIVE content |
+|---|---|---|
+| Confirm before continuing (NO BID + excess tables) | 76 | **0** |
+| **4 — Summary** | **64** | **0** |
+
+Step 4 has **no failures of any kind** — not even exempt ones. That is the
+diagnosis confirming itself: every failure this wizard produced was a step the
+user had not reached, and on the last step there are none left to dim. The
+summary's tinted rows, coloured supplier names and part codes all pass.
+
+**What actually blocked it was not what this document said.** The note above
+blamed the 21 supplier pickers. They were not the gate: `Next` stays disabled
+until the quote is RUN, and the button said so in its own tooltip —
+*"Run the quote before continuing"*. Filling every supplier and never pressing
+**Run Quote** leaves it exactly as stuck as filling none. Reading the disabled
+control's own explanation would have been faster than any of the scripting.
+
+Two notes for whoever repeats this:
+
+- **`await` is unusable on a pane that has been hidden a while.** Chrome's
+  intensive throttling stretches each timer toward a minute, so a loop of twenty
+  short sleeps does not finish inside a tool call. Nothing is wrong with the app.
+- The 21 suppliers were therefore set **synchronously**, by calling each
+  ComboBox's own `onChange` through its React fibre with a real option from its
+  own `data`. Safe here because `StepQuoting`'s `edit` is a functional
+  `setLines(ls => …)`, so seventeen updates batched in one tick apply cleanly.
+  Recorded because it is state driven programmatically rather than through the
+  UI — the screen being measured is real, the route to it was not.
 
 ## Result tab and checklist screens — swept 5 September
 
@@ -184,8 +207,8 @@ the Project Requirement list opens filtered to the **Open only** queue, which
 excludes exactly those. Clear the queue filter, then filter Status = Quoted —
 four records — and any of them has a costed result.
 
-Dark mode does not exist to sweep. The Run Quotation wizard's step 4 remains the
-only surface still unreached, for the reason given above.
+Dark mode does not exist to sweep. **Every other surface in the application has
+now been measured.**
 
 ## A harness gap, found and closed mid-sweep
 
