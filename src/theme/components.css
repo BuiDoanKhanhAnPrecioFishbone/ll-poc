@@ -183,6 +183,26 @@
 .vy-dialog .k-dialog-titlebar { padding: var(--vy-space-8) var(--vy-space-9) var(--vy-space-5); }
 .vy-dialog .k-dialog-title { flex: 1; min-width: 0; }
 .vy-dialog-titlewrap { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--vy-space-8); width: 100%; }
+
+/* THE MAXIMISE BUTTON SITS IN A DIFFERENT BOX FROM THE CLOSE, and phase D left
+   it looking it. Kendo renders close into `.k-dialog-titlebar-actions` and
+   centres it there; ours has to live inside the TITLE slot, because Kendo's
+   Dialog has no maximise and no way to add one to its actions. Two containers,
+   two alignments.
+
+   Measured against the close button before this rule: ours was 8px wide against
+   its 23px, and its centre sat 8px higher.
+
+   `flex: 0 0 auto` is the width half — the row is `space-between` with a title
+   that can be long, and without a basis the button was the thing that gave way.
+   Left to size itself it is the 15px icon plus `--vy-space-2` either side = 23px,
+   which is Kendo's close exactly, so the two match without either being pinned
+   to a number the other could drift from.
+
+   `align-self: center` is the vertical half. The row is `flex-start` so the
+   title and subtitle stack from the top; the button opts out of that and centres
+   in the same content box Kendo centres its close in. */
+.vy-dialog-max { flex: 0 0 auto; align-self: center; }
 .vy-dialog-title { font-size: var(--vy-text-lg); font-weight: var(--vy-weight-bold); color: var(--vy-grey-900); margin: 0; }
 .vy-dialog-sub { font-size: var(--vy-text-base); color: var(--vy-grey-500); margin: var(--vy-space-2) 0 0; font-weight: var(--vy-weight-regular); }
 .vy-dialog .k-dialog-content { padding: var(--vy-space-9); }
