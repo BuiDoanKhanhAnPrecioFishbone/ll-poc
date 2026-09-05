@@ -713,3 +713,53 @@ three of those groups have three options, which a switch cannot hold at all.
 Nothing is blocked by it. It is the last thing between this app and retiring the
 final piece of the library the migration replaced, which is our housekeeping
 rather than the customer's problem — and the question says so.
+
+---
+
+# The tab-width regression, and the sweep after it — 5 September 2026
+
+Phase B swapped `Tabs` onto Kendo's TabStrip and shipped a layout regression that
+reached **every tabbed screen in the app**. Kendo wraps tab content in
+`.k-animation-container`, which is `display: inline-block` — it shrinks to fit
+its content instead of filling the panel. Measured in the New Project Requirement
+dialog: panel **1140px**, container inside it **486px**.
+
+The width was not the damage; what the width did to the grid was.
+`.vy-field-groups` is `repeat(auto-fit, minmax(280px, 1fr))`, so 486px fits ONE
+column where 1140 fits three. Four field groups stacked into a single narrow
+column, Quote Configuration alone reached **1431px tall**, and two thirds of the
+dialog sat empty beside it. Reported by An as "it took a lot of space now".
+
+## Why phase B missed it
+
+The phase B checks were keyboard navigation, ARIA roles, the count badge and the
+focus ring. Every one passed, and not one of them looks at a box size — which is
+precisely what changes when a container is swapped. **A width assertion against
+the parent belongs in every component swap from here on**, and it is cheap: one
+line comparing the new container to the box it replaced.
+
+## The sweep
+
+Six `<Tabs>` call sites. Fix is `.vy-tabs .k-animation-container { display: block;
+width: 100% }`, scoped so Kendo's DROPDOWN popups — which use the same container
+and want shrink-to-fit — are untouched.
+
+| where | panel / container | |
+|---|---|---|
+| Quotation detail (a page, not a dialog) | 984 / 984 | measured |
+| Add Part Master Detail | 1140 / 1140 | measured |
+| Part record | 1140 / 1140 | measured |
+| BoM, nested inside the part record | 1140 / 1140 | measured |
+| New Project Requirement | three columns restored | measured |
+| Add Contact | — | **not measured** |
+
+**Add Contact is inferred, not verified.** Its trigger only renders when
+`q.newCustomer` is true and no seeded quotation sets it, so reaching the dialog
+means creating a seventeen-field RFQ first. It renders the same `<Tabs>`
+component and therefore the same `.vy-tabs` class the rule keys on, which is why
+this is a low-risk inference rather than a guess — but it is an inference, and
+worth a look the first time anyone opens that dialog.
+
+Also checked: every `.k-animation-container` present on screen belongs to a tab
+panel, is `display: block`, and matches its parent's width exactly. Nothing else
+in the app was collapsed by it.
