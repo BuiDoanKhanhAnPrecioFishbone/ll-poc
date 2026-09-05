@@ -251,6 +251,28 @@
   border: 0; padding: var(--vy-space-9) 0 0; background: transparent;
 }
 
+/* THE TAB PANEL HAS TO FILL ITS OWN WIDTH, and phase B did not notice it stopped.
+
+   Kendo wraps tab content in `.k-animation-container`, which is
+   `display: inline-block` — so it SHRINKS TO FIT its content instead of filling
+   the panel. Measured inside the New Project Requirement dialog: the panel was
+   1140px and the container inside it 486px, with our content sized to the
+   container rather than the dialog.
+
+   The visible cost was not the width, it was what the width did to the grid.
+   `.vy-field-groups` is `repeat(auto-fit, minmax(280px, 1fr))`, and 486px fits
+   ONE column where 1140px fits three — so every field group stacked into a
+   single narrow column and Quote Configuration alone became 1431px tall, with
+   two thirds of the dialog empty beside it.
+
+   Scoped to `.vy-tabs`, because `.k-animation-container` is also what Kendo
+   wraps DROPDOWN popups in, where shrink-to-fit is exactly right. */
+.vy-tabs .k-animation-container,
+.vy-tabs .k-child-animation-container {
+  display: block;
+  width: 100%;
+}
+
 /* =============================================================================
    DATA GRID — virtualised
    -----------------------------------------------------------------------------
