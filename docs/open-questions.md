@@ -1,6 +1,6 @@
 # Open questions for the client
 
-Twenty things the prototype cannot settle on its own. Each states what we
+Twenty-one things the prototype cannot settle on its own. Each states what we
 found, what we did in the meantime, and what we need from you.
 
 **Most are not blocking.** The prototype works under a stated assumption in
@@ -62,6 +62,7 @@ Ordered by what an answer unblocks, not by number.
 | 15 | Create BoM: "Create Custom Template" (live) or "Create Customer Template" (sheet)? Add Material Type and BoM Type? Is Select Action really two checkboxes? | Live label; sheet's field list; radio |
 | 16 | MFG–MPN: gate the AML on Part Source? Exactly one Primary per part? | Shown on every part; not enforced |
 | 17 | **Switches.** Your system ships four; we have none. Which four fields are they? | Flags stay checkboxes, choices stay radios |
+| 18 | **Error text with field names in it.** Your Run Quotation message names `assemblyPartNumber, partRev, partDesc`. Keep it exact, or show the labels the user can see? | Kept exact |
 
 **Two defects in your live system** are listed at the end of this document for
 your own backlog. They need nothing from us.
@@ -433,6 +434,57 @@ rather ask than quietly ship a control that hides half of a choice.
 **Until you answer:** flags stay checkboxes and choices stay radios. Nothing is
 blocked; this is the last thing standing between us and retiring the final piece
 of the old component library, which is our housekeeping rather than your problem.
+
+## 18. An error message that names fields the user cannot see
+
+Step 1 of Run Quotation, on the Import New BoM flow, refuses to continue with:
+
+> Please input information for **assemblyPartNumber, partRev, partDesc**
+
+Those are internal field names. On the same screen, a few centimetres above the
+message, the fields they refer to are labelled:
+
+| the message says | the field on screen says |
+|---|---|
+| `assemblyPartNumber` | **Assembly Part Number** |
+| `partRev` | **Revision** |
+| `partDesc` | **Description** |
+
+**We built it that way on purpose and would not change it without asking.** The
+string is your Testing Guideline's, word for word, and our rule for anything in
+that tier is that layout may be redesigned and content may not — same fields,
+same words. A tester matching your sheet against the build is looking for that
+exact sentence, and quietly improving it is how a build stops matching the
+document it is supposed to be checked against.
+
+So this is a question about your document, not about our screen.
+
+**Three ways to go, and the middle one is probably what you want:**
+
+**a) Leave it exactly as it is.** Your guideline and the build stay identical.
+The cost is that a planner who has never seen the code has to work out that
+`partRev` is the box labelled Revision. This is what we do today.
+
+**b) Keep the string, add the labels.**
+
+> Please input information for assemblyPartNumber, partRev, partDesc
+> — that is Assembly Part Number, Revision and Description.
+
+A tester searching for the original sentence still finds it; a user gets told
+which boxes to fill. This is the only option that serves both, and our
+suggestion.
+
+**c) Replace it with the labels**, and update the guideline to match. Cleanest
+result, but the sheet and the build have to change together or testing breaks.
+
+**One thing worth deciding once rather than per message.** This is not the only
+place your text reaches the screen verbatim — "Select assembly first!" sits
+beside it, and there are labels elsewhere we have quoted rather than reworded,
+including the misspelling in question 16. If the answer here is (b) or (c), tell
+us whether it is a rule for all user-facing text or a one-off for this message,
+and we will apply it consistently rather than asking again each time.
+
+**Until you answer:** the message stays exactly as your guideline writes it.
 
 ## Two defects in the live system, for your backlog
 
