@@ -95,12 +95,27 @@
 .vy-search-field .vy-input { padding-left: var(--vy-space-12); }
 
 /* --- Select / menu --------------------------------------------------------- */
-.vy-select {
-  display: inline-flex; align-items: center; justify-content: space-between; gap: var(--vy-space-4);
-  font-family: inherit; font-size: var(--vy-text-base); color: var(--vy-grey-900);
-  background: var(--vy-grey-0); border: 1px solid var(--vy-grey-300);
-  border-radius: var(--vy-shape-sm); padding: var(--vy-space-4) var(--vy-space-5); cursor: pointer; min-width: var(--vy-card-min-w);
-}
+/* PHASE F. `.vy-select` is now the class on Kendo's ComboBox WRAPPER
+   (`k-combobox k-input vy-select`), so the box — border, background, radius,
+   padding, the caret — is Kendo's and every chrome rule that used to live here
+   is gone. Keeping them meant two borders and two paddings on one control.
+
+   What stays is what Kendo cannot know: how wide the control should be in each
+   of the containers this app puts it in. Those rules are further down and were
+   already written against `.vy-select`, so they keep working unchanged. */
+.vy-select { width: 100%; }
+
+/* HEIGHT, and it is not cosmetic. Kendo's medium picker came out at **29px**
+   against our `.vy-input` at **37px**, and in this app a dropdown and a text
+   field sit in the same column of the same form — `Part Number` above
+   `Customer`, `Part Description` above `Part Source`. Two control heights eight
+   pixels apart down one column is the kind of difference nobody reports and
+   everybody sees.
+
+   Matched at the INNER input, where Kendo puts its padding, using the same two
+   tokens `.vy-input` uses — so if that field is ever retuned the dropdown
+   follows it instead of drifting. */
+.vy-select .k-input-inner { padding: var(--vy-space-4) var(--vy-space-5); }
 .vy-menu { background: var(--vy-grey-0); border: 1px solid var(--vy-grey-200); border-radius: var(--vy-shape-md); box-shadow: var(--vy-elev-3); padding: var(--vy-space-2); z-index: var(--vy-z-menu); }
 /* Resets the button chrome, because this class is used on BOTH div items (Radix
    menus) and <button> options (the combobox list). Written for the divs, it left
@@ -637,7 +652,9 @@
 .vy-tasks { min-width: 0; }
 .vy-checklist-items li[data-selected] .vy-check-name { color: var(--vy-grey-900); font-weight: var(--vy-weight-medium); }
 .vy-assignees > section + section { border-top: 1px solid var(--vy-grey-200); padding-top: var(--vy-space-7); }
-.vy-minitable .vy-select { min-width: 0; width: 100%; font-size: var(--vy-text-sm); padding: var(--vy-space-2) var(--vy-space-4); }
+/* Padding dropped with the chrome — Kendo's picker owns it. Size and width
+   stay, because a filter cell is tighter than a form field. */
+.vy-minitable .vy-select { min-width: 0; width: 100%; font-size: var(--vy-text-sm); }
 .vy-minitable-row .vy-td { overflow: visible; }
 
 /* ---- About-this-prototype disclosure -------------------------------------

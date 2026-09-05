@@ -176,7 +176,7 @@ everything.
 | **C** | ~~`Checkbox` → Kendo Checkbox~~ **DONE 4 Sep** | low | Finished A properly |
 | **D** | ~~`Dialog` → Kendo Dialog~~ **DONE 4 Sep** | **high** | Best parity, re-opened layering — done alone, with a keyboard pass |
 | **E** | ~~Reassess `Select`, Popover menus, `Toast`~~ **DONE 5 Sep** | — | Decided with D's result in hand |
-| **F** | `Select` → Kendo ComboBox | medium | E's one recommendation — see below |
+| **F** | ~~`Select` → Kendo ComboBox~~ **DONE 5 Sep** | medium | E's one recommendation, done |
 
 **A is worth doing this week whatever is decided about B–E.** It removes four
 dead packages and fixes a defect the customer can see on every grid.
@@ -615,3 +615,76 @@ The lesson is narrow and useful: Kendo's packages depend on each other —
 `buttons` pulls `popup`, `grid` pulls `dropdowns` and `data-tools` — so a Kendo
 package sitting in `node_modules` is not evidence that nothing needs it. Let npm
 remove things; never `rm -rf` inside `node_modules`.
+
+---
+
+# Phase F — done, 5 September 2026
+
+`Select` is Kendo's ComboBox. **None of the 37 call sites changed**: the API is
+the same, and the behaviours the old control encoded from the live bundle are
+still enforced — two of them by props, one by a fix this phase had to make.
+
+## The behaviour diff, which is the point of the phase
+
+| behaviour, and where it came from | how it survives |
+|---|---|
+| **Lookup only** — `bundle-evidence.md` established Customer is a lookup, so a customer who does not exist must be impossible to type | `allowCustom={false}`. Verified: "Nonexistent Customer Ltd" is refused |
+| **`contains`, case-insensitive** — read off the live filter descriptor | filtering stays ours. Verified: lowercase `controls` matches "00848 - KT **Controls** Ltd" mid-string |
+| **The field is the trigger** — from An's Assigned To screenshot and `onComboBoxKeyDown` in the live app | ComboBox's trigger *is* the text input |
+| The customer-code prefix rule | still fires — choosing a customer put `00455-` into Part Number |
+| Blank option reads as an em dash | `itemRender`. Verified on the Status filter: first row renders `—` |
+| "No option matches …" | `listNoDataRender` |
+| `aria-required` / `aria-invalid` | `inputAttributes`, which puts them on the real input |
+
+## Two defects, and the second one mattered
+
+**1. A committed value showed as blank.** Passing `filter` back as a prop hands
+Kendo a defined string every render, which puts the ComboBox permanently into
+filter-display mode — so the field showed the empty filter instead of the chosen
+value. The diagnosis came from a side effect rather than the control: the
+selection *had* reached the form, because the Part Number field beside it had
+grown its `00455-` customer prefix. Kendo owns the input text now; we own only
+what the query means.
+
+**2. Typing over a value and clicking away DELETED it.** With `allowCustom`
+false, Kendo answers unmatched text by setting the value to **null**. So editing
+a chosen customer and blurring cleared it — while the Part Number kept the
+prefix that customer had put there, leaving a form referring to a customer it no
+longer had. The control this replaces could not do that: typing filtered, and
+only choosing an option changed anything.
+
+Null is now ignored, which restores exactly the old rule, and `clearButton` is
+off because it is the other route to null and would otherwise be a button that
+does nothing. Neither is a loss — where empty is a legal answer the option list
+already carries a blank entry.
+
+## One thing that was wrong before this phase
+
+Kendo's medium picker is **29px**; our `.vy-input` is **37px**. In this form a
+dropdown and a text field share a column — `Part Number` above `Customer`,
+`Part Description` above `Part Source` — so that was eight pixels of difference
+down one column. Matched at the inner input using the same two tokens
+`.vy-input` uses, so a retune of the field carries the dropdown with it.
+
+## Cost
+
+JS **+5.0 kB gzip** (491.56 → 496.58). CSS went **down** 0.5 kB: the hand-built
+combobox took 25 lines of `app.css`, its chrome rules in `components.css` and the
+`--vy-select-menu-min` token with it, and `k-picker` was already shipping. No new
+dependency — `kendo-react-dropdowns` was already the Grid's.
+
+## Verified
+
+Selection commits by keyboard and shows in the field; junk is refused and the
+previous value survives; filtering is contains and case-insensitive; the em dash
+renders; heights match at 37px; the focus ring is ours
+(`rgb(255,255,255) 0 0 0 2px, rgb(42,99,184) 0 0 0 4px`) because the bridge rule
+already covered `.k-input-inner`; the popup anchors correctly — measured x and
+width equal to the field, top flush with its bottom edge.
+
+**A caution that cost time twice.** Arrow keys and Enter appear not to work:
+`ComboBox.mjs` and `Navigation.mjs` both switch on `e.keyCode`, and the harness
+delivers **0** — the third time this exact gap has appeared, after Space in C and
+Escape in D. Dispatching events carrying a real `keyCode` drives it correctly.
+And a popup seen rendering in the top-left corner was a stale one left by focus
+juggling, not a positioning bug; re-opening cleanly measured flush.

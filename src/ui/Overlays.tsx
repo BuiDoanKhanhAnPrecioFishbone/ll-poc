@@ -1,8 +1,8 @@
+import { ComboBox } from '@progress/kendo-react-dropdowns';
 import { Dialog as KendoDialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
 import { TabStrip, TabStripTab } from '@progress/kendo-react-layout';
-import * as RPopover from '@radix-ui/react-popover';
 import * as RRadio from '@radix-ui/react-radio-group';
-import { createContext, type ReactNode, useContext, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { cloneElement, createContext, type ReactNode, useContext, useEffect, useId, useMemo, useState } from 'react';
 
 /* =============================================================================
    Radix primitives, styled from tokens.
@@ -271,98 +271,74 @@ export function Select({ options, value, onChange, label, id, required, invalid 
   /** Accepted and ignored: every list filters now. Kept so call sites compile. */
   filterable?: boolean;
 }) {
-  const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState('');
-  const [active, setActive] = useState(0);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const listId = `${id ?? label ?? 'sel'}-list`;
-
-  /* Contains and case-insensitive, matching the live filter descriptor. */
+  /* FILTERING IS CONTROLLED, on purpose. Kendo can filter its own data, but its
+     default operator is not ours: `bundle-evidence.md` read a `contains` filter
+     descriptor with `ignoreCase` off the live app, and that is what this does.
+     Holding the filter here keeps the operator ours and visible, rather than a
+     prop whose meaning changes with a Kendo release. */
+  const [filter, setFilter] = useState('');
   const shown = useMemo(() => {
-    const q = query.trim().toLowerCase();
+    const q = filter.trim().toLowerCase();
     return q ? options.filter(o => o.toLowerCase().includes(q)) : options;
-  }, [options, query]);
-
-  /* While closed the field shows the VALUE; open, it shows what is being typed.
-     One input doing both is what makes it a combobox rather than a button that
-     happens to sit above a list. */
-  const shownText = open ? query : value;
-
-  const commit = (v: string) => { onChange(v); setQuery(''); setOpen(false); };
-
-  function onKeyDown(e: React.KeyboardEvent) {
-    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-      e.preventDefault();
-      if (!open) { setOpen(true); return; }
-      const d = e.key === 'ArrowDown' ? 1 : -1;
-      setActive(i => (i + d + shown.length) % Math.max(shown.length, 1));
-    } else if (e.key === 'Enter') {
-      if (open && shown[active] !== undefined) { e.preventDefault(); commit(shown[active]); }
-    } else if (e.key === 'Escape') {
-      setQuery(''); setOpen(false);
-    } else if (e.key === 'Home' && open) { e.preventDefault(); setActive(0); }
-    else if (e.key === 'End' && open) { e.preventDefault(); setActive(shown.length - 1); }
-  }
+  }, [options, filter]);
 
   return (
-    <RPopover.Root open={open} onOpenChange={o => { setOpen(o); if (!o) setQuery(''); }}>
-      <RPopover.Anchor asChild>
-        <div className="vy-select" data-invalid={invalid || undefined} data-open={open || undefined}>
-          <input
-            ref={inputRef}
-            id={id}
-            className="vy-select-input"
-            /* The ARIA a combobox owes: what it controls, whether it is open,
-               and which option is current — the last via activedescendant, so
-               focus can stay in the input while the highlight moves. */
-            role="combobox"
-            aria-expanded={open}
-            aria-controls={listId}
-            aria-autocomplete="list"
-            aria-label={label}
-            aria-required={required || undefined}
-            aria-invalid={invalid || undefined}
-            aria-activedescendant={open && shown[active] ? `${listId}-${active}` : undefined}
-            value={shownText}
-            placeholder={open && value ? value : undefined}
-            onChange={e => { setQuery(e.target.value); setActive(0); if (!open) setOpen(true); }}
-            onKeyDown={onKeyDown}
-            onMouseDown={() => setOpen(true)}
-          />
-          <button type="button" className="vy-select-caret" tabIndex={-1} aria-hidden
-                  onMouseDown={e => { e.preventDefault(); setOpen(o => !o); inputRef.current?.focus(); }}>
-            <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor"
-                 strokeWidth="1.8" strokeLinecap="round"><path d="m5 8 5 5 5-5" /></svg>
-          </button>
-        </div>
-      </RPopover.Anchor>
+    <ComboBox
+      id={id}
+      className="vy-select"
+      data={shown}
+      value={value}
+      /* `e.value` is null when the field is cleared; the 37 call sites are typed
+         for a string and several write it straight into a record. */
+      /* NULL IS IGNORED, and this is a data-loss fix rather than a preference.
+         With `allowCustom` false, Kendo answers unmatched text by setting the
+         value to null — so typing over a chosen customer and clicking away
+         CLEARED it. Caught with "Nonexistent Customer Ltd": the customer went
+         blank while the Part Number kept the `00455-` prefix that customer had
+         put there, leaving a form that referred to a customer it no longer had.
 
-      <RPopover.Portal>
-        <RPopover.Content
-          className="vy-menu vy-select-menu" sideOffset={4} align="start"
-          /* Focus stays in the field. Without this Popover moves it into the
-             content and the next keystroke goes nowhere useful. */
-          onOpenAutoFocus={e => e.preventDefault()}
-          onCloseAutoFocus={e => e.preventDefault()}
-        >
-          <ul className="vy-select-list" role="listbox" id={listId} aria-label={label}>
-            {shown.map((o, i) => (
-              <li key={o || `blank-${i}`}>
-                <button type="button" role="option" id={`${listId}-${i}`}
-                        aria-selected={o === value}
-                        className="vy-menu-item" data-active={i === active || undefined}
-                        onMouseEnter={() => setActive(i)}
-                        onClick={() => commit(o)}>
-                  {o || <span className="vy-empty">—</span>}
-                </button>
-              </li>
-            ))}
-            {shown.length === 0 && (
-              <li className="vy-menu-empty">No option matches “{query}”.</li>
-            )}
-          </ul>
-        </RPopover.Content>
-      </RPopover.Portal>
-    </RPopover.Root>
+         The control this replaces could not do that: typing filtered, and only
+         choosing an option changed the value. Ignoring null restores exactly
+         that, and `clearButton` is off because it is the other route to null —
+         leaving it on would be a button that does nothing. Neither is a loss:
+         where empty is a legal answer the option list already carries a blank
+         entry, which renders as an em dash below. */
+      onChange={e => { if (e.value != null) onChange(e.value); setFilter(''); }}
+      clearButton={false}
+      filterable
+      /* NOTE: `filter` is deliberately NOT passed back as a prop, though Kendo
+         accepts it. Controlling it means handing Kendo a defined string on every
+         render, which puts the ComboBox permanently into filter-display mode:
+         the field then shows the filter — empty — instead of the chosen value.
+         The symptom was a committed selection that left the box looking blank,
+         while the Part Number field beside it correctly grew its `00455-`
+         customer prefix, proving the value HAD reached the form.
+
+         So Kendo owns the input text, and we own only the filtering: the query
+         arrives here, and `data` is what we decide it means. */
+      onFilterChange={e => setFilter(e.filter.value)}
+      /* THE ONE CONSTRAINT THIS COMPONENT EXISTS TO KEEP. `allowCustom` would let
+         a user type a customer who does not exist and have it accepted;
+         `bundle-evidence.md` established Customer is a LOOKUP, so that has to be
+         impossible. False is Kendo's default — stated anyway, because a default
+         is not a decision and this one was argued from evidence. */
+      allowCustom={false}
+      ariaLabel={label}
+      /* Kendo has no `required` or `invalid` prop. `inputAttributes` puts them on
+         the real input, which is where a screen reader looks for them. */
+      inputAttributes={{
+        'aria-required': required || undefined,
+        'aria-invalid': invalid || undefined,
+      }}
+      /* An empty option is a real choice in this data — "no package type" — and
+         rendering it as a blank row gives the user nothing to aim at. */
+      itemRender={(li, itemProps) =>
+        itemProps.dataItem === ''
+          ? cloneElement(li, li.props, <span className="vy-empty">—</span>)
+          : li}
+      listNoDataRender={() => (
+        <div className="vy-menu-empty">No option matches “{filter}”.</div>
+      )}
+    />
   );
 }
