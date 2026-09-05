@@ -175,7 +175,8 @@ everything.
 | **B** | ~~`Tabs` → TabStrip~~ **DONE 4 Sep** | low | Strongest evidence, smallest surface, proved the pattern |
 | **C** | ~~`Checkbox` → Kendo Checkbox~~ **DONE 4 Sep** | low | Finished A properly |
 | **D** | ~~`Dialog` → Kendo Dialog~~ **DONE 4 Sep** | **high** | Best parity, re-opened layering — done alone, with a keyboard pass |
-| **E** | Reassess `Select`, Popover menus, `Toast` | — | Decide with D's result in hand, not before |
+| **E** | ~~Reassess `Select`, Popover menus, `Toast`~~ **DONE 5 Sep** | — | Decided with D's result in hand |
+| **F** | `Select` → Kendo ComboBox | medium | E's one recommendation — see below |
 
 **A is worth doing this week whatever is decided about B–E.** It removes four
 dead packages and fixes a defect the customer can see on every grid.
@@ -506,3 +507,111 @@ tab or not at all.
 **Not verified:** only the `xl` and default sizes were exercised on screen; `lg`
 rests on the same base rule. And the harness cannot press Escape for real, so
 that path is argued from Kendo's source rather than observed.
+
+---
+
+# Phase E — the reassessment, 5 September 2026
+
+E was never a swap. It asked whether the three things the original scope held —
+`Select`, the Popover menus, and `Toast` — still deserve holding once B, C and D
+had actually been done. **One changes to a yes. Two stay held, and more firmly
+than before.**
+
+## What B, C and D actually taught
+
+The scope guessed that the cost of a swap was the swap. It is not. Every phase
+shipped Kendo defaults that would have silently degraded the app, and none of
+them were visible to a build, a lint, or `css:check`:
+
+| phase | regressions Kendo's defaults would have shipped |
+|---|---|
+| B — Tabs | 2 — a count-badge rule that matched nothing; a focus ring at 1.6:1 |
+| C — Checkbox | 4 — border at 1.30:1; indeterminate keeping it; disabled styling absent entirely; no `:hover` rule in Kendo at all |
+| D — Dialog | 6 — class landing on the wrapper; footer scrolling away; doubled padding; a stretched button; a half-strength scrim; **every dialog sharing one ARIA id** |
+
+Three of those were accessibility defects, and the count rises with the size of
+the component. That is the number to weigh a swap against — not the diff.
+
+Two costs turned out to be **zero**, repeatedly: the Grid's subset already pulls
+in tabstrip, checkbox and dialog CSS, so none of the three added a byte. Worth
+checking per component rather than assuming either way.
+
+## `Select` → Kendo ComboBox: **do it**
+
+The original scope called this "the largest surface and the smallest functional
+delta" and put it last. Three facts move it to first among what is left.
+
+**1. Kendo dropdowns already render in this app.** Measured with a BoM dialog
+open: **six `.k-dropdownlist` / `.k-picker`** on screen, in the MiniTable's own
+filter cells, beside **zero** of ours. So `.vy-select` is now the visual outlier
+— a second dropdown design sitting a few centimetres from Kendo's, in the same
+product. This is the same evidence that unblocked phase 1, where twelve Kendo
+Buttons were rendering while the scope said the Button was broken.
+
+**2. It adds no dependency and no CSS.** `@progress/kendo-react-dropdowns` is
+already a dependency of `kendo-react-grid` — proven the hard way below — and
+`k-picker` is already 205 rules in the shipped stylesheet.
+
+**3. The API keeps every constraint our Select encodes**, which is the part that
+mattered most, because ours was built from the live bundle rather than from
+taste:
+
+| our constraint | Kendo ComboBox |
+|---|---|
+| lookup only — a customer who does not exist must be impossible to type | `allowCustom` defaults to **false** |
+| contains, case-insensitive filtering | `filterable` + `filter` + `onFilterChange` |
+| the field is the trigger, not a box that appears after opening | ComboBox's trigger **is** the text input |
+| named for screen readers | `ariaLabel`, `ariaLabelledBy`, `ariaDescribedBy` |
+
+That last row is the one to notice. `ariaLabel` is exactly the gap that forced
+phase C to use Kendo's checkbox CLASS instead of its component. The ComboBox
+does not have that gap, so this can be a normal component swap.
+
+**It still needs its own phase.** 37 call sites behind one wrapper, and the
+behaviour was derived from `bundle-evidence.md` rather than invented — so the
+swap needs a behaviour diff, not just a render check.
+
+## Popover menus: **hold**, and the reason is sharper now
+
+`k-menu` ×8 is decent evidence for menus, but ours are not menus. They are a
+column list of checkboxes, a user account panel, and a people picker with
+avatars and chips. Kendo's Popup would replace the **container** — a white panel
+with a shadow — and that container is already indistinguishable from Kendo's,
+because the bridge maps our elevation onto `--kendo-elevation-*`.
+
+So the visible gain is close to zero, against re-opening anchoring and layering:
+the one place this app has already lost a day, when `Popover.Trigger asChild`
+measured Kendo's ref handle forever. Given D's six regressions for a component
+with a real payoff, six for one with none is not a trade worth making.
+
+## `Toast`: **hold**, and the API settles it
+
+The scope called `k-notification` ×1 thin evidence. Reading the component makes
+it thinner:
+
+- **No action slot.** `Notification` takes `children`, `closable`, `type`,
+  `onClose` — and nothing else. Our toast's **undo** is used at 29 call sites;
+  it would become an ad-hoc button inside the message body.
+- **No timer.** Auto-dismiss is the caller's `setTimeout`, which we already own.
+- **It is the first swap with a real cost.** `k-notification` is **0**
+  occurrences in the shipped CSS, unlike every other component so far. And
+  `@progress/kendo-react-notification` is present only because
+  `kendo-react-conversational-ui` pulls it in — nothing we ship depends on it —
+  so this one genuinely adds a package.
+
+More cost than any previous swap, less capability than what it replaces, on the
+weakest evidence in the sweep. Hold.
+
+## A mistake worth recording
+
+Both packages were installed with `--no-save` to read their APIs, then removed
+with `rm -rf` — and **the build broke**:
+`kendo-react-grid/cells/GridFilterCell.mjs` imports
+`@progress/kendo-react-dropdowns`. It was never only an inspection copy; it is a
+real transitive dependency of the Grid we ship. `npm install` restored it, and
+`package.json` was never touched.
+
+The lesson is narrow and useful: Kendo's packages depend on each other —
+`buttons` pulls `popup`, `grid` pulls `dropdowns` and `data-tools` — so a Kendo
+package sitting in `node_modules` is not evidence that nothing needs it. Let npm
+remove things; never `rm -rf` inside `node_modules`.
