@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Dialog, Tabs } from '../ui/Overlays';
 import { ValidationPanel } from '../components/quotation/ValidationPanel';
@@ -40,11 +40,58 @@ export function QuotationDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [tab, setTab] = useState('requirements');
+  /* Bumped by the smart buttons, and by nothing else — it distinguishes "the
+     user pressed a tab" from "the user was SENT to one", and only the second
+     should move the page.
+
+     A COUNTER, not a boolean, and not `tab` itself. Keying the effect on `tab`
+     would miss the case where the destination is the tab already showing —
+     press "3 Documents" while standing on Checklists and nothing would change,
+     so nothing would scroll, so the button would look broken on the one screen
+     where it is easiest to reach. */
+  const [jump, setJump] = useState(0);
+  const jumpTarget = useRef<string | null>(null);
   const [bomOpen, setBomOpen] = useState(false);
   const [runOpen, setRunOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
   const [newContacts, setNewContacts] = useState<NewContact[]>([]);
   const toast = useToast();
+
+  /**
+   * Smart button → the tab holding what it counted.
+   *
+   * Scroll THEN focus, the same order as the ValidationPanel below: focusing
+   * alone jumps the strip into view with no animation and often under the
+   * sticky header, and the point of a navigation button is that the user SEES
+   * where they were taken.
+   *
+   * The focus runs in an effect rather than in the click handler because the
+   * tab that should receive it is not active yet — React has not re-rendered,
+   * so `.k-active` at click time is still the tab being left.
+   */
+  function goToTab(value: string) {
+    setTab(value);
+    jumpTarget.current = value;
+    setJump(n => n + 1);
+  }
+
+  useEffect(() => {
+    if (!jump) return;          // the initial render sent nobody anywhere
+    const strip = document.querySelector('.vy-tabs');
+    if (!strip) return;
+    strip.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    /* Deferred a task for the same reason as the Part record's MPN section: this
+       runs inside the click's own dispatch, and the browser's default action for
+       that click focuses the button that was pressed — overwriting anything set
+       from here. It happens to survive on this screen because Kendo's TabStrip
+       also focuses the tab it selects, but relying on that is relying on someone
+       else's implementation detail to cover our race. */
+    const t = setTimeout(() => {
+      const active = strip.querySelector('.k-tabstrip-item.k-active');
+      if (active instanceof HTMLElement) active.focus({ preventScroll: true });
+    }, 0);
+    return () => clearTimeout(t);
+  }, [jump]);
 
   /* Edit is a mode, not a permanent state of the page. `saved` holds edits made
      in this session; `draft` holds edits not yet committed. Keeping them apart
@@ -236,9 +283,16 @@ export function QuotationDetail() {
                        caught Customer, whose count is null rather than 0, so
                        the single most-clicked button in the row offered to
                        create a second customer for the RFQ. An empty
-                       destination is still a destination. */
-                    onClick={() => toast.notImplemented(
-                      `open the ${b.count === 1 ? b.label.toLowerCase() : b.plural.toLowerCase()} linked to RFQ${q.no}`)}>
+                       destination is still a destination.
+
+                       And then every one of the six went to a toast anyway —
+                       five of them past a destination two hundred pixels below.
+                       `b.tab` closes that (docs/stub-audit.md); Customer keeps
+                       the toast because it genuinely has nowhere to go. */
+                    onClick={() => b.tab
+                      ? goToTab(b.tab)
+                      : toast.notImplemented(
+                          `open the ${b.count === 1 ? b.label.toLowerCase() : b.plural.toLowerCase()} linked to RFQ${q.no}`)}>
               <SmartIcon name={b.icon} />
               {b.count !== null && <span className="vy-smart-n">{b.count}</span>}
               <span>{b.count === 1 ? b.label : b.plural}</span>

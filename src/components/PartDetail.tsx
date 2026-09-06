@@ -49,6 +49,10 @@ import type { Part } from '../data/parts';
 export function PartDetail({ part, onClose }: { part: Part; onClose: () => void }) {
   const toast = useToast();
   const [tab, setTab] = useState('general');
+  /* On hand → the MPN Mapping table, which is where the stock actually is.
+     Bumped only by that button; MpnMappingSection does the scrolling and
+     focusing, because only it knows when its own DOM exists. */
+  const [jumpToStock, setJumpToStock] = useState(0);
   const [bomOpen, setBomOpen] = useState(false);
   const [whereOpen, setWhereOpen] = useState(false);
   const available = part.onHand - part.allocated;
@@ -107,8 +111,14 @@ export function PartDetail({ part, onClose }: { part: Part; onClose: () => void 
               <SmartIcon name={isMake ? 'quote' : 'doc'} />
               <span>{isMake ? 'BoM' : 'Where used'}</span>
             </button>
+            {/* Said "not in this prototype" while the destination was mounted
+                one tab away: the Quantity Info tab renders MpnMappingSection,
+                and every MPN row in it opens the real Stock Report dialog. The
+                Testing Guideline puts the table there — "Navigate to Quantity
+                Info tab → Displays the MPN Mapping table" — so this is the
+                short path to an instruction, not a new screen. */}
             <button type="button" className="vy-smart-btn" data-empty={part.onHand === 0 || undefined}
-                    onClick={() => toast.notImplemented(`open the stock report for ${part.partNumber}`)}>
+                    onClick={() => { setTab('quantity'); setJumpToStock(n => n + 1); }}>
               <SmartIcon name="log" />
               <span className="vy-smart-n">{part.onHand.toLocaleString()}</span>
               <span>On hand</span>
@@ -183,7 +193,7 @@ export function PartDetail({ part, onClose }: { part: Part; onClose: () => void 
                       wins. It is placed last so the field groups above it stay
                       a block, and it spans the full width rather than becoming
                       a fourth column of the grid. */}
-                  <MpnMappingSection part={part} />
+                  <MpnMappingSection part={part} focusSignal={jumpToStock} />
                 </div>
               ),
             },

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Dialog, Select } from '../ui/Overlays';
 import { Button } from '../ui/Button';
 import { TextField } from '../ui/Field';
@@ -47,7 +47,27 @@ const money = (n: number) =>
  * the ones actually purchased. Raised as an open question rather than decided
  * by inference in either direction.
  */
-export function MpnMappingSection({ part }: { part: Part }) {
+export function MpnMappingSection({ part, focusSignal = 0 }: {
+  part: Part;
+  /**
+   * Bumped by the Part record's On hand smart button to send the reader here.
+   *
+   * The focus lives in THIS component, not in the caller, because the caller
+   * cannot know when this subtree exists. It first tried: PartDetail switched
+   * to the Quantity Info tab and then looked the section up by id in its own
+   * effect — which worked on every open except the first after a page load,
+   * when Kendo's TabStrip had not yet mounted the newly selected panel. The
+   * lookup returned null, the effect returned early, and focus stayed on the
+   * button. Three runs in a row: miss, hit, hit.
+   *
+   * An effect inside the component that renders the element cannot lose that
+   * race — it does not run until this subtree has committed.
+   *
+   * A COUNTER rather than a boolean so pressing On hand a second time, already
+   * on this tab, repeats the journey instead of silently doing nothing.
+   */
+  focusSignal?: number;
+}) {
   const toast = useToast();
   const [rows, setRows] = useState<MpnMapping[]>(
     () => mappingsFor(part.partNumber, part.description));
@@ -64,10 +84,43 @@ export function MpnMappingSection({ part }: { part: Part }) {
   const columns = useMemo(
     () => mappingColumns(setDetail, setStockFor), []);
 
+  const root = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (!focusSignal) return;   // 0 is the initial render, which sent nobody here
+    const el = root.current;
+    if (!el) return;
+    /* Scroll THEN focus, the same order as the RFQ record's ValidationPanel:
+       focusing alone jumps the section into view with no animation, and the
+       point of a NAVIGATION button is that the reader sees the journey. */
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    /* Deferred a task, and NOT for the usual "wait for the DOM" reason — the
+       element is already mounted and attached when this runs; that was checked.
+
+       This effect runs inside the click's own dispatch, and the browser's
+       default action for that click focuses the button that was pressed. A
+       focus set from here is therefore overwritten a moment later by the
+       button, which is exactly what happened: focus() returned, no focusin
+       fired, and activeElement stayed on the smart button. Reproducible on the
+       first open after a page load, and intermittent after that — which is what
+       a race looks like. A timeout puts us after the dispatch, where the move
+       sticks. */
+    const t = setTimeout(() => el.focus({ preventScroll: true }), 0);
+    return () => clearTimeout(t);
+  }, [focusSignal]);
+
   return (
-    <section className="vy-mpn">
+    /* `tabIndex` exists for ONE caller: the Part record's On hand smart button,
+       which used to announce that opening a stock report was not in this
+       prototype while this section — and the working Stock Report dialog on
+       every one of its rows — sat one tab away. See docs/stub-audit.md.
+
+       -1 keeps it out of the tab sequence: it is a destination to be SENT to,
+       not a stop on the way past. Named by its own heading rather than a
+       repeated string, so the two cannot drift apart. */
+    <section className="vy-mpn" ref={root} tabIndex={-1}
+             aria-labelledby="part-mpn-mapping-title">
       <div className="vy-mpn-head">
-        <h3 className="vy-field-group-title">MPN Mapping</h3>
+        <h3 className="vy-field-group-title" id="part-mpn-mapping-title">MPN Mapping</h3>
         {/* "Add a line" — the live button's own label, which is why it is not
             the more obvious "Add MPN". The modal it opens IS called Add MPN
             Mapping, and that name is on the dialog. */}
