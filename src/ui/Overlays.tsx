@@ -61,8 +61,12 @@ const DialogDepth = createContext(0);
  * than a DOM lookup because Kendo PORTALS the dialog to the body: our host div
  * is a React ancestor of the dialog but not a DOM one, so no amount of
  * `closest()` would find it. See docs/modal-patterns.md.
+ *
+ * EXPORTED because `Dialog` is not the only dismissible container in this app.
+ * `ViewSetting` is a right sidebar with its own scrim, and it provides this too,
+ * so a dropdown inside it behaves the way a dropdown inside a dialog does.
  */
-const DialogDismiss = createContext<(() => void) | null>(null);
+export const DialogDismiss = createContext<(() => void) | null>(null);
 
 export function Dialog({ open, onClose, title, subtitle, children, actions, size = 'md' }: {
   open: boolean; onClose: () => void; title: string; subtitle?: ReactNode;

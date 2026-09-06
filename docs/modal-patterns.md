@@ -281,16 +281,47 @@ on a page toolbar and one in a tab panel (the Checklists assignee). Escape close
 the list, and a second Escape with nothing left to dismiss is a no-op rather than
 an error — `DialogDismiss` is null there, which is the case the `?.` exists for.
 
-### One thing the sweep turned up, unrelated to this fix
+### The sweep turned up one more, and it is fixed too
 
 `ViewSetting` — the Filter / Column / Sort panel — is an `<aside role="dialog">`
-of its own rather than our `Dialog`, and **`src/ui/ViewSetting.tsx` contains no
-Escape handling at all**. So a panel that announces itself as a dialog cannot be
-dismissed with the key every dialog is dismissed with.
+of its own rather than our `Dialog`, and it had **no Escape handling at all**. A
+panel announcing itself as a dialog could not be dismissed with the key every
+dialog is dismissed with.
 
-That is read from the source, not measured — the panel resisted being opened
-reliably from script, and it is not worth more time inside this fix. It predates
-all of this and belongs in its own change.
+It resisted opening from script during the sweep, and the reason turned out to
+be the test rather than the panel: the page has **two** `.vy-funnel` buttons and
+the first is the filter-toolbar toggle. Addressing the gear by its `aria-label`
+opens it every time.
+
+**Escape is handled on the panel, not on the document**, and that is the whole
+design. A document-level listener would fire even when a dropdown inside the
+panel had already dealt with the key — recreating, in a new place, the exact bug
+the section above fixes. On the element, `Select` can stop the event on its way
+up and keep the panel open, and the panel provides `DialogDismiss` so that same
+`Select` can close it on a SECOND press.
+
+For Escape to arrive at all, focus has to be inside, so the panel takes
+`tabIndex={-1}` and focuses itself on open — deferred by a task, for the reason
+in `docs/stub-audit.md`: it runs inside the click that opened it, and the
+browser's default action re-focuses the pressed button afterwards.
+
+`onClose` opens no new way to lose work. The Close button and the scrim already
+call it, and both callers pass the same handler for `onClose` and `onDiscard`.
+
+| | |
+|---|---|
+| Escape, nothing else open | panel closes |
+| Escape with a dropdown open | list closes, **panel stays** |
+| Escape again | panel closes |
+| Focus on open | lands on the panel, and draws **no** focus ring (`:focus-visible` does not match programmatic focus here) |
+| Scrim click · Close button · Maximise/Restore · tab switching | all unchanged |
+| Both callers — Part Master and Request For Quotation | same behaviour, correct heading each |
+
+**Note the scrim difference.** `ViewSetting`'s scrim *does* dismiss, where a
+`Dialog`'s is inert (Rule 5). That is not an inconsistency to iron out without
+asking: this is a right sidebar for choosing filters and columns, not a form
+holding typed work, and the Testing Guideline calls it a sidebar. Recorded so
+the difference is a decision rather than a discrepancy.
 
 ### A note on verifying this
 

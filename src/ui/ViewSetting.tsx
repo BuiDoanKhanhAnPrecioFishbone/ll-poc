@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from './Button';
-import { Select } from './Overlays';
+import { DialogDismiss, Select } from './Overlays';
 import { FilterToolbar } from './FilterToolbar';
 import { TextField } from './Field';
 import type { ColumnSpec } from '../components/column-model';
@@ -65,6 +65,30 @@ export function ViewSetting<T>({
 
   const set = (patch: Partial<SavedView>) => setDraft(d => ({ ...d, ...patch }));
 
+  /* ---- Escape, and the focus that makes it possible ----------------------
+     This panel calls itself `role="dialog"` and until now could not be closed
+     with the key every dialog is closed with. The Close button and the scrim
+     both call `onClose`, and both callers pass the same handler for `onClose`
+     and `onDiscard`, so Escape opens no new way to lose work — it does exactly
+     what the two existing dismissals do.
+
+     Escape is handled on the panel, NOT on the document, and that is the whole
+     design. A document listener would fire even when a dropdown inside the
+     panel had already dealt with the key, closing the list and the panel
+     together — the bug just fixed for dialogs (docs/modal-patterns.md). Keeping
+     it on the element means `Select` can stop the event on its way up and keep
+     the panel open, and `DialogDismiss` below gives that same `Select` the way
+     to close the panel on a SECOND press, once its list is gone. */
+  const panel = useRef<HTMLElement>(null);
+  useEffect(() => {
+    /* Deferred a task for the reason recorded in docs/stub-audit.md: this runs
+       inside the click that opened the panel, and the browser's default action
+       for that click focuses the button that was pressed — afterwards,
+       overwriting anything set from here. */
+    const t = setTimeout(() => panel.current?.focus({ preventScroll: true }), 0);
+    return () => clearTimeout(t);
+  }, []);
+
   /* ---- drag to reorder, for both the column and sort lists ---------------- */
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const reorder = <X,>(list: X[], from: number, to: number) => {
@@ -75,10 +99,15 @@ export function ViewSetting<T>({
   };
 
   return (
-    <>
+    <DialogDismiss.Provider value={onClose}>
       <div className="vy-scrim" onClick={onClose} aria-hidden />
       <aside className="vy-viewsetting" role="dialog" data-maximised={maximised || undefined}
-             aria-label={`${screen} - View Setting`}>
+             aria-label={`${screen} - View Setting`}
+             ref={panel}
+             /* -1, so the panel can receive focus on open without becoming a
+                stop on the way through the page. */
+             tabIndex={-1}
+             onKeyDown={e => { if (e.key === 'Escape') onClose(); }}>
         <header className="vy-vs-head">
           <h2>{screen} - View Setting</h2>
           <div className="vy-window-actions">
@@ -315,7 +344,7 @@ export function ViewSetting<T>({
           Views are held in this browser only.
         </footer>
       </aside>
-    </>
+    </DialogDismiss.Provider>
   );
 }
 
