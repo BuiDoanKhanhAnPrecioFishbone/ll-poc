@@ -173,6 +173,11 @@
    becoming an empty flex or grid item in whatever laid out the dialog's caller. */
 .vy-dialog-host { display: contents; }
 
+/* Same idea for the Select: a host that exists only to catch Escape before
+   Kendo does (see Overlays.tsx). It must generate no box — 37 call sites lay
+   these out in grids and flex rows and none of them should see an extra item. */
+.vy-select-host { display: contents; }
+
 /* PHASE D. `.vy-dialog` is now the class Kendo puts on its WRAPPER — the
    full-screen layer holding the scrim and the panel — not on the panel itself.
    That caught me out: the old rules here (fixed, centred, sized, shadowed) were

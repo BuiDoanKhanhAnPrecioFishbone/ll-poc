@@ -2,7 +2,7 @@ import { ComboBox } from '@progress/kendo-react-dropdowns';
 import { Dialog as KendoDialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
 import { TabStrip, TabStripTab } from '@progress/kendo-react-layout';
 import * as RRadio from '@radix-ui/react-radio-group';
-import { cloneElement, createContext, type ReactNode, useContext, useEffect, useId, useMemo, useState } from 'react';
+import { cloneElement, createContext, type ReactNode, useContext, useEffect, useId, useMemo, useRef, useState } from 'react';
 
 /* =============================================================================
    Radix primitives, styled from tokens.
@@ -50,6 +50,20 @@ import { cloneElement, createContext, type ReactNode, useContext, useEffect, use
  */
 const DialogDepth = createContext(0);
 
+/**
+ * How to dismiss the dialog we are inside, if any. `null` means "not in one".
+ *
+ * Exists for `Select`, and for one key. Escape has to reach whatever is
+ * innermost — the open dropdown list, or failing that the dialog — and Kendo
+ * gives neither control a way to say "I handled it" to the other. So `Select`
+ * takes Escape away from Kendo entirely and decides, and this is how it reaches
+ * the dialog once it has nothing of its own left to close. A context rather
+ * than a DOM lookup because Kendo PORTALS the dialog to the body: our host div
+ * is a React ancestor of the dialog but not a DOM one, so no amount of
+ * `closest()` would find it. See docs/modal-patterns.md.
+ */
+const DialogDismiss = createContext<(() => void) | null>(null);
+
 export function Dialog({ open, onClose, title, subtitle, children, actions, size = 'md' }: {
   open: boolean; onClose: () => void; title: string; subtitle?: ReactNode;
   children: ReactNode; actions?: ReactNode; size?: 'md' | 'lg' | 'xl';
@@ -79,6 +93,7 @@ export function Dialog({ open, onClose, title, subtitle, children, actions, size
 
   return (
     <DialogDepth.Provider value={depth}>
+      <DialogDismiss.Provider value={onClose}>
       {/* THIS DIV EXISTS ONLY TO STOP ESCAPE, and it has to be a real DOM
           element because React dispatches synthetic events along the REACT
           tree, not the DOM one — a portal is no exception.
@@ -145,6 +160,7 @@ export function Dialog({ open, onClose, title, subtitle, children, actions, size
         {actions && <DialogActionsBar>{actions}</DialogActionsBar>}
       </KendoDialog>
       </div>
+      </DialogDismiss.Provider>
     </DialogDepth.Provider>
   );
 }
@@ -330,10 +346,74 @@ export function Select({ options, value, onChange, label, id, required, invalid 
      as "nothing chosen" instead of "uncontrolled". */
   const selected = useMemo(() => opts.find(o => o.value === value) ?? null, [opts, value]);
 
+  /* ESCAPE IS OURS, NOT KENDO'S, and the popup is controlled so that it can be.
+     Both halves of Kendo's Escape were wrong inside a dialog, in opposite
+     directions, and the cause is one line of `ComboBox.mjs`:
+
+       list OPEN   → it closes the popup and lets the event carry on, so the
+                     DIALOG closed too. Open a dropdown, change your mind, press
+                     Escape, lose the whole form.
+       list CLOSED → it calls `clearValueOnEnterOrEsc`, which calls
+                     `stopPropagation`, so Escape did NOTHING AT ALL — a user
+                     whose focus was in a dropdown could not leave the dialog.
+
+     One key, dismissing two things in one state and none in the other. Taking
+     it at CAPTURE means Kendo's handler never runs, so neither behaviour can
+     happen, and this decides instead: the innermost dismissible thing goes
+     first — the list if it is open, otherwise the dialog.
+
+     KENDO KEEPS ITS POPUP. The first attempt controlled `opened` so that this
+     could close the list itself. Backed out: it takes ownership of every open
+     and close — outside click, blur, selection, filtering — to fix one key, and
+     this browser pane cannot exercise those paths well enough to prove the
+     takeover is safe. A synthetic `focusout` leaves the list open on the
+     UNCHANGED build too, so the harness cannot tell the two versions apart
+     there, which is a reason to take less rather than a licence to take more.
+
+     So `opened` stays Kendo's and only the KEY is ours, each case handled in
+     the phase where it can be:
+
+       list OPEN   → do nothing on the way down, let Kendo close the popup, then
+                     stop the event on the way back UP, before it reaches the
+                     dialog. This span sits between the two in the React tree,
+                     which is the only place that distinction can be drawn.
+       list CLOSED → take it on the way DOWN, so Kendo's swallow never happens,
+                     and hand it to the dialog. */
+  const [listOpen, setListOpen] = useState(false);
+  /* Read in the bubble handler, and it must be a ref: `listOpen` there is the
+     value from the render that attached the handler, and Kendo may have closed
+     the popup in between. */
+  const escWhileOpen = useRef(false);
+  const dismissDialog = useContext(DialogDismiss);
+
   return (
+    /* A host for the key handler, because `onKeyDownCapture` is not a ComboBox
+       prop — Kendo forwards no arbitrary DOM props. `display: contents` keeps it
+       out of the layout, so the 37 call sites see the same box they always did;
+       the same technique, and the same reason, as `.vy-dialog-host`.
+
+       CAPTURE, so this runs BEFORE Kendo's own handler rather than after it.
+       After is too late: by then Kendo has either closed the popup and released
+       the event, or swallowed it. */
+    <span className="vy-select-host"
+          onKeyDownCapture={e => {
+            if (e.key !== 'Escape') return;
+            escWhileOpen.current = listOpen;
+            if (listOpen) return;         // Kendo closes the popup; we stop it on the way up
+            e.stopPropagation();
+            /* Nothing of ours left to dismiss. Outside a dialog this is null and
+               Escape does nothing, which is what it did before. */
+            dismissDialog?.();
+          }}
+          onKeyDown={e => {
+            if (e.key === 'Escape' && escWhileOpen.current) e.stopPropagation();
+          }}>
     <ComboBox
       id={id}
       className="vy-select"
+      /* Observed, not controlled — see the note above. */
+      onOpen={() => setListOpen(true)}
+      onClose={() => setListOpen(false)}
       data={shown}
       textField="label"
       dataItemKey="value"
@@ -390,5 +470,6 @@ export function Select({ options, value, onChange, label, id, required, invalid 
         <div className="vy-menu-empty">No option matches “{filter}”.</div>
       )}
     />
+    </span>
   );
 }

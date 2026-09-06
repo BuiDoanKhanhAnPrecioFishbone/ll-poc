@@ -166,11 +166,11 @@ record still measures 1180 with three-column field groups on both tabs, New
 Project Requirement 1180 with its tab strip and animation container both at
 1140, and no page scrolls sideways.
 
-### OPEN DEFECT — Escape with a dropdown open closes the dropdown *and* the dialog
+### Escape in a dropdown — also fixed, 6 September 2026
 
 Found while checking that the fix above had not disturbed anything nearby, and
-**it is older than that fix**: verified against the pre-fix build, where the
-guard is absent from the DOM and the behaviour is identical.
+older than it: verified against the pre-fix build, where the guard is absent
+from the DOM and the behaviour is identical.
 
 New Project Requirement, one `Select` open:
 
@@ -188,12 +188,53 @@ The neighbouring case is odd in the opposite direction. With the list **closed**
 Escape from inside a ComboBox closes **nothing at all** — Kendo swallows it — so
 the same key does too much in one state and nothing in the other.
 
-Not fixed here, because unlike the stack bug the correct behaviour is a design
-call and the blast radius is larger: `Select` has 37 call sites in 14 files, and
-the fix has to distinguish "list open" from "list closed" rather than swallowing
-Escape in both. The standard rule — Escape dismisses the innermost dismissible
-thing, so the list first and the dialog on a second press — is what I would
-implement, and it would fix the closed-list case too.
+Both halves come from one line of Kendo's `ComboBox.mjs`. With the list **open**
+it rejects suggestions and lets the event carry on, so the dialog gets it too.
+With the list **closed** it calls `clearValueOnEnterOrEsc`, which calls
+`stopPropagation` — so nothing at all happens. One key, dismissing two things in
+one state and none in the other.
+
+**The rule now is the standard one: Escape dismisses the innermost dismissible
+thing.** The list first, the dialog on a second press.
+
+`Select` takes the key at CAPTURE, before Kendo's handler, and each case is
+settled in the phase where it can be:
+
+| | |
+|---|---|
+| list open | do nothing on the way down — let Kendo close the popup — then stop the event on the way back **up**, before it reaches the dialog |
+| list closed | take it on the way **down**, so Kendo's swallow never happens, and dismiss the dialog through a context the dialog provides |
+
+The context matters. Kendo **portals** the dialog to the body, so `.vy-dialog-host`
+is a React ancestor of the dialog but not a DOM one, and no `closest()` would
+ever find it. `DialogDismiss` carries `onClose` down the React tree instead,
+which is the same tree the events travel.
+
+**What was tried and backed out:** controlling the ComboBox's `opened` prop, so
+`Select` could close the list itself. It works, but it takes ownership of every
+open and close — outside click, blur, selection, filtering — in order to fix one
+key, and this browser pane cannot exercise those paths well enough to prove the
+takeover is safe. A synthetic `focusout` leaves the list open on the **unchanged**
+build too, so the harness cannot tell the two versions apart there. That is a
+reason to take less, not a licence to take more.
+
+The host element is a `<span class="vy-select-host">` with `display: contents`,
+because `onKeyDownCapture` is not a ComboBox prop and Kendo forwards no arbitrary
+DOM props. It generates no box, so none of the 37 call sites sees a new layout
+item — measured at 0px wide.
+
+Verified:
+
+| | |
+|---|---|
+| Toggle opens and closes the list | yes |
+| Picking an item commits the value and closes the list | yes |
+| Escape, list open | list closes, **dialog survives** |
+| Escape again, list closed | dialog closes |
+| Escape from a plain control in a dialog | closes it, unchanged |
+| A `Select` on a page, outside any dialog | list closes; a second Escape with nothing to dismiss is a no-op, not an error |
+| Nested: Part record → MPN detail, list open in the inner one | Escape 1 closes the list, Escape 2 closes **only** the inner dialog |
+| Layout | dialog 1180, no page scroll, host 0px |
 
 ### A note on verifying this
 
@@ -259,9 +300,8 @@ itself, never the dialog and never the page.
 
 1. **Minimize** — item 9 on the answer sheet. Asked for 23 times, not built, and
    the reason is a real design difference rather than a shortcut.
-2. **Escape with a dropdown open** — still dismisses the whole dialog. Ours to
-   fix, not theirs to decide, but it changes behaviour they may have seen in a
-   demo, and the fix touches every `Select` in the app.
+2. ~~Escape with a dropdown open~~ — fixed. Worth mentioning only because it
+   changes behaviour they may have seen in a demo.
 3. **Four buttons on the Part record's bar** — the guideline's own list, but the
    only bar in the app shaped that way.
 
