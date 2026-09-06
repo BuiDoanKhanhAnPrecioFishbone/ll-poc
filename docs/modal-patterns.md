@@ -1,0 +1,229 @@
+# Standard modal patterns
+
+The specification behind `Dialog` in `src/ui/Overlays.tsx`. Every modal in this
+prototype is that component with different content.
+
+Written 6 September 2026. Measurements taken at 1440×900 unless stated.
+
+## Why this document exists
+
+Tables have `docs/table-patterns.md`. Filters have `docs/filter-spec.md`. Modals
+had nothing — and they are the most-used surface in the app after the grid.
+
+That is not an oversight in our documentation. **No customer source specifies
+modal design at all.**
+
+| Source | What it says about modals |
+|---|---|
+| Testing Guideline | 105 uses of "dialog", 16 of "modal", 7 of "pop-up" — every one naming *which* modal exists and *what fields are in it* |
+| | One behavioural line, in 23 places: *"Allow user to use modal window actions: Minimize · Maximize/Restore Down · Close"* |
+| | One content line: BoM metadata is read-only in its pop-up, *"to preserve data integrity"* |
+| Kick-off deck | Nothing. Its six archetypes — Login, Generic Layout, List View, Form View, Data Form View, Setting Form View — are all **full-page**, and slide 16's alert pattern is an inline panel, not a modal |
+| 25 Aug review | Nothing |
+
+So the customer has told us which modals to build and what goes in them, and
+has said nothing about how one should look or behave. Twenty-two call sites were
+built on conventions we chose. This document states those conventions so they
+can be reviewed as a set rather than discovered screen by screen — and records
+one defect and two open questions found while writing it.
+
+## Inventory
+
+Twenty-two `<Dialog>` call sites across fourteen files. Three sizes.
+
+---
+
+## Rule 1 — Three sizes, chosen by content shape
+
+| Size | Token | Measured | Viewport cap | For |
+|---|---|---|---|---|
+| `md` *(default)* | `--vy-dialog-md` | **640px** | 94vw | A short form, a confirmation, a single decision |
+| `lg` | `--vy-dialog-lg` | **960px** | 94vw | A form with two columns, or a narrow table |
+| `xl` | `--vy-dialog-xl` | **1180px** | 96vw | A record, a wide grid, or anything with tabs |
+
+Named by size rather than set per dialog, so a screen cannot invent a width. The
+cap is a `min()` against the viewport, not a media query, so the same rule holds
+at every width.
+
+**Choose by the shape of the content, not by its importance.** A confirmation is
+`md` because it holds one sentence, not because it matters less.
+
+Three call sites take the default implicitly rather than writing `size="md"`.
+Both are the same width; the explicit form is preferred because it records that
+a choice was made.
+
+## Rule 2 — The actions bar is a sibling of the content and never scrolls
+
+`.k-dialog-content` **is** the scroll box — measured `overflow-y: auto`, and on
+the Part record it scrolls at 669px of content inside a 792px panel. The buttons
+sit in Kendo's `DialogActionsBar`, which renders as a *sibling* of that box.
+
+This was not free. Our own footer lived inside the content and scrolled away
+with the form, which is the one place a dialog's buttons must not go. Nothing
+should ever be wrapped around `children` here either: a second padded, scrolling
+div inside the content produced doubled padding and two scrollbars in the same
+axis.
+
+Panel height is capped at **88vh** — measured 792px of 900. The dialog never
+runs off the screen; its content scrolls instead.
+
+## Rule 3 — Dismiss on the left, commit on the right, destructive last
+
+Reading order matches consequence: the way out first, the thing that changes
+something last.
+
+| | |
+|---|---|
+| Cancel / Close / Back | `default` or `text`, leftmost |
+| Secondary actions | `default` or `tonal`, middle |
+| The commit | `filled`, last |
+| A destructive commit | `danger`, last — *"Yes, delete"*, *"Discard changes"* |
+
+Verified across every call site whose action bar can be read statically. Three —
+BoM Comparison, Create BoM and Run Quotation — render different button sets per
+step, so a static read cannot confirm them and they are not claimed here.
+
+**Open point.** The Part record's bar carries four buttons: `Close`, `QR Code`,
+`Approve`, `Edit part`. That is the only bar in the app mixing dismissal with
+three separate actions, and it is at the limit of what a footer can hold before
+it stops reading as a row of choices. Not changed — the three actions are the
+Testing Guideline's own list for that screen — but flagged.
+
+## Rule 4 — Nesting is a band, ten per level
+
+This app stacks modals three deep: a Part record opens a Stock Report, which
+opens Update Quantity.
+
+Measured, all three on screen at once:
+
+| Depth | Dialog | z-index |
+|---|---|---|
+| 1 | Part record | **10040** |
+| 2 | Stock Report | **10050** |
+| 3 | Update Quantity | **10060** |
+
+`--vy-z-dialog` is 10040 and each level adds ten — enough for a scrim to sit
+under its own panel and above everything below, and far short of the next token
+up (menu 10070).
+
+Two faults this replaced, both invisible until measured. Every dialog shared one
+z-index, so the innermost was on top **only because its portal mounted last**;
+and a child's scrim could not dim its parent, so three stacked dialogs all
+rendered at full brightness with nothing to say which one was live. The scrim is
+`rgba(19, 24, 32, .45)` at every level, so each one darkens the stack beneath it.
+
+Each dialog also takes a unique ARIA id from `useId()`. Kendo builds its ids as
+`` `${props.id ?? "accessibility"}-id` ``, so without one **every** dialog on the
+page gets the same id and a nested dialog announces itself with its parent's
+title.
+
+## Rule 5 — Two ways out, and the backdrop is not one of them
+
+| Gesture | Behaviour | |
+|---|---|---|
+| Close button | closes this dialog | |
+| Escape | closes | **see the defect below** |
+| Click the scrim | **does nothing** | measured: 2 dialogs open, 2 after the click |
+
+The scrim being inert is deliberate and worth keeping. Most of these modals are
+forms; a stray click outside one should not discard what has been typed.
+
+### DEFECT — Escape closes the whole stack, not the innermost dialog
+
+**One Escape from inside the innermost of three open dialogs closed all three.**
+Measured: `["Part record", "Stock Report", "Update Quantity"]` → `[]`.
+
+The cause is in Kendo's `Dialog.mjs`, which handles the key with a React
+`onKeyDown` on the dialog element:
+
+```
+e.keyCode === Y.esc && r.onClose && (e.preventDefault(), d(e))
+```
+
+React propagates events along the **React tree**, not the DOM tree — and a
+portal is no exception. Update Quantity is a React child of Stock Report, which
+is a React child of the Part record, so one keydown runs all three handlers and
+every dialog closes. `preventDefault` does not stop it; only
+`stopPropagation` would.
+
+`docs/ux-audit.md` states that "Escape closes only the innermost". **That claim
+is wrong** and is corrected here. It was reached by opening three dialogs and
+pressing Escape once — which does close the innermost, and also everything
+behind it, and the observation recorded only the part that was being looked for.
+
+Not fixed in this document: the fix belongs in `Dialog`, needs a wrapper that
+stops Escape propagating past the dialog that handled it, and should be measured
+against all twenty-two call sites rather than bundled into a spec.
+
+### A note on verifying this
+
+Three attempts disagreed before the mechanism explained all of them:
+
+| Method | Result | Why |
+|---|---|---|
+| Synthetic Escape on `document` | nothing closed | `document` is outside every dialog's React tree — no handler runs |
+| Synthetic Escape from a control inside the innermost | **all three closed** | the real propagation path |
+| Real `Escape` keypress via the browser tool | nothing closed | the pane is hidden and `document.hasFocus()` is false, so the key never reached the page |
+
+The middle one is the faithful reproduction: a real Escape with focus inside the
+innermost dialog produces exactly that native bubbling keydown. The other two are
+explained by the mechanism rather than contradicting it.
+
+## Rule 6 — Maximise is built, Minimize deliberately is not
+
+The guideline asks for all three window actions in **23 separate places**.
+
+**Maximise / Restore down** is built, on every dialog, in the title bar. It earns
+its place: Run Quotation's pricing grid and the Stock Report both hold tables
+wider than their dialog. It is a toggle with `aria-pressed`, and its label and
+tooltip both flip to "Restore down". A dialog always reopens at its normal size —
+carrying "maximised" across two unrelated dialogs would surprise whoever opens
+the next one.
+
+**Minimize is not built, and this is a live question** (`open-questions.md`
+item 9). In Kendo, minimise collapses a *draggable, non-modal* window to its
+title bar. Our dialogs are modal and centred, so a minimised one would be a title
+bar floating in the middle of a dimmed screen with the page still unreachable
+behind it — which does not do the thing minimising is for. What a user usually
+wants there is to put the dialog aside and look at the record underneath, and
+that needs non-modal draggable windows, not a collapse animation.
+
+## Rule 7 — Title, subtitle, and what the title bar may hold
+
+The title bar holds the title, an optional subtitle, the maximise toggle and
+Kendo's close button. Nothing else.
+
+The title names the record or the task — `Stock Report`, `BoM — 00848-962-4138`,
+`Create New Customer`. The subtitle is for the sentence the title cannot carry:
+*"Choose how far the imported parts should reach"*, or the record's description.
+
+Maximise and close sit in **different containers** and are aligned to match by
+hand: Kendo renders close into `.k-dialog-titlebar-actions` and centres it there,
+while ours has to live inside the title slot because Kendo's Dialog offers no way
+to add a button to its actions.
+
+## Rule 8 — One responsive rule, no breakpoints
+
+The viewport cap does all the work. At 375px the Part record's `xl` dialog
+measures **360px** — 96vw — with nothing past the right edge and no sideways
+scroll on the page.
+
+Content inside may still need to scroll horizontally: the MPN Mapping table is
+1690px wide and scrolls **inside its own** `overflow-x: auto` container, so the
+page and the dialog both stay put. That is the rule — a wide table scrolls
+itself, never the dialog and never the page.
+
+---
+
+## Still unspecified, and worth the customer's opinion
+
+1. **Minimize** — item 9 on the answer sheet. Asked for 23 times, not built, and
+   the reason is a real design difference rather than a shortcut.
+2. **The Escape defect** — ours to fix, not theirs to decide, but it changes
+   behaviour they may have seen in a demo.
+3. **Four buttons on the Part record's bar** — the guideline's own list, but the
+   only bar in the app shaped that way.
+
+Nothing in this document changes a screen. It states what twenty-two dialogs
+already do, so the next one does not have to guess — and so the customer can
+disagree with a written rule rather than with a screenshot.

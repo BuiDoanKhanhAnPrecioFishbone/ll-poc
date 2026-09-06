@@ -101,8 +101,19 @@ dropdown in the app. It carries `tabindex="-1"` and `aria-hidden="true"`: not a
 tab stop, not announced, correctly decorative.
 
 **Dialogs nested three deep** — Part record → Stock Report → Update Quantity —
-move focus into the top dialog on open, and Escape closes only the innermost.
-That is the hardest case in the new work and it behaves.
+move focus into the top dialog on open.
+
+~~and Escape closes only the innermost. That is the hardest case in the new work
+and it behaves.~~ **WRONG, corrected 6 Sep 2026.** One Escape from inside the
+innermost closes **all three**: Kendo handles the key with a React `onKeyDown`,
+and React propagates through the React tree rather than the DOM, so a portalled
+child's keydown runs its parents' handlers too. Measured in
+`docs/modal-patterns.md`, which carries the mechanism and the fix that is owed.
+
+The claim was reached by pressing Escape once with three dialogs open — which
+does close the innermost, and also everything behind it. The observation
+recorded the half it was looking for. A dismissal check has to count what is
+left on screen, not confirm that the top one went.
 
 ## Not examined here
 
