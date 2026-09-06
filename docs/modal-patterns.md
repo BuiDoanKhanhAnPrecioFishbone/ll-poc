@@ -128,10 +128,11 @@ title.
 The scrim being inert is deliberate and worth keeping. Most of these modals are
 forms; a stray click outside one should not discard what has been typed.
 
-### DEFECT — Escape closes the whole stack, not the innermost dialog
+### Escape closes one level — fixed 6 September 2026
 
-**One Escape from inside the innermost of three open dialogs closed all three.**
-Measured: `["Part record", "Stock Report", "Update Quantity"]` → `[]`.
+**Before the fix, one Escape from inside the innermost of three open dialogs
+closed all three.** Measured: `["Part record", "Stock Report", "Update
+Quantity"]` → `[]`.
 
 The cause is in Kendo's `Dialog.mjs`, which handles the key with a React
 `onKeyDown` on the dialog element:
@@ -151,9 +152,48 @@ is wrong** and is corrected here. It was reached by opening three dialogs and
 pressing Escape once — which does close the innermost, and also everything
 behind it, and the observation recorded only the part that was being looked for.
 
-Not fixed in this document: the fix belongs in `Dialog`, needs a wrapper that
-stops Escape propagating past the dialog that handled it, and should be measured
-against all twenty-two call sites rather than bundled into a spec.
+**The fix** is a `div.vy-dialog-host` wrapping the KendoDialog inside `Dialog`.
+It has to be a real DOM element, because being a React *ancestor* of the
+KendoDialog is the whole point: in the bubble phase it runs after the handler
+that closed this dialog and before any parent's, so `stopPropagation` there ends
+the event at exactly one level. `display: contents` keeps it out of the layout —
+Kendo portals the dialog away, so the div would otherwise sit in the parent
+dialog's flex or grid as an empty item.
+
+Measured after: **3 → 2 → 1 → 0**, one level per Escape, and a single dialog
+still closes on the first press. The width assertion came with it — the Part
+record still measures 1180 with three-column field groups on both tabs, New
+Project Requirement 1180 with its tab strip and animation container both at
+1140, and no page scrolls sideways.
+
+### OPEN DEFECT — Escape with a dropdown open closes the dropdown *and* the dialog
+
+Found while checking that the fix above had not disturbed anything nearby, and
+**it is older than that fix**: verified against the pre-fix build, where the
+guard is absent from the DOM and the behaviour is identical.
+
+New Project Requirement, one `Select` open:
+
+| | list open | dialogs |
+|---|---|---|
+| before Escape | yes | 1 |
+| after Escape | no | **0** |
+
+A user opens a dropdown, changes their mind, presses Escape — and loses the
+whole form. Same mechanism as the stack bug: Kendo's ComboBox popup is
+portalled, but its React parent chain runs back through the dialog, so one
+keydown dismisses both.
+
+The neighbouring case is odd in the opposite direction. With the list **closed**,
+Escape from inside a ComboBox closes **nothing at all** — Kendo swallows it — so
+the same key does too much in one state and nothing in the other.
+
+Not fixed here, because unlike the stack bug the correct behaviour is a design
+call and the blast radius is larger: `Select` has 37 call sites in 14 files, and
+the fix has to distinguish "list open" from "list closed" rather than swallowing
+Escape in both. The standard rule — Escape dismisses the innermost dismissible
+thing, so the list first and the dialog on a second press — is what I would
+implement, and it would fix the closed-list case too.
 
 ### A note on verifying this
 
@@ -219,8 +259,9 @@ itself, never the dialog and never the page.
 
 1. **Minimize** — item 9 on the answer sheet. Asked for 23 times, not built, and
    the reason is a real design difference rather than a shortcut.
-2. **The Escape defect** — ours to fix, not theirs to decide, but it changes
-   behaviour they may have seen in a demo.
+2. **Escape with a dropdown open** — still dismisses the whole dialog. Ours to
+   fix, not theirs to decide, but it changes behaviour they may have seen in a
+   demo, and the fix touches every `Select` in the app.
 3. **Four buttons on the Part record's bar** — the guideline's own list, but the
    only bar in the app shaped that way.
 

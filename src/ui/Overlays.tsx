@@ -79,6 +79,29 @@ export function Dialog({ open, onClose, title, subtitle, children, actions, size
 
   return (
     <DialogDepth.Provider value={depth}>
+      {/* THIS DIV EXISTS ONLY TO STOP ESCAPE, and it has to be a real DOM
+          element because React dispatches synthetic events along the REACT
+          tree, not the DOM one — a portal is no exception.
+
+          Kendo closes on Escape with an `onKeyDown` on its own
+          `.k-dialog-wrapper`. Our nested dialogs are React children of the
+          dialogs they open from, so ONE Escape from inside the innermost ran
+          all three handlers and closed the whole stack: Part record → Stock
+          Report → Update Quantity, gone together, measured. `preventDefault`
+          does not help — Kendo already calls it — because the event is still
+          propagating.
+
+          This div is a React ANCESTOR of the KendoDialog below it, so in the
+          bubble phase it runs AFTER the handler that closed this dialog and
+          before any parent dialog's. Stopping the event here means each
+          Escape closes exactly one level.
+
+          `display: contents` because the element is otherwise pure overhead:
+          Kendo portals the dialog to the body, so this div's only child
+          renders elsewhere and it would sit in the parent dialog's layout as
+          an empty flex or grid item. See docs/modal-patterns.md. */}
+      <div className="vy-dialog-host"
+           onKeyDown={e => { if (e.key === 'Escape') e.stopPropagation(); }}>
       <KendoDialog
         id={uid}
         className={`vy-dialog vy-dialog--${size}${maximised ? ' vy-dialog--max' : ''}`}
@@ -121,6 +144,7 @@ export function Dialog({ open, onClose, title, subtitle, children, actions, size
             dialog's buttons must not go. */}
         {actions && <DialogActionsBar>{actions}</DialogActionsBar>}
       </KendoDialog>
+      </div>
     </DialogDepth.Provider>
   );
 }

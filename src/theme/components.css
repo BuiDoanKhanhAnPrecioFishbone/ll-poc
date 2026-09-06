@@ -167,6 +167,12 @@
 
 /* --- Dialog ---------------------------------------------------------------- */
 .vy-scrim { position: fixed; inset: 0; background: var(--vy-overlay-scrim); z-index: var(--vy-z-dialog); animation: vy-fade var(--vy-dur-medium) var(--vy-ease-standard); }
+/* The Escape guard's host — see the comment in Overlays.tsx. It wraps the
+   KendoDialog purely to be a React ancestor of it, and Kendo portals the dialog
+   away, so this element has nothing to render. `display: contents` keeps it from
+   becoming an empty flex or grid item in whatever laid out the dialog's caller. */
+.vy-dialog-host { display: contents; }
+
 /* PHASE D. `.vy-dialog` is now the class Kendo puts on its WRAPPER — the
    full-screen layer holding the scrim and the panel — not on the panel itself.
    That caught me out: the old rules here (fixed, centred, sized, shadowed) were
