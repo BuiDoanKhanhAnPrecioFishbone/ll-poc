@@ -2,6 +2,7 @@ import { ComboBox } from '@progress/kendo-react-dropdowns';
 import { Dialog as KendoDialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
 import { TabStrip, TabStripTab } from '@progress/kendo-react-layout';
 import * as RRadio from '@radix-ui/react-radio-group';
+import { DialogDismiss } from './dismiss';
 import { cloneElement, createContext, type ReactNode, useContext, useEffect, useId, useMemo, useRef, useState } from 'react';
 
 /* =============================================================================
@@ -50,23 +51,6 @@ import { cloneElement, createContext, type ReactNode, useContext, useEffect, use
  */
 const DialogDepth = createContext(0);
 
-/**
- * How to dismiss the dialog we are inside, if any. `null` means "not in one".
- *
- * Exists for `Select`, and for one key. Escape has to reach whatever is
- * innermost — the open dropdown list, or failing that the dialog — and Kendo
- * gives neither control a way to say "I handled it" to the other. So `Select`
- * takes Escape away from Kendo entirely and decides, and this is how it reaches
- * the dialog once it has nothing of its own left to close. A context rather
- * than a DOM lookup because Kendo PORTALS the dialog to the body: our host div
- * is a React ancestor of the dialog but not a DOM one, so no amount of
- * `closest()` would find it. See docs/modal-patterns.md.
- *
- * EXPORTED because `Dialog` is not the only dismissible container in this app.
- * `ViewSetting` is a right sidebar with its own scrim, and it provides this too,
- * so a dropdown inside it behaves the way a dropdown inside a dialog does.
- */
-export const DialogDismiss = createContext<(() => void) | null>(null);
 
 export function Dialog({ open, onClose, title, subtitle, children, actions, size = 'md' }: {
   open: boolean; onClose: () => void; title: string; subtitle?: ReactNode;

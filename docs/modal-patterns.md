@@ -317,6 +317,10 @@ call it, and both callers pass the same handler for `onClose` and `onDiscard`.
 | Scrim click · Close button · Maximise/Restore · tab switching | all unchanged |
 | Both callers — Part Master and Request For Quotation | same behaviour, correct heading each |
 
+`DialogDismiss` lives in `src/ui/dismiss.ts` rather than in `Overlays.tsx`,
+because a context exported alongside components costs Fast Refresh on a file
+every screen in the app imports — the linter says so, and it is right.
+
 **Note the scrim difference.** `ViewSetting`'s scrim *does* dismiss, where a
 `Dialog`'s is inert (Rule 5). That is not an inconsistency to iron out without
 asking: this is a right sidebar for choosing filters and columns, not a form

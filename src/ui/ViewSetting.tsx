@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Button } from './Button';
-import { DialogDismiss, Select } from './Overlays';
+import { Select } from './Overlays';
+import { DialogDismiss } from './dismiss';
 import { FilterToolbar } from './FilterToolbar';
 import { TextField } from './Field';
 import type { ColumnSpec } from '../components/column-model';
