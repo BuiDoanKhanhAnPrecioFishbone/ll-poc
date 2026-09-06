@@ -236,6 +236,62 @@ Verified:
 | Nested: Part record → MPN detail, list open in the inner one | Escape 1 closes the list, Escape 2 closes **only** the inner dialog |
 | Layout | dialog 1180, no page scroll, host 0px |
 
+### Swept across every dialog that has a Select
+
+The fix lives in two shared components, so the behaviour is structural rather
+than per-screen — but "structural" is a prediction until it is measured, and
+nesting depth is exactly the kind of thing that breaks a prediction. Every
+reachable dialog containing a `Select` was driven the same way: open the first
+list, Escape, Escape.
+
+Two assertions each — the first Escape closes the list **and leaves the dialog
+count unchanged**; the second closes **exactly one** dialog, so a nested one
+never takes its parent with it.
+
+| Dialog | Depth | Selects | Esc 1 | Esc 2 |
+|---|---|---|---|---|
+| New Project Requirement | 1 | 9 | ✓ | ✓ |
+| Add Part Master Detail | 1 | 8 | ✓ | ✓ |
+| Run Quotation — step 1 | 1 | 5 | ✓ | ✓ |
+| BoM Comparison | 1 | 4 | ✓ | ✓ |
+| Bill of Materials (Upload BoM) | 1 | 3 | ✓ | ✓ |
+| Add MPN Mapping | **2** | 2 | ✓ | ✓ |
+| MPN Mapping detail | **2** | 2 | ✓ | ✓ |
+| Update Quantity | **3** | 2 | ✓ | ✓ |
+| Replenishment | **3** | 2 | ✓ | ✓ |
+
+Nine dialogs, thirty-seven Selects between them, three nesting depths. The
+depth-3 rows are the ones that matter: `Update Quantity` sits under Stock Report
+under the Part record, and closing it left both parents standing.
+
+**Correctly skipped, having no Select at all:** Import parts (its scope control
+is a RadioGroup, not a Select), Upload a document, Stock Report, Where Part
+Number Used, and the BoM record.
+
+**Not reached: `Add: Packages`.** It is the one remaining dialog with a Select
+(one), nested inside the Run Quotation wizard, and getting to it needs the
+wizard driven past step 1 — which this harness cannot do, because the step gate
+did not release after choosing from all five of step 1's dropdowns by click. It
+is the same `Select` inside the same `Dialog` at a depth already covered twice,
+so the expectation is that it behaves; it is listed here as untested rather than
+assumed.
+
+**Selects outside a dialog were checked too**, because the fix reaches them: one
+on a page toolbar and one in a tab panel (the Checklists assignee). Escape closes
+the list, and a second Escape with nothing left to dismiss is a no-op rather than
+an error — `DialogDismiss` is null there, which is the case the `?.` exists for.
+
+### One thing the sweep turned up, unrelated to this fix
+
+`ViewSetting` — the Filter / Column / Sort panel — is an `<aside role="dialog">`
+of its own rather than our `Dialog`, and **`src/ui/ViewSetting.tsx` contains no
+Escape handling at all**. So a panel that announces itself as a dialog cannot be
+dismissed with the key every dialog is dismissed with.
+
+That is read from the source, not measured — the panel resisted being opened
+reliably from script, and it is not worth more time inside this fix. It predates
+all of this and belongs in its own change.
+
 ### A note on verifying this
 
 Three attempts disagreed before the mechanism explained all of them:
