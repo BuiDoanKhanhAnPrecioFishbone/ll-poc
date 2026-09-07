@@ -1,5 +1,5 @@
 # Voyager Cloud ERP — UX Revamp
-## Work log, 19–25 August 2026
+## Work log, 19 August – 6 September 2026
 
 Client: Linh Long Engineering · Prepared by: Huyen Nguyen (UI/UX), Precio Fishbone
 Repository: `ll-poc` · Deployed prototype: `ll-poc-tau.vercel.app`
@@ -13,6 +13,8 @@ saved, not how long it took. Adjust the hours to your own record before invoicin
 
 ## Summary
 
+### Phase 1 · 19–25 August
+
 | | |
 |---|---|
 | Elapsed | 7 calendar days (19–25 Aug 2026) |
@@ -21,6 +23,25 @@ saved, not how long it took. Adjust the hours to your own record before invoicin
 | Net code | ~16,400 lines added, ~3,600 removed |
 | Modules delivered | Quotations (complete), Part Master (list), My Queues |
 | Estimated effort | **58–72 hours** |
+
+### Phase 2 · 26 August – 6 September
+
+| | |
+|---|---|
+| Elapsed | 12 calendar days (26 Aug – 6 Sep 2026) |
+| Days with recorded activity | 10 |
+| Commits | 108 |
+| Net code | ~30,200 lines added, ~3,800 removed |
+| Modules delivered | Part Master Detail, BoM, MFG-MPN (AML), Quotation wizards (Quick, Standard, Resume Draft), Login |
+| Component library | migrated to **KendoReact** after the licence arrived, 31 Aug |
+| Estimated effort | **71–87 hours** |
+
+### Both phases
+
+| | |
+|---|---|
+| Commits | 152 |
+| Estimated effort | **129–159 hours** |
 
 ---
 
@@ -160,24 +181,177 @@ Also added an automated stylesheet check which found **six classes defined in tw
 files** — where one silently overrode the other. Three had already caused visible
 bugs, including one where an internal page was restyling every chip in the app.
 
+### WP13 · Testing Guideline intake, and the gap it opened
+**26–27 Aug · 10–12 h · 17 commits**
+
+The customer's Testing Guideline arrived and was read against the build. It
+contradicted the prototype in fifteen places on the record form alone — tab
+names, section names, required markers, option values, three fields that should
+have been radio groups rather than dropdowns, and two fields invented that the
+live system does not have. All corrected to the customer's own wording.
+
+Also built from it: ITAR as an access rule rather than a badge, the Quotation
+Result's eleven real columns, the Conversations Comment/Send Email choice with a
+rich editor, the list grid's real columns and pager, the advanced filter rebuilt
+without operators, saved views with a View Setting sidebar, and the New Project
+Requirement modal on both of the customer's paths.
+
+Their PR List test sheet was then run end to end: **26 pass, 3 fixed, 5
+deviations** recorded for them to rule on.
+
+### WP14 · Quotation wizards
+**28 Aug · 6–7 h · 7 commits**
+
+Quick Quote built out to the guideline's four steps, and Standard Quote's second
+entry point, Load Existing Assembly. Action bars consolidated to one per screen,
+the Mine/Everyone scope control dropped, and one reading measure applied across
+the app.
+
+### WP15 · UI consistency sweep, four parts
+**29–30 Aug · 6–8 h · 8 commits**
+
+An automated consistency checker, then four passes over what it and a manual
+review found: colour contrast, the one remaining native `confirm()`, a missing
+loading state, motion where content is replaced, three touch targets under the
+24px minimum, and a class with no rule behind it.
+
+**The finding worth naming: the app announced failures in green.** Validation
+messages and "Select assembly first!" were arriving on the success toast — the
+words right and the colour saying the opposite, which is worse than silence,
+because a user who trusts the colour carries on believing the step worked.
+
+### WP16 · Resume Draft, Part Master tooling, deck audit, Login
+**30 Aug · 5–6 h · 6 commits**
+
+Resume Draft Quote as the third entry point, with a Save draft that saves. Filter,
+view and column tools wired onto Part Master. The kick-off deck checked against
+the repo for the first time and filed into the precedence order, which produced
+the gap list still being worked through. Login rebuilt to answer the two faults
+the deck names by name — "too much empty space" and "lack of contrast".
+
+### WP17 · Kendo licence, and five screens from the guideline
+**31 Aug · 10–12 h · 24 commits**
+
+The heaviest day of the engagement. The Kendo licence key arrived and was
+recorded with its deployment route, plus a check page proving a licensed grid
+renders clean on the deployment.
+
+Five screens built: Part Master Detail as the deck's Data Form View archetype,
+BoM detail and Where Part Number Used, the Bill of Materials list, Create New
+Part, Create the new BoM (Config and Review), and MFG-MPN (AML) — the Approved
+Manufacturer List. Plus the deck's alert panel and the notifications bell.
+
+The live production bundle was swept for the components it actually uses and
+compared against ours — **and the sweep was then corrected**: MultiSelect ships
+in it, and the method used could not have found it.
+
+### WP18 · Responsive, accessibility, and the answer sheet
+**1 Sep · 3–4 h · 3 commits**
+
+Responsive and accessibility checks across the three new packages, and the
+sixteen open questions written up as an answer sheet the customer can fill in.
+
+### WP19 · KendoReact migration, phases 0–8
+**4 Sep · 8–10 h · 12 commits**
+
+The customer chose KendoReact so the mockup would not diverge from the system
+they already use. Scoped before anything was touched, then a theme spike, then
+the grid, MiniTable, DataGrid, Excel export and file upload.
+
+Two capability wins came free: real Excel export and a real upload control.
+A keyboard failure in the Kendo Grid was found and fixed, and a **layering scale**
+replaced the single z-index every overlay shared — the symptom being an error
+toast rendering behind the Run Quotation dialog and dimmed by its own scrim.
+
+**Phase 1 was declared blocked and the diagnosis was wrong.** KendoReact 16's
+Button was reported as incompatible with React 19; it was one prop. Recorded
+rather than quietly corrected, because the wrong diagnosis cost a day.
+
+### WP20 · Radix to Kendo, phases A–F
+**4–5 Sep · 6–8 h · 8 commits**
+
+Six component families reassessed one at a time against evidence from the live
+bundle, not swapped wholesale. Four packages removed; Tabs, Checkbox, Dialog and
+Select moved to Kendo; Popover, Toast and RadioGroup **held**, each with a stated
+reason — Kendo's Notification has no action slot and our undo is used at 29 call
+sites, which is a fact rather than a preference.
+
+Kendo's defaults would have shipped three regressions on the checkbox alone, and
+every dialog in the app shared one ARIA id, so a nested dialog announced itself
+with its parent's title.
+
+### WP21 · Post-migration defects
+**5 Sep · 5–6 h · 7 commits**
+
+Kendo wraps tab content in a container that shrinks to fit, which collapsed a
+three-column form to one on **every tabbed screen** — reported by the customer,
+not caught by our checks, because none of them looked at a box size. Fixed, then
+swept across all six tabbed surfaces, the last of which was measured rather than
+inferred by creating a new-customer RFQ through the UI to reach it.
+
+Also: the maximise button aligned with the close button in every dialog, the
+tasks panel tightened, and view pickers moved onto Kendo.
+
+### WP22 · Accessibility sweeps
+**5 Sep · 6–7 h · 9 commits**
+
+Colour contrast, focus order and density, each swept with a harness that was
+**first proved able to detect a planted failure** before its zero results were
+believed. Text passes everywhere; three control borders failed and a new token
+fixed all four occurrences. Every remaining failure in the Run Quotation wizard
+is an inactive control, which WCAG exempts.
+
+Two questions raised rather than guessed: which four fields are switches, and
+whether error text may name fields the user cannot see.
+
+### WP23 · Dead ends, the modal spec, and Escape
+**6 Sep · 6–7 h · 7 commits**
+
+All nineteen "not in this prototype" stubs audited against what has since been
+built. **Six were missing wiring, not a feature** — five of them the RFQ record's
+smart buttons, whose destinations sit on the same page.
+
+Modal design was found to be specified **nowhere**: the guideline names ~25
+modals and their contents but never how one should behave, and the deck's six
+archetypes are all full-page. `docs/modal-patterns.md` now states the eight rules
+the app's 22 dialogs already follow, so the customer can review them as a set.
+
+Writing it found two defects, both fixed. One Escape closed **every** open dialog
+rather than the innermost, and Escape with a dropdown open dismissed the dropdown
+**and** the form behind it. Swept across nine dialogs and three nesting depths.
+
 ---
 
 ## In progress
 
 | Item | State |
 |---|---|
-| My Queues — module separation and role scoping | Permission model and module queues built; page not yet rebuilt |
-| Advanced filter — rebuild as a saved **View Setting** | Specification received 25 Aug; current build to be replaced |
+| My Queues — module separation and role scoping | **Parked at the customer's request, 25 Aug.** Permission model and module queues built; page not rebuilt |
+| ~~Advanced filter — rebuild as a saved View Setting~~ | **Done, 27 Aug** (WP13) |
+| Setting Form View (deck slide 15) | **Blocked.** No guideline section defines it; four Configuration paths reach a placeholder |
+| Brand — "Voyager IQ" rename and tagline | **Blocked** on the customer (answer sheet, Q1) |
+| Dark mode (deck slide 7) | **Blocked** on a scope decision (answer sheet) |
+| `Add: Packages` dialog | The one dialog not reachable by our test harness; its Escape behaviour is untested rather than assumed |
 
 ---
 
 ## What the client should know
 
-**1. The prototype does not use a commercial component library.**
-No licence is available, so it is built on MIT-licensed components. **Every
-functional requirement is met either way** — pagination, column selection,
-read-only field treatment, filters. The only cost is implementation time, since
-these are written rather than bought.
+**1. The prototype now runs on KendoReact.** *(Reversed 31 Aug – 4 Sep; the
+paragraph this replaces said the opposite, and was true when written.)*
+The licence key arrived on 31 August and is active until 5/6/2029. The customer
+then chose Kendo so the mockup would not look unlike the system their users
+already know, and the migration ran as WP19 and WP20 — component by component,
+each swap justified against what the live production bundle actually uses.
+
+Three families were deliberately **not** moved, each for a stated reason rather
+than a preference: our Toast carries an undo action used at 29 call sites and
+Kendo's Notification has no action slot; the popover menus are bespoke panels
+with no visible gain from swapping; and the radio groups wait on question 17.
+
+The design system is now a **bridge** — our tokens mapped onto Kendo's 453
+custom properties — so the visual identity stays ours while the components are
+theirs.
 
 **2. Current phase is layout and user experience, not visual design.**
 Colour, spacing, typography and component styling are a later phase, deliberately
@@ -190,7 +364,15 @@ features that would otherwise have been rebuilt from guesswork. The fidelity
 decision (WP8) prevents a change-management cost across 51 screens and every
 current user.
 
-**4. Two questions remain open with the client.**
-What "Build Requirement" draws its options from — there is no metadata code for
-it — and where the "Quoted" status originates, as it appears on the list but not
-in the status enumeration.
+**4. Eighteen questions are open with the client**, up from two, because the
+Testing Guideline and the kick-off deck each raised more than they closed. They
+are written up as an answer sheet at `docs/open-questions.md`, ordered so the
+three that actually stop work come first: the **brand** decision, the scope of
+**Setting Form View**, and whether **dark mode** is in scope.
+
+One is cheap to answer and expensive to get wrong: Purchase Lead Time is in
+**days** on the customer's own sheet and **weeks** on their live form. We assumed
+days. Either way it is a sevenfold planning error.
+
+**5. Two defects in the live system** were found while building against it and
+are listed for the customer's own backlog. They need nothing from us.
