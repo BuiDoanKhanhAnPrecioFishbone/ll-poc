@@ -26,11 +26,15 @@ import { useToast } from '../ui/Toast';
  * a brand panel beside it. Two panels also produce the contrast the deck asks
  * for, at the scale of the page rather than of one button.
  *
- * THE BRAND stays VOYAGER / Linh Long Engineering. The deck also asks for a
- * rename to "Voyager IQ" with a new tagline, and that is deliberately NOT done
- * here: the tagline sentence reads two ways and its wording may carry a typo, so
- * it is logged in `docs/kickoff-deck-gaps.md` as a question for the customer
- * rather than guessed at on the screen that carries their name.
+ * THE BRAND IS VOYAGER IQ / Linh Long Engineering, settled 7 Sep 2026. It read
+ * VOYAGER while the rename sat in `docs/kickoff-deck-gaps.md` as an open
+ * question; the customer's answer is that it was never a naming question at all
+ * — the name is Voyager IQ and the work is a design system.
+ *
+ * THE TAGLINE IS STILL NOT ON THIS SCREEN. The deck asks to "improve the
+ * tagline, 'The completed ERP/MES Solution'", a sentence that reads two ways and
+ * may carry a typo, and no answer has been given. Better absent than guessed at
+ * on the screen carrying their name.
  *
  * NOTHING IS AUTHENTICATED. This is a mockup: the form posts nowhere, stores
  * nothing, and validates nothing beyond both boxes being non-empty. Sign In
@@ -64,7 +68,7 @@ export function Login() {
         <div className="vy-login-brandmark">
           <span className="vy-brand-mark" aria-hidden>V</span>
           <div>
-            <strong>VOYAGER</strong>
+            <strong>VOYAGER IQ</strong>
             <span>Linh Long Engineering</span>
           </div>
         </div>

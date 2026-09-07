@@ -89,11 +89,16 @@ export function AppShell() {
       {navOpen && <div className="vy-nav-scrim" onClick={() => setNavOpen(false)} aria-hidden />}
 
       <aside className="vy-sidebar">
+        {/* VOYAGER IQ — the product name, settled as design decision D1-D3 on
+            7 Sep 2026. It read "VOYAGER" because the rename had been filed as an
+            open question; it is not one, and never was. The MARK is still the
+            letter V: D3 puts a new logo in the future, so this keeps the
+            existing one rather than inventing a placeholder to replace it. */}
         <div className="vy-brand">
           <div className="vy-brand-mark" aria-hidden>V</div>
           {!collapsed && (
             <div className="vy-brand-text">
-              <strong>VOYAGER</strong>
+              <strong>VOYAGER IQ</strong>
               <span>Linh Long Engineering</span>
             </div>
           )}

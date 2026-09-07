@@ -45,6 +45,39 @@ means the palette is authored as `surface` / `on-surface` semantic pairs rather
 than raw `grey-100` references. Deferring the *deliverable* is cheap; deferring
 the *architecture* is not.
 
+### Built, 7 September 2026
+
+**The ramp.** Hue 216 → **222**, chosen by measurement. The deciding constraint
+was not the blue: two status badges have to stay distinguishable from primary,
+and the old ramp was crowding one of them.
+
+| | to violet `waiting` (263) | to cyan `review` (193) |
+|---|---|---|
+| hue 216, old | 47° | **23°** |
+| hue 222, new | 41° | 29° |
+
+So the new hue is not merely different — it is *more evenly* separated than what
+it replaces. Going further toward indigo reverses the problem (37° at 226).
+Saturation now tapers at the light end, 46% at step 50 rising to 72% at 600, so
+a selected row reads as *marked* rather than *coloured*.
+
+Measured on white: **600 = 9.16:1** (AAA as link text), 400 = 4.48:1 (a control
+boundary needs 3.0), grey-900 on the 50 tint = 16.16:1.
+
+**The semantic layer**, and it is what D13 actually bought. `--vy-surface`,
+`--vy-on-surface`, `--vy-border`, `--vy-brand` and their variants name a *job*;
+the primitives are how that job is done today. Dark values are authored and
+measured — body text 14.57:1, muted 8.17:1, control boundary 3.83:1 — in a block
+that redefines only the semantic layer, never a primitive.
+
+**Nothing consumes it yet.** The stylesheets still reference primitives
+directly, so switching the theme today would repaint the tokens and leave every
+component where it stands. That migration — 576 colour references across seven
+stylesheets — is the next piece, and it is what turns dark mode on.
+
+**Wordmark** now reads VOYAGER IQ in the shell and on Login. The mark is still
+the letter V, per D3.
+
 ### Still open
 
 **D7 (depth), D8 (radius), D10 (showcase screens).** None blocks work — each has

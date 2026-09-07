@@ -9,19 +9,40 @@
 
 :root {
   /* --- Brand ramp -----------------------------------------------------------
-     Derived from the existing Voyager mark so the revamp keeps brand equity.
-     The legacy app used a single flat blue with no ramp, which is why disabled,
-     hover and selected states were indistinguishable. */
-  --vy-blue-50:  #eef4fc;
-  --vy-blue-100: #d4e3f7;
-  --vy-blue-200: #a9c6ef;
-  --vy-blue-300: #7aa6e4;
-  --vy-blue-400: #4a82d2;
-  --vy-blue-500: #2a63b8;
-  --vy-blue-600: #1b4f9c;  /* PRIMARY */
-  --vy-blue-700: #163f7d;
-  --vy-blue-800: #12325f;
-  --vy-blue-900: #0d2444;
+     VOYAGER IQ, hue 222. Design decision D1, 7 September 2026: "adjacent" —
+     recognisably the same family as the existing Voyager mark, clearly not the
+     same blue. The old ramp sat at hue 216 and was derived from that mark to
+     keep brand equity; this keeps the equity and moves 6 degrees toward indigo.
+
+     THE HUE WAS CHOSEN BY MEASUREMENT, not taste, and the deciding constraint
+     was not the blue itself. Two status badges have to stay distinguishable
+     from primary: `waiting` is violet (263) and `review` is cyan (193), and the
+     comments on both say so — a badge too close to primary reads as a link.
+
+       hue 216 (old):  47 degrees to violet, 23 to cyan
+       hue 222 (new):  41 degrees to violet, 29 to cyan
+
+     222 is not merely different, it is more EVENLY separated than what it
+     replaces; the old ramp was crowding the cyan badge. Going further toward
+     indigo reverses the problem — at 226 the gap to violet falls to 37.
+
+     Saturation tapers at the light end (46% at 50, rising to 72% at 600) so the
+     tints behind selected rows and hovered cells read as neutral rather than
+     baby blue. The old ramp held ~70% all the way up, which is why a selected
+     row looked coloured rather than marked.
+
+     Measured on white: 600 = 9.16:1 (AAA as link text), 400 = 4.48:1 (a control
+     boundary needs 3.0), 50 carries grey-900 at 16.16:1. */
+  --vy-blue-50:  #f1f4fa;
+  --vy-blue-100: #dae2f3;
+  --vy-blue-200: #b0c2ea;
+  --vy-blue-300: #7f9ce1;
+  --vy-blue-400: #4973d4;
+  --vy-blue-500: #2754bc;
+  --vy-blue-600: #1a419e;  /* PRIMARY */
+  --vy-blue-700: #15347e;
+  --vy-blue-800: #112960;
+  --vy-blue-900: #0d1e44;
 
   /* Accent — the red from the logo. Used ONLY for destructive actions and
      critical alerts. Never for decoration; it must stay rare to stay loud. */
@@ -69,6 +90,59 @@
   --vy-grey-700: #363e4b;
   --vy-grey-800: #232a34;
   --vy-grey-900: #131820;
+
+  /* --- SEMANTIC LAYER --------------------------------------------------------
+     Roles, not colours. Everything above this line is a raw value; everything
+     below names a JOB, and the raw values are how that job is done today.
+
+     THIS EXISTS FOR DARK MODE (design decision D13, 7 Sep 2026: in scope,
+     deferred). "Later" is a decision about the deliverable, not the
+     architecture — a stylesheet that says `background: var(--vy-grey-0)` has
+     hard-coded "white", and no theme can move it. One that says
+     `var(--vy-surface)` has hard-coded "the colour a panel is", which is a
+     question a theme is allowed to answer differently. Deferring the switch is
+     cheap; deferring the layer means re-deciding all 576 colour references in
+     the stylesheets a second time.
+
+     THE DARK VALUES ARE AUTHORED AND MEASURED (see the block after :root), but
+     nothing consumes them yet: the components still reference the primitives
+     directly. Migrating those references is what turns the switch on, and it is
+     tracked separately — this layer is the precondition, not the feature. */
+
+  /* Surfaces, lightest job to deepest. `sunken` is for insets that sit BELOW
+     the page — a grid header, a well — not for anything a user acts on. */
+  --vy-surface-app:       var(--vy-grey-50);
+  --vy-surface:           var(--vy-grey-0);
+  --vy-surface-raised:    var(--vy-grey-0);   /* dialogs, menus — depth via shadow in light */
+  --vy-surface-sunken:    var(--vy-grey-100);
+  --vy-surface-hover:     var(--vy-grey-50);
+  --vy-surface-selected:  var(--vy-blue-50);
+
+  /* Text, in three tiers. `muted` is the workhorse for labels and meta and is
+     the one that has already failed a sweep once — see the note on grey-500. */
+  --vy-on-surface:        var(--vy-grey-900);
+  --vy-on-surface-muted:  var(--vy-grey-600);
+  --vy-on-surface-subtle: var(--vy-grey-500);
+  --vy-on-surface-invert: var(--vy-grey-0);
+
+  /* Lines. `border` is STRUCTURE — panel edges, table rules, card outlines —
+     which WCAG 1.4.11 does not cover. `border-control` is the boundary of
+     something you can operate, which it does; it is defined below, on its own,
+     because finding a value for it needed an argument. */
+  --vy-border:            var(--vy-grey-200);
+  --vy-border-strong:     var(--vy-grey-300);
+
+  /* Brand, by role rather than by step, so a theme can re-point them. In dark
+     mode the fill and the text CANNOT be the same token: a 9:1-on-white blue is
+     invisible on a dark panel, so the text role moves up the ramp and the fill
+     role moves with it. */
+  --vy-brand:             var(--vy-blue-600);
+  --vy-brand-hover:       var(--vy-blue-700);
+  --vy-brand-active:      var(--vy-blue-800);
+  --vy-brand-text:        var(--vy-blue-600);
+  --vy-brand-on:          var(--vy-grey-0);
+  --vy-brand-subtle:      var(--vy-blue-50);
+  --vy-brand-boundary:    var(--vy-blue-400);
 
   /* --- Status semantics -----------------------------------------------------
      One token per BUSINESS STATE, not per colour. Every module maps its own
@@ -331,4 +405,89 @@
   --vy-dialog-md:        640px;
   --vy-dialog-lg:        960px;
   --vy-dialog-xl:       1180px;
+}
+
+/* =============================================================================
+   DARK THEME — authored, measured, NOT YET SWITCHED ON
+   -----------------------------------------------------------------------------
+   Design decision D13: dark mode is in scope and deferred. These values exist so
+   that the deferral costs nothing later; they redefine ONLY the semantic layer,
+   never a primitive, because grey-50 must go on meaning "the light grey" in both
+   themes or the ramp stops being a ramp.
+
+   NOTHING CONSUMES THIS YET. The stylesheets still reference primitives
+   directly, so setting `data-theme="dark"` today would repaint the semantic
+   tokens and leave every component where it was. Turning it on is the migration,
+   not this block.
+
+   Three states, per the platform's own contract: an explicit choice stamps
+   `data-theme`; the default "system" setting stamps nothing and only
+   `prefers-color-scheme` separates the two; and the toggle must win in both
+   directions, which is why the rules are written three times rather than once.
+
+   MEASURED against --vy-surface-dark (#161c25): body text 14.57:1, muted 8.17:1,
+   subtle 5.09:1, control boundary 3.83:1, brand text 6.31:1. Elevation reads by
+   LIGHTNESS here rather than by shadow — a shadow on a dark ground is invisible,
+   which is why `surface-raised` and `surface` are the same token in light mode
+   and different ones here. */
+
+:root[data-theme="dark"] {
+  --vy-surface-app:       #0f131a;
+  --vy-surface:           #161c25;
+  --vy-surface-raised:    #1e2531;
+  --vy-surface-sunken:    #0b0e14;
+  --vy-surface-hover:     #1e2531;
+  --vy-surface-selected:  #1b2a4a;
+
+  --vy-on-surface:        #e9edf3;
+  --vy-on-surface-muted:  #aab4c3;
+  --vy-on-surface-subtle: #828d9d;
+  --vy-on-surface-invert: #0f131a;
+
+  --vy-border:            #2a323f;
+  --vy-border-strong:     #3b4553;
+  --vy-border-control:    #6d7889;
+
+  --vy-brand:             var(--vy-blue-400);
+  --vy-brand-hover:       var(--vy-blue-300);
+  --vy-brand-active:      var(--vy-blue-200);
+  --vy-brand-text:        var(--vy-blue-300);
+  --vy-brand-on:          var(--vy-grey-0);
+  --vy-brand-subtle:      #1b2a4a;
+  --vy-brand-boundary:    var(--vy-blue-400);
+
+  --vy-overlay-scrim:     rgba(0, 0, 0, .62);
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  /* Guarded, so an explicit light choice is not overridden by the OS. */
+  :root:not([data-theme="light"]) {
+    --vy-surface-app:       #0f131a;
+    --vy-surface:           #161c25;
+    --vy-surface-raised:    #1e2531;
+    --vy-surface-sunken:    #0b0e14;
+    --vy-surface-hover:     #1e2531;
+    --vy-surface-selected:  #1b2a4a;
+
+    --vy-on-surface:        #e9edf3;
+    --vy-on-surface-muted:  #aab4c3;
+    --vy-on-surface-subtle: #828d9d;
+    --vy-on-surface-invert: #0f131a;
+
+    --vy-border:            #2a323f;
+    --vy-border-strong:     #3b4553;
+    --vy-border-control:    #6d7889;
+
+    --vy-brand:             var(--vy-blue-400);
+    --vy-brand-hover:       var(--vy-blue-300);
+    --vy-brand-active:      var(--vy-blue-200);
+    --vy-brand-text:        var(--vy-blue-300);
+    --vy-brand-on:          var(--vy-grey-0);
+    --vy-brand-subtle:      #1b2a4a;
+    --vy-brand-boundary:    var(--vy-blue-400);
+
+    --vy-overlay-scrim:     rgba(0, 0, 0, .62);
+    color-scheme: dark;
+  }
 }

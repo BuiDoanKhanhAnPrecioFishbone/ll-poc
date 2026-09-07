@@ -1012,9 +1012,12 @@
 .vy-rt-input p:last-child { margin-bottom: 0; }
 .vy-rt-input h3 { margin: 0 0 var(--vy-space-4); font-size: var(--vy-text-md); font-weight: var(--vy-weight-semibold); }
 .vy-rt-input ul, .vy-rt-input ol { margin: 0 0 var(--vy-space-4); padding-left: var(--vy-space-10); }
+/* Placeholder text is TEXT — 1.4.3 applies, and grey-400 measured 2.58:1 here.
+   Missed by the September sweep because the Conversations tab was not in its
+   set. `on-surface-subtle` is the quietest tier that still conforms: 5.24:1. */
 .vy-rt-placeholder {
   position: absolute; top: var(--vy-space-5); left: var(--vy-space-6);
-  color: var(--vy-grey-400); pointer-events: none;
+  color: var(--vy-on-surface-subtle); pointer-events: none;
 }
 
 /* ---- Comment / Send Email ------------------------------------------------

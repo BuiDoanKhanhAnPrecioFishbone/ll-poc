@@ -1093,7 +1093,10 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
 .vy-activity-time { font-family: var(--vy-font-mono); font-size: var(--vy-text-xs); color: var(--vy-grey-500); flex: 0 0 auto; font-variant-numeric: tabular-nums; }
 .vy-activity-summary { flex: 1; min-width: 0; font-size: var(--vy-text-base); }
 .vy-activity-detail-n { font-size: var(--vy-text-xs); color: var(--vy-grey-500); white-space: nowrap; }
-.vy-activity-chevron { color: var(--vy-grey-400); width: 1em; flex: 0 0 auto; }
+/* `aria-hidden`, so no screen reader reads it — but it is the only VISUAL sign
+   that a row expands, which makes it a state indicator rather than decoration
+   and puts it under 1.4.11's 3:1. It measured 2.41:1 on grey-400. */
+.vy-activity-chevron { color: var(--vy-on-surface-subtle); width: 1em; flex: 0 0 auto; }
 .vy-activity-detail {
   margin: var(--vy-space-2) 0 var(--vy-space-4) var(--vy-space-11);
   padding: var(--vy-space-4) var(--vy-space-5);
