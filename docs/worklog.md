@@ -34,14 +34,14 @@ saved, not how long it took. Adjust the hours to your own record before invoicin
 | Net code | ~30,200 lines added, ~3,800 removed |
 | Modules delivered | Part Master Detail, BoM, MFG-MPN (AML), Quotation wizards (Quick, Standard, Resume Draft), Login |
 | Component library | migrated to **KendoReact** after the licence arrived, 31 Aug |
-| Estimated effort | **71–87 hours** |
+| Estimated effort | **79.5 hours** (timesheet total for 26 Aug – 6 Sep) |
 
 ### Both phases
 
 | | |
 |---|---|
 | Commits | 152 |
-| Estimated effort | **129–159 hours** |
+| Timesheet total | **138.5 hours** (6 Aug – 6 Sep, both tabs reconcile) |
 
 ---
 
@@ -182,7 +182,7 @@ files** — where one silently overrode the other. Three had already caused visi
 bugs, including one where an internal page was restyling every chip in the app.
 
 ### WP13 · Testing Guideline intake, and the gap it opened
-**26–27 Aug · 10–12 h · 17 commits**
+**26–27 Aug · 19.5 h · 17 commits** *(hours as already logged on the timesheet)*
 
 The customer's Testing Guideline arrived and was read against the build. It
 contradicted the prototype in fifteen places on the record form alone — tab
