@@ -1,12 +1,56 @@
 # Open questions for the client
 
-Twenty-one things the prototype cannot settle on its own. Each states what we
+Twenty-one things the prototype cannot settle on its own, plus thirteen design
+system decisions — ten of them answered on 7 September 2026. Each states what we
 found, what we did in the meantime, and what we need from you.
 
 **Most are not blocking.** The prototype works under a stated assumption in
 every case, and where we chose we said why. But three of them now block work
 that cannot start without an answer, and two would be expensive to discover
 late.
+
+---
+
+## Design system decisions — answered 7 September 2026
+
+A separate track from the numbered questions below, and a **reframe**. Brand had
+been filed here as a naming question: which tagline, whether to rename. It is
+not. The name is settled — **Voyager IQ** — and the work is a design system:
+a look adapted to an ERP environment, with every component held to a strict
+accessibility standard.
+
+| # | Decision | Answer | Consequence |
+|---|---|---|---|
+| D1 | How far may the palette move from today's Voyager blue? | **Adjacent** — recognisable, clearly new | `--vy-blue-600: #1b4f9c` was derived from the existing mark to keep brand equity. That reasoning stands; the hue shifts within the family |
+| D2 | Does Rocket EMS red/navy influence it? | **No — Voyager IQ is its own identity** | Closes the "inspired by Rocket colour" line in the kick-off deck |
+| D3 | New logo/mark? | **Yes, but later** | Keep the current "V" mark; leave room for a replacement |
+| D4 | WCAG target | **Our default: AA, with AAA on body text** | The contrast harness already enforces this |
+| D5 | Typeface | **Our default: Inter, JetBrains Mono for codes** | No licensed corporate face to source |
+| D6 | Default row density | **Comfortable** *(changed — we had compact)* | `prefs.tsx` default flipped. Compact fits more rows; they chose scanning comfort for all-day use |
+| D7 | Depth — flat/bordered, or elevated? | **Open** | Proceeding on restrained elevation, dialogs only |
+| D8 | Corner radius | **Open** | Proceeding on 4–6px |
+| D9 | Motion | **Our default: minimal, respects reduced-motion** | |
+| D10 | Which screens are the showcase for sign-off? | **Open** | Proposing Quotations list + RFQ record |
+| D11 | Kendo components — restyle fully, or keep Kendo's look? | **Kendo stays the base; restyle through primitive tokens, to meet the strict standard** | Confirms the bridge approach: our tokens mapped onto Kendo's ~453 custom properties, rather than overriding component CSS |
+| D12 | Languages | **English only** — no Vietnamese, no CJK | Type scale and line-height need no CJK allowance |
+| D13 | Dark mode | **In scope, deferred** — prepare for it | Not a deliverable now, but the palette must be authored as semantic pairs from the start. Retrofitting means redoing every token |
+
+### The two that change what we build
+
+**D6 is a code change, applied.** `prefs.tsx` now defaults to `comfortable`. A
+returning user's own choice still wins — it is read from `localStorage` first.
+
+**D13 changes the token architecture now, not later.** "Prepare for dark mode"
+means the palette is authored as `surface` / `on-surface` semantic pairs rather
+than raw `grey-100` references. Deferring the *deliverable* is cheap; deferring
+the *architecture* is not.
+
+### Still open
+
+**D7 (depth), D8 (radius), D10 (showcase screens).** None blocks work — each has
+a default in the table — but D10 is worth settling before the design system is
+presented, because approving a whole system at once rarely works and picking the
+two screens it is judged on is the client's call.
 
 ---
 

@@ -36,15 +36,19 @@ type Prefs = {
   dateStyle: DateStyle; setDateStyle: (d: DateStyle) => void;
 };
 
+/* COMFORTABLE, not compact — the client's answer of 7 Sep 2026 (design decision
+   D6). Compact fits more rows, which is why it was the default; they chose
+   scanning comfort over row count for all-day operational use. A returning
+   user's own choice still wins, because it is read from localStorage below. */
 const Ctx = createContext<Prefs>({
-  density: 'compact', setDensity: () => {},
+  density: 'comfortable', setDensity: () => {},
   dateStyle: 'exact', setDateStyle: () => {},
 });
 export const usePrefs = () => useContext(Ctx);
 
 export function PrefsProvider({ children }: { children: ReactNode }) {
   const [density, setDensity] = useState<Density>(
-    () => (localStorage.getItem('vy.density') as Density) ?? 'compact',
+    () => (localStorage.getItem('vy.density') as Density) ?? 'comfortable',
   );
   useEffect(() => { localStorage.setItem('vy.density', density); }, [density]);
 
