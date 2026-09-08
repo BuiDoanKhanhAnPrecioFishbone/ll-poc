@@ -326,6 +326,7 @@ export function Quotations() {
                        onEditFields={() => setSettingOpen(true)} />
       }
       filterActive={active}
+      quickActive={quickOn.length}
       views={
         <ViewPicker views={savedViews} activeId={activeId} onChange={setActiveId} />
       }

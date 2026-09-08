@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { generateParts, PART_COLUMNS, type Part } from '../data/parts';
-import { partFilterFields } from '../data/partFilters';
+import { PART_QUICK, partFilterFields } from '../data/partFilters';
 import { ViewPicker } from '../ui/ViewPicker';
 import { DataGrid } from '../ui/DataGrid';
 import { Button } from '../ui/Button';
@@ -44,6 +44,9 @@ export function PartMaster() {
      answer the same question with two different control layouts cost a user
      more than either layout saves. */
   const [values, setValues] = useState<FilterValues>({});
+  /* Empty by default — see the note on PART_QUICK. A parts list is a reference,
+     not a worklist, so it opens showing every part. */
+  const [quickOn, setQuickOn] = useState<string[]>([]);
   const [settingOpen, setSettingOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
@@ -84,7 +87,18 @@ export function PartMaster() {
     [allFields, view.fields]);
   const active = activeCount(fields, values);
 
-  const rows = useMemo(() => applyView(data, fields, values), [data, fields, values]);
+  const toggleQuick = (key: string) =>
+    setQuickOn(v => (v.includes(key) ? v.filter(k => k !== key) : [...v, key]));
+
+  /* Quick filters narrow CONJUNCTIVELY with each other and with the advanced
+     conditions, exactly as on Project Requirements — turning on two statuses
+     asks for parts that are both, which is empty, and the empty state says so
+     rather than the grid silently showing nothing. */
+  const rows = useMemo(() => {
+    const quickMatched = data.filter(p =>
+      PART_QUICK.filter(f => quickOn.includes(f.key)).every(f => f.match(p)));
+    return applyView(quickMatched, fields, values);
+  }, [data, quickOn, fields, values]);
 
   const allColumns = useMemo(() => {
     const byField = new Map(PART_COLUMNS.map(c => [String(c.field), c]));
@@ -107,7 +121,35 @@ export function PartMaster() {
         data={rows}
         columns={allColumns}
         title="Part Master"
-        subtitle="parts"
+        /* Was the single word "parts", which told a reader nothing they could
+           not see from the heading. */
+        subtitle="Every part on file, with its source and what is on hand"
+        kpis={
+          /* Each tile IS its filter and shows whether it is on, the same
+             contract as Project Requirements: a count you cannot act on is
+             decoration. Counted across every part, not the filtered rows — a
+             tile summarising the grid it sits above would just repeat it. */
+          <>
+            {PART_QUICK.map(f => {
+              const n = data.filter(f.match).length;
+              const on = quickOn.includes(f.key);
+              return (
+                <button key={f.key} type="button" className="vy-kpi" data-key={f.key}
+                        aria-pressed={on} onClick={() => toggleQuick(f.key)}>
+                  <span className="vy-kpi-n">{n.toLocaleString()}</span>
+                  <span className="vy-kpi-label">{f.label}</span>
+                </button>
+              );
+            })}
+          </>
+        }
+        filters={(quickOn.length > 0 || active > 0) ? (
+          <div className="vy-filter-row-main">
+            <Button variant="text" onClick={() => { setQuickOn([]); setValues({}); }}>
+              Clear filters
+            </Button>
+          </div>
+        ) : null}
         searchPlaceholder="Search part number, description or customer"
         actions={<>
           {/* Opens the scope choice the guideline asks for — Import All or
@@ -144,6 +186,7 @@ export function PartMaster() {
                          onEditFields={() => setSettingOpen(true)} />
         }
         filterActive={active}
+        quickActive={quickOn.length}
         views={
           <ViewPicker views={savedViews} activeId={activeId} onChange={setActiveId} />
         }

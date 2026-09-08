@@ -65,3 +65,35 @@ export function partFilterFields(rows: Part[]): ViewField<Part>[] {
       value: p => p.lastChange },
   ];
 }
+
+/**
+ * The quick filters behind the KPI tiles on Part Master.
+ *
+ * The 25 Aug review asked for the record count to become "a KPI summary …
+ * This KPI can also be the filter. When clicking, they can quickly view late
+ * records or new." That was built on Project Requirements and never reached
+ * this screen, which still opened with a bare count and no way to act on it.
+ *
+ * WHY ALL FOUR ARE STATUSES, and it is a data answer rather than a design one.
+ * The tiles worth having on a parts list are the stock ones — out of stock,
+ * nothing available — and in this prototype they cannot exist: `onHand` is
+ * `floor(rnd() * 4000)`, so zero occurs about once in four thousand rows, and
+ * `allocated` is capped at 0.6 of `onHand`, so "nothing available" is
+ * arithmetically impossible. Both tiles would read 0 on every visit, which is
+ * the decoration the Project Requirements tiles exist to avoid.
+ *
+ * Status is what this data actually varies: roughly 57% Active and 14% each of
+ * the other three. **Add the stock tiles when there is stock data** — they are
+ * the two a planner would reach for first.
+ *
+ * NONE IS ON BY DEFAULT. Project Requirements opens on "Open only" because an
+ * RFQ list is a worklist; a part list is a reference, and opening it with 43%
+ * of the parts hidden would be the "list that looks like it failed to load"
+ * its own comment warns about.
+ */
+export const PART_QUICK: { key: string; label: string; match: (p: Part) => boolean }[] = [
+  { key: 'active', label: 'Active', match: p => p.status === 'Active' },
+  { key: 'pending', label: 'Pending', match: p => p.status === 'Pending' },
+  { key: 'obsolete', label: 'Obsolete', match: p => p.status === 'Obsolete' },
+  { key: 'inactive', label: 'Inactive', match: p => p.status === 'Inactive' },
+];

@@ -58,7 +58,7 @@ export function DataGrid<T extends { id: string | number }>({
   data, columns, title, subtitle, actions, filters,
   searchPlaceholder = 'Search', rowHref, onOpenRow, emptyHint, loading, kpis,
   selected, onSelectedChange,
-  filterPanel, filterActive = 0, views, viewSetting,
+  filterPanel, filterActive = 0, quickActive = 0, views, viewSetting,
   allColumns, onToggleColumn, onResetColumns,
 }: {
   data: T[];
@@ -76,6 +76,18 @@ export function DataGrid<T extends { id: string | number }>({
   filterPanel?: ReactNode;
   /** How many fields are filtering, for the badge on the funnel. */
   filterActive?: number;
+  /**
+   * How many QUICK filters (the KPI tiles) are on.
+   *
+   * Separate from `filterActive` because the two answer different questions.
+   * `filterActive` badges the funnel, so it must count only what the funnel
+   * opens — advanced conditions. The EMPTY STATE has to know about any
+   * narrowing at all, and with only tiles on it did not: it fell through to
+   * "Nothing to show · There are no records here yet" over a list of 2,000
+   * parts, which is the same misleading empty state that was fixed on Project
+   * Requirements on 27 Aug, reappearing through a different door.
+   */
+  quickActive?: number;
   /** The Select View control. */
   views?: ReactNode;
   /** The gear that opens View Setting. */
@@ -189,6 +201,8 @@ export function DataGrid<T extends { id: string | number }>({
   /* Collapsed on arrival. The badge on the funnel is what stops a hidden
      filter looking like missing data. */
   const [filterOpen, setFilterOpen] = useState(false);
+  /* Anything narrowing the list, however it was applied. */
+  const narrowing = filterActive + quickActive;
 
   const [page, setPage] = useState(0);
   /* 20 is the live default. */
@@ -299,22 +313,24 @@ export function DataGrid<T extends { id: string | number }>({
               <strong>
                 {search
                   ? <>Nothing matches “{search}”</>
-                  : filterActive > 0
+                  : narrowing > 0
                     ? <>Nothing matches these filters</>
                     : <>Nothing to show</>}
               </strong>
               <p>
                 {emptyHint ?? (
-                  search && filterActive > 0
+                  search && narrowing > 0
                     ? 'Both a search and a filter are narrowing this list.'
                     : search
                       ? 'No record contains that text.'
-                      : filterActive > 0
-                        ? `${filterActive} ${filterActive === 1 ? 'filter is' : 'filters are'} applied. Clear them to see every record.`
+                      : narrowing > 0
+                        ? `${narrowing} ${narrowing === 1 ? 'filter is' : 'filters are'} applied. Clear them to see every record.`
                         : 'There are no records here yet.'
                 )}
               </p>
               {search && <Button variant="filled" onClick={() => setSearch('')}>Clear search</Button>}
+              {/* Only offered when the FUNNEL holds something — a tile is
+                  already visible above the grid and needs no shortcut. */}
               {!search && filterActive > 0 && (
                 <Button variant="filled" onClick={() => setFilterOpen(true)}>Show filters</Button>
               )}
