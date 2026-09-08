@@ -219,6 +219,56 @@ sheets that actually declare a `--kendo-` property, and only on a change.
 | Contrast, light | **0 / 286** |
 | Light vs the pre-migration baseline | **pixel-identical**, 738 and 349 |
 
+### Every screen swept in dark, 8 September
+
+| screen | dark |
+|---|---|
+| Home · My Queues · Login | 0 |
+| Quotations list · RFQ record (5 tabs) | 0 |
+| Part Master · part record · MPN tab | 0 |
+| Nested dialogs: Stock Report, Update Quantity, MPN detail (3 deep) | 0 |
+| BoM list · Create BoM · BoM Comparison · BoM record | 0 |
+| Run Quotation · View Setting (3 tabs) · sitemap · design system · audit | 0 |
+
+**Four real defects were found, all pre-existing and all invisible to earlier
+sweeps** because they live on surfaces a sweep only reaches if you open them:
+
+1. **The upload dropzone**, "Select files…" and "or", using the `faint` text
+   tier — 3.8:1 in dark and **2.52:1 in light**. Ten rules were misusing that
+   tier for real content; all moved to `subtle`. Exactly one legitimate use
+   remains, a disabled control, which WCAG exempts.
+2. **Swatch labels** on the design-system page at ~1.05:1 — the label chip is
+   half of a pair and stayed near-white while its text flipped light.
+3. **The audit page's finding chips** at 1.44:1 — text on *chrome* taking
+   `on-surface-invert`, which flips, instead of `on-dark-fg`, which does not.
+   The two are the same white in light, which is why it never showed.
+4. **A regression of my own**, below.
+
+### The theme switch reloads, and that is the finding
+
+The switch shipped with a repair step: after changing the theme it disabled and
+re-enabled Kendo's stylesheet, to force relative colours to re-resolve. It fixed
+the colour it targeted and **silently broke `.k-button-solid-primary`** — the
+primary "Add New" button lost its blue fill, in LIGHT mode.
+
+The contrast sweep never noticed: dark text on a white page passes. It was the
+element-by-element diff against the pre-migration baseline that caught it, and
+`git checkout` of three successive commits that placed it.
+
+Pinning the variable instead was tried and is *also* not enough. Measured after
+a runtime switch: `--kendo-color-base-on-surface` read `#e9edf3` on the root
+while the button consuming it stayed at the light value. **Chrome updates the
+custom property and does not invalidate the element reading it.**
+
+So the switch **persists the choice and reloads**. `index.html` applies the
+stored theme before Kendo's stylesheet is first evaluated, so every derived
+colour is correct from the start and nothing needs repairing. A preference
+changed once in a session can afford a reload; a toolbar with dark text on a
+dark ground cannot.
+
+Light is **pixel-identical** to the pre-migration baseline again: 738 elements,
+0 differences.
+
 **Sweeping with the user menu open** found the one real defect in this pass, and
 every earlier sweep had missed it because a closed popover renders nothing: the
 subtle text tier failed on the two grounds that sit above the page — the

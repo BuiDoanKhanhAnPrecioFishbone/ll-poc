@@ -1,5 +1,5 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { applyTheme, readStoredTheme, THEME_KEY, type Theme } from '../theme/applyTheme';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { readStoredTheme, THEME_KEY, type Theme } from '../theme/applyTheme';
 
 /**
  * User preferences.
@@ -57,11 +57,16 @@ export function PrefsProvider({ children }: { children: ReactNode }) {
 
   /* Seeded from what `index.html` ALREADY applied before first paint, so the
      first render agrees with what is on screen instead of correcting it. */
-  const [theme, setTheme] = useState<Theme>(readStoredTheme);
-  useEffect(() => {
-    try { localStorage.setItem(THEME_KEY, theme); } catch { /* blocked storage */ }
-    applyTheme(theme);
-  }, [theme]);
+  /* Seeded from what `index.html` already applied before first paint.
+     CHANGING it reloads, because Chrome does not reliably invalidate the
+     elements consuming a re-themed custom property — see applyTheme.ts. A
+     preference changed once in a session can afford a reload; a toolbar that
+     keeps dark text on a dark ground cannot. */
+  const [theme] = useState<Theme>(readStoredTheme);
+  const setTheme = useCallback((next: Theme) => {
+    try { localStorage.setItem(THEME_KEY, next); } catch { /* blocked storage */ }
+    window.location.reload();
+  }, []);
 
   const [dateStyle, setDateStyle] = useState<DateStyle>(
     () => (localStorage.getItem('vy.dateStyle') as DateStyle) ?? 'exact',
@@ -71,7 +76,7 @@ export function PrefsProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo(
     () => ({ density, setDensity, theme, setTheme, dateStyle, setDateStyle }),
-    [density, theme, dateStyle],
+    [density, theme, setTheme, dateStyle],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

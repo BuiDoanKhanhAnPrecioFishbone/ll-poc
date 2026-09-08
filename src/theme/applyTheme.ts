@@ -13,55 +13,32 @@ export type Theme = 'light' | 'dark' | 'system';
 export const THEME_KEY = 'vy.theme';
 
 /**
- * KENDO'S DERIVED COLOURS DO NOT ALL RE-RESOLVE ON THEIR OWN, and this is the
- * reason this file exists rather than a one-line `setAttribute` at the call
- * site.
+ * A THEME CHANGE RELOADS THE PAGE, and that is the finding rather than a
+ * shortcut.
  *
- * Kendo declares its variants as relative colours — `oklch(from
- * var(--kendo-color-base) clamp(…) 0 h)` — on `:root`. When `data-theme`
- * changes after first paint, Chrome re-resolves most of them but not all:
- * measured on the Quotations list, the grid background and cell text flipped
- * correctly while `--kendo-color-base-on-surface`, which colours every outline
- * button, stayed on its previous branch. "Columns" read 0.36 lightness — dark
- * text — on a dark toolbar.
+ * Chrome updates a custom property on `:root` when `data-theme` changes but
+ * does not always invalidate the element consuming it. Measured, after a
+ * runtime switch to dark: `--kendo-color-base-on-surface` read `#e9edf3` on the
+ * root while the outline button reading `color: var(--kendo-color-base-on-surface)`
+ * stayed at `rgb(35, 42, 52)` — the light value — and so sat at 1.18:1 on a
+ * dark toolbar.
  *
- * Disabling and re-enabling the stylesheet that DECLARES those properties
- * forces the whole set to be re-evaluated. Measured: the same button went from
- * 0.36 to 0.945 immediately after. The forced reflow between the two writes is
- * load-bearing — without it the browser coalesces them and nothing happens.
+ * Two workarounds were tried and both were worse than a reload. Disabling and
+ * re-enabling Kendo's stylesheet forced the recalculation and silently broke
+ * `.k-button-solid-primary`, costing the primary button its fill in LIGHT mode.
+ * Pinning the variable to one of ours made the VARIABLE re-resolve correctly
+ * and the consuming element still did not update.
  *
- * This is a workaround for engine behaviour, not for anything in our stylesheets,
- * so it is deliberately narrow: only sheets that actually declare a `--kendo-`
- * property are touched, and only when the theme changes. A first paint needs
- * none of it, which is why `index.html` sets the attribute before this module
- * ever loads.
+ * A reload is correct, costs nothing on a preference changed once, and needs no
+ * repair anywhere: `index.html` applies the stored theme before Kendo's
+ * stylesheet is first evaluated, so every derived colour is right from the
+ * start. This function therefore only sets the attribute — used for the initial
+ * application; the change path reloads.
  */
-function refreshDerivedColours() {
-  for (const sheet of Array.from(document.styleSheets)) {
-    let rules: CSSRuleList | undefined;
-    try { rules = sheet.cssRules; } catch { continue; }   // cross-origin
-    let declaresKendo = false;
-    for (const rule of Array.from(rules ?? [])) {
-      const style = (rule as CSSStyleRule).style;
-      if (!style) continue;
-      for (let i = 0; i < style.length; i++) {
-        if (style[i].startsWith('--kendo-')) { declaresKendo = true; break; }
-      }
-      if (declaresKendo) break;
-    }
-    const node = sheet.ownerNode as (HTMLStyleElement | HTMLLinkElement | null);
-    if (!declaresKendo || !node) continue;
-    node.disabled = true;
-    void document.body.offsetHeight;   // force the invalidation to land
-    node.disabled = false;
-  }
-}
-
-export function applyTheme(theme: Theme, { refresh = true } = {}) {
+export function applyTheme(theme: Theme) {
   const root = document.documentElement;
   if (theme === 'system') root.removeAttribute('data-theme');
   else root.setAttribute('data-theme', theme);
-  if (refresh) refreshDerivedColours();
 }
 
 /** What `index.html` already applied, so the first render agrees with the paint. */

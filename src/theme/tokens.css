@@ -135,8 +135,15 @@
 
      `muted` is the workhorse for labels and meta and has already failed a sweep
      once; see the note on grey-500. `faint` is grey-400 and measures 2.58:1 on
-     white, so it is legitimate ONLY on a dark ground or where the text is
-     decorative — two product uses of it were contrast failures, fixed 7 Sep. */
+     white, so it is legitimate ONLY where WCAG exempts the text. After sweeping
+     every screen on 8 Sep that is exactly ONE rule — a disabled control.
+
+     Ten others were using it for real content and failing in BOTH themes: the
+     upload dropzone's "Select files…" and "or" at 2.52:1, zero values in the
+     BoM summary and the chart legend, N/A checklist rows, the View Setting drag
+     grip, and four labels on the internal design-system and audit pages. All
+     moved to `subtle`. None had been caught before because no sweep had opened
+     the dialog they live in. */
   --vy-on-surface-strong: var(--vy-grey-900);
   --vy-on-surface:        var(--vy-grey-800);
   --vy-on-surface-soft:   var(--vy-grey-700);
@@ -334,6 +341,11 @@
   --vy-on-dark-hairline:      rgba(255, 255, 255, .07);
   --vy-on-dark-hover:         rgba(255, 255, 255, .05);
   --vy-on-dark-active:        rgba(43, 99, 184, .22);
+  /* The chip a swatch's NAME sits on, so the name stays readable over any
+     colour in the ramp. It is half of a pair — the text on it is
+     `on-surface-soft`, which flips with the theme — so the chip has to flip
+     too. It did not, and every dark swatch label measured about 1.05:1: light
+     text on a white chip. */
   --vy-swatch-label-bg:       rgba(255, 255, 255, .85);
   --vy-overlay-scrim:         rgba(19, 24, 32, .45);
 
@@ -576,6 +588,7 @@
   --vy-accent-warning: #f0aa75;
   --vy-accent-waiting: #a679ec;
   --vy-accent-neutral: #aab4c3;
+  --vy-swatch-label-bg: rgba(16, 21, 28, .85);
   --vy-overlay-scrim: rgba(0, 0, 0, .62);
   color-scheme: dark;
 }
@@ -652,6 +665,7 @@
     --vy-accent-warning: #f0aa75;
     --vy-accent-waiting: #a679ec;
     --vy-accent-neutral: #aab4c3;
+    --vy-swatch-label-bg: rgba(16, 21, 28, .85);
     --vy-overlay-scrim: rgba(0, 0, 0, .62);
     color-scheme: dark;
   }

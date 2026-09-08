@@ -618,7 +618,7 @@
 .vy-check-name { flex: 1; min-width: 0; }
 /* Completed items step back so the outstanding ones read first. */
 .vy-checklist-items li[data-state="Done"] .vy-check-name { color: var(--vy-on-surface-subtle); }
-.vy-checklist-items li[data-state="N/A"] .vy-check-name { color: var(--vy-on-surface-faint); }
+.vy-checklist-items li[data-state="N/A"] .vy-check-name { color: var(--vy-on-surface-subtle); }
 
 /* A quiet tag, not a ghost row: "does not apply" is information, not absence. */
 

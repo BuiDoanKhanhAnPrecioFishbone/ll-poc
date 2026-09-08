@@ -181,7 +181,7 @@
 .vy-palette-list li { padding: var(--vy-space-4) var(--vy-space-5); border-radius: var(--vy-radius-md); cursor: pointer; }
 .vy-palette-list li.is-sel { background: var(--vy-brand-subtle); }
 .vy-palette-row { display: flex; align-items: baseline; gap: var(--vy-space-4); }
-.vy-palette-group { font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .06em; color: var(--vy-on-surface-faint); min-width: var(--vy-palette-group-w); }
+.vy-palette-group { font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .06em; color: var(--vy-on-surface-subtle); min-width: var(--vy-palette-group-w); }
 .vy-palette-title { font-size: var(--vy-text-md); color: var(--vy-on-surface-strong); font-weight: var(--vy-weight-medium); }
 .vy-palette-was { font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle); margin-left: var(--vy-palette-indent); }
 .vy-palette-empty { color: var(--vy-on-surface-subtle); padding: var(--vy-space-7) var(--vy-space-5); cursor: default; }
@@ -218,9 +218,9 @@
 .vy-tree-purpose { font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle); font-weight: var(--vy-weight-regular); }
 .vy-tree-item { padding: var(--vy-space-2) 0 var(--vy-space-2) var(--vy-space-7); border-left: 1px solid var(--vy-border); margin-left: var(--vy-space-2); }
 .vy-tree-item-row { display: flex; align-items: baseline; justify-content: space-between; gap: var(--vy-space-5); font-size: var(--vy-text-base); color: var(--vy-on-surface-soft); }
-.vy-tree-group code, .vy-tree-item code { font-family: var(--vy-font-mono); font-size: var(--vy-text-2xs); color: var(--vy-on-surface-faint); white-space: nowrap; }
+.vy-tree-group code, .vy-tree-item code { font-family: var(--vy-font-mono); font-size: var(--vy-text-2xs); color: var(--vy-on-surface-subtle); white-space: nowrap; }
 .vy-issue { font-size: var(--vy-text-xs); color: var(--vy-danger-text-deep); background: var(--vy-danger-subtle); border-radius: var(--vy-radius-sm); padding: var(--vy-space-2) var(--vy-space-4); margin: var(--vy-space-2) 0; }
-.vy-was { font-size: var(--vy-text-xs); color: var(--vy-on-surface-faint); }
+.vy-was { font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle); }
 
 /* ---- Design system page --------------------------------------------------- */
 .vy-ds-section { background: var(--vy-surface); border: 1px solid var(--vy-border); border-radius: var(--vy-radius-md); padding: var(--vy-space-8) var(--vy-space-9); margin-bottom: var(--vy-space-8); }
@@ -238,7 +238,7 @@
 .vy-spec-table td:nth-child(2) { white-space: nowrap; color: var(--vy-on-surface-strong); }
 .vy-type-scale { display: flex; flex-direction: column; gap: var(--vy-space-4); }
 .vy-type-row { display: flex; align-items: baseline; justify-content: space-between; border-bottom: 1px solid var(--vy-border-faint); padding-bottom: var(--vy-space-3); }
-.vy-type-row code { font-family: var(--vy-font-mono); font-size: var(--vy-text-xs); color: var(--vy-on-surface-faint); }
+.vy-type-row code { font-family: var(--vy-font-mono); font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle); }
 
 /* ---- Audit ---------------------------------------------------------------- */
 .vy-filter-row { display: flex; gap: var(--vy-space-3); flex-wrap: wrap; margin-bottom: var(--vy-space-8); }
@@ -249,7 +249,12 @@
 .vy-findings { display: flex; flex-direction: column; gap: var(--vy-space-6); }
 .vy-finding { background: var(--vy-surface); border: 1px solid var(--vy-border); border-radius: var(--vy-radius-md); padding: var(--vy-space-8) var(--vy-space-8); }
 .vy-finding header { display: flex; align-items: baseline; gap: var(--vy-space-5); flex-wrap: wrap; margin-bottom: var(--vy-space-5); }
-.vy-finding-id { font-family: var(--vy-font-mono); font-size: var(--vy-text-xs); color: var(--vy-on-surface-invert); background: var(--vy-surface-chrome-soft); border-radius: var(--vy-radius-sm); padding: var(--vy-space-1) var(--vy-space-3); }
+/* Text on CHROME, so it takes `on-dark-fg` rather than `on-surface-invert`.
+   The two are the same white in light mode, which is why the difference stayed
+   invisible; in dark, `on-surface-invert` flips to near-black and this chip
+   measured 1.44:1 — dark text on a dark chip. Chrome does not invert, so the
+   text on it must not either. */
+.vy-finding-id { font-family: var(--vy-font-mono); font-size: var(--vy-text-xs); color: var(--vy-on-dark-fg); background: var(--vy-surface-chrome-soft); border-radius: var(--vy-radius-sm); padding: var(--vy-space-1) var(--vy-space-3); }
 .vy-finding h2 { margin: 0; font-size: var(--vy-text-md); font-weight: var(--vy-weight-bold); color: var(--vy-on-surface-strong); flex: 1; min-width: var(--vy-finding-title-w); }
 .vy-finding-tags { display: flex; gap: var(--vy-space-3); }
 .vy-tag { font-size: var(--vy-text-xs); border-radius: var(--vy-radius-pill); padding: var(--vy-space-1) var(--vy-space-4); font-weight: var(--vy-weight-semibold); }
@@ -410,7 +415,7 @@
 .vy-bom-pane { border: 1px solid var(--vy-border); border-radius: var(--vy-radius-md); padding: var(--vy-space-7); }
 .vy-dropzone { border: 1px dashed var(--vy-border-strong); border-radius: var(--vy-radius-md); background: var(--vy-surface-subtle); padding: var(--vy-space-9); text-align: center; display: flex; flex-direction: column; align-items: center; gap: var(--vy-space-3); }
 .vy-dropzone strong { color: var(--vy-on-surface); font-size: var(--vy-text-md); }
-.vy-dropzone span { color: var(--vy-on-surface-faint); font-size: var(--vy-text-sm); }
+.vy-dropzone span { color: var(--vy-on-surface-subtle); font-size: var(--vy-text-sm); }
 .vy-hint { font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle); margin: var(--vy-space-2) 0 0; max-width: 56ch; }
 .vy-inline-field { display: flex; align-items: center; gap: var(--vy-space-4); margin-top: var(--vy-space-5); font-size: var(--vy-text-base); color: var(--vy-on-surface-muted); }
 .vy-inline-field--stack { flex-direction: column; align-items: stretch; }
@@ -597,7 +602,7 @@
 .vy-bom-summary-item { padding: var(--vy-space-5) var(--vy-space-6); background: var(--vy-surface-subtle); border: 1px solid var(--vy-border); border-radius: var(--vy-radius-md); }
 .vy-bom-summary-item dt { font-size: var(--vy-text-xs); color: var(--vy-on-surface-muted); }
 .vy-bom-summary-item dd { margin: var(--vy-space-2) 0 0; font-size: var(--vy-text-xl); font-weight: var(--vy-weight-bold); color: var(--vy-on-surface-strong); font-variant-numeric: tabular-nums; }
-.vy-bom-summary-item[data-zero] dd { color: var(--vy-on-surface-faint); font-weight: var(--vy-weight-medium); }
+.vy-bom-summary-item[data-zero] dd { color: var(--vy-on-surface-subtle); font-weight: var(--vy-weight-medium); }
 
 .vy-bom-parts { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--vy-space-3); }
 .vy-bom-parts > li { border: 1px solid var(--vy-border); border-radius: var(--vy-radius-md); overflow: hidden; }
@@ -656,9 +661,9 @@
 
 .vy-chart-legend { list-style: none; display: flex; flex-wrap: wrap; gap: var(--vy-space-4) var(--vy-space-8); margin: var(--vy-space-8) 0 0; padding: var(--vy-space-6) 0 0; border-top: 1px solid var(--vy-border); }
 .vy-chart-legend li { display: flex; align-items: center; gap: var(--vy-space-3); font-size: var(--vy-text-sm); color: var(--vy-on-surface-soft); }
-.vy-chart-legend li[data-zero] { color: var(--vy-on-surface-faint); }
+.vy-chart-legend li[data-zero] { color: var(--vy-on-surface-subtle); }
 .vy-chart-legend em { font-style: normal; font-weight: var(--vy-weight-semibold); color: var(--vy-on-surface-strong); font-variant-numeric: tabular-nums; }
-.vy-chart-legend li[data-zero] em { color: var(--vy-on-surface-faint); font-weight: var(--vy-weight-regular); }
+.vy-chart-legend li[data-zero] em { color: var(--vy-on-surface-subtle); font-weight: var(--vy-weight-regular); }
 .vy-chart-key { width: var(--vy-space-6); height: var(--vy-space-6); border-radius: var(--vy-radius-sm); flex: 0 0 auto; }
 
 /* The Sitemap page's verdict, and the badges that say which column is real.
@@ -1216,7 +1221,7 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
 .vy-vs-row--sort { display: grid; grid-template-columns: auto 1fr auto auto; }
 .vy-vs-row[draggable="true"] { cursor: grab; }
 .vy-vs-row[draggable="true"]:active { cursor: grabbing; }
-.vy-vs-grip { color: var(--vy-on-surface-faint); letter-spacing: -2px; user-select: none; }
+.vy-vs-grip { color: var(--vy-on-surface-subtle); letter-spacing: -2px; user-select: none; }
 .vy-vs-name { font-size: var(--vy-text-base); color: var(--vy-on-surface-strong); min-width: 0; }
 /* Required columns keep their place but lose the remove control, so the row
    still reads as a row rather than one with a hole where a button should be. */
