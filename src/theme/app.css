@@ -192,7 +192,7 @@
 .vy-queue { background: var(--vy-surface); border: 1px solid var(--vy-border); border-left: var(--vy-accent-bar-w) solid var(--vy-border-strong); border-radius: var(--vy-radius-md); padding: var(--vy-space-7) var(--vy-space-8); text-decoration: none; box-shadow: var(--vy-shadow-sm); }
 .vy-queue:hover { border-color: var(--vy-border-strong); box-shadow: var(--vy-shadow-md); }
 .vy-queue[data-tone="open"]     { border-left-color: var(--vy-accent-caution); }
-.vy-queue[data-tone="blocked"]  { border-left-color: var(--vy-red-500); }
+.vy-queue[data-tone="blocked"]  { border-left-color: var(--vy-danger-boundary); }
 .vy-queue[data-tone="progress"] { border-left-color: var(--vy-brand-boundary-strong); }
 .vy-queue-n { font-size: var(--vy-text-3xl); font-weight: var(--vy-weight-bold); color: var(--vy-on-surface-strong); line-height: 1; }
 .vy-queue-label { font-size: var(--vy-text-base); color: var(--vy-on-surface-muted); margin-top: var(--vy-space-3); }
@@ -201,7 +201,7 @@
 /* ---- Sitemap comparison --------------------------------------------------- */
 .vy-stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(var(--vy-stat-min-w), 1fr)); gap: var(--vy-space-5); margin-bottom: var(--vy-space-9); }
 .vy-stat { background: var(--vy-surface); border: 1px solid var(--vy-border); border-radius: var(--vy-radius-md); padding: var(--vy-space-6) var(--vy-space-7); }
-.vy-stat-n { font-size: var(--vy-text-2xl); font-weight: var(--vy-weight-bold); color: var(--vy-red-600); line-height: 1; }
+.vy-stat-n { font-size: var(--vy-text-2xl); font-weight: var(--vy-weight-bold); color: var(--vy-danger-text); line-height: 1; }
 .vy-stat-label { font-size: var(--vy-text-sm); color: var(--vy-on-surface-muted); margin-top: var(--vy-space-2); }
 
 .vy-compare { display: grid; grid-template-columns: 1fr 1fr; gap: var(--vy-space-8); align-items: start; }
@@ -210,7 +210,7 @@
 @media (max-width: 1100px) { .vy-compare { grid-template-columns: 1fr; } }
 .vy-compare-col { background: var(--vy-surface); border: 1px solid var(--vy-border); border-radius: var(--vy-radius-md); padding: var(--vy-space-7) var(--vy-space-8); }
 .vy-compare-head { font-size: var(--vy-text-base); font-weight: var(--vy-weight-bold); margin: 0 0 var(--vy-space-6); padding-bottom: var(--vy-space-4); border-bottom: var(--vy-space-1) solid; }
-.vy-compare-head--before { color: var(--vy-red-600); border-color: var(--vy-red-500); }
+.vy-compare-head--before { color: var(--vy-danger-text); border-color: var(--vy-danger-boundary); }
 .vy-compare-head--after  { color: var(--vy-accent-positive); border-color: var(--vy-accent-positive); }
 
 .vy-tree-group { margin-bottom: var(--vy-space-7); }
@@ -219,7 +219,7 @@
 .vy-tree-item { padding: var(--vy-space-2) 0 var(--vy-space-2) var(--vy-space-7); border-left: 1px solid var(--vy-border); margin-left: var(--vy-space-2); }
 .vy-tree-item-row { display: flex; align-items: baseline; justify-content: space-between; gap: var(--vy-space-5); font-size: var(--vy-text-base); color: var(--vy-on-surface-soft); }
 .vy-tree-group code, .vy-tree-item code { font-family: var(--vy-font-mono); font-size: var(--vy-text-2xs); color: var(--vy-on-surface-faint); white-space: nowrap; }
-.vy-issue { font-size: var(--vy-text-xs); color: var(--vy-red-700); background: var(--vy-red-50); border-radius: var(--vy-radius-sm); padding: var(--vy-space-2) var(--vy-space-4); margin: var(--vy-space-2) 0; }
+.vy-issue { font-size: var(--vy-text-xs); color: var(--vy-danger-text-deep); background: var(--vy-danger-subtle); border-radius: var(--vy-radius-sm); padding: var(--vy-space-2) var(--vy-space-4); margin: var(--vy-space-2) 0; }
 .vy-was { font-size: var(--vy-text-xs); color: var(--vy-on-surface-faint); }
 
 /* ---- Design system page --------------------------------------------------- */
@@ -255,7 +255,7 @@
 .vy-tag { font-size: var(--vy-text-xs); border-radius: var(--vy-radius-pill); padding: var(--vy-space-1) var(--vy-space-4); font-weight: var(--vy-weight-semibold); }
 .vy-tag[data-effort="Low"]    { background: var(--vy-status-done-bg); color: var(--vy-status-done-fg); }
 .vy-tag[data-effort="Medium"] { background: var(--vy-status-open-bg); color: var(--vy-status-open-fg); }
-.vy-tag[data-effort="High"]   { background: var(--vy-red-50); color: var(--vy-red-700); }
+.vy-tag[data-effort="High"]   { background: var(--vy-danger-subtle); color: var(--vy-danger-text-deep); }
 .vy-tag[data-value="High"]    { background: var(--vy-brand-subtle-strong); color: var(--vy-brand-text-deep); }
 .vy-tag[data-value="Medium"]  { background: var(--vy-surface-sunken); color: var(--vy-on-surface-muted); }
 .vy-finding dl { margin: 0; display: grid; grid-template-columns: var(--vy-finding-label-w) 1fr; gap: var(--vy-space-3) var(--vy-space-7); }
@@ -308,7 +308,7 @@
 .vy-record-bar { display: flex; align-items: center; justify-content: space-between; gap: var(--vy-space-6); flex-wrap: wrap; }
 .vy-record-id { display: flex; align-items: center; gap: var(--vy-space-4); }
 .vy-record-no { font-size: var(--vy-text-lg); font-weight: var(--vy-weight-semibold); color: var(--vy-on-surface-strong); }
-.vy-flag { font-size: var(--vy-text-xs); font-weight: var(--vy-weight-semibold); letter-spacing: .06em; color: var(--vy-red-700); background: var(--vy-red-50); border: 1px solid var(--vy-red-500); border-radius: var(--vy-radius-sm); padding: 1px var(--vy-space-3); }
+.vy-flag { font-size: var(--vy-text-xs); font-weight: var(--vy-weight-semibold); letter-spacing: .06em; color: var(--vy-danger-text-deep); background: var(--vy-danger-subtle); border: 1px solid var(--vy-danger-boundary); border-radius: var(--vy-radius-sm); padding: 1px var(--vy-space-3); }
 
 /* ITAR is a warning — red, because seeing it changes who may open the record.
    "New Customer" is not a warning, it is a fact, so it borrows the flag's shape
@@ -522,7 +522,7 @@
    its own base at equal specificity, which is how three earlier bugs happened.
    ========================================================================== */
 .vy-queue { display: block; }
-.vy-queue[data-tone="overdue"] { border-left-color: var(--vy-red-600); }
+.vy-queue[data-tone="overdue"] { border-left-color: var(--vy-danger); }
 .vy-queue[data-tone="soon"]    { border-left-color: var(--vy-accent-caution); }
 .vy-queue[data-tone="waiting"] { border-left-color: var(--vy-accent-waiting); }
 /* A zero is information, not an alarm: it keeps its place in the row so the four
@@ -555,7 +555,7 @@
 .vy-load-bar { height: var(--vy-space-6); background: var(--vy-surface-sunken); border-radius: var(--vy-radius-pill); overflow: hidden; }
 .vy-load-bar > span { display: block; height: 100%; background: var(--vy-brand-soft); border-radius: var(--vy-radius-pill); }
 .vy-load-n { font-size: var(--vy-text-sm); color: var(--vy-on-surface-muted); white-space: nowrap; }
-.vy-load-late { font-style: normal; margin-left: var(--vy-space-4); color: var(--vy-red-600); font-weight: var(--vy-weight-semibold); }
+.vy-load-late { font-style: normal; margin-left: var(--vy-space-4); color: var(--vy-danger-text); font-weight: var(--vy-weight-semibold); }
 
 /* =============================================================================
    RUN QUOTATION — additions for the restored steps
@@ -951,7 +951,7 @@
   min-width: var(--vy-space-8); height: var(--vy-space-8);
   padding: 0 var(--vy-space-2);
   display: grid; place-items: center;
-  background: var(--vy-red-600); color: var(--vy-on-dark-fg);
+  background: var(--vy-danger); color: var(--vy-on-dark-fg);
   border-radius: var(--vy-radius-pill);
   font-size: var(--vy-text-2xs); font-weight: var(--vy-weight-bold);
   font-variant-numeric: tabular-nums;
@@ -1004,7 +1004,7 @@
 .vy-kpi[aria-pressed="true"] { background: var(--vy-brand-subtle); border-color: var(--vy-brand-boundary-light); }
 .vy-kpi-n { font-size: var(--vy-text-2xl); font-weight: var(--vy-weight-bold); color: var(--vy-on-surface-strong); line-height: 1.1; font-variant-numeric: tabular-nums; }
 .vy-kpi-label { font-size: var(--vy-text-sm); color: var(--vy-on-surface-muted); }
-.vy-kpi[data-key="overdue"]     { border-left-color: var(--vy-red-600); }
+.vy-kpi[data-key="overdue"]     { border-left-color: var(--vy-danger); }
 .vy-kpi[data-key="due-week"]    { border-left-color: var(--vy-accent-caution); }
 .vy-kpi[data-key="waiting-doc"] { border-left-color: var(--vy-accent-waiting); }
 .vy-kpi[data-key="open"]        { border-left-color: var(--vy-brand-boundary-strong); }
@@ -1226,7 +1226,7 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
   background: none; border: 0; border-radius: var(--vy-radius-sm);
   color: var(--vy-on-surface-subtle); cursor: pointer;
 }
-.vy-vs-remove:hover { background: var(--vy-red-50); color: var(--vy-red-700); }
+.vy-vs-remove:hover { background: var(--vy-danger-subtle); color: var(--vy-danger-text-deep); }
 .vy-vs-remove:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
 .vy-vs-dir {
   background: var(--vy-surface-app); border: 1px solid var(--vy-border); border-radius: var(--vy-radius-pill);
@@ -1339,15 +1339,15 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
 .vy-validation {
   margin-bottom: var(--vy-space-9);
   padding: var(--vy-space-8) var(--vy-space-9);
-  background: var(--vy-red-50);
-  border: 1px solid var(--vy-red-500);
+  background: var(--vy-danger-subtle);
+  border: 1px solid var(--vy-danger-boundary);
   /* A heavier left edge, so the block is identifiable at a glance down the page
      without the whole border shouting. */
   border-left-width: var(--vy-accent-bar-w);
   border-radius: var(--vy-radius-md);
 }
 /* red-700 on red-50 is 7.4:1. The accent red-500 would be 3.9 and fail. */
-.vy-validation-title { margin: 0 0 var(--vy-space-6); font-size: var(--vy-text-base); color: var(--vy-red-700); line-height: 1.5; }
+.vy-validation-title { margin: 0 0 var(--vy-space-6); font-size: var(--vy-text-base); color: var(--vy-danger-text-deep); line-height: 1.5; }
 
 .vy-validation-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--vy-space-3); }
 .vy-validation-list li {
@@ -1454,7 +1454,7 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
    Built from the live control, where the email is the line that separates two
    people with the same name. */
 .vy-people { display: flex; align-items: center; gap: var(--vy-space-3); flex-wrap: wrap; min-height: var(--vy-control-md); }
-.vy-people[data-invalid] .vy-people-add { border-color: var(--vy-red-500); }
+.vy-people[data-invalid] .vy-people-add { border-color: var(--vy-danger-boundary); }
 
 .vy-people-chip {
   display: inline-flex; align-items: center; gap: var(--vy-space-3);
@@ -1482,7 +1482,7 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
 .vy-people-add:hover { border-color: var(--vy-border-mid); color: var(--vy-on-surface-strong); }
 .vy-people-add:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
 .vy-people-clear { min-height: var(--vy-space-10); background: none; border: 0; padding: 0 var(--vy-space-3); cursor: pointer; font-size: var(--vy-text-sm); color: var(--vy-on-surface-muted); }
-.vy-people-clear:hover { color: var(--vy-red-700); }
+.vy-people-clear:hover { color: var(--vy-danger-text-deep); }
 
 .vy-people-menu { width: var(--vy-people-menu-w); max-height: 320px; overflow: auto; }
 .vy-people-list { list-style: none; margin: 0; padding: var(--vy-space-2); display: flex; flex-direction: column; }
@@ -1536,7 +1536,7 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
   white-space: nowrap;
 }
 /* red-700 on red-50 — 6.78:1. */
-.vy-task-status[data-status="To do"] { background: var(--vy-red-50); color: var(--vy-red-700); }
+.vy-task-status[data-status="To do"] { background: var(--vy-danger-subtle); color: var(--vy-danger-text-deep); }
 /* Cyan, via the token — see --vy-status-review-* for why not a blue. 5.15:1. */
 .vy-task-status[data-status="In Progress"] { background: var(--vy-status-review-bg); color: var(--vy-status-review-fg); }
 /* Reuses the done token, which is already the green every other Completed in

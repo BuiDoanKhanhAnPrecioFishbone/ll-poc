@@ -68,7 +68,7 @@ html[data-kendo-bridged] {
      accepted in the same slots — the derivations are relative-colour functions
      that work from whatever the root value is. */
   --kendo-color-primary: var(--vy-brand);
-  --kendo-color-error: var(--vy-red-600);
+  --kendo-color-error: var(--vy-danger);
 
   /* THE ONE DERIVED VARIANT THIS FILE PINS, and only because Kendo's own
      threshold disagrees with WCAG at the value the dark theme uses.

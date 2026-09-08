@@ -45,7 +45,7 @@
 .vy-btn--outlined { background: var(--vy-surface); color: var(--vy-on-surface); border-color: var(--vy-border-strong); }
 .vy-btn--outlined:hover { border-color: var(--vy-border-mid); }
 .vy-btn--text     { background: transparent; color: var(--vy-brand-text-hover); padding-inline: var(--vy-space-5); }
-.vy-btn--danger   { background: var(--vy-red-600); color: var(--vy-on-dark-fg); box-shadow: var(--vy-elev-1); }
+.vy-btn--danger   { background: var(--vy-danger); color: var(--vy-on-dark-fg); box-shadow: var(--vy-elev-1); }
 .vy-btn-icon { display: inline-flex; }
 
 /* --- Badge / pill ---------------------------------------------------------
@@ -383,7 +383,7 @@
 /* red-600 rather than the red-500 accent: this carries white text, and the
    accent red is reserved for destructive CONTROLS, where it sits under a label
    rather than behind one. */
-.vy-toast[data-kind="error"] { background: var(--vy-red-600); }
+.vy-toast[data-kind="error"] { background: var(--vy-danger); }
 .vy-toast[data-swipe="end"] { animation: vy-toast-out var(--vy-dur-short) var(--vy-ease-accelerate); }
 .vy-toast-text { margin: 0; }
 .vy-toast-close { background: none; border: 0; color: inherit; opacity: .7; cursor: pointer; padding: 0; display: inline-flex; }
@@ -805,7 +805,7 @@
    meaning so nothing has to be decoded. */
 .vy-priority { display: inline-flex; align-items: center; gap: var(--vy-space-3); white-space: nowrap; }
 .vy-priority-dot { width: var(--vy-space-5); height: var(--vy-space-5); border-radius: 50%; flex: 0 0 auto; }
-.vy-priority[data-level="High"]   .vy-priority-dot { background: var(--vy-red-600); }
+.vy-priority[data-level="High"]   .vy-priority-dot { background: var(--vy-danger); }
 .vy-priority[data-level="Medium"] .vy-priority-dot { background: var(--vy-accent-caution); }
 /* Low is a hollow dot, not a pale one: on a grid at 11px a light fill and an
    empty cell look the same, and "no priority set" is a different fact. */
@@ -888,7 +888,7 @@
    also what they asked for. */
 .vy-required {
   margin-left: var(--vy-space-2);
-  color: var(--vy-red-600);
+  color: var(--vy-danger-text);
   font-weight: var(--vy-weight-semibold);
 }
 
@@ -897,7 +897,7 @@
   display: block;
   margin-top: var(--vy-space-2);
   font-size: var(--vy-text-xs);
-  color: var(--vy-red-600);
+  color: var(--vy-danger-text);
 }
 
 /* The notes section spans the full width — two free-text boxes side by side
@@ -939,15 +939,15 @@
 .vy-field--editing[data-invalid] .vy-input,
 .vy-field--editing[data-invalid] .vy-select,
 .vy-field--editing[data-invalid] textarea {
-  border-color: var(--vy-red-600);
+  border-color: var(--vy-danger);
 }
 .vy-field--editing[data-invalid] .vy-input:focus-visible,
 .vy-field--editing[data-invalid] .vy-select:focus-visible {
-  box-shadow: 0 0 0 2px var(--vy-surface), 0 0 0 4px var(--vy-red-500);
+  box-shadow: 0 0 0 2px var(--vy-surface), 0 0 0 4px var(--vy-danger-boundary);
 }
 /* A radio group has no single control to outline, so the group is boxed. */
 .vy-field--radio[data-invalid] dd {
-  border-color: var(--vy-red-600);
+  border-color: var(--vy-danger);
 }
 
 /* A BoM file name in a grid cell. Monospace, because these are versioned file
@@ -1280,7 +1280,7 @@
 .vy-cost-grid .vy-cost-row[data-emphasis] { margin: 0; padding: 0; border: 0; }
 /* Excess is the one figure in red: it is money spent on material the build
    does not consume, which is a different kind of number from the other four. */
-.vy-cost-row[data-tone="excess"] dd { color: var(--vy-red-700); }
+.vy-cost-row[data-tone="excess"] dd { color: var(--vy-danger-text-deep); }
 
 /* ---- View Setting: the filter preview ------------------------------------
    Two screens on this app say "filter". The toolbar over the grid is where you
