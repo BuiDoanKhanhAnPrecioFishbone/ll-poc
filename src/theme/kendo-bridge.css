@@ -35,6 +35,31 @@
    `-hover` and `-subtle` from it. That is what makes this cheap, and it is
    also why the derived variants are left alone below rather than pinned by
    hand.
+
+   -----------------------------------------------------------------------------
+   8 SEP 2026 — THE MAP NOW POINTS AT ROLES, NOT VALUES.
+
+   Every `var()` below names a semantic token (`--vy-surface`, `--vy-border`,
+   `--vy-brand`) rather than a primitive, which is the last piece dark mode
+   needed. It matters more here than anywhere else in the app, because of what
+   Kendo does with a surface:
+
+     --kendo-color-on-app-surface:
+       oklch(from <surface> clamp(0.36, (0.6 - l) * 99999, 0.95) 0 h)
+
+   That is a CONTRAST SWITCH, not a tint. Below 0.6 lightness it snaps to 0.95
+   and above it to 0.36 — so handing Kendo a dark surface makes every derived
+   text colour in the theme flip to near-white on its own. Pointing six
+   variables at semantic tokens themed the whole component library; nothing
+   below had to be written twice.
+
+   ONE ENGINE LIMITATION, MEASURED. Chrome does not re-resolve a relative colour
+   inside a custom property when an attribute changes after paint, so toggling
+   `data-theme` at runtime leaves Kendo's derived colours on their previous
+   branch — five controls measured as failures that way and passed cleanly when
+   the same page was loaded dark from the first paint. Following
+   `prefers-color-scheme` works; a runtime toggle would need a reload, or the
+   theme applied before first paint.
    ========================================================================== */
 
 html[data-kendo-bridged] {
@@ -42,19 +67,19 @@ html[data-kendo-bridged] {
      Kendo ships these in oklch() and derives variants from them. Hex is
      accepted in the same slots — the derivations are relative-colour functions
      that work from whatever the root value is. */
-  --kendo-color-primary: var(--vy-blue-600);
+  --kendo-color-primary: var(--vy-brand);
   --kendo-color-error: var(--vy-red-600);
 
   /* Neutral surfaces. `app-surface` is the page, `surface` the raised areas,
      `base` the controls. Kendo computes `on-app-surface` from `app-surface`
      for contrast, so it is deliberately NOT set here — letting it derive is
      what keeps its own contrast guarantees intact. */
-  --kendo-color-app-surface: var(--vy-grey-0);
-  --kendo-color-surface: var(--vy-grey-50);
-  --kendo-color-base: var(--vy-grey-50);
-  --kendo-color-base-subtle: var(--vy-grey-100);
-  --kendo-color-border: var(--vy-grey-200);
-  --kendo-color-border-alt: var(--vy-grey-300);
+  --kendo-color-app-surface: var(--vy-surface);
+  --kendo-color-surface: var(--vy-surface-app);
+  --kendo-color-base: var(--vy-surface-app);
+  --kendo-color-base-subtle: var(--vy-surface-sunken);
+  --kendo-color-border: var(--vy-border);
+  --kendo-color-border-alt: var(--vy-border-strong);
 
   /* ---- Typography --------------------------------------------------------
      13px is the house body size, set as the grid and form default in
@@ -250,11 +275,11 @@ html[data-kendo-bridged] .k-checkbox:disabled {
 }
 
 html[data-kendo-bridged] .k-checkbox:hover:not(:disabled) {
-  border-color: var(--vy-grey-600);
+  border-color: var(--vy-border-heavy);
 }
 html[data-kendo-bridged] .k-checkbox:checked:hover:not(:disabled) {
-  border-color: var(--vy-blue-700);
-  background-color: var(--vy-blue-700);
+  border-color: var(--vy-brand-hover);
+  background-color: var(--vy-brand-hover);
 }
 
 /* =============================================================================
@@ -328,7 +353,7 @@ html[data-kendo-bridged] .k-grid th:focus-visible,
 html[data-kendo-bridged] .k-table-td:focus-visible,
 html[data-kendo-bridged] .k-table-th:focus-visible,
 html[data-kendo-bridged] .k-tabstrip-item:focus-visible {
-  outline: 2px solid var(--vy-blue-500) !important;
+  outline: 2px solid var(--vy-brand-boundary-strong) !important;
   outline-offset: -2px !important;
   box-shadow: none !important;
 }

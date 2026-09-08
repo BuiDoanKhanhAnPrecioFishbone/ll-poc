@@ -99,15 +99,48 @@ because two map entries collapsed distinct greys into one token. That is a
 redesign smuggled into a refactor, and the element diff is the only reason it
 was caught rather than shipped.
 
-### What dark mode still needs
+### The bridge, 8 September — and Kendo themed itself
 
-Sweeping in dark: **16 failures out of 290**, and every one is a Kendo-styled
-control (`k-button-text`) or the low-priority label. That is exactly the
-boundary of this migration — `kendo-bridge.css` was deliberately left alone, and
-it still maps Kendo's ~453 custom properties onto *primitives*. Pointing the
-bridge at the semantic layer is the next piece and the last one dark mode needs.
+`kendo-bridge.css` now points at roles too. **Zero raw primitives remain
+anywhere in the stylesheets.** It was eleven references, and it mattered more
+than its size because of what Kendo does with a surface:
 
-Light mode sweeps clean: **290 checked, 0 failures.**
+```
+--kendo-color-on-app-surface:
+  oklch(from <surface> clamp(0.36, (0.6 - l) * 99999, 0.95) 0 h)
+```
+
+That is a **contrast switch, not a tint** — below 0.6 lightness it snaps to
+0.95, above it to 0.36. Handing Kendo a dark surface makes every derived text
+colour in the theme flip to near-white by itself. Six variables re-pointed
+themed the entire component library; nothing had to be written twice.
+
+| | light | dark |
+|---|---|---|
+| Contrast failures / 290 checked | **0** | **7** |
+| Before the bridge change | 0 | 16 |
+
+**Light mode is still byte-identical** to the pre-migration baseline: 738
+elements, 0 differences.
+
+**The seven are near-misses, 3.37–4.48 against a 4.5 requirement** — not the
+1.58s of the earlier run. Every one is white-on-brand or brand-as-text, and they
+cannot be fixed by moving `--vy-brand`: tried at blue-300, 400 and 500, and each
+value just moves the failure to a different control (blue-500 fixes the brand
+mark and breaks the pager at 2.73). One token is serving both a fill and a text
+colour. **Splitting those two roles is dark-mode design work, not migration
+work**, and it is what remains.
+
+### One engine limitation, measured
+
+Chrome does not re-resolve a relative colour inside a custom property when an
+attribute changes after paint. Toggling `data-theme` at runtime leaves Kendo's
+derived colours on their previous branch — five controls measured as failures
+that way and passed cleanly when the same page was loaded dark from first paint.
+
+So: following `prefers-color-scheme` works today. A runtime toggle would need a
+reload, or the theme set before first paint. Worth knowing before anyone
+specifies a switch in the header.
 
 ### Still open
 
