@@ -164,6 +164,17 @@
      mode the fill and the text CANNOT be the same token: a 9:1-on-white blue is
      invisible on a dark panel, so the text role moves up the ramp and the fill
      role moves with it. */
+  /* FILL AND TEXT ARE DIFFERENT JOBS, and in a dark theme they pull in opposite
+     directions. A fill needs to be dark enough for its label to read; brand
+     TEXT on the page needs to be light enough to read against it. One value
+     cannot do both — measured: at blue-400 the pager arrows fail at 3.94, at
+     blue-500 the pager passes and the brand mark fails at 2.73. Moving the
+     single token only relocates the failure.
+
+     So the dark theme INVERTS the pair rather than shifting it: the fill goes
+     light and its label goes dark, which is also what Kendo's own derivation
+     expects — `on-primary` is computed from `primary` by a contrast switch, so
+     a light primary automatically gets dark text. Light theme is unchanged. */
   --vy-brand:             var(--vy-blue-600);
   --vy-brand-hover:       var(--vy-blue-700);
   --vy-brand-active:      var(--vy-blue-800);
@@ -489,13 +500,13 @@
   --vy-border-strong: #3b4553;
   --vy-border-heavy: #55606f;
   --vy-border-control: #6d7889;
-  --vy-brand: var(--vy-blue-400);
-  --vy-brand-hover: var(--vy-blue-300);
-  --vy-brand-active: var(--vy-blue-200);
+  --vy-brand: var(--vy-blue-300);
+  --vy-brand-hover: var(--vy-blue-200);
+  --vy-brand-active: var(--vy-blue-100);
   --vy-brand-text: var(--vy-blue-300);
   --vy-brand-text-hover: var(--vy-blue-200);
   --vy-brand-text-deep: var(--vy-blue-100);
-  --vy-brand-on: var(--vy-grey-0);
+  --vy-brand-on: #0f131a;
   --vy-brand-subtle: #1b2a4a;
   --vy-brand-subtle-strong: #223357;
   --vy-brand-boundary: var(--vy-blue-400);
@@ -531,13 +542,13 @@
     --vy-border-strong: #3b4553;
     --vy-border-heavy: #55606f;
     --vy-border-control: #6d7889;
-    --vy-brand: var(--vy-blue-400);
-    --vy-brand-hover: var(--vy-blue-300);
-    --vy-brand-active: var(--vy-blue-200);
+    --vy-brand: var(--vy-blue-300);
+    --vy-brand-hover: var(--vy-blue-200);
+    --vy-brand-active: var(--vy-blue-100);
     --vy-brand-text: var(--vy-blue-300);
     --vy-brand-text-hover: var(--vy-blue-200);
     --vy-brand-text-deep: var(--vy-blue-100);
-    --vy-brand-on: var(--vy-grey-0);
+    --vy-brand-on: #0f131a;
     --vy-brand-subtle: #1b2a4a;
     --vy-brand-subtle-strong: #223357;
     --vy-brand-boundary: var(--vy-blue-400);

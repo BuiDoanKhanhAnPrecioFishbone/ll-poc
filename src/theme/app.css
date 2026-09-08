@@ -22,7 +22,7 @@
 .vy-brand { display: flex; align-items: center; gap: var(--vy-space-5); padding: var(--vy-space-7) var(--vy-space-8); border-bottom: 1px solid var(--vy-on-dark-hairline); }
 .vy-brand-mark {
   width: var(--vy-control-sm); height: var(--vy-control-sm); flex: 0 0 var(--vy-control-sm); border-radius: var(--vy-radius-md);
-  background: var(--vy-brand); color: var(--vy-on-dark-fg);
+  background: var(--vy-brand); color: var(--vy-brand-on);
   display: grid; place-items: center; font-weight: var(--vy-weight-heavy); font-size: var(--vy-text-lg);
 }
 .vy-brand-text { display: flex; flex-direction: column; line-height: 1.2; overflow: hidden; }
@@ -244,7 +244,7 @@
 .vy-filter-row { display: flex; gap: var(--vy-space-3); flex-wrap: wrap; margin-bottom: var(--vy-space-8); }
 .vy-audit-chip { background: var(--vy-surface); border: 1px solid var(--vy-border); border-radius: var(--vy-radius-pill); padding: var(--vy-space-2) var(--vy-space-6); font-size: var(--vy-text-base); color: var(--vy-on-surface-muted); cursor: pointer; font-family: inherit; }
 .vy-audit-chip:hover { border-color: var(--vy-border-strong); }
-.vy-audit-chip.is-on { background: var(--vy-brand); border-color: var(--vy-brand); color: var(--vy-on-dark-fg); }
+.vy-audit-chip.is-on { background: var(--vy-brand); border-color: var(--vy-brand); color: var(--vy-brand-on); }
 .vy-audit-chip span { opacity: .7; margin-left: var(--vy-space-2); }
 .vy-findings { display: flex; flex-direction: column; gap: var(--vy-space-6); }
 .vy-finding { background: var(--vy-surface); border: 1px solid var(--vy-border); border-radius: var(--vy-radius-md); padding: var(--vy-space-8) var(--vy-space-8); }
@@ -951,7 +951,7 @@
   min-width: var(--vy-space-8); height: var(--vy-space-8);
   padding: 0 var(--vy-space-2);
   display: grid; place-items: center;
-  background: var(--vy-red-600); color: var(--vy-on-surface-invert);
+  background: var(--vy-red-600); color: var(--vy-on-dark-fg);
   border-radius: var(--vy-radius-pill);
   font-size: var(--vy-text-2xs); font-weight: var(--vy-weight-bold);
   font-variant-numeric: tabular-nums;
@@ -1042,7 +1042,7 @@
 .vy-pager-page:hover { background: var(--vy-surface-sunken); color: var(--vy-on-surface-strong); }
 .vy-pager-page[aria-current="page"] {
   background: var(--vy-brand); border-color: var(--vy-brand);
-  color: var(--vy-on-surface-invert); font-weight: var(--vy-weight-semibold);
+  color: var(--vy-brand-on); font-weight: var(--vy-weight-semibold);
 }
 .vy-pager-page:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
 .vy-pager-gap { padding: 0 var(--vy-space-2); color: var(--vy-on-surface-subtle); }

@@ -27,7 +27,7 @@
 .vy-btn:disabled { opacity: var(--vy-state-disabled); cursor: not-allowed; }
 .vy-btn:disabled::after { display: none; }
 
-.vy-btn--filled   { background: var(--vy-brand); color: var(--vy-on-dark-fg); box-shadow: var(--vy-elev-1); }
+.vy-btn--filled   { background: var(--vy-brand); color: var(--vy-brand-on); box-shadow: var(--vy-elev-1); }
 .vy-btn--filled:hover  { box-shadow: var(--vy-elev-2); }
 /* The one place we paint over Kendo. MD3's tonal is a filled button at low
    emphasis — a tinted surface with dark text — and Kendo's ladder has no such
@@ -436,7 +436,7 @@
 .vy-step[data-state="done"] .vy-step-btn    { border-top-color: var(--vy-accent-positive); }
 .vy-step[data-state="done"] .vy-step-dot    { background: var(--vy-accent-positive); color: var(--vy-on-dark-fg); }
 .vy-step[data-state="current"] .vy-step-btn { border-top-color: var(--vy-brand); }
-.vy-step[data-state="current"] .vy-step-dot { background: var(--vy-brand); color: var(--vy-on-dark-fg); }
+.vy-step[data-state="current"] .vy-step-dot { background: var(--vy-brand); color: var(--vy-brand-on); }
 .vy-step[data-state="current"] .vy-step-label { color: var(--vy-on-surface-strong); font-weight: var(--vy-weight-bold); }
 .vy-step[data-state="todo"] .vy-step-btn    { opacity: .55; }
 

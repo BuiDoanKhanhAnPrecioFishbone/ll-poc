@@ -123,13 +123,50 @@ themed the entire component library; nothing had to be written twice.
 **Light mode is still byte-identical** to the pre-migration baseline: 738
 elements, 0 differences.
 
-**The seven are near-misses, 3.37–4.48 against a 4.5 requirement** — not the
-1.58s of the earlier run. Every one is white-on-brand or brand-as-text, and they
-cannot be fixed by moving `--vy-brand`: tried at blue-300, 400 and 500, and each
-value just moves the failure to a different control (blue-500 fixes the brand
-mark and breaks the pager at 2.73). One token is serving both a fill and a text
-colour. **Splitting those two roles is dark-mode design work, not migration
-work**, and it is what remains.
+**The seven were all white-on-brand or brand-as-text**, and could not be fixed
+by moving `--vy-brand`: tried at blue-300, 400 and 500, and each value just
+relocated the failure. One token was serving both a fill and a text colour.
+
+### The brand split, 8 September — dark goes to zero
+
+Fill and text are different jobs, and in a dark theme they pull opposite ways: a
+fill has to be dark enough for its label, brand text has to be light enough for
+the page. **So the dark theme inverts the pair rather than shifting it** — the
+fill goes light and its label goes dark, which is also what Kendo expects, since
+`on-primary` is derived from `primary` by a contrast switch.
+
+Three parts: the dark brand values inverted (fill blue-300, label near-black);
+six call sites repointed from "white" to `--vy-brand-on`, which is white in
+light and so changes nothing there; and the count badge corrected — it is a
+**red** fill, never brand, and had been taking `on-surface-invert`, which flips
+to near-black in dark and gave 3.37:1 on red.
+
+One Kendo derivation is now pinned, the only one this bridge overrides. Kendo
+computes `on-primary` with a **0.75** lightness threshold where the surface
+switch uses 0.6; blue-300 sits at 0.68, so Kendo chose white and measured
+2.71:1.
+
+| Quotations list | light | dark |
+|---|---|---|
+| Contrast failures / 261 | **0** | **0** |
+
+Light is **pixel-identical** to the pre-migration baseline on both screens —
+738 and 349 elements, 0 differences. *(Compared as resolved pixels: pinning
+`on-primary` changed white's serialisation from `oklch(1 0 264)` to
+`rgb(255,255,255)`, which a string diff reports as a change and a colour
+comparison correctly does not.)*
+
+### What is left for dark mode: the status and accent family
+
+The RFQ record still fails in dark, and it is one thing repeated: the red `(*)`
+required marker at **3.1:1**, dark red on a near-black ground. `--vy-red-*`,
+`--vy-status-*` and `--vy-tone-*` were never migrated — they are still
+light-only primitives.
+
+The pale status backgrounds survive by accident (a pale fill with dark text
+reads on any ground), but any of those colours used as TEXT fails. That family
+needs the same role treatment the greys and blues have had, and it is the last
+piece.
 
 ### One engine limitation, measured
 

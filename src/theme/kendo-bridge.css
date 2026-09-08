@@ -70,6 +70,21 @@ html[data-kendo-bridged] {
   --kendo-color-primary: var(--vy-brand);
   --kendo-color-error: var(--vy-red-600);
 
+  /* THE ONE DERIVED VARIANT THIS FILE PINS, and only because Kendo's own
+     threshold disagrees with WCAG at the value the dark theme uses.
+
+     Kendo computes it as
+       oklch(from <primary> clamp(0.10, (0.75 - l) * 99999, 1) 0 h)
+     — a contrast switch like the surface one, but tripping at 0.75 rather than
+     0.6. The dark theme's primary is blue-300, which sits at l = 0.68: under
+     Kendo's threshold, so it chooses WHITE, and white on blue-300 measures
+     2.71:1. Every other derived variant is still left to derive.
+
+     In light this changes nothing — `--vy-brand-on` is white there, which is
+     what Kendo would have picked anyway. It exists for the dark theme, where
+     the brand pair inverts: light fill, dark label. */
+  --kendo-color-on-primary: var(--vy-brand-on);
+
   /* Neutral surfaces. `app-surface` is the page, `surface` the raised areas,
      `base` the controls. Kendo computes `on-app-surface` from `app-surface`
      for contrast, so it is deliberately NOT set here — letting it derive is
