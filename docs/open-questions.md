@@ -187,9 +187,43 @@ measure between **6.16 and 12.31** against the dark panel.
 Light stays **pixel-identical** to the pre-migration baseline: 738 and 349
 elements, 0 differences.
 
-**Dark mode now sweeps clean on every screen measured.** It remains deferred as
-a deliverable per D13 — there is no theme switch in the UI, and the runtime
-toggle caveat above still applies — but the palette behind it is finished.
+**Dark mode now sweeps clean on every screen measured.**
+
+### The switch, 8 September
+
+Three states in the user menu beside row density and date format — **Light ·
+Dark · System** — persisted in `localStorage`, defaulting to System. Three
+rather than a two-way toggle because "follow this device" is a real answer and
+the honest default: a user who has already told their operating system which
+they prefer should not have to say it again here.
+
+**Applied before first paint** by an inline script in `index.html`. That is not
+about avoiding a flash, though it does: Kendo resolves its relative colours when
+its stylesheet is first evaluated, so setting the attribute earlier means every
+derived colour is correct from the start and needs no repair.
+
+**The runtime caveat is now handled rather than documented.** Chrome
+re-resolves most of Kendo's derived colours when `data-theme` changes after
+paint, but not all — the grid and its cells flipped while
+`--kendo-color-base-on-surface`, which colours every outline button, stayed on
+its previous branch. Disabling and re-enabling the stylesheet that *declares*
+those properties forces the whole set to re-evaluate; the forced reflow between
+the two writes is load-bearing. `src/theme/applyTheme.ts` does it, only for
+sheets that actually declare a `--kendo-` property, and only on a change.
+
+| Verified | |
+|---|---|
+| Light · Dark · System, clicked at runtime | all three flip, including the outline buttons |
+| Choice survives a reload | yes, and beats the OS preference |
+| Contrast, dark reached **by clicking** | **0 failures / 286** |
+| Contrast, light | **0 / 286** |
+| Light vs the pre-migration baseline | **pixel-identical**, 738 and 349 |
+
+**Sweeping with the user menu open** found the one real defect in this pass, and
+every earlier sweep had missed it because a closed popover renders nothing: the
+subtle text tier failed on the two grounds that sit above the page — the
+selected tint at 4.23 and `surface-strong` at 3.84. Raised to `#8f9aaa`, which
+clears every dark ground in the system.
 
 ### One near-miss worth recording
 

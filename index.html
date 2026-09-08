@@ -5,6 +5,18 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Voyager ERP — UX revamp mockup</title>
+    <!-- BEFORE FIRST PAINT, deliberately. Two reasons, and neither is cosmetic
+         polish: a theme applied after React mounts shows a flash of the wrong
+         one, and — the real reason — Kendo resolves its relative colours when
+         its stylesheet is first evaluated. Getting the attribute on the root
+         before that happens means every derived colour is correct from the
+         start and needs no repair. See src/theme/applyTheme.ts. -->
+    <script>
+      try {
+        var t = localStorage.getItem('vy.theme');
+        if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+      } catch (e) { /* private mode; fall through to prefers-color-scheme */ }
+    </script>
   </head>
   <body>
     <div id="root"></div>

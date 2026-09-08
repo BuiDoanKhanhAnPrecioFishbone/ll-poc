@@ -502,7 +502,7 @@
   --vy-on-surface: #e9edf3;
   --vy-on-surface-soft: #d3dae4;
   --vy-on-surface-muted: #aab4c3;
-  --vy-on-surface-subtle: #828d9d;
+  --vy-on-surface-subtle: #8f9aaa;
   --vy-on-surface-faint: #67727f;
   --vy-on-surface-invert: #0f131a;
   --vy-border-faint: #212936;
@@ -539,7 +539,14 @@
 
      Every other pair keeps its hue and inverts the lightness relationship:
      light text on a dark tint of the same colour. Measured against the dark
-     panel, all pairs land between 6.16 and 12.31. */
+     panel, all pairs land between 6.16 and 12.31.
+
+     THE SUBTLE TEXT TIER IS SET BY ITS WORST GROUND, not by the panel. #828d9d
+     clears 4.5 on the page (5.09) and fails on the two surfaces that sit above
+     it — the selected tint at 4.23 and `surface-strong` at 3.84. Found by
+     sweeping with the user menu OPEN, which every earlier sweep had missed
+     because a closed popover renders nothing. #8f9aaa clears every dark ground
+     in the system, the tightest being `surface-strong` at 4.53. */
   --vy-danger: var(--vy-red-600);
   --vy-danger-on: var(--vy-grey-0);
   --vy-danger-text: #f0918a;
@@ -590,7 +597,7 @@
     --vy-on-surface: #e9edf3;
     --vy-on-surface-soft: #d3dae4;
     --vy-on-surface-muted: #aab4c3;
-    --vy-on-surface-subtle: #828d9d;
+    --vy-on-surface-subtle: #8f9aaa;
     --vy-on-surface-faint: #67727f;
     --vy-on-surface-invert: #0f131a;
     --vy-border-faint: #212936;

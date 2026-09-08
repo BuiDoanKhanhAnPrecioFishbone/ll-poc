@@ -1,5 +1,6 @@
 import * as Popover from '@radix-ui/react-popover';
 import { usePrefs, type Density, type DateStyle } from '../ui/prefs';
+import type { Theme } from '../theme/applyTheme';
 
 /**
  * The user menu, and the home for preferences that apply everywhere.
@@ -16,13 +17,24 @@ const DENSITIES: { id: Density; label: string; note: string }[] = [
   { id: 'relaxed', label: 'Relaxed', note: 'Easiest to read' },
 ];
 
+/* Three, not a two-way switch. "System" is a real answer and the DEFAULT one:
+   a user who has already told their operating system which they prefer should
+   not have to tell this application separately, and an app that cannot express
+   "follow the system" silently overrides that choice the first time it is
+   touched. It is also the state `tokens.css` is written around. */
+const THEMES: { id: Theme; label: string; note: string }[] = [
+  { id: 'light', label: 'Light', note: 'Always' },
+  { id: 'dark', label: 'Dark', note: 'Always' },
+  { id: 'system', label: 'System', note: 'Follow this device' },
+];
+
 const DATE_STYLES: { id: DateStyle; label: string; note: string }[] = [
   { id: 'exact', label: 'Exact date', note: '24 Aug 2026' },
   { id: 'relative', label: 'From today', note: '3 days late' },
 ];
 
 export function UserMenu() {
-  const { density, setDensity, dateStyle, setDateStyle } = usePrefs();
+  const { density, setDensity, theme, setTheme, dateStyle, setDateStyle } = usePrefs();
   return (
     <Popover.Root>
       <Popover.Trigger asChild>
@@ -47,6 +59,20 @@ export function UserMenu() {
                         className="vy-density-choice" onClick={() => setDensity(d.id)}>
                   <span className="vy-density-label">{d.label}</span>
                   <span className="vy-density-note">{d.note}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="vy-usermenu-section">
+            <h3>Appearance</h3>
+            <p className="vy-usermenu-hint">Dark mode is new — tell us what reads badly.</p>
+            <div className="vy-density-choices" role="radiogroup" aria-label="Appearance">
+              {THEMES.map(t => (
+                <button key={t.id} type="button" role="radio" aria-checked={theme === t.id}
+                        className="vy-density-choice" onClick={() => setTheme(t.id)}>
+                  <span className="vy-density-label">{t.label}</span>
+                  <span className="vy-density-note">{t.note}</span>
                 </button>
               ))}
             </div>

@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { applyTheme, readStoredTheme, THEME_KEY, type Theme } from '../theme/applyTheme';
 
 /**
  * User preferences.
@@ -33,6 +34,7 @@ export type DateStyle = 'exact' | 'relative';
 
 type Prefs = {
   density: Density; setDensity: (d: Density) => void;
+  theme: Theme; setTheme: (t: Theme) => void;
   dateStyle: DateStyle; setDateStyle: (d: DateStyle) => void;
 };
 
@@ -42,6 +44,7 @@ type Prefs = {
    user's own choice still wins, because it is read from localStorage below. */
 const Ctx = createContext<Prefs>({
   density: 'comfortable', setDensity: () => {},
+  theme: 'system', setTheme: () => {},
   dateStyle: 'exact', setDateStyle: () => {},
 });
 export const usePrefs = () => useContext(Ctx);
@@ -52,6 +55,14 @@ export function PrefsProvider({ children }: { children: ReactNode }) {
   );
   useEffect(() => { localStorage.setItem('vy.density', density); }, [density]);
 
+  /* Seeded from what `index.html` ALREADY applied before first paint, so the
+     first render agrees with what is on screen instead of correcting it. */
+  const [theme, setTheme] = useState<Theme>(readStoredTheme);
+  useEffect(() => {
+    try { localStorage.setItem(THEME_KEY, theme); } catch { /* blocked storage */ }
+    applyTheme(theme);
+  }, [theme]);
+
   const [dateStyle, setDateStyle] = useState<DateStyle>(
     () => (localStorage.getItem('vy.dateStyle') as DateStyle) ?? 'exact',
   );
@@ -59,8 +70,8 @@ export function PrefsProvider({ children }: { children: ReactNode }) {
 
 
   const value = useMemo(
-    () => ({ density, setDensity, dateStyle, setDateStyle }),
-    [density, dateStyle],
+    () => ({ density, setDensity, theme, setTheme, dateStyle, setDateStyle }),
+    [density, theme, dateStyle],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
