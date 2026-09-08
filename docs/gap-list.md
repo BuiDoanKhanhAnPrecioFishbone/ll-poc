@@ -73,6 +73,8 @@ Precedence per `docs/precedence.md`.
 | D6 | Sort tab's add button reads `Add a column` |
 | D7 | Demo pie chart `World Population by Broad Age Groups` still on Home in production |
 | D8 | One date is `Due Date` on the form and `Date Needed` on the grid |
+| D13 | Part Master's column ORDER did not match the live system — Customer and Description swapped, Status and Last Changed swapped, and Part Class / Part Type / ABC pushed to positions 12–14 behind three columns the live list does not have. The same correction as B9, never applied to this screen. Closed 9 Sep |
+| D14 | `hiddenByDefault` was honoured by nothing. It set the width budget and was ignored when a screen built its default view, so ABC — empty in 100% of records — opened at full width beside the part number, which is the finding the original audit led with. Closed 9 Sep |
 | D12 | Bill of Materials was the last list screen with a search box and nothing else — no filter, saved views, column chooser or KPI summary, and the subtitle "assemblies". Closed 8 Sep |
 | D11 | Part Master opened with the subtitle "parts" and no KPI summary, so the 25 Aug review's "the KPI can also be the filter" reached only one of the two list screens. Closed 8 Sep |
 | D9 | `Assigned To` is not a list column and the Column tab does not offer it, so an estimator cannot see who owns a row without opening it — worth raising, given My Queues is built on assignment |

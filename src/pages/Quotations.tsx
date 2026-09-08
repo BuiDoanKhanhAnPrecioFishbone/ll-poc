@@ -90,7 +90,10 @@ export function Quotations() {
     id: 'system', name: 'Default', isDefault: false, system: true,
     fields: ['priority', 'no', 'projectName', 'customer', 'status',
              'dateNeeded', 'createdDate', 'lastUpdated'],
-    columns: QUOTATION_COLUMNS.map(c => ({ field: String(c.field) })),
+    /* No column here carries the flag today; filtered anyway so that adding
+       one later is not silently ignored, which is how Part Master's went
+       unnoticed for three weeks. */
+    columns: QUOTATION_COLUMNS.filter(c => !c.hiddenByDefault).map(c => ({ field: String(c.field) })),
     sort: [],
   }), []);
 

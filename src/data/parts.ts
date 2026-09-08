@@ -172,19 +172,43 @@ function generated(count: number): Part[] {
 /* Column roles and their widths are defined once in components/column-model.ts
    and src/theme/tokens.ts; the rules behind them are in docs/table-patterns.md.
    This file only says which role each Part column has. */
+/**
+ * IN THE LIVE SYSTEM'S ORDER, which is not the order this list had.
+ *
+ * The live Part Master was measured on 19 Aug (docs/table-patterns.md) and runs
+ * PART NUMBER · CUSTOMER NAME · REV · DESCRIPTION · PART SOURCE · PART CLASS ·
+ * PART TYPE · ABC · UOM · LAST CHANGE · STATUS. This list had Description and
+ * Customer swapped, Status and Last Changed swapped, and Part Class, Part Type
+ * and ABC exiled to positions 12-14 behind three columns the live list does not
+ * have at all.
+ *
+ * That matters more than it looks. Column order is not styling: someone who
+ * uses the real system every day finds Customer by POSITION, and a prototype
+ * that moves it is asking them to relearn a screen the revamp promised not to
+ * change. `docs/precedence.md` — same fields, same words, arranged better —
+ * and the same correction was already made to the Quotations grid as gap B9.
+ * It never reached this screen.
+ *
+ * ON HAND, ALLOCATED and UNIT COST are ours, not the live system's. Kept,
+ * because stock on a parts list is genuinely useful and the guideline's Part
+ * Master Detail carries the same figures — but `hiddenByDefault`, so the
+ * default view is the live eleven and the extra three are a choice the user
+ * makes in the column chooser rather than one made for them.
+ */
 export const PART_COLUMNS: ColumnSpec<Part>[] = [
   { field: 'partNumber', title: 'Part Number', role: 'ident', searchable: true },
-  { field: 'description', title: 'Description', role: 'text', searchable: true },
   { field: 'customer', title: 'Customer', role: 'text', searchable: true, priority: 2 },
   { field: 'rev', title: 'Rev', role: 'code', priority: 3 },
+  { field: 'description', title: 'Description', role: 'text', searchable: true },
   { field: 'partSource', title: 'Source', role: 'code', priority: 3 },
-  { field: 'onHand', title: 'On Hand', role: 'number' },
-  { field: 'allocated', title: 'Allocated', role: 'number', priority: 3 },
-  { field: 'unitCost', title: 'Unit Cost', role: 'money', priority: 2 },
-  { field: 'uom', title: 'UoM', role: 'code', priority: 3 },
-  { field: 'status', title: 'Status', role: 'status' },
-  { field: 'lastChange', title: 'Last Changed', role: 'date', priority: 2 },
   { field: 'partClass', title: 'Part Class', role: 'code', hiddenByDefault: true, note: 'Empty in 55% of records' },
   { field: 'partType', title: 'Part Type', role: 'code', hiddenByDefault: true, note: 'Empty in 55% of records' },
   { field: 'abc', title: 'ABC', role: 'code', hiddenByDefault: true, note: 'Empty in 100% of records — hidden until it is populated' },
+  { field: 'uom', title: 'UoM', role: 'code', priority: 3 },
+  { field: 'lastChange', title: 'Last Changed', role: 'date', priority: 2 },
+  { field: 'status', title: 'Status', role: 'status' },
+  /* Not on the live list — see the note above. */
+  { field: 'onHand', title: 'On Hand', role: 'number', hiddenByDefault: true, note: 'Not on the live list; stock detail, off by default' },
+  { field: 'allocated', title: 'Allocated', role: 'number', priority: 3, hiddenByDefault: true, note: 'Not on the live list; stock detail, off by default' },
+  { field: 'unitCost', title: 'Unit Cost', role: 'money', priority: 2, hiddenByDefault: true, note: 'Not on the live list; cost detail, off by default' },
 ];

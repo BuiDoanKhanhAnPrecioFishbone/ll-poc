@@ -60,7 +60,13 @@ export function PartMaster() {
     id: 'system', name: 'Default', isDefault: false, system: true,
     fields: ['customer', 'partSource', 'partClass', 'partType', 'abc', 'uom',
              'status', 'lastChange'],
-    columns: PART_COLUMNS.map(c => ({ field: String(c.field) })),
+    /* `hiddenByDefault` is HONOURED here, and was not before. The flag existed
+       on three columns and only ever fed the width budget, so the default view
+       still opened with every column — including ABC, which is empty in 100% of
+       production records and was sitting at full width beside the part number.
+       That is the exact finding the original audit led with, reproduced in the
+       prototype meant to answer it. table-patterns.md rule 2. */
+    columns: PART_COLUMNS.filter(c => !c.hiddenByDefault).map(c => ({ field: String(c.field) })),
     sort: [],
   }), []);
 
