@@ -71,7 +71,7 @@
 
   /* --- Focus ring -----------------------------------------------------------
      One ring, everywhere, and it never relies on colour alone. */
-  --vy-focus-ring: 0 0 0 2px var(--vy-grey-0), 0 0 0 4px var(--vy-blue-500);
+  --vy-focus-ring: 0 0 0 2px var(--vy-surface), 0 0 0 4px var(--vy-brand-boundary-strong);
 }
 
 /* A single state-layer implementation. Any interactive surface opts in with

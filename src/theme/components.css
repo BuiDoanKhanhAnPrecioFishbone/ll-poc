@@ -27,7 +27,7 @@
 .vy-btn:disabled { opacity: var(--vy-state-disabled); cursor: not-allowed; }
 .vy-btn:disabled::after { display: none; }
 
-.vy-btn--filled   { background: var(--vy-blue-600); color: var(--vy-on-dark-fg); box-shadow: var(--vy-elev-1); }
+.vy-btn--filled   { background: var(--vy-brand); color: var(--vy-on-dark-fg); box-shadow: var(--vy-elev-1); }
 .vy-btn--filled:hover  { box-shadow: var(--vy-elev-2); }
 /* The one place we paint over Kendo. MD3's tonal is a filled button at low
    emphasis — a tinted surface with dark text — and Kendo's ladder has no such
@@ -38,13 +38,13 @@
    specific the selector — the giveaway was the text colour from the same rule
    applying while the background did not. On solid, an ordinary override works. */
 .k-button.k-button-solid.vy-btn--tonal {
-  background-color: var(--vy-blue-50); color: var(--vy-blue-800); border-color: var(--vy-blue-100);
+  background-color: var(--vy-brand-subtle); color: var(--vy-brand-text-deep); border-color: var(--vy-brand-subtle-strong);
 }
-.k-button.k-button-solid.vy-btn--tonal:hover { background-color: var(--vy-blue-100); }
-.vy-btn--tonal    { background: var(--vy-blue-50); color: var(--vy-blue-800); }
-.vy-btn--outlined { background: var(--vy-grey-0); color: var(--vy-grey-800); border-color: var(--vy-grey-300); }
-.vy-btn--outlined:hover { border-color: var(--vy-grey-400); }
-.vy-btn--text     { background: transparent; color: var(--vy-blue-700); padding-inline: var(--vy-space-5); }
+.k-button.k-button-solid.vy-btn--tonal:hover { background-color: var(--vy-brand-subtle-strong); }
+.vy-btn--tonal    { background: var(--vy-brand-subtle); color: var(--vy-brand-text-deep); }
+.vy-btn--outlined { background: var(--vy-surface); color: var(--vy-on-surface); border-color: var(--vy-border-strong); }
+.vy-btn--outlined:hover { border-color: var(--vy-border-mid); }
+.vy-btn--text     { background: transparent; color: var(--vy-brand-text-hover); padding-inline: var(--vy-space-5); }
 .vy-btn--danger   { background: var(--vy-red-600); color: var(--vy-on-dark-fg); box-shadow: var(--vy-elev-1); }
 .vy-btn-icon { display: inline-flex; }
 
@@ -64,13 +64,13 @@
 .vy-badge[data-token="done"]      { color: var(--vy-status-done-fg);      background: var(--vy-status-done-bg); }
 .vy-badge[data-token="blocked"]   { color: var(--vy-status-blocked-fg);   background: var(--vy-status-blocked-bg); }
 .vy-badge[data-token="cancelled"] { color: var(--vy-status-cancelled-fg); background: var(--vy-status-cancelled-bg); }
-.vy-pill { font-size: var(--vy-text-xs); color: var(--vy-grey-600); background: var(--vy-grey-100); border-radius: var(--vy-shape-full); padding: 1px var(--vy-space-4); }
+.vy-pill { font-size: var(--vy-text-xs); color: var(--vy-on-surface-muted); background: var(--vy-surface-sunken); border-radius: var(--vy-shape-full); padding: 1px var(--vy-space-4); }
 
 /* --- Chip ------------------------------------------------------------------ */
 .vy-chip {
   display: inline-flex; align-items: center; gap: var(--vy-space-2);
-  font-family: inherit; font-size: var(--vy-text-base); color: var(--vy-grey-700);
-  background: var(--vy-grey-0); border: 1px solid var(--vy-grey-300);
+  font-family: inherit; font-size: var(--vy-text-base); color: var(--vy-on-surface-soft);
+  background: var(--vy-surface); border: 1px solid var(--vy-border-strong);
   border-radius: var(--vy-shape-sm); padding: var(--vy-space-2) var(--vy-space-5); cursor: pointer;
   transition: background-color var(--vy-dur-short) var(--vy-ease-standard);
 }
@@ -81,26 +81,26 @@
    and 1.4.11 applies to it. blue-300 measures 2.50. Unlike the grey scale, the
    blue scale has a conforming step already: blue-400 is 3.88, so this needed no
    new token. */
-.vy-chip[data-selected] { background: var(--vy-blue-50); border-color: var(--vy-blue-400); color: var(--vy-blue-800); font-weight: var(--vy-weight-medium); }
-.vy-chip-check { color: var(--vy-blue-600); }
+.vy-chip[data-selected] { background: var(--vy-brand-subtle); border-color: var(--vy-brand-boundary); color: var(--vy-brand-text-deep); font-weight: var(--vy-weight-medium); }
+.vy-chip-check { color: var(--vy-brand-text); }
 
 /* --- Fields ---------------------------------------------------------------- */
 .vy-field-control { display: flex; flex-direction: column; gap: var(--vy-space-2); }
-.vy-field-label { font-size: var(--vy-text-sm); color: var(--vy-grey-600); }
-.vy-field-hint  { font-size: var(--vy-text-xs); color: var(--vy-grey-500); }
+.vy-field-label { font-size: var(--vy-text-sm); color: var(--vy-on-surface-muted); }
+.vy-field-hint  { font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle); }
 .vy-input {
-  font-family: inherit; font-size: var(--vy-text-base); color: var(--vy-grey-900);
-  background: var(--vy-grey-0); border: 1px solid var(--vy-border-control);
+  font-family: inherit; font-size: var(--vy-text-base); color: var(--vy-on-surface-strong);
+  background: var(--vy-surface); border: 1px solid var(--vy-border-control);
   border-radius: var(--vy-shape-sm); padding: var(--vy-space-4) var(--vy-space-5); width: 100%;
   transition: border-color var(--vy-dur-short) var(--vy-ease-standard);
 }
 /* grey-500, not grey-400. The resting border is now darker than grey-400, so
    the old hover was lighter than the state it was meant to emphasise. */
-.vy-input:hover { border-color: var(--vy-grey-500); }
-.vy-input:focus { border-color: var(--vy-blue-500); outline: none; box-shadow: var(--vy-focus-ring); }
+.vy-input:hover { border-color: var(--vy-border-heavy); }
+.vy-input:focus { border-color: var(--vy-brand-boundary-strong); outline: none; box-shadow: var(--vy-focus-ring); }
 .vy-textarea { resize: vertical; min-height: calc(var(--vy-space-14) * 2); line-height: 1.5; }
 .vy-search-field { position: relative; display: flex; align-items: center; flex: 1; max-width: var(--vy-search-w); }
-.vy-search-field svg { position: absolute; left: var(--vy-space-5); color: var(--vy-grey-500); pointer-events: none; }
+.vy-search-field svg { position: absolute; left: var(--vy-space-5); color: var(--vy-on-surface-subtle); pointer-events: none; }
 .vy-search-field .vy-input { padding-left: var(--vy-space-12); }
 
 /* --- Select / menu --------------------------------------------------------- */
@@ -125,7 +125,7 @@
    tokens `.vy-input` uses — so if that field is ever retuned the dropdown
    follows it instead of drifting. */
 .vy-select .k-input-inner { padding: var(--vy-space-4) var(--vy-space-5); }
-.vy-menu { background: var(--vy-grey-0); border: 1px solid var(--vy-grey-200); border-radius: var(--vy-shape-md); box-shadow: var(--vy-elev-3); padding: var(--vy-space-2); z-index: var(--vy-z-menu); }
+.vy-menu { background: var(--vy-surface); border: 1px solid var(--vy-border); border-radius: var(--vy-shape-md); box-shadow: var(--vy-elev-3); padding: var(--vy-space-2); z-index: var(--vy-z-menu); }
 /* Resets the button chrome, because this class is used on BOTH div items (Radix
    menus) and <button> options (the combobox list). Written for the divs, it left
    the buttons wearing the browser's own `buttonface` grey and a 2px outset
@@ -135,11 +135,11 @@
 .vy-menu-item {
   appearance: none; background: none; border: 0; width: 100%; text-align: left;
   font: inherit;
-  font-size: var(--vy-text-base); color: var(--vy-grey-800);
+  font-size: var(--vy-text-base); color: var(--vy-on-surface);
   padding: var(--vy-space-3) var(--vy-space-5); border-radius: var(--vy-shape-sm);
   cursor: pointer; outline: none;
 }
-.vy-menu-item[data-highlighted] { background: var(--vy-blue-50); }
+.vy-menu-item[data-highlighted] { background: var(--vy-brand-subtle); }
 
 /* --- Checkbox / radio ------------------------------------------------------ */
 /* The LABEL carries the 24px minimum target, not the box. The whole label is
@@ -147,7 +147,7 @@
    height and nothing asked for more. Growing the box instead would make every
    checkbox in the app visually heavier to fix a number; growing the label costs
    nothing visible and is the thing a pointer actually hits (WCAG 2.2, 2.5.8). */
-.vy-check, .vy-radio { display: flex; align-items: center; min-height: var(--vy-space-10); gap: var(--vy-space-4); font-size: var(--vy-text-base); color: var(--vy-grey-800); cursor: pointer; }
+.vy-check, .vy-radio { display: flex; align-items: center; min-height: var(--vy-space-10); gap: var(--vy-space-4); font-size: var(--vy-text-base); color: var(--vy-on-surface); cursor: pointer; }
 /* Only the RADIO is drawn here now. The checkbox is Kendo's (phase C), so the
    two no longer share a rule — RadioGroup is still Radix, and the scope holds it
    there until the customer says which of those fields are switches in their own
@@ -156,12 +156,12 @@
 .vy-radio-dot {
   display: grid; place-items: center; flex: 0 0 auto;
   width: var(--vy-space-9); height: var(--vy-space-9);
-  background: var(--vy-grey-0); border: 1px solid var(--vy-border-control); color: var(--vy-on-dark-fg);
+  background: var(--vy-surface); border: 1px solid var(--vy-border-control); color: var(--vy-on-dark-fg);
   cursor: pointer; transition: background-color var(--vy-dur-short) var(--vy-ease-standard);
   border-radius: var(--vy-shape-full);
 }
-.vy-radio-dot[data-state="checked"] { border-color: var(--vy-blue-600); border-width: var(--vy-border-emphasis); }
-.vy-radio-fill { width: var(--vy-space-4); height: var(--vy-space-4); border-radius: var(--vy-shape-full); background: var(--vy-blue-600); }
+.vy-radio-dot[data-state="checked"] { border-color: var(--vy-brand); border-width: var(--vy-border-emphasis); }
+.vy-radio-fill { width: var(--vy-space-4); height: var(--vy-space-4); border-radius: var(--vy-shape-full); background: var(--vy-brand); }
 .vy-radios { display: flex; flex-direction: column; gap: var(--vy-space-4); }
 
 
@@ -223,13 +223,13 @@
    title and subtitle stack from the top; the button opts out of that and centres
    in the same content box Kendo centres its close in. */
 .vy-dialog-max { flex: 0 0 auto; align-self: center; }
-.vy-dialog-title { font-size: var(--vy-text-lg); font-weight: var(--vy-weight-bold); color: var(--vy-grey-900); margin: 0; }
-.vy-dialog-sub { font-size: var(--vy-text-base); color: var(--vy-grey-500); margin: var(--vy-space-2) 0 0; font-weight: var(--vy-weight-regular); }
+.vy-dialog-title { font-size: var(--vy-text-lg); font-weight: var(--vy-weight-bold); color: var(--vy-on-surface-strong); margin: 0; }
+.vy-dialog-sub { font-size: var(--vy-text-base); color: var(--vy-on-surface-subtle); margin: var(--vy-space-2) 0 0; font-weight: var(--vy-weight-regular); }
 .vy-dialog .k-dialog-content { padding: var(--vy-space-9); }
 /* The discard confirmation lists what would be lost. The list is the content of
    that dialog, not decoration, so it gets the same weight as a field value —
    this is the thing the user is being asked to read before choosing. */
-.vy-dialog-lead { margin: 0 0 var(--vy-space-4); font-size: var(--vy-text-base); color: var(--vy-grey-600); }
+.vy-dialog-lead { margin: 0 0 var(--vy-space-4); font-size: var(--vy-text-base); color: var(--vy-on-surface-muted); }
 .vy-discard-list {
   margin: 0; padding: 0; list-style: none;
   display: flex; flex-direction: column; gap: var(--vy-space-2);
@@ -237,16 +237,16 @@
 }
 .vy-discard-list li {
   padding: var(--vy-space-3) var(--vy-space-5);
-  background: var(--vy-grey-25);
-  border: 1px solid var(--vy-grey-200);
+  background: var(--vy-surface-subtle);
+  border: 1px solid var(--vy-border);
   border-radius: var(--vy-radius-sm);
-  font-size: var(--vy-text-base); color: var(--vy-grey-900);
+  font-size: var(--vy-text-base); color: var(--vy-on-surface-strong);
 }
 /* Kendo's actions bar gives every child `flex: 1 0 0%`, which is right for its
    own stretched button rows and wrong here: one Save button grew to the full
    1140px width of the dialog. Ours are ordinary buttons sitting to the right. */
 .vy-dialog .k-dialog-actions > * { flex: 0 0 auto; }
-.vy-dialog .k-dialog-actions { display: flex; justify-content: flex-end; gap: var(--vy-space-4); padding: var(--vy-space-5) var(--vy-space-9) var(--vy-space-8); border-top: 1px solid var(--vy-grey-200); }
+.vy-dialog .k-dialog-actions { display: flex; justify-content: flex-end; gap: var(--vy-space-4); padding: var(--vy-space-5) var(--vy-space-9) var(--vy-space-8); border-top: 1px solid var(--vy-border); }
 @keyframes vy-fade { from { opacity: 0 } to { opacity: 1 } }
 /* No `translate(-50%, …)` any more: Kendo centres the panel with flex, so the
    animation only has to carry the rise, not the centring. */
@@ -261,8 +261,8 @@
    What stays is the COUNT BADGE, which Kendo has no equivalent for. It rides
    inside Kendo's `title` node, so it needs Kendo's active class rather than
    Radix's `data-state` to know when to switch to the emphasised palette. */
-.vy-tab-count { font-size: var(--vy-text-xs); background: var(--vy-grey-100); color: var(--vy-grey-600); border-radius: var(--vy-shape-full); padding: 0 var(--vy-space-3); }
-.vy-tabs .k-tabstrip-item.k-active .vy-tab-count { background: var(--vy-blue-100); color: var(--vy-blue-800); }
+.vy-tab-count { font-size: var(--vy-text-xs); background: var(--vy-surface-sunken); color: var(--vy-on-surface-muted); border-radius: var(--vy-shape-full); padding: 0 var(--vy-space-3); }
+.vy-tabs .k-tabstrip-item.k-active .vy-tab-count { background: var(--vy-brand-subtle-strong); color: var(--vy-brand-text-deep); }
 
 /* Kendo draws its own panel border and padding; ours sat inside a plain div and
    the surrounding screens are built to that spacing. Reset only the box, not
@@ -308,7 +308,7 @@
 .vy-content:has(.vy-page--grid) { display: flex; flex-direction: column; overflow: hidden; }
 .vy-page--grid { flex: 1; min-height: 0; display: flex; flex-direction: column; padding-bottom: var(--vy-space-6); }
 .vy-page--grid .vy-grid-shell { flex: 1; min-height: 0; }
-.vy-grid-shell { background: var(--vy-grey-0); border: 1px solid var(--vy-grey-200); border-radius: var(--vy-shape-md); box-shadow: var(--vy-elev-1); overflow: hidden; display: flex; flex-direction: column; }
+.vy-grid-shell { background: var(--vy-surface); border: 1px solid var(--vy-border); border-radius: var(--vy-shape-md); box-shadow: var(--vy-elev-1); overflow: hidden; display: flex; flex-direction: column; }
 /* The grid fills whatever height its container has, rather than subtracting a
    guessed offset from the viewport. The previous rule used
    calc(100vh - var(--vy-grid-viewport-offset)); when that token went missing in
@@ -318,16 +318,16 @@
 .vy-grid-scroll { flex: 1; min-height: 0; overflow: auto; }
 .vy-grid-table { min-width: min-content; }
 
-.vy-grid-head { display: grid; position: sticky; top: 0; z-index: 2; background: var(--vy-grey-50); border-bottom: 1px solid var(--vy-grey-300); }
+.vy-grid-head { display: grid; position: sticky; top: 0; z-index: 2; background: var(--vy-surface-app); border-bottom: 1px solid var(--vy-border-strong); }
 .vy-th {
   display: flex; align-items: center; gap: var(--vy-space-2);
   font-family: inherit; font-size: var(--vy-text-xs); font-weight: var(--vy-weight-semibold);
-  letter-spacing: .04em; text-transform: uppercase; color: var(--vy-grey-600);
-  background: transparent; border: 0; border-right: 1px solid var(--vy-grey-200);
+  letter-spacing: .04em; text-transform: uppercase; color: var(--vy-on-surface-muted);
+  background: transparent; border: 0; border-right: 1px solid var(--vy-border);
   padding: var(--vy-space-4) var(--vy-space-5); cursor: pointer; text-align: left; white-space: nowrap;
 }
 .vy-th:last-child { border-right: 0; }
-.vy-th[data-sorted] { color: var(--vy-blue-700); }
+.vy-th[data-sorted] { color: var(--vy-brand-text-hover); }
 .vy-th[data-role="number"], .vy-th[data-role="money"], .vy-th[data-role="date"] { justify-content: flex-end; }
 .vy-sort { flex: 0 0 auto; }
 
@@ -344,19 +344,19 @@
 }
 .vy-tr {
   display: grid; position: absolute; top: 0; left: 0; width: 100%;
-  align-items: center; border-bottom: 1px solid var(--vy-grey-100);
+  align-items: center; border-bottom: 1px solid var(--vy-border-faint);
 }
 /* Hover still tracks the row — useful for reading across 1,700px of columns —
    but the row is no longer a control, so it does not claim the pointer. */
-.vy-tr:hover { background: var(--vy-blue-50); }
+.vy-tr:hover { background: var(--vy-brand-subtle); }
 .vy-td {
   display: flex; align-items: center; min-width: 0; height: 100%;
-  padding-inline: var(--vy-space-5); font-size: var(--vy-text-base); color: var(--vy-grey-800);
+  padding-inline: var(--vy-space-5); font-size: var(--vy-text-base); color: var(--vy-on-surface);
 }
 .vy-td[data-role="number"], .vy-td[data-role="money"], .vy-td[data-role="date"] {
   justify-content: flex-end; font-variant-numeric: tabular-nums;
 }
-.vy-td[data-role="ident"] { font-family: var(--vy-font-mono); font-size: var(--vy-text-sm); color: var(--vy-grey-900); }
+.vy-td[data-role="ident"] { font-family: var(--vy-font-mono); font-size: var(--vy-text-sm); color: var(--vy-on-surface-strong); }
 .vy-td .vy-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 
@@ -374,7 +374,7 @@
 }
 .vy-toast {
   display: flex; align-items: flex-start; gap: var(--vy-space-5);
-  background: var(--vy-grey-900); color: var(--vy-on-dark-fg);
+  background: var(--vy-surface-chrome); color: var(--vy-on-dark-fg);
   border-radius: var(--vy-shape-sm); box-shadow: var(--vy-elev-4);
   padding: var(--vy-space-5) var(--vy-space-6); font-size: var(--vy-text-base);
   animation: vy-toast-in var(--vy-dur-medium) var(--vy-ease-decelerate);
@@ -395,8 +395,8 @@
 
 /* --- Design-system page: elevation demo ------------------------------------ */
 .vy-elev-row { display: flex; gap: var(--vy-space-9); flex-wrap: wrap; padding: var(--vy-space-4) 0; }
-.vy-elev-swatch { width: var(--vy-space-14); height: var(--vy-space-14); border-radius: var(--vy-shape-md); background: var(--vy-grey-0); display: grid; place-items: center; font-size: var(--vy-text-sm); color: var(--vy-grey-500); }
-.vy-elev-swatch[data-level="0"] { box-shadow: var(--vy-elev-0); border: 1px solid var(--vy-grey-200); }
+.vy-elev-swatch { width: var(--vy-space-14); height: var(--vy-space-14); border-radius: var(--vy-shape-md); background: var(--vy-surface); display: grid; place-items: center; font-size: var(--vy-text-sm); color: var(--vy-on-surface-subtle); }
+.vy-elev-swatch[data-level="0"] { box-shadow: var(--vy-elev-0); border: 1px solid var(--vy-border); }
 .vy-elev-swatch[data-level="1"] { box-shadow: var(--vy-elev-1); }
 .vy-elev-swatch[data-level="2"] { box-shadow: var(--vy-elev-2); }
 .vy-elev-swatch[data-level="3"] { box-shadow: var(--vy-elev-3); }
@@ -409,15 +409,15 @@
 .vy-step-btn {
   display: flex; align-items: center; gap: var(--vy-space-4); width: 100%;
   font-family: inherit; text-align: left; background: transparent;
-  border: 0; border-top: var(--vy-border-emphasis) solid var(--vy-grey-200);
+  border: 0; border-top: var(--vy-border-emphasis) solid var(--vy-border);
   padding: var(--vy-space-5) var(--vy-space-4) var(--vy-space-4); border-radius: var(--vy-shape-sm);
-  cursor: default; color: var(--vy-grey-500);
+  cursor: default; color: var(--vy-on-surface-subtle);
 }
 .vy-step-btn[data-reachable] { cursor: pointer; }
 .vy-step-dot {
   display: grid; place-items: center; flex: 0 0 auto;
   width: var(--vy-space-10); height: var(--vy-space-10); border-radius: 50%;
-  background: var(--vy-grey-100); color: var(--vy-grey-600);
+  background: var(--vy-surface-sunken); color: var(--vy-on-surface-muted);
   font-size: var(--vy-text-sm); font-weight: var(--vy-weight-semibold);
 }
 .vy-step-labels { display: flex; flex-direction: column; min-width: 0; }
@@ -425,26 +425,26 @@
    ("1 - Config BoM", not "BoM"), and a wrapped label splits its own step number
    onto a separate line — which reads as a broken layout, not a long word. */
 .vy-step-label {
-  font-size: var(--vy-text-base); font-weight: var(--vy-weight-medium); color: var(--vy-grey-700);
+  font-size: var(--vy-text-base); font-weight: var(--vy-weight-medium); color: var(--vy-on-surface-soft);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 /* Unnumbered dot: a plain pip, since the label carries the number. */
 .vy-step-pip { width: var(--vy-space-4); height: var(--vy-space-4); border-radius: 50%; background: currentColor; opacity: .55; }
 .vy-step[data-state="current"] .vy-step-pip { opacity: 1; }
-.vy-step-text { font-size: var(--vy-text-xs); color: var(--vy-grey-500); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vy-step-text { font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .vy-step[data-state="done"] .vy-step-btn    { border-top-color: var(--vy-accent-positive); }
 .vy-step[data-state="done"] .vy-step-dot    { background: var(--vy-accent-positive); color: var(--vy-on-dark-fg); }
-.vy-step[data-state="current"] .vy-step-btn { border-top-color: var(--vy-blue-600); }
-.vy-step[data-state="current"] .vy-step-dot { background: var(--vy-blue-600); color: var(--vy-on-dark-fg); }
-.vy-step[data-state="current"] .vy-step-label { color: var(--vy-grey-900); font-weight: var(--vy-weight-bold); }
+.vy-step[data-state="current"] .vy-step-btn { border-top-color: var(--vy-brand); }
+.vy-step[data-state="current"] .vy-step-dot { background: var(--vy-brand); color: var(--vy-on-dark-fg); }
+.vy-step[data-state="current"] .vy-step-label { color: var(--vy-on-surface-strong); font-weight: var(--vy-weight-bold); }
 .vy-step[data-state="todo"] .vy-step-btn    { opacity: .55; }
 
 /* --- Record editing --------------------------------------------------------- */
 .vy-edit-banner {
   margin: 0 0 var(--vy-space-8); padding: var(--vy-space-4) var(--vy-space-6);
-  background: var(--vy-blue-50); color: var(--vy-blue-800);
-  border-left: var(--vy-accent-bar-w) solid var(--vy-blue-600);
+  background: var(--vy-brand-subtle); color: var(--vy-brand-text-deep);
+  border-left: var(--vy-accent-bar-w) solid var(--vy-brand);
   border-radius: var(--vy-shape-sm); font-size: var(--vy-text-base);
 }
 
@@ -458,10 +458,10 @@
    in the same file as its base, after it.
    ========================================================================== */
 .vy-field-groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(var(--vy-field-group-min), 1fr)); gap: var(--vy-space-9); }
-.vy-field-group-title { font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .06em; color: var(--vy-grey-500); font-weight: var(--vy-weight-heavy); margin: 0 0 var(--vy-space-4); padding-bottom: var(--vy-space-2); border-bottom: 1px solid var(--vy-grey-200); }
+.vy-field-group-title { font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .06em; color: var(--vy-on-surface-subtle); font-weight: var(--vy-weight-heavy); margin: 0 0 var(--vy-space-4); padding-bottom: var(--vy-space-2); border-bottom: 1px solid var(--vy-border); }
 .vy-field-list { margin: 0; }
-.vy-field { display: grid; grid-template-columns: var(--vy-field-label-w) 1fr; gap: var(--vy-space-4); padding: var(--vy-space-3) 0; border-bottom: 1px solid var(--vy-grey-100); }
-.vy-field dt { font-size: var(--vy-text-base); color: var(--vy-grey-500); }
+.vy-field { display: grid; grid-template-columns: var(--vy-field-label-w) 1fr; gap: var(--vy-space-4); padding: var(--vy-space-3) 0; border-bottom: 1px solid var(--vy-border-faint); }
+.vy-field dt { font-size: var(--vy-text-base); color: var(--vy-on-surface-subtle); }
 /* ---- Field values ---------------------------------------------------------
    VIEW mode renders a WHITE BOX. Customer decision, 25 Aug 2026: "the grey box
    only shows in EDIT mode; in VIEW mode just show the white box as normal."
@@ -477,15 +477,15 @@
   margin: 0;
   min-height: var(--vy-control-md);
   padding: var(--vy-space-3) var(--vy-space-5);
-  background: var(--vy-grey-0);
-  border: 1px solid var(--vy-grey-200);
+  background: var(--vy-surface);
+  border: 1px solid var(--vy-border);
   border-radius: var(--vy-radius-sm);
   font-size: var(--vy-text-base);
-  color: var(--vy-grey-900);
+  color: var(--vy-on-surface-strong);
 }
 /* Empty stays a stated absence rather than an empty box, which reads as a
    field that failed to load. */
-.vy-field dd.is-empty { color: var(--vy-grey-500); font-style: italic; }
+.vy-field dd.is-empty { color: var(--vy-on-surface-subtle); font-style: italic; }
 /* A notes field holds a paragraph, so its box grows with the text. */
 .vy-field--wide dd { min-height: calc(var(--vy-control-md) * 2); }
 
@@ -507,7 +507,7 @@
   padding-block: var(--vy-space-5);
 }
 .vy-field--editing dt { padding-top: 0; }
-.vy-field--editing dt label { font-size: var(--vy-text-sm); color: var(--vy-grey-600); }
+.vy-field--editing dt label { font-size: var(--vy-text-sm); color: var(--vy-on-surface-muted); }
 .vy-field--editing dd { display: flex; flex-direction: column; gap: var(--vy-space-2); min-width: 0; }
 
 /* Controls fill their field. The select's default minimum is for standalone
@@ -521,7 +521,7 @@
 .vy-field--wide dt { padding-top: 0; }
 .vy-suffixed { display: flex; align-items: center; gap: var(--vy-space-3); }
 .vy-suffixed .vy-field-control { flex: 1; }
-.vy-suffix { font-size: var(--vy-text-base); color: var(--vy-grey-500); white-space: nowrap; }
+.vy-suffix { font-size: var(--vy-text-base); color: var(--vy-on-surface-subtle); white-space: nowrap; }
 .vy-notes-edit { display: grid; grid-template-columns: repeat(auto-fit, minmax(var(--vy-note-min-w), 1fr)); gap: var(--vy-space-8); margin-top: var(--vy-space-9); }
 
 /* =============================================================================
@@ -538,28 +538,28 @@
    passed while the table was unusable.
    ========================================================================== */
 .vy-minitable {
-  border: 1px solid var(--vy-grey-200);
+  border: 1px solid var(--vy-border);
   border-radius: var(--vy-shape-md);
   overflow-x: auto;
-  background: var(--vy-grey-0);
+  background: var(--vy-surface);
 }
 .vy-minitable-head,
 .vy-minitable-row { display: grid; align-items: center; min-width: min-content; }
 
 .vy-minitable-head {
   position: sticky; top: 0; z-index: 1;
-  background: var(--vy-grey-50);
-  border-bottom: 1px solid var(--vy-grey-300);
+  background: var(--vy-surface-app);
+  border-bottom: 1px solid var(--vy-border-strong);
 }
 .vy-minitable-head .vy-th {
-  border-right: 1px solid var(--vy-grey-200);
+  border-right: 1px solid var(--vy-border);
   cursor: default;
 }
 .vy-minitable-head .vy-th:last-child { border-right: 0; }
 
-.vy-minitable-row { border-bottom: 1px solid var(--vy-grey-100); min-height: var(--vy-row-h-comfortable); }
+.vy-minitable-row { border-bottom: 1px solid var(--vy-border-faint); min-height: var(--vy-row-h-comfortable); }
 .vy-minitable-row:last-child { border-bottom: 0; }
-.vy-minitable-row:hover { background: var(--vy-blue-50); }
+.vy-minitable-row:hover { background: var(--vy-brand-subtle); }
 .vy-minitable-row .vy-td { padding-block: var(--vy-space-3); }
 
 /* Inside a dialog the table gets its own scroll rather than growing the dialog:
@@ -580,7 +580,7 @@
   font-variant-numeric: tabular-nums;
   letter-spacing: -.01em;
   white-space: nowrap;
-  color: var(--vy-grey-900);
+  color: var(--vy-on-surface-strong);
 }
 
 /* --- Containers ------------------------------------------------------------
@@ -598,16 +598,16 @@
    version drew the state twice — a glyph at the left edge and a word at the
    right — and neither was clickable. */
 .vy-checklist-items { list-style: none; margin: 0 0 var(--vy-space-4); padding: 0; }
-.vy-checklist-items li { border-bottom: 1px solid var(--vy-grey-100); }
+.vy-checklist-items li { border-bottom: 1px solid var(--vy-border-faint); }
 .vy-checklist-items li:last-child { border-bottom: 0; }
 
 .vy-check-row {
   display: flex; align-items: center; gap: var(--vy-space-4);
   padding: var(--vy-space-3) var(--vy-space-3) var(--vy-space-3) 0;
   cursor: pointer; border-radius: var(--vy-shape-sm);
-  font-size: var(--vy-text-base); color: var(--vy-grey-800);
+  font-size: var(--vy-text-base); color: var(--vy-on-surface);
 }
-.vy-check-row:hover { background: var(--vy-blue-50); }
+.vy-check-row:hover { background: var(--vy-brand-subtle); }
 /* The checkbox that used to be drawn here is Kendo's now (phase C). What stays
    is the one case where its colour carries meaning: a tick in a CHECKLIST is a
    completion, not a selection. Keyed off the row rather than a modifier class,
@@ -617,13 +617,13 @@
 
 .vy-check-name { flex: 1; min-width: 0; }
 /* Completed items step back so the outstanding ones read first. */
-.vy-checklist-items li[data-state="Done"] .vy-check-name { color: var(--vy-grey-500); }
-.vy-checklist-items li[data-state="N/A"] .vy-check-name { color: var(--vy-grey-400); }
+.vy-checklist-items li[data-state="Done"] .vy-check-name { color: var(--vy-on-surface-subtle); }
+.vy-checklist-items li[data-state="N/A"] .vy-check-name { color: var(--vy-on-surface-faint); }
 
 /* A quiet tag, not a ghost row: "does not apply" is information, not absence. */
 
 
-.vy-checklist-progress { font-size: var(--vy-text-sm); color: var(--vy-grey-600); white-space: nowrap; }
+.vy-checklist-progress { font-size: var(--vy-text-sm); color: var(--vy-on-surface-muted); white-space: nowrap; }
 .vy-checklist-progress[data-complete] { color: var(--vy-accent-positive); font-weight: var(--vy-weight-semibold); }
 
 /* Layout for the two checklist columns and their headers. Kept with the rest
@@ -646,7 +646,7 @@
   position: sticky; top: var(--vy-space-4);
   display: flex; flex-direction: column; gap: var(--vy-space-7);
   padding-right: var(--vy-space-8);
-  border-right: 1px solid var(--vy-grey-200);
+  border-right: 1px solid var(--vy-border);
 }
 .vy-checklist-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--vy-space-4); margin-bottom: var(--vy-space-4); }
 
@@ -662,7 +662,7 @@
    takes the same 24px floor. */
 .vy-link {
   display: inline-flex; align-items: center; min-height: var(--vy-space-10);
-  color: var(--vy-blue-700); text-decoration: none; width: fit-content;
+  color: var(--vy-brand-text-hover); text-decoration: none; width: fit-content;
   /* Resets the button chrome, because this class is used on BOTH <a> and
      <button>. It was written against the two <Link>s that first needed it, so
      the first <button> to take it — Forgot Password? on the login — rendered as
@@ -687,12 +687,12 @@
    default, which would break the ellipsis on a long part number. */
 .vy-cell-link {
   background: none; border: 0; padding: 0; font: inherit; text-align: left;
-  color: var(--vy-blue-700); text-decoration: none; cursor: pointer;
+  color: var(--vy-brand-text-hover); text-decoration: none; cursor: pointer;
   border-radius: var(--vy-shape-xs);
   display: flex; align-items: center; height: 100%; min-width: 0;
 }
 .vy-cell-link:hover { text-decoration: underline; }
-.vy-tr:hover .vy-cell-link { color: var(--vy-blue-800); }
+.vy-tr:hover .vy-cell-link { color: var(--vy-brand-text-deep); }
 
 /* --- Tab-level actions -------------------------------------------------------
    Edit controls sit with the fields they change. They were in the record
@@ -709,8 +709,8 @@
    that it applies to this RFQ; the row then carries its document, assignee and
    status. */
 .vy-tasks { min-width: 0; }
-.vy-checklist-items li[data-selected] .vy-check-name { color: var(--vy-grey-900); font-weight: var(--vy-weight-medium); }
-.vy-assignees > section + section { border-top: 1px solid var(--vy-grey-200); padding-top: var(--vy-space-7); }
+.vy-checklist-items li[data-selected] .vy-check-name { color: var(--vy-on-surface-strong); font-weight: var(--vy-weight-medium); }
+.vy-assignees > section + section { border-top: 1px solid var(--vy-border); padding-top: var(--vy-space-7); }
 /* Padding dropped with the chrome — Kendo's picker owns it. Size and width
    stay, because a filter cell is tighter than a form field. */
 .vy-minitable .vy-select { min-width: 0; width: 100%; font-size: var(--vy-text-sm); }
@@ -771,15 +771,15 @@
 /* Locked styling is edit-mode only — see the rule further down. In view mode a
    read-only field is indistinguishable from any other, because in view mode
    they all are. */
-.vy-flag-row[data-locked] { color: var(--vy-grey-600); }
+.vy-flag-row[data-locked] { color: var(--vy-on-surface-muted); }
 .vy-field-locked {
   display: inline-block;
   margin-left: var(--vy-space-4);
   padding: 0 var(--vy-space-3);
   border-radius: var(--vy-radius-sm);
-  background: var(--vy-grey-100);
+  background: var(--vy-surface-sunken);
   font-size: var(--vy-text-2xs);
-  color: var(--vy-grey-600);
+  color: var(--vy-on-surface-muted);
   white-space: nowrap;
   vertical-align: middle;
 }
@@ -809,26 +809,26 @@
 .vy-priority[data-level="Medium"] .vy-priority-dot { background: var(--vy-accent-caution); }
 /* Low is a hollow dot, not a pale one: on a grid at 11px a light fill and an
    empty cell look the same, and "no priority set" is a different fact. */
-.vy-priority[data-level="Low"]    .vy-priority-dot { background: none; box-shadow: inset 0 0 0 1.5px var(--vy-grey-400); }
-.vy-priority[data-level="Low"] { color: var(--vy-grey-600); }
+.vy-priority[data-level="Low"]    .vy-priority-dot { background: none; box-shadow: inset 0 0 0 1.5px var(--vy-border-mid); }
+.vy-priority[data-level="Low"] { color: var(--vy-on-surface-muted); }
 
 /* ---- Popover + column chooser -------------------------------------------- */
 .vy-popover {
   min-width: var(--vy-popover-min-w);
   max-height: 60vh; overflow-y: auto;
-  background: var(--vy-grey-0);
-  border: 1px solid var(--vy-grey-200);
+  background: var(--vy-surface);
+  border: 1px solid var(--vy-border);
   border-radius: var(--vy-radius-md);
   box-shadow: var(--vy-shadow-lg);
   padding: var(--vy-space-5);
   z-index: var(--vy-z-menu);
 }
-.vy-popover-arrow { fill: var(--vy-grey-0); }
+.vy-popover-arrow { fill: var(--vy-on-surface-invert); }
 .vy-popover-head {
   display: flex; align-items: center; justify-content: space-between;
   gap: var(--vy-space-5); margin-bottom: var(--vy-space-4);
-  padding-bottom: var(--vy-space-4); border-bottom: 1px solid var(--vy-grey-200);
-  font-size: var(--vy-text-sm); color: var(--vy-grey-800);
+  padding-bottom: var(--vy-space-4); border-bottom: 1px solid var(--vy-border);
+  font-size: var(--vy-text-sm); color: var(--vy-on-surface);
 }
 .vy-column-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--vy-space-1); }
 .vy-column-list li { display: flex; flex-direction: column; }
@@ -836,15 +836,15 @@
   display: flex; align-items: center; gap: var(--vy-space-4);
   padding: var(--vy-space-3) var(--vy-space-4);
   border-radius: var(--vy-radius-sm); cursor: pointer;
-  font-size: var(--vy-text-base); color: var(--vy-grey-800);
+  font-size: var(--vy-text-base); color: var(--vy-on-surface);
 }
-.vy-column-list label:hover { background: var(--vy-grey-50); }
-.vy-column-list input { width: var(--vy-space-7); height: var(--vy-space-7); accent-color: var(--vy-blue-600); cursor: pointer; }
+.vy-column-list label:hover { background: var(--vy-surface-app); }
+.vy-column-list input { width: var(--vy-space-7); height: var(--vy-space-7); accent-color: var(--vy-brand); cursor: pointer; }
 /* Why a column ships hidden, said once, where the decision is made — rather
    than buried in a tooltip on a button. */
 .vy-column-note {
   padding: 0 var(--vy-space-4) var(--vy-space-3) var(--vy-space-11);
-  font-size: var(--vy-text-xs); color: var(--vy-grey-500); line-height: 1.4;
+  font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle); line-height: 1.4;
 }
 
 /* ---- Locked fields, in edit mode ----------------------------------------
@@ -863,10 +863,10 @@
   display: flex; align-items: center; gap: var(--vy-space-4);
   min-height: var(--vy-control-md);
   padding: var(--vy-space-3) var(--vy-space-5);
-  background: var(--vy-grey-100);
-  border: 1px solid var(--vy-grey-300);
+  background: var(--vy-surface-sunken);
+  border: 1px solid var(--vy-border-strong);
   border-radius: var(--vy-radius-sm);
-  color: var(--vy-grey-600);
+  color: var(--vy-on-surface-muted);
 }
 
 /* ---- Checkboxes ----------------------------------------------------------
@@ -924,7 +924,7 @@
   display: block;
   margin-top: var(--vy-space-1);
   font-size: var(--vy-text-xs);
-  color: var(--vy-grey-500);
+  color: var(--vy-on-surface-subtle);
   line-height: 1.4;
 }
 
@@ -943,7 +943,7 @@
 }
 .vy-field--editing[data-invalid] .vy-input:focus-visible,
 .vy-field--editing[data-invalid] .vy-select:focus-visible {
-  box-shadow: 0 0 0 2px var(--vy-grey-0), 0 0 0 4px var(--vy-red-500);
+  box-shadow: 0 0 0 2px var(--vy-surface), 0 0 0 4px var(--vy-red-500);
 }
 /* A radio group has no single control to outline, so the group is boxed. */
 .vy-field--radio[data-invalid] dd {
@@ -962,40 +962,40 @@
    convincing bold or italic at 15px.
    ========================================================================== */
 .vy-richtext {
-  border: 1px solid var(--vy-grey-300);
+  border: 1px solid var(--vy-border-strong);
   border-radius: var(--vy-radius-md);
-  background: var(--vy-grey-0);
+  background: var(--vy-surface);
   overflow: hidden;
 }
-.vy-richtext:focus-within { border-color: var(--vy-blue-500); box-shadow: var(--vy-focus-ring); }
+.vy-richtext:focus-within { border-color: var(--vy-brand-boundary-strong); box-shadow: var(--vy-focus-ring); }
 
 .vy-rt-toolbar {
   display: flex; align-items: center; flex-wrap: wrap; gap: var(--vy-space-2);
   padding: var(--vy-space-3) var(--vy-space-4);
-  background: var(--vy-grey-25);
-  border-bottom: 1px solid var(--vy-grey-200);
+  background: var(--vy-surface-subtle);
+  border-bottom: 1px solid var(--vy-border);
 }
 /* Groups are separated by a rule rather than extra space: undo/redo, character
    formatting and block formatting are three different kinds of act, and a gap
    alone reads as inconsistent spacing. */
 .vy-rt-group { display: flex; gap: var(--vy-space-1); }
-.vy-rt-group + .vy-rt-group { margin-left: var(--vy-space-3); padding-left: var(--vy-space-3); border-left: 1px solid var(--vy-grey-200); }
+.vy-rt-group + .vy-rt-group { margin-left: var(--vy-space-3); padding-left: var(--vy-space-3); border-left: 1px solid var(--vy-border); }
 
 .vy-rt-btn {
   display: grid; place-items: center;
   width: var(--vy-space-10); height: var(--vy-space-10);
   background: none; border: 0; border-radius: var(--vy-radius-sm);
-  color: var(--vy-grey-600); cursor: pointer;
+  color: var(--vy-on-surface-muted); cursor: pointer;
 }
-.vy-rt-btn:hover { background: var(--vy-grey-100); color: var(--vy-grey-900); }
+.vy-rt-btn:hover { background: var(--vy-surface-sunken); color: var(--vy-on-surface-strong); }
 .vy-rt-btn:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
 /* Pressed means "this format is on where the cursor is", so it has to look
    switched rather than merely hovered. */
-.vy-rt-btn[aria-pressed="true"] { background: var(--vy-blue-50); color: var(--vy-blue-700); }
+.vy-rt-btn[aria-pressed="true"] { background: var(--vy-brand-subtle); color: var(--vy-brand-text-hover); }
 
 .vy-rt-block select {
-  font: inherit; font-size: var(--vy-text-sm); color: var(--vy-grey-800);
-  background: var(--vy-grey-0); border: 1px solid var(--vy-grey-200);
+  font: inherit; font-size: var(--vy-text-sm); color: var(--vy-on-surface);
+  background: var(--vy-surface); border: 1px solid var(--vy-border);
   border-radius: var(--vy-radius-sm); padding: var(--vy-space-1) var(--vy-space-3);
   cursor: pointer; margin-right: var(--vy-space-3);
 }
@@ -1004,7 +1004,7 @@
 .vy-rt-input {
   min-height: var(--vy-editor-min-h);
   padding: var(--vy-space-5) var(--vy-space-6);
-  font-size: var(--vy-text-base); color: var(--vy-grey-900); line-height: 1.55;
+  font-size: var(--vy-text-base); color: var(--vy-on-surface-strong); line-height: 1.55;
   outline: none;
 }
 .vy-rt-input:empty { min-height: var(--vy-editor-min-h); }
@@ -1023,21 +1023,21 @@
 /* ---- Comment / Send Email ------------------------------------------------
    A choice, not a checkbox. It changes WHO reads what you are about to write,
    so it sits above the editor rather than below it. */
-.vy-conv-modes { display: inline-flex; background: var(--vy-grey-100); border-radius: var(--vy-radius-pill); padding: var(--vy-space-1); margin-bottom: var(--vy-space-4); }
+.vy-conv-modes { display: inline-flex; background: var(--vy-surface-sunken); border-radius: var(--vy-radius-pill); padding: var(--vy-space-1); margin-bottom: var(--vy-space-4); }
 .vy-conv-mode {
   appearance: none; border: 0; background: none; cursor: pointer;
   padding: var(--vy-space-3) var(--vy-space-7);
   border-radius: var(--vy-radius-pill);
-  font-size: var(--vy-text-sm); font-weight: var(--vy-weight-medium); color: var(--vy-grey-600);
+  font-size: var(--vy-text-sm); font-weight: var(--vy-weight-medium); color: var(--vy-on-surface-muted);
 }
-.vy-conv-mode:hover { color: var(--vy-grey-900); }
+.vy-conv-mode:hover { color: var(--vy-on-surface-strong); }
 .vy-conv-mode[aria-selected="true"] {
-  background: var(--vy-grey-0); color: var(--vy-grey-900);
+  background: var(--vy-surface); color: var(--vy-on-surface-strong);
   font-weight: var(--vy-weight-semibold); box-shadow: var(--vy-shadow-sm);
 }
 .vy-conv-mode:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
 
-.vy-conv-audience { margin: 0 0 var(--vy-space-4); font-size: var(--vy-text-sm); color: var(--vy-grey-600); }
+.vy-conv-audience { margin: 0 0 var(--vy-space-4); font-size: var(--vy-text-sm); color: var(--vy-on-surface-muted); }
 /* Emailing leaves the building. The composer says so with a colour it does not
    otherwise use, so the difference is visible without reading. */
 .vy-composer[data-mode="email"] .vy-conv-audience { color: var(--vy-accent-warning); }
@@ -1053,19 +1053,19 @@
 .vy-rt-swatches { position: relative; }
 .vy-rt-swatches > summary { list-style: none; cursor: pointer; }
 .vy-rt-swatches > summary::-webkit-details-marker { display: none; }
-.vy-rt-swatches[open] > summary { background: var(--vy-blue-50); color: var(--vy-blue-700); }
+.vy-rt-swatches[open] > summary { background: var(--vy-surface-selected); color: var(--vy-brand-text-hover); }
 .vy-rt-swatch-list {
   position: absolute; z-index: var(--vy-z-menu); top: calc(100% + var(--vy-space-2)); left: 0;
   display: flex; gap: var(--vy-space-2);
   padding: var(--vy-space-3);
-  background: var(--vy-grey-0);
-  border: 1px solid var(--vy-grey-200);
+  background: var(--vy-surface);
+  border: 1px solid var(--vy-border);
   border-radius: var(--vy-radius-md);
   box-shadow: var(--vy-shadow-lg);
 }
 .vy-rt-swatch {
   width: var(--vy-space-9); height: var(--vy-space-9);
-  border: 1px solid var(--vy-grey-300); border-radius: var(--vy-radius-sm);
+  border: 1px solid var(--vy-border-strong); border-radius: var(--vy-radius-sm);
   cursor: pointer; padding: 0;
 }
 .vy-rt-swatch:hover { transform: scale(1.12); }
@@ -1074,9 +1074,9 @@
 /* A column that cannot be turned off shows as ticked and disabled rather than
    being absent — otherwise its row is missing from a list that claims to be
    every column, and the user wonders where it went. */
-.vy-column-list label[data-required] { cursor: default; color: var(--vy-grey-600); }
+.vy-column-list label[data-required] { cursor: default; color: var(--vy-on-surface-muted); }
 .vy-column-list label[data-required]:hover { background: none; }
-.vy-column-req { margin-left: auto; font-style: normal; font-size: var(--vy-text-2xs); color: var(--vy-grey-500); }
+.vy-column-req { margin-left: auto; font-style: normal; font-size: var(--vy-text-2xs); color: var(--vy-on-surface-subtle); }
 
 /* Window actions — Maximize / Restore Down, then Close. The guideline also asks
    for Minimize; see the note in Overlays.tsx and question 9 for why it is not
@@ -1100,8 +1100,8 @@
 /* General information sits in a panel so the eye can tell "the RFQ's identity"
    from "its detail", the same split the record screen makes with its header. */
 .vy-create-general {
-  background: var(--vy-grey-50);
-  border: 1px solid var(--vy-grey-200);
+  background: var(--vy-surface-app);
+  border: 1px solid var(--vy-border);
   border-radius: var(--vy-shape-md);
   padding: var(--vy-space-8);
 }
@@ -1114,11 +1114,11 @@
   min-height: var(--vy-control-md);
   display: flex; align-items: center;
   padding: var(--vy-space-3) var(--vy-space-5);
-  background: var(--vy-grey-100);
-  border: 1px dashed var(--vy-grey-300);
+  background: var(--vy-surface-sunken);
+  border: 1px dashed var(--vy-border-strong);
   border-radius: var(--vy-radius-sm);
   font-size: var(--vy-text-sm);
-  color: var(--vy-grey-600);
+  color: var(--vy-on-surface-muted);
 }
 
 /* A field plus anything that hangs off it — currently Add Contact under
@@ -1160,8 +1160,8 @@
 .vy-quote-context {
   display: flex; flex-wrap: wrap; gap: var(--vy-space-5) var(--vy-space-8);
   padding: var(--vy-space-6);
-  background: var(--vy-grey-50);
-  border: 1px solid var(--vy-grey-200);
+  background: var(--vy-surface-app);
+  border: 1px solid var(--vy-border);
   border-radius: var(--vy-shape-md);
 }
 .vy-quote-fact { display: flex; flex-direction: column; gap: var(--vy-space-1); min-width: 0; }
@@ -1169,9 +1169,9 @@
 .vy-quote-fact--input { min-width: var(--vy-quote-qty-w); }
 .vy-quote-fact-label {
   font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .05em;
-  color: var(--vy-grey-500); font-weight: var(--vy-weight-medium);
+  color: var(--vy-on-surface-subtle); font-weight: var(--vy-weight-medium);
 }
-.vy-quote-fact-value { font-size: var(--vy-text-base); color: var(--vy-grey-900); }
+.vy-quote-fact-value { font-size: var(--vy-text-base); color: var(--vy-on-surface-strong); }
 
 /* ---- Step 1 -------------------------------------------------------------- */
 .vy-quote-config-grid {
@@ -1194,13 +1194,13 @@
   margin: 0; min-height: var(--vy-control-md);
   display: flex; align-items: center;
   padding: var(--vy-space-3) var(--vy-space-5);
-  background: var(--vy-grey-0);
-  border: 1px solid var(--vy-grey-200);
+  background: var(--vy-surface);
+  border: 1px solid var(--vy-border);
   border-radius: var(--vy-radius-sm);
-  font-size: var(--vy-text-base); color: var(--vy-grey-900);
+  font-size: var(--vy-text-base); color: var(--vy-on-surface-strong);
 }
-.vy-read-value[data-locked] { background: var(--vy-grey-100); border-color: var(--vy-grey-300); color: var(--vy-grey-600); }
-.vy-read-value[data-empty] { color: var(--vy-grey-500); font-style: italic; }
+.vy-read-value[data-locked] { background: var(--vy-surface-sunken); border-color: var(--vy-border-strong); color: var(--vy-on-surface-muted); }
+.vy-read-value[data-empty] { color: var(--vy-on-surface-subtle); font-style: italic; }
 
 .vy-attachments { margin-top: var(--vy-space-7); }
 .vy-attachments ul { list-style: none; margin: var(--vy-space-3) 0 0; padding: 0; display: flex; flex-direction: column; gap: var(--vy-space-2); }
@@ -1225,8 +1225,8 @@
   background: transparent; border-color: transparent;
   padding: var(--vy-space-2) var(--vy-space-3);
 }
-.vy-cell-input:hover { border-color: var(--vy-grey-300); background: var(--vy-grey-0); }
-.vy-cell-input:focus { border-color: var(--vy-blue-500); background: var(--vy-grey-0); }
+.vy-cell-input:hover { border-color: var(--vy-border-strong); background: var(--vy-surface); }
+.vy-cell-input:focus { border-color: var(--vy-brand-boundary-strong); background: var(--vy-surface); }
 
 /* ---- The tone vocabulary ------------------------------------------------- */
 /* ROW tones — what happened to the whole line. */
@@ -1249,7 +1249,7 @@
 .vy-line-status[data-status="COVER"]  { background: var(--vy-status-done-bg); color: var(--vy-status-done-fg); }
 .vy-line-status[data-status="NO"]     { background: var(--vy-status-open-bg); color: var(--vy-status-open-fg); }
 .vy-line-status[data-status="N/A"]    { background: var(--vy-tone-missing-bg); color: var(--vy-tone-missing-fg); }
-.vy-line-status[data-status="NO BID"] { background: var(--vy-grey-200); color: var(--vy-grey-600); }
+.vy-line-status[data-status="NO BID"] { background: var(--vy-surface-strong); color: var(--vy-on-surface-muted); }
 
 /* ---- Frozen columns ------------------------------------------------------ */
 .vy-minitable[data-frozen] { overflow-x: auto; }
@@ -1263,11 +1263,11 @@
    it. The whole point of that column's colour is that a red part blocks
    confirming the RFQ, and it was invisible. */
 .vy-minitable[data-frozen] .vy-td[data-stick]:not([data-tone]) { background: inherit; }
-.vy-minitable-row { background: var(--vy-grey-0); }
-.vy-minitable[data-frozen] .vy-th[data-stick] { background: var(--vy-grey-50); }
+.vy-minitable-row { background: var(--vy-surface); }
+.vy-minitable[data-frozen] .vy-th[data-stick] { background: var(--vy-surface-app); }
 /* The last frozen column casts the edge, so the split is visible while scrolling. */
 .vy-minitable[data-frozen] .vy-th[data-stick]:last-of-type,
-.vy-minitable[data-frozen] .vy-td[data-stick]:last-of-type { box-shadow: 1px 0 0 var(--vy-grey-300); }
+.vy-minitable[data-frozen] .vy-td[data-stick]:last-of-type { box-shadow: 1px 0 0 var(--vy-border-strong); }
 
 /* ---- Step 4 cost summary ------------------------------------------------- */
 .vy-cost-card--wide { display: flex; flex-direction: column; align-items: flex-start; gap: var(--vy-space-6); }
@@ -1291,12 +1291,12 @@
 .vy-vs-preview-label {
   display: block; margin-bottom: var(--vy-space-3);
   font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .05em;
-  color: var(--vy-grey-500); font-weight: var(--vy-weight-medium);
+  color: var(--vy-on-surface-subtle); font-weight: var(--vy-weight-medium);
 }
 .vy-vs-preview-frame {
   padding: var(--vy-space-5);
-  background: var(--vy-grey-50);
-  border: 1px dashed var(--vy-grey-300);
+  background: var(--vy-surface-app);
+  border: 1px dashed var(--vy-border-strong);
   border-radius: var(--vy-radius-md);
   /* Inert: it is a picture of the toolbar, not a second copy to filter with.
      Two working filter toolbars on screen at once is the confusion this is
@@ -1316,10 +1316,10 @@
   margin-left: auto;
   padding: var(--vy-space-2) var(--vy-space-3);
   font-size: var(--vy-text-sm); font-weight: var(--vy-weight-medium);
-  color: var(--vy-blue-700);
+  color: var(--vy-brand-text-hover);
   border-radius: var(--vy-radius-sm);
 }
-.vy-filter-edit-fields:hover { background: var(--vy-blue-50); }
+.vy-filter-edit-fields:hover { background: var(--vy-brand-subtle); }
 .vy-filter-edit-fields:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
 
 /* ---- Standard Quote: the assembly picker --------------------------------- */
@@ -1334,8 +1334,8 @@
 .vy-voyager-files li {
   display: flex; align-items: center; justify-content: space-between; gap: var(--vy-space-6);
   padding: var(--vy-space-4) var(--vy-space-6);
-  background: var(--vy-grey-25);
-  border: 1px solid var(--vy-grey-200);
+  background: var(--vy-surface-subtle);
+  border: 1px solid var(--vy-border);
   border-radius: var(--vy-radius-md);
 }
 .vy-voyager-files li > div { display: flex; flex-direction: column; gap: var(--vy-space-1); min-width: 0; }
@@ -1392,8 +1392,8 @@
 /* Primary is the one buyers order against; Alternate is approved but second
    choice. Weight rather than colour, because the table already spends its
    colour on stock levels and a second scheme would compete with it. */
-.vy-pref { color: var(--vy-grey-600); }
-.vy-pref[data-primary] { color: var(--vy-grey-900); font-weight: var(--vy-weight-medium); }
+.vy-pref { color: var(--vy-on-surface-muted); }
+.vy-pref[data-primary] { color: var(--vy-on-surface-strong); font-weight: var(--vy-weight-medium); }
 
 /* ---- MiniTable on the Kendo Grid ----------------------------------------- */
 /* The column-role model, re-expressed for a real <table>. The old `.vy-td` is
@@ -1402,13 +1402,13 @@
    Roles now ride on `data-role` and are styled here instead, so
    `docs/table-patterns.md` still describes what happens. */
 .vy-minitable-k {
-  border: 1px solid var(--vy-grey-200);
+  border: 1px solid var(--vy-border);
   border-radius: var(--vy-shape-md);
   /* `hidden` would round the corners and then CLIP Kendo's own horizontal
      scroller, so a wide grid simply lost its right-hand columns with no way to
      reach them. `auto` still clips to the radius and keeps the scrollbar. */
   overflow-x: auto;
-  background: var(--vy-grey-0);
+  background: var(--vy-surface);
 }
 .vy-minitable-k .k-grid { border: 0; font-size: var(--vy-text-base); }
 
@@ -1416,7 +1416,7 @@
 .vy-minitable-k td[data-role="money"],
 .vy-minitable-k td[data-role="date"] { text-align: right; font-variant-numeric: tabular-nums; }
 .vy-minitable-k td[data-role="ident"] {
-  font-family: var(--vy-font-mono); font-size: var(--vy-text-sm); color: var(--vy-grey-900);
+  font-family: var(--vy-font-mono); font-size: var(--vy-text-sm); color: var(--vy-on-surface-strong);
 }
 
 /* Row and cell states. The vocabulary is the guideline's — grey excluded, red
@@ -1469,7 +1469,7 @@
 /* The selection column holds one checkbox and nothing else. */
 .vy-grid-k .vy-td--select,
 .vy-grid-k .k-grid th:has(.vy-check) { text-align: center; padding-inline: 0; }
-.vy-grid-k tr[data-selected] { background: var(--vy-blue-50); }
+.vy-grid-k tr[data-selected] { background: var(--vy-brand-subtle); }
 
 /* ---- File upload (phase 7) ----------------------------------------------- */
 .vy-filedrop .k-upload { border-radius: var(--vy-radius-md); }

@@ -17,8 +17,8 @@ body {
   font-family: var(--vy-font-sans);
   font-size: var(--vy-text-base);
   line-height: 1.45;
-  color: var(--vy-grey-800);
-  background: var(--vy-grey-50);
+  color: var(--vy-on-surface);
+  background: var(--vy-surface-app);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-synthesis-weight: none;   /* Inter has real weights; never fake bold */

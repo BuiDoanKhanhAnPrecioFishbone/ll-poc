@@ -52,7 +52,7 @@
      band above the lists rather than squeezing both. */
   .vy-checklist-layout { grid-template-columns: 1fr; }
   .vy-assignees { position: static; border-right: 0; padding-right: 0;
-    border-bottom: 1px solid var(--vy-grey-200); padding-bottom: var(--vy-space-7);
+    border-bottom: 1px solid var(--vy-border); padding-bottom: var(--vy-space-7);
     display: grid; grid-template-columns: repeat(auto-fit, minmax(var(--vy-card-min-w), 1fr)); }
 }
 

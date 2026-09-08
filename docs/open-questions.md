@@ -78,6 +78,37 @@ stylesheets — is the next piece, and it is what turns dark mode on.
 **Wordmark** now reads VOYAGER IQ in the shell and on Login. The mark is still
 the letter V, per D3.
 
+**The migration, 8 September.** All **553** colour references in the owned
+stylesheets now name a role instead of a value; `app.css`, `components.css`,
+`md3.css` and `responsive.css` contain **zero** raw `--vy-grey-*` or
+`--vy-blue-*`. Dark mode is switchable: `data-theme="dark"` repaints the app.
+
+It was done by script, mapping `(css property × primitive × selector)` to a
+role — `color` is text, `background` is a surface, `border-*` is a line, and a
+`:hover` in the selector picks `surface-hover` over `surface-app`. Rings and
+shadows were included, because a focus ring left at `blue-500` on a dark panel
+is the same bug as a border left at `grey-200`.
+
+**Proved invisible rather than assumed.** Every mapping was checked to resolve
+to the exact primitive it replaced *before* being applied, and the rendered
+result was diffed element by element against a snapshot taken beforehand:
+Quotations list **738 elements, 0 differences**; the RFQ record **349, 0**.
+
+The first attempt was NOT invisible — 54 differences, all in the sidebar,
+because two map entries collapsed distinct greys into one token. That is a
+redesign smuggled into a refactor, and the element diff is the only reason it
+was caught rather than shipped.
+
+### What dark mode still needs
+
+Sweeping in dark: **16 failures out of 290**, and every one is a Kendo-styled
+control (`k-button-text`) or the low-priority label. That is exactly the
+boundary of this migration — `kendo-bridge.css` was deliberately left alone, and
+it still maps Kendo's ~453 custom properties onto *primitives*. Pointing the
+bridge at the semantic layer is the next piece and the last one dark mode needs.
+
+Light mode sweeps clean: **290 checked, 0 failures.**
+
 ### Still open
 
 **D7 (depth), D8 (radius), D10 (showcase screens).** None blocks work — each has

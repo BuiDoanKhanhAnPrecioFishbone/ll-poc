@@ -114,23 +114,51 @@
   --vy-surface-app:       var(--vy-grey-50);
   --vy-surface:           var(--vy-grey-0);
   --vy-surface-raised:    var(--vy-grey-0);   /* dialogs, menus — depth via shadow in light */
+  --vy-surface-subtle:    var(--vy-grey-25);  /* a card that is barely off the page */
   --vy-surface-sunken:    var(--vy-grey-100);
+  --vy-surface-strong:    var(--vy-grey-200);
   --vy-surface-hover:     var(--vy-grey-50);
   --vy-surface-selected:  var(--vy-blue-50);
+  /* CHROME — a surface that is deliberately dark and STAYS dark: the sidebar,
+     the Login brand panel, the toast. Not "inverse of the page", which is the
+     name it briefly had and the reason the sidebar came out light-on-light the
+     first time dark mode was switched on. Inverting chrome is not what a dark
+     theme means; chrome is dark in both, and only gets lighter to stay legible
+     against a darker page. */
+  --vy-surface-chrome:      var(--vy-grey-900);
+  --vy-surface-chrome-soft: var(--vy-grey-700);
 
-  /* Text, in three tiers. `muted` is the workhorse for labels and meta and is
-     the one that has already failed a sweep once — see the note on grey-500. */
-  --vy-on-surface:        var(--vy-grey-900);
+  /* Text. SIX tiers, because the stylesheets were already using six greys for
+     text and collapsing them here would have been a redesign smuggled into a
+     refactor. `on-surface` is the DEFAULT — grey-800, what body copy already
+     computes to — with `strong` above it for headings and identifiers.
+
+     `muted` is the workhorse for labels and meta and has already failed a sweep
+     once; see the note on grey-500. `faint` is grey-400 and measures 2.58:1 on
+     white, so it is legitimate ONLY on a dark ground or where the text is
+     decorative — two product uses of it were contrast failures, fixed 7 Sep. */
+  --vy-on-surface-strong: var(--vy-grey-900);
+  --vy-on-surface:        var(--vy-grey-800);
+  --vy-on-surface-soft:   var(--vy-grey-700);
   --vy-on-surface-muted:  var(--vy-grey-600);
   --vy-on-surface-subtle: var(--vy-grey-500);
+  --vy-on-surface-faint:  var(--vy-grey-400);
   --vy-on-surface-invert: var(--vy-grey-0);
+  /* Text on chrome. Not the same job as `on-surface-faint`: a grey that reads
+     quiet on white is not the grey that reads quiet on near-black, which is a
+     mistake the on-dark notes below already record once. It keeps the SAME
+     value in the dark theme, because chrome keeps the same job. */
+  --vy-on-chrome-muted:   var(--vy-grey-300);
 
   /* Lines. `border` is STRUCTURE — panel edges, table rules, card outlines —
      which WCAG 1.4.11 does not cover. `border-control` is the boundary of
      something you can operate, which it does; it is defined below, on its own,
      because finding a value for it needed an argument. */
+  --vy-border-faint:      var(--vy-grey-100);
   --vy-border:            var(--vy-grey-200);
   --vy-border-strong:     var(--vy-grey-300);
+  --vy-border-mid:        var(--vy-grey-400);
+  --vy-border-heavy:      var(--vy-grey-500);
 
   /* Brand, by role rather than by step, so a theme can re-point them. In dark
      mode the fill and the text CANNOT be the same token: a 9:1-on-white blue is
@@ -140,9 +168,17 @@
   --vy-brand-hover:       var(--vy-blue-700);
   --vy-brand-active:      var(--vy-blue-800);
   --vy-brand-text:        var(--vy-blue-600);
+  --vy-brand-text-hover:  var(--vy-blue-700);
+  --vy-brand-text-deep:   var(--vy-blue-800);
   --vy-brand-on:          var(--vy-grey-0);
   --vy-brand-subtle:      var(--vy-blue-50);
+  --vy-brand-subtle-strong: var(--vy-blue-100);
+  --vy-brand-light:       var(--vy-blue-400);
+  --vy-brand-soft:        var(--vy-blue-500);
   --vy-brand-boundary:    var(--vy-blue-400);
+  --vy-brand-boundary-soft: var(--vy-blue-200);
+  --vy-brand-boundary-light: var(--vy-blue-300);
+  --vy-brand-boundary-strong: var(--vy-blue-500);
 
   /* --- Status semantics -----------------------------------------------------
      One token per BUSINESS STATE, not per colour. Every module maps its own
@@ -411,83 +447,109 @@
    DARK THEME — authored, measured, NOT YET SWITCHED ON
    -----------------------------------------------------------------------------
    Design decision D13: dark mode is in scope and deferred. These values exist so
-   that the deferral costs nothing later; they redefine ONLY the semantic layer,
-   never a primitive, because grey-50 must go on meaning "the light grey" in both
-   themes or the ramp stops being a ramp.
+   the deferral costs nothing later. They redefine ONLY the semantic layer, never
+   a primitive — grey-50 has to go on meaning "the light grey" in both themes or
+   the ramp stops being a ramp, and a badge that legitimately wants white text
+   would get near-black.
 
-   NOTHING CONSUMES THIS YET. The stylesheets still reference primitives
-   directly, so setting `data-theme="dark"` today would repaint the semantic
-   tokens and leave every component where it was. Turning it on is the migration,
-   not this block.
-
-   Three states, per the platform's own contract: an explicit choice stamps
+   Three states, per the platform's contract: an explicit choice stamps
    `data-theme`; the default "system" setting stamps nothing and only
-   `prefers-color-scheme` separates the two; and the toggle must win in both
-   directions, which is why the rules are written three times rather than once.
+   `prefers-color-scheme` separates light from dark; and the toggle has to win in
+   both directions. That is why the same declarations appear twice. THEY ARE
+   GENERATED FROM ONE LIST rather than typed twice — a hand-maintained copy of a
+   35-token block drifts, and the drift would show up as one theme being subtly
+   wrong in a way nobody looks for.
 
-   MEASURED against --vy-surface-dark (#161c25): body text 14.57:1, muted 8.17:1,
+   MEASURED against --vy-surface (#161c25): body text 14.57:1, muted 8.17:1,
    subtle 5.09:1, control boundary 3.83:1, brand text 6.31:1. Elevation reads by
    LIGHTNESS here rather than by shadow — a shadow on a dark ground is invisible,
-   which is why `surface-raised` and `surface` are the same token in light mode
-   and different ones here. */
+   which is why `surface-raised` and `surface` are one token in light and two
+   here. */
 
 :root[data-theme="dark"] {
-  --vy-surface-app:       #0f131a;
-  --vy-surface:           #161c25;
-  --vy-surface-raised:    #1e2531;
-  --vy-surface-sunken:    #0b0e14;
-  --vy-surface-hover:     #1e2531;
-  --vy-surface-selected:  #1b2a4a;
-
-  --vy-on-surface:        #e9edf3;
-  --vy-on-surface-muted:  #aab4c3;
+  --vy-surface-app: #0f131a;
+  --vy-surface: #161c25;
+  --vy-surface-raised: #1e2531;
+  --vy-surface-subtle: #131922;
+  --vy-surface-sunken: #0b0e14;
+  --vy-surface-strong: #2a323f;
+  --vy-surface-hover: #1e2531;
+  --vy-surface-selected: #1b2a4a;
+  --vy-surface-chrome: #1e2531;
+  --vy-surface-chrome-soft: #2a323f;
+  --vy-on-surface-strong: #f5f8fc;
+  --vy-on-surface: #e9edf3;
+  --vy-on-surface-soft: #d3dae4;
+  --vy-on-surface-muted: #aab4c3;
   --vy-on-surface-subtle: #828d9d;
+  --vy-on-surface-faint: #67727f;
   --vy-on-surface-invert: #0f131a;
-
-  --vy-border:            #2a323f;
-  --vy-border-strong:     #3b4553;
-  --vy-border-control:    #6d7889;
-
-  --vy-brand:             var(--vy-blue-400);
-  --vy-brand-hover:       var(--vy-blue-300);
-  --vy-brand-active:      var(--vy-blue-200);
-  --vy-brand-text:        var(--vy-blue-300);
-  --vy-brand-on:          var(--vy-grey-0);
-  --vy-brand-subtle:      #1b2a4a;
-  --vy-brand-boundary:    var(--vy-blue-400);
-
-  --vy-overlay-scrim:     rgba(0, 0, 0, .62);
+  --vy-border-faint: #212936;
+  --vy-border: #2a323f;
+  --vy-border-strong: #3b4553;
+  --vy-border-heavy: #55606f;
+  --vy-border-control: #6d7889;
+  --vy-brand: var(--vy-blue-400);
+  --vy-brand-hover: var(--vy-blue-300);
+  --vy-brand-active: var(--vy-blue-200);
+  --vy-brand-text: var(--vy-blue-300);
+  --vy-brand-text-hover: var(--vy-blue-200);
+  --vy-brand-text-deep: var(--vy-blue-100);
+  --vy-brand-on: var(--vy-grey-0);
+  --vy-brand-subtle: #1b2a4a;
+  --vy-brand-subtle-strong: #223357;
+  --vy-brand-boundary: var(--vy-blue-400);
+  --vy-brand-boundary-soft: var(--vy-blue-500);
+  --vy-brand-boundary-light: var(--vy-blue-300);
+  --vy-brand-boundary-strong: var(--vy-blue-400);
+  --vy-overlay-scrim: rgba(0, 0, 0, .62);
   color-scheme: dark;
 }
 
 @media (prefers-color-scheme: dark) {
   /* Guarded, so an explicit light choice is not overridden by the OS. */
   :root:not([data-theme="light"]) {
-    --vy-surface-app:       #0f131a;
-    --vy-surface:           #161c25;
-    --vy-surface-raised:    #1e2531;
-    --vy-surface-sunken:    #0b0e14;
-    --vy-surface-hover:     #1e2531;
-    --vy-surface-selected:  #1b2a4a;
-
-    --vy-on-surface:        #e9edf3;
-    --vy-on-surface-muted:  #aab4c3;
+    --vy-surface-app: #0f131a;
+    --vy-surface: #161c25;
+    --vy-surface-raised: #1e2531;
+    --vy-surface-subtle: #131922;
+    --vy-surface-sunken: #0b0e14;
+    --vy-surface-strong: #2a323f;
+    --vy-surface-hover: #1e2531;
+    --vy-surface-selected: #1b2a4a;
+    --vy-surface-chrome: #1e2531;
+    --vy-surface-chrome-soft: #2a323f;
+    --vy-on-surface-strong: #f5f8fc;
+    --vy-on-surface: #e9edf3;
+    --vy-on-surface-soft: #d3dae4;
+    --vy-on-surface-muted: #aab4c3;
     --vy-on-surface-subtle: #828d9d;
+    --vy-on-surface-faint: #67727f;
     --vy-on-surface-invert: #0f131a;
-
-    --vy-border:            #2a323f;
-    --vy-border-strong:     #3b4553;
-    --vy-border-control:    #6d7889;
-
-    --vy-brand:             var(--vy-blue-400);
-    --vy-brand-hover:       var(--vy-blue-300);
-    --vy-brand-active:      var(--vy-blue-200);
-    --vy-brand-text:        var(--vy-blue-300);
-    --vy-brand-on:          var(--vy-grey-0);
-    --vy-brand-subtle:      #1b2a4a;
-    --vy-brand-boundary:    var(--vy-blue-400);
-
-    --vy-overlay-scrim:     rgba(0, 0, 0, .62);
+    --vy-border-faint: #212936;
+    --vy-border: #2a323f;
+    --vy-border-strong: #3b4553;
+    --vy-border-heavy: #55606f;
+    --vy-border-control: #6d7889;
+    --vy-brand: var(--vy-blue-400);
+    --vy-brand-hover: var(--vy-blue-300);
+    --vy-brand-active: var(--vy-blue-200);
+    --vy-brand-text: var(--vy-blue-300);
+    --vy-brand-text-hover: var(--vy-blue-200);
+    --vy-brand-text-deep: var(--vy-blue-100);
+    --vy-brand-on: var(--vy-grey-0);
+    --vy-brand-subtle: #1b2a4a;
+    --vy-brand-subtle-strong: #223357;
+    --vy-brand-boundary: var(--vy-blue-400);
+    --vy-brand-boundary-soft: var(--vy-blue-500);
+    --vy-brand-boundary-light: var(--vy-blue-300);
+    --vy-brand-boundary-strong: var(--vy-blue-400);
+    --vy-on-chrome-muted: var(--vy-grey-300);
+  
+    --vy-border-mid: #55606f;
+    --vy-brand-light: var(--vy-blue-300);
+    --vy-brand-soft: var(--vy-blue-400);
+    --vy-overlay-scrim: rgba(0, 0, 0, .62);
     color-scheme: dark;
   }
 }
