@@ -42,6 +42,23 @@ export function fmtDate(d: Date) {
 }
 
 /**
+ * Today, as a person would say it — "Tuesday 9 September".
+ *
+ * Exists because Home and My Queues both had that sentence written as a STRING
+ * LITERAL, frozen on 19 August, the day those screens were built. Three weeks
+ * later both greeted every visitor with the wrong day, on a screen whose own
+ * header carries a live clock — so the page disagreed with itself, two inches
+ * apart. A date that is decoration on the day it is written becomes a lie
+ * afterwards; the only safe version is a computed one.
+ *
+ * Deliberately no year: this is a greeting, not a record field, and `fmtDate`
+ * remains the one format for anything that IS one.
+ */
+export function fmtToday(d: Date = new Date()) {
+  return d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+}
+
+/**
  * Date AND time, for the fields the guideline says carry both.
  *
  * It is explicit about several: Created Date "displays the date and time when

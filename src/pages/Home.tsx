@@ -1,3 +1,4 @@
+import { fmtToday } from '../ui/renderCell';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { generateQuotations, CUSTOMER_OPTIONS, type QuotationStatus } from '../data/quotations';
@@ -71,7 +72,7 @@ export function Home() {
       <div className="vy-page-head">
         <div>
           <h1 className="vy-page-title">Home</h1>
-          <p className="vy-page-sub">Huyen NTN · Linh Long Engineering · Tuesday 19 August</p>
+          <p className="vy-page-sub">Huyen NTN · Linh Long Engineering · {fmtToday()}</p>
         </div>
         <Link className="vy-link" to={QUEUES_PATH}>What needs me today →</Link>
       </div>

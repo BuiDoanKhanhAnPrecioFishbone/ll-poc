@@ -1,3 +1,4 @@
+import { fmtToday } from '../ui/renderCell';
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { generateQuotations, daysUntil, PEOPLE, type Quotation } from '../data/quotations';
@@ -76,7 +77,7 @@ export function Queues() {
         <div>
           <h1 className="vy-page-title">My Queues</h1>
           <p className="vy-page-sub">
-            {scope === 'mine' ? 'RFQs assigned to you' : 'RFQs across the team'} · Tuesday 19 August
+            {scope === 'mine' ? 'RFQs assigned to you' : 'RFQs across the team'} · {fmtToday()}
           </p>
         </div>
 
