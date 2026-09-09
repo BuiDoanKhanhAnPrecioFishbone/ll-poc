@@ -126,21 +126,6 @@
    follows it instead of drifting. */
 .vy-select .k-input-inner { padding: var(--vy-space-4) var(--vy-space-5); }
 .vy-menu { background: var(--vy-surface); border: 1px solid var(--vy-border); border-radius: var(--vy-shape-md); box-shadow: var(--vy-elev-3); padding: var(--vy-space-2); z-index: var(--vy-z-menu); }
-/* Resets the button chrome, because this class is used on BOTH div items (Radix
-   menus) and <button> options (the combobox list). Written for the divs, it left
-   the buttons wearing the browser's own `buttonface` grey and a 2px outset
-   border — which read as a stack of inset grey blocks rather than a list, and
-   which coincidentally sat close enough to grey-100 to look almost deliberate.
-   Second time this exact class of bug has appeared; see .vy-link. */
-.vy-menu-item {
-  appearance: none; background: none; border: 0; width: 100%; text-align: left;
-  font: inherit;
-  font-size: var(--vy-text-base); color: var(--vy-on-surface);
-  padding: var(--vy-space-3) var(--vy-space-5); border-radius: var(--vy-shape-sm);
-  cursor: pointer; outline: none;
-}
-.vy-menu-item[data-highlighted] { background: var(--vy-brand-subtle); }
-
 /* --- Checkbox / radio ------------------------------------------------------ */
 /* The LABEL carries the 24px minimum target, not the box. The whole label is
    clickable, so it is the target — and it was 20px tall because that is the box
@@ -255,7 +240,7 @@
 /* --- Tabs ------------------------------------------------------------------ */
 /* The strip itself is Kendo's now (phase B of the Radix scope), drawn by the
    tabstrip subset and coloured by the bridge, because `k-tabstrip` ×12 is what
-   the customer's own system shows them. `.vy-tablist` and `.vy-tab` are gone
+   the customer's own system shows them. `vy-tablist` and `vy-tab` are gone
    with the Radix version — they styled elements nothing renders any more.
 
    What stays is the COUNT BADGE, which Kendo has no equivalent for. It rides
@@ -294,12 +279,17 @@
 }
 
 /* =============================================================================
-   DATA GRID — virtualised
+   DATA GRID — the frame around Kendo's
    -----------------------------------------------------------------------------
-   CSS grid rather than a <table>: rows are absolutely positioned by the
-   virtualiser, which a table layout cannot express. Column alignment comes from
-   one shared grid-template built from the column-role tokens, so a cell cannot
-   drift out of line with its heading.
+   What is left here is the shell, the toolbar and the page-level height chain.
+   The table itself is Kendo's, styled further down under `.vy-grid-k`.
+
+   This section used to hold a whole hand-built grid: a CSS-grid `vy-grid-head`
+   / `vy-tr` / `vy-td` table with its own virtualiser. Phase D replaced it and
+   the rules stayed behind for months, describing markup nothing rendered any
+   more — long enough for two live rules to be quietly lost inside the dead ones
+   (the selected-row accent bar, the row-hover link colour). Removed once every
+   selector was measured against the running app at zero matches.
    ========================================================================== */
  /* A grid page fills the content area exactly and never scrolls itself: the
     grid owns the only scrollbar. Using flex rather than height:100% avoids the
@@ -309,55 +299,6 @@
 .vy-page--grid { flex: 1; min-height: 0; display: flex; flex-direction: column; padding-bottom: var(--vy-space-6); }
 .vy-page--grid .vy-grid-shell { flex: 1; min-height: 0; }
 .vy-grid-shell { background: var(--vy-surface); border: 1px solid var(--vy-border); border-radius: var(--vy-shape-md); box-shadow: var(--vy-elev-1); overflow: hidden; display: flex; flex-direction: column; }
-/* The grid fills whatever height its container has, rather than subtracting a
-   guessed offset from the viewport. The previous rule used
-   calc(100vh - var(--vy-grid-viewport-offset)); when that token went missing in
-   a refactor the calc became invalid, the whole declaration was dropped, and
-   the scroll container grew to 72,030px — so the virtualiser had nothing to
-   cull and put all 2,000 rows in the DOM. Flex has no value to lose. */
-.vy-grid-scroll { flex: 1; min-height: 0; overflow: auto; }
-.vy-grid-table { min-width: min-content; }
-
-.vy-grid-head { display: grid; position: sticky; top: 0; z-index: 2; background: var(--vy-surface-app); border-bottom: 1px solid var(--vy-border-strong); }
-.vy-th {
-  display: flex; align-items: center; gap: var(--vy-space-2);
-  font-family: inherit; font-size: var(--vy-text-xs); font-weight: var(--vy-weight-semibold);
-  letter-spacing: .04em; text-transform: uppercase; color: var(--vy-on-surface-muted);
-  background: transparent; border: 0; border-right: 1px solid var(--vy-border);
-  padding: var(--vy-space-4) var(--vy-space-5); cursor: pointer; text-align: left; white-space: nowrap;
-}
-.vy-th:last-child { border-right: 0; }
-.vy-th[data-sorted] { color: var(--vy-brand-text-hover); }
-.vy-th[data-role="number"], .vy-th[data-role="money"], .vy-th[data-role="date"] { justify-content: flex-end; }
-.vy-sort { flex: 0 0 auto; }
-
-/* The animation lives HERE, with the base rule, not in app.css. Split across
-   two files the class had two homes and `npm run css:orphans` flagged it —
-   correctly: app.css loads later, so a future property set in both would be
-   decided by file order rather than by intent, which is how the checklist rows
-   collapsed and the edit-mode layout broke. Nothing was overridden this time;
-   the point is that it could not be seen from either file. */
-.vy-grid-body {
-  position: relative; width: 100%;
-  /* Skeleton to rows: the body fades, not the rows — the grid is virtualised. */
-  animation: vy-mode-read var(--vy-dur-medium) var(--vy-ease-decelerate);
-}
-.vy-tr {
-  display: grid; position: absolute; top: 0; left: 0; width: 100%;
-  align-items: center; border-bottom: 1px solid var(--vy-border-faint);
-}
-/* Hover still tracks the row — useful for reading across 1,700px of columns —
-   but the row is no longer a control, so it does not claim the pointer. */
-.vy-tr:hover { background: var(--vy-brand-subtle); }
-.vy-td {
-  display: flex; align-items: center; min-width: 0; height: 100%;
-  padding-inline: var(--vy-space-5); font-size: var(--vy-text-base); color: var(--vy-on-surface);
-}
-.vy-td[data-role="number"], .vy-td[data-role="money"], .vy-td[data-role="date"] {
-  justify-content: flex-end; font-variant-numeric: tabular-nums;
-}
-.vy-td[data-role="ident"] { font-family: var(--vy-font-mono); font-size: var(--vy-text-sm); color: var(--vy-on-surface-strong); }
-.vy-td .vy-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 
 /* --- Toast ----------------------------------------------------------------- */
@@ -524,48 +465,6 @@
 .vy-suffix { font-size: var(--vy-text-base); color: var(--vy-on-surface-subtle); white-space: nowrap; }
 .vy-notes-edit { display: grid; grid-template-columns: repeat(auto-fit, minmax(var(--vy-note-min-w), 1fr)); gap: var(--vy-space-8); margin-top: var(--vy-space-9); }
 
-/* =============================================================================
-   MINI TABLE
-   -----------------------------------------------------------------------------
-   The short lists inside a record: documents, quotation results, wizard lines.
-   Same column-role model and visual language as the main DataGrid, without the
-   virtualiser — these are tens of rows, not tens of thousands.
-
-   This block was missing entirely when MiniTable was written. With no
-   `display: grid`, the inline grid-template had nothing to act on and every
-   cell stacked into one column: seven headings down the page, then each row's
-   values beneath them. Row counts were still correct, so automated checks
-   passed while the table was unusable.
-   ========================================================================== */
-.vy-minitable {
-  border: 1px solid var(--vy-border);
-  border-radius: var(--vy-shape-md);
-  overflow-x: auto;
-  background: var(--vy-surface);
-}
-.vy-minitable-head,
-.vy-minitable-row { display: grid; align-items: center; min-width: min-content; }
-
-.vy-minitable-head {
-  position: sticky; top: 0; z-index: 1;
-  background: var(--vy-surface-app);
-  border-bottom: 1px solid var(--vy-border-strong);
-}
-.vy-minitable-head .vy-th {
-  border-right: 1px solid var(--vy-border);
-  cursor: default;
-}
-.vy-minitable-head .vy-th:last-child { border-right: 0; }
-
-.vy-minitable-row { border-bottom: 1px solid var(--vy-border-faint); min-height: var(--vy-row-h-comfortable); }
-.vy-minitable-row:last-child { border-bottom: 0; }
-.vy-minitable-row:hover { background: var(--vy-brand-subtle); }
-.vy-minitable-row .vy-td { padding-block: var(--vy-space-3); }
-
-/* Inside a dialog the table gets its own scroll rather than growing the dialog:
-   a wizard step that pushes its own action bar off-screen cannot be completed. */
-.vy-dialog .vy-minitable { max-height: 46vh; overflow-y: auto; }
-
 /* --- Identifiers -----------------------------------------------------------
    Part numbers, RFQ numbers, MPNs. Monospaced and tabular so they align
    digit-for-digit down a column and a transposed character is visible.
@@ -694,7 +593,7 @@
 .vy-cell-link:hover { text-decoration: underline; }
 /* Deepens while the pointer is anywhere on the row, so a wide row tells you
    which link the cursor is aligned with before you have travelled back to it.
-   It was keyed off `.vy-tr`, the row class of the CSS-grid grid this screen
+   It was keyed off `vy-tr`, the row class of the CSS-grid grid this screen
    had before Kendo — a class now on no element in the app, so the rule had
    been matching nothing. */
 .vy-grid-k .k-grid tbody tr:hover .vy-cell-link { color: var(--vy-brand-text-deep); }
@@ -716,11 +615,6 @@
 .vy-tasks { min-width: 0; }
 .vy-checklist-items li[data-selected] .vy-check-name { color: var(--vy-on-surface-strong); font-weight: var(--vy-weight-medium); }
 .vy-assignees > section + section { border-top: 1px solid var(--vy-border); padding-top: var(--vy-space-7); }
-/* Padding dropped with the chrome — Kendo's picker owns it. Size and width
-   stay, because a filter cell is tighter than a form field. */
-.vy-minitable .vy-select { min-width: 0; width: 100%; font-size: var(--vy-text-sm); }
-.vy-minitable-row .vy-td { overflow: visible; }
-
 /* ---- About-this-prototype disclosure -------------------------------------
    Reviewer material lives here rather than in the nav (D7). Everything about
    it is one step quieter than a nav item: smaller type, muted colour, no icon,
@@ -876,7 +770,7 @@
 
 /* ---- Checkboxes ----------------------------------------------------------
    "Checkboxes should display an outer border and update their value immediately
-   when toggled." The border was already there (see .vy-check-box above) and the
+   when toggled." The border was already there (see vy-check-box above) and the
    value already commits on change; what was missing was a hover edge, so the
    target had no feedback before the click. */
 /* Moved to kendo-bridge.css — Kendo ships no `:hover` for checkboxes at all,
@@ -1233,20 +1127,6 @@
 .vy-cell-input:hover { border-color: var(--vy-border-strong); background: var(--vy-surface); }
 .vy-cell-input:focus { border-color: var(--vy-brand-boundary-strong); background: var(--vy-surface); }
 
-/* ---- The tone vocabulary ------------------------------------------------- */
-/* ROW tones — what happened to the whole line. */
-.vy-minitable-row[data-tone="excluded"]    { background: var(--vy-tone-excluded-bg); color: var(--vy-tone-excluded-fg); }
-.vy-minitable-row[data-tone="no-supplier"] { background: var(--vy-tone-missing-bg); }
-.vy-minitable-row[data-tone="short"]       { background: var(--vy-tone-short-bg); }
-.vy-minitable-row[data-tone="covered"]     { background: var(--vy-tone-covered-bg); }
-
-/* CELL tones — what is true of one value. */
-.vy-td[data-tone="known"]     { background: var(--vy-tone-covered-bg); }
-.vy-td[data-tone="missing"]   { background: var(--vy-tone-missing-bg); color: var(--vy-tone-missing-fg); }
-.vy-td[data-tone="known-mfg"] { background: var(--vy-tone-known-mfg-bg); }
-/* Waiting on the quote run. */
-.vy-td[data-tone="pending"]   { background: var(--vy-tone-missing-bg); }
-
 .vy-line-status {
   font-size: var(--vy-text-xs); font-weight: var(--vy-weight-semibold);
   letter-spacing: .04em; padding: 1px var(--vy-space-3); border-radius: var(--vy-radius-sm);
@@ -1255,24 +1135,6 @@
 .vy-line-status[data-status="NO"]     { background: var(--vy-status-open-bg); color: var(--vy-status-open-fg); }
 .vy-line-status[data-status="N/A"]    { background: var(--vy-tone-missing-bg); color: var(--vy-tone-missing-fg); }
 .vy-line-status[data-status="NO BID"] { background: var(--vy-surface-strong); color: var(--vy-on-surface-muted); }
-
-/* ---- Frozen columns ------------------------------------------------------ */
-.vy-minitable[data-frozen] { overflow-x: auto; }
-.vy-minitable[data-frozen] .vy-th[data-stick],
-.vy-minitable[data-frozen] .vy-td[data-stick] { position: sticky; }
-/* A frozen cell must be opaque or the scrolling columns show through it, so it
-   inherits its row's tone — a grey excluded row stays grey all the way across.
-
-   `:not([data-tone])` matters: ROCKET_PN is both frozen AND carries its own
-   green/red Part Master colour, and without the guard this rule painted over
-   it. The whole point of that column's colour is that a red part blocks
-   confirming the RFQ, and it was invisible. */
-.vy-minitable[data-frozen] .vy-td[data-stick]:not([data-tone]) { background: inherit; }
-.vy-minitable-row { background: var(--vy-surface); }
-.vy-minitable[data-frozen] .vy-th[data-stick] { background: var(--vy-surface-app); }
-/* The last frozen column casts the edge, so the split is visible while scrolling. */
-.vy-minitable[data-frozen] .vy-th[data-stick]:last-of-type,
-.vy-minitable[data-frozen] .vy-td[data-stick]:last-of-type { box-shadow: 1px 0 0 var(--vy-border-strong); }
 
 /* ---- Step 4 cost summary ------------------------------------------------- */
 .vy-cost-card--wide { display: flex; flex-direction: column; align-items: flex-start; gap: var(--vy-space-6); }
@@ -1401,7 +1263,7 @@
 .vy-pref[data-primary] { color: var(--vy-on-surface-strong); font-weight: var(--vy-weight-medium); }
 
 /* ---- MiniTable on the Kendo Grid ----------------------------------------- */
-/* The column-role model, re-expressed for a real <table>. The old `.vy-td` is
+/* The column-role model, re-expressed for a real <table>. The old `vy-td` was
    `display:flex; height:100%` — correct for the CSS-grid table it was written
    for, fatal inside a <td>, where it stops columns aligning with their headers.
    Roles now ride on `data-role` and are styled here instead, so
@@ -1426,7 +1288,7 @@
 
 /* Row and cell states. The vocabulary is the guideline's — grey excluded, red
    no-supplier, yellow short, green covered — and only the selector changes:
-   Kendo renders a <tr>, so the old `.vy-minitable-row[data-tone]` no longer
+   Kendo renders a <tr>, so the old `vy-minitable-row[data-tone]` no longer
    matches anything. */
 .vy-minitable-k tr[data-tone="excluded"]    { background: var(--vy-tone-excluded-bg); color: var(--vy-tone-excluded-fg); }
 .vy-minitable-k tr[data-tone="no-supplier"] { background: var(--vy-tone-missing-bg); }
@@ -1439,7 +1301,7 @@
 
 /* ---- DataGrid on the Kendo Grid ------------------------------------------ */
 /* The role model and the density preference, re-expressed for a real <table>.
-   The old `.vy-grid-*` rules laid out a CSS grid — `display: grid` rows and a
+   The old `vy-grid-*` rules laid out a CSS grid — `display: grid` rows and a
    shared `grid-template-columns` — which is exactly what a <td> must not
    inherit; that mistake cost phase 5 an afternoon. */
 .vy-grid-k { flex: 1; min-height: 0; display: flex; flex-direction: column; }
@@ -1476,7 +1338,7 @@
    The header needs a centring rule of its OWN. `text-align: center` centres
    inline content, and the label wrapping the checkbox is `display: flex` — a
    block — so the header checkbox sat at the left edge of its 40px cell while
-   every checkbox in the rows below was centred by `.vy-td--select`'s flex.
+   every checkbox in the rows below was centred by `vy-td--select`'s flex.
    Ten pixels of drift, in the one column narrow enough for the eye to read it
    as a single vertical line.
 
@@ -1487,15 +1349,19 @@
 .vy-grid-k .k-grid th:has(.vy-check) { text-align: center; padding-inline: 0; }
 .vy-grid-k .k-grid th:has(.vy-check) .vy-check { width: 100%; justify-content: center; }
 /* Selection is A TINT PLUS A BAR, and the bar is the part doing the work.
-   The same dead `.vy-tr` carried the bar, so selection arrived here as tint
-   alone — and Kendo's own row hover is an 11% wash of the text colour, which
-   in light theme lands DARKER than our selected tint. A hovered row read as
-   more selected than the selected one.
+   The dead `vy-tr` carried the bar, so selection arrived here as tint alone —
+   and Kendo's own row hover is an 11% wash of the text colour, which in light
+   theme lands DARKER than our selected tint. A hovered row read as more
+   selected than the selected one.
 
-   Inset shadow rather than a border: a border would take width from the first
-   column and shift every cell sideways as selections change. */
+   Darkening the selected row to separate the two is the obvious fix and the
+   wrong one: on blue-100 the muted grey-500 in a cell measures 4.02 against
+   AA's 4.5, so telling two states apart would cost the legibility of the text
+   inside them. Inset shadow rather than a border, because a border would take
+   width from the first column and shift every cell sideways as selections
+   change. */
 .vy-grid-k tr[data-selected] {
-  background: var(--vy-brand-subtle);
+  background: var(--vy-surface-selected);
   box-shadow: inset var(--vy-accent-bar-w) 0 0 0 var(--vy-brand);
 }
 

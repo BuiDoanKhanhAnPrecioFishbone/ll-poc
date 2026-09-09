@@ -1444,19 +1444,6 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
    compact row it would push the cell taller than the row. The row already gives
    the checkbox a full-height target here. */
 .vy-td--select .vy-check { min-height: 0; gap: 0; }
-/* Selection is a TINT PLUS A BAR, and the bar is the part doing the work.
-   `.vy-tr:hover` is already blue-50, so tint alone made a selected row identical
-   to whichever row the cursor happened to be over. Darkening the selected row to
-   separate them was the obvious fix and the wrong one: on blue-100 the muted
-   grey-500 in a cell measures 4.02 against AA's 4.5, so distinguishing two
-   states cost the legibility of the text inside them.
-
-   An inset shadow instead of a border, because a border would take width from
-   the first column and shift every cell one row at a time as selections change. */
-.vy-tr[data-selected] {
-  background: var(--vy-surface-selected);
-  box-shadow: inset var(--vy-accent-bar-w) 0 0 0 var(--vy-brand);
-}
 
 
 /* The dropdown's filter box. Sits above the scrolling list and stays put, so a
@@ -1562,18 +1549,3 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
 
 .vy-task-actions { display: inline-flex; align-items: center; gap: var(--vy-space-3); }
 
-
-/* MiniTable's sortable headers. The button fills the cell so the whole header is
-   the target, not just the words — a 60px "Qty" header with a 24px hit area is
-   the kind of thing that only shows up when someone tries to use it. */
-.vy-minitable-sort {
-  display: flex; align-items: center; gap: var(--vy-space-3);
-  width: 100%; min-height: var(--vy-space-10); padding: 0;
-  font: inherit; color: inherit; cursor: pointer; text-align: inherit;
-}
-/* Number and money headers sit right, so their sort arrow must too. */
-.vy-th[data-role="number"] .vy-minitable-sort,
-.vy-th[data-role="money"] .vy-minitable-sort { justify-content: flex-end; }
-.vy-minitable-sort:hover { color: var(--vy-on-surface-strong); }
-.vy-minitable-sort[data-sorted] { color: var(--vy-brand-text-hover); font-weight: var(--vy-weight-semibold); }
-.vy-minitable-sort:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; border-radius: var(--vy-radius-sm); }
