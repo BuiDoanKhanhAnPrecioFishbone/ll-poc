@@ -692,7 +692,12 @@
   display: flex; align-items: center; height: 100%; min-width: 0;
 }
 .vy-cell-link:hover { text-decoration: underline; }
-.vy-tr:hover .vy-cell-link { color: var(--vy-brand-text-deep); }
+/* Deepens while the pointer is anywhere on the row, so a wide row tells you
+   which link the cursor is aligned with before you have travelled back to it.
+   It was keyed off `.vy-tr`, the row class of the CSS-grid grid this screen
+   had before Kendo — a class now on no element in the app, so the rule had
+   been matching nothing. */
+.vy-grid-k .k-grid tbody tr:hover .vy-cell-link { color: var(--vy-brand-text-deep); }
 
 /* --- Tab-level actions -------------------------------------------------------
    Edit controls sit with the fields they change. They were in the record
@@ -1481,7 +1486,18 @@
 .vy-grid-k .vy-td--select,
 .vy-grid-k .k-grid th:has(.vy-check) { text-align: center; padding-inline: 0; }
 .vy-grid-k .k-grid th:has(.vy-check) .vy-check { width: 100%; justify-content: center; }
-.vy-grid-k tr[data-selected] { background: var(--vy-brand-subtle); }
+/* Selection is A TINT PLUS A BAR, and the bar is the part doing the work.
+   The same dead `.vy-tr` carried the bar, so selection arrived here as tint
+   alone — and Kendo's own row hover is an 11% wash of the text colour, which
+   in light theme lands DARKER than our selected tint. A hovered row read as
+   more selected than the selected one.
+
+   Inset shadow rather than a border: a border would take width from the first
+   column and shift every cell sideways as selections change. */
+.vy-grid-k tr[data-selected] {
+  background: var(--vy-brand-subtle);
+  box-shadow: inset var(--vy-accent-bar-w) 0 0 0 var(--vy-brand);
+}
 
 /* ---- File upload (phase 7) ----------------------------------------------- */
 .vy-filedrop .k-upload { border-radius: var(--vy-radius-md); }

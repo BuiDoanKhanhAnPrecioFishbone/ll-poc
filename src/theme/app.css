@@ -1435,7 +1435,7 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
 /* Row selection. The checkbox column is centred and fixed-width — it holds one
    control whose size never changes, so it gets exactly the room that needs and
    no share of the growth. */
-/* `.vy-th--select` was in this selector list and on no element in the app —
+/* `vy-th--select` was in this selector list and on no element in the app —
    a dead rule that read like the header was already handled, which is part of
    why the misalignment survived. The header is centred in components.css, next
    to the rest of the Kendo grid. */
