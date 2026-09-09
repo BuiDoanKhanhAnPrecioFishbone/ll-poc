@@ -1435,11 +1435,15 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
 /* Row selection. The checkbox column is centred and fixed-width — it holds one
    control whose size never changes, so it gets exactly the room that needs and
    no share of the growth. */
-.vy-th--select, .vy-td--select { display: flex; align-items: center; justify-content: center; }
+/* `.vy-th--select` was in this selector list and on no element in the app —
+   a dead rule that read like the header was already handled, which is part of
+   why the misalignment survived. The header is centred in components.css, next
+   to the rest of the Kendo grid. */
+.vy-td--select { display: flex; align-items: center; justify-content: center; }
 /* The label's 24px target floor is right everywhere else, but inside a 28px
    compact row it would push the cell taller than the row. The row already gives
    the checkbox a full-height target here. */
-.vy-th--select .vy-check, .vy-td--select .vy-check { min-height: 0; gap: 0; }
+.vy-td--select .vy-check { min-height: 0; gap: 0; }
 /* Selection is a TINT PLUS A BAR, and the bar is the part doing the work.
    `.vy-tr:hover` is already blue-50, so tint alone made a selected row identical
    to whichever row the cursor happened to be over. Darkening the selected row to

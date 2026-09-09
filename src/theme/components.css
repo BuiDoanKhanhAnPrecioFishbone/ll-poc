@@ -1466,9 +1466,21 @@
 .vy-grid-k td[data-role="ident"] { font-family: var(--vy-font-mono); font-size: var(--vy-text-sm); }
 .vy-grid-k td[data-role="status"] { overflow: visible; }
 
-/* The selection column holds one checkbox and nothing else. */
+/* The selection column holds one checkbox and nothing else.
+
+   The header needs a centring rule of its OWN. `text-align: center` centres
+   inline content, and the label wrapping the checkbox is `display: flex` — a
+   block — so the header checkbox sat at the left edge of its 40px cell while
+   every checkbox in the rows below was centred by `.vy-td--select`'s flex.
+   Ten pixels of drift, in the one column narrow enough for the eye to read it
+   as a single vertical line.
+
+   The LABEL is centred rather than the <th>: `display: flex` on a table cell
+   takes it out of table layout, and the header row then lost the 4px that the
+   checkbox's 40px target floor was contributing to its height. */
 .vy-grid-k .vy-td--select,
 .vy-grid-k .k-grid th:has(.vy-check) { text-align: center; padding-inline: 0; }
+.vy-grid-k .k-grid th:has(.vy-check) .vy-check { width: 100%; justify-content: center; }
 .vy-grid-k tr[data-selected] { background: var(--vy-brand-subtle); }
 
 /* ---- File upload (phase 7) ----------------------------------------------- */
