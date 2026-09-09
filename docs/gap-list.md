@@ -73,6 +73,7 @@ Precedence per `docs/precedence.md`.
 | D6 | Sort tab's add button reads `Add a column` |
 | D7 | Demo pie chart `World Population by Broad Age Groups` still on Home in production |
 | D8 | One date is `Due Date` on the form and `Date Needed` on the grid |
+| D16 | The placeholder could not name itself outside the live menu's leaves: module roots, the proposed `/sell` and `/settings` tree, and any typo all rendered the word "Screen" over an empty subtitle. Closed 9 Sep |
 | D15 | Home and My Queues printed "Tuesday 19 August" as a string literal, frozen on the day those screens were built. Three weeks later both greeted every visitor with the wrong day — on a screen whose own header carries a live clock, so the page disagreed with itself two inches apart. Closed 9 Sep |
 | D13 | Part Master's column ORDER did not match the live system — Customer and Description swapped, Status and Last Changed swapped, and Part Class / Part Type / ABC pushed to positions 12–14 behind three columns the live list does not have. The same correction as B9, never applied to this screen. Closed 9 Sep |
 | D14 | `hiddenByDefault` was honoured by nothing. It set the width budget and was ignored when a screen built its default view, so ABC — empty in 100% of records — opened at full width beside the part number, which is the finding the original audit led with. Closed 9 Sep |
