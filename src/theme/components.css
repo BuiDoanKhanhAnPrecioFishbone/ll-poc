@@ -1322,9 +1322,46 @@
    states the measurement AND the 24px of cell padding the first pass forgot. */
 .vy-grid-k .k-grid td .vy-code { white-space: nowrap; }
 
-.vy-grid-k[data-density="compact"]     .k-grid td { padding-block: var(--vy-space-1); }
-.vy-grid-k[data-density="comfortable"] .k-grid td { padding-block: var(--vy-space-3); }
-.vy-grid-k[data-density="relaxed"]     .k-grid td { padding-block: var(--vy-space-5); }
+/* Cell padding is declared as a VALUE, not just applied, because the link cell
+   below hands it from the <td> to the link inside it. Two literals would drift
+   the moment a density changed. */
+.vy-grid-k                             { --vy-cell-pad-y: var(--vy-space-3); --vy-cell-pad-x: var(--vy-space-6); }
+.vy-grid-k[data-density="compact"]     { --vy-cell-pad-y: var(--vy-space-1); }
+.vy-grid-k[data-density="comfortable"] { --vy-cell-pad-y: var(--vy-space-3); }
+.vy-grid-k[data-density="relaxed"]     { --vy-cell-pad-y: var(--vy-space-5); }
+.vy-grid-k .k-grid td { padding-block: var(--vy-cell-pad-y); }
+/* The MiniTable took Kendo's own 8px/12px. Same numbers, said by us, so the
+   link rule below has something to move. */
+.vy-minitable-k { --vy-cell-pad-y: var(--vy-space-4); --vy-cell-pad-x: var(--vy-space-6); }
+
+/* THE LINK IS THE CELL.
+   `.vy-cell-link` asks for `height: 100%` to fill its cell — written when the
+   parent was `vy-td`, a flex box with a definite height. Inside Kendo's <td>
+   the percentage has nothing to resolve against, so the link collapsed to its
+   own text: 99x17 inside a 240x32 cell. TWENTY-TWO PER CENT of the cell was
+   clickable. The pointer sits visibly on the part number, in the right column,
+   on the right row, and three times in four nothing happens — on the most
+   clicked element in a 2,000-row grid. In the MiniTable it was 23%, and one
+   80px cell was down to 8%.
+
+   Fixed by moving the padding rather than adding a hit-area overlay: the cell
+   gives its padding up, the link takes the identical values and fills the cell
+   edge to edge. The text lands on the same pixel it did before. An overlay
+   would have covered the last 1.5px too, but it would also have sat on top of
+   the cell's own text, and every other cell in this grid stays selectable so
+   people can copy part numbers out — that rule is not worth trading for 5% of
+   a target.
+
+   Residual: the row is ~3px taller than its own text (the 20px checkbox in the
+   select column sets it), so the link covers ~90% of the cell rather than all
+   of it, centred, leaving ~1.5px top and bottom. */
+.vy-grid-k .k-grid td:has(> .vy-cell-link),
+.vy-minitable-k .k-grid td:has(> .vy-cell-link) { padding: 0; }
+.vy-grid-k .k-grid td > .vy-cell-link,
+.vy-minitable-k .k-grid td > .vy-cell-link {
+  width: 100%;
+  padding: var(--vy-cell-pad-y) var(--vy-cell-pad-x);
+}
 
 /* Column roles: the same alignment and typography the CSS-grid build had. */
 .vy-grid-k td[data-role="number"],
