@@ -559,9 +559,36 @@
    style the rest of the app uses — a class in the markup that no rule answers.
    Follows .vy-cell-link below rather than inventing a second convention, and
    takes the same 24px floor. */
+/* A LINK IS UNDERLINED AT REST, and this is a measurement rather than a taste.
+   These links carried no underline until the pointer arrived, so at rest the
+   only thing separating a link from the text beside it was hue. Measured, the
+   blue and the body text differ by 1.06:1 in light and 1.54:1 in dark — the
+   same lightness, different hue. To anyone who does not separate blue from
+   grey, the Part Master identifier column looked like every other column.
+
+   No colour fixes it. The link has to clear 4.5:1 against the row it sits on,
+   and the body text beside it is already 10.74:1; the lightest blue still
+   passing AA on that background reaches only 2.39:1 against that text. Every
+   step of the ramp was measured — the best available is 1.59:1 in light and
+   2.34:1 in dark. The 3:1 that WCAG's G183 asks for is not reachable on the
+   colour axis at all, so the distinction has to be a shape.
+
+   Quiet by construction — 1px, offset clear of the digits — but NOT faint: the
+   underline is now the thing identifying the control, so it has to clear 3:1
+   itself (1.4.11). Composited against all six backgrounds a row can have (plain,
+   hover and selected, in both themes) the weakest case at 45% was 2.17:1; 65%
+   only just reaches 3.01:1. At 70% the floor is 3.24:1, which is the value here.
+   Hover takes it to full strength on top of the colour deepening. */
+.vy-link, .vy-cell-link {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: .18em;
+  text-decoration-color: color-mix(in srgb, currentColor 70%, transparent);
+}
+
 .vy-link {
   display: inline-flex; align-items: center; min-height: var(--vy-space-10);
-  color: var(--vy-brand-text-hover); text-decoration: none; width: fit-content;
+  color: var(--vy-brand-text); width: fit-content;
   /* Resets the button chrome, because this class is used on BOTH <a> and
      <button>. It was written against the two <Link>s that first needed it, so
      the first <button> to take it — Forgot Password? on the login — rendered as
@@ -570,7 +597,7 @@
      look like one. */
   background: none; border: 0; padding: 0; font: inherit; cursor: pointer;
 }
-.vy-link:hover { text-decoration: underline; }
+.vy-link:hover { color: var(--vy-brand-text-hover); text-decoration-color: currentColor; }
 
 /* Fills its cell rather than just its text. The link was 17px tall in a 27px
    cell, leaving 10px where the pointer is already over the part number and
@@ -586,11 +613,11 @@
    default, which would break the ellipsis on a long part number. */
 .vy-cell-link {
   background: none; border: 0; padding: 0; font: inherit; text-align: left;
-  color: var(--vy-brand-text-hover); text-decoration: none; cursor: pointer;
+  color: var(--vy-brand-text); cursor: pointer;
   border-radius: var(--vy-shape-xs);
   display: flex; align-items: center; height: 100%; min-width: 0;
 }
-.vy-cell-link:hover { text-decoration: underline; }
+.vy-cell-link:hover { color: var(--vy-brand-text-hover); text-decoration-color: currentColor; }
 /* Deepens while the pointer is anywhere on the row, so a wide row tells you
    which link the cursor is aligned with before you have travelled back to it.
    It was keyed off `vy-tr`, the row class of the CSS-grid grid this screen
