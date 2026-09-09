@@ -226,6 +226,14 @@
 .vy-ds-section { background: var(--vy-surface); border: 1px solid var(--vy-border); border-radius: var(--vy-radius-md); padding: var(--vy-space-8) var(--vy-space-9); margin-bottom: var(--vy-space-8); }
 .vy-ds-section h2 { margin: 0 0 var(--vy-space-2); font-size: var(--vy-text-lg); color: var(--vy-on-surface-strong); }
 .vy-ds-note { margin: 0 0 var(--vy-space-7); color: var(--vy-on-surface-subtle); font-size: var(--vy-text-base); max-width: 78ch; }
+/* A semantic group on the design-system page: a heading, its reasoning, and the
+   swatches it names. Same shape as `.vy-ramp` but with room for the note, which
+   is the part that carries the argument. */
+.vy-ds-group { margin-bottom: var(--vy-space-9); }
+.vy-ds-group:last-child { margin-bottom: 0; }
+.vy-ds-group h3 { margin: 0 0 var(--vy-space-2); font-size: var(--vy-text-md); color: var(--vy-on-surface-strong); }
+.vy-ds-group .vy-ds-note { margin-bottom: var(--vy-space-5); }
+
 .vy-ramp { margin-bottom: var(--vy-space-6); }
 .vy-ramp-name { font-size: var(--vy-text-sm); font-weight: var(--vy-weight-semibold); color: var(--vy-on-surface-muted); margin-bottom: var(--vy-space-3); }
 .vy-ramp-row { display: flex; flex-wrap: wrap; gap: var(--vy-space-2); }

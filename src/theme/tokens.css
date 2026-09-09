@@ -589,6 +589,8 @@
   --vy-accent-waiting: #a679ec;
   --vy-accent-neutral: #aab4c3;
   --vy-swatch-label-bg: rgba(16, 21, 28, .85);
+  --vy-shadow-tint: #000000;
+  --vy-shadow-key: #000000;
   --vy-overlay-scrim: rgba(0, 0, 0, .62);
   color-scheme: dark;
 }
@@ -666,6 +668,8 @@
     --vy-accent-waiting: #a679ec;
     --vy-accent-neutral: #aab4c3;
     --vy-swatch-label-bg: rgba(16, 21, 28, .85);
+    --vy-shadow-tint: #000000;
+    --vy-shadow-key: #000000;
     --vy-overlay-scrim: rgba(0, 0, 0, .62);
     color-scheme: dark;
   }

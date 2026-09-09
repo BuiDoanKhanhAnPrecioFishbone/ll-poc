@@ -22,14 +22,33 @@
 
 :root {
   /* --- Elevation ------------------------------------------------------------
-     MD3's five levels. Shadows are tinted with the brand blue rather than pure
-     black: neutral-grey shadows over a warm-white surface read as dirt. */
+     MD3's five levels. Each is two shadows: a tight neutral "contact" shadow,
+     and a wider one TINTED WITH THE BRAND, because neutral grey over a
+     warm-white surface reads as dirt rather than depth.
+
+     THE TINT WAS FROZEN AT THE OLD BRAND BLUE until 9 Sep. These were written
+     as literal `rgba(27, 79, 156, …)` — #1b4f9c, the hue-216 primary — so when
+     the palette moved to hue 222 the shadows kept tinting with a colour that no
+     longer existed anywhere else in the system. The migration that repointed
+     553 references could not catch it: it looked for `var(--vy-blue-*)`, and a
+     literal rgba() is not a var.
+
+     Now derived from the brand token, so the tint cannot drift from the palette
+     again — and in dark it becomes near-black, because a light-tinted shadow on
+     a dark ground is a glow, which reads as emphasis rather than height. */
+  --vy-shadow-key:  #131820;              /* the contact shadow, always neutral */
+  --vy-shadow-tint: var(--vy-brand);      /* the wide shadow, follows the brand */
   --vy-elev-0: none;
-  --vy-elev-1: 0 1px 2px rgba(19, 24, 32, .06), 0 1px 3px 1px rgba(27, 79, 156, .06);
-  --vy-elev-2: 0 1px 2px rgba(19, 24, 32, .08), 0 2px 6px 2px rgba(27, 79, 156, .07);
-  --vy-elev-3: 0 4px 8px 3px rgba(27, 79, 156, .08), 0 1px 3px rgba(19, 24, 32, .10);
-  --vy-elev-4: 0 6px 10px 4px rgba(27, 79, 156, .09), 0 2px 3px rgba(19, 24, 32, .10);
-  --vy-elev-5: 0 8px 12px 6px rgba(27, 79, 156, .10), 0 4px 4px rgba(19, 24, 32, .12);
+  --vy-elev-1: 0 1px 2px color-mix(in srgb, var(--vy-shadow-key) 6%, transparent),
+               0 1px 3px 1px color-mix(in srgb, var(--vy-shadow-tint) 6%, transparent);
+  --vy-elev-2: 0 1px 2px color-mix(in srgb, var(--vy-shadow-key) 8%, transparent),
+               0 2px 6px 2px color-mix(in srgb, var(--vy-shadow-tint) 7%, transparent);
+  --vy-elev-3: 0 4px 8px 3px color-mix(in srgb, var(--vy-shadow-tint) 8%, transparent),
+               0 1px 3px color-mix(in srgb, var(--vy-shadow-key) 10%, transparent);
+  --vy-elev-4: 0 6px 10px 4px color-mix(in srgb, var(--vy-shadow-tint) 9%, transparent),
+               0 2px 3px color-mix(in srgb, var(--vy-shadow-key) 10%, transparent);
+  --vy-elev-5: 0 8px 12px 6px color-mix(in srgb, var(--vy-shadow-tint) 10%, transparent),
+               0 4px 4px color-mix(in srgb, var(--vy-shadow-key) 12%, transparent);
 
   /* --- State layers ---------------------------------------------------------
      MD3 expresses interaction as a translucent layer over the base colour, at
