@@ -131,3 +131,29 @@ view, except the items listed under "Parked" and the open questions in
 `docs/testing/what-this-changes.md`.
 
 **PARKED** — My Queues module separation and role scoping.
+
+---
+
+**RE-OPENED, 10 Sep 2026** — the live system was restructured after our 25 Aug
+capture and this repo is built against the older menu. Full evidence in
+`docs/live-recheck-10sep.md`. Seven items, none of them Project Requirements
+(which is unchanged):
+
+| # | Gap | Weight |
+|---|---|---|
+| M1 | Login has no **Sign in with Microsoft** — an entire auth path the live page offers | blocking for a login demo |
+| M2 | Part Master toolbar has no **AML Search** | one action |
+| M3 | Bill of Materials lists **parts, not BoMs** — live has ASSEMBLY PN · REVISION · DESCRIPTION · BOM VERSION · CUSTOMER · LAST RUN BY · LAST RUN DATE · BOM STATUS. This closes the inference `BomList.tsx` flagged in its own header | a screen's whole column model |
+| M4 | No **Manufacturers (MFG)** screen | a screen |
+| M5 | No **MPN list** screen — our nav item reaches `Placeholder` | a screen |
+| M6 | No **Packing List** screen | a screen |
+| M7 | Part Master column wording: live `CUSTOMER NAME` / `PART SOURCE` / `LAST CHANGE` vs our `Customer` / `Source` / `Last Changed` | three labels |
+
+Plus routing: `/inventory-management/part-mst` is now **404** on the live
+system; it moved to `/engineering/part-mst`, and BoM, MPN and MFG moved with it
+into a new **Engineering** group. `src/App.tsx` and `src/data/sitemap.ts` still
+use the old paths.
+
+Not gaps, checked and cleared: Project Requirements is unchanged in every
+column, control and page size; the Part Master and BoM KPI tiles are the 25 Aug
+review's "the KPI can also be the filter" (C3), not an invention.
