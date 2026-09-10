@@ -1397,6 +1397,19 @@
 .vy-grid-k td[data-role="ident"] { font-family: var(--vy-font-mono); font-size: var(--vy-text-sm); }
 .vy-grid-k td[data-role="status"] { overflow: visible; }
 
+/* KNOWN, MEASURED, NOT FIXED: a grid header is 41px where the grid is
+   selectable and 36px where it is not — the checkbox label's 40px target floor
+   showing through. Two attempts failed and neither is left in the file:
+   `min-height` on the <th> is ignored (a table cell sizes from its row), and
+   `height` on the <tr> is capped by `.k-grid-header-wrap`, Kendo's own header
+   box. Raising it means overriding that wrapper, which is what makes the
+   header stick while the body scrolls.
+
+   Left alone deliberately. It is 5px, between screens that are navigated
+   BETWEEN rather than seen side by side, and the alternative is reaching into
+   the one piece of Kendo layout that earns its keep. Recorded here so the next
+   person does not re-derive it. */
+
 /* The selection column holds one checkbox and nothing else.
 
    The header needs a centring rule of its OWN. `text-align: center` centres

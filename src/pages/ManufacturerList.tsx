@@ -1,48 +1,95 @@
 import { useMemo, useState } from 'react';
 import { DataGrid } from '../ui/DataGrid';
-import { Button } from '../ui/Button';
+import { ViewPicker } from '../ui/ViewPicker';
+import { FilterToolbar } from '../ui/FilterToolbar';
+import { ViewSetting } from '../ui/ViewSetting';
+import { draftFrom } from '../ui/useViews';
+import { useListScreen } from '../ui/useListScreen';
+import { SmartIcon } from '../components/quotation/SmartButtons';
 import { useToast } from '../ui/Toast';
-import { generateManufacturers, MANUFACTURER_COLUMNS } from '../data/engineering';
+import { Button } from '../ui/Button';
+import { generateManufacturers, manufacturerFilterFields, MANUFACTURER_COLUMNS } from '../data/engineering';
 
 /**
  * Manufacturers (MFG) — `/engineering/mfg`. Gap M4.
  *
- * A screen the live system has had all along and this prototype did not. It sat
- * under Procurement Management in our 25 Aug capture as "Manufacturer
- * Management"; the customer moved it into the new Engineering group and renamed
- * it, and either way we only ever had a nav entry pointing at a placeholder.
- *
- * DELIBERATELY PLAIN. Six columns and three actions, because six columns and
- * three actions is what the live screen has. No KPI tiles, no saved views, no
- * filter panel: those exist on Part Master and Project Requirements because the
- * 25 Aug review and the Testing Guideline asked for them THERE. Nothing has
- * asked for them here, and adding them because the other screens have them is
- * how a prototype grows features the customer never requested.
+ * NO KPI TILES, and that is the one thing this screen does differently from its
+ * neighbours. Eighteen rows over two statuses would make a tile row that reads
+ * "16 / 2" — a header pretending to be a summary. The saved views, column
+ * chooser and filter panel ARE here, because those are about a control layout a
+ * user learns once and expects everywhere.
  */
 export function ManufacturerList() {
   const toast = useToast();
-  const data = useMemo(() => generateManufacturers(), []);
+  const all = useMemo(() => generateManufacturers(), []);
   const [selected, setSelected] = useState<Set<string | number>>(new Set());
 
+  const L = useListScreen({
+    key: 'mfg-list',
+    rows: all,
+    columns: MANUFACTURER_COLUMNS,
+    filterFields: manufacturerFilterFields,
+  });
+
   return (
-    <DataGrid
-      title="Manufacturer List"
-      subtitle="Who makes a part, as distinct from who sells it to you"
-      data={data}
-      columns={MANUFACTURER_COLUMNS}
-      searchPlaceholder="Search name, website or alias"
-      selected={selected}
-      onSelectedChange={setSelected}
-      actions={<>
-        <Button onClick={() => toast.notImplemented('import manufacturers')}>Import manufacturer</Button>
-        <Button variant="filled" onClick={() => toast.notImplemented('add a manufacturer')}>
-          Add manufacturer
-        </Button>
-      </>}
-      /* The live grid has a per-row Edit. Opening from the identifier is this
-         prototype's standing pattern and the reason is recorded in
-         docs/table-patterns.md — it is open question 1, not a local decision. */
-      onOpenRow={m => toast.notImplemented(`open ${m.name}`)}
-    />
+    <>
+      <DataGrid
+        title="Manufacturer List"
+        subtitle="Who makes a part, as distinct from who sells it to you"
+        data={L.rows}
+        columns={L.columns}
+        searchPlaceholder="Search name, website or alias"
+        selected={selected}
+        onSelectedChange={setSelected}
+        actions={<>
+          <Button onClick={() => toast.notImplemented('import manufacturers')}>Import manufacturer</Button>
+          <Button variant="filled" onClick={() => toast.notImplemented('add a manufacturer')}>Add manufacturer</Button>
+        </>}
+        filters={(L.quickOn.length > 0 || L.filterActive > 0) ? (
+          <div className="vy-filter-row-main">
+            <Button variant="text" onClick={L.clearAll}>Clear filters</Button>
+          </div>
+        ) : null}
+        filterPanel={
+          <FilterToolbar fields={L.fields} values={L.values} onChange={L.setValues}
+                         onClear={() => L.setValues({})} activeCount={L.filterActive}
+                         onEditFields={() => L.setSettingOpen(true)} />
+        }
+        filterActive={L.filterActive}
+        quickActive={L.quickOn.length}
+        views={<ViewPicker views={L.views.views} activeId={L.views.activeId}
+                           onChange={L.views.setActiveId} />}
+        viewSetting={
+          <button type="button" className="vy-funnel" aria-label="Setup View Template"
+                  title="Setup View Template" onClick={() => L.setSettingOpen(true)}>
+            <SmartIcon name="settings" />
+          </button>
+        }
+        allColumns={MANUFACTURER_COLUMNS}
+        onToggleColumn={L.toggleColumn}
+        onResetColumns={() => L.setWorkingCols(L.view.columns)}
+        onOpenRow={row => toast.notImplemented(`open ${row.name}`)}
+      />
+
+      {L.settingOpen && (
+        <ViewSetting
+          screen="Manufacturer List"
+          view={{ ...L.view, columns: L.workingCols }}
+          allColumns={MANUFACTURER_COLUMNS}
+          allFields={L.allFields}
+          canDelete={!L.view.system}
+          onClose={() => L.setSettingOpen(false)}
+          onDiscard={() => L.setSettingOpen(false)}
+          onDelete={() => { L.views.remove(L.view.id); L.setSettingOpen(false); }}
+          /* Same contract as every other list screen: "save as new" builds a
+             fresh view from the draft rather than overwriting the one in hand. */
+          onSave={(v, asNew) => {
+            L.views.save(asNew ? { ...draftFrom(v, v.name), isDefault: v.isDefault } : v);
+            L.setWorkingCols(v.columns);
+            L.setSettingOpen(false);
+          }}
+        />
+      )}
+    </>
   );
 }

@@ -13,6 +13,7 @@
    screens quietly disagree in a demo.
    ========================================================================== */
 import type { ColumnSpec } from '../components/column-model';
+import type { ViewField } from '../ui/views';
 
 /* One tiny PRNG, seeded per row index, so nothing depends on call order. */
 const rng = (seed: number) => () => {
@@ -205,4 +206,67 @@ export const PACKING_LIST_COLUMNS: ColumnSpec<PackingListRow>[] = [
   { field: 'billing',     title: 'Billing',      role: 'status' },
   { field: 'totalQty',    title: 'Total Qty',    role: 'number' },
   { field: 'shipDate',    title: 'Ship Date',    role: 'date' },
+];
+
+/* -------------------------------------------------------- Filters and tiles --
+
+   Declared per screen; the machinery that applies them is `useListScreen`. The
+   fields are the ones that VARY on each grid — a filter that cannot change the
+   result teaches people to distrust the panel. */
+
+export function manufacturerFilterFields(rows: Manufacturer[]): ViewField<Manufacturer>[] {
+  const uniq = (xs: string[]) => [...new Set(xs)].filter(Boolean).sort();
+  return [
+    { field: 'country', label: 'Country', kind: 'select',
+      options: uniq(rows.map(m => m.country)), value: m => m.country },
+    { field: 'status', label: 'Status', kind: 'select',
+      options: uniq(rows.map(m => m.status)), value: m => m.status },
+    { field: 'lastSync', label: 'Last Sync', kind: 'date-range', value: m => m.lastSync },
+  ];
+}
+
+export function mpnFilterFields(rows: Mpn[]): ViewField<Mpn>[] {
+  const uniq = (xs: string[]) => [...new Set(xs)].filter(Boolean).sort();
+  return [
+    { field: 'manufacturer', label: 'Manufacturer', kind: 'select',
+      options: uniq(rows.map(m => m.manufacturer)), value: m => m.manufacturer },
+    { field: 'lifecycleStatus', label: 'Lifecycle Status', kind: 'select',
+      options: uniq(rows.map(m => m.lifecycleStatus)), value: m => m.lifecycleStatus },
+    { field: 'packageType', label: 'Package Type', kind: 'select',
+      options: uniq(rows.map(m => m.packageType)), value: m => m.packageType },
+    { field: 'countryOfOrigin', label: 'Country of Origin', kind: 'select',
+      options: uniq(rows.map(m => m.countryOfOrigin)), value: m => m.countryOfOrigin },
+    { field: 'pcnAlert', label: 'PCN Alert', kind: 'select',
+      options: uniq(rows.map(m => m.pcnAlert)), value: m => m.pcnAlert },
+    { field: 'lastSyncedAt', label: 'Last Synced At', kind: 'date-range', value: m => m.lastSyncedAt },
+  ];
+}
+
+export function packingFilterFields(rows: PackingListRow[]): ViewField<PackingListRow>[] {
+  const uniq = (xs: string[]) => [...new Set(xs)].filter(Boolean).sort();
+  return [
+    { field: 'customer', label: 'Customer', kind: 'select',
+      options: uniq(rows.map(p => p.customer)), value: p => p.customer },
+    { field: 'fulfillment', label: 'Fulfillment', kind: 'select',
+      options: uniq(rows.map(p => p.fulfillment)), value: p => p.fulfillment },
+    { field: 'billing', label: 'Billing', kind: 'select',
+      options: uniq(rows.map(p => p.billing)), value: p => p.billing },
+    { field: 'shipDate', label: 'Ship Date', kind: 'date-range', value: p => p.shipDate },
+  ];
+}
+
+/* KPI tiles where a split is worth a row of numbers, and NOT where it is noise.
+   Manufacturers is eighteen rows over two statuses; a tile row there would be a
+   header that says "16 / 2". */
+export const MPN_QUICK: { key: string; label: string; match: (m: Mpn) => boolean }[] = [
+  { key: 'active',   label: 'Active',      match: m => m.lifecycleStatus === 'Active' },
+  { key: 'nrnd',     label: 'NRND',        match: m => m.lifecycleStatus === 'NRND' },
+  { key: 'eol',      label: 'End of Life', match: m => m.lifecycleStatus === 'End of Life' || m.lifecycleStatus === 'Obsolete' },
+  { key: 'pcn',      label: 'PCN alert',   match: m => m.pcnAlert === 'Yes' },
+];
+
+export const PACKING_QUICK: { key: string; label: string; match: (p: PackingListRow) => boolean }[] = [
+  { key: 'pending',  label: 'Not shipped', match: p => p.fulfillment !== 'Shipped' },
+  { key: 'shipped',  label: 'Shipped',     match: p => p.fulfillment === 'Shipped' },
+  { key: 'unbilled', label: 'Not invoiced', match: p => p.billing === 'Not Invoiced' },
 ];
