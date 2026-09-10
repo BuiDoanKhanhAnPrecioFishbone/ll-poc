@@ -135,17 +135,94 @@ question before anyone designs those two screens.
 
 ---
 
-## 5. What this re-check did NOT cover
+## 5. Second pass — the items the first pass left open
 
-- Part Master returned **0 rows** for this account, so no row rendering, cell
-  formatting or record screen was compared.
-- No record was opened; the Form View, Run Quotation wizard and BoM Comparison
-  result view were not re-verified against `bundle-evidence.md`.
+### Part Master rows — covered
+
+**21,959 items, 20 per page.** The "0 - 0 of 0" in the first pass was me
+sampling mid-load; the check was wrong, not the screen.
+
+The row model has **13 columns, not 11**: a leading **select checkbox**, then a
+leading **icon button that opens the record**, then the eleven named ones.
+
+| What | Live | Ours |
+|---|---|---|
+| Opening a record | leading icon-button column; **PART NUMBER is plain text** | the identifier is the link |
+| `LAST CHANGE` | `09/09/2026 16:35:29` — MM/DD/YYYY, **with seconds** | `16 May 2026` — date only |
+| `STATUS` | rounded pill, green `#e2f3e6` on `#1e6b34` | `StatusBadge` — same idea |
+| Row select | checkbox, `Select Row` | same |
+
+Two things follow.
+
+**The eye-icon column is on this screen too.** Our records had only noted it on
+Project Requirements. Our choice to hang opening off the identifier instead is
+*already* documented as standing against a client document knowingly, and is
+open question 1 — so it is escalated, not invented. But the customer's pattern
+is more consistent than we recorded, which strengthens their side of it.
+
+**`fmtDateTime`'s open question is answered.** Its comment says seconds were
+dropped because "the seed sets seconds to zero on every record, so a seconds
+field would read `:00` on every row… worth confirming whether seconds carry
+meaning for them". The live data settles it: `16:35:29`, `15:51:03`, `10:48:17`
+— real seconds, displayed. And `LAST CHANGE` carries a **time at all**, where we
+render it date-only through `fmtDate`.
+
+### Form View — covered, and it matches
+
+Route `/sales-management/quotation/:id`, opening as a maximisable panel
+(`restore` / `close`).
+
+- **Tabs — all five, exact:** Specific Requirements · Checklists & Assignment ·
+  Quotation Result · Conversations · Activity Logs.
+- **Sections — exact:** `ITAR`, `QUOTE CONFIGURATION`,
+  `TECHNICAL SPECIFICATIONS`, `SPECIAL REQUIREMENTS & OPTIONS`,
+  `ADDITIONAL NOTES`.
+- **Fields — all 27 present in `requirementFields.ts`**, including the required
+  markers. Nothing missing, nothing extra.
+- `Historical RFQ` is absent from the live record and present in ours —
+  expected: it is conditional on Order Type `Repeat`, and this record is not.
+- The one wording difference is deliberate and labelled: live
+  `Provide Alt Aml For Out Stock`, ours `Provide Alt AML For Out of Stock`,
+  with the reason recorded at `src/data/quotations.ts:215`.
+
+**But the record actions do not match.**
+
+| Live | Ours |
+|---|---|
+| Edit · BoM Comparison · Run Quotation · **Confirm RFQ** · **Cancel** | Edit · BoM Comparison · Run Quotation |
+
+`Confirm RFQ` appears **nowhere in this codebase**, though `components.css`
+already refers to a red part blocking it. Both are state transitions on a real
+customer record, so neither was clicked to see what it does.
+
+### Run Quotation and BoM Comparison — still NOT verified
+
+All four chunks `bundle-evidence.md` was extracted from — `chunk-BAkpvJLm`,
+`chunk-DtT2PYYA`, `chunk-CQr-c-QW`, `chunk-CeuR-5ZG` — now **404**, and the new
+`lib.js` references none of them. The rebuild re-obfuscated: `Config BoM`,
+`Review BoM`, `AML Search` and `Packing List` all return zero plain-string hits
+in the new bundle although they are visibly on screen.
+
+So that evidence describes a build that no longer exists. Re-verifying means
+either redoing the RC4 string-array extraction against the new chunks, or
+clicking `Run Quotation` on a live RFQ — a write on the customer's production
+data, which is not mine to take unsupervised. **Neither was done.** The
+structure may well be unchanged; we simply cannot say so from evidence.
+
+---
+
+## 6. What this re-check did NOT cover
+
+- **Run Quotation** and **BoM Comparison** — see above; evidence is stale and
+  re-verifying costs either a re-extraction or a write.
+- `Confirm RFQ` and the record-level `Cancel` — seen, deliberately not clicked.
+- The four other tabs of the Form View — only Specific Requirements was read
+  field by field.
 - `Material Planning` could not be inspected — it 404s on their side.
 - Screens behind Procurement, Production, Accounting and System Configuration
   were not walked; nothing in this repo builds them.
 
-## 6. A note on method
+## 7. A note on method
 
 Reading the sidebar, I clicked every collapsed disclosure at once to expand the
 tree. That threw `useNavigationLoading must be used within a

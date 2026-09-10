@@ -154,6 +154,22 @@ system; it moved to `/engineering/part-mst`, and BoM, MPN and MFG moved with it
 into a new **Engineering** group. `src/App.tsx` and `src/data/sitemap.ts` still
 use the old paths.
 
+**Second pass, same day** — Part Master rows and the Form View, now read with
+data (the earlier "0 of 0" was a mid-load sample, not a real state):
+
+| # | Gap | Weight |
+|---|---|---|
+| M8 | No **Confirm RFQ** action on the RFQ record. The string appears nowhere in this codebase, though our own CSS already refers to a red part blocking it | a state transition |
+| M9 | Live records carry a **Cancel** action too. Ours has only the edit-mode cancel, which is a different thing. Not clicked — it changes a real record | a state transition |
+| M10 | `LAST CHANGE` on Part Master is `09/09/2026 16:35:29` — a date **and time, with seconds**. We render it date-only via `fmtDate`. This also answers `fmtDateTime`'s own open question about whether seconds carry meaning: the live data has real ones and shows them | one column, one format decision |
+
 Not gaps, checked and cleared: Project Requirements is unchanged in every
 column, control and page size; the Part Master and BoM KPI tiles are the 25 Aug
-review's "the KPI can also be the filter" (C3), not an invention.
+review's "the KPI can also be the filter" (C3), not an invention; the RFQ Form
+View matches on all five tabs, all five section names and **all 27 fields**.
+
+Still unverified, and honestly so: **Run Quotation** and **BoM Comparison**. All
+four chunks `bundle-evidence.md` was extracted from now 404 and the rebuild
+re-obfuscated its strings, so that evidence describes a build that no longer
+exists. Confirming it needs either a fresh RC4 extraction or a write on live
+data.
