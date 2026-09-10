@@ -195,7 +195,14 @@ Route `/sales-management/quotation/:id`, opening as a maximisable panel
 already refers to a red part blocking it. Both are state transitions on a real
 customer record, so neither was clicked to see what it does.
 
-### Run Quotation and BoM Comparison — still NOT verified
+### Run Quotation and BoM Comparison — NOW VERIFIED
+
+**Done — see `docs/bundle-evidence-10sep.md`.** The extraction was re-run
+against the new build with `scripts/decode-bundle.mjs`: 54,342 strings from
+1,627 scopes. Both flows are confirmed unchanged, and our builds of them are
+correct. The paragraph below records why it was blocked at the time.
+
+
 
 All four chunks `bundle-evidence.md` was extracted from — `chunk-BAkpvJLm`,
 `chunk-DtT2PYYA`, `chunk-CQr-c-QW`, `chunk-CeuR-5ZG` — now **404**, and the new
@@ -213,8 +220,7 @@ structure may well be unchanged; we simply cannot say so from evidence.
 
 ## 6. What this re-check did NOT cover
 
-- **Run Quotation** and **BoM Comparison** — see above; evidence is stale and
-  re-verifying costs either a re-extraction or a write.
+- ~~**Run Quotation** and **BoM Comparison**~~ — done, `bundle-evidence-10sep.md`.
 - `Confirm RFQ` and the record-level `Cancel` — seen, deliberately not clicked.
 - The four other tabs of the Form View — only Specific Requirements was read
   field by field.

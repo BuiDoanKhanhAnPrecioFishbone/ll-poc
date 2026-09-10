@@ -1,5 +1,11 @@
 # Bundle evidence — Run Quotation and BoM Comparison
 
+> **STALE, and superseded by `docs/bundle-evidence-10sep.md`.** All four chunks
+> cited below now return 404 — the app was rebuilt and every hash changed. The
+> findings were RE-CONFIRMED against the new build on 10 Sep, so what this file
+> says is still true; its citations just no longer resolve. Re-run with
+> `scripts/decode-bundle.mjs`.
+
 Captured 24 Aug 2026 from the production build at `https://erp.linhlongengineering.com`.
 No login, no writes: the app's own JavaScript is fetched and its obfuscated string
 tables decoded. Nothing here is inferred — every string below is a literal in the
