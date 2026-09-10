@@ -173,3 +173,52 @@ four chunks `bundle-evidence.md` was extracted from now 404 and the rebuild
 re-obfuscated its strings, so that evidence describes a build that no longer
 exists. Confirming it needs either a fresh RC4 extraction or a write on live
 data.
+
+
+---
+
+## M1–M10 — CLOSED, 10 Sep 2026
+
+All ten built. Commits `fa29d52`, `8772a20`, `2d9b9bb`.
+
+| # | What | Where |
+|---|---|---|
+| M1 | Sign in with Microsoft, with the OR rule and the hint line | `pages/Login.tsx` |
+| M2 | AML Search on the Part Master toolbar | `components/AmlSearchDialog.tsx` |
+| M3 | The BoM list lists BoMs, not parts | `data/bomList.ts` |
+| M4 | Manufacturers (MFG) | `pages/ManufacturerList.tsx` |
+| M5 | Part Numbers (MPN) | `pages/MpnList.tsx` |
+| M6 | Packing Lists | `pages/PackingList.tsx` |
+| M7 | Customer Name · Part Source · Last Change | `data/parts.ts` |
+| M8 | Confirm RFQ | `pages/QuotationDetail.tsx` |
+| M9 | Cancel RFQ, and the back control relabelled | `pages/QuotationDetail.tsx` |
+| M10 | `datetime` column role; `fmtDateTime` emits seconds | `ui/renderCell.tsx` |
+
+Plus the routing: the **Engineering** group, `/engineering/*`, and redirects
+from the four old paths. 84 nav routes crawled after the change — every one
+resolves, nothing renders the generic placeholder.
+
+### Three things these gaps uncovered on our side
+
+- **The back control on an RFQ said "Cancel"**, on the reading that the live
+  record labels it that way. The bundle shows that Cancel is
+  `confirmCancelRfqForm` — it cancels the RFQ. Deferring to their wording was
+  right; deferring to a word whose meaning had been guessed was not.
+- **BoM version could be 0**, from `Math.floor(rnd() * 4)`. Invisible inside one
+  record, unmissable as a column.
+- **Three generators produced date-only values** that a `datetime` column then
+  rendered as `00:00:00`. Fixed at source each time.
+
+### Still open, and needing the customer rather than us
+
+1. **MPN `LIFECYCLE STATUS` values.** Ours are the industry-standard set; the
+   live grid was read before its rows loaded, so theirs were never seen.
+2. **Packing List `FULFILLMENT` and `BILLING` values.** Only `SHIPPED` is
+   confirmed, from the bundle's own "Mark this packing list as SHIPPED?".
+3. **`BOM STATUS` wording.** Evidenced as a two-state toggle
+   (`ToggleStatusBOM`); which two words is not established.
+4. **What `Confirm RFQ` actually does.** There is no `Confirmed` in the status
+   vocabulary, so we built New → In-Progress. Stated as an inference in the code.
+5. **The verbatim error strings** (`bundle-evidence-10sep.md` §3.2). Theirs are
+   the customer's own words; ours are cleaner and invented. Tier 1 asks for
+   clearer messaging, tier 2 says the words are theirs — a real conflict.
