@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { generateParts, PART_COLUMNS, type Part } from '../data/parts';
-import { PART_QUICK, partFilterFields } from '../data/partFilters';
+import type { Part } from '../data/parts';
+import { generateBomList, bomFilterFields, BOM_LIST_COLUMNS, BOM_QUICK } from '../data/bomList';
 import { DataGrid } from '../ui/DataGrid';
 import { Button } from '../ui/Button';
 import { ViewPicker } from '../ui/ViewPicker';
@@ -13,7 +13,6 @@ import { useToast } from '../ui/Toast';
 import { BomComparisonDialog } from '../components/quotation/BomComparisonDialog';
 import { PartBomDialog } from '../components/PartBomDialog';
 import { CreateBomDialog } from '../components/CreateBomDialog';
-import { BOM_SOURCES } from '../data/partMetadata';
 
 /**
  * Bill of Materials list — Inventory Management » Bill of Materials.
@@ -44,14 +43,11 @@ export function BomList() {
   const [createOpen, setCreateOpen] = useState(false);
   const [selected, setSelected] = useState<Part | null>(null);
 
-  /* Same seed as Part Master, so a part shows the same data on both screens.
-     Gated on the same set as the BoM button rather than on MAKE alone — the two
-     were the same test while MAKE and BUY were the only values the generator
-     produced, and Create New Part now offers six. A MAKE/BUY assembly that
-     shows a BoM button on its record but is absent from the Bill of Materials
-     list would be one screen contradicting another. */
-  const assemblies = useMemo(
-    () => generateParts(2000).filter(p => BOM_SOURCES.includes(p.partSource)), []);
+  /* ROWS ARE BILLS OF MATERIALS, not parts — gap M3. Built from the same
+     `bomFor` the part record's BoM tab uses, so an assembly reports the same
+     version and the same runner in both places. See data/bomList.ts for why
+     this screen changed subject. */
+  const assemblies = useMemo(() => generateBomList(), []);
 
   const [loading, setLoading] = useState(true);
   useEffect(() => { const t = setTimeout(() => setLoading(false), 700); return () => clearTimeout(t); }, []);
@@ -74,14 +70,14 @@ export function BomList() {
        it does nothing; `abc` is empty in 100% of production records. A filter
        field that cannot change the result is a control that teaches users to
        distrust the panel. */
-    fields: ['customer', 'partClass', 'partType', 'uom', 'status', 'lastChange'],
+    fields: ['customer', 'bomStatus', 'lastRunBy', 'lastRunDate'],
     /* `hiddenByDefault` is HONOURED here, and was not before. The flag existed
        on three columns and only ever fed the width budget, so the default view
        still opened with every column — including ABC, which is empty in 100% of
        production records and was sitting at full width beside the part number.
        That is the exact finding the original audit led with, reproduced in the
        prototype meant to answer it. table-patterns.md rule 2. */
-    columns: PART_COLUMNS.filter(c => !c.hiddenByDefault).map(c => ({ field: String(c.field) })),
+    columns: BOM_LIST_COLUMNS.map(c => ({ field: String(c.field) })),
     sort: [],
   }), []);
 
@@ -96,10 +92,10 @@ export function BomList() {
     cols.some(c => c.field === field)
       ? cols.filter(c => c.field !== field)
       : [...cols, { field }].sort((a, b) =>
-          PART_COLUMNS.findIndex(c => String(c.field) === a.field) -
-          PART_COLUMNS.findIndex(c => String(c.field) === b.field)));
+          BOM_LIST_COLUMNS.findIndex(c => String(c.field) === a.field) -
+          BOM_LIST_COLUMNS.findIndex(c => String(c.field) === b.field)));
 
-  const allFields = useMemo(() => partFilterFields(assemblies), [assemblies]);
+  const allFields = useMemo(() => bomFilterFields(assemblies), [assemblies]);
   const fields = useMemo(
     () => allFields.filter(f => view.fields.includes(f.field)),
     [allFields, view.fields]);
@@ -110,12 +106,12 @@ export function BomList() {
 
   const rows = useMemo(() => {
     const quickMatched = assemblies.filter(p =>
-      PART_QUICK.filter(f => quickOn.includes(f.key)).every(f => f.match(p)));
+      BOM_QUICK.filter(f => quickOn.includes(f.key)).every(f => f.match(p)));
     return applyView(quickMatched, fields, values);
   }, [assemblies, quickOn, fields, values]);
 
   const columns = useMemo(() => {
-    const byField = new Map(PART_COLUMNS.map(c => [String(c.field), c]));
+    const byField = new Map(BOM_LIST_COLUMNS.map(c => [String(c.field), c]));
     return workingCols
       .map(vc => {
         const base = byField.get(vc.field);
@@ -126,7 +122,7 @@ export function BomList() {
           ...(vc.width ? { width: vc.width, widthNote: 'Set on this view.' } : {}),
         };
       })
-      .filter(Boolean) as typeof PART_COLUMNS;
+      .filter(Boolean) as typeof BOM_LIST_COLUMNS;
   }, [workingCols]);
 
   return (
@@ -134,14 +130,13 @@ export function BomList() {
       <DataGrid
         data={rows}
         columns={columns}
-        title="Bill of Materials"
-        /* Was the single word "assemblies". This says which parts are here and
-           which are not, which is the one thing a reader cannot infer from a
-           list that looks like Part Master. */
-        subtitle="Assemblies with a Bill of Materials — the parts inside them live on Part Master"
+        title="Bills of Materials"
+        /* The subtitle used to explain which PARTS were on the list, because
+           the list was parts. It is BoMs now, so it says what a row is. */
+        subtitle="One row per bill of materials — the parts inside them live on Part Master"
         kpis={
           <>
-            {PART_QUICK.map(f => {
+            {BOM_QUICK.map(f => {
               const n = assemblies.filter(f.match).length;
               const on = quickOn.includes(f.key);
               return (
@@ -181,7 +176,7 @@ export function BomList() {
             <SmartIcon name="settings" />
           </button>
         }
-        allColumns={PART_COLUMNS}
+        allColumns={BOM_LIST_COLUMNS}
         onToggleColumn={toggleColumn}
         onResetColumns={() => setWorkingCols(view.columns)}
         loading={loading}
@@ -194,14 +189,16 @@ export function BomList() {
         emptyHint={active + quickOn.length > 0
           ? undefined
           : 'No assembly matches. Only parts that have a BoM appear on this screen.'}
-        onOpenRow={setSelected}
+        /* A BoM row still opens the assembly's part record — the BoM lives
+           inside it. `row.part` is carried on the row for exactly this. */
+        onOpenRow={row => setSelected(row.part)}
       />
 
       {settingOpen && (
         <ViewSetting
           screen="Bill of Materials"
           view={{ ...view, columns: workingCols }}
-          allColumns={PART_COLUMNS}
+          allColumns={BOM_LIST_COLUMNS}
           allFields={allFields}
           canDelete={!view.system}
           onClose={() => setSettingOpen(false)}

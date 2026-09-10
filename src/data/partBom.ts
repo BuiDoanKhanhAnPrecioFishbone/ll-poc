@@ -46,20 +46,31 @@ function seeded(text: string) {
 
 export function bomFor(part: Part): PartBom {
   const rnd = seeded(part.partNumber);
-  const created = new Date(2026, 0, 1 + Math.floor(rnd() * 200));
+  /* A working moment, not midnight. These dates were date-only, which was
+     invisible while they appeared as `createdDate` inside one record and
+     obvious the moment LAST RUN DATE became a `datetime` column on the BoM
+     list — a page of `00:00:00`. A BoM run happens at a time. */
+  const created = new Date(2026, 0, 1 + Math.floor(rnd() * 200),
+                           8 + Math.floor(rnd() * 9), Math.floor(rnd() * 60), Math.floor(rnd() * 60));
   return {
     customer: part.customer,
     partNumber: part.partNumber,
     revision: part.rev || '—',
     /* Starts at 0 and counts up, as the guideline's own example does: "from 0 to
        1, 1 to 2". */
-    version: Math.floor(rnd() * 4),
+    /* 1-BASED. This was `Math.floor(rnd() * 4)`, so a quarter of assemblies
+       carried BoM version 0 — a version that does not exist, printed as
+       "Version 0" in the BoM dialog's subtitle and "0" in its BoM Version fact.
+       It went unnoticed while the number appeared inside one record; the BoM
+       LIST puts it in a column, where a page of v0 rows is unmissable. */
+    version: 1 + Math.floor(rnd() * 4),
     itar: rnd() > 0.75,
     quantity: [1, 10, 25, 50, 100][Math.floor(rnd() * 5)],
     bomType: BOM_TYPES[Math.floor(rnd() * BOM_TYPES.length)],
     runBy: RUNNERS[Math.floor(rnd() * RUNNERS.length)],
     createdDate: created,
-    lastUpdated: new Date(created.getTime() + Math.floor(rnd() * 120) * 86400000),
+    lastUpdated: new Date(created.getTime() + Math.floor(rnd() * 120) * 86400000
+                          + Math.floor(rnd() * 8) * 3600000 + Math.floor(rnd() * 3600) * 1000),
     components: buildBomLines(),
   };
 }
