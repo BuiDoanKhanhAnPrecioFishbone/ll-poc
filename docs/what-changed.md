@@ -302,16 +302,20 @@ words are yours.
 
 ---
 
-# Part 5 — Three defects in your live system
+# Part 5 — Three things we noticed in passing
 
-Found while building against it, listed for your own backlog. Nothing here needs
-anything from us.
+Small things we ran into while building against your system. None of them
+affect the mockup and none need anything from us — noted only in case they are
+useful to whoever is next in that part of the code.
 
-1. **`Material Planning` opens a 404.** The menu entry points at `/planning`,
-   which does not exist.
-2. **`RMA List` under Inventory Management opens the Transfer screen** — browser
-   title "Transfer", heading "Transfer", transfer columns.
-3. **The "World Population" demo chart** is still on the dashboard. (1.13)
+1. **The Material Planning menu entry** points at `/planning`, which does not
+   currently resolve — most likely a screen still on its way.
+2. **"RMA List" under Inventory Management** opens the Transfer screen —
+   browser title "Transfer", heading "Transfer", transfer columns. The label and
+   the destination look to have drifted apart at some point.
+3. **A sample chart on the dashboard.** "World Population by Broad Age Groups"
+   is still on the landing page. It was on the August list; we mention it again
+   only because it is the quickest item on that list to clear.
 
 ---
 
