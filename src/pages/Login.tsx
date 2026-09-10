@@ -124,10 +124,15 @@ export function Login() {
             </button>
           </div>
 
-          {/* Filled primary, white on blue-600 — 8.6:1. The live button is pale
-              blue on white, which is the contrast fault the deck names. Disabled
-              until both boxes have something in them, so the one control on the
-              page never fails silently. */}
+          {/* Filled primary. Measured 10 Sep: white on blue-600 is 9.16:1 in
+              light, and near-black on blue-300 is 6.86:1 in dark. This comment
+              said 8.6:1 for years after the palette moved to hue 222 — a number
+              carried forward rather than re-measured, which is how a figure ends
+              up in a client document being wrong.
+
+              The live button is pale blue on white, the contrast fault the deck
+              names. Disabled until both boxes have something in them, so the one
+              control on the page never fails silently. */}
           <Button type="submit" variant="filled" className="vy-login-submit" disabled={!ready}>
             Sign In
           </Button>
