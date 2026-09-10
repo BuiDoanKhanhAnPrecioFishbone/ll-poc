@@ -41,6 +41,21 @@ import { useToast } from '../ui/Toast';
  * navigates to Home and says as much, on the same rule every other
  * unimplemented control in this prototype follows.
  */
+/* Microsoft's four squares, at their own brand colours. Drawn rather than
+   linked: an <img> to a CDN is a network dependency on a login screen, and
+   these four hex values are the one place in this app where a brand colour
+   legitimately ignores our token layer — they are someone else's mark. */
+function MicrosoftLogo() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden focusable="false">
+      <rect x="0" y="0" width="7" height="7" fill="#f25022" />
+      <rect x="9" y="0" width="7" height="7" fill="#7fba00" />
+      <rect x="0" y="9" width="7" height="7" fill="#00a4ef" />
+      <rect x="9" y="9" width="7" height="7" fill="#ffb900" />
+    </svg>
+  );
+}
+
 export function Login() {
   const navigate = useNavigate();
   const toast = useToast();
@@ -116,6 +131,31 @@ export function Login() {
           <Button type="submit" variant="filled" className="vy-login-submit" disabled={!ready}>
             Sign In
           </Button>
+
+          {/* MICROSOFT SSO — gap M1. The live page offers a second way in and
+              this one did not: an `OR` rule, `Sign in with Microsoft`, and the
+              line below it. The bundle carries a `login/callback` route, so it
+              is a real OAuth round trip rather than a decorative button.
+
+              It sits BELOW the username form, where the live page puts it. That
+              ordering is worth keeping even though SSO is likely the path most
+              staff take: the form above is the fallback for anyone whose
+              account is not federated, and burying it under the button that
+              will not work for them is the worse failure. */}
+          <div className="vy-login-or"><span>OR</span></div>
+
+          <Button
+            type="button"
+            variant="outlined"
+            className="vy-login-sso"
+            onClick={() => toast.notImplemented('sign in with your Microsoft account')}
+          >
+            <MicrosoftLogo />
+            Sign in with Microsoft
+          </Button>
+          <p className="vy-login-sso-hint">
+            Use your organization account to sign in securely.
+          </p>
 
           <p className="vy-login-legal">
             <button type="button" className="vy-link"

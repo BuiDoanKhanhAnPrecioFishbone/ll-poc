@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Dialog, Tabs } from '../ui/Overlays';
 import { ValidationPanel } from '../components/quotation/ValidationPanel';
 import { Button } from '../ui/Button';
+import { ConfirmDialog } from '../ui/ConfirmDialog';
 import { StatusBadge } from '../ui/Badge';
 import { generateQuotations, daysUntil, findCustomer, contactsFor, taskStatus, type Quotation } from '../data/quotations';
 import { ChecklistsTab } from '../components/quotation/ChecklistsTab';
@@ -53,6 +54,8 @@ export function QuotationDetail() {
   const jumpTarget = useRef<string | null>(null);
   const [bomOpen, setBomOpen] = useState(false);
   const [runOpen, setRunOpen] = useState(false);
+  const [cancelOpen, setCancelOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
   const [newContacts, setNewContacts] = useState<NewContact[]>([]);
   const toast = useToast();
@@ -253,13 +256,23 @@ export function QuotationDetail() {
       <header className="vy-rfq-head">
         {/* Back is a way OUT, not something you do to the record. As a pill
             beside "Run Quotation" it competed with the actions; above them and
-            unstyled, it reads as the escape hatch it is. */}
-        {/* "Cancel" on the live record, not "Back". Kept as a quiet link
-            rather than a pill so it does not compete with Run Quotation — the
-            layout is ours to change, the word is not. */}
+            unstyled, it reads as the escape hatch it is.
+
+            IT USED TO SAY "CANCEL", on the reading that the live record labels
+            its back control that way and "the word is not ours to change". The
+            10 Sep bundle re-extraction shows that reading was wrong: the live
+            Cancel is `confirmCancelRfqForm`, with `RFQ_Page.Cancel.Title` and
+            `RFQ_Page.Cancel.Content` behind it. It cancels the RFQ. It is a
+            state change, and it is now built as one — the red button in the
+            action bar below.
+
+            Which left two controls called Cancel on one screen, one of them
+            navigation. So this one says where it goes instead. Deferring to
+            their wording was right; the mistake was deferring to a word whose
+            meaning had been guessed. */}
         <button type="button" className="vy-back"
                 onClick={() => navigate('/sales-management/quotation')}>
-          <span aria-hidden>←</span> Cancel
+          <span aria-hidden>←</span> Project Requirements
         </button>
 
         {/* ---- Smart buttons -----------------------------------------------
@@ -360,6 +373,40 @@ export function QuotationDetail() {
               <>
                 <Button onClick={() => { setDraft({ ...q }); setTouched(new Set()); }}>Edit</Button>
                 <Button onClick={() => setBomOpen(true)}>BoM Comparison</Button>
+                {/* CANCEL RFQ — gap M9. On the live record's action bar and
+                    missing here; our only "Cancel" was the edit-mode one, which
+                    is a different thing entirely. The bundle names its
+                    confirmation directly — `confirmCancelRfqForm`,
+                    `RFQ_Page.Cancel.Title`, `RFQ_Page.Cancel.Content` — so this
+                    is a state change behind a question, not a button.
+
+                    Destructive, so it is a plain button at the far left of the
+                    group rather than beside Run Quotation: the two most
+                    consequential actions on this record should not be
+                    neighbours. Hidden once the RFQ is already closed, because
+                    cancelling a Cancelled record is not a state this system
+                    has. */}
+                {q.status !== 'Cancelled' && q.status !== 'Completed' && (
+                  <Button variant="danger" onClick={() => setCancelOpen(true)}>Cancel</Button>
+                )}
+                {/* CONFIRM RFQ — gap M8. Also on the live action bar, and
+                    absent from this codebase entirely, though our own CSS
+                    already refers to a red part blocking it.
+
+                    WHAT IT DOES IS AN INFERENCE and is flagged as one. The
+                    status vocabulary recovered from the bundle is New,
+                    In Progress, Quoted, Completed, Cancelled, Closed — there is
+                    NO `Confirmed`. So confirming cannot be its own state; the
+                    reading that fits is that it accepts a New requirement and
+                    starts work on it, which is New -> In-Progress. The one
+                    other clue points the same way: the BoM import's confirm
+                    dialog carries `Import_Confirm_Dialog_Change_RfqStatus`, so
+                    confirming is tied to a status change.
+
+                    Only offered while the RFQ is New, for the same reason. */}
+                {q.status === 'New' && (
+                  <Button onClick={() => setConfirmOpen(true)}>Confirm RFQ</Button>
+                )}
                 <Button variant="filled" onClick={() => setRunOpen(true)}>Run Quotation</Button>
               </>
             )}
@@ -559,6 +606,29 @@ export function QuotationDetail() {
           }}
         />
       )}
+      {/* Both are questions before a state change, so both are the same
+          shape: what will happen, stated once, and a verb on the button that
+          says which of the two it is. Neither uses the word "Yes". */}
+      {cancelOpen && (
+        <ConfirmDialog
+          title="Cancel this RFQ?"
+          body={`RFQ${q.no} will be closed as Cancelled. Any quotation already run against it stays on the record, and it stops appearing in the open work queues.`}
+          confirmLabel="Cancel RFQ"
+          tone="danger"
+          onConfirm={() => { setCancelOpen(false); toast.notImplemented('cancel this RFQ'); }}
+          onClose={() => setCancelOpen(false)}
+        />
+      )}
+      {confirmOpen && (
+        <ConfirmDialog
+          title="Confirm this RFQ?"
+          body={`RFQ${q.no} moves from New to In-Progress and becomes work in hand — it leaves the New queue and shows as being worked on.`}
+          confirmLabel="Confirm RFQ"
+          onConfirm={() => { setConfirmOpen(false); toast.notImplemented('confirm this RFQ'); }}
+          onClose={() => setConfirmOpen(false)}
+        />
+      )}
+
       {bomOpen && <BomComparisonDialog onClose={() => setBomOpen(false)} />}
       {runOpen && <RunQuotationDialog q={q} onClose={() => setRunOpen(false)} />}
     </div>

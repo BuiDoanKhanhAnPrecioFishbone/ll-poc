@@ -1434,3 +1434,35 @@
 .vy-filedrop .vy-field-hint { margin-top: var(--vy-space-3); display: block; }
 .vy-attach-tab { padding-block: var(--vy-space-4); }
 .vy-attach-tab .vy-hint { margin-bottom: var(--vy-space-5); }
+
+/* --- Login: the second way in ------------------------------------------------
+   The `OR` rule between the username form and Microsoft SSO. A centred word on
+   a line, drawn with two flex rules rather than a border and a background patch,
+   so it needs no knowledge of what colour it sits on — which matters here,
+   because this panel is one of the few surfaces that differs between themes. */
+.vy-login-or {
+  display: flex; align-items: center; gap: var(--vy-space-5);
+  margin: var(--vy-space-7) 0;
+  font-size: var(--vy-text-xs); text-transform: uppercase;
+  letter-spacing: .06em; color: var(--vy-on-surface-subtle);
+}
+.vy-login-or::before, .vy-login-or::after {
+  content: ''; flex: 1; height: 1px; background: var(--vy-border);
+}
+/* Full width, like the Sign In button above it — two equal ways in, presented
+   as equals.
+
+   The flex row that pairs the mark with the label has to go on Kendo's INNER
+   `.k-button-text`, not on the button. Kendo wraps every child it is given in
+   that one span, so a `display: flex; gap` on the button itself has a single
+   child to lay out and does nothing — the mark rendered on its own line above
+   the words, centred, looking like a logo with a caption. */
+.vy-login-sso { width: 100%; }
+.vy-login-sso .k-button-text {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: var(--vy-space-4);
+}
+.vy-login-sso-hint {
+  margin: var(--vy-space-4) 0 0; text-align: center;
+  font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle);
+}
