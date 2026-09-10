@@ -29,6 +29,11 @@ export function renderCell<T>(spec: ColumnSpec<T>, row: T): ReactNode {
     case 'ident':  return <span className="vy-ident" title={String(v)}>{String(v)}</span>;
     case 'status': return <StatusBadge value={String(v)} />;
     case 'date':   return fmtDate(v as Date);
+    /* A column whose value is a MOMENT renders the moment. Part Master's
+       LAST CHANGE was going through `fmtDate` and losing the time entirely:
+       the live grid shows `09/09/2026 16:35:29` and we showed `16 May 2026`.
+       See gap M10. */
+    case 'datetime': return fmtDateTime(v as Date);
     case 'money':  return (v as number).toLocaleString('en-GB', { style: 'currency', currency: 'USD' });
     case 'number': return (v as number).toLocaleString();
     case 'code':   return <span className="vy-code">{String(v)}</span>;
@@ -68,12 +73,14 @@ export function fmtToday(d: Date = new Date()) {
  * working-hours timestamp — so the information existed and the screen threw it
  * away.
  *
- * HH:MM, not the guideline's HH:MM:SS. The seed sets seconds to zero on every
- * record, so a seconds field would read ":00" on every row of every screen —
- * precision the data does not have. Worth confirming with the customer whether
- * seconds carry meaning for them; against real timestamps this becomes a
- * one-word change.
+ * HH:MM:SS, and it took a look at the live system to earn the last two digits.
+ * This comment used to say HH:MM, on the reasoning that the seed sets seconds to
+ * zero so a seconds field would read ":00" on every row — "worth confirming with
+ * the customer whether seconds carry meaning". Confirmed on 10 Sep: Part Master's
+ * LAST CHANGE column shows `09/09/2026 16:35:29`, `15:51:03`, `10:48:17`. The
+ * seconds are real, they are displayed, and the guideline asked for them all
+ * along. The generators now vary seconds so the column is not a row of `:00`.
  */
 export function fmtDateTime(d: Date) {
-  return `${fmtDate(d)} ${d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}`;
+  return `${fmtDate(d)} ${d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
 }

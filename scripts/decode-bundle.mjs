@@ -68,9 +68,6 @@ function decodeChunk(src) {
     if (rm) {
       // walk back to the nearest `!function(){` or `(function(){` before it
       const back = src.lastIndexOf('function', rm.index);
-      let start = back;
-      if (src[back - 1] === '!') start = back - 1;
-      else if (src[back - 1] === '(') start = back - 1;
       const bodyOpen = src.indexOf('{', back + 8);
       const bodyEnd = matchBraces(src, bodyOpen);
       if (bodyEnd > 0) rotSrc = '!' + src.slice(back, bodyEnd + 1) + '()';
@@ -79,7 +76,7 @@ function decodeChunk(src) {
 
     const prog = `${arrSrc}\n${accSrc}\n${rotSrc}\n
       (function(){ const res=[]; const arr=${arrFn}();
-        for (let i=0;i<arr.length;i++){ try{ const v=${acc}(${offset}+i); if(typeof v==='string'&&v) res.push(v); }catch(e){} }
+        for (let i=0;i<arr.length;i++){ try{ const v=${acc}(${offset}+i); if(typeof v==='string'&&v) res.push(v); }catch{} }
         return res; })()`;
     try {
       const res = vm.runInNewContext(prog,
@@ -88,7 +85,7 @@ function decodeChunk(src) {
         { timeout: 5000 });
       if (res.length) stats.ok++;
       for (const s of res) out.add(s);
-    } catch (e) { stats.threw++; }
+    } catch { stats.threw++; }
   }
   return [...out];
 }

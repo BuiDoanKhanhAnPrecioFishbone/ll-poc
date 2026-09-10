@@ -32,10 +32,11 @@ export const legacyNav: LegacyGroup[] = [
         issues: ['Three names for one thing: nav says "Project Requirements", the browser title says "Request for Quotation", the route and source folder say "quotation".'] },
       { title: 'Sales Orders', path: '/sales-management/so-mst', seq: 3,
         issues: ['Route exposes the database table name (`so-mst` = sales order master).'] },
-      { title: 'RMA Lists', path: '/sales-management/rma', seq: 4,
-        issues: ['"Lists" is an implementation word, not a user word. No other module is called a "List".'] },
-      { title: 'Customer Management', path: '/sales-management/cust-mst', seq: 5,
+      { title: 'Customer Management', path: '/sales-management/cust-mst', seq: 4,
         issues: ['Lives under `system-setup/` in the source tree but under Sales in the menu.'] },
+      { title: 'RMA Lists', path: '/sales-management/rma', seq: 5,
+        issues: ['"Lists" is an implementation word, not a user word. No other module is called a "List".',
+                 'Inventory Management now carries an "RMA List" too — two entries, one word apart, in different modules. The Inventory one does not even open an RMA (see below).'] },
       { title: 'Reporting', path: '/sales-management/reporting', seq: 6,
         issues: ['One of three identically-named "Reporting" entries.'] },
       { title: 'Configuration', path: '/system-setup/sale-setup', seq: 7,
@@ -52,8 +53,6 @@ export const legacyNav: LegacyGroup[] = [
         issues: ['A Procurement screen served from the `sales-management` namespace.'] },
       { title: 'Supplier Management', path: '/inventory-management/supplier', seq: 3,
         issues: ['A Procurement screen served from the `inventory-management` namespace.'] },
-      { title: 'Manufacturer Management', path: '/system-setup/manufacturer', seq: 4,
-        issues: ['A Procurement screen served from the `system-setup` namespace.'] },
       { title: 'Reporting', path: '/procurement/reporting', seq: 5 },
       { title: 'What If', path: '/procurement/what-if', seq: 6,
         issues: ['Unguessable label. Nothing tells a new user this is supply/demand simulation.'] },
@@ -61,23 +60,40 @@ export const legacyNav: LegacyGroup[] = [
     ],
   },
   {
-    title: 'Inventory Management', path: '/inventory-management', seq: 4,
+    /* NEW, 10 Sep 2026. The customer moved the whole parts domain out of
+       Inventory Management into a group of its own — and in doing so landed
+       close to the `Parts` group our own proposed sitemap argues for. Worth
+       saying to them: they reorganised in the same direction, unprompted. */
+    title: 'Engineering', path: '/engineering', seq: 4,
     children: [
-      { title: 'Manufacture Part Number', path: '/inventory-management/mpn', seq: 1,
-        issues: ['Should read "Manufacturer Part Number" (MPN). The current label is grammatically a verb phrase.'] },
-      { title: 'Part Management', path: '/inventory-management/part-mst', seq: 2,
-        issues: ['Nav says "Part Management", the page heading says "Part Master". Two names, one screen.'] },
-      { title: 'Bill of Materials', path: '/inventory-management/bom-list', seq: 3 },
-      { title: 'BoM Templates Setup', path: '/system-setup/bom-templates', seq: 4,
-        issues: ['"BoM" here, "Bill of Materials" one row above — inconsistent casing and abbreviation.'] },
-      { title: 'Transfers Management', path: '/inventory-management/transfer', seq: 5 },
-      { title: 'Adjustments', path: '/inventory-management/adjustments', seq: 6 },
-      { title: 'Reporting', path: '/inventory-management/reporting', seq: 7 },
-      { title: 'Configuration', path: '/inventory-management/configuration', seq: 8 },
+      { title: 'Parts & Item Master', path: '/engineering/part-mst', seq: 1,
+        issues: ['Nav says "Parts & Item Master", the page heading says "Part Master". Two names, one screen — the mismatch survived the rename.'] },
+      { title: 'Bill of Materials (BoM)', path: '/engineering/bom', seq: 2 },
+      { title: 'Manufacturers (MFG)', path: '/engineering/mfg', seq: 3,
+        issues: ['Moved here from Procurement Management, where our 25 Aug capture found it.'] },
+      { title: 'Part Numbers (MPN)', path: '/engineering/mpn', seq: 4,
+        issues: ['"Part Numbers" alone does not distinguish these from the Part Master\'s own numbers; only the "(MPN)" does.'] },
+      { title: 'Material Planning', path: '/planning', seq: 5,
+        issues: ['DEAD LINK: `/planning` returns 404 on the live system itself. Verified 10 Sep.'] },
     ],
   },
   {
-    title: 'Production', path: '/', seq: 5,
+    title: 'Inventory Management', path: '/inventory-management', seq: 5,
+    issues: ['Kept its name and lost its subject: every parts screen moved to Engineering, leaving stock movement and two screens that were not here in August.'],
+    children: [
+      { title: 'Packing List', path: '/inventory-management/packing-list', seq: 1 },
+      { title: 'RMA List', path: '/inventory-management/transfer', seq: 2,
+        issues: ['MISLABELLED: the entry says "RMA List" and opens the Transfer screen — browser title "Transfer", heading "Transfer", transfer columns. Verified 10 Sep.'] },
+      { title: 'Adjustments', path: '/inventory-management/adjustments', seq: 3,
+        issues: ['"Under Construction" on the live system.'] },
+      { title: 'Reporting', path: '/inventory-management/reporting', seq: 4 },
+      { title: 'Configuration', path: '/inventory-management/configuration', seq: 5 },
+      { title: 'BoM Templates', path: '/system-setup/bom-templates', seq: 6,
+        issues: ['A BoM screen left behind in Inventory when the rest of the BoM domain moved to Engineering.'] },
+    ],
+  },
+  {
+    title: 'Production', path: '/', seq: 6,
     issues: ['Group header routes to `/`.'],
     children: [
       { title: 'PCB Viewer', path: '/production/pcb-viewer', seq: 1 },
@@ -92,7 +108,7 @@ export const legacyNav: LegacyGroup[] = [
     ],
   },
   {
-    title: 'Accounting', path: '/', seq: 6,
+    title: 'Accounting', path: '/', seq: 7,
     issues: ['Group header routes to `/`.', 'Sequences collide: two children share seq 2, and 3 and 5 are unused — ordering is not deterministic.'],
     children: [
       { title: 'Customer Invoices', path: '/accounting/customer-invoices', seq: 1 },
@@ -104,12 +120,12 @@ export const legacyNav: LegacyGroup[] = [
     ],
   },
   {
-    title: 'DB Encryption', path: '/db-encryption', seq: 7,
+    title: 'DB Encryption', path: '/db-encryption', seq: 8,
     issues: ['A database administration tool sitting at the same level as Sales and Accounting.', 'Named after the implementation, visible to every user who can see the menu.'],
     children: [],
   },
   {
-    title: 'System Configuration', path: '/user-management', seq: 8,
+    title: 'System Configuration', path: '/user-management', seq: 9,
     issues: ['Eleven admin screens flattened into one list, at the same level as the six business modules.', 'Three children all carry sequence 0 — their order is whatever the API happens to return.', 'Group title says "System Configuration" but its path is `/user-management`.'],
     children: [
       { title: 'Job Management', path: '/system-setup/job-management', seq: 0 },
@@ -222,9 +238,9 @@ export const proposedNav: NavGroup[] = [
   {
     title: 'Parts', icon: 'parts', purpose: 'What things are, and what they are made of',
     items: [
-      { title: 'Part Master', path: '/parts', wasCalled: 'Inventory › Part Management', hint: 'The single record for every part you buy, make or sell' },
-      { title: 'Manufacturer Part Numbers', path: '/parts/mpn', wasCalled: 'Inventory › Manufacture Part Number', hint: 'Approved manufacturer equivalents for a part' },
-      { title: 'Bills of Materials', path: '/parts/bom', wasCalled: 'Inventory › Bill of Materials', hint: 'What a product is assembled from' },
+      { title: 'Part Master', path: '/engineering/part-mst', wasCalled: 'Inventory › Part Management', hint: 'The single record for every part you buy, make or sell' },
+      { title: 'Manufacturer Part Numbers', path: '/engineering/mpn', wasCalled: 'Inventory › Manufacture Part Number', hint: 'Approved manufacturer equivalents for a part' },
+      { title: 'Bills of Materials', path: '/engineering/bom', wasCalled: 'Inventory › Bill of Materials', hint: 'What a product is assembled from' },
     ],
   },
   {

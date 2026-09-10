@@ -7,6 +7,7 @@ import { Button } from '../ui/Button';
 import { useToast } from '../ui/Toast';
 import { PartDetail } from '../components/PartDetail';
 import { ImportPartsDialog } from '../components/ImportPartsDialog';
+import { AmlSearchDialog } from '../components/AmlSearchDialog';
 import { AddPartDialog } from '../components/AddPartDialog';
 import { FilterToolbar } from '../ui/FilterToolbar';
 import { ViewSetting } from '../ui/ViewSetting';
@@ -49,6 +50,7 @@ export function PartMaster() {
   const [quickOn, setQuickOn] = useState<string[]>([]);
   const [settingOpen, setSettingOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const [amlOpen, setAmlOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const { exportRows, excel } = useExcelExport<Part>();
   /* Held by id rather than by row, so a selection survives sorting, filtering
@@ -162,6 +164,16 @@ export function PartMaster() {
               Import by Customer — rather than reporting one unspecified action
               for two different outcomes. */}
           <Button onClick={() => setImportOpen(true)}>Import</Button>
+          {/* AML SEARCH — gap M2. On the live toolbar and absent here, which
+              was odd twice over: the Approved Manufacturer List is a concept
+              this prototype already models inside a part record
+              (`MpnMapping.tsx`), so the screen had the data and no way in.
+
+              It searches ACROSS parts by manufacturer or manufacturer part
+              number, which is the one question the part-number search on this
+              screen cannot answer: "who else can supply this, and what else do
+              we buy from them". */}
+          <Button onClick={() => setAmlOpen(true)}>AML Search</Button>
           {/* Named as the guideline names it. The label changes only to state
               the SCOPE once a selection exists, because that is the moment the
               two possible outcomes diverge — export what I picked, or export
@@ -237,6 +249,7 @@ export function PartMaster() {
       {excel}
 
       {importOpen && <ImportPartsDialog parts={data} onClose={() => setImportOpen(false)} />}
+      {amlOpen && <AmlSearchDialog onClose={() => setAmlOpen(false)} />}
 
       {/* "Create the new Part successfully" then "Display the details of the
           newly created part" — the list refreshes and the record opens. */}

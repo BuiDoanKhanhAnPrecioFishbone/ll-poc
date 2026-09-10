@@ -3,6 +3,9 @@ import { BrowserRouter, Routes, Route, useParams } from 'react-router-dom';
 import { AppShell } from './components/AppShell';
 import { Home } from './pages/Home';
 import { PartMaster } from './pages/PartMaster';
+import { MpnList } from './pages/MpnList';
+import { ManufacturerList } from './pages/ManufacturerList';
+import { PackingList } from './pages/PackingList';
 import { BomList } from './pages/BomList';
 import { Quotations } from './pages/Quotations';
 import { QuotationDetail } from './pages/QuotationDetail';
@@ -47,11 +50,24 @@ export default function App() {
               resolves. */}
           <Route path="/" element={<Home />} />
           <Route path="/my-queues" element={<Queues />} />
-          <Route path="/inventory-management/part-mst" element={<PartMaster />} />
-          {/* The sitemap already named this path; nothing served it, so it fell
-              through to the placeholder. */}
-          <Route path="/inventory-management/bom-list" element={<BomList />} />
-          <Route path="/parts" element={<Navigate to="/inventory-management/part-mst" replace />} />
+          {/* ENGINEERING. The customer reorganised their menu after our 25 Aug
+              capture: a new Engineering group took the parts domain out of
+              Inventory Management, and the routes moved with it. Verified
+              10 Sep — `/inventory-management/part-mst` now returns 404 on the
+              live system. See docs/live-recheck-10sep.md. */}
+          <Route path="/engineering/part-mst" element={<PartMaster />} />
+          <Route path="/engineering/bom" element={<BomList />} />
+          <Route path="/engineering/mpn" element={<MpnList />} />
+          <Route path="/engineering/mfg" element={<ManufacturerList />} />
+          <Route path="/inventory-management/packing-list" element={<PackingList />} />
+          {/* The old paths still resolve. They are in shared links, in our own
+              docs and in the customer's muscle memory, and a redirect costs one
+              line where a 404 costs a support call. */}
+          <Route path="/inventory-management/part-mst" element={<Navigate to="/engineering/part-mst" replace />} />
+          <Route path="/inventory-management/bom-list" element={<Navigate to="/engineering/bom" replace />} />
+          <Route path="/inventory-management/mpn" element={<Navigate to="/engineering/mpn" replace />} />
+          <Route path="/system-setup/manufacturer" element={<Navigate to="/engineering/mfg" replace />} />
+          <Route path="/parts" element={<Navigate to="/engineering/part-mst" replace />} />
           <Route path="/sales-management/quotation" element={<Quotations />} />
           <Route path="/sales-management/quotation/:id" element={<QuotationDetail />} />
           <Route path="/sell/quotations" element={<Navigate to="/sales-management/quotation" replace />} />

@@ -162,7 +162,9 @@ function generated(count: number): Part[] {
       onHand,
       allocated: Math.floor(onHand * rnd() * 0.6),
       unitCost: Math.round(rnd() * 24000) / 100,
-      lastChange: new Date(2026, 7, 19 - Math.floor(rnd() * 400), Math.floor(rnd() * 24), Math.floor(rnd() * 60)),
+      /* Seconds vary, because the live column shows them and a column of `:00`
+         would be a worse lie than no seconds at all. */
+      lastChange: new Date(2026, 7, 19 - Math.floor(rnd() * 400), Math.floor(rnd() * 24), Math.floor(rnd() * 60), Math.floor(rnd() * 60)),
       status: pick(STATUSES),
     });
   }
@@ -195,17 +197,24 @@ function generated(count: number): Part[] {
  * default view is the live eleven and the extra three are a choice the user
  * makes in the column chooser rather than one made for them.
  */
+/* Column TITLES are the live system's own words, checked against the grid on
+   10 Sep: `CUSTOMER NAME`, `PART SOURCE`, `LAST CHANGE`. We had shortened all
+   three to Customer / Source / Last Changed, which reads better and is not ours
+   to decide — precedence.md puts field names in the live system's tier. Gap M7.
+
+   `lastChange` is a `datetime`, not a `date`: the live column carries a time,
+   to the second. Gap M10. */
 export const PART_COLUMNS: ColumnSpec<Part>[] = [
   { field: 'partNumber', title: 'Part Number', role: 'ident', searchable: true },
-  { field: 'customer', title: 'Customer', role: 'text', searchable: true, priority: 2 },
+  { field: 'customer', title: 'Customer Name', role: 'text', searchable: true, priority: 2 },
   { field: 'rev', title: 'Rev', role: 'code', priority: 3 },
   { field: 'description', title: 'Description', role: 'text', searchable: true },
-  { field: 'partSource', title: 'Source', role: 'code', priority: 3 },
+  { field: 'partSource', title: 'Part Source', role: 'code', priority: 3 },
   { field: 'partClass', title: 'Part Class', role: 'code', hiddenByDefault: true, note: 'Empty in 55% of records' },
   { field: 'partType', title: 'Part Type', role: 'code', hiddenByDefault: true, note: 'Empty in 55% of records' },
   { field: 'abc', title: 'ABC', role: 'code', hiddenByDefault: true, note: 'Empty in 100% of records — hidden until it is populated' },
   { field: 'uom', title: 'UoM', role: 'code', priority: 3 },
-  { field: 'lastChange', title: 'Last Changed', role: 'date', priority: 2 },
+  { field: 'lastChange', title: 'Last Change', role: 'datetime', priority: 2 },
   { field: 'status', title: 'Status', role: 'status' },
   /* Not on the live list — see the note above. */
   { field: 'onHand', title: 'On Hand', role: 'number', hiddenByDefault: true, note: 'Not on the live list; stock detail, off by default' },

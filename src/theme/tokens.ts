@@ -20,6 +20,11 @@ export const COLUMN_WIDTH = {
   number: 104,
   money: 124,
   date: 150,
+  /* A moment, not a day. The live Part Master renders LAST CHANGE as
+     `09/09/2026 16:35:29` and the MPN list renders LAST SYNCED AT the same way,
+     so a column that carries a timestamp needs room for one — 150px fits
+     "16 May 2026" and clips the time off the end of it. */
+  datetime: 190,
   status: 128,
   /* Was `rating` at 132px, sized for three stars. Priority is now a dot and a
      word, and the widest word is "Medium" — a dot, a gap and six characters. */
