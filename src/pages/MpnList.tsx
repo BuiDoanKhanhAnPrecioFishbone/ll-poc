@@ -83,6 +83,17 @@ export function MpnList() {
         allColumns={MPN_COLUMNS}
         onToggleColumn={L.toggleColumn}
         onResetColumns={() => L.setWorkingCols(L.view.columns)}
+        loading={L.loading}
+        /* Offered only when no FILTER is narrowing the list — the grid writes
+           its own, better sentence about filters and `emptyHint` would override
+           it. The wording is a STANDING FACT about where rows come from, not a
+           claim about the current state: the same hint also shows under
+           "Nothing matches ‘xyz’" after a failed search, where "none on file
+           yet" would simply be false. The first draft said exactly that, under
+           a heading contradicting it. */
+        emptyHint={L.quickOn.length + L.filterActive > 0
+          ? undefined
+          : 'An approved manufacturer part appears here once its MPN is mapped to a part.'}
         onOpenRow={row => toast.notImplemented(`open ${row.mpnNumber}`)}
       />
 

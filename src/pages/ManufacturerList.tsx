@@ -68,6 +68,17 @@ export function ManufacturerList() {
         allColumns={MANUFACTURER_COLUMNS}
         onToggleColumn={L.toggleColumn}
         onResetColumns={() => L.setWorkingCols(L.view.columns)}
+        loading={L.loading}
+        /* Offered only when no FILTER is narrowing the list — the grid writes
+           its own, better sentence about filters and `emptyHint` would override
+           it. The wording is a STANDING FACT about where rows come from, not a
+           claim about the current state: this same hint also shows under
+           "Nothing matches ‘xyz’" after a failed search, and a sentence that
+           says "none on file yet" is simply false there. First draft said
+           exactly that, under a heading contradicting it. */
+        emptyHint={L.quickOn.length + L.filterActive > 0
+          ? undefined
+          : 'Manufacturers are added here, or imported as a list.'}
         onOpenRow={row => toast.notImplemented(`open ${row.name}`)}
       />
 

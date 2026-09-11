@@ -85,6 +85,17 @@ export function PackingList() {
         allColumns={PACKING_LIST_COLUMNS}
         onToggleColumn={L.toggleColumn}
         onResetColumns={() => L.setWorkingCols(L.view.columns)}
+        loading={L.loading}
+        /* Offered only when no FILTER is narrowing the list — the grid writes
+           its own, better sentence about filters and `emptyHint` would override
+           it. The wording is a STANDING FACT about where rows come from, not a
+           claim about the current state: the same hint also shows under
+           "Nothing matches ‘xyz’" after a failed search, where "none on file
+           yet" would simply be false. The first draft said exactly that, under
+           a heading contradicting it. */
+        emptyHint={L.quickOn.length + L.filterActive > 0
+          ? undefined
+          : 'A packing list is created when an order is ready to go out.'}
         onOpenRow={row => toast.notImplemented(`open ${row.packingList}`)}
       />
 

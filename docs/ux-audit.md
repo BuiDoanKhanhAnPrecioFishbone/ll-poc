@@ -122,3 +122,66 @@ were measured when they were set. Keyboard traversal was checked for focus
 containment, not for tab ORDER within each dialog — **closed 5 Sep**: dialogs run
 column by column, matching their headings, with no group left and returned to.
 See `docs/focus-order.md`.
+
+---
+
+# Responsive and accessibility check — the six surfaces added since 8 Sep, 11 Sep 2026
+
+Manufacturers, Part Numbers (MPN), Packing Lists, the two new RFQ record
+actions and the redesigned Login were built and verified for behaviour, and
+never checked at narrow widths, in dark, or for assistive technology. Same
+method as the 31 August pass.
+
+**Nothing had to be fixed.** Two things had to be *corrected in the check*,
+which is the part worth writing down.
+
+## Responsive, at 375 × 812
+
+| Surface | Result |
+|---|---|
+| Manufacturers | page does not scroll sideways (375 vs 375); grid scrolls inside its own box, 1478 → 345 |
+| Part Numbers (MPN) | same; 1726 → 345 |
+| Packing Lists | same; 1310 → 345 |
+| Login | no sideways scroll; the scope list correctly drops out below 860px, brand mark stays |
+| Cancel RFQ dialog | 360w inside 375, fully within the viewport |
+
+The sidebar is `position: fixed` at `x: -248` on a phone — off-canvas, with
+`main` taking the full 375. That is correct, and it is what first made seven
+correctly-labelled nav links look unnamed.
+
+## Accessibility
+
+| Surface | Interactive controls | Without an accessible name |
+|---|---|---|
+| Manufacturers | 60 | 0 |
+| Part Numbers (MPN) | 65 | 0 |
+| Packing Lists | 64 | 0 |
+| Login | 8 | 0 |
+| Cancel RFQ dialog | all | 0 |
+
+## Contrast, in dark
+
+| Surface | Text nodes checked | Failures |
+|---|---|---|
+| Manufacturers | 120 | 0 |
+| Part Numbers (MPN) | 111 | 0 |
+| Packing Lists | 83 | 0 |
+| Login | 12 | 0 (brand panel floor 5.96:1) |
+
+The sweep was given a positive control — a low-contrast colour injected into
+`.vy-truncate` — and reported 65 failures at 1.58:1, then returned to 0 when it
+was removed. A sweep that has never been seen to fail is not evidence.
+
+## Two checks that were wrong before the code was
+
+**`innerText` returns `''` while the browser pane is hidden**, so the first
+accessible-name pass reported eight unnamed controls — seven sidebar links and
+the search button, all of which carry text. `textContent` does not depend on
+rendering and is the right tool for this.
+
+**`color(srgb r g b)` components are already gamma-encoded.** The first contrast
+sweep re-applied the sRGB transfer function to them and reported 40 failures at
+1.09:1 — which is not a contrast result, it is a parser comparing a colour with
+itself. The same bug produced a wrong underline measurement earlier in the same
+week. Alpha is now composited rather than skipped, so an 11% row stripe is read
+as the surface it actually is.

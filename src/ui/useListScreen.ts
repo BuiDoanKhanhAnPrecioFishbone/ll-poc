@@ -21,7 +21,7 @@ import { applyView, activeCount, type FilterValues, type SavedView, type ViewFie
  * three screens already shared by accident is stated once here. Each screen
  * still declares WHAT it filters and sorts by; none of them re-implement HOW.
  */
-export function useListScreen<T>({ key, rows, columns, filterFields, quick }: {
+export function useListScreen<T>({ key, rows, columns, filterFields, quick, loadMs = 700 }: {
   /** Storage key for saved views. Distinct per screen, so one screen's views
       cannot appear in another's picker. */
   key: string;
@@ -30,7 +30,22 @@ export function useListScreen<T>({ key, rows, columns, filterFields, quick }: {
   filterFields: (rows: T[]) => ViewField<T>[];
   /** The KPI tiles, which double as filters. Omit where a split would be noise. */
   quick?: { key: string; label: string; match: (row: T) => boolean }[];
+  /**
+   * How long the first paint shows the skeleton.
+   *
+   * Every list screen in this prototype has its data in memory, so without
+   * this the grid appears instantly and the LOADING STATE — a real, designed
+   * state with its own skeleton — can never be seen. Part Master and Bills of
+   * Materials each simulate it with their own `useEffect`; the three screens
+   * added on 10 September did not, so they alone popped straight to rows. It
+   * belongs here, where every list screen gets the same behaviour by
+   * construction rather than by remembering.
+   */
+  loadMs?: number;
 }) {
+  const [loading, setLoading] = useState(true);
+  useEffect(() => { const t = setTimeout(() => setLoading(false), loadMs); return () => clearTimeout(t); }, [loadMs]);
+
   const [values, setValues] = useState<FilterValues>({});
   const [quickOn, setQuickOn] = useState<string[]>([]);
   const [settingOpen, setSettingOpen] = useState(false);
@@ -84,6 +99,7 @@ export function useListScreen<T>({ key, rows, columns, filterFields, quick }: {
   }, [workingCols, columns]);
 
   return {
+    loading,
     views, view, values, setValues, quickOn, setQuickOn,
     settingOpen, setSettingOpen,
     allFields, fields, filterActive,
