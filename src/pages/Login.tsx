@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TextField } from '../ui/Field';
 import { Button } from '../ui/Button';
@@ -62,12 +62,26 @@ export function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(false);
+  /* Caps Lock is the single commonest reason a correct password is rejected,
+     and the one thing a password field can warn about without knowing the
+     password. Read from the key event's modifier state — no key logging. */
+  const [caps, setCaps] = useState(false);
+  const [attempted, setAttempted] = useState(false);
+  const userRef = useRef<HTMLInputElement>(null);
 
-  const ready = username.trim() !== '' && password.trim() !== '';
+  /* The cursor belongs in the first field. This page has one job. */
+  useEffect(() => { userRef.current?.focus(); }, []);
+
+  const missing = [
+    username.trim() === '' ? 'Username' : null,
+    password.trim() === '' ? 'Password' : null,
+  ].filter(Boolean) as string[];
+  const ready = missing.length === 0;
 
   function signIn(e: React.FormEvent) {
     e.preventDefault();
-    if (!ready) return;
+    setAttempted(true);
+    if (!ready) { userRef.current?.focus(); return; }
     /* Deliberately not "signed in as {username}" — echoing back what was typed
        into a password form is the shape of a thing that checked it. */
     toast.success('Not in this prototype — this would sign you in. No credentials are sent or stored.');
@@ -79,6 +93,12 @@ export function Login() {
       {/* Left: the brand panel. On-dark surface, which is the one high-contrast
           ground this design system already owns — the sidebar uses it, so the
           login and the app agree before you have signed in. */}
+      {/* THREE ZONES, not one centred stack. The first version answered the
+          deck's "too much empty space" by moving the empty space to the left —
+          a small block floating in a tall dark field is the same fault on a
+          different ground. Anchoring the mark to the top, the statement to the
+          optical centre and the small print to the foot is how the panel earns
+          its 45% of the page. */}
       <aside className="vy-login-brand">
         <div className="vy-login-brandmark">
           <span className="vy-brand-mark" aria-hidden>V</span>
@@ -87,10 +107,26 @@ export function Login() {
             <span>Linh Long Engineering</span>
           </div>
         </div>
-        <p className="vy-login-pitch">ERP solutions for corporate.</p>
-        <p className="vy-login-note">
-          A design prototype. No account is required and nothing you type here is sent anywhere.
-        </p>
+
+        <div className="vy-login-statement">
+          {/* Replaces "ERP solutions for corporate." — the live logo's strapline,
+              which reads as a fragment when it is set as a headline. This says
+              what the system actually does, in the order the work happens:
+              a quote becomes a BoM, a BoM becomes a build, a build ships. */}
+          <p className="vy-login-pitch">One record for a part, from quote to shipment.</p>
+          <ul className="vy-login-scope">
+            <li>Quotations and BoM comparison</li>
+            <li>Parts, manufacturers and approved MPNs</li>
+            <li>Production, stock and packing</li>
+          </ul>
+        </div>
+
+        <div className="vy-login-foot">
+          <p className="vy-login-note">
+            A design prototype. No account is required and nothing you type here
+            is sent anywhere.
+          </p>
+        </div>
       </aside>
 
       {/* Right: the form, held to a readable width inside its half rather than
@@ -100,21 +136,40 @@ export function Login() {
           <h1 className="vy-login-title">Welcome Back</h1>
           <p className="vy-login-sub">Please sign in to continue</p>
 
+          {/* Shown only after a real attempt, so the page does not greet you
+              with an error you have not earned. `role="alert"` so it is
+              announced rather than only seen. */}
+          {attempted && missing.length > 0 && (
+            <p className="vy-login-error" role="alert">
+              {missing.length === 2
+                ? 'Enter your username and password.'
+                : `Enter your ${missing[0].toLowerCase()}.`}
+            </p>
+          )}
+
           <TextField
+            ref={userRef}
             label="Username"
             placeholder="Enter Username"
             autoComplete="username"
             value={username}
             onChange={e => setUsername(e.target.value)}
+            aria-invalid={attempted && username.trim() === '' ? true : undefined}
           />
-          <TextField
-            label="Password"
-            type="password"
-            placeholder="Enter Password"
-            autoComplete="current-password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-          />
+          <div className="vy-login-pw">
+            <TextField
+              label="Password"
+              type="password"
+              placeholder="Enter Password"
+              autoComplete="current-password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              onKeyUp={e => setCaps(e.getModifierState('CapsLock'))}
+              onBlur={() => setCaps(false)}
+              aria-invalid={attempted && password.trim() === '' ? true : undefined}
+            />
+            {caps && <p className="vy-login-caps" role="status">Caps Lock is on.</p>}
+          </div>
 
           <div className="vy-login-row">
             <Checkbox checked={remember} onCheckedChange={setRemember} label="Remember me" />
@@ -126,14 +181,20 @@ export function Login() {
 
           {/* Filled primary. Measured 10 Sep: white on blue-600 is 9.16:1 in
               light, and near-black on blue-300 is 6.86:1 in dark. This comment
-              said 8.6:1 for years after the palette moved to hue 222 — a number
-              carried forward rather than re-measured, which is how a figure ends
-              up in a client document being wrong.
+              said 8.6:1 long after the palette moved to hue 222 — a number
+              carried forward rather than re-measured, which is how a wrong
+              figure reaches a client document.
 
               The live button is pale blue on white, the contrast fault the deck
-              names. Disabled until both boxes have something in them, so the one
-              control on the page never fails silently. */}
-          <Button type="submit" variant="filled" className="vy-login-submit" disabled={!ready}>
+              names.
+
+              IT IS NO LONGER DISABLED WHEN THE FIELDS ARE EMPTY. That was here
+              so the one control on the page could not fail silently, and the
+              intent was right — but a dead button is the silent failure. It
+              gives a keyboard or screen-reader user nothing to act on and does
+              not say which field is missing. Pressing it now names the field
+              instead. */}
+          <Button type="submit" variant="filled" className="vy-login-submit">
             Sign In
           </Button>
 

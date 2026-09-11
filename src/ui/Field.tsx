@@ -1,7 +1,11 @@
-import type { InputHTMLAttributes, TextareaHTMLAttributes } from 'react';
+import type { InputHTMLAttributes, Ref, TextareaHTMLAttributes } from 'react';
 
+/* `ref` is declared rather than inherited: React 19 passes it to a function
+   component as an ordinary prop, but `InputHTMLAttributes` does not carry it,
+   so TypeScript rejects it. Login needs one to put the cursor in the first
+   field and to send it back there when a submit finds the field empty. */
 export function TextField({ label, hint, className = '', ...rest }: {
-  label?: string; hint?: string;
+  label?: string; hint?: string; ref?: Ref<HTMLInputElement>;
 } & InputHTMLAttributes<HTMLInputElement>) {
   return (
     <label className={`vy-field-control ${className}`.trim()}>

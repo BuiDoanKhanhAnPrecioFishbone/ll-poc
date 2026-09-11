@@ -1298,11 +1298,36 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
    before a task. */
 .vy-login { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); min-height: 100vh; }
 
+/* THREE ZONES. `justify-content: center` stacked the mark, the statement and
+   the small print into one block floating in a tall dark field — which is the
+   deck's "too much empty space" fault again, just on a darker ground. The mark
+   anchors the top, the statement sits at the optical centre, the small print
+   holds the foot, and the space between them is doing the work. */
 .vy-login-brand {
   background: var(--vy-surface-chrome);
   padding: var(--vy-space-14) var(--vy-space-12);
-  display: flex; flex-direction: column; justify-content: center; gap: var(--vy-space-8);
+  display: flex; flex-direction: column; justify-content: space-between;
+  gap: var(--vy-space-12);
 }
+/* The statement carries the vertical centre. Slightly above true centre —
+   optical centring reads as centred where geometric centring reads as low. */
+.vy-login-statement { display: flex; flex-direction: column; gap: var(--vy-space-8); margin-block: auto; }
+
+/* What the system covers, in the order the work happens: a quote becomes a
+   BoM, a BoM becomes a build, a build ships. Three lines, because a fourth
+   turns a statement into a feature list. */
+.vy-login-scope { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--vy-space-4); }
+.vy-login-scope li {
+  color: var(--vy-on-dark-secondary); font-size: var(--vy-text-base);
+  padding-left: var(--vy-space-7); position: relative;
+}
+/* A rule, not a bullet or a tick. A tick would claim these are features that
+   have been delivered; a rule just marks the line. */
+.vy-login-scope li::before {
+  content: ''; position: absolute; left: 0; top: .7em;
+  width: var(--vy-space-5); height: 1px; background: var(--vy-brand);
+}
+.vy-login-foot { display: flex; flex-direction: column; gap: var(--vy-space-4); }
 .vy-login-brandmark { display: flex; align-items: center; gap: var(--vy-space-6); }
 .vy-login-brandmark > div { display: flex; flex-direction: column; line-height: 1.25; }
 .vy-login-brandmark strong { color: var(--vy-on-dark-fg); font-size: var(--vy-text-xl); letter-spacing: .08em; }
@@ -1325,6 +1350,25 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
    page, and the live one is a pale bar that reads as disabled. */
 .vy-login-submit { width: 100%; min-height: var(--vy-space-14); font-size: var(--vy-text-md); }
 .vy-login-forgot { font-size: var(--vy-text-base); }
+/* The password field and its Caps Lock warning are one unit, so the warning
+   cannot open a gap between the field and the row below it. */
+.vy-login-pw { display: flex; flex-direction: column; gap: var(--vy-space-3); }
+.vy-login-caps {
+  margin: 0; font-size: var(--vy-text-sm); color: var(--vy-accent-warning);
+  display: flex; align-items: center; gap: var(--vy-space-3);
+}
+.vy-login-caps::before {
+  content: ''; width: var(--vy-space-4); height: var(--vy-space-4); border-radius: 50%;
+  background: var(--vy-accent-warning); flex: none;
+}
+/* Sits above the fields it is about, so a screen reader meets the problem
+   before the controls rather than after them. */
+.vy-login-error {
+  margin: 0; padding: var(--vy-space-5) var(--vy-space-6);
+  background: var(--vy-status-blocked-bg); color: var(--vy-status-blocked-fg);
+  border-left: var(--vy-accent-bar-w) solid var(--vy-danger);
+  border-radius: var(--vy-shape-xs); font-size: var(--vy-text-base);
+}
 .vy-login-legal { margin: var(--vy-space-6) 0 0; display: flex; align-items: center; justify-content: center; gap: var(--vy-space-4); font-size: var(--vy-text-sm); color: var(--vy-on-surface-subtle); }
 
 @media (max-width: 860px) {
@@ -1335,7 +1379,8 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
      rest. */
   .vy-login { grid-template-columns: 1fr; grid-template-rows: auto 1fr; min-height: 100dvh; }
   .vy-login-brand { padding: var(--vy-space-10) var(--vy-space-9); gap: var(--vy-space-5); }
-  .vy-login-pitch, .vy-login-note { display: none; }
+  .vy-login-pitch, .vy-login-note, .vy-login-scope, .vy-login-foot { display: none; }
+  .vy-login-statement { margin-block: 0; }
   .vy-login-panel { padding: var(--vy-space-10) var(--vy-space-9); align-items: flex-start; }
 }
 
