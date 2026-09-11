@@ -238,6 +238,10 @@
   --vy-status-blocked-fg:    var(--vy-red-700);
   --vy-status-blocked-bg:    var(--vy-red-50);
   --vy-status-cancelled-fg:  var(--vy-grey-500);
+  /* Chart-only. A cancelled SEGMENT has to be told apart from a New one at a
+     glance, touching it in the same bar; a cancelled BADGE never does. Darker
+     and cooler than draft's neutral, in both themes. */
+  --vy-chart-cancelled:      var(--vy-grey-700);
   --vy-status-cancelled-bg:  var(--vy-grey-100);
 
   /* --- BoM line tones -------------------------------------------------------
@@ -578,6 +582,7 @@
   --vy-status-blocked-fg: #ee9a96;
   --vy-status-blocked-bg: #38201e;
   --vy-status-cancelled-fg: #aab4c3;
+  --vy-chart-cancelled: #5d6878;
   --vy-status-cancelled-bg: #2a323f;
   --vy-tone-excluded-bg: #2a323f;
   --vy-tone-excluded-fg: #aab4c3;
@@ -657,6 +662,7 @@
     --vy-status-blocked-fg: #ee9a96;
     --vy-status-blocked-bg: #38201e;
     --vy-status-cancelled-fg: #aab4c3;
+  --vy-chart-cancelled: #5d6878;
     --vy-status-cancelled-bg: #2a323f;
     --vy-tone-excluded-bg: #2a323f;
     --vy-tone-excluded-fg: #aab4c3;

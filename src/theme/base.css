@@ -50,7 +50,14 @@ button, input, textarea, select, optgroup {
 :where(button[class]) { appearance: none; background: none; border: 0; }
 
 h1, h2, h3, h4, h5, h6, p, figure, blockquote, dl, dd { margin: 0; }
-ul[class], ol[class] { list-style: none; margin: 0; padding: 0; }
+/* SAME TRICK, SAME REASON — and it was missing from the line below the one
+   that explains it. Written plainly, `ul[class]` scores (0,1,1) and beats a
+   single class at (0,1,0), so it silently ate the margin AND padding of every
+   list that tried to set its own. Seven were losing spacing they had asked
+   for: the dashboard chart legend (its rule sat hard against its own text),
+   the checklist, the load and MFG-map lists, the command palette, the people
+   picker and the attachment list. `:where()` makes this a floor again. */
+:where(ul[class], ol[class]) { list-style: none; margin: 0; padding: 0; }
 img, svg, video { max-width: 100%; display: block; }
 a { color: inherit; }
 

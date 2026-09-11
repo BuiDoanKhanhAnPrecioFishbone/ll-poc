@@ -438,7 +438,10 @@
 
 /* Marks content this mockup could not verify against the live system, so a
    reviewer never mistakes an inference for an observation. */
-.vy-unverified { font-size: var(--vy-text-xs); color: var(--vy-accent-warning); background: var(--vy-status-open-bg); border-radius: var(--vy-radius-sm); padding: var(--vy-space-3) var(--vy-space-5); }
+/* A caution about the content above it, so it needs air above it. It had
+   padding and no margin at all, and its parent card is `display: block` with
+   no gap — so it sat flush against the chart legend, 0px between them. */
+.vy-unverified { font-size: var(--vy-text-xs); color: var(--vy-accent-warning); background: var(--vy-status-open-bg); border-radius: var(--vy-radius-sm); padding: var(--vy-space-3) var(--vy-space-5); margin-top: var(--vy-space-7); }
 
 /* --- Collapsible nav groups --------------------------------------------------
    The group header is a button, not a div: collapsing a section is an action
@@ -661,11 +664,27 @@
 .vy-chart-n[data-zero] { color: var(--vy-on-surface-subtle); font-weight: var(--vy-weight-regular); }
 .vy-chart-month { margin-top: var(--vy-space-1); font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle); }
 
+/* A CHART SEGMENT IS NOT A BADGE, and this block was treating them as the same
+   thing. The status tokens come in pairs — `-fg` is the text on a chip, `-bg`
+   is the chip — and for four of the five states the saturated half happens to
+   be `-fg`, so reading `-fg` looked right. For `progress` it is not: the chip
+   is solid green and its `-fg` is literally `#ffffff`, so the In-Progress
+   series was drawn WHITE ON A WHITE CARD. Thirty-nine records, on the
+   dashboard, invisible — and the legend key beside it blank.
+
+   `progress` therefore takes the saturated half of its own pair. */
 .vy-chart-seg[data-status="draft"],     .vy-chart-key[data-status="draft"]     { background: var(--vy-status-draft-fg); }
-.vy-chart-seg[data-status="progress"],  .vy-chart-key[data-status="progress"]  { background: var(--vy-status-progress-fg); }
+.vy-chart-seg[data-status="progress"],  .vy-chart-key[data-status="progress"]  { background: var(--vy-status-progress-bg); }
 .vy-chart-seg[data-status="open"],      .vy-chart-key[data-status="open"]      { background: var(--vy-status-open-fg); }
 .vy-chart-seg[data-status="done"],      .vy-chart-key[data-status="done"]      { background: var(--vy-status-done-fg); }
-.vy-chart-seg[data-status="cancelled"], .vy-chart-key[data-status="cancelled"] { background: var(--vy-status-cancelled-fg); }
+/* Cancelled gets its own neutral HERE, and only here. As badges, New and
+   Cancelled sit on separate rows and a near-identical grey costs nothing; in a
+   stacked bar they touch. Measured, `draft-fg` and `cancelled-fg` are 1.35:1
+   apart in light and IDENTICAL in dark — one colour for two series, which is
+   the "every status is green" fault this project exists to fix, reproduced in
+   our own chart. The badge tokens are the customer's specification and stay
+   exactly as they are. */
+.vy-chart-seg[data-status="cancelled"], .vy-chart-key[data-status="cancelled"] { background: var(--vy-chart-cancelled); }
 
 .vy-chart-legend { list-style: none; display: flex; flex-wrap: wrap; gap: var(--vy-space-4) var(--vy-space-8); margin: var(--vy-space-8) 0 0; padding: var(--vy-space-6) 0 0; border-top: 1px solid var(--vy-border); }
 .vy-chart-legend li { display: flex; align-items: center; gap: var(--vy-space-3); font-size: var(--vy-text-sm); color: var(--vy-on-surface-soft); }
