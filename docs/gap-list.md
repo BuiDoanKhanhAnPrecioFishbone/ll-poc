@@ -218,7 +218,9 @@ resolves, nothing renders the generic placeholder.
 3. **`BOM STATUS` wording.** Evidenced as a two-state toggle
    (`ToggleStatusBOM`); which two words is not established.
 4. **What `Confirm RFQ` actually does.** There is no `Confirmed` in the status
-   vocabulary, so we built New → In-Progress. Stated as an inference in the code.
+   vocabulary, so we built New → In-Progress. **Partly answered 11 Sept**: the
+   live record renders the button DISABLED on a Quoted RFQ, so it is gated on
+   status, which is what we guessed. Which transition it makes is still open.
 5. **The verbatim error strings** (`bundle-evidence-10sep.md` §3.2). Theirs are
    the customer's own words; ours are cleaner and invented. Tier 1 asks for
    clearer messaging, tier 2 says the words are theirs — a real conflict.
