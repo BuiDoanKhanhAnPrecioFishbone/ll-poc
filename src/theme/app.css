@@ -1461,9 +1461,7 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
 }
 .vy-login-legal .vy-link { font-size: var(--vy-text-sm); }
 
-/* Sign in with Microsoft took Kendo's default button height, 29px. It is the
-   path most staff will use; it should not be the smallest control here. */
-.vy-login-sso { min-height: var(--vy-target-min); }
+
 
 /* `.vy-check` is 24px app-wide and stays that way — it is inside every grid row
    on every list screen, where 44 would set a floor under row height and collide

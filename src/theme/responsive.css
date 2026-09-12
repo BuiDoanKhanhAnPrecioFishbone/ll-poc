@@ -251,6 +251,45 @@
     min-block-size: var(--vy-target-min);
   }
 
+  /* --- Page actions: one scrolling row, primary first ---------------------
+     Four buttons on Part Master — Import, AML Search, Export Part Master Data,
+     New Part — measure 438px of labels plus gaps against 347px of screen, so
+     one row with every label showing is arithmetically impossible. They wrapped
+     to two rows, 96px, directly above the KPI tiles and the list.
+
+     THE LABELS STAY. Shortening "Export Part Master Data" would fix the width
+     and is not ours to do — `docs/precedence.md` tier 2, content and purpose may
+     not be redesigned — and hiding the overflow behind a "More" menu needs the
+     `actions` slot to be a list rather than an opaque node, which is a change to
+     every caller for 52px.
+
+     SO THE ROW SCROLLS, and that makes ORDER matter: whatever is off to the
+     right needs a swipe. The primary action leads, so the one thing most people
+     came to do is the one thing always on screen, and the buttons after it are
+     cut mid-width rather than ending neatly — the peek IS the affordance. No
+     fade: a mask over the right edge would dim the label of whichever button
+     happens to sit there.
+
+     THE TRADE, stated plainly: four actions visible at once for 96px, against
+     the primary plus a peek for 44px. On a phone the list is what the screen is
+     for, and 52px is most of a row of it. */
+  .vy-page-actions {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    /* overflow-y resolves to auto alongside it, which would clip a focus ring;
+       the padding gives the ring somewhere to land. */
+    padding-block: var(--vy-space-1);
+    scrollbar-width: none;
+    scroll-snap-type: x proximity;
+  }
+  .vy-page-actions::-webkit-scrollbar { display: none; }
+  /* Without this the buttons shrink to fit instead of scrolling, and every
+     label truncates — the failure this rule exists to avoid. */
+  .vy-page-actions > * { flex: 0 0 auto; scroll-snap-align: start; }
+  /* `filled` is Kendo's solid primary. One per view, by the variant ladder in
+     Button.tsx, so this cannot reorder two things against each other. */
+  .vy-page-actions .k-button-primary { order: -1; }
+
   /* --- Toolbar and pager: two rows each, not three ------------------------
      At 375px the toolbar measured 187px and the pager 161px — 348px of chrome
      stacked above a list, on a screen 812px tall. Both were three rows, and in

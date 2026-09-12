@@ -1517,7 +1517,12 @@
    that one span, so a `display: flex; gap` on the button itself has a single
    child to lay out and does nothing — the mark rendered on its own line above
    the words, centred, looking like a logo with a caption. */
-.vy-login-sso { width: 100%; }
+/* `min-height` because Sign in with Microsoft took Kendo's default button
+   height, 29px. It is the path most staff will use and should not be the
+   smallest control on the screen. It lived in app.css until css:orphans pointed
+   out that the class was then defined in two files — which is how one of them
+   quietly stops mattering. */
+.vy-login-sso { width: 100%; min-height: var(--vy-target-min); }
 .vy-login-sso .k-button-text {
   display: inline-flex; align-items: center; justify-content: center;
   gap: var(--vy-space-4);

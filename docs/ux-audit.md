@@ -539,3 +539,42 @@ generalised:
 
 `ColumnChooser` gained a `vy-columns-btn` class. It is a layout hook, not a
 style — there was nothing to select the button by.
+
+## Page actions on a phone, 12 Sep 2026
+
+**96px to 48px** on Part Master, the only screen with four of them. One
+scrolling row instead of two wrapped ones, primary first.
+
+Four buttons — Import, AML Search, Export Part Master Data, New Part — measure
+438px of labels plus gaps against 347px of screen, so one row showing every
+label is arithmetically impossible. The two options that would have fixed the
+width were both refused: shortening *"Export Part Master Data"* is a content
+change and not ours to make (`docs/precedence.md` tier 2), and hiding the
+overflow behind a *"More"* menu needs the `actions` slot to be a list rather
+than an opaque `ReactNode` — a change to every caller, for 52px.
+
+So the row scrolls, and that makes **order** matter, because whatever sits off
+to the right needs a swipe. The primary action leads, so the thing most people
+came to do is always on screen, and the buttons after it are cut mid-width
+rather than ending neatly — the peek is the affordance. No fade: a mask over the
+right edge would dim the label of whichever button happened to be there.
+
+**The trade, plainly:** four actions visible at once for 96px, against the
+primary plus a peek for 48px. On a phone the list is what the screen is for. If
+you would rather see all four, deleting the rule restores the two rows.
+
+It only engages where it is needed: BoM (`Upload BoM`, `BoM Comparison`) and
+Quotations (`Add New`, `Export`) have two actions that already fit, so they do
+not scroll and nothing truncates — checked rather than assumed.
+
+`.vy-page-actions .k-button-primary` is safe to reorder against because
+`Button.tsx` puts one `filled` per view by the MD3 variant ladder.
+
+### A tidy-up the checks asked for
+
+`css:orphans` reported `.vy-login-sso` defined in both components.css and
+app.css — *"later file wins, silently"*. That was mine, from raising the SSO
+button to 44px on the login screen. Both declarations applied because they set
+different properties, so nothing was broken, but a class split across two files
+is how one half quietly stops mattering later. Merged into components.css beside
+the rule it belongs with; the button still measures 44×335.
