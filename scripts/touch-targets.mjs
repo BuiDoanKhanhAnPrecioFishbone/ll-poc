@@ -74,6 +74,17 @@ const ROUTES = [
   '/login',
 ];
 
+/* The routes that render a Kendo Grid — the only ones where density means
+   anything, and so the only ones the Compact pass needs. */
+const GRID_ROUTES = [
+  '/sales-management/quotation',
+  '/engineering/part-mst',
+  '/engineering/bom',
+  '/engineering/mpn',
+  '/engineering/mfg',
+  '/inventory-management/packing-list',
+];
+
 const CHROME = process.env.CHROME_PATH
   || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 
@@ -393,9 +404,30 @@ async function main() {
   });
   await send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
 
-  const visit = async (route, selfTest = false) => {
+  /* Density is a stored preference, so it is set in localStorage and the page
+     reloaded — the same path a user takes through the menu, rather than a class
+     poked onto the DOM, which would test a state the app cannot reach. */
+  const visit = async (route, { selfTest = false, density = null } = {}) => {
     await send('Page.navigate', { url: BASE + route });
-    await sleep(3200);
+    await sleep(1200);
+    if (density) {
+      await send('Runtime.evaluate', {
+        expression: `localStorage.setItem('vy.density', ${JSON.stringify(density)})`,
+        returnByValue: true });
+      await send('Page.reload');
+      await sleep(3200);
+      const got = await send('Runtime.evaluate', {
+        expression: `document.querySelector('.vy-grid-k') && document.querySelector('.vy-grid-k').getAttribute('data-density')`,
+        returnByValue: true });
+      /* Assert the density actually took. A pass that silently ran at the
+         default would report the default's numbers and call them Compact's. */
+      const actual = got.result?.result?.value;
+      if (actual && actual !== density) {
+        throw new Error(`asked for ${density} density on ${route}, page rendered ${actual}`);
+      }
+    } else {
+      await sleep(2000);
+    }
     await send('Runtime.evaluate',
       { expression: `window.__vySelfTest = ${selfTest ? 'true' : 'false'}`, returnByValue: true });
     const r = await send('Runtime.evaluate',
@@ -404,7 +436,7 @@ async function main() {
   };
 
   /* Nothing below is believed until this passes. */
-  const st = (await visit('/', true))?.selftest;
+  const st = (await visit('/', { selfTest: true }))?.selftest;
   const expected = { caught: 3, a: 'FAIL', b: 'FAIL', c: 'THIN', d: 'missed',
                      overlapsCaught: 1, clipFalsePositives: 0 };
   const stOk = st && st.caught === expected.caught &&
@@ -428,6 +460,32 @@ async function main() {
     for (const f of v.found) findings.push({ route, ...f });
     for (const o of (v.overlapping || [])) overlaps.push({ route, ...o });
   }
+
+  /* ---- COMPACT DENSITY -------------------------------------------------
+     Compact is deliberately exempt from the 44px floor: someone who picks it
+     has asked for the most rows on screen. What it is NOT exempt from is
+     conformance, and the pass above never sees it — the app opens Comfortable,
+     so a Compact row that fell under 24x24 would ship without anything
+     measuring it. This pass measures it, and only the AA tier and overlaps
+     count; a Compact row being under 44 is the point, not a finding. */
+  const compactFindings = [];
+  const compactOverlaps = [];
+  for (const route of GRID_ROUTES) {
+    const v = await visit(route, { density: 'compact' });
+    if (!v) continue;
+    /* EVERY tier is kept, not just FAIL. The gate still only fires on FAIL, but
+       the margin has to be visible: the first run of this pass passed while a
+       Compact row was 24px with a 20px target, conformant purely because the
+       spacing came to exactly 24. A green tick hid that. The numbers are
+       printed now, so "it passes" and "it passes by nothing" cannot look the
+       same again. */
+    for (const f of v.found) compactFindings.push({ route, ...f });
+    for (const o of (v.overlapping || [])) compactOverlaps.push({ route, ...o });
+  }
+  /* Put the preference back, so a run does not leave the browser profile in a
+     state the next run inherits. */
+  await send('Runtime.evaluate',
+    { expression: `localStorage.setItem('vy.density', 'comfortable')`, returnByValue: true });
 
   ws.close();
   chrome.kill();
@@ -489,9 +547,43 @@ async function main() {
   }
   if (!pairs.size) console.log('  none — no target sits on top of another');
 
+  /* Compact is measured for CONFORMANCE only — see the note on the pass. */
+  const cFails = compactFindings.filter(f => f.tier === 'FAIL');
+  const cSeen = new Map();
+  for (const f of cFails) {
+    const key = f.sel + '\u0000' + f.w + 'x' + f.h;
+    if (!cSeen.has(key)) cSeen.set(key, { ...f, routes: new Set() });
+    cSeen.get(key).routes.add(f.route);
+  }
+  const cPairs = new Set(compactOverlaps.map(o => [o.a, o.b].sort().join(' || ')));
+
+  /* The two numbers the criterion actually turns on. */
+  const smallest = compactFindings.reduce((m, f) => Math.min(m, f.w, f.h), Infinity);
+  const closest = compactFindings.reduce(
+    (m, f) => (f.nearest == null ? m : Math.min(m, f.nearest)), Infinity);
+
+  console.log(`\nCOMPACT density (grid routes; the 44 floor is waived here, AA is not)`);
+  console.log(`  FAIL ${cSeen.size}   OVERLAPPING ${cPairs.size}`);
+  for (const r of cSeen.values()) {
+    console.log(`  [FAIL] ${r.w}x${r.h}  ${r.sel}  "${r.what}"  ${[...r.routes].slice(0, 3).join(' ')}`);
+  }
+  for (const p of cPairs) console.log(`  [OVERLAP] ${p}`);
+  if (smallest !== Infinity) {
+    const bySize = smallest >= 24;
+    console.log(`  smallest target ${smallest}px, closest centres ${closest === Infinity ? 'n/a' : closest + 'px'} (AA needs 24)`);
+    console.log(bySize
+      ? `  conforms on SIZE — the spacing exception is not load-bearing here`
+      : `  conforms ONLY via the 24px spacing exception, by ${closest - 24}px — one padding change from failing`);
+  }
+  if (!cSeen.size && !cPairs.size && smallest === Infinity) {
+    console.log('  nothing under 44 at all in Compact');
+  }
+
   /* A conformance failure gates the build, and so does an overlap: a tap that
-     lands on the wrong control is a defect regardless of how big either is. */
-  process.exit(fails.length || pairs.size ? 1 : 0);
+     lands on the wrong control is a defect regardless of how big either is.
+     Compact contributes on both counts — it is exempt from the guidance, not
+     from the criterion. */
+  process.exit(fails.length || pairs.size || cSeen.size || cPairs.size ? 1 : 0);
 }
 
 main().catch(e => { console.error(e.message); process.exit(2); });

@@ -286,10 +286,20 @@ their classes is permitted. Nothing maps: Kendo publishes 453 custom properties
 and not one sizes a button or a checkbox, so that section sets properties rather
 than remapping them.
 
-**On touch the three row densities converge.** A 44px floor is taller than
-Compact (28) and Comfortable (36); Relaxed is already 44. The preference still
-does exactly what it says on a desktop, which is where it is set. This is the
-consequence of the decision, stated rather than buried.
+**Compact stays tight on touch; Comfortable and Relaxed take the 44px floor.**
+The floor is guidance, not conformance — WCAG 2.5.8 AA asks 24×24 — and someone
+who picks Compact has asked for the most rows on screen and is the last person
+who wants each one grown by 16px. So Compact is exempt from 44 and held to its
+own floor instead.
+
+| on a phone | row | checkbox target | rows per 812px screen |
+|---|---|---|---|
+| Compact | 32px | 44×28 | ~25 |
+| Comfortable (default) | 56px | 44×44 | ~14 |
+
+Compact is 32px on a phone against 24px on a desktop, so it is not quite
+desktop parity. That 8px is the conformance margin, and it was bought for a
+reason — see below.
 
 #### The select column, closed 12 Sep 2026
 
@@ -340,3 +350,37 @@ scrolled half out of view is not an undersized control.
 The self-test now carries eight fixtures: two that must FAIL, one THIN, one
 label-wrapped box that must be MISSED, a deliberate overlap that must be caught,
 and a half-clipped pair that must not be.
+
+### Compact on touch, 12 Sep 2026 — and what a green tick hid
+
+Exempting Compact from the 44px floor was one line. Verifying it found the
+problem.
+
+With no floor at all a Compact row on a phone rendered **24px tall with a 44×20
+checkbox**. The sweep passed it, correctly: WCAG 2.5.8 allows an undersized
+target when a 24px circle centred on it touches no other, and the rows were
+**exactly 24px between centres**. Conformant — by zero pixels. Any later change
+to line height, cell padding or font size would have turned it into a failure,
+and nothing would have said so.
+
+So Compact now has its own floor: `--vy-row-h-compact`, 28px, a token that had
+been declared since the density work and never used. At 28 the targets clear
+24×24 **on size**, so conformance no longer rests on the spacing exception at
+all. The measured result is a 32px row — 4px of real margin instead of none —
+and still half of Comfortable's 56.
+
+**Two things changed in the sweep because of this**, both because the first
+version could not have caught it:
+
+1. It now runs a **second pass at Compact density** over the six grid routes,
+   setting the preference in localStorage and reloading — the same path a user
+   takes — and asserting the page actually rendered Compact, so a pass that
+   silently ran at the default cannot report the default's numbers as Compact's.
+2. It **prints the margin** rather than a verdict: `smallest target 28px,
+   closest centres 28px (AA needs 24)`, and says in words whether conformance
+   rests on size or on the spacing exception. "It passes" and "it passes by
+   nothing" looked identical before; they cannot now.
+
+If you want true desktop parity — 24px rows on a phone too — that is available,
+but it puts the targets back to 20px and conformance back onto the spacing
+exception with no margin. Worth doing deliberately, not by accident.

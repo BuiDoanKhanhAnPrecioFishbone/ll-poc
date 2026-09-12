@@ -221,9 +221,11 @@
   }
 
   /* The grid's select column zeroes `.vy-check` so the checkbox does not set
-     row height. On touch the row is 44 anyway, so it can have its height back
-     and the checkbox becomes a target the width of the cell. */
-  .vy-td--select .vy-check { min-block-size: var(--vy-target-min); }
+     row height. Outside Compact the row is 44 anyway, so it can have its height
+     back and the checkbox becomes a target the width of the cell. */
+  .vy-grid-k:not([data-density="compact"]) .vy-td--select .vy-check {
+    min-block-size: var(--vy-target-min);
+  }
 
   /* --- Text-style buttons: HIT AREA, not appearance -----------------------
      Padding takes them to 44 and an equal negative margin returns the space to
@@ -252,14 +254,49 @@
   /* --- Grid rows ----------------------------------------------------------
      `height` on a table row acts as a MINIMUM in table layout, which is what
      makes this a floor rather than a fixed size — a row with more in it still
-     grows. Measured: a comfortable row goes 32 -> 56. */
-  .vy-grid-k .k-grid tr { height: var(--vy-target-min); }
+     grows. Measured: a comfortable row goes 32 -> 56.
+
+     COMPACT IS EXCLUDED, ON PURPOSE. The 44px floor is guidance, not
+     conformance: WCAG 2.5.8 AA asks 24x24, and a compact row clears that on its
+     own — 28px tall, 28px between centres, no spacing exception needed. Someone
+     who picks Compact has asked for the most rows on screen and is the last
+     person who wants each one grown by 16px. Honouring that costs the 44px
+     guidance on one density that was chosen deliberately; it costs no
+     conformance, and `touch:check` measures Compact separately to keep that
+     true rather than assumed. Comfortable and Relaxed still get the floor, and
+     Comfortable is the default. */
+  .vy-grid-k:not([data-density="compact"]) .k-grid tr { height: var(--vy-target-min); }
 
   /* `.vy-cell-link` carries `height: 100%` and I expected the taller row to
      carry it. It did not: the row grew to 56 and the link stayed at 29, because
      a percentage height does not resolve inside a Kendo `<td>` — the same trap
-     recorded in table-patterns.md. It has to ask for the height itself. */
-  .vy-cell-link { min-block-size: var(--vy-target-min); }
+     recorded in table-patterns.md. It has to ask for the height itself, and it
+     has to sit out Compact too or it would push the row back open from inside
+     the very rule above that spares it. */
+  .vy-grid-k:not([data-density="compact"]) .vy-cell-link {
+    min-block-size: var(--vy-target-min);
+  }
+
+  /* COMPACT GETS ITS OWN FLOOR, and it is not decoration. Left with no floor at
+     all, a Compact row on a phone came out 24px with a 44x20 checkbox, and it
+     cleared WCAG 2.5.8 only through the spacing exception at EXACTLY 24px
+     between centres — conformant by zero pixels, where any later change to line
+     height or padding turns it into a failure nobody would notice.
+
+     28px is `--vy-row-h-compact`, a token that has been declared since the
+     density work and never used; it is the compact row height by name. At 28 the
+     targets clear 24x24 on SIZE, so conformance no longer rests on the spacing
+     exception at all, and Compact is still half the height of Comfortable's 56
+     — roughly 24 rows on an 812px screen against 14. Tight, which is what
+     Compact is for, with a margin instead of none.
+
+     The label and the link take the row's height rather than the 44 floor, or
+     they would push the row back open from inside. */
+  .vy-grid-k[data-density="compact"] .k-grid tr { height: var(--vy-row-h-compact); }
+  .vy-grid-k[data-density="compact"] .vy-td--select .vy-check,
+  .vy-grid-k[data-density="compact"] .vy-cell-link {
+    min-block-size: var(--vy-row-h-compact);
+  }
 
   /* The select column's label has no text, so it was 20px wide in its cell.
      Filling the cell is all this rule does; the WIDTH is set in DataGrid.tsx,
