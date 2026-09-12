@@ -384,3 +384,62 @@ version could not have caught it:
 If you want true desktop parity — 24px rows on a phone too — that is available,
 but it puts the targets back to 20px and conformance back onto the spacing
 exception with no margin. Worth doing deliberately, not by accident.
+
+## The system on a phone, swept 12 Sep 2026
+
+`npm run mobile:check` — 12 routes at 375×812 with touch emulation. This is the
+half `touch:check` does not cover: not "can I hit it" but "can I see it, and
+does it fit".
+
+**No defects.** No route scrolls sideways, nothing paints off the edge, no text
+is cut off without an ellipsis, and the viewport meta is right everywhere.
+Checked by hand on top of that: all three grid dialogs (New Part, AML Search,
+Import) go full-screen at 375×812 and fit exactly, and the nav drawer opens and
+closes correctly.
+
+**Small text is reported as advice, not a defect.** 126 instances under 12px on
+customer screens, 266 more on `/sitemap` and `/design-system`, which are
+internal reference pages. Almost all are 11px — the `--vy-text-xs` step, which
+is a legitimate caption size; iOS caption2 is 11pt. The only 10px on a customer
+screen is the initials inside an avatar, which is a graphic, not prose. Raising
+the bottom of the type scale on touch is available if you want it; it is a
+design decision about the scale, and it would move chart axis labels and badges,
+so it is not one to take by accident.
+
+### Three ways the check lied before it told the truth
+
+Worth recording, because each one looked like a real finding:
+
+1. **91 escapes, none real.** The check compared against `innerWidth`. Under
+   device emulation the visual viewport GROWS to cover whatever overflows —
+   inject something 60px too wide and `innerWidth` goes 375 → 435 — so every
+   comparison passes by definition. The self-test caught it on the first run:
+   the injected fault came back undetected while the other two were found.
+   `documentElement.clientWidth` stays at 375.
+2. **Then 91 escapes again, still none real.** With the width fixed, it reported
+   what MEASURES outside rather than what PAINTS outside: Kendo grid columns at
+   x=1400 inside a header that clips at 375, the nav drawer parked off-canvas,
+   and 38 `<col>` elements that paint nothing at all. It now intersects each
+   element with every clipping ancestor.
+3. **Both "cut off" findings were `.vy-sr-only`** — a 1px box clipping text on
+   purpose, which is the entire point of the pattern.
+
+### And one that nearly became a bug report
+
+Mid-audit the mobile nav drawer appeared to be broken: `data-nav-open="true"`,
+the scrim rendered, and the sidebar stayed at `translateX(-248px)` — unmovable
+by a stylesheet, by toggling the attribute, or by inline `transform: none
+!important`, which should beat everything.
+
+It was the harness. The preview pane was hidden, so the page had stopped
+compositing: `visibilityState: "hidden"`, zero rAF frames in 1.3 seconds,
+`document.timeline.currentTime` stuck at 0. The drawer's CSS transition was
+therefore frozen at `currentTime: 0`, pinned to its start value — and **a
+running transition sits above important declarations in the cascade**, so
+nothing could override it. Disabling the transition showed the drawer working
+exactly as written: closed −248, open 0.
+
+The probe now switches off transitions and animations before measuring, so
+every number it reports is a property of the CSS rather than of the frame it
+was caught on. Add it to the list of harness traps alongside `innerText`
+returning `''` and `elementFromPoint` returning null while the pane is hidden.
