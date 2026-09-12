@@ -173,11 +173,34 @@ const PROBE = `(() => {
                by: Math.round(el.scrollWidth - el.clientWidth) });
   }
 
-  const doc = document.documentElement;
+  /* SIDEWAYS, AND NOT ONLY THE DOCUMENT. This app does not scroll the document:
+     the .vy-content element is the scroll region, so when a page is too wide it
+     is that element which scrolls and the document scrollWidth stays exactly
+     equal to the viewport. The first version of this check only asked the
+     document, and therefore reported a clean page while the RFQ record's due
+     chip sat 23px off the right edge — visibly cut in a screenshot we had
+     already published.
+
+     The grid's own horizontal scroller is a different thing and stays exempt:
+     it lives inside this region, it exists to show a wide table, and it is the
+     answer to that problem rather than a symptom. What is checked here is the
+     page shell — if THAT scrolls sideways, the page is too wide. */
+  const shells = [document.documentElement, document.body,
+                  ...document.querySelectorAll('.vy-content')];
+  let sideways = null;
+  for (const el of shells) {
+    if (!el) continue;
+    if (el.scrollWidth > el.clientWidth + 1) {
+      sideways = { where: where(el), scrollWidth: el.scrollWidth,
+                   viewport: el.clientWidth };
+      break;
+    }
+  }
+
   const meta = document.querySelector('meta[name="viewport"]');
   stopMotion.remove();
   return {
-    sideways: doc.scrollWidth > W + 1 ? { scrollWidth: doc.scrollWidth, viewport: W } : null,
+    sideways,
     viewportMeta: meta ? meta.content : null,
     escapes, small, cut,
   };
@@ -268,7 +291,7 @@ async function main() {
     const v = await visit(route);
     if (!v) { findings.push({ route, kind: 'probe', detail: 'page did not render' }); continue; }
     if (v.sideways) findings.push({ route, kind: 'sideways',
-      detail: `document is ${v.sideways.scrollWidth}px wide in a ${v.sideways.viewport}px viewport` });
+      detail: `${v.sideways.where} scrolls sideways — ${v.sideways.scrollWidth}px of content in ${v.sideways.viewport}px` });
     if (!v.viewportMeta || v.viewportMeta.indexOf('width=device-width') < 0) findings.push({ route,
       kind: 'viewport-meta', detail: `meta viewport is ${v.viewportMeta || 'absent'}` });
     for (const e of v.escapes) findings.push({ route, kind: 'escapes',

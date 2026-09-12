@@ -110,7 +110,13 @@
   .vy-search { width: auto; padding-inline: var(--vy-space-4); }
   .vy-page-head { flex-direction: column; align-items: stretch; gap: var(--vy-space-5); }
   .vy-page-actions { flex-wrap: wrap; }
-  .vy-record-bar { flex-direction: column; align-items: stretch; }
+  /* `flex-wrap: nowrap` IS THE HALF THAT WAS MISSING, and its absence was the
+     RFQ record's broken header. The bar carries `flex-wrap: wrap` for its row
+     layout; switching only the direction leaves a COLUMN-WRAP container, which
+     wraps into columns and takes the sum of their widths. Both children then
+     measured 395px inside a 313px bar, the due chip painted to x=398 on a 375px
+     screen, and the page scrolled sideways to reach it. */
+  .vy-record-bar { flex-direction: column; align-items: stretch; flex-wrap: nowrap; }
   .vy-dialog .k-dialog { width: 96vw; max-height: 92vh; }
 }
 
@@ -277,6 +283,52 @@
     display: inline-flex; align-items: center;
     min-block-size: var(--vy-target-min);
   }
+
+  /* --- The record header wraps ---------------------------------------------
+     `.vy-record-id` is a nowrap flex row holding the RFQ number, its status
+     badge and the due chip. At 375px those measure 395px, so the due chip
+     painted to x=398 on a 375px screen: "Due in 43 da" and then the edge of the
+     phone. Nothing clipped it, so it was not cut off so much as simply placed
+     off the screen, and the page scrolled sideways to reach it.
+
+     WE HAD PUBLISHED A PICTURE OF THIS. It is in the phone figure captured for
+     the comparison document, and neither the eye that chose the figure nor the
+     check that had just passed the route caught it &mdash; see mobile-check's
+     note on why the check could not.
+
+     `flex-wrap: wrap` ALONE DID NOTHING, and the reason is the flexbox rule
+     that catches everyone: a flex item's `min-width` is `auto`, which means it
+     refuses to shrink below its own content. `.vy-record-id` sat at its
+     max-content 395px inside a 313px bar, so there was never a narrower width
+     at which its wrap could take effect. `min-width: 0` lets it shrink, and
+     then the wrap does the work: the identifier keeps its line and the badge
+     and chip drop below when they do not fit.
+
+     The actions row beside it had the same problem for the same reason — it
+     could not shrink, so the horizontal scroller it was given could never
+     scroll, and Cancel simply hung off the screen. */
+  .vy-record-id { flex-wrap: wrap; min-width: 0; }
+
+  /* The actions row beside it needs ONLY the `min-width: 0`, and deliberately
+     not the wrap: it could not shrink, so the horizontal scroller it was given
+     could never scroll and Cancel simply hung off the screen. Letting it wrap
+     instead would have fixed the overflow too — and made this the one page
+     where page actions stack rather than scroll, which is a worse outcome than
+     the overflow was. One component, one behaviour. */
+  .vy-record-bar > .vy-page-actions { min-width: 0; }
+
+  /* The same `min-width: auto` trap, in a grid this time: the sitemap's compare
+     column sat at its 443px content width inside a 347px grid and pushed the
+     page 82px wider than the phone. Grid items default to `auto` exactly as
+     flex items do. */
+  .vy-compare-col { min-width: 0; }
+
+  /* Route strings are `nowrap` so an identifier never breaks mid-word, which is
+     right everywhere except here: `/system-setup/region-language-format-config`
+     is 310px of unbreakable text on a 375px screen, and four of them were what
+     kept the sitemap wider than the phone after the grid was fixed. On these
+     two internal reference pages they may break wherever they must. */
+  .vy-page--doc code { white-space: normal; overflow-wrap: anywhere; }
 
   /* --- The navigation drawer ----------------------------------------------
      The one part of the app the touch sweep could not see. Below 820px the
