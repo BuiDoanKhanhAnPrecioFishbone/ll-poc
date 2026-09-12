@@ -251,6 +251,67 @@
     min-block-size: var(--vy-target-min);
   }
 
+  /* --- Toolbar and pager: two rows each, not three ------------------------
+     At 375px the toolbar measured 187px and the pager 161px — 348px of chrome
+     stacked above a list, on a screen 812px tall. Both were three rows, and in
+     both cases the third row was produced by `.vy-toolbar-spacer`, a
+     flex-grow spacer whose whole job is pushing two groups apart on ONE line.
+     Once the container wraps it stops separating anything and just occupies a
+     slot, forcing the next control over. app.css already says this about the
+     toolbar — "the spacer only earns its keep on one line" — and then leaves it
+     in; below 820px that line never exists.
+
+     NOTHING IS HIDDEN AND NOTHING IS RENAMED. Every control keeps its label,
+     its count and its purpose; they are only allowed to wrap where a phone has
+     room. `docs/precedence.md` tier 2: layout may be redesigned, content and
+     purpose may not. */
+  .vy-grid-toolbar > .vy-toolbar-spacer,
+  .vy-pager > .vy-toolbar-spacer { display: none; }
+
+  /* TWO ROWS: search and Columns above, view picker and the two icon buttons
+     below. Ordered rather than left to the DOM, because the four controls do
+     not fit on one row at 313px — with all of them together the picker was left
+     109px and rendered the active view as "Def…", which is a worse failure than
+     a second row: a picker that cannot show what is picked. Moving Columns up
+     gives the picker 201px and costs nothing, since the search does not need
+     the full width to be usable. */
+  /* A 160px basis. At 200 the search fitted beside "Columns" (80px) on
+     Manufacturer Part Numbers but not beside "Columns (8/14)" (126px) on Part
+     Master, where the count makes the label half as wide again — so that screen
+     went back to three rows while the other had two. 160 leaves room for the
+     widest of them and the search still grows into whatever is left, 175px
+     there and 221px where the label is short. */
+  .vy-grid-toolbar > .vy-search-field { order: 0; flex: 1 1 160px; min-width: 0; max-width: none; }
+  .vy-grid-toolbar > .vy-columns-btn  { order: 1; }
+  .vy-grid-toolbar > .vy-view-picker  { order: 2; }
+  .vy-grid-toolbar > .vy-funnel       { order: 3; }
+  /* The view picker absorbs whatever the icon buttons and Columns leave, rather
+     than holding a fixed 180px that pushes Columns onto a third row.
+
+     `flex: 1 1 0`, NOT `1 1 auto`. With an auto basis the picker is measured at
+     its content width, 257px, and flexbox wraps a line before it shrinks an
+     item below that — so the picker GREW into the space and shoved the second
+     icon button and Columns onto a row of their own, which is the fault this
+     rule exists to remove. A zero basis makes the line measure 44 + 44 + 80 and
+     fit, and the picker then takes the 109px left over. */
+  /* A 140px basis, not 0: with a zero basis the picker contributes nothing to
+     the line's measurement and gets pulled up onto the search's row, which puts
+     the icon buttons back on a third. */
+  .vy-view-picker { flex: 1 1 140px; min-width: 0; max-width: none; }
+  .vy-view-picker .k-combobox, .vy-view-picker .k-input { width: 100%; min-width: 0; }
+
+  /* The count and the page-size control share one row, and the page buttons,
+     which need 342px, take the row below and centre in it.
+
+     THE PADDING AND GAP COME IN because the two of them only just fit. On
+     Manufacturer Part Numbers the count is "1 - 20 of 600 items" and they fit
+     at the standard spacing; on Part Master it is "1 - 20 of 2,000 items" and
+     they were six pixels over, so that screen kept a third row while the other
+     had two. Four pixels off each side and two off the gap is invisible and
+     buys enough for both. */
+  .vy-pager { padding-inline: var(--vy-space-6); gap: var(--vy-space-5); }
+  .vy-pager-nav { flex: 1 0 100%; justify-content: center; }
+
   /* --- The grid must not be the thing that gets squeezed ------------------
      `.vy-grid-k` is `flex: 1; min-height: 0`, so it takes what is left after
      the page head, the KPI tiles, the toolbar and the pager. On a desktop that

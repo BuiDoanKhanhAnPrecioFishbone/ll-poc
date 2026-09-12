@@ -26,7 +26,10 @@ export function ColumnChooser({ columns, hiddenCount, onToggle, onReset }: {
   return (
     <Popover.Root>
       <Popover.Trigger asChild>
-        <Button variant={hiddenCount > 0 ? 'tonal' : 'outlined'}>
+        {/* The class is a layout hook, not a style: below 820px the toolbar
+            needs to put this button on the search's row so the view picker is
+            not squeezed to "Def…". There was nothing to select it by. */}
+        <Button className="vy-columns-btn" variant={hiddenCount > 0 ? 'tonal' : 'outlined'}>
           Columns{hiddenCount > 0 && ` (${columns.length - hiddenCount}/${columns.length})`}
         </Button>
       </Popover.Trigger>

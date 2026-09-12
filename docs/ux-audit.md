@@ -485,7 +485,57 @@ tall phone, four on a short one.
 pager, so a 440px shell still left the grid 89px and the rows 28. Worth knowing
 before anyone moves it.
 
-**Still worth a look, not done here:** the toolbar is 187px and the pager 161px
-at 375px wide — 348px of chrome above a list. Both wrap into three rows on a
-phone. Reducing either is a layout decision about what a phone user needs from a
-list screen, not a floor to raise.
+The toolbar and pager were trimmed on 12 Sep — see below.
+
+## Toolbar and pager on a phone, 12 Sep 2026
+
+**348px of chrome above the list, down to 258.** Both were three rows; both are
+two. Nothing is hidden and nothing is renamed — every control keeps its label,
+its count and its purpose (`docs/precedence.md` tier 2: layout may be
+redesigned, content and purpose may not). A desktop is untouched: toolbar 66px,
+pager 54px, original order.
+
+| at 375px | before | after |
+|---|---|---|
+| toolbar | 187px, 3 rows | 131px, 2 rows |
+| pager | 161px, 3 rows | 127px, 2 rows |
+
+The third row in both cases came from `.vy-toolbar-spacer`, a flex-grow spacer
+whose only job is pushing two groups apart on **one** line. Once the container
+wraps it separates nothing and just occupies a slot, shoving the next control
+over. app.css already said so — *"the spacer only earns its keep on one line"* —
+and then left it in; below 820px that line never exists.
+
+### Three things that had to be measured, not reasoned
+
+Each looked settled and wasn't:
+
+1. **`flex: 1 1 auto` on the view picker made it greedy.** With an auto basis it
+   is measured at its content width, 257px, and flexbox wraps a line before
+   shrinking an item below that — so the picker *grew* into the space and pushed
+   the second icon button and Columns onto a third row, which is the fault the
+   rule existed to remove.
+2. **A zero basis then went too far.** At `flex: 1 1 0` the picker contributed
+   nothing to the line measurement, got pulled onto the search's row, and left
+   the icon buttons on a row of their own again. 140px is the basis that packs
+   correctly.
+3. **Four controls do not fit on one row at 313px.** With all of them together
+   the picker was left 109px and rendered the active view as `Def…` — a picker
+   that cannot show what is picked, which is worse than a second row. Columns
+   moved up to the search's row; the picker now has 201px and reads `Default`.
+
+### And two figures that differ per screen
+
+Both were found by checking a second screen rather than assuming the first
+generalised:
+
+- **The search basis is 160px, not 200.** At 200 the search fitted beside
+  `Columns` (80px) on Manufacturer Part Numbers but not beside `Columns (8/14)`
+  (126px) on Part Master, where the count makes the label half as wide again —
+  so that screen went back to three rows while the other had two.
+- **The pager needed 4px off each side and 2px off its gap.** `1 - 20 of 600
+  items` fits beside the page-size control at standard spacing; `1 - 20 of 2,000
+  items` was six pixels over.
+
+`ColumnChooser` gained a `vy-columns-btn` class. It is a layout hook, not a
+style — there was nothing to select the button by.
