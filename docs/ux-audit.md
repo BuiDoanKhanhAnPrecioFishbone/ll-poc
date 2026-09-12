@@ -236,3 +236,39 @@ done in the same commit as the sweep:
 Sign out was raised to 44 on 12 Sep because it was the one control that broke
 its own menu's rhythm — every other row there is 50px. That was a local
 inconsistency, not this decision.
+
+### Login, fixed 12 Sep 2026
+
+Six controls, all now 44: Sign In (was 40 — the primary action on the page, four
+pixels short), Sign in with Microsoft (29, Kendo's default height, on the path
+most staff will take), Remember me (24), Forgot Password?, Privacy Notice and
+Term of service (24).
+
+Taken unconditionally rather than behind `pointer: coarse`. The density
+trade-off that holds up the decision above is real on a grid and absent here:
+this is one centred form with room to spare, a larger click target costs a mouse
+nothing, and it is the screen most likely to be opened on a phone.
+
+The three text-style buttons grew their HIT AREA and not their appearance —
+padding to 44, an equal negative margin returning the space to the layout. Type
+size and vertical rhythm are unchanged; the alternative was a 44px slab under
+three short phrases. Verified afterwards that no two hit areas overlap and each
+still hit-tests to itself: 12px of clearance remains between the Remember-me row
+and Sign In, 19px between the two legal links.
+
+`.vy-check` stays 24px everywhere else. It sits in every grid row on every list
+screen, which is exactly where 44 would set a floor under row height and collide
+with Compact.
+
+### A correction to the sweep itself
+
+The first run reported the login's text fields at 335x37. They are not a defect:
+`TextField` wraps its input in a `<label>`, so tapping the label text focuses the
+field and the real target is taller than 44. The sweep was measuring the painted
+box instead of the area that activates the control, and it now takes the union of
+a control and its associated label — wrapping or `label[for]`.
+
+That also moved the Remember-me checkbox from 20x20 to 117x24: still short, but
+short by 20px rather than 24, and for a different reason than first reported. The
+self-test gained a fixture for it — a 20px box inside a 44px label, which must
+come back MISSED while the three planted failures are still caught.

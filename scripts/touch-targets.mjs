@@ -138,13 +138,37 @@ const PROBE = `(async () => {
     return !!h && (h === el || el.contains(h) || h.contains(el));
   };
 
+  /* THE TARGET IS WHAT YOU CAN TAP, NOT THE BOX THAT PAINTS. A 20px checkbox
+     inside a label is tapped anywhere on the label — clicking the word toggles
+     it, which is native behaviour, not something this app wired up. Measuring
+     the input alone reported those as undersized when the real target is the
+     whole row. Takes the union, so a label that is SMALLER than its input
+     cannot shrink the figure. */
+  const effective = el => {
+    const r = el.getBoundingClientRect();
+    let lab = el.closest('label');
+    if (!lab && el.id) {
+      try { lab = document.querySelector('label[for="' + CSS.escape(el.id) + '"]'); }
+      catch (e) { lab = null; }
+    }
+    if (!lab || !visible(lab)) return r;
+    const l = lab.getBoundingClientRect();
+    const left = Math.min(r.left, l.left), right = Math.max(r.right, l.right);
+    const top = Math.min(r.top, l.top), bottom = Math.max(r.bottom, l.bottom);
+    return { left, top, right, bottom, width: right - left, height: bottom - top };
+  };
+
   const measure = context => {
     const els = Array.from(document.querySelectorAll(SEL)).filter(visible);
     const boxes = els.map(el => {
-      const r = el.getBoundingClientRect();
+      const r = effective(el);
       return { el, w: r.width, h: r.height, cx: r.left + r.width / 2, cy: r.top + r.height / 2 };
     }).filter(b => b.cx >= 0 && b.cy >= 0 && b.cx <= innerWidth && b.cy <= innerHeight)
-      .filter(b => hittable(b.el, b.cx, b.cy));
+      /* Hit tested at the CONTROL's own centre, not the union's: a label's
+         centre can sit on the text beside the box, which is still the same
+         target but makes the assertion say less. */
+      .filter(b => { const r = b.el.getBoundingClientRect();
+                     return hittable(b.el, r.left + r.width / 2, r.top + r.height / 2); });
     const out = [];
     for (const b of boxes) {
       if (dead(b.el) || inlineInText(b.el)) continue;
@@ -174,7 +198,7 @@ const PROBE = `(async () => {
   };
 
   /* ---- self-test ---------------------------------------------------------
-     Three controls with known verdicts. If the measurement is broken, this is
+     Four controls with known verdicts. If the measurement is broken, this is
      where it shows, before any real number is believed. */
   if (window.__vySelfTest) {
     const host = document.createElement('div');
@@ -182,15 +206,22 @@ const PROBE = `(async () => {
     host.innerHTML =
       '<button id="vy-st-a" style="width:20px;height:20px;display:block">a</button>' +
       '<button id="vy-st-b" style="width:20px;height:20px;display:block;margin-top:2px">b</button>' +
-      '<button id="vy-st-c" style="width:30px;height:30px;display:block;margin-top:120px">c</button>';
+      '<button id="vy-st-c" style="width:30px;height:30px;display:block;margin-top:120px">c</button>' +
+      /* d proves the label union is live: a 20px box that would be reported on
+         its own, inside a label big enough that the real target passes. It must
+         come back MISSED. a/b/c coming back caught is what rules out "missed
+         because the whole measurement died". */
+      '<label style="display:block;width:200px;height:44px;margin-top:120px">' +
+        '<input id="vy-st-d" type="checkbox" style="width:20px;height:20px">d</label>';
     document.body.appendChild(host);
     await sleep(60);
-    const seen = measure('selftest').filter(f => /^[abc]$/.test(f.what));
+    const seen = measure('selftest').filter(f => /^[abcd]$/.test(f.what));
     host.remove();
     const verdict = Object.fromEntries(seen.map(f => [f.what, f.tier]));
     return { selftest: {
       caught: seen.length,
-      a: verdict.a || 'missed', b: verdict.b || 'missed', c: verdict.c || 'missed',
+      a: verdict.a || 'missed', b: verdict.b || 'missed',
+      c: verdict.c || 'missed', d: verdict.d || 'missed',
     } };
   }
 
@@ -280,9 +311,10 @@ async function main() {
 
   /* Nothing below is believed until this passes. */
   const st = (await visit('/', true))?.selftest;
-  const expected = { caught: 3, a: 'FAIL', b: 'FAIL', c: 'THIN' };
+  const expected = { caught: 3, a: 'FAIL', b: 'FAIL', c: 'THIN', d: 'missed' };
   const stOk = st && st.caught === expected.caught &&
-               st.a === expected.a && st.b === expected.b && st.c === expected.c;
+               st.a === expected.a && st.b === expected.b &&
+               st.c === expected.c && st.d === expected.d;
   if (!stOk) {
     console.error('self-test failed — the sweep cannot measure, so its result means nothing');
     console.error('  expected', JSON.stringify(expected));

@@ -1436,8 +1436,39 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
 .vy-login-row { display: flex; align-items: center; justify-content: space-between; gap: var(--vy-space-6); flex-wrap: wrap; }
 /* Full width and taller than a toolbar button: it is the only action on the
    page, and the live one is a pale bar that reads as disabled. */
-.vy-login-submit { width: 100%; min-height: var(--vy-space-14); font-size: var(--vy-text-md); }
-.vy-login-forgot { font-size: var(--vy-text-base); }
+/* TOUCH TARGETS ON THIS SCREEN, raised 12 Sep 2026 after the sweep.
+   Unconditionally, not behind `pointer: coarse`. Everywhere else in this app
+   that trade-off is real — a grid is dense on purpose and row density is a
+   preference the customer chose — but this screen is one centred form with
+   room to spare, a bigger click target is not a cost to a mouse, and it is the
+   screen most likely to be opened on a phone. */
+
+/* Was `--vy-space-14`, 40px: the primary action on the page, four pixels short
+   of the figure Apple and Material both land on. */
+.vy-login-submit { width: 100%; min-height: var(--vy-target-min); font-size: var(--vy-text-md); }
+
+/* THE TEXT-STYLE BUTTONS grow their HIT AREA, not their appearance. Padding
+   takes each to 44 and an equal negative margin gives the space back to the
+   layout, so nothing moves and the type keeps its size and rhythm. Raising the
+   visible box instead would put a 44px slab under three short phrases. They sit
+   apart horizontally, so the taller boxes do not meet. */
+.vy-login-forgot,
+.vy-login-legal .vy-link {
+  font-size: var(--vy-text-base);
+  display: inline-flex; align-items: center;
+  min-height: var(--vy-target-min);
+  padding-block: var(--vy-space-5); margin-block: calc(-1 * var(--vy-space-5));
+}
+.vy-login-legal .vy-link { font-size: var(--vy-text-sm); }
+
+/* Sign in with Microsoft took Kendo's default button height, 29px. It is the
+   path most staff will use; it should not be the smallest control here. */
+.vy-login-sso { min-height: var(--vy-target-min); }
+
+/* `.vy-check` is 24px app-wide and stays that way — it is inside every grid row
+   on every list screen, where 44 would set a floor under row height and collide
+   with Compact density. Scoped to this screen, where there is one of them. */
+.vy-login .vy-check { min-height: var(--vy-target-min); }
 /* The password field and its Caps Lock warning are one unit, so the warning
    cannot open a gap between the field and the row below it. */
 .vy-login-pw { display: flex; flex-direction: column; gap: var(--vy-space-3); }
