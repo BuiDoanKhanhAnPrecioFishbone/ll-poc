@@ -51,6 +51,17 @@ const JOBS = [
     })()`,
   },
   {
+    /* The dialog, because the comparison document shows it before and after:
+       every dialog was truncating its own subtitle until 12 September. */
+    name: 'ph-mock-dialog', route: '/engineering/part-mst', vp: PHONE,
+    prep: `(async () => {
+      const b = Array.from(document.querySelectorAll('button'))
+        .find(x => /^New Part$/.test(x.textContent.trim()));
+      b.click();
+      await new Promise(r => setTimeout(r, 900));
+    })()`,
+  },
+  {
     name: 'ph-mock-compact', route: '/engineering/mpn', vp: PHONE,
     density: 'compact',
   },
