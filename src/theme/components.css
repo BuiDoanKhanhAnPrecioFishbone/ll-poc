@@ -766,6 +766,29 @@
   padding: var(--vy-space-5);
   z-index: var(--vy-z-menu);
 }
+/* The user menu keeps its identity and its sign-out fixed, and scrolls only
+   the preferences between them. The shared `.vy-popover` scrolls as one box,
+   which is right for a short list and wrong here: this menu is 715px of content
+   under a 60vh cap, so anything at the foot is below the fold on a laptop. */
+.vy-popover.vy-usermenu {
+  display: flex; flex-direction: column; overflow: hidden;
+  /* `60vh` is a guess at the room available; Radix MEASURES it, from the
+     trigger to the viewport edge, and publishes it on the content. At 1280x900
+     it reports 847px against 715px of menu — so the shared cap was folding the
+     menu into a scroller with 307px of empty screen below it. The fallback
+     keeps the old guess if the variable is ever absent. */
+  max-height: var(--radix-popover-content-available-height, 60vh);
+}
+/* DO NOT give `.vy-popover` a `position` — the clip above would then eat the
+   arrow. Radix draws the arrow in an absolutely positioned span that sits 5px
+   ABOVE the content's top edge; it escapes `overflow: hidden` only because a
+   static ancestor is not in its containing block chain. Setting
+   `position: relative` here makes the popover that containing block and the
+   arrow disappears. Verified by toggling it: static hit-tests the arrow's
+   polygon, relative hit-tests the header behind it. */
+.vy-usermenu-scroll { overflow-y: auto; min-height: 0; flex: 1 1 auto; }
+.vy-usermenu .vy-usermenu-foot { flex: 0 0 auto; }
+
 .vy-popover-arrow { fill: var(--vy-on-surface-invert); }
 .vy-popover-head {
   display: flex; align-items: center; justify-content: space-between;

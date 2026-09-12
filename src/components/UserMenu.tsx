@@ -42,7 +42,7 @@ export function UserMenu() {
         <button className="vy-avatar" aria-label="Huyen NTN — account and preferences">H</button>
       </Popover.Trigger>
       <Popover.Portal>
-        <Popover.Content className="vy-popover" align="end" sideOffset={8}>
+        <Popover.Content className="vy-popover vy-usermenu" align="end" sideOffset={8}>
           <div className="vy-usermenu-id">
             <div className="vy-avatar vy-avatar--lg" aria-hidden>H</div>
             <div>
@@ -51,6 +51,12 @@ export function UserMenu() {
             </div>
           </div>
 
+          {/* ONLY THE PREFERENCES SCROLL. `.vy-popover` caps itself at 60vh, so
+              on a 900px laptop this menu was 540px tall against 715px of
+              content — and Sign out, being last, sat 139px below the fold. A
+              control added specifically so the login screen could be reached by
+              clicking, reachable only by scrolling first. */}
+          <div className="vy-usermenu-scroll">
           <div className="vy-usermenu-section">
             <h3>Row density</h3>
             <p className="vy-usermenu-hint">Applies to every list.</p>
@@ -91,6 +97,8 @@ export function UserMenu() {
                 </button>
               ))}
             </div>
+          </div>
+
           </div>
 
           {/* THE WAY TO THE SIGN-IN SCREEN. It had none: `/login` was a route
