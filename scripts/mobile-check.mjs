@@ -197,12 +197,59 @@ const PROBE = `(() => {
     }
   }
 
+  /* CLIPPED — content an ancestor hides, with no way to reveal it.
+     Neither check above can see this, and it has now hidden two real defects.
+     CUTOFF asks whether an element clips ITSELF, and the Add Part dialog's
+     subtitle does not: it is 469px wide and perfectly happy. What clips it is
+     Kendo's title box, an ancestor, at 280px with overflow hidden. ESCAPES asks
+     what paints outside the screen, and the subtitle paints outside nothing —
+     it is simply not painted past 280px. So the reader got "A new part in Part
+     Master. Nothing is sa" and neither check had an opinion.
+
+     The test: an element whose painted box is materially narrower than its
+     layout box, where the ancestor doing the clipping CANNOT be scrolled to
+     reveal the rest. A grid clipping a wide table is exempt, because the table
+     scrolls. An ellipsis is exempt, because it is a decision. */
+  const clipped = [];
+  for (const el of all) {
+    const ecs = getComputedStyle(el);
+    if (ecs.textOverflow === 'ellipsis') continue;
+    const direct = Array.from(el.childNodes)
+      .some(n => n.nodeType === 3 && n.textContent.trim().length > 1);
+    if (!direct) continue;
+    const full = el.getBoundingClientRect();
+    if (full.width < 8 || full.height < 8) continue;
+    const vis = clipBox(el);
+    const lostX = Math.round(full.width - vis.width);
+    if (lostX < 4) continue;
+    let culprit = null, scrollable = false;
+    for (let q = el.parentElement; q; q = q.parentElement) {
+      const qcs = getComputedStyle(q);
+      if (qcs.overflowX === 'visible' && qcs.overflowY === 'visible') continue;
+      const qr = q.getBoundingClientRect();
+      if (qr.right < full.right - 1 || qr.left > full.left + 1) {
+        culprit = q;
+        /* SCROLLABLE MEANS A PERSON CAN REACH IT, not merely that the box has
+           overflow. A container that hides its overflow reports scrollWidth
+           larger than clientWidth exactly as a scroller does, and nobody can
+           scroll it. Testing the size alone let the dialog subtitle through a
+           second time, after the check had been extended to find it. */
+        const ox = qcs.overflowX;
+        scrollable = (ox === 'auto' || ox === 'scroll') &&
+                     q.scrollWidth > q.clientWidth + 1;
+        break;
+      }
+    }
+    if (!culprit || scrollable) continue;
+    clipped.push({ sel: where(el), what: label(el), lost: lostX, by: where(culprit) });
+  }
+
   const meta = document.querySelector('meta[name="viewport"]');
   stopMotion.remove();
   return {
     sideways,
     viewportMeta: meta ? meta.content : null,
-    escapes, small, cut,
+    escapes, small, cut, clipped,
   };
 })()`;
 
@@ -223,6 +270,26 @@ const SELFTEST = `(() => {
     '</div>';
   document.body.appendChild(host);
 })()`;
+
+/* OVERLAYS. A route sweep never opens one, and that is exactly where the next
+   defect was: the Add Part dialog's subtitle read "A new part in Part Master.
+   Nothing is sa" and then the edge of the box — on a route this check had just
+   called clean. A dialog is a layout like any other, so the same four checks
+   run again with each overlay open. */
+const OVERLAYS = [
+  { name: 'dialog', open: `(async()=>{const b=[...document.querySelectorAll('button')]
+      .find(x=>/^(New Part|Add New|Upload BoM|Create packing list|Add manufacturer)$/.test(x.textContent.trim()));
+      if(!b) return false; b.click(); await new Promise(r=>setTimeout(r,900)); return true;})()` },
+  { name: 'column chooser', open: `(async()=>{const b=[...document.querySelectorAll('button')]
+      .find(x=>/^Columns/.test(x.textContent.trim()));
+      if(!b) return false; b.click(); await new Promise(r=>setTimeout(r,700)); return true;})()` },
+  { name: 'filter panel', open: `(async()=>{const b=document.querySelector('.vy-funnel');
+      if(!b) return false; b.click(); await new Promise(r=>setTimeout(r,700)); return true;})()` },
+  { name: 'user menu', open: `(async()=>{const b=document.querySelector('.vy-avatar');
+      if(!b) return false; b.click(); await new Promise(r=>setTimeout(r,600)); return true;})()` },
+  { name: 'nav drawer', open: `(async()=>{const b=document.querySelector('.vy-nav-toggle');
+      if(!b) return false; b.click(); await new Promise(r=>setTimeout(r,600)); return true;})()` },
+];
 
 async function connect() {
   for (let i = 0; i < 60; i++) {
@@ -300,6 +367,34 @@ async function main() {
       detail: `${e.sel} "${e.what}" at ${e.size}px` });
     for (const e of v.cut) findings.push({ route, kind: 'cutoff',
       detail: `${e.sel} "${e.what}" clipped by ${e.by}px with no ellipsis` });
+    for (const e of (v.clipped || [])) findings.push({ route, kind: 'clipped',
+      detail: `${e.sel} "${e.what}" — ${e.lost}px hidden by ${e.by}, which does not scroll` });
+
+    for (const ov of OVERLAYS) {
+      const opened = await send('Runtime.evaluate',
+        { expression: ov.open, awaitPromise: true, returnByValue: true });
+      if (!opened.result?.result?.value) continue;
+      const o = await send('Runtime.evaluate',
+        { expression: PROBE, returnByValue: true });
+      const w = o.result?.result?.value;
+      if (w) {
+        const where = `${route} · ${ov.name}`;
+        if (w.sideways) findings.push({ route: where, kind: 'sideways',
+          detail: `${w.sideways.where} scrolls sideways — ${w.sideways.scrollWidth}px of content in ${w.sideways.viewport}px` });
+        for (const e of w.escapes) findings.push({ route: where, kind: 'escapes',
+          detail: `${e.sel} "${e.what}" reaches ${e.right}px, ${e.over}px past the edge` });
+        for (const e of w.cut) findings.push({ route: where, kind: 'cutoff',
+          detail: `${e.sel} "${e.what}" clipped by ${e.by}px with no ellipsis` });
+        for (const e of (w.clipped || [])) findings.push({ route: where, kind: 'clipped',
+          detail: `${e.sel} "${e.what}" — ${e.lost}px hidden by ${e.by}, which does not scroll` });
+        for (const e of w.small) findings.push({ route: where, kind: 'smalltext',
+          detail: `${e.sel} "${e.what}" at ${e.size}px` });
+      }
+      await send('Runtime.evaluate', {
+        expression: `document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))`,
+        returnByValue: true });
+      await sleep(500);
+    }
   }
 
   ws.close();
@@ -318,7 +413,7 @@ async function main() {
      caption size — iOS caption2 is 11pt — so a list of 305 of them is a
      description of the type scale, not a bug report. Gating on it would mean a
      check that can never pass and therefore is never read. */
-  const DEFECT = { sideways: 1, escapes: 1, cutoff: 1, 'viewport-meta': 1, probe: 1 };
+  const DEFECT = { sideways: 1, escapes: 1, cutoff: 1, clipped: 1, 'viewport-meta': 1, probe: 1 };
   const defects = findings.filter(f => DEFECT[f.kind]);
   const small = findings.filter(f => f.kind === 'smalltext');
 

@@ -209,6 +209,17 @@
    in the same content box Kendo centres its close in. */
 .vy-dialog-max { flex: 0 0 auto; align-self: center; }
 .vy-dialog-title { font-size: var(--vy-text-lg); font-weight: var(--vy-weight-bold); color: var(--vy-on-surface-strong); margin: 0; }
+/* THE TITLE BLOCK MAY WRAP. Kendo's `.k-window-title` is `white-space: nowrap`
+   with `overflow: hidden`, which our title and subtitle sit inside and inherit.
+   On a desktop the dialog is wide enough that nobody notices; at 375px the Add
+   Part subtitle measured 469px and the reader got "A new part in Part Master.
+   Nothing is sa" and then the edge of the box — the rest of the sentence, which
+   is the half that says nothing is saved until you press Save, simply was not
+   there.
+
+   Unconditional rather than behind a breakpoint: a subtitle clipped mid-word is
+   wrong at any width, and this is prose, not a label. It wraps now instead. */
+.vy-dialog-titlewrap { white-space: normal; }
 .vy-dialog-sub { font-size: var(--vy-text-base); color: var(--vy-on-surface-subtle); margin: var(--vy-space-2) 0 0; font-weight: var(--vy-weight-regular); }
 .vy-dialog .k-dialog-content { padding: var(--vy-space-9); }
 /* The discard confirmation lists what would be lost. The list is the content of
@@ -1394,7 +1405,18 @@
    sees and reports, instead of quietly making one screen's rows taller than
    another's. Widths live with the column definitions, where the note beside each
    states the measurement AND the 24px of cell padding the first pass forgot. */
-.vy-grid-k .k-grid td .vy-code { white-space: nowrap; }
+/* The chip keeps its single line, and says so when the line does not fit. It
+   is `nowrap` because a code is one token; without a matching ellipsis the cell
+   simply hid the rest — "Sub-assy Box Build" arrived as "Sub-assy Box B" with
+   152px of it gone and nothing on screen admitting it. Invisible on a desktop,
+   where the column is wide enough; it appeared on a phone only because the
+   touch type scale is 2px larger in the same fixed column. */
+.vy-grid-k .k-grid td .vy-code {
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 /* Cell padding is declared as a VALUE, not just applied, because the link cell
    below hands it from the <td> to the link inside it. Two literals would drift
