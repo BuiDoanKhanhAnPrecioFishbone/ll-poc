@@ -272,3 +272,58 @@ That also moved the Remember-me checkbox from 20x20 to 117x24: still short, but
 short by 20px rather than 24, and for a different reason than first reported. The
 self-test gained a fixture for it — a 20px box inside a 44px label, which must
 come back MISSED while the three planted failures are still caught.
+
+
+### The rest of the app, 12 Sep 2026
+
+Done, behind `@media (pointer: coarse)`. **55 controls under 44 → 2. No AA
+failure. No overlapping targets. A desktop is untouched** — the same controls
+measured at 1440 before and after are identical to the pixel: avatar 28×28,
+funnel 28×28, pager page 24×24, Kendo button 58×29, cell link 239×29, row 32.
+
+Ours are in responsive.css, Kendo's in kendo-bridge.css, which is where styling
+their classes is permitted. Nothing maps: Kendo publishes 453 custom properties
+and not one sizes a button or a checkbox, so that section sets properties rather
+than remapping them.
+
+**On touch the three row densities converge.** A 44px floor is taller than
+Compact (28) and Comfortable (36); Relaxed is already 44. The preference still
+does exactly what it says on a desktop, which is where it is set. This is the
+consequence of the decision, stated rather than buried.
+
+#### The two that remain, and why they stay
+
+Both are the grid's select column at 40px wide — 40×44 for the checkbox, 40×56
+for the cell. The column is `SELECT_COL_W = 40` in DataGrid.tsx, one constant
+shared by the header and every row. Forcing the cell to 44 from CSS does not
+widen the column; it makes the cell overflow it, and the sweep reported that as
+four overlapping pairs — the checkbox sitting on top of the next cell's link. A
+4px shortfall against a guidance figure is a better outcome than a tap that
+opens the wrong record. Widening the constant fixes both and also moves the
+column on every desktop, which was not this change's to do — it is a small,
+clean follow-up if you want the last two closed.
+
+They conform as they stand: 40×44 is well over 24×24, nearest neighbour 56px.
+
+#### What the sweep got wrong, twice, while doing this
+
+Both found by the checks rather than by eye, and both would have shipped:
+
+1. **`.vy-back` overlapped the smart buttons by 982px².** Its hit area was grown
+   with padding and a negative margin — the login technique — and on the RFQ
+   page that put it on top of the row below. Invisible on screen; a tap near the
+   seam would have opened the wrong thing. It takes real space now.
+2. **The overlap check itself reported two collisions that no finger could
+   produce**, between a grid's last row and the pager. A row clipped by the
+   grid's `overflow: hidden` still reports its whole box. The check now
+   intersects with every clipping ancestor.
+
+Fixing (2) then broke the size tier — 1 finding became 11, all rows at a grid's
+edge measured at their clipped height. Size and overlap want different boxes:
+overlap uses the clipped box, because a hidden half cannot be mis-tapped; size
+uses the full box and skips anything more than 10% clipped, because a row
+scrolled half out of view is not an undersized control.
+
+The self-test now carries eight fixtures: two that must FAIL, one THIN, one
+label-wrapped box that must be MISSED, a deliberate overlap that must be caught,
+and a half-clipped pair that must not be.

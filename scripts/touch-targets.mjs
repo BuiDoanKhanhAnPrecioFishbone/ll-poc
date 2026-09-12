@@ -144,6 +144,28 @@ const PROBE = `(async () => {
      the input alone reported those as undersized when the real target is the
      whole row. Takes the union, so a label that is SMALLER than its input
      cannot shrink the figure. */
+  /* CLIPPED IS NOT TAPPABLE. A grid's content box hides its overflow, so the
+     last row is often cut mid-height — the element's rect still reports the
+     whole box, which extends past the clip and onto whatever sits below, the
+     pager included. Comparing those raw rects invented two overlaps that no
+     finger could ever produce. The tappable area is the intersection with
+     every clipping ancestor. */
+  const clipped = (el, r) => {
+    let box = { left: r.left, top: r.top, right: r.right, bottom: r.bottom };
+    for (let p = el.parentElement; p; p = p.parentElement) {
+      const cs = getComputedStyle(p);
+      if (cs.overflow === 'visible' && cs.overflowX === 'visible' && cs.overflowY === 'visible') continue;
+      const c = p.getBoundingClientRect();
+      box.left = Math.max(box.left, c.left);
+      box.top = Math.max(box.top, c.top);
+      box.right = Math.min(box.right, c.right);
+      box.bottom = Math.min(box.bottom, c.bottom);
+    }
+    box.width = Math.max(0, box.right - box.left);
+    box.height = Math.max(0, box.bottom - box.top);
+    return box;
+  };
+
   const effective = el => {
     const r = el.getBoundingClientRect();
     let lab = el.closest('label');
@@ -158,6 +180,26 @@ const PROBE = `(async () => {
     return { left, top, right, bottom, width: right - left, height: bottom - top };
   };
 
+  /* SIZE AND OVERLAP WANT DIFFERENT BOXES, and conflating them was wrong in
+     both directions.
+
+     For OVERLAP the clipped box is the honest one: the half of a row hidden
+     under the grid's edge cannot be tapped, so it cannot be tapped by mistake
+     either. Using raw rects there invented two collisions with the pager.
+
+     For SIZE the clipped box is NOT: a row scrolled half out of view is not an
+     undersized control, it is a normally sized one that is partly off screen,
+     and it measures full size the moment it scrolls in. Reporting the clipped
+     height turned one finding into eleven, every one of them a row at the edge
+     of a grid. So size uses the full box and simply SKIPS anything substantially
+     clipped — there is nothing to say about a control you are only half
+     looking at. */
+  const mostlyVisible = (el, r) => {
+    const c = clipped(el, r);
+    const full = r.width * r.height;
+    return full <= 0 ? false : (c.width * c.height) / full >= 0.9;
+  };
+
   const measure = context => {
     const els = Array.from(document.querySelectorAll(SEL)).filter(visible);
     const boxes = els.map(el => {
@@ -168,7 +210,10 @@ const PROBE = `(async () => {
          centre can sit on the text beside the box, which is still the same
          target but makes the assertion say less. */
       .filter(b => { const r = b.el.getBoundingClientRect();
-                     return hittable(b.el, r.left + r.width / 2, r.top + r.height / 2); });
+                     return hittable(b.el, r.left + r.width / 2, r.top + r.height / 2); })
+      .filter(b => mostlyVisible(b.el, { left: b.cx - b.w / 2, top: b.cy - b.h / 2,
+                                         right: b.cx + b.w / 2, bottom: b.cy + b.h / 2,
+                                         width: b.w, height: b.h }));
     const out = [];
     for (const b of boxes) {
       if (dead(b.el) || inlineInText(b.el)) continue;
@@ -197,6 +242,40 @@ const PROBE = `(async () => {
     return out;
   };
 
+  /* OVERLAPPING TARGETS. Growing a hit area with padding and a negative margin
+     leaves the layout alone but can push the box over its neighbour, and then a
+     tap near the seam activates the wrong control — silently, and not visible
+     in a screenshot. Size alone cannot see this, and raising 55 targets is
+     exactly what causes it. Same-element pairs and nested pairs are skipped for
+     the reason they are skipped in the spacing figure: they are one target. */
+  const overlapsIn = context => {
+    const els = Array.from(document.querySelectorAll(SEL)).filter(visible);
+    const boxes = els.map(el => {
+      const r = clipped(el, effective(el));
+      return { el, r, cx: r.left + r.width / 2, cy: r.top + r.height / 2 };
+    }).filter(b => b.r.width > 0 && b.r.height > 0)
+      .filter(b => { const q = b.el.getBoundingClientRect();
+                     return hittable(b.el, q.left + q.width / 2, q.top + q.height / 2); });
+    const out = [];
+    for (let i = 0; i < boxes.length; i++) {
+      for (let j = i + 1; j < boxes.length; j++) {
+        const a = boxes[i], b = boxes[j];
+        if (a.el.contains(b.el) || b.el.contains(a.el)) continue;
+        const ar = a.r, br = b.r;
+        if (ar.right <= br.left || br.right <= ar.left) continue;
+        if (ar.bottom <= br.top || br.bottom <= ar.top) continue;
+        const area = (Math.min(ar.right, br.right) - Math.max(ar.left, br.left)) *
+                     (Math.min(ar.bottom, br.bottom) - Math.max(ar.top, br.top));
+        /* Under a pixel of touching is a rounding artefact, not an overlap. */
+        if (area < 4) continue;
+        out.push({ context, a: where(a.el) + ' "' + name(a.el) + '"',
+                   b: where(b.el) + ' "' + name(b.el) + '"',
+                   area: Math.round(area) });
+      }
+    }
+    return out;
+  };
+
   /* ---- self-test ---------------------------------------------------------
      Four controls with known verdicts. If the measurement is broken, this is
      where it shows, before any real number is believed. */
@@ -212,21 +291,36 @@ const PROBE = `(async () => {
          come back MISSED. a/b/c coming back caught is what rules out "missed
          because the whole measurement died". */
       '<label style="display:block;width:200px;height:44px;margin-top:120px">' +
-        '<input id="vy-st-d" type="checkbox" style="width:20px;height:20px">d</label>';
+        '<input id="vy-st-d" type="checkbox" style="width:20px;height:20px">d</label>' +
+      /* e and f are big enough to pass on size and deliberately overlap by
+         10px, so a silent overlap check cannot pass for a clean one. */
+      '<button id="vy-st-e" style="position:absolute;left:0;top:300px;width:50px;height:50px">e</button>' +
+      '<button id="vy-st-f" style="position:absolute;left:40px;top:300px;width:50px;height:50px">f</button>' +
+      /* g is half-clipped by its container; h sits exactly where g's UNCLIPPED
+         box would reach. Raw rects call that an overlap; a finger never can.
+         Must report 0 while e/f still reports 1. */
+      '<div style="position:absolute;left:120px;top:300px;width:60px;height:25px;overflow:hidden">' +
+        '<button id="vy-st-g" style="width:60px;height:50px">g</button></div>' +
+      '<button id="vy-st-h" style="position:absolute;left:120px;top:330px;width:60px;height:20px">h</button>';
     document.body.appendChild(host);
     await sleep(60);
     const seen = measure('selftest').filter(f => /^[abcd]$/.test(f.what));
-    host.remove();
     const verdict = Object.fromEntries(seen.map(f => [f.what, f.tier]));
+    const all = overlapsIn('selftest');
+    const ef = all.filter(o => /"[ef]"/.test(o.a) && /"[ef]"/.test(o.b));
+    const gh = all.filter(o => /"[gh]"/.test(o.a) || /"[gh]"/.test(o.b));
+    host.remove();
     return { selftest: {
       caught: seen.length,
       a: verdict.a || 'missed', b: verdict.b || 'missed',
       c: verdict.c || 'missed', d: verdict.d || 'missed',
+      overlapsCaught: ef.length, clipFalsePositives: gh.length,
     } };
   }
 
   /* ---- the sweep ---------------------------------------------------------- */
   const found = measure('at rest');
+  const overlapping = overlapsIn('at rest');
 
   /* Overlays. Their contents do not exist until opened, and the defect that
      prompted this sweep lived in one. */
@@ -258,7 +352,7 @@ const PROBE = `(async () => {
     }
   }
 
-  return { found };
+  return { found, overlapping };
 })()`;
 
 /* ── CDP plumbing ────────────────────────────────────────────────────────── */
@@ -311,10 +405,13 @@ async function main() {
 
   /* Nothing below is believed until this passes. */
   const st = (await visit('/', true))?.selftest;
-  const expected = { caught: 3, a: 'FAIL', b: 'FAIL', c: 'THIN', d: 'missed' };
+  const expected = { caught: 3, a: 'FAIL', b: 'FAIL', c: 'THIN', d: 'missed',
+                     overlapsCaught: 1, clipFalsePositives: 0 };
   const stOk = st && st.caught === expected.caught &&
                st.a === expected.a && st.b === expected.b &&
-               st.c === expected.c && st.d === expected.d;
+               st.c === expected.c && st.d === expected.d &&
+               st.overlapsCaught === expected.overlapsCaught &&
+               st.clipFalsePositives === expected.clipFalsePositives;
   if (!stOk) {
     console.error('self-test failed — the sweep cannot measure, so its result means nothing');
     console.error('  expected', JSON.stringify(expected));
@@ -324,10 +421,12 @@ async function main() {
   }
 
   const findings = [];
+  const overlaps = [];
   for (const route of ROUTES) {
     const v = await visit(route);
     if (!v) { findings.push({ route, tier: 'FAIL', context: 'probe', what: 'page did not render', sel: '', w: 0, h: 0 }); continue; }
     for (const f of v.found) findings.push({ route, ...f });
+    for (const o of (v.overlapping || [])) overlaps.push({ route, ...o });
   }
 
   ws.close();
@@ -373,8 +472,26 @@ async function main() {
       + (r.worstNearest !== Infinity ? ` · closest neighbour ${r.worstNearest}px` : ''));
   }
   if (!rows.length) console.log('  every target is at least 44x44');
-  /* Only a conformance failure gates the build. THIN is advice. */
-  process.exit(fails.length ? 1 : 0);
+
+  /* Deduplicated by the PAIR of controls, not by instance — one bad rule
+     produces the same collision on every row of every grid. */
+  const pairs = new Map();
+  for (const o of overlaps) {
+    const key = [o.a, o.b].sort().join(' || ');
+    if (!pairs.has(key)) pairs.set(key, { ...o, n: 0, routes: new Set() });
+    pairs.get(key).n++;
+    pairs.get(key).routes.add(o.route);
+  }
+  console.log(`\nOVERLAPPING hit areas ${pairs.size} pair(s)`);
+  for (const p of pairs.values()) {
+    console.log(`  ${p.a}\n  overlaps ${p.b}  by ${p.area}px2`);
+    console.log(`        ${p.n} instance(s) · ${[...p.routes].slice(0, 3).join(' ')}`);
+  }
+  if (!pairs.size) console.log('  none — no target sits on top of another');
+
+  /* A conformance failure gates the build, and so does an overlap: a tap that
+     lands on the wrong control is a defect regardless of how big either is. */
+  process.exit(fails.length || pairs.size ? 1 : 0);
 }
 
 main().catch(e => { console.error(e.message); process.exit(2); });

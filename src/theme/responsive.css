@@ -148,3 +148,130 @@
 @media (max-width: 900px) {
   .vy-clock, .vy-header-select, .vy-topbar-sep { display: none; }
 }
+
+/* =============================================================================
+   TOUCH TARGETS — 12 Sep 2026
+   -----------------------------------------------------------------------------
+   Swept at 375x812 (`npm run touch:check`): no WCAG 2.5.8 AA failure, but 55
+   controls under 44x44, the size Apple and Material converge on for a finger.
+   Not one was too narrow — 43 were too short only. This is one decision about
+   height, applied once.
+
+   BEHIND `pointer: coarse`, WHICH IS THE WHOLE POINT. This is a desktop ERP and
+   density is the reason people can work in it; raising every icon to 44 on a
+   mouse would undo exactly what the customer values. A finger needs the room, a
+   cursor does not, so the floor applies only where there is a finger. Nothing
+   in this block reaches a desktop — verified by measuring the same controls at
+   1440 before and after.
+
+   IT MUST STAY AT THE END OF THIS FILE. An unconditional rule placed after a
+   media query wins on source order regardless of the condition — the same trap
+   documented at the top of this file for `.vy-nav-toggle`.
+
+   KENDO'S OWN CONTROLS ARE NOT HERE. `.k-button`, `.k-checkbox` and the rest
+   are in kendo-bridge.css, where styling their classes is the file's job and
+   the consistency check permits it.
+
+   ONE CONSEQUENCE WORTH SAYING OUT LOUD: on a touch device the three row
+   densities converge, because a 44px floor is taller than Compact (28) and
+   Comfortable (36). Relaxed is already 44. The preference still does what it
+   says on a desktop, which is where it is set and where it was asked for.
+   ========================================================================== */
+@media (pointer: coarse) {
+
+  /* --- Icon-only controls in the top bar and toolbars ---------------------
+     25-28px square, and the smallest things on screen. `inline-flex` with
+     centring comes with the size: these were sized by their padding, so a
+     min-size alone would leave the icon sitting off-centre in a bigger box. */
+  .vy-icon-btn,
+  .vy-funnel,
+  .vy-avatar,
+  .vy-pager-page {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-inline-size: var(--vy-target-min);
+    min-block-size: var(--vy-target-min);
+  }
+  /* `.vy-pager-page` sets an explicit 24px height that min-block-size would
+     fight; `auto` hands the decision to the minimum. */
+  .vy-pager-page { height: auto; }
+  /* `.vy-avatar` is a circle at an explicit 28px. `min-*` beats `width` and
+     `height`, so it grows without the radius having to be restated. */
+
+  /* --- Controls that are wide enough and only ever too short -------------- */
+  .vy-smart-btn,
+  .vy-scope-btn,
+  .vy-filter-edit-fields,
+  .vy-input,
+  .vy-check {
+    min-block-size: var(--vy-target-min);
+  }
+
+  /* Below 820px the search collapses from a 420px field to a 32px icon, which
+     is why it needs a width here and the controls above do not. */
+  .vy-search {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-inline-size: var(--vy-target-min); min-block-size: var(--vy-target-min);
+  }
+
+  /* The column chooser's rows are bare <label>s in `.vy-column-list`, so they
+     get no help from `.vy-check`. Ten of them per list, at 32px. */
+  .vy-column-list label {
+    display: flex; align-items: center;
+    min-block-size: var(--vy-target-min);
+  }
+
+  /* The grid's select column zeroes `.vy-check` so the checkbox does not set
+     row height. On touch the row is 44 anyway, so it can have its height back
+     and the checkbox becomes a target the width of the cell. */
+  .vy-td--select .vy-check { min-block-size: var(--vy-target-min); }
+
+  /* --- Text-style buttons: HIT AREA, not appearance -----------------------
+     Padding takes them to 44 and an equal negative margin returns the space to
+     the layout, so type size and vertical rhythm are untouched. The same
+     treatment the login screen got. All seven `.vy-link` uses in this app are
+     standalone — none sits inline in a sentence, where this would put the hit
+     areas of adjacent lines on top of each other. `touch:check` fails on
+     overlapping targets, so that assumption is checked rather than trusted. */
+  .vy-link {
+    display: inline-flex; align-items: center;
+    min-block-size: var(--vy-target-min);
+    padding-block: var(--vy-space-5);
+    margin-block: calc(-1 * var(--vy-space-5));
+  }
+
+  /* `.vy-back` TAKES REAL SPACE INSTEAD. It was in the rule above until
+     touch:check reported its hit area sitting 982px2 on top of the smart
+     buttons below it — invisible on screen, and a tap near the seam would have
+     opened the wrong thing. It is one link in a page header with room around
+     it, so it can afford the 20px the negative margin was clawing back. */
+  .vy-back {
+    display: inline-flex; align-items: center;
+    min-block-size: var(--vy-target-min);
+  }
+
+  /* --- Grid rows ----------------------------------------------------------
+     `height` on a table row acts as a MINIMUM in table layout, which is what
+     makes this a floor rather than a fixed size — a row with more in it still
+     grows. Measured: a comfortable row goes 32 -> 56. */
+  .vy-grid-k .k-grid tr { height: var(--vy-target-min); }
+
+  /* `.vy-cell-link` carries `height: 100%` and I expected the taller row to
+     carry it. It did not: the row grew to 56 and the link stayed at 29, because
+     a percentage height does not resolve inside a Kendo `<td>` — the same trap
+     recorded in table-patterns.md. It has to ask for the height itself. */
+  .vy-cell-link { min-block-size: var(--vy-target-min); }
+
+  /* The select column's label has no text, so it was 20px wide in a 40px cell.
+     It now fills the cell — 40 wide, 44 tall.
+
+     IT STOPS AT 40 AND THAT IS DELIBERATE. The column is `SELECT_COL_W = 40` in
+     DataGrid.tsx, one constant shared by the header and every row. Forcing the
+     cell to 44 from CSS does not widen the column: it makes the cell overflow
+     it, and touch:check reported the result as four overlapping pairs — the
+     checkbox sitting on top of the next cell's link. A 4px shortfall against a
+     guidance figure is a better outcome than a tap that opens the wrong record.
+     Widening the constant would fix both, and would also move the column on
+     every desktop, which is not this change's to do. It still conforms: 40x44
+     is over 24x24, and the nearest other target is 59px away. */
+  .vy-td--select .vy-check { inline-size: 100%; justify-content: center; }
+}

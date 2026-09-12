@@ -386,3 +386,55 @@ html[data-kendo-bridged] .k-tabstrip-item:focus-visible {
      would mean inventing the counterpart, and an invented rung is a guess that
      later reads as a decision.
    -------------------------------------------------------------------------- */
+
+/* =============================================================================
+   TOUCH TARGETS — Kendo's half, 12 Sep 2026
+   -----------------------------------------------------------------------------
+   The other half is at the end of responsive.css, under the same media query
+   and for the same reason. These are here because they style Kendo's classes,
+   which is this file's job and which the consistency check permits only here.
+
+   NOTHING MAPS. The bridge is a variable map everywhere else, and that was
+   checked first: Kendo publishes 453 custom properties and not one of them
+   sizes a button or a checkbox — 63 mention size, spacing or padding, and all
+   63 are the spacing scale. Component heights are static CSS, so this section
+   sets properties instead of remapping them. It is the exception in this file,
+   not a new pattern.
+
+   ON A MOUSE THIS BLOCK DOES NOT EXIST.
+   ========================================================================== */
+@media (pointer: coarse) {
+  /* Every Kendo button measured between 23 and 29px tall: the grid toolbar,
+     the pager's first/prev/next/last, dialog actions, Run Quotation. */
+  /* min-inline-size as well as block: the pager's arrows, a combobox's expand
+     button and the RFQ header's Edit were 23-41px WIDE and full height. A
+     button with a label is already wider than 44 and does not notice. */
+  html[data-kendo-bridged] .k-button {
+    min-block-size: var(--vy-target-min);
+    min-inline-size: var(--vy-target-min);
+  }
+
+  /* The pager's own box was sized for 25px buttons. Once they are 44 the
+     buttons overflow it, and the top one ended up 5px2 on top of the last grid
+     row's checkbox — small, but it is still a tap landing on the wrong control.
+     Room for a 44px button plus its padding. */
+  html[data-kendo-bridged] .k-pager {
+    min-block-size: calc(var(--vy-target-min) + var(--vy-space-4));
+  }
+
+  /* Text and numeric inputs, and the inner element of every combobox and
+     dropdown — 33 to 35px. */
+  html[data-kendo-bridged] .k-input-inner { min-block-size: var(--vy-target-min); }
+
+  /* The page-size picker is a bare <select>, styled by the browser rather than
+     by Kendo, and at 24px it was among the shortest controls in the app. */
+  html[data-kendo-bridged] .k-pager select,
+  html[data-kendo-bridged] select { min-block-size: var(--vy-target-min); }
+
+  /* THE CHECKBOX KEEPS ITS 20px BOX. Drawing it at 44 would put a control the
+     size of a thumbnail in every row; what needed to grow was the area that
+     toggles it, and that is the label — handled as `.vy-check` in
+     responsive.css. This only stops Kendo's own fixed height from capping the
+     label once the row is 44. */
+  html[data-kendo-bridged] .k-checkbox-wrap { min-block-size: var(--vy-target-min); }
+}
