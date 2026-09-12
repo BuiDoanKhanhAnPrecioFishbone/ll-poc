@@ -185,3 +185,54 @@ sweep re-applied the sRGB transfer function to them and reported 40 failures at
 itself. The same bug produced a wrong underline measurement earlier in the same
 week. Alpha is now composited rather than skipped, so an 11% row stripe is read
 as the surface it actually is.
+
+---
+
+## Touch targets, swept 12 Sep 2026
+
+`npm run touch:check` — `scripts/touch-targets.mjs`, 12 routes at 375×812 with
+touch emulation, overlays opened so their contents are measured.
+
+**No WCAG 2.5.8 AA failure.** Nothing is under 24×24 without the 24px spacing
+that the criterion accepts in its place. The grid's row checkbox is 20×20, which
+would fail on its own; its rows are 33px apart, which is what rescues it. That
+is worth knowing before anyone makes the grid denser — Compact density is a
+customer-facing preference, and it is the thing standing between this sweep and
+a conformance failure.
+
+**59 controls are under 44×44**, the size Apple and Material converge on for a
+finger. Split evenly between ours and Kendo's: 29 `vy-`, 29 `k-`.
+
+The useful finding is the shape of it, not the count:
+
+| | controls |
+|---|---|
+| too short only | 43 |
+| too short and too narrow | 16 |
+| too narrow only | **0** |
+
+Not one control in this app is too narrow. Heights cluster hard — 21 sit at
+29px (the standard button), 15 at 24–25px (pager pages, text links, the page-size
+select), 8 at 33–35px (Kendo inputs and comboboxes). The 16 that fail both
+dimensions are the square ones: the topbar icons at 25–26, the avatar and the
+funnel at 28, the row checkbox at 20.
+
+So this is one decision about height, taken once, not fifty-nine fixes.
+
+### What is NOT decided here
+
+Raising these on the desktop would undo the density this system was asked for.
+The obvious move is `@media (pointer: coarse)` — a floor applied only where
+there is a finger, leaving the mouse layout untouched. Two reasons it is not
+done in the same commit as the sweep:
+
+1. It collides with **row density**. Lifting the row checkbox to 44 sets a floor
+   under row height, and Compact is a preference the customer chose. Whether
+   Compact stays compact on a phone is theirs to answer, not ours.
+2. Half the list is **Kendo's own controls**. Overriding a vendor's internals is
+   the thing this project has been careful about all along, and `.k-checkbox`,
+   `.k-button` and the pager are all theirs.
+
+Sign out was raised to 44 on 12 Sep because it was the one control that broke
+its own menu's rhythm — every other row there is 50px. That was a local
+inconsistency, not this decision.
