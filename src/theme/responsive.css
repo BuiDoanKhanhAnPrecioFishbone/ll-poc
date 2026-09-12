@@ -67,10 +67,19 @@
     box-shadow: var(--vy-elev-4);
   }
   .vy-shell[data-nav-open="true"] .vy-sidebar { transform: none; }
-  .vy-shell[data-nav-open="true"] .vy-brand-text,
   .vy-shell[data-nav-open="true"] .vy-nav-group-head,
   .vy-shell[data-nav-open="true"] .vy-nav-item span,
   .vy-shell[data-nav-open="true"] .vy-nav-chevron { display: revert; }
+
+  /* `flex`, NOT `revert`, and the difference was a visible defect. `revert`
+     goes back to the USER-AGENT value — `block` for a div — discarding the
+     author rule in app.css that makes this a column. So in the open drawer the
+     product name and the company name stopped stacking and became two inline
+     siblings on one line, with "Linh Long Engineering" clipped by the panel
+     edge. It read as the product name wrapping, which is how it survived: the
+     wrap was the symptom, this was the cause. The other three in the rule above
+     are genuinely reverting to their UA display, so they keep `revert`. */
+  .vy-shell[data-nav-open="true"] .vy-brand-text { display: flex; }
   .vy-shell[data-nav-open="true"] .vy-nav-item { justify-content: flex-start; padding-inline: var(--vy-space-8); }
   .vy-nav-toggle { display: inline-flex; }
   /* The mobile nav is a DRAWER, so it sits on the drawer layer rather than one

@@ -19,7 +19,15 @@ import { useExcelExport } from '../ui/useExcelExport';
 export function PartMaster() {
   const toast = useToast();
   /* Re-read after a part is created, so the new row is in the list behind the
-     detail dialog rather than appearing only on the next visit. */
+     detail dialog rather than appearing only on the next visit.
+
+     `created` IS A DELIBERATE CACHE-BUSTER AND MUST STAY. oxlint reports it as
+     an "unnecessary dependency" because the factory body never mentions it, and
+     that reading is wrong: `generateParts` begins with `createdParts()`, which
+     is module-level mutable state, so the factory's result depends on something
+     the linter cannot see. Remove the dependency to silence the warning and a
+     newly created part stops appearing in the list until the next visit —
+     silently, because nothing throws. */
   const [created, setCreated] = useState(0);
   const data = useMemo(() => generateParts(2000), [created]);
   const [selectedPart, setSelectedPart] = useState<Part | null>(null);

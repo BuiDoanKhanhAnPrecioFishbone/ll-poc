@@ -478,7 +478,16 @@ function StockReportDialog({ mapping, customer, onClose }: {
   const [lines, setLines] = useState<StockLine[]>(
     () => generateStock(mapping, customer));
   const [editing, setEditing] = useState<StockLine | null>(null);
-  const [replenishing, setReplenishing] = useState(false);
+  /* HOLDS THE NEW LINE'S ID, not a boolean, and that is the point.
+     `Date.now()` used to be read inline in the JSX — a call during render, so
+     it returned a different value on every re-render and the "new line" handed
+     to the dialog changed identity underneath it while the dialog was open.
+     Moving it into a `useMemo` did not fix that: useMemo also runs during
+     render, so the impurity simply moved somewhere less visible and brought a
+     spurious dependency with it.
+     The id belongs to the moment the user opens the dialog, so it is made in
+     the handler that opens it. Render reads state and calls nothing. */
+  const [replenishing, setReplenishing] = useState<string | null>(null);
 
   const total = lines.reduce((a, l) => a + l.quantity, 0);
   const free = lines.reduce((a, l) => a + availableQty(l), 0);
@@ -488,7 +497,7 @@ function StockReportDialog({ mapping, customer, onClose }: {
       open onClose={onClose} size="lg"
       title="Stock Report"
       subtitle={`${mapping.manufacturer} · ${mapping.mpn}`}
-      actions={<Button variant="filled" onClick={() => setReplenishing(true)}>Replenishment</Button>}
+      actions={<Button variant="filled" onClick={() => setReplenishing(`${mapping.id}-new-${Date.now()}`)}>Replenishment</Button>}
     >
       <div className="vy-result-summary">
         <div className="vy-fact">
@@ -530,15 +539,15 @@ function StockReportDialog({ mapping, customer, onClose }: {
         <UpdateQuantityDialog
           replenish
           line={{
-            id: `${mapping.id}-new-${Date.now()}`,
+            id: replenishing,
             date: new Date(), location: '', manufacturer: mapping.manufacturer,
             mpn: mapping.mpn, owner: 'Rocket EMS', ownerType: 'Rocket',
             quantity: 0, allocatedQty: 0, unit: 'EACH',
           }}
-          onClose={() => setReplenishing(false)}
+          onClose={() => setReplenishing(null)}
           onSave={l => {
             setLines(ls => [...ls, l]);
-            setReplenishing(false);
+            setReplenishing(null);
             toast.success(`${l.quantity.toLocaleString()} ${l.unit} added at ${l.location}.`);
           }}
         />

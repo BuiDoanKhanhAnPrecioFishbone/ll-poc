@@ -110,10 +110,21 @@ export function QuotationDetail() {
   const [touched, setTouched] = useState<Set<string>>(new Set());
   const markTouched = (name: string) => setTouched(t => new Set(t).add(name));
   const editing = draft !== null;
-  const all = useMemo(() => generateQuotations(330), []);
   /* Historical RFQ is a reference to another RFQ, so its options are the other
-     RFQs — seeded here rather than invented inside the field definition. */
-  useMemo(() => setHistoricalRfqOptions(all.map(x => ({ customer: x.customer, no: x.no }))), [all]);
+     RFQs — seeded here rather than invented inside the field definition.
+
+     SEEDED INSIDE THIS useMemo, not a second one. It was its own
+     `useMemo(() => setHistoricalRfqOptions(...), [all])`, which is a hook whose
+     return value is thrown away: useMemo is for caching a value, and using one
+     for its side effect hides the effect somewhere nobody looks. Moving it in
+     here keeps the timing identical — same render, before first paint, once —
+     which an effect would not: the field would paint with an empty option list
+     first. */
+  const all = useMemo(() => {
+    const rows = generateQuotations(330);
+    setHistoricalRfqOptions(rows.map(x => ({ customer: x.customer, no: x.no })));
+    return rows;
+  }, []);
   const base = useMemo(() => all.find(x => x.id === id), [all, id]);
   const q = saved ?? base;
 

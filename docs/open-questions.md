@@ -324,16 +324,38 @@ Ordered by what an answer unblocks, not by number.
 
 ### Blocking — work cannot start until you answer
 
+**One item, not three.** This table listed three until 12 Sep 2026; two of them
+had been answered and built days earlier and the table had not been updated.
+Correcting it matters more than it sounds: a client reading the old version
+would think three things were waiting on them, and would not know which one
+actually is.
+
 | # | Decision | Our assumption | What it unblocks |
 |---|---|---|---|
-| — | **Brand.** Is "The completed ERP/MES Solution" the tagline you *want*, or the one you want *improved*? If new, is "completed" meant to be "complete"? Rename to **Voyager IQ** now? | We render `VOYAGER` unchanged | The rename, the palette, every screen's header |
 | — | **Setting Form View** (deck slide 15) — no guideline section defines it. What is in scope? | Not built; four Configuration paths fall through to a placeholder | An entire screen archetype |
-| — | **Dark mode** (deck slide 7) — no source but the deck mentions it. In scope? | Not built; on-dark tokens exist for the sidebar only | Touches every colour token in the system |
+
+#### Closed, and why they are no longer here
+
+| Was blocking | Now |
+|---|---|
+| **Brand / rename** | **Settled 7 Sep** as design decisions D1–D3: the name is Voyager IQ and it is rendered — `AppShell.tsx` and `Login.tsx` both read `VOYAGER IQ`. The old row still claimed *"we render `VOYAGER` unchanged"*, which stopped being true the same week. **The tagline is still open** and has moved to *Expensive to get wrong* below, where it belongs: nothing is blocked on it, we simply do not show a tagline rather than guess at one. |
+| **Dark mode** | **In scope and built.** D13 answered it, and it shipped as a full user preference — `light` / `dark` / `system` in `applyTheme.ts`, swept across every screen on 8 Sep and re-measured on 12 Sep. Not a question any more. |
+
+#### Also not startable, and not on the list above
+
+**Sales Orders.** It is the largest hole in the navigation and an obvious
+candidate for the next screen, which is exactly why it is worth saying plainly:
+**there is no specification for it anywhere in these documents.** It exists as a
+sitemap entry and a menu item and nothing else — no field list, no columns, no
+live capture. Building it would be invention rather than reconstruction, which
+`precedence.md` rules out. It needs the same thing Setting Form View needs: a
+source.
 
 ### Expensive to get wrong — please confirm early
 
 | # | Decision | Our assumption | Why it matters |
 |---|---|---|---|
+| — | **Tagline.** Is "The completed ERP/MES Solution" the line you *want*, or the one you want *improved*? If new, is "completed" meant to be "complete"? | **We show no tagline.** Better absent than guessed at on the screen carrying your name | It appears under the mark on the login screen and in the shell header |
 | 13 | Purchase Lead Time — **days** (your sheet) or **weeks** (your live form)? | Days | A sevenfold planning error either way |
 | 12 | Part Source: `PACKAGING` is not in your live system. Should Create New Part also offer SERVICE, MAKE/PHANT, PROG? Does auto-exclusion cover MAKE/PHAN as well as MAKE/PHANT? | The sheet's six, `FLSTK` corrected to `FLRSTK` | Changes which BoM lines get quoted |
 | 4 | Date format — your two sources disagree | One format, stated in the doc | Every date on every screen |

@@ -10,8 +10,17 @@
  *
  *   node scripts/css-orphans.js
  *
- * The six `vy-btn--*` variants are expected to show: Button builds its class at
- * runtime from the `variant` prop, so no literal string contains them.
+ * RUNTIME-BUILT NAMES ARE LISTED SEPARATELY, not as orphans. Three components
+ * compose a class from a prop — `vy-btn--${variant}`, `vy-field--${variant}`,
+ * `vy-dialog--${size}` — so no literal string contains the result and a naive
+ * scan calls every one of them dead. It called ten dead on 12 Sep 2026 and all
+ * ten were live; acting on that list would have broken the Slot button path,
+ * every field variant and every dialog size.
+ *
+ * This script cannot tell a live `vy-btn--danger` from a dead one — only that
+ * something builds `vy-btn--` at runtime. So it reports them under their own
+ * heading and leaves the judgement to a person, instead of filing them where
+ * they read as safe to delete.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -25,7 +34,16 @@ const used=new Set();
 for(const m of src.matchAll(/['"`]([^'"`]*\bvy-[a-z0-9-]+[^'"`]*)['"`]/g))
   for(const c of m[1].split(/[\s]+/)) if(/^vy-[a-z0-9-]+$/.test(c)) used.add(c);
 const declared=new Set([...css.matchAll(/\.(vy-[a-z0-9-]+)/g)].map(m=>m[1]));
-const orphans=[...declared].filter(c=>!used.has(c)).sort();
+
+/* Prefixes a component completes at runtime: `vy-btn--${variant}` yields
+   `vy-btn--`. Anything declared under one of these cannot be judged here. */
+const dynamic=new Set();
+for(const m of src.matchAll(/\b(vy-[a-z0-9-]*?--)\$\{/g)) dynamic.add(m[1]);
+const isDynamic=c=>[...dynamic].some(p=>c.startsWith(p));
+
+const unused=[...declared].filter(c=>!used.has(c)).sort();
+const orphans=unused.filter(c=>!isDynamic(c));
+const runtime=unused.filter(isDynamic);
 
 /* Classes defined in more than one stylesheet.
    app.css loads after components.css, so a repeated name silently inherits
@@ -51,4 +69,9 @@ if (dupes.length) {
 }
 console.log('declared',declared.size,'used',used.size,'orphaned',orphans.length);
 console.log(orphans.join('\n'));
+if(runtime.length){
+  console.log(`\nBUILT AT RUNTIME — not orphans, and not automatically judgeable (${runtime.length})`);
+  console.log(`  from ${[...dynamic].sort().join(', ')}`);
+  console.log('  '+runtime.join('\n  '));
+}
 process.exit(0);

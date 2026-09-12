@@ -26,7 +26,13 @@
   display: grid; place-items: center; font-weight: var(--vy-weight-heavy); font-size: var(--vy-text-lg);
 }
 .vy-brand-text { display: flex; flex-direction: column; line-height: 1.2; overflow: hidden; }
-.vy-brand-text strong { color: var(--vy-on-dark-fg); font-size: var(--vy-text-md); letter-spacing: .08em; }
+/* `nowrap` for the same reason the company name below it already had it: the
+   product name is a name, and "VOYAGER / IQ" over two lines reads as two words.
+   It wrapped in the mobile drawer at 248px, and did so before the touch type
+   scale went up — checked against the old scale before blaming that. The parent
+   hides its overflow, so if a longer name ever stops fitting this clips instead
+   of wrapping; mobile:check reports exactly that as CUTOFF. */
+.vy-brand-text strong { color: var(--vy-on-dark-fg); font-size: var(--vy-text-md); letter-spacing: .08em; white-space: nowrap; }
 .vy-brand-text span { color: var(--vy-on-dark-muted); font-size: var(--vy-text-xs); white-space: nowrap; }
 
 .vy-nav { flex: 1; overflow-y: auto; padding: var(--vy-space-4) 0 var(--vy-space-8); }
