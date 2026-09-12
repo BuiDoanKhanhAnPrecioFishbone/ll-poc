@@ -62,11 +62,29 @@
   .vy-sidebar {
     position: fixed; inset-block: 0; inset-inline-start: 0; z-index: var(--vy-z-drawer);
     transform: translateX(-100%);
-    transition: transform var(--vy-dur-medium) var(--vy-ease-emphasised);
+    /* `visibility: hidden` TAKES THE CLOSED DRAWER OUT OF THE TAB ORDER, and
+       without it a phone user tabs through seventeen invisible navigation links
+       and the About disclosure before reaching the page. A translated element
+       is still rendered and still focusable: focus moves into it, the focus
+       ring is off screen to the left, and there is nothing to see or scroll
+       back to — WCAG 2.4.11, and found by focus:check on its first real run.
+
+       Transitioned with a DELAY rather than a duration, because visibility is
+       not interpolable: closing waits the length of the slide so the panel is
+       still visible on its way out, opening flips it immediately so the slide
+       in is visible. */
+    visibility: hidden;
+    transition: transform var(--vy-dur-medium) var(--vy-ease-emphasised),
+                visibility 0s linear var(--vy-dur-medium);
     width: var(--vy-shell-sidebar-w); flex-basis: var(--vy-shell-sidebar-w);
     box-shadow: var(--vy-elev-4);
   }
-  .vy-shell[data-nav-open="true"] .vy-sidebar { transform: none; }
+  .vy-shell[data-nav-open="true"] .vy-sidebar {
+    transform: none;
+    visibility: visible;
+    transition: transform var(--vy-dur-medium) var(--vy-ease-emphasised),
+                visibility 0s;
+  }
   .vy-shell[data-nav-open="true"] .vy-nav-group-head,
   .vy-shell[data-nav-open="true"] .vy-nav-item span,
   .vy-shell[data-nav-open="true"] .vy-nav-chevron { display: revert; }

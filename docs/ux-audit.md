@@ -645,3 +645,52 @@ everything raised for touch they were the least optional. Both are 44 now.
 `VOYAGER IQ` wraps to two lines in the drawer's brand block. Checked against the
 old type scale before blaming the type bump: it wrapped there too, so it is
 pre-existing and cosmetic. Say the word and it is one `white-space` away.
+
+## Keyboard focus, swept 12 Sep 2026
+
+`npm run focus:check` — every focusable control on 10 routes at **two widths**,
+1440 and 375, focused one at a time and measured. 802 controls. Two checks:
+
+- **OBSCURED** — focused, and not visible: scrolled out of its own scroller, or
+  clipped to nothing by an ancestor. WCAG 2.4.11 Focus Not Obscured (Minimum).
+- **NO VISIBLE INDICATOR** — focusing changes nothing about how the control is
+  drawn. WCAG 2.4.7 Focus Visible.
+
+It exists because the page-actions scroller broke keyboard focus and **nothing
+caught it** — not lint, not the touch sweep, not the mobile sweep, because all
+of them measure the page at rest and this only exists while something is
+focused. It was found by hand, which is not a strategy.
+
+### It found a real defect on its first run
+
+**The closed navigation drawer was still in the tab order.** On a phone the
+sidebar is parked at `translateX(-100%)` — rendered, and therefore focusable. So
+tabbing through any screen went through **seventeen invisible navigation links
+and the About disclosure** before reaching the page: focus moved, the ring was
+off screen to the left, and there was nothing to see and nothing to scroll back
+to.
+
+Fixed with `visibility: hidden` on the closed drawer, transitioned by *delay*
+rather than duration because visibility does not interpolate — closing waits the
+length of the slide so the panel stays visible on its way out; opening flips
+immediately so the slide in is seen. Verified through a full cycle: hidden at
+−248 → visible at 0 with focusable items → hidden again. Desktop is untouched
+(the rule lives inside the 820px block).
+
+That is 122 controls that were reachable and invisible, now not reachable at
+all until the drawer is open.
+
+### And the check lied once first
+
+It reported the login username as having no focus indicator. It does have one —
+`Login.tsx` **autofocuses** it, so the probe compared an already-focused input
+against itself. It now blurs before measuring the resting appearance.
+
+### The fixture that had to be corrected
+
+The planted "obscured" control was first placed at `left: 4000px` inside an
+`overflow: hidden` box. It was never reported, and the code was right: the
+parent's scrollWidth grows, so the browser scrolls it into view on focus, which
+is the browser doing its job. A **negative** offset cannot be scrolled to —
+`scrollLeft` has no negative side — so the control stays invisible however hard
+the browser tries. That is the state worth detecting.

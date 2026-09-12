@@ -11,10 +11,11 @@
     "css:orphans": "node scripts/css-orphans.js",
     "css:consistency": "node scripts/css-consistency.js",
     "css:check": "npm run css:orphans && npm run css:consistency",
-    "check": "npm run lint && npm run css:check && npm run build && npm run render:check && npm run touch:check && npm run mobile:check",
+    "check": "npm run lint && npm run css:check && npm run build && npm run render:check && npm run touch:check && npm run mobile:check && npm run focus:check",
     "render:check": "node scripts/render-check.mjs",
     "touch:check": "node scripts/touch-targets.mjs",
-    "mobile:check": "node scripts/mobile-check.mjs"
+    "mobile:check": "node scripts/mobile-check.mjs",
+    "focus:check": "node scripts/focus-check.mjs"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",
