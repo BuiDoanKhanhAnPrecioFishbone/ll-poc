@@ -261,17 +261,11 @@
      recorded in table-patterns.md. It has to ask for the height itself. */
   .vy-cell-link { min-block-size: var(--vy-target-min); }
 
-  /* The select column's label has no text, so it was 20px wide in a 40px cell.
-     It now fills the cell — 40 wide, 44 tall.
-
-     IT STOPS AT 40 AND THAT IS DELIBERATE. The column is `SELECT_COL_W = 40` in
-     DataGrid.tsx, one constant shared by the header and every row. Forcing the
-     cell to 44 from CSS does not widen the column: it makes the cell overflow
-     it, and touch:check reported the result as four overlapping pairs — the
-     checkbox sitting on top of the next cell's link. A 4px shortfall against a
-     guidance figure is a better outcome than a tap that opens the wrong record.
-     Widening the constant would fix both, and would also move the column on
-     every desktop, which is not this change's to do. It still conforms: 40x44
-     is over 24x24, and the nearest other target is 59px away. */
+  /* The select column's label has no text, so it was 20px wide in its cell.
+     Filling the cell is all this rule does; the WIDTH is set in DataGrid.tsx,
+     because Kendo writes column widths into a colgroup from a prop and no media
+     query can reach them. An earlier version of this rule forced the cell to 44
+     from here instead — the cell overflowed the column it could not resize, and
+     touch:check reported four overlapping pairs. */
   .vy-td--select .vy-check { inline-size: 100%; justify-content: center; }
 }

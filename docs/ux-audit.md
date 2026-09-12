@@ -291,19 +291,32 @@ Compact (28) and Comfortable (36); Relaxed is already 44. The preference still
 does exactly what it says on a desktop, which is where it is set. This is the
 consequence of the decision, stated rather than buried.
 
-#### The two that remain, and why they stay
+#### The select column, closed 12 Sep 2026
 
-Both are the grid's select column at 40px wide — 40×44 for the checkbox, 40×56
-for the cell. The column is `SELECT_COL_W = 40` in DataGrid.tsx, one constant
-shared by the header and every row. Forcing the cell to 44 from CSS does not
-widen the column; it makes the cell overflow it, and the sweep reported that as
-four overlapping pairs — the checkbox sitting on top of the next cell's link. A
-4px shortfall against a guidance figure is a better outcome than a tap that
-opens the wrong record. Widening the constant fixes both and also moves the
-column on every desktop, which was not this change's to do — it is a small,
-clean follow-up if you want the last two closed.
+**Every target in the app is now at least 44×44 on touch. FAIL 0, THIN 0,
+overlaps 0.**
 
-They conform as they stand: 40×44 is well over 24×24, nearest neighbour 56px.
+The last two were the grid's select column at 40px wide. The fix is not CSS:
+Kendo writes column widths into a colgroup from a prop, so a media query cannot
+reach them, and an earlier attempt to raise the cell from CSS only made it
+overflow the column it was not allowed to resize — four overlapping pairs.
+
+So the width follows the pointer in React instead, via a new `useMediaQuery`
+hook reading `(pointer: coarse)`. 40 for a cursor, 44 for a finger. It uses
+`useSyncExternalStore` rather than an effect so the value is right during the
+first render; an effect would paint the desktop width and then correct it, which
+on a grid is every column visibly shifting on load.
+
+This keeps a documented decision intact rather than overruling it. The constant
+carried the note that the checkbox track is narrow because *"it holds one control
+whose size never changes, so a role width would only make it wider than its
+content"*. That is true of a cursor and false of a finger — the box is the same
+20px either way, but the target is not. A blunt 40 → 44 would have made the
+track wider than its content on every desktop, which is exactly what that note
+rules out.
+
+Verified in both modes: touch gives header 44 and body 44×56 with zero column
+drift; desktop still reports 40×32, row height 32, avatar 28×28 — unchanged.
 
 #### What the sweep got wrong, twice, while doing this
 

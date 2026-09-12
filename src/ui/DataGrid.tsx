@@ -8,6 +8,7 @@ import { orderBy, type SortDescriptor } from '@progress/kendo-data-query';
 import { SearchField } from './Field';
 import { ColumnChooser } from './ColumnChooser';
 import { Pager } from './Pager';
+import { useMediaQuery, POINTER_COARSE } from './useMediaQuery';
 import { usePrefs } from './prefs';
 import { Button } from './Button';
 import { widthOf, type ColumnSpec } from '../components/column-model';
@@ -22,8 +23,20 @@ export type Density = 'compact' | 'comfortable' | 'relaxed';
    below for why it is not passed to Kendo. */
 export const ROW_H: Record<Density, number> = { compact: 28, comfortable: 36, relaxed: 44 };
 /* The checkbox track is fixed and narrow — it holds one control whose size never
-   changes, so a role width would only make it wider than its content. */
+   changes, so a role width would only make it wider than its content.
+
+   THAT IS TRUE OF A CURSOR AND FALSE OF A FINGER. The control is the same 20px
+   box either way, but its TARGET is not: on touch the label fills the cell and
+   has to be 44 to be worth tapping, and at 40 the column was the last thing in
+   the app still under the floor. So the track follows the pointer.
+
+   IT HAS TO BE A NUMBER, WHICH IS WHY IT IS NOT IN CSS. Kendo writes column
+   widths into a colgroup from this prop; a media query cannot reach them. The
+   first attempt raised the CELL from CSS instead and the cell simply overflowed
+   the column it could not resize — four overlapping targets, the checkbox
+   sitting on top of the next cell's link. */
 const SELECT_COL_W = 40;
+const SELECT_COL_W_TOUCH = 44;
 
 
 /**
@@ -140,6 +153,10 @@ export function DataGrid<T extends { id: string | number }>({
      the UI elements you want to show should be configured here for consistency".
      Set once, applies to every grid. */
   const { density } = usePrefs();
+  /* Read during render, not in an effect: an effect would paint the desktop
+     width first and correct it, and on a grid that is every column visibly
+     shifting on load. */
+  const selectColW = useMediaQuery(POINTER_COARSE) ? SELECT_COL_W_TOUCH : SELECT_COL_W;
   const [search, setSearch] = useState('');
   /**
    * Column visibility is NOT held here.
@@ -371,7 +388,7 @@ export function DataGrid<T extends { id: string | number }>({
               {selectable && (
                 <GridColumn
                   field="__select"
-                  width={SELECT_COL_W}
+                  width={selectColW}
                   sortable={false}
                   title=" "
                   cells={{
