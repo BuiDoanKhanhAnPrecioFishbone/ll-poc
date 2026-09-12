@@ -35,15 +35,19 @@ export function Queues() {
   const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading');
   const [rows, setRows] = useState<Quotation[]>([]);
 
-  const load = () => {
-    setState('loading');
+  /* `setState('loading')` is deliberately NOT in here. The state already starts
+     at 'loading', so setting it again on mount is a second render that changes
+     nothing. Retry does need it, and retry is an event — which is where a state
+     change belongs. */
+  const start = () => {
     const t = setTimeout(() => {
       try { setRows(generateQuotations(330)); setState('ready'); }
       catch { setState('error'); }
     }, 420);
     return () => clearTimeout(t);
   };
-  useEffect(load, []);
+  useEffect(start, []);
+  const retry = () => { setState('loading'); start(); };
 
   const scoped = useMemo(
     () => (scope === 'mine' ? rows.filter(q => q.assignedTo.includes(ME)) : rows),
@@ -108,7 +112,7 @@ export function Queues() {
         <div className="vy-empty-state" role="alert">
           <strong>Your queues could not be loaded</strong>
           <p>The request for RFQ counts did not come back. Nothing has been changed.</p>
-          <Button variant="filled" onClick={load}>Try again</Button>
+          <Button variant="filled" onClick={retry}>Try again</Button>
         </div>
       )}
 

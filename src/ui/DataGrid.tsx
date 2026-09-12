@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Grid, GridColumn,
@@ -232,8 +232,13 @@ export function DataGrid<T extends { id: string | number }>({
   const safePage = Math.min(page, pageCount - 1);
   const rows = allRows.slice(safePage * pageSize, safePage * pageSize + pageSize);
   /* A narrower result set starts at page one. Staying on page 7 of a set that
-     now has two pages is how a grid ends up looking empty for no reason. */
-  useEffect(() => { setPage(0); }, [filtered]);
+     now has two pages is how a grid ends up looking empty for no reason.
+
+     During render, so the reset lands in the same frame as the new rows.
+     `safePage` above still clamps — it covers the render in which the filter
+     changed, and this covers every render after it. */
+  const [seenFiltered, setSeenFiltered] = useState(filtered);
+  if (seenFiltered !== filtered) { setSeenFiltered(filtered); setPage(0); }
 
   const selectable = !!selected && !!onSelectedChange;
 

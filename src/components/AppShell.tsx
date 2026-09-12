@@ -43,10 +43,6 @@ export function AppShell() {
   const groupOf = (p: string) =>
     liveNav.find(g => !g.leaf && g.items.some(i => i.path === p || (i.path !== '/' && p.startsWith(i.path + '/'))))?.title;
   const [openGroup, setOpenGroup] = useState<string | null>(() => groupOf(pathname) ?? 'Sales Management');
-  useEffect(() => {
-    const g = groupOf(pathname);
-    if (g) setOpenGroup(g);
-  }, [pathname]);
 
   /* Shell-level preferences. In a real build these come from the user record;
      here they persist per browser so the choice at least survives a reload. */
@@ -68,7 +64,22 @@ export function AppShell() {
      closes on navigation, because leaving it open over the screen you just
      asked for is the classic mobile-drawer mistake. */
   const [navOpen, setNavOpen] = useState(false);
-  useEffect(() => { setNavOpen(false); }, [pathname]);
+
+  /* BOTH REACTIONS TO A NAVIGATION, in one place and during render. They were
+     two effects on the same `[pathname]`, which meant two post-commit state
+     changes for one event: the new screen painted once with the previous
+     group still expanded and the drawer still open over it, then corrected
+     itself. On a phone that is the drawer visibly closing after you have
+     already arrived. */
+  const [seenPath, setSeenPath] = useState(pathname);
+  if (seenPath !== pathname) {
+    setSeenPath(pathname);
+    /* Only when the new route belongs to a group — a route that belongs to
+       none leaves whatever was open alone, which is the original behaviour. */
+    const g = groupOf(pathname);
+    if (g) setOpenGroup(g);
+    setNavOpen(false);
+  }
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {

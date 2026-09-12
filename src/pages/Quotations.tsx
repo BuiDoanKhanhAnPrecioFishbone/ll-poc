@@ -19,6 +19,7 @@ import { useViews, draftFrom } from '../ui/useViews';
 import { applySort, type SavedView } from '../ui/views';
 import { NewRequirementDialog } from '../components/quotation/NewRequirementDialog';
 import { SmartIcon } from '../components/quotation/SmartButtons';
+import { useResetOn } from '../ui/useResetOn';
 
 /**
  * The four measures. These are the ONLY quick filters, and they live in the KPI
@@ -118,8 +119,9 @@ export function Quotations() {
    *
    * Resets when you switch view, because that is what switching a view means.
    */
-  const [workingCols, setWorkingCols] = useState(view.columns);
-  useEffect(() => { setWorkingCols(view.columns); }, [view]);
+  /* Resets when the view changes — during render, not in an effect, so the
+     grid never paints one frame of the previous view's columns first. */
+  const [workingCols, setWorkingCols] = useResetOn(view, () => view.columns);
 
   const toggleColumn = (field: string) => setWorkingCols(cols =>
     cols.some(c => c.field === field)

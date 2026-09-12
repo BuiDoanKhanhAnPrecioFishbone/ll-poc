@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { allDestinations } from '../data/sitemap';
 
@@ -37,8 +37,18 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
       .map(r => r.d);
   }, [q]);
 
-  useEffect(() => { setSel(0); }, [q]);
-  useEffect(() => { if (open) setQ(''); }, [open]);
+  /* Typing moves the highlight back to the first result, and opening the
+     palette starts from an empty query. Both were effects, so both painted one
+     frame of the old state first — a stale highlight on the row you had arrowed
+     to, and the previous search still in the box as it appeared. */
+  const [seenQ, setSeenQ] = useState(q);
+  if (seenQ !== q) { setSeenQ(q); setSel(0); }
+
+  const [seenOpen, setSeenOpen] = useState(open);
+  if (seenOpen !== open) {
+    setSeenOpen(open);
+    if (open) setQ('');
+  }
 
   if (!open) return null;
 

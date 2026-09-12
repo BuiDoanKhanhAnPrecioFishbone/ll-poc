@@ -15,6 +15,7 @@ import { useViews, draftFrom } from '../ui/useViews';
 import { applyView, activeCount, type FilterValues, type SavedView } from '../ui/views';
 import { SmartIcon } from '../components/quotation/SmartButtons';
 import { useExcelExport } from '../ui/useExcelExport';
+import { useResetOn } from '../ui/useResetOn';
 
 export function PartMaster() {
   const toast = useToast();
@@ -85,8 +86,9 @@ export function PartMaster() {
   const { views: savedViews, active: view, activeId, setActiveId, save, remove } =
     useViews('part-master', systemView);
 
-  const [workingCols, setWorkingCols] = useState(view.columns);
-  useEffect(() => { setWorkingCols(view.columns); }, [view]);
+  /* Resets when the view changes — during render, not in an effect, so the
+     grid never paints one frame of the previous view's columns first. */
+  const [workingCols, setWorkingCols] = useResetOn(view, () => view.columns);
 
   const toggleColumn = (field: string) => setWorkingCols(cols =>
     cols.some(c => c.field === field)

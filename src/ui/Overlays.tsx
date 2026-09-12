@@ -3,7 +3,7 @@ import { Dialog as KendoDialog, DialogActionsBar } from '@progress/kendo-react-d
 import { TabStrip, TabStripTab } from '@progress/kendo-react-layout';
 import * as RRadio from '@radix-ui/react-radio-group';
 import { DialogDismiss } from './dismiss';
-import { cloneElement, createContext, type ReactNode, useContext, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { cloneElement, createContext, type ReactNode, useContext, useId, useMemo, useRef, useState } from 'react';
 
 /* =============================================================================
    Radix primitives, styled from tokens.
@@ -58,8 +58,16 @@ export function Dialog({ open, onClose, title, subtitle, children, actions, size
 }) {
   const [maximised, setMaximised] = useState(false);
   /* A dialog reopens at its normal size. Carrying "maximised" across two
-     unrelated dialogs would surprise whoever opens the next one. */
-  useEffect(() => { if (!open) setMaximised(false); }, [open]);
+     unrelated dialogs would surprise whoever opens the next one.
+
+     Adjusted during render rather than in an effect: the reset is conditional
+     (only on the close), so it does not fit `useResetOn`, but the mechanism is
+     the same — remember the last `open`, compare, act once on the change. */
+  const [seenOpen, setSeenOpen] = useState(open);
+  if (seenOpen !== open) {
+    setSeenOpen(open);
+    if (!open) setMaximised(false);
+  }
 
   /* A UNIQUE ID, and it is an accessibility fix rather than bookkeeping.
 

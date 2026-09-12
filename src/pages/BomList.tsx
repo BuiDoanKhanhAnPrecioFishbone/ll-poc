@@ -13,6 +13,7 @@ import { useToast } from '../ui/Toast';
 import { BomComparisonDialog } from '../components/quotation/BomComparisonDialog';
 import { PartBomDialog } from '../components/PartBomDialog';
 import { CreateBomDialog } from '../components/CreateBomDialog';
+import { useResetOn } from '../ui/useResetOn';
 
 /**
  * Bill of Materials list — Inventory Management » Bill of Materials.
@@ -85,8 +86,9 @@ export function BomList() {
   const { views: savedViews, active: view, activeId, setActiveId, save, remove } =
     useViews('bom-list', systemView);
 
-  const [workingCols, setWorkingCols] = useState(view.columns);
-  useEffect(() => { setWorkingCols(view.columns); }, [view]);
+  /* Resets when the view changes — during render, not in an effect, so the
+     grid never paints one frame of the previous view's columns first. */
+  const [workingCols, setWorkingCols] = useResetOn(view, () => view.columns);
 
   const toggleColumn = (field: string) => setWorkingCols(cols =>
     cols.some(c => c.field === field)

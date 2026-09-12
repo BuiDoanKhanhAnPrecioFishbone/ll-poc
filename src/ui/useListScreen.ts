@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { ColumnSpec } from '../components/column-model';
 import { useViews } from './useViews';
 import { applyView, activeCount, type FilterValues, type SavedView, type ViewField } from './views';
+import { useResetOn } from './useResetOn';
 
 /**
  * The list-screen toolbar, as one hook.
@@ -62,8 +63,9 @@ export function useListScreen<T>({ key, rows, columns, filterFields, quick, load
   const views = useViews(key, systemView);
   const { active: view } = views;
 
-  const [workingCols, setWorkingCols] = useState(view.columns);
-  useEffect(() => { setWorkingCols(view.columns); }, [view]);
+  /* Resets when the view changes — during render, not in an effect, so the
+     grid never paints one frame of the previous view's columns first. */
+  const [workingCols, setWorkingCols] = useResetOn(view, () => view.columns);
 
   const toggleColumn = (field: string) => setWorkingCols(cols =>
     cols.some(c => c.field === field)
