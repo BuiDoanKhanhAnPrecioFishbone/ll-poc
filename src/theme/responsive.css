@@ -251,6 +251,25 @@
     min-block-size: var(--vy-target-min);
   }
 
+  /* --- The grid must not be the thing that gets squeezed ------------------
+     `.vy-grid-k` is `flex: 1; min-height: 0`, so it takes what is left after
+     the page head, the KPI tiles, the toolbar and the pager. On a desktop that
+     is most of the screen. On a 375x812 phone it is almost nothing: measured
+     with the OLD type scale the content box was 72px against a 56px row — one
+     row, and the pager alone was 129px. Raising the type scale made it 28px and
+     zero rows, which is how this got noticed; the squeeze predates it.
+
+     A list screen whose list is the first thing to disappear has its priorities
+     backwards. `.vy-content` already scrolls, so the grid can claim a floor and
+     let the page scroll past it — about six rows on a tall phone and four on a
+     short one, instead of none on either.
+
+     THE FLOOR GOES ON THE GRID, NOT ON THE SHELL. Putting it on the shell did
+     nothing: the shell holds the toolbar and the pager as well, and at 375px
+     those measure 187px and 161px, so a 440px shell still left the grid 89px
+     and the rows 28. The shell grows to fit its contents instead. */
+  .vy-page--grid .vy-grid-k { min-block-size: 50vh; }
+
   /* --- Grid rows ----------------------------------------------------------
      `height` on a table row acts as a MINIMUM in table layout, which is what
      makes this a floor rather than a fixed size — a row with more in it still

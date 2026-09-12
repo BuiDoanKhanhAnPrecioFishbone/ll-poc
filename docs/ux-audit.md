@@ -397,14 +397,8 @@ Checked by hand on top of that: all three grid dialogs (New Part, AML Search,
 Import) go full-screen at 375×812 and fit exactly, and the nav drawer opens and
 closes correctly.
 
-**Small text is reported as advice, not a defect.** 126 instances under 12px on
-customer screens, 266 more on `/sitemap` and `/design-system`, which are
-internal reference pages. Almost all are 11px — the `--vy-text-xs` step, which
-is a legitimate caption size; iOS caption2 is 11pt. The only 10px on a customer
-screen is the initials inside an avatar, which is a graphic, not prose. Raising
-the bottom of the type scale on touch is available if you want it; it is a
-design decision about the scale, and it would move chart axis labels and badges,
-so it is not one to take by accident.
+**Small text: 126 instances under 12px on customer screens, 266 more on the two
+internal reference pages — now zero.** See below.
 
 ### Three ways the check lied before it told the truth
 
@@ -443,3 +437,55 @@ The probe now switches off transitions and animations before measuring, so
 every number it reports is a property of the CSS rather than of the frame it
 was caught on. Add it to the list of harness traps alongside `innerText`
 returning `''` and `elementFromPoint` returning null while the pane is hidden.
+
+## The type scale on touch, 12 Sep 2026
+
+Shifted, not floored. **Nothing on any screen is under 12px on a phone**, and a
+desktop is untouched.
+
+| token | desktop | touch |
+|---|---|---|
+| 2xs | 10 | 12 |
+| xs | 11 | 13 |
+| sm | 12 | 14 |
+| base | 13 | 15 |
+| md | 14 | 16 |
+| lg | 16 | 18 |
+
+A floor would have collapsed the scale: clamping everything to 12 makes `2xs`,
+`xs` and `sm` one size and throws away the hierarchy the scale exists to carry —
+the bottom of this scale steps in single pixels, so 10, 11 and 12 are barely
+three sizes at all. A constant +2 across the body range keeps every relationship
+exactly as it is and lifts the smallest step to 12. `xl` and up do not move:
+they are already 20px or more, and growing a heading on a 375px screen buys
+nothing and costs a wrap. Stopping at `lg` also preserves the gap to `xl` —
+without lifting `lg`, `md` and `lg` would both be 16.
+
+### What it exposed: the list was the thing being squeezed
+
+Bigger type made a pre-existing defect impossible to miss. `.vy-grid-k` is
+`flex: 1; min-height: 0`, so it takes whatever is left after the page head, the
+KPI tiles, the toolbar and the pager. On a desktop that is most of the screen.
+On a 375×812 phone, measured:
+
+| | toolbar | pager | grid content | rows visible |
+|---|---|---|---|---|
+| old type scale | 187px | 129px | 72px | 0 of a 56px row |
+| new type scale | 187px | 161px | 28px | 0 |
+| with the floor | 187px | 161px | 345px | **6** |
+
+A list screen whose list is the first thing to disappear has its priorities
+backwards, and it was already backwards before the type changed — 72px is one
+row that does not fit either. `.vy-content` already scrolls, so the grid now
+claims `min-block-size: 50vh` and the page scrolls past it: about six rows on a
+tall phone, four on a short one.
+
+**The floor goes on the grid, not on the shell.** Putting it on
+`.vy-grid-shell` did nothing at all — the shell also holds the toolbar and the
+pager, so a 440px shell still left the grid 89px and the rows 28. Worth knowing
+before anyone moves it.
+
+**Still worth a look, not done here:** the toolbar is 187px and the pager 161px
+at 375px wide — 348px of chrome above a list. Both wrap into three rows on a
+phone. Reducing either is a layout decision about what a phone user needs from a
+list screen, not a floor to raise.

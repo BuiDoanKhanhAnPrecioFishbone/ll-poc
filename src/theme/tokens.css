@@ -284,6 +284,34 @@
   --vy-text-2xl:  24px;
   --vy-text-3xl:  28px;
 
+  /* --- The same scale, on a finger ------------------------------------------
+     `mobile:check` found 126 pieces of text under 12px on customer screens,
+     nearly all at `xs`. None of it is a conformance failure — 1.4.4 is about
+     zoom, which works — but 10 and 11px is small on a device held at arm's
+     length, and this scale steps in single pixels at the bottom, so 10, 11 and
+     12 are barely three sizes at all.
+
+     A FLOOR WOULD HAVE COLLAPSED IT. Clamping everything to 12 makes 2xs, xs
+     and sm one size and throws away the hierarchy the scale exists to carry.
+     Shifting the body range by a constant +2 keeps every relationship exactly
+     as it is and lifts the smallest step to 12: 12, 13, 14, 15, 16, 18 instead
+     of 10, 11, 12, 13, 14, 16.
+
+     THE DISPLAY SIZES DO NOT MOVE. `xl` and up are 20px and over; they are
+     already comfortable, and growing a heading on a 375px screen buys nothing
+     and costs a wrap. Stopping at `lg` also keeps the gap to `xl` — without
+     lifting `lg`, `md` and `lg` would both be 16.
+
+     A desktop is untouched. */
+  @media (pointer: coarse) {
+    --vy-text-2xs:  12px;
+    --vy-text-xs:   13px;
+    --vy-text-sm:   14px;
+    --vy-text-base: 15px;
+    --vy-text-md:   16px;
+    --vy-text-lg:   18px;
+  }
+
   /* --- Shape ---------------------------------------------------------------- */
   --vy-radius-sm: 3px;
   --vy-radius-md: 4px;   /* the house radius */
