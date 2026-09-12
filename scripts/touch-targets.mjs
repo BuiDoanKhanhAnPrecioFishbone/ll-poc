@@ -57,7 +57,17 @@ const PORT = Number(process.env.CDP_PORT || 9445);
 
 /* iPhone X/11/12-class. The narrowest phone worth designing for is 320, which
    is checked separately for layout; 375 is where the targets are. */
-const VIEWPORT = { width: 375, height: 812, scale: 2 };
+/* 375 by default. The width is overridable because the touch RULES are keyed on
+   `pointer: coarse` rather than on width, so they fire identically at 820 — but
+   the LAYOUT there is different (sidebar in the flow, toolbars unwrapped), and
+   "the rules are the same" is not the same claim as "the result is the same".
+   Run it at the other end of the band with:
+     TOUCH_W=820 TOUCH_H=1024 npm run touch:check */
+const VIEWPORT = {
+  width: Number(process.env.TOUCH_W || 375),
+  height: Number(process.env.TOUCH_H || 812),
+  scale: 2,
+};
 
 const ROUTES = [
   '/',

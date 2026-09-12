@@ -41,9 +41,15 @@ import path from 'node:path';
 const BASE = process.env.BASE_URL || 'http://localhost:5180';
 const PORT = Number(process.env.CDP_PORT || 9452);
 
+/* DARK IS A THIRD PASS, not a nicety. This check compares how a control is
+   drawn before and after focus, and dark mode redefines the very properties it
+   compares — outline colour, border colour, background. A focus ring that
+   reads clearly on white can vanish against a dark surface without a single
+   rule changing, and no check had ever looked. */
 const VIEWPORTS = [
-  { label: 'desktop', width: 1440, height: 900, mobile: false },
-  { label: 'phone', width: 375, height: 812, mobile: true },
+  { label: 'desktop', width: 1440, height: 900, mobile: false, theme: 'light' },
+  { label: 'phone', width: 375, height: 812, mobile: true, theme: 'light' },
+  { label: 'phone, dark', width: 375, height: 812, mobile: true, theme: 'dark' },
 ];
 
 const ROUTES = [
@@ -219,7 +225,20 @@ async function main() {
     await send('Emulation.setDeviceMetricsOverride', {
       width: vp.width, height: vp.height, deviceScaleFactor: 1, mobile: vp.mobile });
     await send('Page.navigate', { url: BASE + route });
+    await sleep(1000);
+    /* Set the way a person sets it — the stored preference, then a reload. */
+    await send('Runtime.evaluate', {
+      expression: `localStorage.setItem('vy.theme', ${JSON.stringify(vp.theme || 'light')})`,
+      returnByValue: true });
+    await send('Page.reload');
     await sleep(3200);
+    const got = await send('Runtime.evaluate', {
+      expression: `document.documentElement.getAttribute('data-theme')`,
+      returnByValue: true });
+    const actual = got.result?.result?.value;
+    if (actual && actual !== (vp.theme || 'light')) {
+      throw new Error(`asked for ${vp.theme} on ${route}, page rendered ${actual}`);
+    }
     if (selfTest) { await send('Runtime.evaluate', { expression: SELFTEST, returnByValue: true }); await sleep(150); }
     const r = await send('Runtime.evaluate',
       { expression: PROBE, awaitPromise: true, returnByValue: true });

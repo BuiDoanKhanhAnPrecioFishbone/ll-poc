@@ -39,6 +39,33 @@ const BASE = process.env.BASE_URL || 'http://localhost:5180';
 const PORT = Number(process.env.CDP_PORT || 9446);
 const VIEWPORT = { width: 375, height: 812, scale: 2 };
 
+/* FOUR PASSES, because every defect this check has missed was in a state it
+   never entered.
+
+   DARK is a shipped preference — light / dark / system — and until now no
+   check had ever seen it. Contrast was measured by hand in dark; layout was
+   not, and dark swaps borders and backgrounds.
+
+   768 AND 820 are the band between the two sizes that were tested. The layout
+   switches AT 820 — the sidebar becomes a drawer, the record bar stacks, the
+   toolbars rewrap — and a breakpoint boundary is the likeliest place in any
+   stylesheet for a rule to apply on one side and not the other. 820 is the
+   last width the rules still fire at, 768 a tablet held upright.
+
+   Overlays run on the first pass only. They are expensive and they do not vary
+   with width the way page layout does; running them four times would treble the
+   gate for very little. */
+const PASSES = [
+  { label: 'phone 375, light', width: 375, height: 812, scale: 2, mobile: true,
+    theme: 'light', overlays: true },
+  { label: 'phone 375, dark',  width: 375, height: 812, scale: 2, mobile: true,
+    theme: 'dark',  overlays: false },
+  { label: 'at the 820 breakpoint', width: 820, height: 1024, scale: 1, mobile: true,
+    theme: 'light', overlays: false },
+  { label: 'tablet 768', width: 768, height: 1024, scale: 2, mobile: true,
+    theme: 'light', overlays: false },
+];
+
 const ROUTES = [
   '/', '/my-queues',
   '/sales-management/quotation', '/sales-management/quotation/rfq-1',
@@ -321,14 +348,33 @@ async function main() {
     new Promise(res => { const i = ++id; pending.set(i, res); ws.send(JSON.stringify({ id: i, method, params })); });
 
   await send('Page.enable'); await send('Runtime.enable');
-  await send('Emulation.setDeviceMetricsOverride', {
-    width: VIEWPORT.width, height: VIEWPORT.height,
-    deviceScaleFactor: VIEWPORT.scale, mobile: true });
-  await send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
 
-  const visit = async (route, withFaults = false) => {
+  const applyPass = async pass => {
+    await send('Emulation.setDeviceMetricsOverride', {
+      width: pass.width, height: pass.height,
+      deviceScaleFactor: pass.scale, mobile: pass.mobile });
+    await send('Emulation.setTouchEmulationEnabled',
+      { enabled: pass.mobile, maxTouchPoints: pass.mobile ? 5 : 0 });
+  };
+
+  /* The theme is a stored preference, so it is set the way a person sets it and
+     the page reloaded — not by poking a class onto the root, which would test a
+     state the app cannot reach. */
+  const visit = async (route, { withFaults = false, theme = 'light' } = {}) => {
     await send('Page.navigate', { url: BASE + route });
+    await sleep(1000);
+    await send('Runtime.evaluate', {
+      expression: `localStorage.setItem('vy.theme', ${JSON.stringify(theme)})`,
+      returnByValue: true });
+    await send('Page.reload');
     await sleep(3200);
+    const got = await send('Runtime.evaluate', {
+      expression: `document.documentElement.getAttribute('data-theme')`,
+      returnByValue: true });
+    const actual = got.result?.result?.value;
+    if (actual && actual !== theme) {
+      throw new Error(`asked for the ${theme} theme on ${route}, page rendered ${actual}`);
+    }
     if (withFaults) {
       await send('Runtime.evaluate', { expression: SELFTEST, returnByValue: true });
       await sleep(150);
@@ -337,7 +383,8 @@ async function main() {
     return r.result?.result?.value;
   };
 
-  const st = await visit('/', true);
+  await applyPass(PASSES[0]);
+  const st = await visit('/', { withFaults: true });
   const caught = {
     escape: !!st?.escapes?.some(e => e.sel.indexOf('vy-st-wide') >= 0),
     small: !!st?.small?.some(e => e.sel.indexOf('vy-st-small') >= 0),
@@ -354,23 +401,26 @@ async function main() {
   }
 
   const findings = [];
+  for (const pass of PASSES) {
+  await applyPass(pass);
   for (const route of ROUTES) {
-    const v = await visit(route);
-    if (!v) { findings.push({ route, kind: 'probe', detail: 'page did not render' }); continue; }
-    if (v.sideways) findings.push({ route, kind: 'sideways',
+    const v = await visit(route, { theme: pass.theme });
+    const rlabel = `${route} · ${pass.label}`;
+    if (!v) { findings.push({ route: rlabel, kind: 'probe', detail: 'page did not render' }); continue; }
+    if (v.sideways) findings.push({ route: rlabel, kind: 'sideways',
       detail: `${v.sideways.where} scrolls sideways — ${v.sideways.scrollWidth}px of content in ${v.sideways.viewport}px` });
     if (!v.viewportMeta || v.viewportMeta.indexOf('width=device-width') < 0) findings.push({ route,
       kind: 'viewport-meta', detail: `meta viewport is ${v.viewportMeta || 'absent'}` });
-    for (const e of v.escapes) findings.push({ route, kind: 'escapes',
+    for (const e of v.escapes) findings.push({ route: rlabel, kind: 'escapes',
       detail: `${e.sel} "${e.what}" reaches ${e.right}px, ${e.over}px past the edge` });
-    for (const e of v.small) findings.push({ route, kind: 'smalltext',
+    for (const e of v.small) findings.push({ route: rlabel, kind: 'smalltext',
       detail: `${e.sel} "${e.what}" at ${e.size}px` });
-    for (const e of v.cut) findings.push({ route, kind: 'cutoff',
+    for (const e of v.cut) findings.push({ route: rlabel, kind: 'cutoff',
       detail: `${e.sel} "${e.what}" clipped by ${e.by}px with no ellipsis` });
-    for (const e of (v.clipped || [])) findings.push({ route, kind: 'clipped',
+    for (const e of (v.clipped || [])) findings.push({ route: rlabel, kind: 'clipped',
       detail: `${e.sel} "${e.what}" — ${e.lost}px hidden by ${e.by}, which does not scroll` });
 
-    for (const ov of OVERLAYS) {
+    if (pass.overlays) for (const ov of OVERLAYS) {
       const opened = await send('Runtime.evaluate',
         { expression: ov.open, awaitPromise: true, returnByValue: true });
       if (!opened.result?.result?.value) continue;
@@ -378,7 +428,7 @@ async function main() {
         { expression: PROBE, returnByValue: true });
       const w = o.result?.result?.value;
       if (w) {
-        const where = `${route} · ${ov.name}`;
+        const where = `${rlabel} · ${ov.name}`;
         if (w.sideways) findings.push({ route: where, kind: 'sideways',
           detail: `${w.sideways.where} scrolls sideways — ${w.sideways.scrollWidth}px of content in ${w.sideways.viewport}px` });
         for (const e of w.escapes) findings.push({ route: where, kind: 'escapes',
@@ -395,6 +445,7 @@ async function main() {
         returnByValue: true });
       await sleep(500);
     }
+  }
   }
 
   ws.close();
@@ -425,7 +476,7 @@ async function main() {
   }
   const rows = [...byDefect.values()];
 
-  console.log(`viewport ${VIEWPORT.width}x${VIEWPORT.height}  routes ${ROUTES.length}  self-test passed`);
+  console.log(`${ROUTES.length} routes x ${PASSES.length} passes — ${PASSES.map(p => p.label).join('; ')}  self-test passed`);
   console.log(`DEFECTS ${rows.length}`);
   for (const r of rows) {
     console.log(`  [${r.kind}] ${r.detail}`);
