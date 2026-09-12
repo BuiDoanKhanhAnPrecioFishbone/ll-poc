@@ -10,7 +10,9 @@
     "preview": "vite preview",
     "css:orphans": "node scripts/css-orphans.js",
     "css:consistency": "node scripts/css-consistency.js",
-    "css:check": "npm run css:orphans && npm run css:consistency"
+    "css:check": "npm run css:orphans && npm run css:consistency",
+    "check": "npm run lint && npm run css:check && npm run build && npm run render:check",
+    "render:check": "node scripts/render-check.mjs"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",
