@@ -758,6 +758,13 @@
 /* ---- Popover + column chooser -------------------------------------------- */
 .vy-popover {
   min-width: var(--vy-popover-min-w);
+  /* A popover is sized by its content, and content does not know how wide the
+     screen is: the user menu's longest hint gave it an intrinsic 324px, which
+     hangs 4px off a 320px phone. Radix measures the room and publishes it; this
+     applies it. Everything inside wraps normally, so the constraint only ever
+     re-wraps text. No effect above 320 — it binds only when the popover would
+     otherwise leave the viewport. */
+  max-width: var(--radix-popover-content-available-width, none);
   max-height: 60vh; overflow-y: auto;
   background: var(--vy-surface);
   border: 1px solid var(--vy-border);

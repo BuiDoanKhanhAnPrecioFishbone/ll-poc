@@ -1011,7 +1011,11 @@
 .vy-usermenu-foot { margin-top: var(--vy-space-5); border-top: 1px solid var(--vy-border); }
 .vy-usermenu-signout {
   display: flex; align-items: center; gap: var(--vy-space-4);
-  min-height: var(--vy-space-10); padding: var(--vy-space-3) var(--vy-space-4);
+  /* 24px here made Sign out the only target in this menu under 44 and the only
+     row that broke its 50px rhythm — the eight preference rows are two-line and
+     measure 50. Its own hint sits outside the link, so it stays one line and has
+     to ask for the height. */
+  min-height: var(--vy-target-min); padding: var(--vy-space-3) var(--vy-space-4);
   margin-inline: calc(-1 * var(--vy-space-4));
   border-radius: var(--vy-shape-sm); text-decoration: none;
   font-size: var(--vy-text-base); font-weight: var(--vy-weight-medium);

@@ -325,6 +325,13 @@
   --vy-space-12: 32px;
   --vy-space-14: 40px;
 
+  /* The floor for anything a finger has to hit. Not on the spacing scale on
+     purpose — it is an accessibility minimum, not a rhythm step, and a control
+     that needs it should say so rather than reach for whichever space token
+     happens to be 44. WCAG 2.5.8 asks 24x24; 44 is the figure both Apple and
+     Material settled on for touch, and this app is opened on phones. */
+  --vy-target-min: 44px;
+
   /* --- Weight scale --------------------------------------------------------- */
   --vy-weight-regular:  400;
   --vy-weight-medium:   500;
