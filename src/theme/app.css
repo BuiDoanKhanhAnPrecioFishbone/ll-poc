@@ -1006,6 +1006,20 @@
 .vy-usermenu-id strong { display: block; color: var(--vy-on-surface-strong); font-size: var(--vy-text-base); }
 .vy-usermenu-id span { color: var(--vy-on-surface-subtle); font-size: var(--vy-text-xs); }
 .vy-usermenu-section { padding-top: var(--vy-space-5); }
+/* Sign out is an ACTION among preferences, so it is ruled off from them rather
+   than becoming a fourth setting. */
+.vy-usermenu-foot { margin-top: var(--vy-space-5); border-top: 1px solid var(--vy-border); }
+.vy-usermenu-signout {
+  display: flex; align-items: center; gap: var(--vy-space-4);
+  min-height: var(--vy-space-10); padding: var(--vy-space-3) var(--vy-space-4);
+  margin-inline: calc(-1 * var(--vy-space-4));
+  border-radius: var(--vy-shape-sm); text-decoration: none;
+  font-size: var(--vy-text-base); font-weight: var(--vy-weight-medium);
+  color: var(--vy-on-surface-strong);
+}
+.vy-usermenu-signout:hover { background: var(--vy-surface-hover); }
+.vy-usermenu-signout:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
+.vy-usermenu-signout svg { flex: 0 0 auto; color: var(--vy-on-surface-muted); }
 .vy-usermenu-section h3 { margin: 0; font-size: var(--vy-text-sm); font-weight: var(--vy-weight-semibold); color: var(--vy-on-surface); }
 .vy-usermenu-hint { margin: var(--vy-space-1) 0 var(--vy-space-4); font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle); }
 .vy-density-choices { display: flex; flex-direction: column; gap: var(--vy-space-1); }

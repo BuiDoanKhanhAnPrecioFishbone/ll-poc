@@ -1,4 +1,5 @@
 import * as Popover from '@radix-ui/react-popover';
+import { Link } from 'react-router-dom';
 import { usePrefs, type Density, type DateStyle } from '../ui/prefs';
 import type { Theme } from '../theme/applyTheme';
 
@@ -90,6 +91,26 @@ export function UserMenu() {
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* THE WAY TO THE SIGN-IN SCREEN. It had none: `/login` was a route
+              nobody could reach by clicking, so the one screen the kick-off
+              deck spends two slides on could only be seen by typing its URL.
+              A reviewer will not do that, and a reviewer is who this build is
+              for.
+
+              A real <Link>, not a toast saying what it would do. There is no
+              session to end here, so signing out IS just going to that screen
+              — and a control that navigates should navigate. */}
+          <div className="vy-usermenu-section vy-usermenu-foot">
+            <Link className="vy-usermenu-signout" to="/login">
+              <svg viewBox="0 0 20 20" width="15" height="15" fill="none" stroke="currentColor"
+                   strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M12 14v2a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M9 10h8m0 0-2.5-2.5M17 10l-2.5 2.5" />
+              </svg>
+              Sign out
+            </Link>
+            <p className="vy-usermenu-hint">Takes you to the sign-in screen. Nothing is stored to clear.</p>
           </div>
 
           <Popover.Arrow className="vy-popover-arrow" />
