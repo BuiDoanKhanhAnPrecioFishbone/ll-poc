@@ -5,6 +5,7 @@ import { useToast } from '../../ui/Toast';
 import { useExcelExport } from '../../ui/useExcelExport';
 import type { ColumnSpec } from '../column-model';
 import type { Quotation, QuoteResult } from '../../data/quotations';
+import { pageActionsProps } from '../../ui/pageActions';
 
 const money = (n: number) => n.toLocaleString('en-GB', { style: 'currency', currency: 'USD' });
 
@@ -101,7 +102,7 @@ export function ResultTab({ q, onRun }: { q: Quotation; onRun: () => void }) {
           <div className="vy-fact-label">Last run</div>
           <div className="vy-fact-value">{fmtDateTime(latest.lastRunDate)} · {latest.lastRunBy}</div>
         </div>
-        <div className="vy-page-actions">
+        <div {...pageActionsProps}>
           {/* The costed lines, in the columns the tab shows. Kendo writes real
               numbers with a currency format, so the totals are summable rather
               than a column of text. */}

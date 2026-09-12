@@ -15,6 +15,7 @@ import { widthOf, type ColumnSpec } from '../components/column-model';
 import { GridSkeleton } from './GridSkeleton';
 import { kendoDomProps, kendoHeaderProps } from './kendoDomProps';
 import { renderCell, fmtDate } from './renderCell';
+import { pageActionsProps } from './pageActions';
 
 export type Density = 'compact' | 'comfortable' | 'relaxed';
 /* The density scale, kept here because it is the app's row-height vocabulary
@@ -259,7 +260,7 @@ export function DataGrid<T extends { id: string | number }>({
 
             The guideline's left/right split still holds where it belongs —
             among the view controls in that toolbar. */}
-        {actions && <div className="vy-page-actions">{actions}</div>}
+        {actions && <div {...pageActionsProps}>{actions}</div>}
       </div>
 
       {kpis && <div className="vy-kpi-row">{kpis}</div>}

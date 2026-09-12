@@ -578,3 +578,70 @@ button to 44px on the login screen. Both declarations applied because they set
 different properties, so nothing was broken, but a class split across two files
 is how one half quietly stops mattering later. Merged into components.css beside
 the rule it belongs with; the button still measures 44×335.
+
+## Re-checked on a phone, 12 Sep 2026 — and two real defects the checks had hidden
+
+Every automated check green: render 0, touch FAIL 0 / THIN 0 / overlaps 0,
+Compact conforming on size, mobile DEFECTS 0, no text under 12px. Dialogs
+re-checked by hand (all three full-screen at 375×812, fitting, scrolling
+internally), the nav drawer opens and closes, and a 375×667 phone still shows
+four rows.
+
+Both defects below were **introduced or hidden by earlier work in this same
+sweep**, and neither was visible in any report until the checks themselves were
+corrected.
+
+### 1. The scrolling page-actions row broke keyboard focus
+
+Tabbing from `New Part` to the off-screen `Export Part Master Data` moved focus
+without bringing the button into view. A focus ring nobody can see is the same
+as no focus ring — **WCAG 2.4.11 Focus Not Obscured (Minimum)**, and it was
+created by the scroller added an hour earlier.
+
+Chrome does not scroll this sub-scroller on a focus move, so the row does it
+itself: `pageActionsProps` in `src/ui/pageActions.ts`, one `onFocus` (which is
+`focusin`, so it bubbles and covers children a caller adds later) calling
+`scrollIntoView({ inline: 'nearest', block: 'nearest' })`, shared by the three
+places that render the row.
+
+**Verifying it took three attempts, and the first two were worthless:**
+
+- Attempt one measured in the preview pane and reported "focus does not scroll".
+- Attempt two used `document.body.focus()` to reset between trials — body is not
+  focusable, so focus never moved and two of three trials re-focused an element
+  that was already focused, measuring a no-op.
+- Attempt three found the real problem: **a document without system focus
+  dispatches no focus events at all.** A listener on the container counted zero
+  `focusin` events. Headless Chrome never holds system focus, so every run was
+  guaranteed to report the defect whether or not it existed.
+
+`Emulation.setFocusEmulationEnabled` fixes that, and a **control** settles it —
+the same row cloned without the React handler:
+
+| | scrollLeft | focused button visible |
+|---|---|---|
+| with the handler | 116 | **yes** |
+| clone, same CSS, no handler | 0 | no |
+
+Not scroll-snap: removing `scroll-snap-type` and `scroll-snap-align` changed
+nothing.
+
+### 2. The touch sweep could not see the navigation
+
+`touch:check` had been reporting *"every target is at least 44×44"* while the
+app's primary navigation sat at **38px** and the About disclosure at **27px**.
+
+Below 820px the sidebar is parked off-canvas at `translateX(-100%)`, so every
+item in it failed the hit test at its own centre and was dropped before being
+measured. A closed drawer is not an absent one. The sweep now opens it, and
+disables transitions first — a drawer caught mid-slide measures wherever it
+happens to be.
+
+Seventeen links are how a phone reaches every screen in this app, so of
+everything raised for touch they were the least optional. Both are 44 now.
+
+### Noted, not changed
+
+`VOYAGER IQ` wraps to two lines in the drawer's brand block. Checked against the
+old type scale before blaming the type bump: it wrapped there too, so it is
+pre-existing and cosmetic. Say the word and it is one `white-space` away.

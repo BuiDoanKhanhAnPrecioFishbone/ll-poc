@@ -18,6 +18,7 @@ import { RecordField, isMissing } from '../components/quotation/RecordField';
 import { smartButtonsFor, SmartIcon } from '../components/quotation/SmartButtons';
 import { HISTORICAL_RFQ_FIELD, showsHistoricalRfq, HEADER_GROUPS, COMMERCIAL, TECHNICAL, INVENTORY, NOTES, ALL_FIELDS,
          setHistoricalRfqOptions } from '../components/quotation/requirementFields';
+import { pageActionsProps } from '../ui/pageActions';
 
 /**
  * Quotation record.
@@ -349,7 +350,7 @@ export function QuotationDetail() {
               where both are visible. When it sat on the tab alone it under-
               claimed; when it sat here while unlocking only the tab, it over-
               claimed. */}
-          <div className="vy-page-actions">
+          <div {...pageActionsProps}>
             {editing ? (
               <>
                 <Button onClick={cancelEdit}>Cancel</Button>

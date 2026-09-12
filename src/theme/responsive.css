@@ -251,6 +251,22 @@
     min-block-size: var(--vy-target-min);
   }
 
+  /* --- The navigation drawer ----------------------------------------------
+     The one part of the app the touch sweep could not see. Below 820px the
+     sidebar sits off-canvas at translateX(-100%), so every item in it failed
+     the hit test at its own centre and was dropped before being measured —
+     `touch:check` reported "every target is at least 44x44" while the primary
+     navigation sat at 38 and the About disclosure at 27. The sweep now opens
+     the drawer; these are what it found.
+
+     A phone reaches every screen in this app through these seventeen links, so
+     of everything raised for touch they are the least optional. */
+  .vy-sidebar .vy-nav-item,
+  .vy-about summary {
+    display: flex; align-items: center;
+    min-block-size: var(--vy-target-min);
+  }
+
   /* --- Page actions: one scrolling row, primary first ---------------------
      Four buttons on Part Master — Import, AML Search, Export Part Master Data,
      New Part — measure 438px of labels plus gaps against 347px of screen, so

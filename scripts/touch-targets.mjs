@@ -97,6 +97,15 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 const PROBE = `(async () => {
   const sleep = ms => new Promise(r => setTimeout(r, ms));
 
+  /* Transitions off before anything is measured, for the reason written up in
+     mobile-check: a drawer caught mid-slide measures wherever it happens to be,
+     and one frozen by a non-rendering page measures its start value forever. */
+  const stopMotion = document.createElement('style');
+  stopMotion.textContent =
+    '*,*::before,*::after{transition:none !important;animation:none !important}';
+  document.head.appendChild(stopMotion);
+  document.body.getBoundingClientRect();
+
   const SEL = [
     'a[href]', 'button', 'input:not([type=hidden])', 'select', 'textarea',
     'summary', '[role=button]', '[role=link]', '[role=checkbox]', '[role=radio]',
@@ -336,6 +345,13 @@ const PROBE = `(async () => {
   /* Overlays. Their contents do not exist until opened, and the defect that
      prompted this sweep lived in one. */
   const openers = [
+    /* THE NAVIGATION DRAWER, and it was the blind spot that made this list
+       look complete. Below 820px the sidebar is parked off-canvas at
+       translateX(-100%), so every nav item fails the hit test at its own
+       centre and is dropped before it is ever measured — the sweep reported
+       "every target is at least 44x44" while the app's primary navigation sat
+       at 38. A closed drawer is not an absent one. */
+    { name: 'navigation',     find: () => document.querySelector('.vy-nav-toggle') },
     { name: 'user menu',      find: () => document.querySelector('.vy-avatar') },
     { name: 'column chooser', find: () => Array.from(document.querySelectorAll('button'))
                                             .find(b => /Columns \\(/.test(b.textContent)) },
