@@ -202,7 +202,7 @@
    "waiting on US", which is the queue's whole subject, and it stays distinct
    from `progress`'s lighter blue. */
 .vy-queue[data-tone="overdue"]  { border-left-color: var(--vy-danger); }
-.vy-queue[data-tone="soon"]     { border-left-color: var(--vy-accent-caution); }
+.vy-queue[data-tone="soon"]     { border-left-color: var(--vy-accent-warning); }
 .vy-queue[data-tone="open"]     { border-left-color: var(--vy-brand); }
 .vy-queue[data-tone="waiting"]  { border-left-color: var(--vy-accent-waiting); }
 .vy-queue[data-tone="blocked"]  { border-left-color: var(--vy-danger-boundary); }
@@ -1046,10 +1046,51 @@
 .vy-kpi[aria-pressed="true"] { background: var(--vy-brand-subtle); border-color: var(--vy-brand-boundary-light); }
 .vy-kpi-n { font-size: var(--vy-text-2xl); font-weight: var(--vy-weight-bold); color: var(--vy-on-surface-strong); line-height: 1.1; font-variant-numeric: tabular-nums; }
 .vy-kpi-label { font-size: var(--vy-text-sm); color: var(--vy-on-surface-muted); }
+/* EVERY TILE CARRIES ITS STATE, not just the four on Project Requirements.
+   The accent bar existed only for that screen's keys; the ten keys on Part
+   Master, Bills of Materials, MPN and Packing Lists fell through to the default
+   grey border. A reader learns on one screen that the bar means something, then
+   finds it means nothing on four others — worse than never having coloured it.
+
+   Two rules held while choosing. A key means the SAME THING wherever it appears
+   — `active` is green on three screens, `pending` amber on two — and the tiles
+   on ANY ONE screen must be mutually distinct, which is precisely what the
+   chart legend and the queue cards both failed at.
+
+   The ambers take `--vy-accent-warning` rather than `--vy-accent-caution`: the
+   lighter one measures 2.97:1 against the card, just under the 3:1 this project
+   holds meaningful graphics to. Same hue to read, and it clears the bar. */
+
+/* Project Requirements */
 .vy-kpi[data-key="overdue"]     { border-left-color: var(--vy-danger); }
-.vy-kpi[data-key="due-week"]    { border-left-color: var(--vy-accent-caution); }
+.vy-kpi[data-key="due-week"]    { border-left-color: var(--vy-accent-warning); }
 .vy-kpi[data-key="waiting-doc"] { border-left-color: var(--vy-accent-waiting); }
 .vy-kpi[data-key="open"]        { border-left-color: var(--vy-brand-boundary-strong); }
+
+/* Lifecycle, shared by Part Master, Bills of Materials and MPN. These four map
+   onto the status vocabulary: Active is `done`, Pending is `draft`, Obsolete is
+   `blocked`, Inactive is `cancelled`. */
+.vy-kpi[data-key="active"]      { border-left-color: var(--vy-accent-positive); }
+.vy-kpi[data-key="pending"]     { border-left-color: var(--vy-accent-warning); }
+.vy-kpi[data-key="obsolete"]    { border-left-color: var(--vy-danger); }
+.vy-kpi[data-key="inactive"]    { border-left-color: var(--vy-accent-neutral); }
+
+/* Bills of Materials. `revised` is not a state — it counts assemblies past
+   their first BoM version — so it takes the brand accent rather than borrowing
+   a lifecycle colour it would misrepresent. */
+.vy-kpi[data-key="revised"]     { border-left-color: var(--vy-brand); }
+
+/* MPN. `nrnd` warns you off designing something in, `eol` is the end of the
+   road, and `pcn` is an outstanding change notice — attention of a different
+   kind, so it takes the waiting accent rather than a second amber. */
+.vy-kpi[data-key="nrnd"]        { border-left-color: var(--vy-accent-warning); }
+.vy-kpi[data-key="eol"]         { border-left-color: var(--vy-danger); }
+.vy-kpi[data-key="pcn"]         { border-left-color: var(--vy-accent-waiting); }
+
+/* Packing Lists. `shipped` is the completed state, so it takes the same green
+   as `active`; `unbilled` waits on someone else. */
+.vy-kpi[data-key="shipped"]     { border-left-color: var(--vy-accent-positive); }
+.vy-kpi[data-key="unbilled"]    { border-left-color: var(--vy-accent-waiting); }
 
 
 /* =============================================================================
