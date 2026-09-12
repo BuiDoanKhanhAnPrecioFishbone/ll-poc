@@ -191,7 +191,20 @@
 .vy-queue-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(var(--vy-card-min-w), 1fr)); gap: var(--vy-space-6); margin-bottom: var(--vy-space-9); }
 .vy-queue { background: var(--vy-surface); border: 1px solid var(--vy-border); border-left: var(--vy-accent-bar-w) solid var(--vy-border-strong); border-radius: var(--vy-radius-md); padding: var(--vy-space-7) var(--vy-space-8); text-decoration: none; box-shadow: var(--vy-shadow-sm); }
 .vy-queue:hover { border-color: var(--vy-border-strong); box-shadow: var(--vy-shadow-md); }
-.vy-queue[data-tone="open"]     { border-left-color: var(--vy-accent-caution); }
+/* ALL SIX TONES IN ONE PLACE. They were split across two blocks 350 lines
+   apart, and the split is why nobody saw that `open` and `soon` had both been
+   given `--vy-accent-caution`. My Queues renders four cards — overdue, soon,
+   open, waiting — so two of the four carried an identical amber bar, and the
+   bar is the only thing distinguishing them at a glance. The same fault as the
+   chart legend, on a different screen.
+
+   `open` takes the brand accent: in the seven-state vocabulary it means
+   "waiting on US", which is the queue's whole subject, and it stays distinct
+   from `progress`'s lighter blue. */
+.vy-queue[data-tone="overdue"]  { border-left-color: var(--vy-danger); }
+.vy-queue[data-tone="soon"]     { border-left-color: var(--vy-accent-caution); }
+.vy-queue[data-tone="open"]     { border-left-color: var(--vy-brand); }
+.vy-queue[data-tone="waiting"]  { border-left-color: var(--vy-accent-waiting); }
 .vy-queue[data-tone="blocked"]  { border-left-color: var(--vy-danger-boundary); }
 .vy-queue[data-tone="progress"] { border-left-color: var(--vy-brand-boundary-strong); }
 .vy-queue-n { font-size: var(--vy-text-3xl); font-weight: var(--vy-weight-bold); color: var(--vy-on-surface-strong); line-height: 1; }
@@ -538,9 +551,6 @@
    its own base at equal specificity, which is how three earlier bugs happened.
    ========================================================================== */
 .vy-queue { display: block; }
-.vy-queue[data-tone="overdue"] { border-left-color: var(--vy-danger); }
-.vy-queue[data-tone="soon"]    { border-left-color: var(--vy-accent-caution); }
-.vy-queue[data-tone="waiting"] { border-left-color: var(--vy-accent-waiting); }
 /* A zero is information, not an alarm: it keeps its place in the row so the four
    measures stay in the same order every visit, but stops competing for attention. */
 .vy-queue[data-zero] { opacity: .62; }

@@ -591,6 +591,23 @@
   display: flex; align-items: center; height: 100%; min-width: 0;
 }
 .vy-cell-link:hover { color: var(--vy-brand-text-hover); text-decoration: underline; text-underline-offset: .18em; }
+
+/* KENDO REACHES INTO THIS ONE, and only when it is an anchor. The theme ships
+   `.k-grid a { color: inherit }` at (0,1,1), which outranks `.vy-cell-link` at
+   (0,1,0) — so an identifier that renders as a real <a> took the cell's text
+   colour instead of the brand blue.
+
+   That split the system down the middle without anyone seeing it: Part Master
+   opens its record through `onOpenRow`, which renders a <button>, and looked
+   right; Project Requirements opens through `rowHref`, which renders an <a>,
+   and its RFQ number sat in Kendo's neutral — indistinguishable from the text
+   beside it, on the screen this whole project is mostly about. The one control
+   the identifier-as-affordance decision rests on, not looking like a control.
+
+   Specificity (0,2,1), which clears Kendo's rule without scoping to a screen. */
+.k-grid a.vy-cell-link { color: var(--vy-brand-text); }
+.vy-grid-k .k-grid tbody tr:hover a.vy-cell-link { color: var(--vy-brand-text-deep); }
+.k-grid a.vy-cell-link:hover { color: var(--vy-brand-text-hover); }
 /* A LINK CARRIES WEIGHT AT REST, and this is a measurement rather than a taste.
    Without it the only thing separating a part number from the text beside it is
    hue: 1.06:1 against the body text in light, 1.54:1 in dark — the same
