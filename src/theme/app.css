@@ -1052,10 +1052,32 @@
    more than a number in the module name, and the KPI can also be the filter.
    So each tile IS its quick filter and shows whether it is on.
    ========================================================================== */
-.vy-kpi-row { display: flex; flex-wrap: wrap; gap: var(--vy-space-4); margin-bottom: var(--vy-space-6); }
+/* THE BAND FILLS ITS CONTAINER. As a wrapping flex row the tiles sized to
+   content and stopped wherever they ran out: measured at 1440, four tiles ended
+   584px into a 940px band and three ended at 436, so between a third and a half
+   of the row was empty while the grid directly below it ran the full width. The
+   band read as unaligned with the screen it summarises. On a phone it was worse
+   — two tiles per row ending 300px into 375.
+
+   `auto-fit` + `1fr` gives equal tracks that consume the row at any count and
+   any width: four at 1440, three at 1440, two on a phone, one at the narrowest.
+   The minmax floor is the old min-width, so a track never gets smaller than the
+   tile was. */
+.vy-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--vy-kpi-min-w), 1fr));
+  gap: var(--vy-space-4);
+  margin-bottom: var(--vy-space-6);
+}
 .vy-kpi {
   display: flex; flex-direction: column; gap: var(--vy-space-1);
-  min-width: var(--vy-kpi-min-w);
+  /* The track carries the floor now. `auto` here would re-add the old
+     content-sized minimum and stop a track from ever shrinking to fit. */
+  min-width: 0;
+  /* PADDING UNCHANGED, deliberately. A roomier tile looked better on a desktop
+     and cost 4px of height each — which on a phone is two rows of tiles, 8px
+     more chrome above a grid whose chrome was cut from 444px to 306px on
+     purpose. The tiles got wider; they did not need to get taller. */
   padding: var(--vy-space-5) var(--vy-space-7);
   background: var(--vy-surface);
   border: 1px solid var(--vy-border);
