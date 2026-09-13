@@ -1,0 +1,34 @@
+#!/bin/sh
+#
+# Runs before every `git push`. Lint, the two CSS checks, and the build —
+# about ten seconds.
+#
+# WHAT IT DELIBERATELY DOES NOT RUN. The four browser checks take roughly ten
+# minutes: twelve routes at four viewport-and-theme passes, plus a thousand
+# controls focused one at a time in three passes. A ten-minute wait on every
+# push is a hook people disable in a week, and a disabled hook checks nothing.
+# Those run in CI instead — see .github/workflows/check.yml — where the wait
+# costs nobody their terminal.
+#
+# So this hook is not the gate. It is the part of the gate that is cheap enough
+# to be certain about before the push, so that CI is reporting real regressions
+# rather than typos.
+#
+# To skip it once, when you know why:   git push --no-verify
+#
+# Installed by `npm install`, via the `prepare` script, which points
+# core.hooksPath at .githooks. Nothing to install separately, and the hook is
+# in the repository rather than in one person's .git directory.
+
+set -e
+
+echo "pre-push: lint, css, build (the browser checks run in CI)"
+
+if ! npm run --silent check:fast; then
+  echo ""
+  echo "pre-push: check:fast failed — nothing was pushed."
+  echo "          Fix it, or push with --no-verify if you mean to."
+  exit 1
+fi
+
+echo "pre-push: ok"

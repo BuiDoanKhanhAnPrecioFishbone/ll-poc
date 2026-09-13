@@ -1,0 +1,97 @@
+# The gate, run by a machine instead of by memory.
+#
+# Until now `npm run check` was honour-system: nothing ran it, so a regression
+# landed silently until someone happened to look. The pre-push hook
+# (.githooks/pre-push) catches the cheap half in ten seconds; this catches the
+# half that takes ten minutes.
+#
+# THE FOUR BROWSER CHECKS RUN AS SEPARATE JOBS, not as one `check:visual`.
+# They are independent measurements, so `fail-fast: false` keeps the other
+# three running when one fails — one round of fixes instead of four — and each
+# reports under its own name, so "mobile:check failed" is legible from the
+# checks list without opening a log.
+name: check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: check-${{ github.ref }}
+  cancel-in-progress: true
+
+# NO TELERIK_LICENSE SECRET, deliberately. The obvious worry is that an
+# unlicensed KendoReact watermarks its components and the visual checks then
+# fail on the watermark while looking exactly like a UX regression. Checked
+# rather than assumed, on 13 Sep 2026: this machine has never activated the key
+# — it sits in .env.local, which is a Vite convention that kendo-licensing's
+# postinstall does not read, and no env var was ever exported. So every green
+# run of this gate so far was already an unlicensed one. Probing the rendered
+# Part Master for watermark elements and the console for a licence warning
+# returns nothing, and `npm run build` exits 0 without the key. CI checks a dev
+# server and a compile; neither needs the licence, so the paid credential stays
+# out of a second secret store. Vercel still needs it for the deployed site —
+# that is docs/kendo-license-activation.md, and unchanged by this.
+
+env:
+  # Ubuntu runners ship Google Chrome here. The check scripts default to the
+  # macOS bundle path, which does not exist on a runner.
+  CHROME_PATH: /usr/bin/google-chrome
+  # Ubuntu 23.10+ restricts the unprivileged user namespaces Chrome's sandbox
+  # needs, so headless Chrome can refuse to start on a runner. Set here rather
+  # than hard-coded in the scripts: a sandbox disabled by default on everyone's
+  # machine is a worse trade than one line in one workflow file.
+  CHROME_FLAGS: --no-sandbox
+
+jobs:
+  fast:
+    name: lint, css, build
+    runs-on: ubuntu-latest
+    # A hung job otherwise runs to GitHub's six-hour default. These are billed
+    # minutes on a private repo; the real numbers are two and five.
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run check:fast
+
+  visual:
+    # Four runners are not worth spending on a tree that does not compile.
+    needs: fast
+    name: ${{ matrix.check }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        check: [render:check, touch:check, mobile:check, focus:check]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+          cache: npm
+
+      - name: Chrome must be where the scripts expect it
+        run: |
+          if [ ! -x "$CHROME_PATH" ]; then
+            echo "::error::No Chrome at $CHROME_PATH. The runner image changed; set CHROME_PATH in this workflow to wherever it lives now."
+            exit 1
+          fi
+          "$CHROME_PATH" --version
+
+      - run: npm ci
+
+      # with-server starts Vite on the port the checks read, waits for it, runs
+      # the check, and shuts it down. No "in another terminal" step to forget.
+      - run: node scripts/with-server.mjs ${{ matrix.check }}

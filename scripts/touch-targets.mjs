@@ -1,8 +1,11 @@
 /**
  * Touch targets, measured on a phone.
  *
- *   npm run dev             # in another terminal
- *   npm run touch:check
+ *   node scripts/with-server.mjs touch:check    # starts the server itself
+ *
+ * Or `npm run touch:check` against a server you are already running — but it
+ * must be on the port BASE_URL names (5180), which is NOT where `npm run dev`
+ * lands on its own (5173). with-server exists because of exactly that.
  *
  * WHY A SCRIPT AND NOT A READ-THROUGH. A target's size is almost never written
  * down. Sign out measured 31px from `min-height: 24px` plus 6px of padding plus
@@ -97,6 +100,13 @@ const GRID_ROUTES = [
 
 const CHROME = process.env.CHROME_PATH
   || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+
+/* Extra Chrome flags, space-separated. Exists for CI: Ubuntu 23.10+ blocks the
+   unprivileged user namespaces Chrome's sandbox needs, so a runner may need
+   `CHROME_FLAGS=--no-sandbox`. Empty everywhere else — a sandbox turned off by
+   default on a developer's machine is a worse trade than a variable in one
+   workflow file. */
+const EXTRA_FLAGS = (process.env.CHROME_FLAGS || '').split(' ').filter(Boolean);
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
@@ -410,7 +420,7 @@ async function main() {
   catch { console.error(`Cannot reach ${BASE}. Start the dev server first: npm run dev`); process.exit(2); }
 
   const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'vy-touch-'));
-  const chrome = spawn(CHROME, ['--headless=new', '--disable-gpu', '--hide-scrollbars',
+  const chrome = spawn(CHROME, [...EXTRA_FLAGS, '--headless=new', '--disable-gpu', '--hide-scrollbars',
     `--remote-debugging-port=${PORT}`, `--user-data-dir=${profile}`, '--no-first-run',
     `--window-size=${VIEWPORT.width},${VIEWPORT.height}`, 'about:blank'], { stdio: 'ignore' });
 

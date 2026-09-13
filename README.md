@@ -122,6 +122,41 @@ npm install
 npm run dev
 ```
 
+### Checks
+
+```bash
+npm run check         # everything: about ten minutes
+npm run check:fast    # lint, css, build: about ten seconds
+npm run check:visual  # the four browser checks, server and all
+```
+
+`check:visual` starts its own dev server on the port the checks read, runs all
+four against it — every one, even after a failure, because they are independent
+measurements and you want the whole list — and shuts it down. If you already
+have a server on that port it is reused and left alone.
+
+Measured on 13 Sep 2026, so nobody has to guess where the ten minutes go:
+
+| | |
+| --- | --- |
+| `render:check` | 86s |
+| `touch:check` | 126s |
+| `focus:check` | 153s — 1,081 controls focused one at a time, three passes |
+| `mobile:check` | 259s — twelve routes, four viewport-and-theme passes |
+
+Two things run these without being asked:
+
+| | | |
+| --- | --- | --- |
+| **`.githooks/pre-push`** | before every push | `check:fast`, ~10s |
+| **`.github/workflows/check.yml`** | every push and PR | everything, the four browser checks as parallel jobs |
+
+The hook is installed by `npm install` (the `prepare` script points
+`core.hooksPath` at `.githooks`) — nothing to install separately, and the hook
+lives in the repository rather than in one person's `.git`. It runs only the
+cheap half on purpose: a ten-minute wait on every push is a hook people disable
+within a week. Skip it once with `git push --no-verify`.
+
 ### Licences
 
 None. Every dependency is MIT. There is no key to configure and no watermark.
