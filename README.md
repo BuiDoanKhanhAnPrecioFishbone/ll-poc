@@ -231,6 +231,12 @@ Import the repository at [vercel.com/new](https://vercel.com/new). The defaults 
 
 `vercel.json` already rewrites all routes to `index.html` so that deep links work.
 
+The defaults are not quite everything, though: set **`TELERIK_LICENSE`** under
+Settings → Environment Variables, ticked for Production, Preview *and*
+Development, since Vercel builds previews the same way it builds production.
+The signal that it worked is in the **install** log, not the build log — see
+[`kendo-license-activation.md`](docs/kendo-license-activation.md).
+
 ---
 
 ## Structure
