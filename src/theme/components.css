@@ -618,7 +618,26 @@
    Specificity (0,2,1), which clears Kendo's rule without scoping to a screen. */
 .k-grid a.vy-cell-link { color: var(--vy-brand-text); }
 .vy-grid-k .k-grid tbody tr:hover a.vy-cell-link { color: var(--vy-brand-text-deep); }
-.k-grid a.vy-cell-link:hover { color: var(--vy-brand-text-hover); }
+/* AND THE SAME INTRUSION TAKES THE UNDERLINE, which went unnoticed while the
+   colour above was being fixed. Kendo's grid ships BOTH halves —
+
+     a       { color: inherit; text-decoration: none; }
+     a:hover { text-decoration: none; }
+
+   — and that second rule is (0,2,1) against `.vy-cell-link:hover` at (0,2,0),
+   so the hover underline applied to every identifier rendered as a <button>
+   and to none rendered as an <a>. Hovering a part number on Part Master
+   underlined it; hovering an RFQ number on Project Requirements did not, on two
+   screens that are meant to be the same pattern. Reported from the screen, not
+   by a check: render-check compares the colour of `.vy-cell-link` across
+   routes, and text-decoration was never in its list.
+
+   Same selector and same specificity as the colour fix directly above, because
+   it is the same fight. */
+.k-grid a.vy-cell-link:hover {
+  color: var(--vy-brand-text-hover);
+  text-decoration: underline; text-underline-offset: .18em;
+}
 /* A LINK CARRIES WEIGHT AT REST, and this is a measurement rather than a taste.
    Without it the only thing separating a part number from the text beside it is
    hue: 1.06:1 against the body text in light, 1.54:1 in dark — the same
