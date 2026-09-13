@@ -465,6 +465,36 @@
      and the rows 28. The shell grows to fit its contents instead. */
   .vy-page--grid .vy-grid-k { min-block-size: 50vh; }
 
+  /* --- AND THE SHELL HAS TO SCROLL, or the floor eats the pager -----------
+     The rule above says "`.vy-content` already scrolls, so the grid can claim a
+     floor and let the page scroll past it". That premise was wrong.
+     `.vy-content` is `overflow-y: hidden`, and so is `.vy-grid-shell`. Nothing
+     scrolled past anything.
+
+     WHAT THAT COST, measured on a 375x812 phone: the pager sat entirely below
+     the fold on five of the six list screens — 108px down on Part Master,
+     Bills of Materials and Packing Lists, 84px on MPN, 158px on Project
+     Requirements — with `documentElement.scrollHeight === clientHeight`, so no
+     gesture anywhere reached it. "1 - 20 of 2,000 items", the page-size picker
+     and every page number were rendered and then clipped. Manufacturers was the
+     one screen where the pager survived, and it is the one list screen with no
+     KPI tiles above it: the natural control, and it points straight at the
+     stack of chrome as the cause.
+
+     THE ARITHMETIC SAYS NO TRIMMING COULD HAVE FIXED IT. The floor is 50vh =
+     406px and the pager is 127px: 533px, inside a shell that measures 416px
+     with the KPI tiles and 513px without. The floor alone guarantees the pager
+     does not fit, whatever else is on the page.
+
+     So the shell scrolls. It already carried 250px of overflow with
+     `overflow-y: hidden` over the top of it; this makes that overflow reachable
+     instead of lost. The grid keeps its floor and its six rows, and the pager
+     is one swipe away rather than nowhere.
+
+     `overflow-x` is untouched and stays hidden, so this cannot turn into the
+     sideways scroll the first check in mobile-check exists to catch. */
+  .vy-page--grid .vy-grid-shell { overflow-y: auto; }
+
   /* --- Grid rows ----------------------------------------------------------
      `height` on a table row acts as a MINIMUM in table layout, which is what
      makes this a floor rather than a fixed size — a row with more in it still

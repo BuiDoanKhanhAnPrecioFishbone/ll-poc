@@ -776,7 +776,21 @@
      re-wraps text. No effect above 320 — it binds only when the popover would
      otherwise leave the viewport. */
   max-width: var(--radix-popover-content-available-width, none);
-  max-height: 60vh; overflow-y: auto;
+  /* RADIX MEASURES THE ROOM; 60vh GUESSES AT IT. The user menu below already
+     learned this and took the measured value; the shared rule kept the guess,
+     and on a phone the guess is wrong in the other direction. The Bills of
+     Materials column chooser is fourteen rows: 60vh of an 812px screen is
+     487px, more than the space between its trigger and either edge, so Radix
+     placed a box that could not fit and the popover's own heading and its Reset
+     button ended up 20px and 9px ABOVE the top of the screen — unreachable, on
+     a control whose whole job is reaching things.
+
+     `--radix-popover-content-available-height` is the distance Radix measured
+     from the trigger to the viewport edge on the side it chose. Capping to that
+     means the popover always fits and scrolls its own list instead. The 60vh
+     fallback stays for the case where the variable is absent. */
+  max-height: var(--radix-popover-content-available-height, 60vh);
+  overflow-y: auto;
   background: var(--vy-surface);
   border: 1px solid var(--vy-border);
   border-radius: var(--vy-radius-md);

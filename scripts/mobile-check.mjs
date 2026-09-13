@@ -113,11 +113,29 @@ const PROBE = `(() => {
      back undetected while the other two were found.
      documentElement.clientWidth stays at the layout viewport, 375. */
   const W = document.documentElement.clientWidth;
+  /* Same reasoning as W, on the other axis. */
+  const H = document.documentElement.clientHeight;
 
   const seen = el => {
     const cs = getComputedStyle(el);
     if (cs.display === 'none' || cs.visibility === 'hidden') return false;
     if (parseFloat(cs.opacity) === 0) return false;
+    /* CONTENT-VISIBILITY IS A FOURTH WAY TO BE INVISIBLE, and the three above
+       miss it. A closed <details> hides its contents with it, and unlike
+       display:none it KEEPS their layout boxes: the About disclosure in the nav
+       drawer, closed, reports five links with real 236x24 rects at y=756..852,
+       computed display flex, computed visibility visible. Two of them sit past
+       the fold, so the unreachable test called them unreachable content. They
+       are not content at all — nothing paints, elementFromPoint returns the
+       panel behind them, and focus() will not take.
+
+       checkVisibility is the browser's own answer to this exact question, and
+       it covers all four causes at once. Kept behind a capability test so an
+       older Chrome falls back to the three checks rather than reporting
+       everything as hidden. */
+    if (el.checkVisibility
+        && !el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true,
+                                 contentVisibilityAuto: true })) return false;
     const r = el.getBoundingClientRect();
     return r.width > 0 && r.height > 0;
   };
@@ -281,12 +299,121 @@ const PROBE = `(() => {
     clipped.push({ sel: where(el), what: label(el), lost: lostX, by: where(culprit) });
   }
 
+  /* UNREACHABLE — the Y axis, which nothing here had ever looked at.
+     Every check above measures width. SIDEWAYS asks whether the page scrolls
+     horizontally, ESCAPES what paints past the left or right edge, CUTOFF and
+     CLIPPED how much WIDTH an element lost. Three of them were written for a
+     defect of the shape "content hidden by an ancestor" and all three would
+     have missed the same defect rotated ninety degrees.
+
+     Which is what happened. On a 375x812 phone the pager sat below the fold on
+     five of the six list screens — "1 - 20 of 2,000 items", the page-size
+     picker and every page number, rendered and then cut off by
+     .vy-grid-shell's overflow-y: hidden, on a page that does not scroll. There
+     is no gesture that reaches it. This check reported DEFECTS 0 over it for
+     as long as it has existed.
+
+     The test: something a person needs — a control, or text — whose box lies
+     entirely outside the viewport vertically, where NOTHING can scroll it back.
+
+     REACHABLE IS THE WHOLE POINT, and it has two sources. A scrollable
+     ancestor is one: Kendo's virtualised grid renders rows far below its own
+     viewport and every one of them is a swipe away, so a scrollable ancestor
+     exempts. The document itself is the other — except inside a fixed subtree,
+     which does not move when the document scrolls. Without that second clause
+     a fixed header parked off screen would be excused by a page that scrolls
+     somewhere else entirely. */
+  const unreachable = [];
+  {
+    const docScrolls =
+      document.documentElement.scrollHeight > document.documentElement.clientHeight + 1;
+    const INTERACTIVE = { A: 1, BUTTON: 1, INPUT: 1, SELECT: 1, TEXTAREA: 1, SUMMARY: 1 };
+
+    const reachable = el => {
+      let fixed = false;
+      for (let q = el; q; q = q.parentElement) {
+        const qcs = getComputedStyle(q);
+        if (qcs.position === 'fixed') fixed = true;
+        if (q === el) continue;
+        const oy = qcs.overflowY;
+        if ((oy === 'auto' || oy === 'scroll') && q.scrollHeight > q.clientHeight + 1) return true;
+      }
+      return docScrolls && !fixed;
+    };
+
+    const wanted = el => {
+      if (INTERACTIVE[el.tagName]) return true;
+      const ti = el.getAttribute('tabindex');
+      if (ti !== null && ti !== '-1') return true;
+      return Array.from(el.childNodes)
+        .some(n => n.nodeType === 3 && n.textContent.trim().length > 1);
+    };
+
+    const FOCUSABLE = { A: 1, BUTTON: 1, INPUT: 1, SELECT: 1, TEXTAREA: 1, SUMMARY: 1 };
+    const focusable = el =>
+      FOCUSABLE[el.tagName] || (el.getAttribute('tabindex') || '') === '0';
+
+    /* A SKIP LINK IS SUPPOSED TO BE OFF SCREEN. "Skip to content" is parked
+       above the fold by design and comes back on focus — reporting it would be
+       reporting a working accessibility feature as a fault. There is no
+       reliable signature for the pattern in the computed style, so this asks
+       the question directly: focus it, and see whether it arrives. That is the
+       same thing a keyboard user does, and the only definition that does not
+       guess. Focus is put back afterwards. */
+    const arrivesOnFocus = el => {
+      if (!focusable(el)) return false;
+      const before = document.activeElement;
+      try { el.focus({ preventScroll: true }); } catch (err) { return false; }
+      el.getBoundingClientRect();
+      const r = el.getBoundingClientRect();
+      const onScreen = r.top < H && r.bottom > 0;
+      try { before && before.focus ? before.focus({ preventScroll: true }) : el.blur(); }
+      catch (err) { /* nothing to restore to */ }
+      return onScreen;
+    };
+
+    /* TWO PASSES, and the first one deliberately ignores whether anyone wants
+       the element. Asking "is this wanted AND off screen" reported the pager as
+       twelve findings — the count, the page-size select and every one of its
+       ten buttons — because .vy-pager itself holds no text of its own and so
+       never qualified, which left nothing to collapse the children into. The
+       fix is to find the outermost box that is wholly off screen first, and
+       only then ask whether anything inside it matters. One pager, one line. */
+    const off = new Set();
+    for (const el of all) {
+      const r = el.getBoundingClientRect();
+      if (r.width < 4 || r.height < 4) continue;
+      if (r.top < H && r.bottom > 0) continue;   // any part of it is on screen
+      if (reachable(el)) continue;
+      off.add(el);
+    }
+
+    for (const el of off) {
+      let covered = false;
+      for (let q = el.parentElement; q; q = q.parentElement) {
+        if (off.has(q)) { covered = true; break; }
+      }
+      if (covered) continue;
+      /* Something in here has to be worth reaching. */
+      const holdsSomething = wanted(el)
+        || Array.from(el.querySelectorAll('*')).some(wanted);
+      if (!holdsSomething) continue;
+      if (arrivesOnFocus(el)) continue;
+      const r = el.getBoundingClientRect();
+      unreachable.push({
+        sel: where(el), what: label(el),
+        by: Math.round(r.top >= H ? r.top - H : -r.bottom),
+        edge: r.top >= H ? 'below' : 'above',
+      });
+    }
+  }
+
   const meta = document.querySelector('meta[name="viewport"]');
   stopMotion.remove();
   return {
     sideways,
     viewportMeta: meta ? meta.content : null,
-    escapes, small, cut, clipped,
+    escapes, small, cut, clipped, unreachable,
   };
 })()`;
 
@@ -304,6 +431,23 @@ const SELFTEST = `(() => {
        NOT be reported as an escape. */
     '<div class="vy-st-clipwrap" style="width:60px;overflow:hidden;position:relative">' +
       '<div class="vy-st-clipped" style="position:absolute;left:2000px;width:80px;height:8px"></div>' +
+    '</div>' +
+    /* BOTH FIXTURES ARE position:fixed, so neither adds to the document height.
+       A fault injected by simply placing something below the fold would make
+       the document scrollable, which would make it reachable, which would make
+       the positive control prove the opposite of what it is for. */
+    /* Positive: below the fold, clipped by an ancestor that does not scroll. */
+    '<div class="vy-st-noreach-wrap" style="position:fixed;top:0;left:0;' +
+      'width:130px;height:16px;overflow:hidden">' +
+      '<div class="vy-st-noreach" style="position:absolute;top:3000px;width:130px;' +
+        'height:30px">pager text</div>' +
+    '</div>' +
+    /* Negative: below the fold, inside something that DOES scroll — a
+       virtualised grid row, in miniature. Must NOT be reported. */
+    '<div class="vy-st-reach-wrap" style="position:fixed;top:0;left:0;' +
+      'width:130px;height:16px;overflow-y:auto">' +
+      '<div style="height:2000px"></div>' +
+      '<div class="vy-st-reach" style="height:30px">reachable text</div>' +
     '</div>';
   document.body.appendChild(host);
 })()`;
@@ -359,6 +503,15 @@ async function main() {
 
   await send('Page.enable'); await send('Runtime.enable');
 
+  /* WITHOUT THIS, :focus STYLES DO NOT EXIST HERE. A headless document never
+     holds system focus, so nothing ever matches :focus and anything revealed by
+     it stays hidden. focus-check.mjs records two hours spent learning that; the
+     cost here was subtler — the skip link, which is parked above the fold by
+     design and comes back on :focus, was reported as unreachable content
+     because the check could not make it come back. Everything else on the page
+     is unaffected, so this only ever makes the unreachable test honest. */
+  await send('Emulation.setFocusEmulationEnabled', { enabled: true });
+
   const applyPass = async pass => {
     await send('Emulation.setDeviceMetricsOverride', {
       width: pass.width, height: pass.height,
@@ -402,8 +555,16 @@ async function main() {
     /* Must be FALSE. The three above being true is what rules out "quiet
        because the whole probe died". */
     clippedNotReported: !st?.escapes?.some(e => e.sel.indexOf('vy-st-clipped') >= 0),
+    /* The Y axis, both directions: it must see the one nothing can scroll to,
+       and must NOT see the one a scrollable ancestor can reach. A check that
+       only proves it can fire would pass just as happily by reporting
+       everything. */
+    unreachable: !!st?.unreachable?.some(e => e.sel.indexOf('vy-st-noreach') >= 0),
+    reachableNotReported:
+      !st?.unreachable?.some(e => e.sel.indexOf('vy-st-reach') >= 0),
   };
-  if (!caught.escape || !caught.small || !caught.cut || !caught.clippedNotReported) {
+  if (!caught.escape || !caught.small || !caught.cut || !caught.clippedNotReported
+      || !caught.unreachable || !caught.reachableNotReported) {
     console.error('self-test failed — the check cannot see its own injected faults');
     console.error('  ' + JSON.stringify(caught));
     ws.close(); chrome.kill();
@@ -429,6 +590,8 @@ async function main() {
       detail: `${e.sel} "${e.what}" clipped by ${e.by}px with no ellipsis` });
     for (const e of (v.clipped || [])) findings.push({ route: rlabel, kind: 'clipped',
       detail: `${e.sel} "${e.what}" — ${e.lost}px hidden by ${e.by}, which does not scroll` });
+    for (const e of (v.unreachable || [])) findings.push({ route: rlabel, kind: 'unreachable',
+      detail: `${e.sel} "${e.what}" sits ${e.by}px ${e.edge} the fold and nothing scrolls to it` });
 
     if (pass.overlays) for (const ov of OVERLAYS) {
       const opened = await send('Runtime.evaluate',
@@ -447,6 +610,8 @@ async function main() {
           detail: `${e.sel} "${e.what}" clipped by ${e.by}px with no ellipsis` });
         for (const e of (w.clipped || [])) findings.push({ route: where, kind: 'clipped',
           detail: `${e.sel} "${e.what}" — ${e.lost}px hidden by ${e.by}, which does not scroll` });
+        for (const e of (w.unreachable || [])) findings.push({ route: where, kind: 'unreachable',
+          detail: `${e.sel} "${e.what}" sits ${e.by}px ${e.edge} the fold and nothing scrolls to it` });
         for (const e of w.small) findings.push({ route: where, kind: 'smalltext',
           detail: `${e.sel} "${e.what}" at ${e.size}px` });
       }
@@ -474,7 +639,8 @@ async function main() {
      caption size — iOS caption2 is 11pt — so a list of 305 of them is a
      description of the type scale, not a bug report. Gating on it would mean a
      check that can never pass and therefore is never read. */
-  const DEFECT = { sideways: 1, escapes: 1, cutoff: 1, clipped: 1, 'viewport-meta': 1, probe: 1 };
+  const DEFECT = { sideways: 1, escapes: 1, cutoff: 1, clipped: 1, unreachable: 1,
+                   'viewport-meta': 1, probe: 1 };
   const defects = findings.filter(f => DEFECT[f.kind]);
   const small = findings.filter(f => f.kind === 'smalltext');
 
@@ -493,7 +659,8 @@ async function main() {
     console.log(`        ${[...r.routes].slice(0, 4).join(' ')}${r.routes.size > 4 ? ' …' : ''}`);
   }
   if (!rows.length) {
-    console.log('  no sideways scroll, nothing painted off the edge, nothing cut off');
+    console.log('  no sideways scroll, nothing painted off the edge, nothing cut off,'
+      + ' nothing stranded past the fold');
   }
 
   /* Internal reference pages are separated rather than dropped: they are part
