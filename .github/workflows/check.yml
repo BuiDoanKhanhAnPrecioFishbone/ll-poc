@@ -49,8 +49,9 @@ jobs:
   fast:
     name: lint, css, build
     runs-on: ubuntu-latest
-    # A hung job otherwise runs to GitHub's six-hour default. These are billed
-    # minutes on a private repo; the real numbers are two and five.
+    # A hung job otherwise runs to GitHub's six-hour default. The repo is
+    # public so the minutes are free, but a job wedged for six hours is still a
+    # job nobody notices. Measured on the first run: 24s and 5m0s.
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4

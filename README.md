@@ -151,6 +151,9 @@ Two things run these without being asked:
 | **`.githooks/pre-push`** | before every push | `check:fast`, ~10s |
 | **`.github/workflows/check.yml`** | every push and PR | everything, the four browser checks as parallel jobs |
 
+First run, all five jobs green: 5m29s wall clock, 12m24s of runner time. The
+repo is public, so those minutes are free.
+
 The hook is installed by `npm install` (the `prepare` script points
 `core.hooksPath` at `.githooks`) — nothing to install separately, and the hook
 lives in the repository rather than in one person's `.git`. It runs only the
