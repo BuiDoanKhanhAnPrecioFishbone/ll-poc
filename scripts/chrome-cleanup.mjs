@@ -37,7 +37,7 @@ import path from 'node:path';
    today and would quietly start deleting anything else that ever used it. */
 const PREFIXES = [
   'vy-render-', 'vy-touch-', 'vy-mobile-', 'vy-focus-',
-  'vy-hover-', 'vy-shots-', 'vy-sweep-',
+  'vy-hover-', 'vy-shots-', 'vy-sweep-', 'vy-dialog-',
 ];
 
 const STALE_MS = 6 * 60 * 60 * 1000;
