@@ -3,10 +3,11 @@ import type { FocusEvent } from 'react';
 /**
  * The props for a page-actions row.
  *
- * WHY THIS IS NOT JUST A CLASS NAME. Below 820px `.vy-page-actions` becomes a
- * single horizontally scrolling row — four buttons on Part Master measure 438px
- * of labels against 347px of screen, so one row showing every label is
- * impossible and two rows cost 96px above the list.
+ * WHY THIS IS NOT JUST A CLASS NAME. Until 15 Sep 2026 `.vy-page-actions` became
+ * a single horizontally scrolling row on touch devices. It wraps now — the cut-off
+ * last button read as a broken layout — so nothing here scrolls sideways today.
+ * The handler stays because it costs nothing when there is nothing to scroll, and
+ * the KPI chip row prototype reuses it; the history below is why it exists.
  *
  * A SCROLLING ROW BREAKS KEYBOARD FOCUS, and it does so silently. Tab from
  * "New Part" to "Export Part Master Data" and the browser moves focus without

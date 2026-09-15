@@ -346,41 +346,33 @@
     min-block-size: var(--vy-target-min);
   }
 
-  /* --- Page actions: one scrolling row, primary first ---------------------
+  /* --- Page actions: wrap, primary first -----------------------------------
      Four buttons on Part Master — Import, AML Search, Export Part Master Data,
      New Part — measure 438px of labels plus gaps against 347px of screen, so
-     one row with every label showing is arithmetically impossible. They wrapped
-     to two rows, 96px, directly above the KPI tiles and the list.
+     one row with every label showing is arithmetically impossible.
 
      THE LABELS STAY. Shortening "Export Part Master Data" would fix the width
      and is not ours to do — `docs/precedence.md` tier 2, content and purpose may
-     not be redesigned — and hiding the overflow behind a "More" menu needs the
-     `actions` slot to be a list rather than an opaque node, which is a change to
-     every caller for 52px.
+     not be redesigned.
 
-     SO THE ROW SCROLLS, and that makes ORDER matter: whatever is off to the
-     right needs a swipe. The primary action leads, so the one thing most people
-     came to do is the one thing always on screen, and the buttons after it are
-     cut mid-width rather than ending neatly — the peek IS the affordance. No
-     fade: a mask over the right edge would dim the label of whichever button
-     happens to sit there.
+     THEY WRAP. Until 15 Sep 2026 the row scrolled sideways instead, and cut the
+     last button mid-label on purpose — the peek was meant to say "there is
+     more". Seen in the client document, it read as a broken layout: a button
+     sliced off at the screen edge looks like a defect whatever it intends, and
+     an affordance that reads as a fault has failed. Wrapping shows every label
+     whole, for 52px more above the list. The argument against that — "52px is
+     most of a row" — predates the grid shell scrolling (the pager fix), after
+     which the list keeps its 50vh floor however tall the header grows.
 
-     THE TRADE, stated plainly: four actions visible at once for 96px, against
-     the primary plus a peek for 44px. On a phone the list is what the screen is
-     for, and 52px is most of a row of it. */
-  .vy-page-actions {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    /* overflow-y resolves to auto alongside it, which would clip a focus ring;
-       the padding gives the ring somewhere to land. */
-    padding-block: var(--vy-space-1);
-    scrollbar-width: none;
-    scroll-snap-type: x proximity;
-  }
-  .vy-page-actions::-webkit-scrollbar { display: none; }
-  /* Without this the buttons shrink to fit instead of scrolling, and every
-     label truncates — the failure this rule exists to avoid. */
-  .vy-page-actions > * { flex: 0 0 auto; scroll-snap-align: start; }
+     A "More" menu would keep one row, and is the better end state; it needs the
+     `actions` slot to become a list rather than an opaque node, a change to all
+     seven screens that pass actions. Not done here.
+
+     Wraps at this width already with a mouse (the 820px rule above); this block
+     only has to stop overriding that, and keep the primary action first. */
+  .vy-page-actions { flex-wrap: wrap; }
+  /* Whole buttons, never shrunk to fit a line: a label must not truncate. */
+  .vy-page-actions > * { flex: 0 0 auto; }
   /* `filled` is Kendo's solid primary. One per view, by the variant ladder in
      Button.tsx, so this cannot reorder two things against each other. */
   .vy-page-actions .k-button-primary { order: -1; }
