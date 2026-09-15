@@ -3,6 +3,7 @@
    in a figure while every automated check called the page clean. */
 import { spawn } from 'node:child_process';
 import fs from 'node:fs'; import os from 'node:os'; import path from 'node:path';
+import { cleanupOnKill } from './chrome-cleanup.mjs';
 
 const BASE = 'http://localhost:5180';
 const PORT = 9459;
@@ -56,6 +57,7 @@ const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'vy-sweep-'));
 const chrome = spawn('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
   ['--headless=new','--disable-gpu','--hide-scrollbars',`--remote-debugging-port=${PORT}`,
    `--user-data-dir=${profile}`,'--no-first-run','--window-size=375,812','about:blank'],{stdio:'ignore'});
+cleanupOnKill(chrome, profile);
 const ws = new WebSocket(await connect()); await new Promise(r => (ws.onopen = r));
 let id = 0; const pend = new Map();
 ws.onmessage = e => { const m = JSON.parse(e.data); if (m.id && pend.has(m.id)) { pend.get(m.id)(m); pend.delete(m.id); } };

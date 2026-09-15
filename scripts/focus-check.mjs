@@ -40,6 +40,7 @@ import { spawn } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { cleanupOnKill } from './chrome-cleanup.mjs';
 
 const BASE = process.env.BASE_URL || 'http://localhost:5180';
 const PORT = Number(process.env.CDP_PORT || 9452);
@@ -218,6 +219,7 @@ async function main() {
   const chrome = spawn(CHROME, [...EXTRA_FLAGS, '--headless=new', '--disable-gpu', '--hide-scrollbars',
     `--remote-debugging-port=${PORT}`, `--user-data-dir=${profile}`, '--no-first-run',
     '--window-size=1440,900', 'about:blank'], { stdio: 'ignore' });
+  cleanupOnKill(chrome, profile);
 
   const ws = new WebSocket(await connect());
   await new Promise(r => (ws.onopen = r));
