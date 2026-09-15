@@ -2,7 +2,7 @@
  * Start the dev server, run the checks against it, shut it down.
  *
  *   node scripts/with-server.mjs render:check touch:check
- *   npm run check:visual          # the same thing, all four
+ *   npm run check:visual          # the same thing, all five
  *
  * WHY THIS EXISTS, beyond saving a terminal. Every browser check defaults to
  * `http://localhost:5180`, and `npm run dev` serves on **5173** — Vite's

@@ -166,11 +166,11 @@ npm run dev
 ```bash
 npm run check         # everything: about ten minutes
 npm run check:fast    # lint, css, build: about ten seconds
-npm run check:visual  # the four browser checks, server and all
+npm run check:visual  # the five browser checks, server and all
 ```
 
 `check:visual` starts its own dev server on the port the checks read, runs all
-four against it — every one, even after a failure, because they are independent
+five against it — every one, even after a failure, because they are independent
 measurements and you want the whole list — and shuts it down. If you already
 have a server on that port it is reused and left alone.
 
@@ -182,13 +182,14 @@ Measured on 13 Sep 2026, so nobody has to guess where the ten minutes go:
 | `touch:check` | 126s |
 | `focus:check` | 153s — 1,081 controls focused one at a time, three passes |
 | `mobile:check` | 259s — twelve routes, four viewport-and-theme passes |
+| `hover:check` | 47s — every control hovered with its ancestors, and compared with its copies |
 
 Two things run these without being asked:
 
 | | | |
 | --- | --- | --- |
 | **`.githooks/pre-push`** | before every push | `check:fast`, ~10s |
-| **`.github/workflows/check.yml`** | every push and PR | everything, the four browser checks as parallel jobs |
+| **`.github/workflows/check.yml`** | every push and PR | everything, the five browser checks as parallel jobs |
 
 First run, all five jobs green: 5m29s wall clock, 12m24s of runner time. The
 repo is public, so those minutes are free.
