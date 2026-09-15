@@ -14,6 +14,17 @@
  * A figure captioned "live" that was not captured live would be worse than no
  * figure at all.
  *
+ * PHONE AND DESKTOP NEVER SHARE A CHROME SESSION. Until 15 Sep 2026 every job
+ * ran in one page, phone jobs first, and the four desktop figures came out with
+ * phone touch styles — 44px rows, large controls, a hamburger at 1440 wide —
+ * and were published that way. Measured on one page with exactly this script's
+ * emulation calls: a fresh desktop capture reports pointer:coarse false and 33px
+ * rows; the same "desktop" capture after one phone job reports coarse TRUE and
+ * 56px rows, although setTouchEmulationEnabled was just called with enabled:
+ * false. Turning touch emulation off does not turn the coarse pointer off. Only
+ * a new session does, so each viewport kind gets its own Chrome, and every shot
+ * is checked for the pointer it should have before it is saved.
+ *
  * TRANSITIONS ARE STOPPED BEFORE EVERY CAPTURE. A drawer caught mid-slide
  * photographs as a half-open drawer, and the reader cannot tell that from a
  * layout bug. The same rule the checks use.
@@ -29,7 +40,9 @@ import { cleanupOnKill } from './chrome-cleanup.mjs';
 
 const BASE = process.env.BASE_URL || 'http://localhost:5180';
 const PORT = Number(process.env.CDP_PORT || 9455);
-const OUT = 'docs/shots';
+/* Overridable so the script can be exercised without rewriting the tracked
+   figures in docs/shots. */
+const OUT = process.env.SHOTS_OUT || 'docs/shots';
 const CHROME = process.env.CHROME_PATH
   || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 
@@ -87,10 +100,10 @@ const STOP_MOTION = `(() => {
   document.body.getBoundingClientRect();
 })()`;
 
-async function connect() {
+async function connect(port) {
   for (let i = 0; i < 60; i++) {
     try {
-      const r = await fetch(`http://127.0.0.1:${PORT}/json`);
+      const r = await fetch(`http://127.0.0.1:${port}/json`);
       const page = (await r.json()).find(t => t.type === 'page');
       if (page?.webSocketDebuggerUrl) return page.webSocketDebuggerUrl;
     } catch { /* not up yet */ }
@@ -99,19 +112,17 @@ async function connect() {
   throw new Error('Chrome never exposed a debuggable page');
 }
 
-async function main() {
-  try { await fetch(BASE); }
-  catch { console.error(`Cannot reach ${BASE}. Start the dev server first: npm run dev`); process.exit(2); }
-
-  fs.mkdirSync(OUT, { recursive: true });
-
+/* Runs one group of jobs — all phone or all desktop — in a Chrome of its own,
+   and returns the names of any job it could not capture correctly. */
+async function runGroup(jobs, port) {
+  const failed = [];
   const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'vy-shots-'));
   const chrome = spawn(CHROME, ['--headless=new', '--disable-gpu', '--hide-scrollbars',
-    `--remote-debugging-port=${PORT}`, `--user-data-dir=${profile}`, '--no-first-run',
+    `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, '--no-first-run',
     '--force-device-scale-factor=1', '--window-size=1440,900', 'about:blank'], { stdio: 'ignore' });
-  cleanupOnKill(chrome, profile);
+  const release = cleanupOnKill(chrome, profile);
 
-  const ws = new WebSocket(await connect());
+  const ws = new WebSocket(await connect(port));
   await new Promise(r => (ws.onopen = r));
   let id = 0; const pending = new Map();
   ws.onmessage = e => { const m = JSON.parse(e.data);
@@ -121,7 +132,7 @@ async function main() {
 
   await send('Page.enable'); await send('Runtime.enable');
 
-  for (const job of JOBS) {
+  for (const job of jobs) {
     const vp = job.vp;
     await send('Emulation.setDeviceMetricsOverride', {
       width: vp.width, height: vp.height,
@@ -154,27 +165,61 @@ async function main() {
       returnByValue: true });
     if (!ok.result?.result?.value) {
       console.error(`  ${job.name}: page did not render — skipped`);
+      failed.push(job.name);
+      continue;
+    }
+
+    /* And that it rendered for the device the figure claims. A desktop figure
+       drawn with touch styles looks entirely plausible — which is how four of
+       them were published. */
+    const coarse = (await send('Runtime.evaluate', {
+      expression: `matchMedia('(pointer: coarse)').matches`, returnByValue: true }))?.result?.result?.value;
+    if (coarse !== vp.mobile) {
+      console.error(`  ${job.name}: rendered with pointer:coarse=${coarse}, expected ${vp.mobile} — skipped`);
+      failed.push(job.name);
       continue;
     }
 
     const shot = await send('Page.captureScreenshot', { format: 'jpeg', quality: 82 });
     const data = shot.result?.data;
-    if (!data) { console.error(`  ${job.name}: no image returned`); continue; }
+    if (!data) { console.error(`  ${job.name}: no image returned`); failed.push(job.name); continue; }
     const file = path.join(OUT, job.name + '.jpg');
     fs.writeFileSync(file, Buffer.from(data, 'base64'));
     const kb = Math.round(fs.statSync(file).size / 1024);
-    console.log(`  ${job.name.padEnd(22)} ${vp.width}x${vp.height}  ${kb}KB  ${job.route}`);
+    console.log(`  ${job.name.padEnd(22)} ${vp.width}x${vp.height}  ${kb}KB  ${job.route}  coarse=${coarse}`);
   }
-
-  /* Leave the preference as the app ships it. */
-  await send('Runtime.evaluate',
-    { expression: `localStorage.setItem('vy.density','comfortable')`, returnByValue: true });
 
   ws.close();
   chrome.kill();
-  await new Promise(r => chrome.once('exit', r));
+  await Promise.race([new Promise(r => chrome.once('exit', r)), sleep(3000)]);
   await sleep(300);
   try { fs.rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 }); } catch { /* temp dir */ }
+  release();
+  return failed;
+}
+
+async function main() {
+  try { await fetch(BASE); }
+  catch { console.error(`Cannot reach ${BASE}. Start the dev server first: npm run dev`); process.exit(2); }
+
+  fs.mkdirSync(OUT, { recursive: true });
+
+  /* Grouped by device kind, order kept within each group — the density jobs
+     depend on running in sequence. A fresh profile per group also means the
+     density preference starts as the app ships it, which the single-session
+     version had to restore by hand at the end. */
+  const groups = [JOBS.filter(j => j.vp.mobile), JOBS.filter(j => !j.vp.mobile)];
+  const failed = [];
+  for (const [i, group] of groups.entries()) {
+    if (!group.length) continue;
+    console.log(group[0].vp.mobile ? 'phone' : 'desktop');
+    failed.push(...await runGroup(group, PORT + i));
+  }
+
+  if (failed.length) {
+    console.error(`${failed.length} figure(s) not captured: ${failed.join(', ')}`);
+    process.exit(1);
+  }
   console.log('done');
 }
 

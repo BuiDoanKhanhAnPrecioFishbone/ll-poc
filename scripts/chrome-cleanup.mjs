@@ -116,19 +116,47 @@ export function cleanupOnKill(chrome, profile) {
     process.exit(code);
   };
 
+  const onSignal = {};
   for (const sig of Object.keys(SIGNAL_CODES)) {
-    process.once(sig, () => { killThenExit(SIGNAL_CODES[sig]); });
+    onSignal[sig] = () => { killThenExit(SIGNAL_CODES[sig]); };
+    process.once(sig, onSignal[sig]);
   }
-  process.once('uncaughtException', err => { killThenExit(2, err); });
-  process.once('unhandledRejection', err => { killThenExit(2, err); });
+  const onUncaught = err => { killThenExit(2, err); };
+  const onRejection = err => { killThenExit(2, err); };
+  process.once('uncaughtException', onUncaught);
+  process.once('unhandledRejection', onRejection);
 
   /* The fallback, for a script's own `process.exit()` in an error path that
      skipped its teardown. An exit handler cannot await, so this is best effort
      and can lose the race above; whatever it misses is an empty skeleton that
      the stale sweep removes on a later run. */
-  process.on('exit', () => {
+  const onExit = () => {
     if (exiting) return;
     try { if (running(chrome)) chrome.kill('SIGKILL'); } catch { /* already gone */ }
     try { fs.rmSync(profile, { recursive: true, force: true }); } catch { /* already gone */ }
-  });
+  };
+  process.on('exit', onExit);
+
+  /* RELEASE, FOR A SCRIPT THAT RUNS MORE THAN ONE CHROME. Call it once this
+     Chrome has been shut down, and the handlers go with it. Without it they
+     outlive their Chrome and pile up, one set per Chrome, and a later Ctrl-C
+     runs all of them at once: a stale handler finds its Chrome already gone and
+     calls process.exit while the live handler is still in its remove-until-gone
+     loop, which cuts that loop short and can leave the empty profile skeleton the
+     loop exists to catch.
+
+     IT DOES NOT PREVENT AN ORPHAN, and an earlier version of this comment said it
+     did. Measured: capture-shots.mjs with release() removed, killed while its
+     second Chrome ran, left 0 Chrome processes and 0 profiles. Every handler
+     sends SIGKILL to its own Chrome before it waits for anything, so the live
+     Chrome dies whichever handler finishes first. What release() protects is the
+     tidy half of the cleanup, and the sweep backs that up regardless.
+     capture-shots.mjs runs a Chrome per viewport kind and is the reason this
+     exists. A script with one Chrome can ignore the return value. */
+  return function release() {
+    for (const sig of Object.keys(SIGNAL_CODES)) process.off(sig, onSignal[sig]);
+    process.off('uncaughtException', onUncaught);
+    process.off('unhandledRejection', onRejection);
+    process.off('exit', onExit);
+  };
 }
