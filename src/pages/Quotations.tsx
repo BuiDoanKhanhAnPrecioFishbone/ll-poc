@@ -69,11 +69,19 @@ export function Quotations() {
   const [params, setParams] = useSearchParams();
   const queue = measureFor(params.get('queue'));
   const scope = params.get('scope');
+  /* Arriving from a record's related-records row: `?customer=<label>` is the
+     "Customer RFQs" button on an RFQ, and it means exactly what the button's
+     count said — this customer's Project Requirements, all of them. */
+  const customer = params.get('customer');
 
   /* Quick filters default to the two an estimator wants on arrival. They are
      one click to drop, and the bar states what is applied rather than filtering
      silently. */
-  const [quickOn, setQuickOn] = useState<string[]>(['open']);
+  const [quickOn, setQuickOn] = useState<string[]>(
+    /* Except when a record sent the user here. The button that did it printed a
+       count of ALL this customer's RFQs, most of which are closed, so opening
+       with the Open chip on would show a fraction of the number pressed. */
+    () => (params.get('customer') ? [] : ['open']));
   /* Whose records. Separate from the measures, and matching the Mine/Team
      toggle on My Queues — the same question deserves the same control. */
   /* One value per field. No operators — see docs/filter-spec.md. */
@@ -142,11 +150,17 @@ export function Quotations() {
   const toggleQuick = (key: string) =>
     setQuickOn(v => (v.includes(key) ? v.filter(k => k !== key) : [...v, key]));
 
-  const clearQueue = () => {
+  const clearParams = (...keys: string[]) => {
     const next = new URLSearchParams(params);
-    next.delete('queue'); next.delete('scope');
+    keys.forEach(k => next.delete(k));
     setParams(next, { replace: true });
   };
+  const clearQueue = () => clearParams('queue', 'scope');
+
+  /* Everything below the queue branch counts and filters inside this — the
+     customer's records when a record linked here, every record otherwise. */
+  const scoped = useMemo(
+    () => (customer ? all.filter(q => q.customer === customer) : all), [all, customer]);
 
   const data = useMemo(() => {
     if (queue) {
@@ -156,13 +170,16 @@ export function Quotations() {
       const inScope = scopeFilter(scope);
       return all.filter(q => inScope(q) && queue.match(q));
     }
-    /* Quick filters are conjunctive with each other and with the advanced
-       conditions: every chip you turn on narrows further. */
-    const inScope = all;
+    /* A customer link NARROWS rather than overrides — unlike a queue tile,
+       which carries its own whole predicate. The chips and the KPI tiles above
+       still work, they just now count and filter inside this customer's
+       records; arriving turns the default Open chip off (see above) so that
+       the first view holds exactly the number the button promised. */
+    const inScope = scoped;
     const quickMatched = inScope.filter(q =>
       QUOTATION_QUICK.filter(f => quickOn.includes(f.key)).every(f => f.match(q)));
     return applyView(quickMatched, fields, values);
-  }, [all, queue, scope, quickOn, values, fields]);
+  }, [all, scoped, queue, scope, quickOn, values, fields]);
 
 
   /* Priority and Date Needed carry bespoke cells; every other column is
@@ -265,7 +282,7 @@ export function Quotations() {
           {QUOTATION_QUICK.filter(f => KPI_KEYS.includes(f.key)).map(f => {
             /* Counted within the current scope. A tile reading 66 above a grid
                showing 15 rows is not a summary of anything on screen. */
-            const n = all.filter(f.match).length;
+            const n = scoped.filter(f.match).length;
             const on = quickOn.includes(f.key);
             return (
               <button key={f.key} type="button" className="vy-kpi" data-key={f.key}
@@ -305,6 +322,17 @@ export function Quotations() {
           <Chip label={`${queue.label} · ${scope === 'team' ? 'Team' : 'Mine'}`} selected onClick={clearQueue} />
           <span className="vy-filter-note">{queue.meaning}</span>
           <Button variant="text" onClick={clearQueue}>Clear</Button>
+        </div>
+      ) : customer ? (
+        /* Arrived from an RFQ's related-records row. Stated in full, because a
+           list showing 4 of 330 records must say why, and cleared in one click
+           — which leaves the user on the full list rather than sending them
+           back to the record they came from. */
+        <div className="vy-filter-row-main">
+          <span className="vy-filter-label">From an RFQ</span>
+          <Chip label={customer} selected onClick={() => clearParams('customer')} />
+          <span className="vy-filter-note">Every Project Requirement for this customer</span>
+          <Button variant="text" onClick={() => clearParams('customer')}>Clear</Button>
         </div>
       ) : (
         /* No "Mine / Everyone" here any more.

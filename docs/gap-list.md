@@ -52,7 +52,7 @@ Precedence per `docs/precedence.md`.
 | C2 | Breadcrumbs | present | remove | ✅ removed |
 | C3 | Record count | in module name | KPI summary, clickable | ✅ done |
 | C4 | Row density | — | user preference | ✅ done |
-| C5 | Smart buttons | absent | required | ✅ added |
+| C5 | Smart buttons | absent | required | ✅ added; narrowed 16 Sep to records with their own screen (see `SmartButtons.tsx`) |
 | C6 | Global header | no clock/tz/language | add all three | ✅ done |
 | C7 | My Queues | absent | header icon + badge | ✅ done |
 | C8 | Collapsed menu | group icons | per-item icons | ✅ done |

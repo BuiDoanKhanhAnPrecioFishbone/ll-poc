@@ -32,6 +32,16 @@ Six of nineteen were reachable. Five of those six sit in one row of one screen.
 
 ### The RFQ smart buttons — five of six *(`QuotationDetail.tsx:240`)*
 
+> **Superseded, 16 Sep.** Wiring those five to their tabs was the right fix for
+> the defect named here — a button that promised a destination and gave a toast
+> — and the wrong fix for the row. Their destinations were tabs on this same
+> page, 469px below, whose strip already prints the same counts; the row was a
+> second copy of the tab strip. The five are gone from the row and the Activity
+> Logs tab gained the count only the row had. What replaced them, and what
+> cannot be linked until the customer answers B3/B4 on the client document, is
+> in `SmartButtons.tsx`.
+
+
 The smart-button row is an **addition**, not a restoration: `SmartButtons.tsx`
 records that the live Voyager RFQ has no such row, and that the 25 Aug review
 asked for one. So there is no live behaviour to match — the question is only

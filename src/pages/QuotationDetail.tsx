@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Dialog, Tabs } from '../ui/Overlays';
 import { ValidationPanel } from '../components/quotation/ValidationPanel';
@@ -16,6 +16,7 @@ import { AddContactDialog, type NewContact } from '../components/quotation/AddCo
 import { useToast } from '../ui/Toast';
 import { RecordField, isMissing } from '../components/quotation/RecordField';
 import { smartButtonsFor, SmartIcon } from '../components/quotation/SmartButtons';
+import { canSee } from '../data/itar';
 import { HISTORICAL_RFQ_FIELD, showsHistoricalRfq, HEADER_GROUPS, COMMERCIAL, TECHNICAL, INVENTORY, NOTES, ALL_FIELDS,
          setHistoricalRfqOptions } from '../components/quotation/requirementFields';
 import { pageActionsProps } from '../ui/pageActions';
@@ -42,17 +43,6 @@ export function QuotationDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [tab, setTab] = useState('requirements');
-  /* Bumped by the smart buttons, and by nothing else — it distinguishes "the
-     user pressed a tab" from "the user was SENT to one", and only the second
-     should move the page.
-
-     A COUNTER, not a boolean, and not `tab` itself. Keying the effect on `tab`
-     would miss the case where the destination is the tab already showing —
-     press "3 Documents" while standing on Checklists and nothing would change,
-     so nothing would scroll, so the button would look broken on the one screen
-     where it is easiest to reach. */
-  const [jump, setJump] = useState(0);
-  const jumpTarget = useRef<string | null>(null);
   const [bomOpen, setBomOpen] = useState(false);
   const [runOpen, setRunOpen] = useState(false);
   const [cancelOpen, setCancelOpen] = useState(false);
@@ -60,42 +50,6 @@ export function QuotationDetail() {
   const [contactOpen, setContactOpen] = useState(false);
   const [newContacts, setNewContacts] = useState<NewContact[]>([]);
   const toast = useToast();
-
-  /**
-   * Smart button → the tab holding what it counted.
-   *
-   * Scroll THEN focus, the same order as the ValidationPanel below: focusing
-   * alone jumps the strip into view with no animation and often under the
-   * sticky header, and the point of a navigation button is that the user SEES
-   * where they were taken.
-   *
-   * The focus runs in an effect rather than in the click handler because the
-   * tab that should receive it is not active yet — React has not re-rendered,
-   * so `.k-active` at click time is still the tab being left.
-   */
-  function goToTab(value: string) {
-    setTab(value);
-    jumpTarget.current = value;
-    setJump(n => n + 1);
-  }
-
-  useEffect(() => {
-    if (!jump) return;          // the initial render sent nobody anywhere
-    const strip = document.querySelector('.vy-tabs');
-    if (!strip) return;
-    strip.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    /* Deferred a task for the same reason as the Part record's MPN section: this
-       runs inside the click's own dispatch, and the browser's default action for
-       that click focuses the button that was pressed — overwriting anything set
-       from here. It happens to survive on this screen because Kendo's TabStrip
-       also focuses the tab it selects, but relying on that is relying on someone
-       else's implementation detail to cover our race. */
-    const t = setTimeout(() => {
-      const active = strip.querySelector('.k-tabstrip-item.k-active');
-      if (active instanceof HTMLElement) active.focus({ preventScroll: true });
-    }, 0);
-    return () => clearTimeout(t);
-  }, [jump]);
 
   /* Edit is a mode, not a permanent state of the page. `saved` holds edits made
      in this session; `draft` holds edits not yet committed. Keeping them apart
@@ -258,6 +212,16 @@ export function QuotationDetail() {
      each tab. The live TabStrip gives five bare nouns. */
   const checklistOutstanding = q.tasks.filter(t => taskStatus(t) !== 'Completed').length;
 
+  /* What the related-records row needs, and nothing else.
+     `canSee` is the same ITAR filter the list screen passes its rows through,
+     applied here for one reason: the number on the button must be the number of
+     rows the destination shows. A count taken from unfiltered data would send an
+     uncleared user to a list of nine promising twelve. */
+  const customerRfqs = all.filter(x => x.customer === q.customer && canSee(x)).length;
+  /* The stored value carries the `RFQ` prefix, because that is what the
+     lookup field offers — `RFQ${no}`. Matching on `no` alone found nothing. */
+  const historicalRfqId = all.find(x => `RFQ${x.no}` === q.historicalRfq)?.id;
+
   return (
     <div className="vy-page vy-page--record">
       {/* ---- Record header: ONE block ------------------------------------
@@ -287,37 +251,26 @@ export function QuotationDetail() {
           <span aria-hidden>←</span> Project Requirements
         </button>
 
-        {/* ---- Smart buttons -----------------------------------------------
+        {/* ---- Related records -------------------------------------------
             Flagged in the 25 Aug review as outright missing: "In leading ERP
             systems, every record must have related navigation."
 
-            They are deliberately NOT styled like the action buttons beside
-            them. An action button does something TO this record; a smart button
-            goes somewhere else. Same shape for both is how a user learns to
-            hesitate before every click. These carry a count, so they also
-            answer "is there anything there" without being pressed — a zero is
-            information, and stays visible rather than being hidden. */}
+            NOT action buttons, and they must not be shaped like them. An action
+            button does something TO this record; these go somewhere else. Same
+            shape for both is how a user learns to hesitate before every click.
+
+            And they go somewhere ELSE — that is the change of 16 Sep. Five of
+            the six buttons here used to open a TAB on this same page, 469px
+            below the row, counting the very arrays those tabs render while the
+            tab strip printed the same counts itself. The row was a second copy
+            of the tab strip. See SmartButtons.tsx for the rule that replaced
+            that, and for the links we cannot build honestly yet. */}
         <nav className="vy-smart-buttons" aria-label="Related records">
-          {smartButtonsFor(q).map(b => (
+          {smartButtonsFor(q, { customerRfqs, historicalRfqId }).map(b => (
             <button key={b.label} type="button" className="vy-smart-btn"
                     data-empty={b.count === 0 || undefined}
-                    /* Always GOES somewhere — never creates. The branch here
-                       used to call create when the count was falsy, which made
-                       one row mix navigation with a record-modifying action,
-                       against the rule this component is built on. It also
-                       caught Customer, whose count is null rather than 0, so
-                       the single most-clicked button in the row offered to
-                       create a second customer for the RFQ. An empty
-                       destination is still a destination.
-
-                       And then every one of the six went to a toast anyway —
-                       five of them past a destination two hundred pixels below.
-                       `b.tab` closes that (docs/stub-audit.md); Customer keeps
-                       the toast because it genuinely has nowhere to go. */
-                    onClick={() => b.tab
-                      ? goToTab(b.tab)
-                      : toast.notImplemented(
-                          `open the ${b.count === 1 ? b.label.toLowerCase() : b.plural.toLowerCase()} linked to RFQ${q.no}`)}>
+                    title={b.title}
+                    onClick={() => navigate(b.to)}>
               <SmartIcon name={b.icon} />
               {b.count !== null && <span className="vy-smart-n">{b.count}</span>}
               <span>{b.count === 1 ? b.label : b.plural}</span>
@@ -560,7 +513,7 @@ export function QuotationDetail() {
           ) },
           { value: 'result',       label: 'Quotation Result', count: q.results.length,     content: <ResultTab q={q} onRun={() => setRunOpen(true)} /> },
           { value: 'conversations',label: 'Conversations',count: q.comments.length,    content: <ConversationsTab q={q} /> },
-          { value: 'activity',     label: 'Activity Logs', content: <ActivityTab q={q} /> },
+          { value: 'activity',     label: 'Activity Logs', count: q.activity.length, content: <ActivityTab q={q} /> },
         ]}
       />
 
