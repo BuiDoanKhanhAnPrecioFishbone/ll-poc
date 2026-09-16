@@ -464,9 +464,14 @@ export function generateQuotations(count = 330): Quotation[] {
          field is shown. The customer's Testing Guideline: "Precondition:
          displays when selected Order Type is Repeat." A stored value on a New
          order would be data the form can never show or clear. */
-      historicalRfq: orderType === 'Repeat'
-        ? `RFQ${String(300 - Math.floor(rnd() * 200)).padStart(10, '0')}`
-        : '',
+      /* A MARKED DRAW, resolved into a real RFQ number after the loop.
+         The draw stays HERE, in the position it has always occupied, because
+         this generator is one deterministic stream: taking a number out of it,
+         or taking one in a different place, re-rolls every record after this
+         point — every customer, status and date in the demo data. The value it
+         feeds cannot be resolved yet, since the records it must name do not
+         exist until the loop ends. */
+      historicalRfq: orderType === 'Repeat' ? `#${rnd()}` : '',
       /* ITAR follows the customer's `isItar` flag on the live form. */
       itar: findCustomer(cust)!.isItar,
       quoteFocus: pick(META.QUOTE_FOCUS),
@@ -562,6 +567,33 @@ export function generateQuotations(count = 330): Quotation[] {
         return log;
       })(),
     });
+  }
+
+  /* ---- Historical RFQ, resolved against the records that now exist ---------
+     It used to be invented inside the loop: `RFQ` plus a number in the 101–300
+     range, which could name a record belonging to another customer, or none at
+     all. The customer's own Testing Guideline says the opposite — "the option
+     list is populated with RFQs corresponding to the selected existing
+     customer" — so the stored value could not appear in the list the field
+     offers for it, and the record's related-records row had nothing to open.
+
+     Resolved here instead, once every record exists: one of the same
+     customer's OLDER RFQs, chosen with the draw the loop already made (the
+     array runs newest first, so older means further down). A customer with only
+     this one RFQ keeps an empty value, which is what a first order for a
+     customer honestly is.
+
+     Only MARKED values are touched. A record created through the New
+     Requirement dialog carries an RFQ the user picked themselves, from the
+     lookup's own list — overwriting that would discard their choice. */
+  for (let i = 0; i < out.length; i++) {
+    const q = out[i];
+    if (!q.historicalRfq.startsWith('#')) continue;
+    const draw = Number(q.historicalRfq.slice(1));
+    const older = out.slice(i + 1).filter(x => x.customer === q.customer);
+    const pool = older.length ? older : out.slice(0, i).filter(x => x.customer === q.customer);
+    const chosen = pool[Math.floor(draw * pool.length)];
+    q.historicalRfq = chosen ? `RFQ${chosen.no}` : '';
   }
   return out;
 }
