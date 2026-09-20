@@ -190,6 +190,43 @@ labelled as sample data.
 
 ---
 
+## 1.14 Where the buttons live
+
+**Before.** On the RFQ record the five actions sit at the top, with
+`Run Quotation` third of five and `Cancel` last — the slot most systems reserve
+for the button that commits. In Run Quotation, `NEXT` sits at the bottom right
+of the step. Two screens, two answers to "where is the button that moves me on".
+
+**After.** One rule in both places: **the way out on the left, the button that
+commits on the right.** On the record, `Cancel RFQ` is first and
+`Run Quotation` last, with two buttons between them. In the wizard, `Cancel` is
+first and `Next` last.
+
+**Next stays at the bottom of a step.** A record's actions apply to the whole
+record at any moment, so they sit at the top — as in PowerBI, Salesforce and
+Fiori. A step's `Next` is the END of that step: it commits what was just read,
+so it sits where the eye finishes — as in Kendo, Material and Fluent. One rule
+beats one position.
+
+Where this comes from:
+
+- **One primary action per screen.** SAP Fiori and Fluent 2 both allow exactly
+  one. The live record shows two blue buttons.
+- **The commit and the way out stay together.** Material 3 puts them side by
+  side at one end; the live row splits them.
+- **Two heavy actions should never be neighbours.** Nielsen Norman Group, on
+  autopilot clicking in repeated work: separate them by space and by weight.
+  `Run Quotation`, `Confirm RFQ` and `Cancel` are three identical neighbours.
+- **A button should say what it cancels.** The live `Cancel` cancels the RFQ but
+  is worded and placed like a window close. GOV.UK: colour alone is not a
+  warning.
+- **Step navigation belongs at the bottom — the live wizard already gets this
+  right.** Microsoft's wizard guidelines put Previous and Next in a bar under
+  the step.
+
+**Asked for** — demo feedback, September 2026. The rule and the measurements are
+in `docs/modal-patterns.md`, Rule 3.
+
 # Part 2 — Screen by screen
 
 ## 2.1 Login
