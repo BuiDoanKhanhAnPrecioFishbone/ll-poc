@@ -376,6 +376,11 @@
   /* `filled` is Kendo's solid primary. One per view, by the variant ladder in
      Button.tsx, so this cannot reorder two things against each other. */
   .vy-page-actions .k-button-primary { order: -1; }
+  /* And the destructive one goes to the END, for the reason the primary comes
+     first: with a mouse the bar reads "way out … commit" left to right, and
+     pulling only the commit forward would land it against the red button it is
+     deliberately kept away from. One per view, same as the primary. */
+  .vy-page-actions .k-button-error { order: 1; }
 
   /* --- Toolbar and pager: two rows each, not three ------------------------
      At 375px the toolbar measured 187px and the pager 161px — 348px of chrome

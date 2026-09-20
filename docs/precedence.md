@@ -12,6 +12,11 @@ Three documents, plus anything the customer says after them:
   system disagree, **this wins** — the live build is what exists, this is what
   it is supposed to do.
 - The reviewer's design report (25 Aug 2026).
+- **Demo feedback, September 2026**, relayed by our own team rather than written
+  by the customer: the buttons are not in consistent places, which made them
+  hesitate. Second-hand and unquotable, so it is treated as a real observation
+  with an unreliable diagnosis attached — what they NOTICED wins, what they
+  proposed does not automatically. Answered in `docs/modal-patterns.md`, Rule 3.
 - **`VIQ – Design Improvement_1.pptx`**, the kick-off deck. The OLDEST of the
   three, so where it and a later source disagree, the later one wins — twice
   already: it asks for KendoUI (no licence, see question 2 below) and for the

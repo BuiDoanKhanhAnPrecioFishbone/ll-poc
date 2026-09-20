@@ -83,6 +83,42 @@ Verified across every call site whose action bar can be read statically. Three �
 BoM Comparison, Create BoM and Run Quotation — render different button sets per
 step, so a static read cannot confirm them and they are not claimed here.
 
+### The same rule on a page bar — 20 September 2026
+
+The rule was written for footers, and the record screens were left to their own
+devices. The RFQ record's bar then rendered `Edit · BoM Comparison · Cancel RFQ ·
+Confirm RFQ · Run Quotation`, which put the destructive button one place from the
+commit — 69px apart at 1024px, measured — under a comment claiming it sat "at the
+far left of the group rather than beside Run Quotation". It did not.
+
+So the rule now covers both surfaces, because it is the same question in two
+shapes: **the way out on the left, the commit on the right, wherever the bar
+sits.** Cancel RFQ is first in the group (x=638) and Run Quotation last (x=888),
+with two buttons between them. On a phone the bar wraps and the primary is pulled
+to the front, so the destructive is pushed to the back by the matching rule in
+`responsive.css` — they land diagonally opposite, not side by side.
+
+**Where the bar sits is a different question from where the commit sits.** After
+a demo in September the customer said the buttons are not in consistent places:
+the record's actions are at the top, while Run Quotation's Next and Previous are
+at the bottom of the step. Both stay where they are, and the reason is that they
+are not the same kind of control:
+
+- A record's actions apply to the whole record and are available at any moment.
+  They belong with the record's identity, at the top, where PowerBI, Salesforce
+  and Fiori all put them.
+- A step's Next is the END of a sequence. It commits what the user has just read,
+  so it sits where their eye finishes, at the bottom right of the step — which is
+  where Kendo, Material, Fluent and every OS wizard put it. Moving it to the top
+  would mean reading a form downwards and then travelling back up to continue,
+  and on step 3's fourteen-column grid that is a long way back.
+
+What makes a control findable is a rule the user can learn, not one coordinate
+for every control: the commit is on the RIGHT in both places, and the way out is
+on the LEFT in both places. The step's position within that is answered by the
+stepper at the top of the dialog, which says which step this is and how many
+remain.
+
 **Open point.** The Part record's bar carries four buttons: `Close`, `QR Code`,
 `Approve`, `Edit part`. That is the only bar in the app mixing dismissal with
 three separate actions, and it is at the limit of what a footer can hold before

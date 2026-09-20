@@ -336,8 +336,6 @@ export function QuotationDetail() {
               </>
             ) : (
               <>
-                <Button onClick={() => { setDraft({ ...q }); setTouched(new Set()); }}>Edit</Button>
-                <Button onClick={() => setBomOpen(true)}>BoM Comparison</Button>
                 {/* CANCEL RFQ — gap M9. On the live record's action bar and
                     missing here; our only "Cancel" was the edit-mode one, which
                     is a different thing entirely. The bundle names its
@@ -345,15 +343,21 @@ export function QuotationDetail() {
                     `RFQ_Page.Cancel.Title`, `RFQ_Page.Cancel.Content` — so this
                     is a state change behind a question, not a button.
 
-                    Destructive, so it is a plain button at the far left of the
-                    group rather than beside Run Quotation: the two most
-                    consequential actions on this record should not be
-                    neighbours. Hidden once the RFQ is already closed, because
-                    cancelling a Cancelled record is not a state this system
-                    has. */}
+                    Destructive, so it is FIRST in the group — the way out on
+                    the left, the commit on the right, which is Rule 3 of
+                    docs/modal-patterns.md applied to a page bar rather than a
+                    footer. It claimed that placement in this comment while
+                    rendering third of four, one button from Run Quotation: the
+                    two most consequential actions on the record were
+                    neighbours. Measured at 1024px on 20 Sep — Cancel at x=819,
+                    Run Quotation at x=888 — and moved. Hidden once the RFQ is
+                    already closed, because cancelling a Cancelled record is not
+                    a state this system has. */}
                 {q.status !== 'Cancelled' && q.status !== 'Completed' && (
                   <Button variant="danger" onClick={() => setCancelOpen(true)}>Cancel</Button>
                 )}
+                <Button onClick={() => { setDraft({ ...q }); setTouched(new Set()); }}>Edit</Button>
+                <Button onClick={() => setBomOpen(true)}>BoM Comparison</Button>
                 {/* CONFIRM RFQ — gap M8. Also on the live action bar, and
                     absent from this codebase entirely, though our own CSS
                     already refers to a red part blocking it.
