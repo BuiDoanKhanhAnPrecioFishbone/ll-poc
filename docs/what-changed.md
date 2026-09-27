@@ -220,6 +220,16 @@ Where this comes from:
 - **A button should say what it cancels.** The live `Cancel` cancels the RFQ but
   is worded and placed like a window close. GOV.UK: colour alone is not a
   warning.
+- **On the right, not the top left.** The top left carries the record's identity
+  — `RFQ0000000358`, its status, its due date — which is read first. Actions
+  placed after a title also move with the length of the project name; on the
+  right they sit at the same edge on every record. Fiori, Salesforce and
+  Material all put a record's actions on the right, and the F-pattern describes
+  how people read CONTENT, not how they find a button.
+- **The customer's PowerBI screen works the same way.** Its top left is the
+  report's name, `BOM_Indented`; it has no record at all — the rows are chosen
+  through Parameters — and its one action-like control, `View report`, sits on
+  the right.
 - **Step navigation belongs at the bottom — the live wizard already gets this
   right.** Microsoft's wizard guidelines put Previous and Next in a bar under
   the step.
