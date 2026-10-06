@@ -61,6 +61,10 @@ export const ICONS: Record<string, string> = {
      grid. A gear would also work, but not at this size in stroke only:
      its teeth have to touch the ring or it becomes a sun again. */
   settings: 'M3 5.5h2.4M8.6 5.5H17M7 3.9a1.6 1.6 0 1 0 0 3.2 1.6 1.6 0 0 0 0-3.2M3 10h6.4M12.6 10H17M11 8.4a1.6 1.6 0 1 0 0 3.2 1.6 1.6 0 0 0 0-3.2M3 14.5h2.4M8.6 14.5H17M7 12.9a1.6 1.6 0 1 0 0 3.2 1.6 1.6 0 0 0 0-3.2',
+
+  /* The only directional glyph in the set, and it points DOWN because its one
+     caller opens a menu below itself. */
+  'chevron-down': 'M5.5 8 10 12.5 14.5 8',
 };
 
 /**

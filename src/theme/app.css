@@ -450,6 +450,126 @@
 .vy-run { display: flex; flex-direction: column; gap: var(--vy-space-7); }
 .vy-run-context { display: flex; align-items: baseline; gap: var(--vy-space-6); flex-wrap: wrap; font-size: var(--vy-text-base); color: var(--vy-on-surface-muted); background: var(--vy-surface-app); border-radius: var(--vy-radius-md); padding: var(--vy-space-4) var(--vy-space-6); }
 .vy-run-step { display: flex; flex-direction: column; gap: var(--vy-space-6); }
+
+/* ---- Step 1, laid out as three regions ------------------------------------
+   It was four sections in one column: 1453px of content in a 669px dialog, so
+   the fields Next requires began 648px below the fold and the only feedback was
+   a toast naming them. The customer's own screen carries the same content side
+   by side and fits it on one screen, which is the shape copied here.
+
+   Reference on the left (what this quote inherits from the RFQ, read-only), the
+   work on the right: what you are doing, then the two halves of doing it. */
+.vy-run-step--config {
+  display: grid;
+  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+  gap: var(--vy-space-8);
+  align-items: stretch;
+  min-height: 0;
+}
+/* The reference column is the one that can be long — eight inherited fields and
+   the attachment list — and it is the one the user reads rather than fills in.
+   So it takes the scrolling, and the work beside it never moves. */
+.vy-run-ref { min-height: 0; overflow: auto; }
+.vy-run-work { display: flex; flex-direction: column; gap: var(--vy-space-8); min-width: 0; }
+.vy-run-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--vy-space-8);
+  align-items: start;
+}
+/* The reference column is narrow, so its fields stack rather than fighting for
+   a second track they cannot fill. */
+.vy-run-ref .vy-quote-config-grid { grid-template-columns: minmax(0, 1fr); }
+.vy-run-ref { background: var(--vy-surface-app); border-radius: var(--vy-radius-md); padding: var(--vy-space-6); }
+
+/* Below this the dialog is too narrow for three regions to be regions: the
+   pair's columns would be ~240px, which is narrower than one field wants. One
+   column, in the reading order the regions already have. */
+@media (max-width: 1180px) {
+  .vy-run-step--config, .vy-run-pair { grid-template-columns: minmax(0, 1fr); }
+  /* ONE COLUMN, AND THE SCROLLING GOES BACK TO THE DIALOG. Holding the frame
+     still and scrolling the grid inside it is worth it on a desktop, where the
+     frame is a context bar and a toolbar the user keeps referring to. On a
+     phone the frame IS most of the height, so the same rule left Assembly
+     Details 246px below the fold with nothing able to reach it — found by the
+     phone sweep the same day Run Quotation was added to it. */
+  .vy-run-ref { overflow: visible; }
+}
+
+/* ---- The grid scrolls, not the step ---------------------------------------
+   Steps 2, 3 and 4 are a context bar, a toolbar and a grid of 20-50 lines. When
+   the whole step scrolled, the context bar and the filters scrolled away with
+   it — so a user hunting a line lost the controls that filter it, and the
+   measurement said the dialog had to move 1072px on step 3 to show rows that a
+   scrolling grid could have shown in place.
+
+   `:has` rather than a class on the content: Kendo owns that node and does not
+   take one, and `.vy-content:has(.vy-page--grid)` above already does the same
+   thing for the list screens. */
+/* COLUMN, not the default row. As a row, `.vy-run` became a flex item sized to
+   its own content — 2816px of stepper — and the overflow below then clipped
+   step 4 out of existence. */
+.vy-dialog .k-dialog-content:has(> .vy-run) { overflow: hidden; display: flex; flex-direction: column; }
+.vy-run { display: flex; flex-direction: column; gap: var(--vy-space-6); min-height: 0; flex: 1 1 auto; }
+/* `min-width: 0` ON THE CHILDREN, and it is not decoration. Making this a flex
+   column turned the stepper into a flex ITEM, whose automatic minimum width is
+   its content's — 2816px of four steps that had been sharing 1536px happily as
+   a block. It was then clipped by the `overflow: hidden` above, so step 4
+   simply vanished. Same trap as `.vy-record-bar > .vy-page-actions` and the
+   sitemap's compare column; third time it has cost an afternoon. */
+.vy-run > * { min-width: 0; }
+.vy-run > .vy-run-step { min-height: 0; flex: 1 1 auto; }
+/* A floor, so a filter that matches two lines still looks like a table rather
+   than a sliver, and the step keeps its shape while rows come and go. */
+.vy-run-step > .vy-minitable-k { flex: 1 1 auto; min-height: 220px; overflow: auto; }
+
+/* ON A PHONE THE DIALOG SCROLLS AGAIN, and this block sits AFTER the rules it
+   overrides because that is the only reason it wins — written above them it
+   lost on source order, and the phone sweep kept reporting Assembly Details
+   246px below a fold nothing could reach.
+
+   Holding the frame still and scrolling the grid inside it is worth it on a
+   desktop, where the frame is a context bar and a toolbar the user refers back
+   to. On a phone the frame IS most of the height. */
+@media (max-width: 1180px) {
+  .vy-dialog .k-dialog-content:has(> .vy-run) { overflow: auto; }
+  .vy-run, .vy-run > .vy-run-step { flex: 0 0 auto; min-height: auto; }
+  .vy-run-step > .vy-minitable-k { flex: 0 0 auto; min-height: 0; overflow-y: visible; }
+}
+
+/* The numbers the Confirm Quote dialog used to carry, in the footer beside the
+   button that acts on them. */
+.vy-run-footnote {
+  margin-right: auto; align-self: center;
+  font-size: var(--vy-text-base); color: var(--vy-on-surface-muted);
+}
+.vy-run-footnote strong { color: var(--vy-on-surface); font-variant-numeric: tabular-nums; }
+
+/* ---- Run Quotation, with its drafts ---------------------------------------
+   One control, two parts: the button runs a new quote, the chevron lists the
+   drafts. They share an outline so they read as one thing with a second door,
+   rather than two buttons that happen to be adjacent. */
+.vy-split { display: inline-flex; align-items: stretch; }
+.vy-split > .k-button { border-start-end-radius: 0; border-end-end-radius: 0; }
+.vy-split-more {
+  display: grid; place-items: center;
+  width: var(--vy-control-sm); padding: 0;
+  border: none; border-inline-start: 1px solid var(--vy-brand-boundary-strong);
+  border-start-end-radius: var(--vy-radius-md); border-end-end-radius: var(--vy-radius-md);
+  background: var(--vy-brand); color: var(--vy-brand-on); cursor: pointer;
+}
+.vy-split-more:hover { background: var(--vy-brand-hover); }
+.vy-draft-menu { padding: var(--vy-space-5); max-width: 22rem; }
+.vy-popover-title { margin: 0 0 var(--vy-space-3); font-size: var(--vy-text-sm); font-weight: var(--vy-weight-bold); text-transform: uppercase; letter-spacing: .04em; color: var(--vy-on-surface-muted); }
+.vy-draft-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--vy-space-2); }
+.vy-draft-list button {
+  display: flex; flex-direction: column; gap: 2px; width: 100%; text-align: start;
+  padding: var(--vy-space-3) var(--vy-space-4); border: none; border-radius: var(--vy-radius-sm);
+  background: none; color: inherit; cursor: pointer; min-height: var(--vy-target-min);
+}
+.vy-draft-list button:hover { background: var(--vy-surface-app); }
+.vy-draft-meta { font-size: var(--vy-text-sm); color: var(--vy-on-surface-muted); }
+.vy-draft-note { margin: var(--vy-space-4) 0 0; font-size: var(--vy-text-sm); color: var(--vy-on-surface-muted); }
 .vy-run-banner { font-size: var(--vy-text-base); border-radius: var(--vy-radius-md); padding: var(--vy-space-5) var(--vy-space-6); }
 .vy-run-banner[data-tone="warn"] { background: var(--vy-status-open-bg); color: var(--vy-status-open-fg); }
 .vy-run-banner[data-tone="ok"] { background: var(--vy-status-done-bg); color: var(--vy-status-done-fg); }
@@ -593,6 +713,10 @@
    RUN QUOTATION — additions for the restored steps
    ========================================================================== */
 .vy-run-section + .vy-run-section { margin-top: var(--vy-space-9); padding-top: var(--vy-space-9); border-top: 1px solid var(--vy-border); }
+/* The separator is for sections that FOLLOW one another down the page. Side by
+   side they are not a sequence, and the rule was pushing Assembly Details 41px
+   below BoM Options and drawing a rule across the top of it. */
+.vy-run-pair > .vy-run-section + .vy-run-section { margin-top: 0; padding-top: 0; border-top: none; }
 .vy-run-actions { display: flex; flex-wrap: wrap; gap: var(--vy-space-4); align-items: center; margin: var(--vy-space-6) 0; }
 .vy-run-banner[data-tone="info"] { background: var(--vy-brand-subtle); border-color: var(--vy-brand-boundary-soft); }
 .vy-run-drafts { display: flex; align-items: center; gap: var(--vy-space-4); margin-top: var(--vy-space-9); padding-top: var(--vy-space-6); border-top: 1px solid var(--vy-border); font-size: var(--vy-text-sm); color: var(--vy-on-surface-muted); }

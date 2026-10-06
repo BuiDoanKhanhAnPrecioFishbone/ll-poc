@@ -4,8 +4,6 @@ import { RadioGroup, Select } from '../../../ui/Overlays';
 import { Button } from '../../../ui/Button';
 import { TextField, TextArea } from '../../../ui/Field';
 import { useToast } from '../../../ui/Toast';
-import { DraftsTable } from './DraftsTable';
-import { draftQuotesFor, type DraftQuote } from '../../../data/draftQuotes';
 import { QtyField } from './QuoteContext';
 import { ImportFileDialog } from './dialogs';
 import { BOM_TEMPLATES, COLUMN_DETECTION, assembliesFor } from '../../../data/bom';
@@ -31,12 +29,12 @@ import type { RunConfig } from './state';
 export const ACTIONS = [
   { value: 'import-new', label: 'Import New BoM' },
   { value: 'load-existing', label: 'Load Existing Assembly' },
-  /* Resume Draft Quote is a third ENTRY POINT, not a third kind of quote — the
-     draft it resumes was created through one of the two above. It belongs on
-     this control because this is where the user already answers "which way am I
-     starting", and a separate button elsewhere would ask the same question in
-     two places. */
-  { value: 'resume-draft', label: 'Continue from drafts' },
+  /* RESUME DRAFT QUOTE IS NOT HERE ANY MORE. It was, as a third option, and it
+     was the wrong shape: the other two answer "what am I quoting", while
+     resuming answers "where was I" — and choosing it replaced both sections
+     below with a table, so a third of this screen existed in order to be
+     hidden. Resuming is an entry point, so it now sits where entry points live:
+     on the record, as Run Quotation > Resume draft. */
 ];
 
 /**
@@ -76,21 +74,26 @@ const ATTACHMENTS = [
  * the Action that decides everything below it, then BoM Options and Assembly
  * Details, whose contents follow from the Action.
  */
-export function StepConfigBom({ q, cfg, set, onContinueDraft }: {
+export function StepConfigBom({ q, cfg, set, invalid = [] }: {
   q: Quotation; cfg: RunConfig; set: (patch: Partial<RunConfig>) => void;
-  /** Resume Draft Quote: jumps straight to step 3 with the chosen draft loaded. */
-  onContinueDraft: (d: DraftQuote) => void;
+  /** Field names that failed on the last press of Next, so they can say so. */
+  invalid?: readonly string[];
 }) {
   const toast = useToast();
   const [importOpen, setImportOpen] = useState(false);
   const customer = findCustomer(q.customer);
   const xlsx = ATTACHMENTS.filter(a => a.ok);
   const assemblies = assembliesFor(q.customer);
-  const drafts = draftQuotesFor(q.customer);
 
   return (
-    <div className="vy-run-step">
-      <section className="vy-run-section">
+    /* THREE REGIONS, NOT FOUR STACKED SECTIONS.
+       Stacked, this step measured 1453px against 669px of dialog: the user
+       scrolled 2.2 screens to reach the fields Next requires. The live system
+       holds the same content on one screen by placing it side by side.
+       Reference on the left; the work on the right — what you are doing
+       (Action), then the two halves of it (the file, and the assembly). */
+    <div className="vy-run-step vy-run-step--config">
+      <section className="vy-run-section vy-run-ref">
         <h3 className="vy-field-group-title">Quoting information</h3>
         <p className="vy-hint">
           Carried from the Project Requirement. Quote Focus, Material Package Type and Markup
@@ -153,6 +156,7 @@ export function StepConfigBom({ q, cfg, set, onContinueDraft }: {
         <Attachments />
       </section>
 
+      <div className="vy-run-work">
       <section className="vy-run-section">
         <h3 className="vy-field-group-title">Action</h3>
         <RadioGroup label="Action" value={cfg.action}
@@ -161,9 +165,7 @@ export function StepConfigBom({ q, cfg, set, onContinueDraft }: {
         <p className="vy-hint">
           {cfg.action === 'import-new'
             ? 'Quote a BoM file attached to this Project Requirement, against an assembly you name.'
-            : cfg.action === 'load-existing'
-              ? 'Quote an assembly already approved and loaded in the system through the ECO process.'
-              : 'Pick up quoting work saved earlier. Continue goes straight to Quoting — the BoM was already configured when the draft was saved.'}
+            : 'Quote an assembly already approved and loaded in the system through the ECO process.'}
         </p>
         {/* "Precondition: Only show this option when user attach at least 1 file
             in this corresponding project requirements." Saying why beats the
@@ -176,19 +178,12 @@ export function StepConfigBom({ q, cfg, set, onContinueDraft }: {
         )}
       </section>
 
-      {/* ---- Continue from drafts ------------------------------------------
-          Replaces BoM Options and Assembly Details rather than joining them:
-          both of those configure a BoM, and a draft's BoM was configured when
-          it was saved. Leaving them on screen would invite the user to set a
-          template for a run that will not read it. */}
-      {cfg.action === 'resume-draft' ? (
-        <section className="vy-run-section">
-          <h3 className="vy-field-group-title">Continue from drafts</h3>
-          <DraftsTable drafts={drafts} customer={q.customer} onContinue={onContinueDraft} />
-        </section>
-      ) : (
-      <>
-      {/* ---- BoM Options ---------------------------------------------------- */}
+      {/* ---- The two halves of the choice, side by side ---------------------
+          The file it is parsed from, and the assembly it is quoted against.
+          They are siblings — one column each — because neither is a step of the
+          other, and stacking them is what pushed Assembly Details below the
+          fold. */}
+      <div className="vy-run-pair">
       <section className="vy-run-section">
         <h3 className="vy-field-group-title">BoM Options</h3>
 
@@ -300,7 +295,7 @@ export function StepConfigBom({ q, cfg, set, onContinueDraft }: {
 
         {cfg.action === 'import-new' ? (
           <div className="vy-quote-config-grid">
-            <Field label="Assembly Part Number" required>
+            <Field label="Assembly Part Number" required error={invalid.includes('assemblyPartNumber')}>
               <TextField aria-label="Assembly Part Number" value={cfg.assemblyPartNumber}
                          placeholder="3032606"
                          onChange={e => set({ assemblyPartNumber: e.target.value })}
@@ -324,12 +319,12 @@ export function StepConfigBom({ q, cfg, set, onContinueDraft }: {
               </span>
             </Field>
 
-            <Field label="Revision" required>
+            <Field label="Revision" required error={invalid.includes('partRev')}>
               <TextField aria-label="Revision" value={cfg.partRev} placeholder="A"
                          onChange={e => set({ partRev: e.target.value })} />
             </Field>
 
-            <Field label="Description" required wide>
+            <Field label="Description" required wide error={invalid.includes('partDesc')}>
               <TextArea aria-label="Description" rows={2} value={cfg.partDesc}
                         onChange={e => set({ partDesc: e.target.value })} />
             </Field>
@@ -341,7 +336,7 @@ export function StepConfigBom({ q, cfg, set, onContinueDraft }: {
           </div>
         ) : (
           <div className="vy-quote-config-grid">
-            <Field label="Please select assembly" required wide>
+            <Field label="Please select assembly" required wide error={invalid.includes('assembly')}>
               <div className="vy-assembly-pick">
                 <Select label="Please select assembly" value={cfg.assembly}
                         options={assemblies.map(a => a.label)}
@@ -391,8 +386,8 @@ export function StepConfigBom({ q, cfg, set, onContinueDraft }: {
           </div>
         )}
       </section>
-      </>
-      )}
+      </div>
+      </div>
 
       <ImportFileDialog
         open={importOpen}
@@ -403,15 +398,21 @@ export function StepConfigBom({ q, cfg, set, onContinueDraft }: {
   );
 }
 
-function Field({ label, required, wide, children }: {
-  label: string; required?: boolean; wide?: boolean; children: React.ReactNode;
+function Field({ label, required, wide, error, children }: {
+  label: string; required?: boolean; wide?: boolean; error?: boolean;
+  children: React.ReactNode;
 }) {
   return (
-    <div className="vy-quote-config-field" data-wide={wide || undefined}>
+    /* `data-invalid` is what the step's Next scrolls to and focuses, and what
+       paints the field. The error is on the FIELD because that is where the fix
+       is; the toast keeps the customer's own sentence. */
+    <div className="vy-quote-config-field" data-wide={wide || undefined}
+         data-invalid={error || undefined}>
       <span className="vy-quote-fact-label">
         {label}{required && <span className="vy-required" aria-hidden> (*)</span>}
       </span>
       {children}
+      {error && <span className="vy-field-error" role="alert">Required to continue</span>}
     </div>
   );
 }

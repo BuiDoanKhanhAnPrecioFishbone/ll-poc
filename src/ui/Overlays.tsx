@@ -52,11 +52,23 @@ import { cloneElement, createContext, type ReactNode, useContext, useId, useMemo
 const DialogDepth = createContext(0);
 
 
-export function Dialog({ open, onClose, title, subtitle, children, actions, size = 'md' }: {
+export function Dialog({ open, onClose, title, subtitle, children, actions, size = 'md',
+                         startMaximised = false }: {
   open: boolean; onClose: () => void; title: string; subtitle?: ReactNode;
   children: ReactNode; actions?: ReactNode; size?: 'md' | 'lg' | 'xl';
+  /**
+   * Open filling the screen, with Restore down still offered.
+   *
+   * For a dialog that is a WORK SURFACE rather than a question. Run Quotation
+   * carries a 21-column grid and four sections of form; measured on 6 Oct it
+   * asked for 625px of scrolling on a 1920px screen while leaving 740px of that
+   * screen empty, because the dialog was a fixed 1180px at every size. The
+   * customer's own window for this flow fills the screen, and their reviewers
+   * said ours was small beside it. They were describing arithmetic.
+   */
+  startMaximised?: boolean;
 }) {
-  const [maximised, setMaximised] = useState(false);
+  const [maximised, setMaximised] = useState(startMaximised);
   /* A dialog reopens at its normal size. Carrying "maximised" across two
      unrelated dialogs would surprise whoever opens the next one.
 
@@ -66,7 +78,8 @@ export function Dialog({ open, onClose, title, subtitle, children, actions, size
   const [seenOpen, setSeenOpen] = useState(open);
   if (seenOpen !== open) {
     setSeenOpen(open);
-    if (!open) setMaximised(false);
+    /* Back to how this dialog OPENS, which is not always "windowed". */
+    if (!open) setMaximised(startMaximised);
   }
 
   /* A UNIQUE ID, and it is an accessibility fix rather than bookkeeping.

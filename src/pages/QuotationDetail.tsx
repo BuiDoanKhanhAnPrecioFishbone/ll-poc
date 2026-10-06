@@ -12,6 +12,8 @@ import { ConversationsTab } from '../components/quotation/ConversationsTab';
 import { ActivityTab } from '../components/quotation/ActivityTab';
 import { BomComparisonDialog } from '../components/quotation/BomComparisonDialog';
 import { RunQuotationDialog } from '../components/quotation/RunQuotationDialog';
+import { RunQuotationButton } from '../components/quotation/RunQuotationButton';
+import type { DraftQuote } from '../data/draftQuotes';
 import { AddContactDialog, type NewContact } from '../components/quotation/AddContactDialog';
 import { useToast } from '../ui/Toast';
 import { RecordField, isMissing } from '../components/quotation/RecordField';
@@ -45,6 +47,9 @@ export function QuotationDetail() {
   const [tab, setTab] = useState('requirements');
   const [bomOpen, setBomOpen] = useState(false);
   const [runOpen, setRunOpen] = useState(false);
+  /* A draft chosen on this bar, opened at the step it was saved from. The
+     wizard used to own this choice as a third option inside step 1. */
+  const [resumeDraft, setResumeDraft] = useState<DraftQuote | undefined>();
   const [cancelOpen, setCancelOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
@@ -376,7 +381,10 @@ export function QuotationDetail() {
                 {q.status === 'New' && (
                   <Button onClick={() => setConfirmOpen(true)}>Confirm RFQ</Button>
                 )}
-                <Button variant="filled" onClick={() => setRunOpen(true)}>Run Quotation</Button>
+                <RunQuotationButton
+                  customer={q.customer}
+                  onRun={() => { setResumeDraft(undefined); setRunOpen(true); }}
+                  onResume={d => { setResumeDraft(d); setRunOpen(true); }} />
               </>
             )}
           </div>
@@ -599,7 +607,10 @@ export function QuotationDetail() {
       )}
 
       {bomOpen && <BomComparisonDialog onClose={() => setBomOpen(false)} />}
-      {runOpen && <RunQuotationDialog q={q} onClose={() => setRunOpen(false)} />}
+      {runOpen && (
+        <RunQuotationDialog q={q} resume={resumeDraft}
+                            onClose={() => { setRunOpen(false); setResumeDraft(undefined); }} />
+      )}
     </div>
   );
 }

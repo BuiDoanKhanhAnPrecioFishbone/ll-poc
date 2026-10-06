@@ -6,68 +6,20 @@ import { MiniTable } from '../../../ui/MiniTable';
 import { FileDrop } from '../../../ui/FileDrop';
 import type { ColumnSpec } from '../../column-model';
 import {
-  PACKAGING_PARTS, totalQtyOf, money, money3, type BomLine,
+  PACKAGING_PARTS, totalQtyOf, money3, type BomLine,
 } from '../../../data/bom';
 import type { RunConfig } from './state';
 
 /* =============================================================================
-   REVIEW EXCLUDED PARTS — leaving step 2
+   ADD ATTRITION — called from step 3
+
+   Two dialogs used to live above this one: Review Excluded Parts, between steps
+   2 and 3, and Confirm Quote, between 3 and 4. Both were modals over a modal
+   reporting a count the step behind them already showed — step 2 carries an
+   "Is Exclude?" filter, and the step-3 footer now states the lines, the total
+   and how many have no supplier beside the button that acts on them.
    ========================================================================== */
 
-/**
- * Shown on Next from step 2, before anything irreversible happens.
- *
- * The warning is the reason it is a dialog rather than a panel: "These parts
- * will not be used to quote from Nexar and cannot be recalled. Warning: After
- * Run Quote in Step 3, excluded parts cannot be recovered." A user who scrolls
- * past a banner has still consented; a user who presses Confirm & Continue has
- * been asked.
- */
-export function ExcludedPartsDialog({ open, lines, onClose, onConfirm }: {
-  open: boolean; lines: BomLine[]; onClose: () => void; onConfirm: () => void;
-}) {
-  const columns: ColumnSpec<BomLine>[] = [
-    { field: 'part', title: 'Part Number', role: 'ident' },
-    { field: 'revision', title: 'Part Rev', role: 'code', width: 96 },
-    { field: 'description', title: 'Part Description', role: 'text' },
-    { field: 'qty', title: 'Qty', role: 'number', width: 90 },
-    { field: 'partSource', title: 'Part Source', role: 'code', width: 128,
-      widthNote: 'Longest value is "MAKE/PHANT".' },
-  ];
-  return (
-    <Dialog
-      open={open} onClose={onClose} size="lg"
-      title="Review Excluded Parts"
-      subtitle={`${lines.length} ${lines.length === 1 ? 'part' : 'parts'} will not be quoted`}
-      actions={<>
-        <Button onClick={onClose}>Go Back</Button>
-        <Button variant="filled" onClick={onConfirm}>Confirm &amp; Continue</Button>
-      </>}
-    >
-      <div className="vy-run-banner" data-tone="warn">
-        These parts will not be used to quote and <strong>cannot be recalled</strong>. After
-        Run Quote on the next step, excluded parts cannot be recovered.
-      </div>
-      <MiniTable data={lines} columns={columns}
-                 empty={<div className="vy-empty-inline"><strong>Nothing is excluded.</strong> Every
-                        line will be quoted.</div>} />
-    </Dialog>
-  );
-}
-
-/* =============================================================================
-   ADD ATTRITION — step 3
-   ========================================================================== */
-
-/**
- * Lines with no attrition, and a way to give them some.
- *
- * "Display only part lines with Attrition = 0. Do not display part lines that
- * were marked as excluded in the previous step." — so the list empties itself
- * as the user works, which is the guideline's stated behaviour: "After attrition
- * is added with a value greater than 0, the corresponding part line is removed
- * from the Add Attrition dialog."
- */
 export function AddAttritionDialog({ open, cfg, lines, onClose, onSet }: {
   open: boolean; cfg: RunConfig; lines: BomLine[];
   onClose: () => void; onSet: (id: number, attrition: number) => void;
@@ -134,92 +86,6 @@ export function AddAttritionDialog({ open, cfg, lines, onClose, onSet }: {
    CONFIRM — leaving step 3
    ========================================================================== */
 
-/**
- * What continuing costs you.
- *
- * Two lists and one number: the lines about to become NO BID, the lines
- * carrying excess, and the Total Excess Amount "at the bottom-right of the
- * dialog". Both lists matter for different reasons — one is work you are giving
- * up on, the other is money you are about to commit to material you will not
- * use.
- */
-export function ConfirmQuoteDialog({ open, lines, onClose, onAccept }: {
-  open: boolean; lines: BomLine[]; onClose: () => void; onAccept: () => void;
-}) {
-  const willNoBid = lines.filter(l => !l.excluded && !l.supplier);
-  const withExcess = lines.filter(l => l.excessAmt > 0);
-  const totalExcess = withExcess.reduce((n, l) => n + l.excessAmt, 0);
-
-  const noBidCols: ColumnSpec<BomLine>[] = [
-    { field: 'part', title: 'Part', role: 'ident' },
-    { field: 'revision', title: 'Rev', role: 'code', width: 80 },
-    { field: 'description', title: 'Description', role: 'text' },
-    { field: 'mfg', title: 'MFG', role: 'text', width: 160,
-      widthNote: 'Manufacturer names run long.' },
-    { field: 'qty', title: 'Qty', role: 'number', width: 90 },
-  ];
-  const excessCols: ColumnSpec<BomLine>[] = [
-    { field: 'part', title: 'Part', role: 'ident' },
-    { field: 'supplier', title: 'Supplier', role: 'text', width: 140 },
-    { field: 'orderQty', title: 'Order Qty', role: 'number', width: 110,
-      render: l => l.orderQty.toLocaleString() },
-    { field: 'excessQty', title: 'Excess Qty', role: 'number', width: 116,
-      render: l => l.excessQty.toLocaleString() },
-    { field: 'excessAmt', title: 'Excess AMT', role: 'money', width: 130,
-      render: l => money(l.excessAmt) },
-  ];
-
-  return (
-    <Dialog
-      open={open} onClose={onClose} size="xl"
-      title="Confirm before continuing"
-      actions={<>
-        <Button onClick={onClose}>Back to Rework</Button>
-        <Button variant="filled" onClick={onAccept}>Accept &amp; Continue</Button>
-      </>}
-    >
-      <section className="vy-run-section">
-        <h3 className="vy-field-group-title">
-          Will become NO BID{willNoBid.length > 0 && <span className="vy-count-badge">{willNoBid.length}</span>}
-        </h3>
-        <p className="vy-hint">
-          These lines have no supplier selected. Continuing sets their status to NO BID.
-        </p>
-        <MiniTable data={willNoBid} columns={noBidCols}
-                   empty={<div className="vy-empty-inline"><strong>Every line has a supplier.</strong> Nothing
-                          will be dropped.</div>} />
-      </section>
-
-      <section className="vy-run-section">
-        <h3 className="vy-field-group-title">
-          Excess{withExcess.length > 0 && <span className="vy-count-badge">{withExcess.length}</span>}
-        </h3>
-        <p className="vy-hint">
-          Material ordered beyond what the build consumes, mostly because a supplier's minimum
-          order exceeds what you need.
-        </p>
-        <MiniTable data={withExcess} columns={excessCols}
-                   empty={<div className="vy-empty-inline"><strong>No excess.</strong></div>} />
-        <p className="vy-run-total">
-          Total Excess Amount: <strong>{money(totalExcess)}</strong>
-        </p>
-      </section>
-    </Dialog>
-  );
-}
-
-/* =============================================================================
-   ADD: PACKAGES — step 4
-   ========================================================================== */
-
-/**
- * Adds a packaging line to the quotation.
- *
- * "The Select Part dropdown list displays only parts that belong to the same
- * Customer as the current quotation, and are created with Part Source =
- * Packaging." Description, MFG and MPN fill themselves from the chosen part and
- * are read-only; quantity, unit price and notes are the user's.
- */
 export function AddPackageDialog({ open, buildQty, onClose, onAdd }: {
   open: boolean;
   /** Needed to turn a per-board package quantity into a total. */

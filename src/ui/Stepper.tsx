@@ -13,7 +13,8 @@
  * Each step states its own status to screen readers, so "where am I and what is
  * left" does not depend on seeing the tick marks.
  */
-export function Stepper({ steps, value, furthest = value, onChange, numbered = true }: {
+export function Stepper({ steps, value, furthest = value, onChange, numbered = true,
+                          showText = true }: {
   steps: { label: string; text?: string }[];
   value: number;
   /** Highest step reached. Steps beyond this are not yet reachable. */
@@ -25,6 +26,15 @@ export function Stepper({ steps, value, furthest = value, onChange, numbered = t
    * reads "① 1 - …", which looks like a rendering fault rather than a design.
    */
   numbered?: boolean;
+  /**
+   * Print each step's sentence under its label.
+   *
+   * OFF for a dialog that already prints the current step's sentence in its
+   * subtitle: the same words twice, 20px apart, cost 50px of a surface whose
+   * content did not fit. The sentence survives as the control's tooltip, so
+   * nothing is lost — it is just no longer said twice at once.
+   */
+  showText?: boolean;
 }) {
   return (
     <ol className="vy-stepper">
@@ -45,11 +55,12 @@ export function Stepper({ steps, value, furthest = value, onChange, numbered = t
               aria-current={state === 'current' ? 'step' : undefined}
               disabled={!reachable}
               onClick={() => reachable && onChange?.(i)}
-              title={
+              title={[
                 i === value ? `Current step: ${s.label}`
                   : reachable ? `Go back to ${s.label}`
-                  : `${s.label} — not reached yet`
-              }
+                  : `${s.label} — not reached yet`,
+                !showText && s.text ? s.text : '',
+              ].filter(Boolean).join(' — ')}
             >
               <span className="vy-step-dot" aria-hidden>
                 {state === 'done'
@@ -61,7 +72,7 @@ export function Stepper({ steps, value, furthest = value, onChange, numbered = t
               </span>
               <span className="vy-step-labels">
                 <span className="vy-step-label">{s.label}</span>
-                {s.text && <span className="vy-step-text">{s.text}</span>}
+                {showText && s.text && <span className="vy-step-text">{s.text}</span>}
               </span>
               <span className="vy-sr-only">
                 {state === 'done' ? ' — completed' : state === 'current' ? ' — current step' : ' — not reached yet'}

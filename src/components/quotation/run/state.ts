@@ -82,10 +82,14 @@ export const STEP1_REQUIRED = ['assemblyPartNumber', 'partRev', 'partDesc'] as c
  * Load Existing Assembly has one thing to get wrong — "Select assembly first!"
  * — because everything else about the assembly comes with it.
  */
+export function missingStep1(cfg: RunConfig): readonly string[] {
+  if (cfg.action === 'load-existing') return cfg.assembly ? [] : ['assembly'];
+  return STEP1_REQUIRED.filter(k => !String(cfg[k]).trim());
+}
+
 export function step1Error(cfg: RunConfig): string | null {
-  if (cfg.action === 'load-existing') {
-    return cfg.assembly ? null : 'Select assembly first!';
-  }
-  const missing = STEP1_REQUIRED.filter(k => !String(cfg[k]).trim());
-  return missing.length ? `Please input information for ${missing.join(', ')}` : null;
+  const missing = missingStep1(cfg);
+  if (!missing.length) return null;
+  if (cfg.action === 'load-existing') return 'Select assembly first!';
+  return `Please input information for ${missing.join(', ')}`;
 }

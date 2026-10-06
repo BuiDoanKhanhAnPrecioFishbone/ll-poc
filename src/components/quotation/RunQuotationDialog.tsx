@@ -7,16 +7,16 @@ import { useToast } from '../../ui/Toast';
 import type { Quotation } from '../../data/quotations';
 import { ME } from '../../data/queues';
 import {
-  buildBomLines, runQuote, totalQtyOf, type BomLine, type LineStatus,
+  buildBomLines, runQuote, totalQtyOf, money, type BomLine, type LineStatus,
 } from '../../data/bom';
 import { StepConfigBom } from './run/StepConfigBom';
 import { StepReviewBom } from './run/StepReviewBom';
 import { StepQuoting } from './run/StepQuoting';
 import { StepSummary } from './run/StepSummary';
 import {
-  ExcludedPartsDialog, AddAttritionDialog, ConfirmQuoteDialog, AddPackageDialog,
+  AddAttritionDialog, AddPackageDialog,
 } from './run/dialogs';
-import { step1Error, type RunConfig } from './run/state';
+import { step1Error, missingStep1, type RunConfig } from './run/state';
 
 /**
  * Run Quotation — Quick Quote.
@@ -57,12 +57,23 @@ const STEPS = [
   { label: '4 - Summary',    text: 'Cost estimation and submission' },
 ];
 
-export function RunQuotationDialog({ q, onClose }: { q: Quotation; onClose: () => void }) {
+export function RunQuotationDialog({ q, onClose, resume }: {
+  q: Quotation; onClose: () => void;
+  /**
+   * A draft to open on, chosen on the record rather than in here.
+   *
+   * "Redirect to Step 3 - Quoting for the selected draft." Steps 1 and 2 are
+   * skipped because the draft already holds their output — the BoM was
+   * configured and reviewed in the sitting that saved it. `furthest` starts at
+   * 2 as well, so stepping back to look at the parsed BoM is still allowed.
+   */
+  resume?: DraftQuote;
+}) {
   const toast = useToast();
-  const [step, setStep] = useState(0);
-  const [furthest, setFurthest] = useState(0);
+  const [step, setStep] = useState(resume ? 2 : 0);
+  const [furthest, setFurthest] = useState(resume ? 2 : 0);
 
-  const [cfg, setCfg] = useState<RunConfig>(() => ({
+  const [cfg, setCfg] = useState<RunConfig>(() => resume ? resume.cfg : ({
     action: 'import-new',
     bomOption: 'current',
     attachment: 'BOM_RevC_2026-08-12.xlsx',
@@ -80,20 +91,20 @@ export function RunQuotationDialog({ q, onClose }: { q: Quotation; onClose: () =
     buildQty: 1,
     attritionSet: 1,
     provider: 'Nexar',
-  }));
+  }) as RunConfig);
   const set = (patch: Partial<RunConfig>) => setCfg(c => ({ ...c, ...patch }));
 
-  const [lines, setLinesState] = useState<BomLine[]>(() => buildBomLines());
+  const [lines, setLinesState] = useState<BomLine[]>(() => resume ? resume.lines : buildBomLines());
   const setLines = (fn: (l: BomLine[]) => BomLine[]) => setLinesState(fn);
 
-  const [hasRun, setHasRun] = useState(false);
-  const [runVersion, setRunVersion] = useState(0);
-  const [runDate, setRunDate] = useState('');
+  const [hasRun, setHasRun] = useState(Boolean(resume?.hasRun));
+  const [runVersion, setRunVersion] = useState(resume?.runVersion ?? 0);
+  const [runDate, setRunDate] = useState(resume?.runDate ?? '');
 
-  const [excludedOpen, setExcludedOpen] = useState(false);
   const [attritionOpen, setAttritionOpen] = useState(false);
-  const [confirmOpen, setConfirmOpen] = useState(false);
   const [packageOpen, setPackageOpen] = useState(false);
+  /* Which step-1 fields failed, so the fields themselves can say so. */
+  const [invalid, setInvalid] = useState<readonly string[]>([]);
 
   const goTo = (i: number) => { setStep(i); setFurthest(f => Math.max(f, i)); };
 
@@ -102,14 +113,36 @@ export function RunQuotationDialog({ q, onClose }: { q: Quotation; onClose: () =
     /* Each flow has its own message and the guideline gives both verbatim —
        "Please input information for assemblyPartNumber, partRev, partDesc" and
        "Select assembly first!". Quoted rather than rewritten, because a tester
-       matching the sheet against the build is looking for those strings. */
+       matching the sheet against the build is looking for those strings.
+
+       THE MESSAGE IS THEIRS; WHERE IT POINTS IS OURS. Those three field names
+       are camel-case internals, and the fields they name sat 648px below the
+       fold — so the toast named three things the user had never seen, nothing
+       was marked, and the dialog did not move. Now the fields carry the error
+       and the first one takes focus; the toast still says their sentence. */
     const err = step1Error(cfg);
-    if (err) { toast.error(err); return; }
+    if (err) {
+      setInvalid(missingStep1(cfg));
+      toast.error(err);
+      /* After the render that marks them — the field does not exist as an
+         invalid control until React has painted it. */
+      requestAnimationFrame(() => {
+        const first = document.querySelector<HTMLElement>('.vy-run [data-invalid] input, .vy-run [data-invalid] textarea, .vy-run [data-invalid] .k-input-inner');
+        first?.focus();
+        first?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      });
+      return;
+    }
+    setInvalid([]);
     goTo(1);
   }
 
-  /* ---- Step 2 -> 3 ------------------------------------------------------- */
-  function leaveStep2() { setExcludedOpen(true); }
+  /* ---- Step 2 -> 3 -------------------------------------------------------
+     It used to open "Review Excluded Parts" — a modal on top of a modal, whose
+     content was a count and a list the step behind it was already showing. The
+     exclusions now live on step 2 as a filter you can press at any time, so the
+     way forward is just forward. */
+  function leaveStep2() { goTo(2); }
 
   /* ---- The run ----------------------------------------------------------- */
   function run() {
@@ -190,52 +223,54 @@ export function RunQuotationDialog({ q, onClose }: { q: Quotation; onClose: () =
     });
     toast.success('Save draft quotation successfully!');
     toast.success(replaced
-      ? `Draft for ${assemblyName} updated. Reopen Run Quotation and choose "Continue from drafts" to pick it up. Held in this browser session only.`
-      : `Draft saved for ${assemblyName}. Reopen Run Quotation and choose "Continue from drafts" to pick it up. Held in this browser session only.`);
+      ? `Draft for ${assemblyName} updated. Pick it up from Run Quotation → Resume draft on the record. Held in this browser session only.`
+      : `Draft saved for ${assemblyName}. Pick it up from Run Quotation → Resume draft on the record. Held in this browser session only.`);
   }
 
-  /* ---- Resume a draft ----------------------------------------------------
-     "Redirect to Step 3 - Quoting for the selected draft." Steps 1 and 2 are
-     skipped because the draft already holds their output — the BoM was
-     configured and reviewed in the sitting that saved it.
-
-     `furthest` is set to 2 as well, so the stepper shows steps 1 and 2 as
-     reachable rather than as work still to do. Someone who resumes a draft and
-     then wants to look at the parsed BoM should be able to step back to it;
-     leaving furthest at 0 would strand them on step 3. */
-  function continueDraft(d: DraftQuote) {
-    setCfg(d.cfg);
-    setLinesState(d.lines);
-    setHasRun(d.hasRun);
-    setRunVersion(d.runVersion);
-    setRunDate(d.runDate);
-    setStep(2);
-    setFurthest(f => Math.max(f, 2));
-    toast.success(`Resumed the draft for ${d.assemblyName}, saved ${d.createdDate.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}.`);
-  }
-
-  /* ---- Step 3 -> 4 ------------------------------------------------------- */
-  function acceptAndContinue() {
-    /* "If the user continues, all unselected BOM lines are updated to
-       Status = NO BID accordingly." */
+  /* ---- Step 3 -> 4 -------------------------------------------------------
+     ONE BUTTON, NO CONFIRMATION DIALOG. This was a modal that asked "are you
+     sure" about a fact the footer can simply state: how many lines will be
+     quoted, what they come to, and how many have no supplier. The rule the
+     dialog existed to enforce is unchanged — "If the user continues, all
+     unselected BOM lines are updated to Status = NO BID accordingly" — it just
+     happens on the press, under a button that says what it does. */
+  function generateQuotation() {
     setLines(ls => ls.map(l =>
       (!l.excluded && !l.supplier ? { ...l, status: 'NO BID' as LineStatus } : l)));
-    setConfirmOpen(false);
     goTo(3);
   }
 
-  const excluded = lines.filter(l => l.excluded);
+  const quotable = lines.filter(l => !l.excluded);
+  const noSupplier = quotable.filter(l => !l.supplier).length;
+  const quotedTotal = quotable.reduce((sum, l) => sum + (l.amount ?? 0), 0);
   const canLeaveStep3 = hasRun;
 
   return (
     <>
       <Dialog
         open size="xl"
+        /* MAXIMISED, with Restore down still there. The customer's reviewers
+           called this dialog small beside their own window, and the measurement
+           agreed: at 1920 it used 61% of the width and still asked for 625px of
+           scrolling. Their users are cost estimators reading a 21-column grid —
+           screen is the material this flow is made of. */
+        startMaximised
         title={`Run Quotation — RFQ${q.no}`}
         subtitle={STEPS[step].text}
         onClose={onClose}
         actions={<>
           <Button onClick={onClose}>Cancel</Button>
+
+          {/* WHAT THE CONFIRMATION DIALOG USED TO SAY, said in the footer beside
+              the button that acts on it. A modal asking "are you sure" about
+              three numbers is a modal that could have printed the numbers. */}
+          {step === 2 && hasRun && (
+            <span className="vy-run-footnote" aria-live="polite">
+              <strong>{quotable.length}</strong> {quotable.length === 1 ? 'line' : 'lines'}
+              {' · '}{money(quotedTotal)}
+              {noSupplier > 0 && <> · <strong>{noSupplier}</strong> without a supplier → NO BID</>}
+            </span>
+          )}
 
           {/* Save draft appears on steps 3 and 4 only, which is where the
               guideline puts it — those are the steps holding work worth losing. */}
@@ -245,22 +280,13 @@ export function RunQuotationDialog({ q, onClose }: { q: Quotation; onClose: () =
             Previous
           </Button>
 
-          {/* Continue from drafts has no Next. The way forward is the Continue
-              button on the row the user chooses, because WHICH draft is the
-              question this step is asking — a Next here would have to either
-              guess a row or refuse, and refusing through a disabled primary
-              button teaches nothing. Hidden rather than disabled: a disabled
-              Next reads as "you have not finished this step yet", which is the
-              wrong story when the step is finished by a control beside it. */}
-          {step === 0 && cfg.action !== 'resume-draft' && (
-            <Button variant="filled" onClick={leaveStep1}>Next</Button>
-          )}
+          {step === 0 && <Button variant="filled" onClick={leaveStep1}>Next</Button>}
           {step === 1 && <Button variant="filled" onClick={leaveStep2}>Next</Button>}
           {step === 2 && (
             <Button variant="filled" disabled={!canLeaveStep3}
                     title={canLeaveStep3 ? undefined : 'Run the quote before continuing'}
-                    onClick={() => setConfirmOpen(true)}>
-              Next
+                    onClick={generateQuotation}>
+              Generate Quotation
             </Button>
           )}
           {step === 3 && (
@@ -274,7 +300,8 @@ export function RunQuotationDialog({ q, onClose }: { q: Quotation; onClose: () =
         </>}
       >
         <div className="vy-run">
-          <Stepper steps={STEPS} value={step} furthest={furthest} onChange={goTo} numbered={false} />
+          <Stepper steps={STEPS} value={step} furthest={furthest} onChange={goTo}
+                   numbered={false} showText={false} />
 
           <div className="vy-run-context">
             <span className="vy-ident">RFQ{q.no}</span>
@@ -283,7 +310,7 @@ export function RunQuotationDialog({ q, onClose }: { q: Quotation; onClose: () =
             <span className="vy-code">{q.rfqType}</span>
           </div>
 
-          {step === 0 && <StepConfigBom q={q} cfg={cfg} set={set} onContinueDraft={continueDraft} />}
+          {step === 0 && <StepConfigBom q={q} cfg={cfg} set={set} invalid={invalid} />}
           {step === 1 && <StepReviewBom cfg={cfg} set={set} lines={lines} setLines={setLines} />}
           {step === 2 && (
             <StepQuoting
@@ -305,23 +332,11 @@ export function RunQuotationDialog({ q, onClose }: { q: Quotation; onClose: () =
         </div>
       </Dialog>
 
-      <ExcludedPartsDialog
-        open={excludedOpen} lines={excluded}
-        onClose={() => setExcludedOpen(false)}
-        onConfirm={() => { setExcludedOpen(false); goTo(2); }}
-      />
-
       <AddAttritionDialog
         open={attritionOpen} cfg={cfg} lines={lines}
         onClose={() => setAttritionOpen(false)}
         onSet={(id, attrition) =>
           setLines(ls => ls.map(l => (l.id === id ? { ...l, attrition } : l)))}
-      />
-
-      <ConfirmQuoteDialog
-        open={confirmOpen} lines={lines}
-        onClose={() => setConfirmOpen(false)}
-        onAccept={acceptAndContinue}
       />
 
       <AddPackageDialog

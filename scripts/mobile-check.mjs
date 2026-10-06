@@ -458,9 +458,14 @@ const SELFTEST = `(() => {
    Nothing is sa" and then the edge of the box — on a route this check had just
    called clean. A dialog is a layout like any other, so the same four checks
    run again with each overlay open. */
+/* RUN QUOTATION IS IN THIS LIST AS OF 6 OCT, and it is the reason the list is
+   worth keeping honest: the wizard was rebuilt that day — maximised, a
+   three-region step 1, grids that scroll inside their frame — and every check
+   stayed green throughout, because no check had ever opened it. A sweep that
+   cannot reach a surface says nothing about that surface. */
 const OVERLAYS = [
   { name: 'dialog', open: `(async()=>{const b=[...document.querySelectorAll('button')]
-      .find(x=>/^(New Part|Add New|Upload BoM|Create packing list|Add manufacturer)$/.test(x.textContent.trim()));
+      .find(x=>/^(New Part|Add New|Upload BoM|Create packing list|Add manufacturer|Run Quotation)$/.test(x.textContent.trim()));
       if(!b) return false; b.click(); await new Promise(r=>setTimeout(r,900)); return true;})()` },
   { name: 'column chooser', open: `(async()=>{const b=[...document.querySelectorAll('button')]
       .find(x=>/^Columns/.test(x.textContent.trim()));
