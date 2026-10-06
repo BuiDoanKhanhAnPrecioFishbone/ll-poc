@@ -1175,18 +1175,23 @@
 
 /* ---- The facts carried from step to step -------------------------------- */
 .vy-quote-context {
-  display: flex; flex-wrap: wrap; gap: var(--vy-space-5) var(--vy-space-8);
-  padding: var(--vy-space-6);
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: var(--vy-space-4) var(--vy-space-8);
+  padding: var(--vy-space-4) var(--vy-space-6);
   background: var(--vy-surface-app);
   border: 1px solid var(--vy-border);
   border-radius: var(--vy-shape-md);
 }
-.vy-quote-fact { display: flex; flex-direction: column; gap: var(--vy-space-1); min-width: 0; }
+/* Label above value, and MEASURED BOTH WAYS on 6 Oct: beside it, the two wide
+   facts pushed the strip from one row to two and it grew to 93px. Stacked it is
+   76px, and with the padding below, 60px. */
+.vy-quote-fact { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .vy-quote-fact[data-wide] { flex: 1 1 var(--vy-quote-fact-wide); }
 .vy-quote-fact--input { min-width: var(--vy-quote-qty-w); }
 .vy-quote-fact-label {
   font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .05em;
   color: var(--vy-on-surface-subtle); font-weight: var(--vy-weight-medium);
+  white-space: nowrap;
 }
 .vy-quote-fact-value { font-size: var(--vy-text-base); color: var(--vy-on-surface-strong); }
 
@@ -1218,6 +1223,23 @@
 }
 .vy-read-value[data-locked] { background: var(--vy-surface-sunken); border-color: var(--vy-border-strong); color: var(--vy-on-surface-muted); }
 .vy-read-value[data-empty] { color: var(--vy-on-surface-subtle); font-style: italic; }
+
+/* ---- The reference panel reads, it does not pretend to be a form ----------
+   Eight inherited values, each in a box the user cannot type into, ran the
+   panel 696px long inside 624px — so it grew a scrollbar, and on macOS that
+   scrollbar is invisible until it moves. The customer reported it as "I cannot
+   scroll to see all the attachments".
+
+   This is the record screen's own rule, which this panel had never followed:
+   "Read mode renders VALUES, not disabled inputs. The live screen puts every
+   field in a read-only Input, so a record you are merely looking at reads as a
+   broken form." Values here; boxes only on the three fields this step can
+   actually change. */
+.vy-run-ref .vy-read-value {
+  min-height: 0; padding: 0; background: none; border: 0; border-radius: 0;
+}
+.vy-run-ref .vy-read-value[data-locked] { background: none; }
+.vy-run-ref .vy-quote-config-grid { gap: var(--vy-space-5); }
 
 .vy-attachments { margin-top: var(--vy-space-7); }
 .vy-attachments ul { list-style: none; margin: var(--vy-space-3) 0 0; padding: 0; display: flex; flex-direction: column; gap: var(--vy-space-2); }

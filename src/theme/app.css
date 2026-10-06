@@ -523,6 +523,15 @@
    than a sliver, and the step keeps its shape while rows come and go. */
 .vy-run-step > .vy-minitable-k { flex: 1 1 auto; min-height: 220px; overflow: auto; }
 
+/* Tighter rows in the wizard's grids, on a mouse only. A step-3 row carries
+   three inline controls, so it stood 59px tall and six rows filled the grid; a
+   cost estimator reading a 20-50 line BoM wants the rows, not the air around
+   them. Left alone on a coarse pointer, where the row height IS the touch
+   target. */
+@media (pointer: fine) {
+  .vy-run-step > .vy-minitable-k .k-grid td { padding-block: var(--vy-space-2); }
+}
+
 /* ON A PHONE THE DIALOG SCROLLS AGAIN, and this block sits AFTER the rules it
    overrides because that is the only reason it wins — written above them it
    lost on source order, and the phone sweep kept reporting Assembly Details
@@ -1118,11 +1127,22 @@
    stretched this one to 104px — the second name collision in two days, which is
    why `npm run css:orphans` now also reports duplicated class names. */
 .vy-queue-bell.is-active { background: var(--vy-brand-subtle); color: var(--vy-brand-text-hover); }
+/* IT SITS IN THE FLOW BY DEFAULT, and pins to a corner only where something
+   has made room for it.
+
+   It was `position: absolute` for every caller, which works on the two icon
+   buttons that are `position: relative` and fails on the third: the quote
+   toolbar's filter chips are plain labels, so the badge skipped out to the
+   nearest positioned ancestor and painted a red "12" over the top-right corner
+   of the Run Quotation dialog. The customer saw it twice and asked about it
+   twice; I spent an hour reading it as a Kendo licence watermark, because that
+   is what a small red badge in the corner of a component usually is. A badge
+   that assumes a positioned parent escapes the first time it does not have one. */
 .vy-count-badge {
-  position: absolute; top: -2px; right: -2px;
   min-width: var(--vy-space-8); height: var(--vy-space-8);
   padding: 0 var(--vy-space-2);
-  display: grid; place-items: center;
+  margin-inline-start: var(--vy-space-2);
+  display: inline-grid; place-items: center; vertical-align: middle;
   background: var(--vy-danger); color: var(--vy-on-dark-fg);
   border-radius: var(--vy-radius-pill);
   font-size: var(--vy-text-2xs); font-weight: var(--vy-weight-bold);
@@ -1411,6 +1431,13 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
   width: var(--vy-space-11); height: var(--vy-space-11);
   background: none; border: 1px solid var(--vy-border); border-radius: var(--vy-radius-md);
   color: var(--vy-on-surface-muted); cursor: pointer; flex: 0 0 auto;
+}
+/* The two icon buttons that DO make room: both are `position: relative`, both
+   are square, and on both the count belongs on the corner rather than beside a
+   label there is no room for. */
+.vy-funnel .vy-count-badge,
+.vy-queue-bell .vy-count-badge {
+  position: absolute; top: -2px; right: -2px; margin-inline-start: 0;
 }
 .vy-funnel:hover { background: var(--vy-surface-app); color: var(--vy-on-surface-strong); }
 .vy-funnel[aria-expanded="true"] { background: var(--vy-brand-subtle); border-color: var(--vy-brand-boundary-light); color: var(--vy-brand-text-hover); }

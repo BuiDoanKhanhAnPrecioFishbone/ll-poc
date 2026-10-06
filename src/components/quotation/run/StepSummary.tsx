@@ -103,6 +103,12 @@ export function StepSummary({ cfg, lines, run, onAddPackage, setLines }: {
       />
 
       <MiniTable data={shown} columns={columns} freeze={3} rowTone={rowTone} empty={<NoRecords />} />
+        /* NO PER-COLUMN FILTER ROW. The step already carries a search box and
+           the filters that matter for it, so the grid's own row filtered the
+           same rows a second way and cost 48px of a grid the customer told us
+           was too short. The guideline asks for filter cells on the Part
+           record's BoM Components tab; it does not ask for them here. */
+        filterable={false}
     </div>
   );
 }

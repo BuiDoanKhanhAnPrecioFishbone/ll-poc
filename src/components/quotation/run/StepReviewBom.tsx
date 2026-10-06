@@ -146,6 +146,12 @@ export function StepReviewBom({ cfg, set, lines, setLines }: {
           in front of them, which would be useless scrolled out of view. */}
       <MiniTable
         data={shown}
+        /* NO PER-COLUMN FILTER ROW. The step already carries a search box and
+           the filters that matter for it, so the grid's own row filtered the
+           same rows a second way and cost 48px of a grid the customer told us
+           was too short. The guideline asks for filter cells on the Part
+           record's BoM Components tab; it does not ask for them here. */
+        filterable={false}
         columns={columns}
         freeze={7}
         rowTone={l => (l.excluded ? 'excluded' : undefined)}
@@ -153,8 +159,8 @@ export function StepReviewBom({ cfg, set, lines, setLines }: {
       />
 
       <p className="vy-hint">
-        Lines with Part Source MAKE or MAKE/PHANT, and lines with no quantity, are excluded
-        automatically — they are made in-house, not bought. Tick one to quote it anyway.
+        MAKE and MAKE/PHANT lines, and lines with no quantity, are excluded automatically
+        — made in-house, not bought. Tick one to quote it anyway.
       </p>
     </div>
   );

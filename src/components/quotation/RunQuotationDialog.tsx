@@ -256,7 +256,12 @@ export function RunQuotationDialog({ q, onClose, resume }: {
            screen is the material this flow is made of. */
         startMaximised
         title={`Run Quotation — RFQ${q.no}`}
-        subtitle={STEPS[step].text}
+        /* The strip that used to sit under the stepper said RFQ number,
+           customer, application and type. The number is in the title above it,
+           and the other three are facts about the record rather than about this
+           step — so they ride in the subtitle, and the 50px the strip cost goes
+           to the grid, which is what a cost estimator is actually reading. */
+        subtitle={`${STEPS[step].text} · ${q.customer} · ${q.application} · ${q.rfqType}`}
         onClose={onClose}
         actions={<>
           <Button onClick={onClose}>Cancel</Button>
@@ -302,13 +307,6 @@ export function RunQuotationDialog({ q, onClose, resume }: {
         <div className="vy-run">
           <Stepper steps={STEPS} value={step} furthest={furthest} onChange={goTo}
                    numbered={false} showText={false} />
-
-          <div className="vy-run-context">
-            <span className="vy-ident">RFQ{q.no}</span>
-            <span>{q.customer}</span>
-            <span className="vy-code">{q.application}</span>
-            <span className="vy-code">{q.rfqType}</span>
-          </div>
 
           {step === 0 && <StepConfigBom q={q} cfg={cfg} set={set} invalid={invalid} />}
           {step === 1 && <StepReviewBom cfg={cfg} set={set} lines={lines} setLines={setLines} />}

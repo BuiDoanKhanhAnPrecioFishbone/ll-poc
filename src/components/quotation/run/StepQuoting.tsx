@@ -143,6 +143,12 @@ export function StepQuoting({ cfg, set, lines, setLines, hasRun, onRun, onApply,
 
       <MiniTable
         data={shown}
+        /* NO PER-COLUMN FILTER ROW. The step already carries a search box and
+           the filters that matter for it, so the grid's own row filtered the
+           same rows a second way and cost 48px of a grid the customer told us
+           was too short. The guideline asks for filter cells on the Part
+           record's BoM Components tab; it does not ask for them here. */
+        filterable={false}
         columns={columns}
         freeze={4}
         rowTone={l => rowTone(l, hasRun)}
