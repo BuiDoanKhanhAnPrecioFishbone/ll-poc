@@ -324,15 +324,24 @@ Ordered by what an answer unblocks, not by number.
 
 ### Blocking — work cannot start until you answer
 
-**One item, not three.** This table listed three until 12 Sep 2026; two of them
-had been answered and built days earlier and the table had not been updated.
-Correcting it matters more than it sounds: a client reading the old version
-would think three things were waiting on them, and would not know which one
-actually is.
+**Two items.** This table listed three until 12 Sep 2026; two of them had been
+answered and built days earlier and the table had not been updated. Correcting
+it matters more than it sounds: a client reading the old version would think
+three things were waiting on them, and would not know which one actually is. A
+second real one was added on 7 Oct.
 
 | # | Decision | Our assumption | What it unblocks |
 |---|---|---|---|
 | — | **Setting Form View** (deck slide 15) — no guideline section defines it. What is in scope? | Not built; four Configuration paths fall through to a placeholder | An entire screen archetype |
+| — | **`Upload Quote from Voyager`** — your running system offers it as the second Select Action on Run Quotation step 1. Your Testing Guideline names that action **`Load Exisiting Assembly`** instead. Are they the same flow under two labels, or does yours upload a previously exported **quote** file rather than load an assembly's BoM? | We built the guideline's two actions, `Import New BoM` and `Load Existing Assembly`. The phrase survives only in the guideline's own **Import File from Voyager** dialog, one level down | If it is a quote upload, it is a flow the mockup does not have at all — not a renamed one |
+
+**Why we cannot settle the second ourselves.** The only source for the label is a
+screenshot of the running system; selecting that radio on production would start
+work against live data, which we were not asked to do. An earlier extraction of
+your shipped JavaScript searched for `Upload Quote File` and `Upload BoM File`
+and found neither, so the bundle does not answer it either. A short screen
+recording of that one radio being selected would settle it without anyone
+touching a record.
 
 #### Closed, and why they are no longer here
 
