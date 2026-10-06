@@ -444,6 +444,9 @@
 .vy-dropzone strong { color: var(--vy-on-surface); font-size: var(--vy-text-md); }
 .vy-dropzone span { color: var(--vy-on-surface-subtle); font-size: var(--vy-text-sm); }
 .vy-hint { font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle); margin: var(--vy-space-2) 0 0; max-width: 56ch; }
+/* 56ch is right for a hint under a field; under a full-width table it forces a
+   one-sentence note into two rows of the table's height. */
+.vy-hint--wide { max-width: none; }
 .vy-inline-field { display: flex; align-items: center; gap: var(--vy-space-4); margin-top: var(--vy-space-5); font-size: var(--vy-text-base); color: var(--vy-on-surface-muted); }
 .vy-inline-field--stack { flex-direction: column; align-items: stretch; }
 
@@ -530,6 +533,25 @@
    target. */
 @media (pointer: fine) {
   .vy-run-step > .vy-minitable-k .k-grid td { padding-block: var(--vy-space-2); }
+
+  /* AND THE EDITORS INSIDE THE CELLS, which are what actually set the height.
+     A step-3 row stood 53px while its text cells were 16px: the difference was
+     an in-cell input 45px tall, carrying a form field's padding into a table.
+     Trimmed to a cell's worth, the row is ~40px and a 1512x945 screen shows
+     twelve lines of a BoM instead of eight. The customer quoting 20-50 lines
+     reads rows, not the air around them.
+
+     THE TYPE IS NOT TOUCHED. 13px stays 13px: making the rows shorter by making
+     the numbers harder to read would trade one complaint for a worse one. */
+  .vy-run-step > .vy-minitable-k .vy-cell-input { padding-block: var(--vy-space-1); }
+  /* The input ITSELF, which is where the height was: a `.vy-input` carries a
+     form's 8px block padding, and in a table that is the row height. */
+  .vy-run-step > .vy-minitable-k .vy-input { padding-block: var(--vy-space-1); }
+  .vy-run-step > .vy-minitable-k .vy-field-control { gap: 0; }
+  .vy-run-step > .vy-minitable-k .k-picker,
+  .vy-run-step > .vy-minitable-k .k-input { min-height: 0; }
+  .vy-run-step > .vy-minitable-k .k-picker .k-input-inner,
+  .vy-run-step > .vy-minitable-k .k-input .k-input-inner { padding-block: var(--vy-space-1); min-height: 0; }
 }
 
 /* ON A PHONE THE DIALOG SCROLLS AGAIN, and this block sits AFTER the rules it
@@ -1143,7 +1165,13 @@
   padding: 0 var(--vy-space-2);
   margin-inline-start: var(--vy-space-2);
   display: inline-grid; place-items: center; vertical-align: middle;
-  background: var(--vy-danger); color: var(--vy-on-dark-fg);
+  /* NEUTRAL BY DEFAULT. Red was inherited from the one caller that earns it —
+     the queue bell, where the number is work already late. On a filter the same
+     number answers "how many rows match", and "Missing Attrition 12" in red
+     reads as twelve errors rather than twelve rows; the customer read it that
+     way on sight. This is the palette the tab counts already use for the same
+     job: a count beside a label. */
+  background: var(--vy-surface-sunken); color: var(--vy-on-surface-muted);
   border-radius: var(--vy-radius-pill);
   font-size: var(--vy-text-2xs); font-weight: var(--vy-weight-bold);
   font-variant-numeric: tabular-nums;
@@ -1434,10 +1462,22 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
 }
 /* The two icon buttons that DO make room: both are `position: relative`, both
    are square, and on both the count belongs on the corner rather than beside a
-   label there is no room for. */
+   label there is no room for. On a corner, over an icon, the badge needs its
+   own ground to stay legible — so these two keep a filled palette. */
 .vy-funnel .vy-count-badge,
 .vy-queue-bell .vy-count-badge {
   position: absolute; top: -2px; right: -2px; margin-inline-start: 0;
+  background: var(--vy-brand); color: var(--vy-brand-on);
+}
+/* RED STAYS HERE AND ONLY HERE, because here it is true: the bell counts RFQs
+   that are already late, which is the one count in the system that is a
+   problem rather than a quantity. */
+.vy-queue-bell .vy-count-badge { background: var(--vy-danger); color: var(--vy-on-dark-fg); }
+
+/* A filter that is ON takes the emphasis its chip has, so the count agrees with
+   the control it belongs to rather than sitting neutral inside a lit chip. */
+.vy-quote-filters .vy-check:has(input:checked) .vy-count-badge {
+  background: var(--vy-brand-subtle-strong); color: var(--vy-brand-text-deep);
 }
 .vy-funnel:hover { background: var(--vy-surface-app); color: var(--vy-on-surface-strong); }
 .vy-funnel[aria-expanded="true"] { background: var(--vy-brand-subtle); border-color: var(--vy-brand-boundary-light); color: var(--vy-brand-text-hover); }

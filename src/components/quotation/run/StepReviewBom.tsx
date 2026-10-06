@@ -158,9 +158,10 @@ export function StepReviewBom({ cfg, set, lines, setLines }: {
         empty={<NoRecords />}
       />
 
-      <p className="vy-hint">
-        MAKE and MAKE/PHANT lines, and lines with no quantity, are excluded automatically
-        — made in-house, not bought. Tick one to quote it anyway.
+      {/* ONE LINE. Two lines of explanation under a table is two rows of the
+          table, and this sentence is read once and then never again. */}
+      <p className="vy-hint vy-hint--wide">
+        MAKE, MAKE/PHANT and zero-quantity lines are excluded automatically — tick one to quote it anyway.
       </p>
     </div>
   );
