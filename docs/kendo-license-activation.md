@@ -1,14 +1,30 @@
 # KendoReact — how licensing and activation work
 
-> **Update, 30 Aug 2026 — a licence key now exists.** The customer supplied one,
-> and it is stored locally in `.env.local` as `TELERIK_LICENSE` (gitignored via
-> `*.local`; it is not in the repository and must never be).
+> **Update, 6 October 2026 — the licence is valid, and activation now runs
+> itself.**
 >
-> **It activates nothing today.** This project installs no `@progress/*`
-> packages, so there is no Kendo component to watermark and nothing that reads
-> the variable. The key removes the *blocker* described in section 6 — it does
-> not by itself change a single pixel. Section 7 covers deployment for when the
-> migration is actually made.
+> The key the customer supplied on 30 August is a **KendoReact subscription
+> licence valid until 6 May 2029**, covering KendoReact 16.0.0 — the version
+> this project installs. Checked with `kendo-ui-license info`; nothing needs to
+> be asked of the customer.
+>
+> **It had never been activated here, and that was visible.** A small badge was
+> found painted over the top-right corner of the Run Quotation dialog — not in
+> the DOM, drawn by KendoReact itself. The 13 September note below says there
+> was no watermark; that was true then and is not true now, so take it as
+> dated rather than wrong.
+>
+> **`npm install` now activates it** through `scripts/activate-kendo-licence.mjs`
+> (wired as `postinstall`). It lifts `TELERIK_LICENSE` out of `.env.local` —
+> which only Vite reads — into the process environment the licensing tool reads,
+> and it **never fails an install**: CI has no key and the repository is public,
+> so an unlicensed install has to succeed. Activation patches
+> `node_modules/@progress/kendo-licensing`, so it has to run again after every
+> clean install, which is exactly why it belongs in `postinstall`.
+>
+> **Deployment still needs one manual step:** set `TELERIK_LICENSE` in the
+> Vercel dashboard. There it is already in the environment, and the script
+> passes it straight through.
 
 Prepared for the client, 25 Aug 2026, in answer to:
 

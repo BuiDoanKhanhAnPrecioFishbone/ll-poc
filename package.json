@@ -19,6 +19,7 @@
     "mobile:check": "node scripts/mobile-check.mjs",
     "focus:check": "node scripts/focus-check.mjs",
     "hover:check": "node scripts/hover-check.mjs",
+    "postinstall": "node scripts/activate-kendo-licence.mjs",
     "prepare": "git rev-parse --git-dir >/dev/null 2>&1 && git config core.hooksPath .githooks || true"
   },
   "dependencies": {
