@@ -7,6 +7,7 @@ import {
 import { orderBy, type SortDescriptor } from '@progress/kendo-data-query';
 import { SearchField } from './Field';
 import { ColumnChooser } from './ColumnChooser';
+import { Icon } from './icons';
 import { Pager } from './Pager';
 import { useMediaQuery, POINTER_COARSE } from './useMediaQuery';
 import { usePrefs } from './prefs';
@@ -38,6 +39,10 @@ export const ROW_H: Record<Density, number> = { compact: 28, comfortable: 36, re
    sitting on top of the next cell's link. */
 const SELECT_COL_W = 40;
 const SELECT_COL_W_TOUCH = 44;
+/* The View column. 44 on a finger because that is the touch target; 40 with a
+   mouse, matching the checkbox column beside it. */
+const VIEW_COL_W = 40;
+const VIEW_COL_W_TOUCH = 44;
 
 
 /**
@@ -157,7 +162,9 @@ export function DataGrid<T extends { id: string | number }>({
   /* Read during render, not in an effect: an effect would paint the desktop
      width first and correct it, and on a grid that is every column visibly
      shifting on load. */
-  const selectColW = useMediaQuery(POINTER_COARSE) ? SELECT_COL_W_TOUCH : SELECT_COL_W;
+  const coarse = useMediaQuery(POINTER_COARSE);
+  const selectColW = coarse ? SELECT_COL_W_TOUCH : SELECT_COL_W;
+  const viewColW = coarse ? VIEW_COL_W_TOUCH : VIEW_COL_W;
   const [search, setSearch] = useState('');
   /**
    * Column visibility is NOT held here.
@@ -186,25 +193,32 @@ export function DataGrid<T extends { id: string | number }>({
     return data.filter(r => searchFields.some(f => String(r[f] ?? '').toLowerCase().includes(n)));
   }, [data, search, searchFields]);
 
-  /* The first ident column becomes the open affordance. Every other cell stays
-     inert text so it can be selected and copied. */
-  const identField = visible.find(c => c.role === 'ident')?.field;
-
   /* One cell renderer for every column. The identifier column becomes the open
      affordance; every other cell stays inert text so it can be selected and
      copied — the rule `docs/table-patterns.md` states and the reason row-wide
      click targets were rejected. */
   const cellFor = (spec: ColumnSpec<T>) => (row: T) => {
-    if (spec.field === identField && !spec.render) {
-      const label = String(row[spec.field]);
-      if (rowHref) return <Link className="vy-cell-link vy-ident" to={rowHref(row)}>{label}</Link>;
-      if (onOpenRow) return (
-        <button type="button" className="vy-cell-link vy-ident" onClick={() => onOpenRow(row)}>
-          {label}
-        </button>
-      );
-    }
+    /* THE IDENTIFIER IS TEXT AGAIN, as of 13 October. It had been the link
+       since the row-click target was dropped; the customer has now answered
+       question B2 — the eye-icon column comes back and the number stops being
+       a link. It reads as a value and selects as one, which is what the people
+       copying part numbers out of this grid all day wanted from it. */
     return renderCell(spec, row);
+  };
+
+  /* One cell for the View column, as an anchor where the record has a route —
+     middle-click, open-in-new-tab and copy-link all still work, which is what
+     the identifier link was giving us and what a bare button would take away. */
+  const viewCell = (row: T) => {
+    const name = `View ${String((row as { id: unknown }).id)}`;
+    const glyph = <Icon name="eye" size={16} />;
+    if (rowHref) return <Link className="vy-view-btn" to={rowHref(row)} aria-label={name} title={name}>{glyph}</Link>;
+    return (
+      <button type="button" className="vy-view-btn" aria-label={name} title={name}
+              onClick={() => onOpenRow?.(row)}>
+        {glyph}
+      </button>
+    );
   };
 
   /* Search, then sort, then page — in that order, because sorting a page rather
@@ -452,6 +466,37 @@ export function DataGrid<T extends { id: string | number }>({
                         </td>
                       );
                     },
+                  }}
+                />
+              )}
+              {/* ---- The View column ------------------------------------
+                  BACK ON 13 OCTOBER, at the customer's request: "bring the eye
+                  icon button to row again, remove deep link in number column".
+                  That answers question B2, which this document had been
+                  carrying as our single most uncertain change.
+
+                  It sits AFTER the checkbox rather than at the very edge: the
+                  checkbox answers "which rows", which is a property of the row
+                  itself, and the eye is the first ACTION on it. Their live
+                  system has no selection column to order it against. One line
+                  to swap if they would rather have it first. */}
+              {(rowHref || onOpenRow) && (
+                <GridColumn
+                  field="__view"
+                  width={viewColW}
+                  sortable={false}
+                  title=" "
+                  cells={{
+                    headerCell: ({ thProps }: GridCustomHeaderCellProps) => (
+                      /* No `aria-sort`: this column holds buttons and cannot be
+                         ordered by, and "none" would claim it can. */
+                      <th {...kendoHeaderProps(thProps)}><span className="vy-sr-only">View</span></th>
+                    ),
+                    data: ({ dataItem, tdProps }: GridCustomCellProps) => (
+                      <td {...kendoDomProps(tdProps)} className="vy-td--view">
+                        {viewCell(dataItem as T)}
+                      </td>
+                    ),
                   }}
                 />
               )}

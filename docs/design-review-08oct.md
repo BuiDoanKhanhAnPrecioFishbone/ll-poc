@@ -98,6 +98,27 @@ auto collapse the menu navigation."*
 It is a count rather than a flag (`src/ui/dialogOpen.ts`): dialogs here stack
 three deep, and closing the innermost one must not uncollapse the shell.
 
+## 6. The eye column comes back — 13 October
+
+*"My client want to bring the eye icon button to row again, remove deep link in
+number column."* That answers open question 1, which this project had been
+carrying as its single most uncertain change since August.
+
+Built the same day. A **View** column on every list, after the selection
+checkbox; the identifier is plain text again. The control is an anchor wherever
+the record has a route, so middle-click, open-in-new-tab and copy-link survive —
+the one thing the identifier link was giving us. Each is named for its row,
+"View RFQ0000000358", not "View".
+
+**One defect on the way, worth recording.** The cell was `display: flex` to
+centre the icon, copying the selection column beside it. A flex `<td>` leaves
+table layout, and with two of them the body table and the header table — two
+separate auto-width tables — stopped agreeing: the MPN column measured 240px in
+the header and 40px in the body, every part number wrapped over four lines and
+rows stood at 72px. The cell is a table cell again and the button centres
+itself. The selection column still carries the same `display: flex`; it is
+alone in its table today, and worth changing the next time that table is opened.
+
 ---
 
 ## Not built, and why

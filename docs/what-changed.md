@@ -83,17 +83,22 @@ in the system. Compact fits roughly 60% more rows on a screen.
 
 ## 1.5 Opening a record
 
-**Before.** A leading column of eye icons — one column of width, on every row of
-every list.
+**Before, and again now.** A View column on every row, with your eye icon.
 
-**After.** The identifier opens the record. It costs no column, it reads as a
-link without explanation, and middle-click and open-in-new-tab work.
+**What happened in between.** We replaced it with a link on the identifier, on
+the argument that the column looked like a component default and that your
+planned "duplicate record (clone)" would not fit beside it. That was open
+question 1, and on **13 October you answered it: the eye column comes back and
+the number stops being a link.** It is your guideline's own answer and the one
+your users already know, so it is built.
 
-**Proposed, and standing against your Testing Guideline knowingly.** The
-guideline lists a "View Detail" column and your system has one. We think it is
-a component default rather than a decision — and your own notes plan a *second*
-row action ("duplicate record (clone)"), which an icon column does not survive.
-**This is open question 1.** If you want the column back, it comes back.
+**Kept from the detour.** The View control is an anchor, not a button, wherever
+the record has its own address — middle-click, open-in-new-tab and copy-link all
+still work. And each one is named for its row, so a screen reader reads "View
+RFQ0000000358" rather than twenty rows of "View".
+
+**Still open:** when clone ships, this column becomes two icons on every row.
+A trailing `⋯` menu is worth deciding before that, not after.
 
 > One thing this costs, and it is the reason we did not make the whole row
 > clickable instead: a drag to select text ends on the row, which fires the
@@ -335,9 +340,12 @@ Billing values — of which only `SHIPPED` is confirmed, from your own
 
 Full list in `docs/open-questions.md`. The ones that block work:
 
-1. **Row actions** — does the eye-icon column come back? (1.5)
+1. ~~**Row actions** — does the eye-icon column come back? (1.5)~~
+   **Answered 13 October: yes.** Built the same day; see 1.5.
 2. **Setting Form View** — how much of it is in scope.
 3. **Dark mode** — in this release or the next.
+4. **`Upload Quote from Voyager`** — your second Select Action on Run Quotation
+   step 1. Does it load an existing assembly's BoM, or upload a quote file?
 
 And five smaller ones raised by the 10 September re-read: the MPN lifecycle
 vocabulary, the Packing List fulfilment and billing vocabularies, the two words

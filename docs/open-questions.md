@@ -398,7 +398,25 @@ your own backlog. They need nothing from us.
 
 ---
 
-## 1. Where should row actions live?
+## 1. Where should row actions live? — ANSWERED: the eye column comes back
+
+**Answered 13 October 2026: (a).** *"Bring the eye icon button to row again,
+remove deep link in number column."* Built the same day: a View column on every
+list, and the identifier is plain text again.
+
+It is an anchor where the record has a route, so middle-click, open-in-new-tab
+and copy-link still work — that was the one thing the identifier link gave us
+that a bare button would have taken away. Each button is named for its row
+("View RFQ0000000358") rather than "View", because a screen reader moving down
+twenty rows learns nothing from twenty identical labels. It sits after the
+selection checkbox: the checkbox answers "which rows", the eye is the first
+action on one. One line to swap if you would rather have it first.
+
+**The clone question is still open, and is now sharper.** The reasoning below is
+left as it was written, because the second row action it warns about has not
+gone away — when "duplicate record (clone)" ships, that column becomes two
+icons on every row, and the trailing `⋯` menu is the thing to decide before it
+does, not after.
 
 **What we found.** Your Testing Guideline lists a **View Detail** column first
 on the Project Requirements list, and the live system has one — an eye icon on
@@ -426,12 +444,13 @@ it. The RFQ number is now the link — it costs no column, supports open-in-new-
 and leaves the row itself unclickable so text can still be selected and copied,
 which your estimators do daily.
 
-**What we need.** Your call on one of three:
-- **a)** Put the eye column back, as the guideline specifies.
+**What we needed.** Your call on one of three:
+- **a)** Put the eye column back, as the guideline specifies. ← **chosen, 13 Oct**
 - **b)** Leave it as it is — identifier links, no action column.
 - **c)** Plan a trailing `⋯` menu now, so clone and anything after it have a home.
 
-We would suggest (c), decided before clone ships rather than after.
+We suggested (c). You chose (a), which is your guideline's own answer and the
+one your users already know. (c) remains worth settling for clone.
 
 ---
 

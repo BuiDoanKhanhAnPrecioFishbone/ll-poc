@@ -1895,6 +1895,37 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
    why the misalignment survived. The header is centred in components.css, next
    to the rest of the Kendo grid. */
 .vy-td--select { display: flex; align-items: center; justify-content: center; }
+
+/* ---- The View column ------------------------------------------------------
+   Back on 13 October at the customer's request, answering question B2. The
+   button carries no label — the column is 40px wide and the eye is the live
+   system's own glyph — so every one is named for its row ("View RFQ0000000358")
+   rather than "View", which is what a screen reader moving down twenty rows
+   needs to hear. */
+/* NOT `display: flex` on the cell, which is what the select column does and
+   what cost an hour here: a flex `<td>` leaves table layout, so the body table
+   and the header table — separate tables, both auto-width — stopped agreeing
+   about column widths. The MPN column came out 240px in the header and 40px in
+   the body, wrapping every part number over four lines and standing the rows at
+   72px. The cell stays a table cell; the button centres itself. */
+.vy-td--view { text-align: center; }
+.vy-view-btn {
+  display: inline-grid; place-items: center; vertical-align: middle;
+  width: var(--vy-control-sm); height: var(--vy-control-sm);
+  border: 0; border-radius: var(--vy-radius-sm);
+  background: none; color: var(--vy-on-surface-subtle); cursor: pointer;
+}
+.vy-view-btn:hover { background: var(--vy-brand-subtle); color: var(--vy-brand-text-hover); }
+/* THE SAME KENDO INTRUSION the identifier link hit, and render:check caught it
+   within the hour: `.k-grid a { color: inherit }` ships at (0,1,1) and beats
+   `.vy-view-btn` at (0,1,0). So the View control came out grey on the five
+   screens that open a record through `onOpenRow` (a <button>) and in the cell's
+   inherited colour on Quotations, which opens through `rowHref` (an <a>) — one
+   control, two colours, split by an implementation detail no user can see.
+   (0,2,1) clears it without scoping to a screen. */
+.k-grid a.vy-view-btn { color: var(--vy-on-surface-subtle); }
+.k-grid a.vy-view-btn:hover { color: var(--vy-brand-text-hover); }
+.vy-view-btn:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
 /* The label's 24px target floor is right everywhere else, but inside a 28px
    compact row it would push the cell taller than the row. The row already gives
    the checkbox a full-height target here. */

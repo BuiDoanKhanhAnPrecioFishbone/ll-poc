@@ -65,6 +65,10 @@ export const ICONS: Record<string, string> = {
   /* The only directional glyph in the set, and it points DOWN because its one
      caller opens a menu below itself. */
   'chevron-down': 'M5.5 8 10 12.5 14.5 8',
+  /* The View glyph on a grid row. An outline eye, which is what the live system
+     uses and what the customer asked to have back on 13 October. Drawn as one
+     lens plus a pupil so it stays legible at 16px without a fill. */
+  eye: 'M2.5 10s3-5.5 7.5-5.5S17.5 10 17.5 10s-3 5.5-7.5 5.5S2.5 10 2.5 10M10 7.75a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5',
 };
 
 /**

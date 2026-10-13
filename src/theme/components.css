@@ -1561,6 +1561,7 @@
    takes it out of table layout, and the header row then lost the 4px that the
    checkbox's 40px target floor was contributing to its height. */
 .vy-grid-k .vy-td--select,
+.vy-grid-k .vy-td--view,
 .vy-grid-k .k-grid th:has(.vy-check) { text-align: center; padding-inline: 0; }
 .vy-grid-k .k-grid th:has(.vy-check) .vy-check { width: 100%; justify-content: center; }
 /* Selection is A TINT PLUS A BAR, and the bar is the part doing the work.
