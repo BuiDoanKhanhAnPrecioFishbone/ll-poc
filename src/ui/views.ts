@@ -60,8 +60,21 @@ export type SavedView = {
   id: string;
   name: string;
   isDefault: boolean;
-  /** Which fields the filter panel shows — chosen on the Filter tab. */
-  fields: string[];
+  /**
+   * The filter VALUES this view applies — chosen on the Filter tab.
+   *
+   * THIS REPLACED A LIST OF FIELD NAMES on 13 October. The tab used to decide
+   * which fields the filter toolbar shows, and the meeting called that wrong:
+   * "Setting → Filter is for view … allow to select value inside that panel
+   * then save as view". A view is a saved question — Active parts for Cerelogic,
+   * overdue RFQs — and the answer to that question is values, not a list of
+   * controls.
+   *
+   * The toolbar now offers every filter field the screen has, which is also
+   * what the live system does and what change 1.4 of the client document
+   * promises: "behind a funnel, all fields at once".
+   */
+  values: FilterValues;
   /** Which columns the grid shows, in order. */
   columns: ViewColumn[];
   /** Applied outermost-first, as the list is ordered. */

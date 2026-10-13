@@ -3,7 +3,8 @@ import { Dialog as KendoDialog, DialogActionsBar } from '@progress/kendo-react-d
 import { TabStrip, TabStripTab } from '@progress/kendo-react-layout';
 import * as RRadio from '@radix-ui/react-radio-group';
 import { DialogDismiss } from './dismiss';
-import { cloneElement, createContext, type ReactNode, useContext, useId, useMemo, useRef, useState } from 'react';
+import { markDialogOpen } from './dialogOpen';
+import { cloneElement, createContext, type ReactNode, useContext, useEffect, useId, useMemo, useRef, useState } from 'react';
 
 /* =============================================================================
    Radix primitives, styled from tokens.
@@ -53,11 +54,18 @@ const DialogDepth = createContext(0);
 
 
 export function Dialog({ open, onClose, title, subtitle, children, actions, size = 'md',
-                         startMaximised = false }: {
+                         startMaximised = size !== 'md' }: {
   open: boolean; onClose: () => void; title: string; subtitle?: ReactNode;
   children: ReactNode; actions?: ReactNode; size?: 'md' | 'lg' | 'xl';
   /**
    * Open filling the screen, with Restore down still offered.
+   *
+   * DEFAULTS TO TRUE FOR `lg` AND `xl` SINCE 13 OCTOBER — asked for at the
+   * meeting: "open one modal/dialog now open full size first". Those two sizes
+   * are the record and work surfaces: a part, an MPN, a BoM comparison, Run
+   * Quotation. `md` is the question-shaped dialog — a confirmation, a short
+   * form — and one that fills a 27-inch screen to ask "are you sure" is a worse
+   * answer than the one it replaced.
    *
    * For a dialog that is a WORK SURFACE rather than a question. Run Quotation
    * carries a 21-column grid and four sections of form; measured on 6 Oct it
@@ -69,6 +77,13 @@ export function Dialog({ open, onClose, title, subtitle, children, actions, size
   startMaximised?: boolean;
 }) {
   const [maximised, setMaximised] = useState(startMaximised);
+
+  /* THE NAVIGATION COLLAPSES WHILE A DIALOG IS OPEN, also asked for on
+     13 October. A maximised dialog covers the sidebar anyway, and leaving it
+     expanded underneath means the shell re-flows when the dialog closes. The
+     shell cannot see this component — it is a sibling of the portal — so the
+     fact is published to the one shared signal in ui/dialogOpen.ts. */
+  useEffect(() => (open ? markDialogOpen() : undefined), [open]);
   /* A dialog reopens at its normal size. Carrying "maximised" across two
      unrelated dialogs would surprise whoever opens the next one.
 

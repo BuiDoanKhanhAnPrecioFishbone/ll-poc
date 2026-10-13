@@ -1,3 +1,4 @@
+import { useAnyDialogOpen } from '../ui/dialogOpen';
 import { useEffect, useMemo, useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { liveNav, reviewPages } from '../data/sitemap';
@@ -32,7 +33,14 @@ import { useToast } from '../ui/Toast';
 
 export function AppShell() {
   const toast = useToast();
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setUserCollapsed] = useState(false);
+  /* Collapsed EITHER because the user said so, or because a dialog is open —
+     13 October: "auto collapse the menu navigation". One state, so the two
+     cannot disagree, and the user's own choice is what comes back when the
+     dialog closes. */
+  const dialogOpen = useAnyDialogOpen();
+  const navCollapsed = collapsed || dialogOpen;
+  const setCollapsed = setUserCollapsed;
   const { pathname } = useLocation();
 
   /* Which nav group is open. Measured at 1024x768: the fully-expanded nav was
@@ -90,7 +98,7 @@ export function AppShell() {
   }, []);
 
   return (
-    <div className="vy-shell" data-collapsed={collapsed} data-nav-open={navOpen}>
+    <div className="vy-shell" data-collapsed={navCollapsed} data-nav-open={navOpen}>
       <a className="vy-skip" href="#vy-main">Skip to content</a>
       {/* ---- Sidebar: persistent, not a drawer -----------------------------
           The production app hides all 51 destinations behind a hamburger, so
@@ -107,7 +115,7 @@ export function AppShell() {
             existing one rather than inventing a placeholder to replace it. */}
         <div className="vy-brand">
           <div className="vy-brand-mark" aria-hidden>V</div>
-          {!collapsed && (
+          {!navCollapsed && (
             <div className="vy-brand-text">
               <strong>VOYAGER IQ</strong>
               <span>Linh Long Engineering</span>
@@ -126,20 +134,20 @@ export function AppShell() {
                 <div className="vy-nav-group vy-nav-group--leaf" key={g.title}>
                   <NavLink to={i.path} end={i.path === '/'}
                            className={({ isActive }) => 'vy-nav-item' + (isActive ? ' is-active' : '')}
-                           title={collapsed ? i.title : i.hint}>
+                           title={navCollapsed ? i.title : i.hint}>
                     <Icon name={i.icon ?? g.icon} />
-                    {!collapsed && <span>{i.title}</span>}
+                    {!navCollapsed && <span>{i.title}</span>}
                   </NavLink>
                 </div>
               );
             }
             /* Collapsed, every group is open — there is no header to click, so
                a closed group would simply be missing. */
-            const open = collapsed || openGroup === g.title;
+            const open = navCollapsed || openGroup === g.title;
             const hasActive = g.items.some(i => i.path === pathname || (i.path !== '/' && pathname.startsWith(i.path + '/')));
             return (
             <div className="vy-nav-group" key={g.title} data-open={open}>
-              {!collapsed && (
+              {!navCollapsed && (
                 /* In the live menu these headers are links, and three of the eight
                    route to `/` — clicking the section you want lands you on Home.
                    Expand/collapse is the behaviour the header already implies, and
@@ -157,9 +165,9 @@ export function AppShell() {
               {open && g.items.map(i => (
                 <NavLink key={i.path} to={i.path} end={i.path === '/'}
                          className={({ isActive }) => 'vy-nav-item' + (isActive ? ' is-active' : '')}
-                         title={collapsed ? `${g.title} › ${i.title}` : i.hint}>
+                         title={navCollapsed ? `${g.title} › ${i.title}` : i.hint}>
                   <Icon name={i.icon ?? g.icon} />
-                  {!collapsed && <span>{i.title}</span>}
+                  {!navCollapsed && <span>{i.title}</span>}
                 </NavLink>
               ))}
             </div>
@@ -173,7 +181,7 @@ export function AppShell() {
               a stakeholder demo read as an argument rather than as the system.
               They stay one click away, below the fold, visually quieter than
               anything in the nav proper. */}
-          {!collapsed && (
+          {!navCollapsed && (
             <details className="vy-about">
               <summary>About this prototype</summary>
               <div className="vy-about-links">
@@ -199,9 +207,9 @@ export function AppShell() {
             type="button"
             className="vy-nav-item vy-collapse"
             onClick={() => setCollapsed(c => !c)}
-            aria-pressed={collapsed}
+            aria-pressed={navCollapsed}
             aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-            title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            title={navCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
             <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden>
               <rect x="2.75" y="3.75" width="14.5" height="12.5" rx="2.5"
@@ -209,7 +217,7 @@ export function AppShell() {
               <rect x="4" y="5" width="4" height="10" rx="1.25"
                     fill="currentColor" opacity={collapsed ? 0.3 : 1} />
             </svg>
-            {!collapsed && <span>Collapse</span>}
+            {!navCollapsed && <span>Collapse</span>}
           </button>
         </div>
       </aside>

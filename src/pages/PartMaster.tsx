@@ -12,7 +12,7 @@ import { AddPartDialog } from '../components/AddPartDialog';
 import { FilterToolbar } from '../ui/FilterToolbar';
 import { ViewSetting } from '../ui/ViewSetting';
 import { useViews, draftFrom } from '../ui/useViews';
-import { applyView, activeCount, type FilterValues, type SavedView } from '../ui/views';
+import { applyView, activeCount, type SavedView } from '../ui/views';
 import { SmartIcon } from '../components/quotation/SmartButtons';
 import { useExcelExport } from '../ui/useExcelExport';
 import { useResetOn } from '../ui/useResetOn';
@@ -53,7 +53,6 @@ export function PartMaster() {
      Wired the same way as Project Requirements, deliberately. Two grids that
      answer the same question with two different control layouts cost a user
      more than either layout saves. */
-  const [values, setValues] = useState<FilterValues>({});
   /* Empty by default — see the note on PART_QUICK. A parts list is a reference,
      not a worklist, so it opens showing every part. */
   const [quickOn, setQuickOn] = useState<string[]>([]);
@@ -69,8 +68,8 @@ export function PartMaster() {
   /** Every column the screen has, and every field its filter panel offers. */
   const systemView = useMemo<SavedView>(() => ({
     id: 'system', name: 'Default', isDefault: false, system: true,
-    fields: ['customer', 'partSource', 'partClass', 'partType', 'abc', 'uom',
-             'status', 'lastChange'],
+    /* A built-in view asks nothing: it is the whole list. */
+    values: {},
     /* `hiddenByDefault` is HONOURED here, and was not before. The flag existed
        on three columns and only ever fed the width budget, so the default view
        still opened with every column — including ABC, which is empty in 100% of
@@ -89,6 +88,11 @@ export function PartMaster() {
   /* Resets when the view changes — during render, not in an effect, so the
      grid never paints one frame of the previous view's columns first. */
   const [workingCols, setWorkingCols] = useResetOn(view, () => view.columns);
+  /* THE VIEW'S OWN FILTERS, re-applied whenever the view changes — a view holds
+     values as of 13 October, so choosing one must ask its question. Reset during
+     render like the columns beside it, so the grid never paints one frame
+     filtered by the view you just left. */
+  const [values, setValues] = useResetOn(view, () => ({ ...view.values }));
 
   const toggleColumn = (field: string) => setWorkingCols(cols =>
     cols.some(c => c.field === field)
@@ -100,9 +104,7 @@ export function PartMaster() {
           PART_COLUMNS.findIndex(c => String(c.field) === b.field)));
 
   const allFields = useMemo(() => partFilterFields(data), [data]);
-  const fields = useMemo(
-    () => allFields.filter(f => view.fields.includes(f.field)),
-    [allFields, view.fields]);
+  const fields = allFields;
   const active = activeCount(fields, values);
 
   const toggleQuick = (key: string) =>

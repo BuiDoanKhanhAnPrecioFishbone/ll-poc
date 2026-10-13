@@ -13,6 +13,7 @@ import { ActivityTab } from '../components/quotation/ActivityTab';
 import { BomComparisonDialog } from '../components/quotation/BomComparisonDialog';
 import { RunQuotationDialog } from '../components/quotation/RunQuotationDialog';
 import { RunQuotationButton } from '../components/quotation/RunQuotationButton';
+import { MoreMenu } from '../ui/MoreMenu';
 import type { DraftQuote } from '../data/draftQuotes';
 import { AddContactDialog, type NewContact } from '../components/quotation/AddContactDialog';
 import { useToast } from '../ui/Toast';
@@ -256,6 +257,89 @@ export function QuotationDetail() {
           <span aria-hidden>←</span> Project Requirements
         </button>
 
+
+        {/* ---- One bar: what you can DO on the left, where you can GO on
+            the right -------------------------------------------------------
+            The 8 October design review, slides 2 and 3. The customer's own
+            built screens put the main actions top-left and the related records
+            top-right with their counts, and slides 6-10 make the case from
+            PowerBI, Manex, Z2Data, Dynamics 365 and Odoo. Slide 3 draws this
+            very bar. The record number and its status sit below it, as their
+            mock-up has them. */}
+        <div className="vy-action-bar">
+          {/* Edit governs the header fields AND the Requirements tab, so it sits
+              where both are visible. When it sat on the tab alone it under-
+              claimed; when it sat here while unlocking only the tab, it over-
+              claimed. */}
+          <div {...pageActionsProps}>
+            {editing ? (
+              <>
+                <Button onClick={cancelEdit}>Cancel</Button>
+                {/* Disabled while a required field is empty — "the Save button
+                    becomes enabled after the user enters or selects values for
+                    all required fields". The label and tooltip say WHICH are
+                    outstanding, because a disabled button with no explanation
+                    is a dead end: you can see it is off, not why. */}
+                <Button variant="filled"
+                        disabled={!dirty || missingRequired.length > 0}
+                        title={missingRequired.length
+                          ? `Still needed: ${missingRequired.map(f => f.label).join(', ')}`
+                          : undefined}
+                        onClick={saveEdit}>
+                  {missingRequired.length
+                    ? `${missingRequired.length} field${missingRequired.length === 1 ? '' : 's'} still needed`
+                    : dirty ? `Save ${changeCount} ${changeCount === 1 ? 'change' : 'changes'}` : 'Save'}
+                </Button>
+              </>
+            ) : (
+              <>
+                {/* ORDER, AND WHY IT CHANGED ON 13 OCTOBER.
+                    The 8 Oct design review settles a question this project had
+                    argued the other way: actions go LEFT, related records go
+                    RIGHT, and the primary action leads. Slides 6-10 make the
+                    case from PowerBI, Manex, Z2Data, Dynamics 365 and Odoo, and
+                    slide 3 draws our own bar with `Run Quotation · Edit · BoM
+                    Comparison · More`. That is the customer's own screen,
+                    reasoned from systems their users already use, and tier 1 of
+                    docs/precedence.md says it wins.
+
+                    What our September argument got right survives inside it:
+                    the two heavy actions are not neighbours of the primary any
+                    more — they are behind More (slide 3: "some 'danger' or less
+                    use actions … should be kept under a More button"). */}
+                <RunQuotationButton
+                  customer={q.customer}
+                  onRun={() => { setResumeDraft(undefined); setRunOpen(true); }}
+                  onResume={d => { setResumeDraft(d); setRunOpen(true); }} />
+                <Button onClick={() => { setDraft({ ...q }); setTouched(new Set()); }}>Edit</Button>
+                <Button onClick={() => setBomOpen(true)}>BoM Comparison</Button>
+                {/* CONFIRM RFQ — gap M8. What it does is an INFERENCE and is
+                    flagged as one: the status vocabulary recovered from the
+                    bundle is New, In Progress, Quoted, Completed, Cancelled,
+                    Closed, with no `Confirmed` in it, so confirming cannot be
+                    its own state. The reading that fits is New -> In-Progress,
+                    and the BoM import's `Import_Confirm_Dialog_Change_RfqStatus`
+                    points the same way. Offered only while the RFQ is New.
+
+                    CANCEL RFQ — gap M9, and a state change behind a question
+                    rather than a button: the bundle names its confirmation
+                    directly (`confirmCancelRfqForm`, `RFQ_Page.Cancel.Title`,
+                    `RFQ_Page.Cancel.Content`). Hidden once the RFQ is closed,
+                    because cancelling a Cancelled record is not a state this
+                    system has. */}
+                <MoreMenu items={[
+                  ...(q.status === 'New'
+                    ? [{ label: 'Confirm RFQ', onSelect: () => setConfirmOpen(true),
+                         note: 'Accepts the requirement and starts work on it' }]
+                    : []),
+                  ...(q.status !== 'Cancelled' && q.status !== 'Completed'
+                    ? [{ label: 'Cancel RFQ', danger: true, onSelect: () => setCancelOpen(true),
+                         note: 'Asks first. The RFQ stops being worked' }]
+                    : []),
+                ]} />
+              </>
+            )}
+          </div>
         {/* ---- Related records -------------------------------------------
             Flagged in the 25 Aug review as outright missing: "In leading ERP
             systems, every record must have related navigation."
@@ -277,11 +361,12 @@ export function QuotationDetail() {
                     title={b.title}
                     onClick={() => navigate(b.to)}>
               <SmartIcon name={b.icon} />
-              {b.count !== null && <span className="vy-smart-n">{b.count}</span>}
               <span>{b.count === 1 ? b.label : b.plural}</span>
+              {b.count !== null && <span className="vy-smart-n">({b.count})</span>}
             </button>
           ))}
         </nav>
+        </div>
 
         <div className="vy-record-bar">
           <div className="vy-record-id">
@@ -315,79 +400,6 @@ export function QuotationDetail() {
             )}
           </div>
 
-          {/* Edit governs the header fields AND the Requirements tab, so it sits
-              where both are visible. When it sat on the tab alone it under-
-              claimed; when it sat here while unlocking only the tab, it over-
-              claimed. */}
-          <div {...pageActionsProps}>
-            {editing ? (
-              <>
-                <Button onClick={cancelEdit}>Cancel</Button>
-                {/* Disabled while a required field is empty — "the Save button
-                    becomes enabled after the user enters or selects values for
-                    all required fields". The label and tooltip say WHICH are
-                    outstanding, because a disabled button with no explanation
-                    is a dead end: you can see it is off, not why. */}
-                <Button variant="filled"
-                        disabled={!dirty || missingRequired.length > 0}
-                        title={missingRequired.length
-                          ? `Still needed: ${missingRequired.map(f => f.label).join(', ')}`
-                          : undefined}
-                        onClick={saveEdit}>
-                  {missingRequired.length
-                    ? `${missingRequired.length} field${missingRequired.length === 1 ? '' : 's'} still needed`
-                    : dirty ? `Save ${changeCount} ${changeCount === 1 ? 'change' : 'changes'}` : 'Save'}
-                </Button>
-              </>
-            ) : (
-              <>
-                {/* CANCEL RFQ — gap M9. On the live record's action bar and
-                    missing here; our only "Cancel" was the edit-mode one, which
-                    is a different thing entirely. The bundle names its
-                    confirmation directly — `confirmCancelRfqForm`,
-                    `RFQ_Page.Cancel.Title`, `RFQ_Page.Cancel.Content` — so this
-                    is a state change behind a question, not a button.
-
-                    Destructive, so it is FIRST in the group — the way out on
-                    the left, the commit on the right, which is Rule 3 of
-                    docs/modal-patterns.md applied to a page bar rather than a
-                    footer. It claimed that placement in this comment while
-                    rendering third of four, one button from Run Quotation: the
-                    two most consequential actions on the record were
-                    neighbours. Measured at 1024px on 20 Sep — Cancel at x=819,
-                    Run Quotation at x=888 — and moved. Hidden once the RFQ is
-                    already closed, because cancelling a Cancelled record is not
-                    a state this system has. */}
-                {q.status !== 'Cancelled' && q.status !== 'Completed' && (
-                  <Button variant="danger" onClick={() => setCancelOpen(true)}>Cancel</Button>
-                )}
-                <Button onClick={() => { setDraft({ ...q }); setTouched(new Set()); }}>Edit</Button>
-                <Button onClick={() => setBomOpen(true)}>BoM Comparison</Button>
-                {/* CONFIRM RFQ — gap M8. Also on the live action bar, and
-                    absent from this codebase entirely, though our own CSS
-                    already refers to a red part blocking it.
-
-                    WHAT IT DOES IS AN INFERENCE and is flagged as one. The
-                    status vocabulary recovered from the bundle is New,
-                    In Progress, Quoted, Completed, Cancelled, Closed — there is
-                    NO `Confirmed`. So confirming cannot be its own state; the
-                    reading that fits is that it accepts a New requirement and
-                    starts work on it, which is New -> In-Progress. The one
-                    other clue points the same way: the BoM import's confirm
-                    dialog carries `Import_Confirm_Dialog_Change_RfqStatus`, so
-                    confirming is tied to a status change.
-
-                    Only offered while the RFQ is New, for the same reason. */}
-                {q.status === 'New' && (
-                  <Button onClick={() => setConfirmOpen(true)}>Confirm RFQ</Button>
-                )}
-                <RunQuotationButton
-                  customer={q.customer}
-                  onRun={() => { setResumeDraft(undefined); setRunOpen(true); }}
-                  onResume={d => { setResumeDraft(d); setRunOpen(true); }} />
-              </>
-            )}
-          </div>
         </div>
 
         {/* The project name is the heading when you are reading. While editing

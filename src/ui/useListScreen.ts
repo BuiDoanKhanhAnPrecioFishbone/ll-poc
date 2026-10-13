@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { ColumnSpec } from '../components/column-model';
 import { useViews } from './useViews';
-import { applyView, activeCount, type FilterValues, type SavedView, type ViewField } from './views';
+import { applyView, activeCount, type SavedView, type ViewField } from './views';
 import { useResetOn } from './useResetOn';
 
 /**
@@ -46,14 +46,12 @@ export function useListScreen<T>({ key, rows, columns, filterFields, quick, load
 }) {
   const [loading, setLoading] = useState(true);
   useEffect(() => { const t = setTimeout(() => setLoading(false), loadMs); return () => clearTimeout(t); }, [loadMs]);
-
-  const [values, setValues] = useState<FilterValues>({});
   const [quickOn, setQuickOn] = useState<string[]>([]);
   const [settingOpen, setSettingOpen] = useState(false);
 
   const systemView = useMemo<SavedView>(() => ({
     id: 'system', name: 'Default', isDefault: false, system: true,
-    fields: filterFields(rows).map(f => String(f.field)),
+    values: {},
     /* `hiddenByDefault` is honoured, so a column that is empty in most records
        does not open at full width beside the identifier. */
     columns: columns.filter(c => !c.hiddenByDefault).map(c => ({ field: String(c.field) })),
@@ -66,6 +64,11 @@ export function useListScreen<T>({ key, rows, columns, filterFields, quick, load
   /* Resets when the view changes — during render, not in an effect, so the
      grid never paints one frame of the previous view's columns first. */
   const [workingCols, setWorkingCols] = useResetOn(view, () => view.columns);
+  /* THE VIEW'S OWN FILTERS, re-applied whenever the view changes — a view holds
+     values as of 13 October, so choosing one must ask its question. Reset during
+     render like the columns beside it, so the grid never paints one frame
+     filtered by the view you just left. */
+  const [values, setValues] = useResetOn(view, () => ({ ...view.values }));
 
   const toggleColumn = (field: string) => setWorkingCols(cols =>
     cols.some(c => c.field === field)
@@ -75,9 +78,7 @@ export function useListScreen<T>({ key, rows, columns, filterFields, quick, load
           columns.findIndex(c => String(c.field) === b.field)));
 
   const allFields = useMemo(() => filterFields(rows), [rows, filterFields]);
-  const fields = useMemo(
-    () => allFields.filter(f => view.fields.includes(String(f.field))),
-    [allFields, view.fields]);
+  const fields = allFields;
   const filterActive = activeCount(fields, values);
 
   const visibleRows = useMemo(() => {

@@ -5,7 +5,7 @@ import { DialogDismiss } from './dismiss';
 import { FilterToolbar } from './FilterToolbar';
 import { TextField } from './Field';
 import type { ColumnSpec } from '../components/column-model';
-import type { SavedView, ViewField, ViewSort } from './views';
+import { activeCount, type SavedView, type ViewField, type ViewSort } from './views';
 
 /**
  * View Setting — the panel behind the gear.
@@ -181,57 +181,45 @@ export function ViewSetting<T>({
         <div className="vy-vs-body">
           {tab === 'filter' && (
             <>
-              <h3 className="vy-vs-heading">Filter options</h3>
-              <p className="vy-vs-hint">Which fields appear in the filter toolbar.</p>
+              {/* ---- A VIEW IS A SAVED QUESTION ------------------------------
+                  This tab chose which FIELDS the filter toolbar shows until
+                  13 October, when the meeting called that wrong: "Setting →
+                  Filter is for view … allow to select value inside that panel
+                  then save as view."
 
-              <ul className="vy-vs-list">
-                {draft.fields.map(f => (
-                  <li key={f} className="vy-vs-row">
-                    <span className="vy-vs-name">{allFields.find(x => x.field === f)?.label ?? f}</span>
-                    <button className="vy-vs-remove" aria-label={`Remove ${f}`}
-                            onClick={() => set({ fields: draft.fields.filter(x => x !== f) })}>
-                      <TrashIcon />
-                    </button>
-                  </li>
-                ))}
-              </ul>
-              <AddRow
-                label="Add more filter(s)"
-                options={allFields.filter(f => !draft.fields.includes(f.field))
-                  .map(f => ({ value: f.field, label: f.label }))}
-                onAdd={f => set({ fields: [...draft.fields, f] })}
-              />
+                  They are right, and the old design had the tell in it: the tab
+                  needed a live preview of the toolbar to explain what it did,
+                  because a list of field names gives no hint that a toolbar
+                  comes out of the other end. A view now holds VALUES — Active
+                  parts for one customer, overdue RFQs — and the toolbar offers
+                  every field the screen has, which is what the live system does
+                  and what we already tell the customer it does.
 
-              {/* THE PREVIEW.
-                  Two screens on this app say "filter" and they do different
-                  things: the toolbar over the grid is where you filter, this
-                  tab decides what that toolbar contains. Naming alone never
-                  carried that — both are "Filter", and a list of field names
-                  gives no hint that a toolbar comes out the other end.
+                  THE CONTROLS ARE THE REAL ONES. Same component as the toolbar
+                  over the grid, bound to the draft, so what you set here is
+                  literally what the view applies — no preview, because there is
+                  nothing left to preview. */}
+              <h3 className="vy-vs-heading">Filter values</h3>
+              <p className="vy-vs-hint">
+                Set the filters this view should apply. Saving keeps them with the view, so
+                choosing it later asks the same question again.
+              </p>
 
-                  So the panel shows the result. It is not a mock-up of the
-                  toolbar; it IS the toolbar component, rendered inert, so it
-                  cannot drift from the real one. Cause and effect end up in the
-                  same view and the distinction stops needing to be explained. */}
-              <div className="vy-vs-preview">
-                <span className="vy-vs-preview-label">The toolbar you get</span>
-                <div className="vy-vs-preview-frame" aria-hidden>
-                  {draft.fields.length ? (
-                    <FilterToolbar
-                      fields={allFields.filter(f => draft.fields.includes(f.field))
-                        /* In the order this list is in, not the order the
-                           fields were declared — otherwise dragging a row here
-                           would change nothing the user can see. */
-                        .sort((a, b) => draft.fields.indexOf(a.field) - draft.fields.indexOf(b.field))}
-                      values={{}} onChange={() => {}} onClear={() => {}} activeCount={0}
-                    />
-                  ) : (
-                    <p className="vy-vs-hint">
-                      No fields, so the grid shows no filter toolbar at all — only the search box.
-                    </p>
-                  )}
-                </div>
+              <div className="vy-vs-filter">
+                <FilterToolbar
+                  fields={allFields}
+                  values={draft.values}
+                  onChange={v => set({ values: v })}
+                  onClear={() => set({ values: {} })}
+                  activeCount={activeCount(allFields, draft.values)}
+                />
               </div>
+
+              <p className="vy-vs-hint">
+                {activeCount(allFields, draft.values) === 0
+                  ? 'No filters set — this view shows every row.'
+                  : `${activeCount(allFields, draft.values)} filter${activeCount(allFields, draft.values) === 1 ? '' : 's'} set.`}
+              </p>
             </>
           )}
 
@@ -240,7 +228,7 @@ export function ViewSetting<T>({
               <h3 className="vy-vs-heading">Column options</h3>
               <p className="vy-vs-hint">Add or remove columns. Drag a row to change the order.</p>
               <div className="vy-vs-colhead">
-                <span>Column Name</span><span>Width</span>
+                <span>Column Name</span><span>Width</span><span />
               </div>
               <ul className="vy-vs-list">
                 {draft.columns.map((c, i) => {

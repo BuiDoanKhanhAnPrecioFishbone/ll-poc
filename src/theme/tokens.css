@@ -328,8 +328,14 @@
      21,941-row Part Master should ship with. The legacy app had one 50px row
      height everywhere, which is why only ~10 rows fit on a 900px screen. */
   --vy-row-h-compact:     28px;
-  --vy-row-h-comfortable: 36px;
-  --vy-row-h-relaxed:     44px;
+  /* COMFORTABLE WENT UP 4px ON 13 OCTOBER, asked for at the meeting: "increase
+     height of table row => comfortable". 36px was a comfortable row only by
+     comparison with compact — it left 11px of air around a 13px line, which on
+     a screen of 20 rows reads as a dense grid wearing the word "comfortable".
+     40px is the height the name promises, and it is still 10px under the legacy
+     app's 50px, so the row count that argument was won on survives. */
+  --vy-row-h-comfortable: 40px;
+  --vy-row-h-relaxed:     48px;
 
   --vy-shell-sidebar-w:   248px;
   --vy-shell-sidebar-w-collapsed: 56px;
@@ -407,7 +413,6 @@
   --vy-quote-qty-w:       120px; /* Build Qty / Attrition Set */
   --vy-quote-field-min:   240px; /* one field on the Config BoM grid */
   --vy-cost-col-min:      170px; /* one figure in the cost summary */
-  --vy-vs-preview-max-h:  260px; /* the filter-toolbar preview in View Setting */
   /* ONE reading measure, and it caps TEXT — never a container.
      Panels, cards and dialogs take their width from the layout they sit in; only
      the prose inside them is capped, because line length is a property of text.
@@ -484,7 +489,6 @@
 
   /* --- Record screen ---------------------------------------------------------
      Field-list column widths and the label column of a definition list. */
-  --vy-field-label-w:    180px;
   --vy-field-group-min:  280px;
   --vy-header-field-min: 190px;  /* record-header facts: label above value */
   --vy-header-group-min: 260px;  /* one of the three header regions */
@@ -495,6 +499,13 @@
   --vy-viewsetting-w:    460px;  /* the View Setting right sidebar */
   --vy-viewsetting-max-w: 860px; /* the same sidebar, maximised */
   --vy-vs-width-col:      88px;  /* the Width input on the Column tab */
+  /* The right-hand cell of a Column row holds either a trash button or the
+     words "(*required)", and they are not the same width — so the NAME field
+     beside them came out long on one row and short on the next. Asked for on
+     13 October: "we should have one width for delete and required so that the
+     text field in the left column will not long and short". Sized to the wider
+     of the two. */
+  --vy-vs-action-col:    6rem;
   --vy-view-picker-w:    180px;
   --vy-tz-w:             180px;  /* timezone select in the global header */
   --vy-kpi-min-w:        140px;

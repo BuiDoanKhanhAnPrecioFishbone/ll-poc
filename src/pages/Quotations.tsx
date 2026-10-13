@@ -12,7 +12,7 @@ import { useExcelExport } from '../ui/useExcelExport';
 import { measureFor, scopeFilter } from '../data/queues';
 import { applyItarVisibility } from '../data/itar';
 import { FilterToolbar } from '../ui/FilterToolbar';
-import { applyView, activeCount, type FilterValues } from '../ui/views';
+import { applyView, activeCount } from '../ui/views';
 import { QUOTATION_QUICK, quotationFilterFields } from '../data/quotationFilters';
 import { ViewSetting } from '../ui/ViewSetting';
 import { useViews, draftFrom } from '../ui/useViews';
@@ -85,7 +85,6 @@ export function Quotations() {
   /* Whose records. Separate from the measures, and matching the Mine/Team
      toggle on My Queues — the same question deserves the same control. */
   /* One value per field. No operators — see docs/filter-spec.md. */
-  const [values, setValues] = useState<FilterValues>({});
   const { dateStyle } = usePrefs();
 
   /* Options are drawn from the rows themselves, so a picker never offers a
@@ -97,8 +96,8 @@ export function Quotations() {
    */
   const systemView = useMemo<SavedView>(() => ({
     id: 'system', name: 'Default', isDefault: false, system: true,
-    fields: ['priority', 'no', 'projectName', 'customer', 'status',
-             'dateNeeded', 'createdDate', 'lastUpdated'],
+    /* A built-in view asks nothing: it is the whole list. */
+    values: {},
     /* No column here carries the flag today; filtered anyway so that adding
        one later is not silently ignored, which is how Part Master's went
        unnoticed for three weeks. */
@@ -130,6 +129,11 @@ export function Quotations() {
   /* Resets when the view changes — during render, not in an effect, so the
      grid never paints one frame of the previous view's columns first. */
   const [workingCols, setWorkingCols] = useResetOn(view, () => view.columns);
+  /* THE VIEW'S OWN FILTERS, re-applied whenever the view changes — a view holds
+     values as of 13 October, so choosing one must ask its question. Reset during
+     render like the columns beside it, so the grid never paints one frame
+     filtered by the view you just left. */
+  const [values, setValues] = useResetOn(view, () => ({ ...view.values }));
 
   const toggleColumn = (field: string) => setWorkingCols(cols =>
     cols.some(c => c.field === field)
@@ -140,9 +144,7 @@ export function Quotations() {
           QUOTATION_COLUMNS.findIndex(c => String(c.field) === a.field) -
           QUOTATION_COLUMNS.findIndex(c => String(c.field) === b.field)));
 
-  const fields = useMemo(
-    () => quotationFilterFields(all).filter(f => view.fields.includes(f.field)),
-    [all, view.fields]);
+  const fields = useMemo(() => quotationFilterFields(all), [all]);
   const active = activeCount(fields, values);
   const toast = useToast();
   const { exportRows, excel } = useExcelExport<Quotation>();

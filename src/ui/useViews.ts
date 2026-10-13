@@ -71,6 +71,6 @@ export function draftFrom(view: SavedView, name = ''): SavedView {
     system: false,
     columns: view.columns.map(c => ({ ...c })) as ViewColumn[],
     sort: view.sort.map(s => ({ ...s })),
-    fields: [...view.fields],
+    values: { ...view.values },
   };
 }

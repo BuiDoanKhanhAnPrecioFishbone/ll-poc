@@ -14,6 +14,11 @@
   display: flex; flex-direction: column;
   transition: width .16s ease, flex-basis .16s ease;
 }
+/* While a dialog is open the shell gives it the screen. Same rule as the user's
+   own Collapse, so there is one collapsed state rather than two that can
+   disagree — asked for on 13 October: "auto collapse the menu navigation". */
+[data-dialog-open] .vy-shell { --vy-sidebar-w: var(--vy-shell-sidebar-w-collapsed); }
+
 [data-collapsed="true"] .vy-sidebar {
   width: var(--vy-shell-sidebar-w-collapsed);
   flex-basis: var(--vy-shell-sidebar-w-collapsed);
@@ -163,7 +168,17 @@
    push the density control onto a row of its own. */
 .vy-toolbar-spacer { flex: 1 1 0; min-width: 0; }
 .vy-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.vy-code { font-family: var(--vy-font-mono); font-size: var(--vy-text-xs); background: var(--vy-surface-sunken); border-radius: var(--vy-radius-sm); padding: 1px var(--vy-space-3); color: var(--vy-on-surface-soft); }
+/* ---- A code value is a VALUE, not a tag ----------------------------------
+   `.vy-code` wrapped MSL levels, package types, part sources, application and
+   RFQ type in a grey pill in a mono face. The 13 October meeting: a tag is for
+   "status or really special information need to be focusing, the remain is text
+   only". Every pill in a column is a column of pills, and then none of them
+   mean anything.
+
+   So the pill and the mono face go; the value stays, in the muted colour that
+   says "this is a code, not prose". Status keeps its badge — that is the one
+   thing a reader scans a list for. */
+.vy-code { font-size: var(--vy-text-base); color: var(--vy-on-surface-soft); font-variant-numeric: tabular-nums; }
 /* grey-500, not grey-300. At grey-300 this measured 1.64:1 on white and 1.48
    on a selected row — the lowest contrast anywhere in the app, on a mark that
    carries meaning: it says the cell is EMPTY rather than narrow, which is a
@@ -447,11 +462,19 @@
 /* 56ch is right for a hint under a field; under a full-width table it forces a
    one-sentence note into two rows of the table's height. */
 .vy-hint--wide { max-width: none; }
-.vy-inline-field { display: flex; align-items: center; gap: var(--vy-space-4); margin-top: var(--vy-space-5); font-size: var(--vy-text-base); color: var(--vy-on-surface-muted); }
+/* ONE SHAPE FOR A LABELLED CONTROL: the label sits above it. 13 October —
+   "same structure, same layout for label and input field (label above, not the
+   same line)". The side-by-side variant survived here because the Primary
+   Provider control on step 3 sits in a toolbar rather than a form, and in a
+   toolbar a label beside its control reads fine on its own. On its own was the
+   problem: a user crossing from the record's fields to this one meets two
+   conventions in one flow. `--stack` is now what the class does, and the
+   modifier is kept as a no-op alias so the three call sites that spell it out
+   keep reading as deliberate. */
+.vy-inline-field { display: flex; flex-direction: column; align-items: stretch; gap: var(--vy-space-2); margin-top: var(--vy-space-5); font-size: var(--vy-text-sm); color: var(--vy-on-surface-muted); }
 .vy-inline-field--stack { flex-direction: column; align-items: stretch; }
 
 .vy-run { display: flex; flex-direction: column; gap: var(--vy-space-7); }
-.vy-run-context { display: flex; align-items: baseline; gap: var(--vy-space-6); flex-wrap: wrap; font-size: var(--vy-text-base); color: var(--vy-on-surface-muted); background: var(--vy-surface-app); border-radius: var(--vy-radius-md); padding: var(--vy-space-4) var(--vy-space-6); }
 .vy-run-step { display: flex; flex-direction: column; gap: var(--vy-space-6); }
 
 /* ---- Step 1, laid out as three regions ------------------------------------
@@ -751,7 +774,6 @@
 .vy-run-actions { display: flex; flex-wrap: wrap; gap: var(--vy-space-4); align-items: center; margin: var(--vy-space-6) 0; }
 .vy-run-banner[data-tone="info"] { background: var(--vy-brand-subtle); border-color: var(--vy-brand-boundary-soft); }
 .vy-run-drafts { display: flex; align-items: center; gap: var(--vy-space-4); margin-top: var(--vy-space-9); padding-top: var(--vy-space-6); border-top: 1px solid var(--vy-border); font-size: var(--vy-text-sm); color: var(--vy-on-surface-muted); }
-.vy-run-total { margin-top: var(--vy-space-6); text-align: right; font-size: var(--vy-text-base); color: var(--vy-on-surface-soft); }
 
 /* Manufacturer mismatch: BOM spelling on the left, Z2Data's on the right, with
    the arrow between them saying which way the rename would go. */
@@ -1040,33 +1062,85 @@
    goes somewhere. Same shape for both teaches hesitation before every click, so
    these are a quiet tinted row: no fill, no border weight, no pill.
    ========================================================================== */
-.vy-smart-buttons {
-  display: flex; flex-wrap: wrap; gap: var(--vy-space-2);
+/* ---- The record's action bar ----------------------------------------------
+   One row: what you can DO on the left, where you can GO on the right, a rule
+   under both, and the record's number and status below it. The 8 October design
+   review, slides 2 and 3 — and their own screens, which are where the pattern
+   comes from.
+
+   It wraps at the gap rather than squeezing: on a narrow window the related
+   records drop under the actions, still in that order, which keeps the reading
+   "here is what this does, here is where it goes". */
+.vy-action-bar {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: var(--vy-space-5) var(--vy-space-8); flex-wrap: wrap;
   margin-bottom: var(--vy-space-6);
   padding-bottom: var(--vy-space-5);
   border-bottom: 1px solid var(--vy-border);
 }
+/* `flex-shrink: 0` is right for a bar that sits alone — it stops the actions
+   being squeezed by a title beside them. Inside this bar it was the reason the
+   page scrolled sideways on a phone: the actions kept their 401px content width
+   in a 313px row, so the coarse-pointer rule that wraps them never got a
+   narrower box to wrap into. Here they may shrink, and then they wrap. */
+.vy-action-bar > .vy-page-actions { justify-content: flex-start; flex: 1 1 auto; }
+/* `min-width: 0` on both halves, and it is load-bearing. As flex items their
+   automatic minimum is their content's, so the actions refused to shrink below
+   401px inside a 313px bar on a phone and the whole page scrolled sideways —
+   the coarse-pointer rule that wraps them could never take effect. Fourth time
+   this project has paid for the automatic-minimum-size rule: `.vy-record-bar`,
+   the sitemap's compare column, the Run Quotation stepper, now this. */
+.vy-action-bar > * { min-width: 0; }
+
+.vy-smart-buttons {
+  display: flex; flex-wrap: wrap; gap: var(--vy-space-2);
+  justify-content: flex-end;
+}
+
+/* The More menu. Kendo's outline button with a chevron, because it IS one of
+   the buttons on the bar — and its items carry a sentence, since a rare action
+   is exactly the one whose consequence nobody remembers. */
+.vy-more-btn { display: inline-flex; align-items: center; gap: var(--vy-space-2); }
+.vy-more-menu { padding: var(--vy-space-3); min-width: 15rem; max-width: 20rem; }
+.vy-more-menu ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.vy-more-menu button {
+  display: flex; flex-direction: column; gap: 2px; width: 100%; text-align: start;
+  padding: var(--vy-space-3) var(--vy-space-4); border: 0; border-radius: var(--vy-radius-sm);
+  background: none; color: var(--vy-on-surface-strong); cursor: pointer;
+  min-height: var(--vy-target-min); font-size: var(--vy-text-base);
+}
+.vy-more-menu button:hover:not(:disabled) { background: var(--vy-surface-app); }
+.vy-more-menu button:disabled { color: var(--vy-on-surface-subtle); cursor: not-allowed; }
+.vy-more-menu button[data-danger] { color: var(--vy-danger-text-deep); }
+.vy-more-menu button[data-danger]:hover:not(:disabled) { background: var(--vy-danger-subtle); }
+.vy-more-note { font-size: var(--vy-text-sm); color: var(--vy-on-surface-muted); }
+/* OUTLINED AND IN THE BRAND COLOUR since 13 October, which is how the
+   customer's own screens draw these and how slide 3 draws ours. The borderless
+   version read as decoration beside a row of real buttons; bordered, the bar
+   says plainly that the left half acts on this record and the right half leaves
+   it. They are still not primary — outline, never fill — because going
+   somewhere is not the main thing to do here. */
 .vy-smart-btn {
   display: inline-flex; align-items: center; gap: var(--vy-space-3);
   padding: var(--vy-space-3) var(--vy-space-5);
-  background: none; border: 1px solid transparent; border-radius: var(--vy-radius-md);
-  font: inherit; font-size: var(--vy-text-sm); color: var(--vy-on-surface-soft);
+  min-height: var(--vy-control-md);
+  background: var(--vy-surface); border: 1px solid var(--vy-brand-boundary-light);
+  border-radius: var(--vy-radius-md);
+  font: inherit; font-size: var(--vy-text-base); color: var(--vy-brand-text);
   cursor: pointer; white-space: nowrap;
 }
-.vy-smart-btn:hover { background: var(--vy-surface-app); border-color: var(--vy-border); color: var(--vy-on-surface-strong); }
+.vy-smart-btn:hover { background: var(--vy-brand-subtle); border-color: var(--vy-brand-boundary); color: var(--vy-brand-text-hover); }
 .vy-smart-btn:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
-.vy-smart-btn svg { color: var(--vy-on-surface-subtle); flex: 0 0 auto; }
-.vy-smart-btn:hover svg { color: var(--vy-brand-text); }
-/* The count leads, because "is there anything there" is the question the button
-   answers before it is pressed. */
-.vy-smart-n {
-  font-weight: var(--vy-weight-bold); color: var(--vy-on-surface-strong);
-  font-variant-numeric: tabular-nums;
-}
+.vy-smart-btn svg { flex: 0 0 auto; }
+/* The count follows the name, in brackets — `Customer RFQs (43)`, which is the
+   form on the customer's own bar. It led the label until 13 October, on the
+   argument that "is there anything there" is answered before the press; the
+   name reads first either way, and matching their screens costs nothing. */
+.vy-smart-n { font-variant-numeric: tabular-nums; }
 /* A zero keeps its place in the row — a row whose buttons appear and disappear
    cannot be learned by position — but stops competing for attention. */
 .vy-smart-btn[data-empty] { color: var(--vy-on-surface-subtle); }
-.vy-smart-btn[data-empty] .vy-smart-n { color: var(--vy-on-surface-subtle); font-weight: var(--vy-weight-regular); }
+.vy-smart-btn[data-empty] { color: var(--vy-on-surface-muted); border-color: var(--vy-border); }
 
 /* =============================================================================
    HEADER GROUPS
@@ -1523,7 +1597,7 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
 .vy-vs-body { flex: 1; overflow-y: auto; padding: var(--vy-space-7); }
 .vy-vs-heading { margin: 0 0 var(--vy-space-2); font-size: var(--vy-text-sm); font-weight: var(--vy-weight-semibold); color: var(--vy-on-surface); text-transform: uppercase; letter-spacing: .04em; }
 .vy-vs-hint { margin: 0 0 var(--vy-space-6); font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle); line-height: 1.45; }
-.vy-vs-colhead { display: grid; grid-template-columns: 1fr var(--vy-vs-width-col); gap: var(--vy-space-4); padding: 0 var(--vy-space-4) var(--vy-space-3) var(--vy-space-9); font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle); }
+.vy-vs-colhead { display: grid; grid-template-columns: minmax(0, 1fr) var(--vy-vs-width-col) var(--vy-vs-action-col); gap: var(--vy-space-4); padding: 0 var(--vy-space-4) var(--vy-space-3) var(--vy-space-9); font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle); }
 
 .vy-vs-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--vy-space-2); }
 .vy-vs-row {
@@ -1532,7 +1606,7 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
   border: 1px solid var(--vy-border); border-radius: var(--vy-radius-sm);
   background: var(--vy-surface);
 }
-.vy-vs-row--col { display: grid; grid-template-columns: auto 1fr var(--vy-vs-width-col) auto; }
+.vy-vs-row--col { display: grid; grid-template-columns: auto minmax(0, 1fr) var(--vy-vs-width-col) var(--vy-vs-action-col); }
 .vy-vs-row--sort { display: grid; grid-template-columns: auto 1fr auto auto; }
 .vy-vs-row[draggable="true"] { cursor: grab; }
 .vy-vs-row[draggable="true"]:active { cursor: grabbing; }
@@ -1540,7 +1614,7 @@ button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outlin
 .vy-vs-name { font-size: var(--vy-text-base); color: var(--vy-on-surface-strong); min-width: 0; }
 /* Required columns keep their place but lose the remove control, so the row
    still reads as a row rather than one with a hole where a button should be. */
-.vy-vs-required { font-size: var(--vy-text-2xs); color: var(--vy-on-surface-subtle); white-space: nowrap; }
+.vy-vs-required { font-size: var(--vy-text-2xs); color: var(--vy-on-surface-subtle); white-space: nowrap; justify-self: center; }
 .vy-vs-remove {
   display: grid; place-items: center; width: var(--vy-space-10); height: var(--vy-space-10);
   background: none; border: 0; border-radius: var(--vy-radius-sm);

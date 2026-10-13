@@ -412,8 +412,22 @@
 .vy-field-groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(var(--vy-field-group-min), 1fr)); gap: var(--vy-space-9); }
 .vy-field-group-title { font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .06em; color: var(--vy-on-surface-subtle); font-weight: var(--vy-weight-heavy); margin: 0 0 var(--vy-space-4); padding-bottom: var(--vy-space-2); border-bottom: 1px solid var(--vy-border); }
 .vy-field-list { margin: 0; }
-.vy-field { display: grid; grid-template-columns: var(--vy-field-label-w) 1fr; gap: var(--vy-space-4); padding: var(--vy-space-3) 0; border-bottom: 1px solid var(--vy-border-faint); }
-.vy-field dt { font-size: var(--vy-text-base); color: var(--vy-on-surface-subtle); }
+/* ---- Label ABOVE the value, everywhere -----------------------------------
+   Asked for on 13 October: "same structure, same layout for label and input
+   field (label above, not the same line)".
+
+   This screen had two layouts for one thing. The header cards — Customer,
+   Project, Schedule & ownership — already stacked label over value, because
+   they are three narrow columns and a side-by-side label would have left the
+   value 90px wide. The tabs below used a two-column grid with the label on the
+   left, which looked settled on its own and read as a different kind of field
+   the moment both were on screen together.
+
+   Stacked wins the tie for the reason the cards already had: it survives a
+   narrow column, a long label and a translated label, none of which the
+   side-by-side version does. The customer's own mock-ups stack. */
+.vy-field { display: grid; gap: var(--vy-space-2); padding: var(--vy-space-4) 0; border-bottom: 1px solid var(--vy-border-faint); }
+.vy-field dt { font-size: var(--vy-text-sm); color: var(--vy-on-surface-muted); }
 /* ---- Field values ---------------------------------------------------------
    VIEW mode renders a WHITE BOX. Customer decision, 25 Aug 2026: "the grey box
    only shows in EDIT mode; in VIEW mode just show the white box as normal."
@@ -452,9 +466,10 @@
 
    Stacking removes the 180px tax entirely and gives the control the full
    column width, which is what a form control wants anyway. */
+/* Since 13 October view mode stacks too, so this block no longer has a
+   two-column layout to undo — what is left is the extra breathing room an
+   editable row needs over a read-only one. */
 .vy-field--editing {
-  grid-template-columns: 1fr;
-  gap: var(--vy-space-2);
   align-items: stretch;
   padding-block: var(--vy-space-5);
 }
@@ -484,11 +499,20 @@
    places that render an identifier outside a grid — MiniTable cells, the
    record header. It was lost with kendo-bridge.css and those identifiers
    silently fell back to the body font. */
+/* ---- Identifiers are TEXT, not code --------------------------------------
+   They were set in JetBrains Mono: part numbers, MPNs, RFQ numbers, assembly
+   numbers. The 13 October meeting: "do not use monotext, hard to read".
+
+   A monospaced face earns its keep where characters must be told apart one at a
+   time — a licence key, a hash, a diff. A part number is read as a WORD by
+   people who know their catalogue, and at 12-13px in a dense grid the mono face
+   is the one that slows them down. What made these scannable was never the
+   face: it is `tabular-nums`, which keeps digits in columns, and that stays.
+   Weight does the rest of the work the font was doing. */
 .vy-ident {
-  font-family: var(--vy-font-mono);
-  font-size: var(--vy-text-sm);
+  font-size: var(--vy-text-base);
+  font-weight: var(--vy-weight-medium);
   font-variant-numeric: tabular-nums;
-  letter-spacing: -.01em;
   white-space: nowrap;
   color: var(--vy-on-surface-strong);
 }
@@ -969,7 +993,7 @@
 
 /* A BoM file name in a grid cell. Monospace, because these are versioned file
    names read character by character when checking which BoM produced a price. */
-.vy-cell-file { font-family: var(--vy-font-mono); font-size: var(--vy-text-xs); }
+.vy-cell-file { font-size: var(--vy-text-sm); color: var(--vy-on-surface-soft); }
 
 /* =============================================================================
    RICH TEXT EDITOR
@@ -1294,29 +1318,6 @@
    filter; the Filter tab of View Setting decides what that toolbar contains.
    Names alone never carried the difference, so the panel shows the result —
    the real FilterToolbar, rendered inert. */
-.vy-vs-preview { margin: var(--vy-space-6) 0 var(--vy-space-8); }
-.vy-vs-preview-label {
-  display: block; margin-bottom: var(--vy-space-3);
-  font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .05em;
-  color: var(--vy-on-surface-subtle); font-weight: var(--vy-weight-medium);
-}
-.vy-vs-preview-frame {
-  padding: var(--vy-space-5);
-  background: var(--vy-surface-app);
-  border: 1px dashed var(--vy-border-strong);
-  border-radius: var(--vy-radius-md);
-  /* Inert: it is a picture of the toolbar, not a second copy to filter with.
-     Two working filter toolbars on screen at once is the confusion this is
-     meant to end, not deepen. */
-  pointer-events: none;
-  /* Scaled down so a nine-field toolbar still fits the 460px panel, and capped
-     — the preview is the payoff, not the workspace, and at full height it
-     pushed the list you actually edit off the bottom of the panel. */
-  zoom: .85;
-  max-height: var(--vy-vs-preview-max-h);
-  overflow-y: auto;
-}
-
 /* The route from where the gap is noticed to where it is fixed. */
 .vy-filter-edit-fields {
   appearance: none; border: 0; background: none; cursor: pointer;
@@ -1480,6 +1481,19 @@
 .vy-grid-k[data-density="compact"]     { --vy-cell-pad-y: var(--vy-space-1); }
 .vy-grid-k[data-density="comfortable"] { --vy-cell-pad-y: var(--vy-space-3); }
 .vy-grid-k[data-density="relaxed"]     { --vy-cell-pad-y: var(--vy-space-5); }
+
+/* AND THE ROW HEIGHT ITSELF, which is what the names were promising.
+   Density was cell padding alone, so "comfortable" came out at 32.7px while
+   `--vy-row-h-comfortable` sat in tokens.css saying 36 and was read only by the
+   touch rules. Two numbers for one idea, and the one the user picks by name was
+   the one that did not apply. On 13 October the meeting asked for taller rows;
+   the fix is to make the token mean what it says on every pointer.
+
+   `height` on a row is a MINIMUM in table layout, so a cell that needs two
+   lines still gets them. */
+.vy-grid-k[data-density="compact"]     .k-grid tbody tr { height: var(--vy-row-h-compact); }
+.vy-grid-k[data-density="comfortable"] .k-grid tbody tr { height: var(--vy-row-h-comfortable); }
+.vy-grid-k[data-density="relaxed"]     .k-grid tbody tr { height: var(--vy-row-h-relaxed); }
 .vy-grid-k .k-grid td { padding-block: var(--vy-cell-pad-y); }
 /* The MiniTable took Kendo's own 8px/12px. Same numbers, said by us, so the
    link rule below has something to move. */
@@ -1518,7 +1532,7 @@
 .vy-grid-k td[data-role="number"],
 .vy-grid-k td[data-role="money"],
 .vy-grid-k td[data-role="date"] { text-align: right; font-variant-numeric: tabular-nums; }
-.vy-grid-k td[data-role="ident"] { font-family: var(--vy-font-mono); font-size: var(--vy-text-sm); }
+.vy-grid-k td[data-role="ident"] { font-weight: var(--vy-weight-medium); font-variant-numeric: tabular-nums; }
 .vy-grid-k td[data-role="status"] { overflow: visible; }
 
 /* KNOWN, MEASURED, NOT FIXED: a grid header is 41px where the grid is
