@@ -168,6 +168,10 @@ Empty state: `No comments yet. Be the first to comment!`
 Grouped by **year**. Entry format:
 `Linh Tran 1 - 08/25/2026 17:08:17` · `Create 1` · `Message: - Create RFQ was created`
 
+> **Superseded, 15 Oct 2026.** The customer rebuilt this tab. It is now a status
+> flow over a master/detail list with user and date-range filters — see
+> `docs/live-activity-log-15oct.md`, read off the live screen the same day.
+
 ---
 
 ## 4. Home

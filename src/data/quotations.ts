@@ -358,6 +358,37 @@ function withHour(d: Date, h: number) {
   const c = new Date(d); c.setHours(h, (h * 7) % 60, 0, 0); return c;
 }
 
+/**
+ * `withHour`, with seconds on it.
+ *
+ * The activity log is the one screen that shows seconds — two edits in the same
+ * minute have an order, and that order is the point of an audit trail. A log
+ * where every entry ends in `:00` reads as fabricated. It is, but it should not
+ * look it.
+ */
+function withSecond(d: Date, h: number, salt: number) {
+  const c = withHour(d, h); c.setSeconds((salt * 17 + h * 13) % 60); return c;
+}
+
+/**
+ * The edits an RFQ picks up after it is created.
+ *
+ * Field names and values are the form's own — `EXCESS_AND_MOQ` really is
+ * None/Low/OK, and "Excess and MOQ: OK -> None" is an edit read off the live
+ * log on 15 Oct 2026. Drawn from this table by INDEX rather than at random; see
+ * the loop that uses it.
+ */
+const FIELD_EDITS: { field: string; from: string; to: string }[] = [
+  { field: 'Excess and MOQ', from: 'OK', to: 'None' },
+  { field: 'Quote Focus', from: 'Production-Competitive Cost', to: 'Stock-Low cost' },
+  { field: 'Markup', from: '12%', to: '15%' },
+  { field: 'Test Requirements', from: 'NA', to: 'Functional' },
+  { field: 'Material Package Type', from: 'Cut Tape', to: 'Reels' },
+  { field: 'Acceptable LeadTime In Day', from: '21 days', to: '14 days' },
+  { field: 'Net Consigned Inventory', from: 'None', to: 'Low' },
+  { field: 'Assembly Turn Time', from: '10 days', to: '7 days' },
+];
+
 function mulberry32(seed: number) {
   return function () {
     seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
@@ -562,6 +593,38 @@ export function generateQuotations(count = 330): Quotation[] {
             at: withHour(new Date(created.getTime() + 86400000), 14),
             action: 'Status', summary: `Status changed to ${status}`,
             changes: [{ field: 'Status', from: 'New', to: status }],
+          });
+        }
+
+        /* FIELD EDITS, so the log has the thing it exists to show. Until now a
+           record carried a creation and at most a status change, and the tab
+           was a list of two lines with no diff in it.
+
+           DERIVED FROM `i`, NEVER FROM `rnd()`. One extra draw inside this
+           generator re-rolls every record after it in the stream — that is how
+           a customer's RFQ count moved from 43 to 55 the last time something
+           was added here. Index arithmetic takes nothing from the stream, so
+           every other number on every other screen is untouched.
+
+           Spread over the two days after creation, clamped so a record created
+           yesterday cannot be edited tomorrow. */
+        for (let k = 0; k < 1 + (i % 3); k++) {
+          const editor = OWNERS[(i + k) % OWNERS.length];
+          const first = FIELD_EDITS[(i * 2 + k) % FIELD_EDITS.length];
+          /* +3 rather than +1, so the second field of a two-field edit is never
+             the same entry as the first. */
+          const changes = k % 2
+            ? [first, FIELD_EDITS[(i * 2 + k + 3) % FIELD_EDITS.length]]
+            : [first];
+          const day = Math.min(created.getTime() + ((k % 2) + 1) * 86400000, TODAY.getTime());
+          log.unshift({
+            id: `ac-${i}-e${k}`,
+            author: editor,
+            initials: editor.split(' ').map(w => w[0]).join('').slice(0, 2),
+            at: withSecond(new Date(day), 9 + k * 3, i + k),
+            action: 'Update',
+            summary: changes.length === 1 ? '1 field changed' : `${changes.length} fields changed`,
+            changes,
           });
         }
         return log;

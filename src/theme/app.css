@@ -388,7 +388,12 @@
 /* =============================================================================
    QUOTATION — CHECKLISTS & ASSIGNMENT
    ========================================================================== */
-.vy-avatar--sm { width: var(--vy-space-11); height: var(--vy-space-11); font-size: var(--vy-text-xs); }
+/* ONE definition. There were two of these — this one at 28px and a second in
+   the activity-log section at 20px — and because both were global, the second
+   won everywhere, including on the nine screens that have nothing to do with
+   activity. The 20px values are kept here, so removing the duplicate changes
+   no screen; the activity log, which wants a bigger mark, scopes its own. */
+.vy-avatar--sm { width: var(--vy-space-9); height: var(--vy-space-9); font-size: var(--vy-text-2xs); }
 
 
 /* THE ACTION SITS BESIDE ITS HEADING, not at the far edge of the panel.
@@ -424,10 +429,12 @@
 
 /* --- Conversations ----------------------------------------------------------- */
 /* The PANEL fills, like every sibling tab. It used to cap — first at 78ch, then
-   at 96ch — which made it the only tab root in the app with a max-width. Next
-   to Activity Logs that was indefensible: .vy-comment and .vy-activity-item
-   share a rule, so the two tabs render the same list, and capping one of them
-   showed the same component at two widths on adjacent tabs.
+   at 96ch — which made it the only tab root in the app with a max-width, and at
+   the time the activity log rendered through this same row, so capping one tab
+   showed one component at two widths on adjacent tabs. The activity log has its
+   own shape since 15 Oct 2026 and no longer shares this rule; the panel still
+   fills, because a tab that caps while its neighbours do not is the defect
+   either way.
 
    The reading measure moves to the PROSE instead, which is where line length
    actually matters. Containers fill; text caps. The empty state is scoped here
@@ -436,18 +443,13 @@
 .vy-conv > .vy-empty-inline { max-width: none; }
 .vy-comment-text { max-width: var(--vy-prose-max); }
 .vy-thread { list-style: none; margin: 0 0 var(--vy-space-9); padding: 0; display: flex; flex-direction: column; gap: var(--vy-space-7); }
-.vy-comment, .vy-activity-item { display: grid; grid-template-columns: auto 1fr; gap: var(--vy-space-5); }
+.vy-comment { display: grid; grid-template-columns: auto 1fr; gap: var(--vy-space-5); }
 .vy-comment-meta { display: flex; align-items: baseline; gap: var(--vy-space-4); flex-wrap: wrap; font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle); margin-bottom: var(--vy-space-2); }
 .vy-comment-meta strong { color: var(--vy-on-surface); font-size: var(--vy-text-base); }
 .vy-comment-body p { margin: 0; font-size: var(--vy-text-base); color: var(--vy-on-surface-soft); }
 .vy-composer { border-top: 1px solid var(--vy-border); padding-top: var(--vy-space-7); }
 .vy-composer-foot { display: flex; align-items: center; justify-content: space-between; gap: var(--vy-space-6); margin-top: var(--vy-space-4); flex-wrap: wrap; }
 
-/* --- Activity ---------------------------------------------------------------- */
-.vy-diff { display: flex; align-items: baseline; gap: var(--vy-space-3); font-size: var(--vy-text-xs); margin-top: var(--vy-space-2); flex-wrap: wrap; }
-.vy-diff-field { color: var(--vy-on-surface-subtle); }
-.vy-diff-from { color: var(--vy-on-surface-subtle); text-decoration: line-through; }
-.vy-diff-to { color: var(--vy-on-surface-strong); font-weight: var(--vy-weight-semibold); }
 
 /* =============================================================================
    BOM COMPARISON / RUN QUOTATION
@@ -1435,66 +1437,219 @@
 .vy-pager-gap { padding: 0 var(--vy-space-2); color: var(--vy-on-surface-subtle); }
 
 /* =============================================================================
-   ACTIVITY LOG — grouped by day, then by person
+   ACTIVITY LOG — status flow, then master/detail
    -----------------------------------------------------------------------------
-   Rebuilt after the 25 Aug review asked for less blank space and grouping by
-   date and user. The flat list repeated the date and the name on every row and
-   gave each entry an avatar column it did not need.
+   REBUILT 15 Oct 2026 against the live screen, which the customer had rebuilt
+   and asked us to follow. Read on a live RFQ the same day. Three parts, in this
+   order: a horizontal status flow; a filtered list of entries grouped by date;
+   the selected entry's field changes.
+
+   What it replaces grouped by day AND by person and opened each diff inline.
+   That answered "what has this person been doing"; this answers "what did this
+   record look like before, and who moved it", and adds the status flow, which
+   we were not showing at all.
    ========================================================================== */
 .vy-activity { display: flex; flex-direction: column; gap: var(--vy-space-8); }
 
-/* The date stays put while its entries scroll under it — the one label you need
-   while reading a long log is which day you are in. */
-.vy-activity-date {
-  position: sticky; top: 0; z-index: 1;
-  margin: 0 0 var(--vy-space-5);
-  padding: var(--vy-space-3) 0;
+/* --- Status flow ------------------------------------------------------------
+   Horizontal and staying horizontal: a record passes through five statuses at
+   most, and left-to-right is how a sequence of states already reads. It scrolls
+   sideways in its own strip rather than wrapping, because a flow that wraps
+   stops reading as a flow. */
+.vy-status-flow {
+  padding: var(--vy-space-7) var(--vy-space-8);
   background: var(--vy-surface-app);
-  font-size: var(--vy-text-sm); font-weight: var(--vy-weight-semibold);
-  color: var(--vy-on-surface-soft);
+  border: 1px solid var(--vy-border);
+  border-radius: var(--vy-radius-md);
 }
-.vy-activity-group + .vy-activity-group { margin-top: var(--vy-space-6); }
-.vy-activity-who { display: flex; align-items: center; gap: var(--vy-space-4); margin-bottom: var(--vy-space-3); }
-.vy-activity-who strong { font-size: var(--vy-text-base); color: var(--vy-on-surface-strong); font-weight: var(--vy-weight-semibold); }
-.vy-activity-count { font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle); }
-.vy-avatar--sm { width: var(--vy-space-9); height: var(--vy-space-9); font-size: var(--vy-text-2xs); }
-
-/* Entries indent under their person, so the group reads as one block of work.
-   The rule is the only chrome — it replaces the per-row avatar column. */
-.vy-activity-list {
-  list-style: none; margin: 0;
-  padding: 0 0 0 var(--vy-space-8);
-  border-left: 1px solid var(--vy-border);
-  margin-left: var(--vy-space-6);
-  display: flex; flex-direction: column;
+.vy-status-flow-title {
+  margin: 0 0 var(--vy-space-6);
+  font-size: var(--vy-text-xs); font-weight: var(--vy-weight-semibold);
+  letter-spacing: .08em; text-transform: uppercase;
+  color: var(--vy-on-surface-muted);
 }
-.vy-activity-line {
-  display: flex; align-items: baseline; gap: var(--vy-space-5); width: 100%;
-  padding: var(--vy-space-3) var(--vy-space-4);
-  background: none; border: 0; border-radius: var(--vy-radius-sm);
-  font: inherit; text-align: left; color: var(--vy-on-surface);
+.vy-status-flow-track {
+  list-style: none; margin: 0; padding: 0 0 var(--vy-space-3);
+  display: flex; align-items: flex-start; gap: var(--vy-space-8);
+  overflow-x: auto;
 }
-button.vy-activity-line { cursor: pointer; }
-button.vy-activity-line:hover { background: var(--vy-surface); }
-button.vy-activity-line:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
-.vy-activity-time { font-family: var(--vy-font-mono); font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle); flex: 0 0 auto; font-variant-numeric: tabular-nums; }
-.vy-activity-summary { flex: 1; min-width: 0; font-size: var(--vy-text-base); }
-.vy-activity-detail-n { font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle); white-space: nowrap; }
-/* `aria-hidden`, so no screen reader reads it — but it is the only VISUAL sign
-   that a row expands, which makes it a state indicator rather than decoration
-   and puts it under 1.4.11's 3:1. It measured 2.41:1 on grey-400. */
-.vy-activity-chevron { color: var(--vy-on-surface-subtle); width: 1em; flex: 0 0 auto; }
-.vy-activity-detail {
-  margin: var(--vy-space-2) 0 var(--vy-space-4) var(--vy-space-11);
-  padding: var(--vy-space-4) var(--vy-space-5);
+/* The year, once, at the head of the track. Every card carries a day and a
+   month; the year is the part that rarely changes, so it is said once. */
+.vy-status-flow-year {
+  flex: none; align-self: center;
+  padding: var(--vy-space-2) var(--vy-space-5);
+  background: var(--vy-brand-subtle-strong); color: var(--vy-brand-text-deep);
+  border-radius: var(--vy-radius-sm);
+  font-size: var(--vy-text-xs); font-weight: var(--vy-weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+/* The connector is drawn on the STEP, not between cards, so a track that
+   scrolls keeps its line attached to what it joins. */
+.vy-status-flow-step {
+  position: relative; flex: none; min-width: 0;
+  display: flex; flex-direction: column; gap: var(--vy-space-3);
+}
+.vy-status-flow-step + .vy-status-flow-step::before {
+  content: ''; position: absolute; top: var(--vy-space-9);
+  left: calc(var(--vy-space-8) * -1); width: var(--vy-space-8);
+  border-top: 1px dashed var(--vy-border-mid);
+}
+.vy-status-flow-card {
+  display: flex; flex-direction: column; align-items: flex-start; gap: var(--vy-space-2);
+  padding: var(--vy-space-5) var(--vy-space-6);
   background: var(--vy-surface);
   border: 1px solid var(--vy-border);
   border-radius: var(--vy-radius-sm);
-  display: flex; flex-direction: column; gap: var(--vy-space-2);
 }
-/* A status change is the entry people scan for, so it keeps a marker. */
-.vy-activity-item[data-action="Status"] .vy-activity-summary { font-weight: var(--vy-weight-medium); }
+.vy-status-flow-who { font-size: var(--vy-text-sm); color: var(--vy-on-surface-soft); }
+.vy-status-flow-change {
+  display: flex; align-items: baseline; gap: var(--vy-space-3);
+  font-size: var(--vy-text-xs); color: var(--vy-on-surface-muted);
+}
+.vy-status-flow-was { text-decoration: line-through; }
+.vy-status-flow-when {
+  font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle);
+  font-variant-numeric: tabular-nums;
+}
 
+/* --- Master / detail --------------------------------------------------------
+   A fixed left rail rather than a fraction of the width: the list holds a name,
+   a time and a one-line summary, and giving it half the tab would stretch three
+   short strings across a screen while the diffs — the long content — wrapped. */
+.vy-activity-split {
+  display: grid; grid-template-columns: var(--vy-activity-rail-w) minmax(0, 1fr);
+  gap: var(--vy-space-8);
+  align-items: start;
+}
+.vy-activity-master {
+  min-width: 0;
+  border: 1px solid var(--vy-border); border-radius: var(--vy-radius-md);
+  background: var(--vy-surface);
+  overflow: hidden;
+}
+.vy-activity-filters {
+  display: flex; flex-wrap: wrap; gap: var(--vy-space-4);
+  padding: var(--vy-space-5);
+  border-bottom: 1px solid var(--vy-border);
+}
+.vy-activity-filters .vy-select { flex: 1 1 100%; }
+.vy-activity-date-filter { flex: 1 1 var(--vy-activity-date-w); min-width: 0; }
+.vy-activity-scroll { max-height: var(--vy-activity-list-h); overflow-y: auto; }
+
+/* The date stays put while its entries scroll under it — the one label you
+   need while reading a long log is which day you are in. */
+.vy-activity-date {
+  position: sticky; top: 0; z-index: 1;
+  margin: 0;
+  padding: var(--vy-space-4) var(--vy-space-5);
+  background: var(--vy-surface-app);
+  border-bottom: 1px solid var(--vy-border-faint);
+  font-size: var(--vy-text-xs); font-weight: var(--vy-weight-semibold);
+  color: var(--vy-on-surface-muted);
+}
+.vy-activity-list { list-style: none; margin: 0; padding: 0; }
+.vy-activity-row {
+  display: flex; align-items: center; gap: var(--vy-space-5); width: 100%;
+  padding: var(--vy-space-5);
+  background: none; border: 0; border-bottom: 1px solid var(--vy-border-faint);
+  font: inherit; text-align: left; color: var(--vy-on-surface); cursor: pointer;
+}
+.vy-activity-row:hover { background: var(--vy-surface-hover); }
+/* 28px here, against the app's 20px: the row is built around the person, and
+   the live screen it follows uses 32px. Scoped, so it stays a decision about
+   this list rather than about every avatar in the product. */
+.vy-activity-row .vy-avatar, .vy-activity-detail-head .vy-avatar {
+  width: var(--vy-space-11); height: var(--vy-space-11); font-size: var(--vy-text-xs);
+}
+.vy-activity-row:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
+/* The selected row, and the only one. `aria-current` rather than a class: the
+   selection is a fact about the row that assistive technology needs too, and
+   styling the attribute keeps the two from drifting apart. */
+.vy-activity-row[aria-current] {
+  background: var(--vy-brand-subtle);
+  box-shadow: inset var(--vy-border-emphasis) 0 0 0 var(--vy-brand);
+}
+.vy-activity-row-main { flex: 1; min-width: 0; display: grid; gap: var(--vy-space-1); }
+.vy-activity-row-main strong {
+  font-size: var(--vy-text-base); font-weight: var(--vy-weight-semibold);
+  color: var(--vy-on-surface-strong);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.vy-activity-what { font-size: var(--vy-text-xs); color: var(--vy-on-surface-muted); }
+.vy-activity-time {
+  flex: none; align-self: flex-start;
+  font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle);
+  font-variant-numeric: tabular-nums;
+}
+.vy-activity-none, .vy-activity-empty {
+  margin: 0; padding: var(--vy-space-9) var(--vy-space-5);
+  text-align: center; color: var(--vy-on-surface-subtle);
+}
+
+.vy-activity-detail {
+  min-width: 0; min-height: var(--vy-activity-detail-min-h);
+  padding: var(--vy-space-6) var(--vy-space-7);
+  background: var(--vy-surface);
+  border: 1px solid var(--vy-border); border-radius: var(--vy-radius-md);
+}
+.vy-activity-detail-head {
+  display: flex; align-items: center; gap: var(--vy-space-5);
+  padding-bottom: var(--vy-space-5);
+  border-bottom: 1px solid var(--vy-border-faint);
+}
+.vy-activity-detail-head strong {
+  flex: 1; min-width: 0;
+  font-size: var(--vy-text-md); color: var(--vy-on-surface-strong);
+}
+.vy-activity-detail-when {
+  font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle);
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.vy-activity-detail-title {
+  margin: var(--vy-space-7) 0 var(--vy-space-4);
+  font-size: var(--vy-text-xs); font-weight: var(--vy-weight-semibold);
+  letter-spacing: .08em; text-transform: uppercase;
+  color: var(--vy-on-surface-muted);
+}
+.vy-activity-detail-summary { margin: var(--vy-space-7) 0 0; color: var(--vy-on-surface-soft); }
+
+/* --- One changed field ------------------------------------------------------
+   The live screen's shape: field name, the old value struck through, an arrow,
+   the new one. Its colours were red for the old value and AMBER for the new;
+   the amber is not reproduced, because amber means "look out" everywhere else
+   in this product and the new value is simply what the field says now. Struck
+   red to brand blue reads the same way round without borrowing a warning. */
+.vy-change-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--vy-space-3); }
+.vy-change {
+  display: flex; align-items: center; gap: var(--vy-space-6); flex-wrap: wrap;
+  padding: var(--vy-space-4) var(--vy-space-5);
+  border: 1px solid var(--vy-border); border-radius: var(--vy-radius-sm);
+}
+.vy-change-field { flex: 1 1 var(--vy-change-field-w); min-width: 0; color: var(--vy-on-surface-soft); }
+.vy-change-values { display: flex; align-items: center; gap: var(--vy-space-4); flex-wrap: wrap; }
+.vy-change-arrow { color: var(--vy-on-surface-subtle); }
+.vy-change-was, .vy-change-now {
+  padding: var(--vy-space-2) var(--vy-space-4);
+  border-radius: var(--vy-radius-sm);
+  font-size: var(--vy-text-sm);
+}
+.vy-change-was {
+  background: var(--vy-danger-subtle); color: var(--vy-danger-text);
+  text-decoration: line-through;
+}
+.vy-change-now {
+  background: var(--vy-brand-subtle); color: var(--vy-brand-text-deep);
+  font-weight: var(--vy-weight-medium);
+}
+
+/* Two panes need room for two panes. Below this the rail would leave the diffs
+   about 200px to wrap in, so the list goes back on top of the detail and each
+   gets the full width. The list keeps its own scroll, so stacking does not make
+   the tab twice as long. */
+@media (max-width: 1100px) {
+  .vy-activity-split { grid-template-columns: minmax(0, 1fr); }
+  .vy-activity-scroll { max-height: var(--vy-activity-list-h-stacked); }
+}
 
 /* =============================================================================
    FILTER TOOLBAR — the panel behind the funnel

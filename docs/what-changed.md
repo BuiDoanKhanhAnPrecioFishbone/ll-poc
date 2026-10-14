@@ -281,10 +281,21 @@ density preference (1.4).
 NOTES` — and **all 27 fields** with their required markers. `Historical RFQ`
 appears only when Order Type is `Repeat`, as your guideline specifies.
 
-**Changed:** the Activity Logs tab. Yours prints raw column names in the diff —
-one entry we read said `DtIssuedUtc:` with no before or after value. Ours groups
-by day and by person and says what changed from what to what.
-**Asked for** — 25 August review.
+**Changed:** the Activity Logs tab, **rebuilt on 15 October to follow yours.**
+You redesigned this tab in Voyager and asked us to match it, so we read the live
+screen and reproduced its three parts: a horizontal **status flow**, a filtered
+**list** of entries grouped by date, and the selected entry's **field changes**
+beside it. The status flow is information the old tab was not showing at all.
+
+Three places it does not copy the live screen exactly, each on purpose:
+
+| | Live | Here | Why |
+|---|---|---|---|
+| On opening | "No activity selected." | The newest entry is already open | The detail pane is two thirds of the tab; spending it on an instruction to click costs every user a click to see the thing they came for |
+| Order inside a day | Oldest-first under one date, newest-first under the next | Always the order things happened | On the record we read, the two groups were sorted in opposite directions — one of them is wrong whichever rule was meant |
+| The new value | Amber | Our blue | Amber means "look out" everywhere else in this product, and the new value is simply what the field says now |
+
+**Asked for** — 15 October.
 
 **Corrected in this mockup, not in yours:** two mangled field labels — `AML` is
 an acronym, and "Out Stock" is missing a word.

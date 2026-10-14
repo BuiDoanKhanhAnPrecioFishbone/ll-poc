@@ -408,6 +408,15 @@
   /* --- Layout sizes ----------------------------------------------------------
      Named because they are component dimensions, not spacing. */
   --vy-control-sm:        28px;  /* avatar, brand mark */
+  /* Activity log. The rail is fixed rather than a fraction: the list holds a
+     name, a time and one short line, and half a tab would stretch three short
+     strings while the diffs beside them wrapped. */
+  --vy-activity-rail-w:      20rem;
+  --vy-activity-date-w:       7rem;
+  --vy-activity-list-h:       26rem;
+  --vy-activity-list-h-stacked: 16rem;
+  --vy-activity-detail-min-h: 20rem;
+  --vy-change-field-w:        10rem;
   --vy-control-md:        34px;  /* input / locked-field height */
   --vy-quote-fact-wide:   220px; /* an assembly number or a description */
   --vy-quote-qty-w:       120px; /* Build Qty / Attrition Set */

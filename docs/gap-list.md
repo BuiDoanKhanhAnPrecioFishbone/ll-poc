@@ -56,7 +56,7 @@ Precedence per `docs/precedence.md`.
 | C6 | Global header | no clock/tz/language | add all three | ✅ done |
 | C7 | My Queues | absent | header icon + badge | ✅ done |
 | C8 | Collapsed menu | group icons | per-item icons | ✅ done |
-| C9 | Activity Logs | grouped by year | group by date **and user**, click for detail | ✅ done |
+| C9 | Activity Logs | grouped by year | status flow, filtered list by date, field changes beside it | ✅ done — **rebuilt 15 Oct 2026** to follow the customer's own redesign; see `docs/live-activity-log-15oct.md` |
 | C10 | Field grouping | four sections exist | group related data by region | ✅ done — but use **A2**'s real names |
 | C11 | Date display | mixed | one format, exact or relative | ✅ done |
 | C12 | Label casing | mixed | consistent | ✅ done |
