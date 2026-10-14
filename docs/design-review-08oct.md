@@ -119,6 +119,76 @@ rows stood at 72px. The cell is a table cell again and the button centres
 itself. The selection column still carries the same `display: flex`; it is
 alone in its table today, and worth changing the next time that table is opened.
 
+## 7. Two fills, not three — 14 October
+
+*"My client do not want a plain text for read only, they want all value to be
+filled inside a text box. Read view: every value is the same, no action inside,
+no white fill (it look like the input active). Edit view: two states, read-only
+with lock icon and disabled fill, editable with white fill."*
+
+White now means one thing in this product: **you can type here.**
+
+| | Fill | Border | Lock |
+|---|---|---|---|
+| Read mode, every value | grey-100 | grey-300 | — |
+| Edit mode, read-only | grey-100 | grey-300 | padlock + why |
+| Edit mode, editable | white | grey-500 | — |
+
+**Read mode and a locked field share one fill, and that is the point.** The fill
+means "not typeable". In read mode nothing is, so every value looks identical
+and no field needs a lock to say so; in edit mode the lock appears exactly where
+it distinguishes. Measured on the RFQ record: 23 value boxes in read mode, 0
+locks, **0 actions inside a box**; in edit mode the locked fields carry the
+padlock and the reason, and every live control is white.
+
+**What this overturns, and what it does not.** The 25 Aug decision put a white
+box in view mode; this takes the white out and keeps the box. The 27 Aug
+confirmation — grey fill and grey border for a locked field, in edit mode only —
+is untouched. It also reverses a change of my own from 6 Oct, which rendered the
+Run Quotation reference values as plain text; see below.
+
+**Three defects found on the way, each from a rule being keyed to the wrong
+thing.**
+
+- **A locked field was keyed to an editing CLASS**, so the dialogs that show a
+  system-owned value beside live controls — MPN Mapping's Part Number, Create
+  BoM's Run by and Created Date — never matched it. Twenty values across those
+  dialogs were rendering as white boxes among white inputs: the exact confusion
+  this instruction is about. Keyed on `[data-locked]` now, which is set by the
+  presence of a reason note, and read mode sets none.
+- **An editable row drew two boxes.** The row's own border and padding wrapped
+  around an input carrying its own, which also pushed every control 11px right
+  of the label it belongs to. The control is the box now; label and control
+  share a left edge, measured at 100px and 100px.
+- **Four colour tokens had drifted** out of the explicit dark-theme block and
+  existed only in the `prefers-color-scheme` copy. A user whose OS is dark got
+  the dark values; a user who *chose* dark in the user menu got the light ones.
+  Found because the reference panel started drawing with one of the four.
+
+### The reference panel keeps its boxes
+
+Run Quotation step 1 is why this was ever a plain-text override: eight inherited
+values in boxes ran the panel 696px into 624px, and macOS hides an overlay
+scrollbar until it moves, so the customer read a scrollable panel as a truncated
+one — *"I cannot scroll to see all the attachments"*. That option is gone, so
+the height is solved where it belonged:
+
+- The panel's explanatory line lost its second half. *"Quote Focus, Material
+  Package Type and Markup may be changed for this run; the rest is shown for
+  reference"* is now what the padlocks say, and the one panel short of vertical
+  room was spending two lines saying it twice.
+- Read boxes there are 28px rather than 34px — this column is genuinely tight,
+  and a box that is not quite control height is one more quiet way of saying it
+  is not a control.
+- **The scrollbar is always drawn**, with its gutter reserved, like the nav rail.
+  At 720p this panel cannot fit whatever its values are rendered as (624px of
+  plain text did not fit either), so the fix is a scrollbar you can see, not a
+  layout tuned until it happens to fit at one window size.
+
+Measured at 1440x900, with the boxes: panel overflow **0px**, attachments
+visible without scrolling — against 55px of hidden overflow before the trims.
+At 1280x720, 27px that now scrolls visibly.
+
 ---
 
 ## Not built, and why

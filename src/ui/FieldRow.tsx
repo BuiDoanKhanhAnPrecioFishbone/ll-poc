@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { Icon } from './icons';
 
 /**
  * ONE labelled row. Every label-and-value pair in the app is this.
@@ -77,7 +78,14 @@ export function FieldRow({
       </dt>
       <dd className={empty ? 'is-empty' : undefined}>
         {children}
-        {note && <span className="vy-field-locked">{note}</span>}
+        {/* The lock, 14 Oct 2026: "read only with lock icon and disable fill
+            bg". The glyph says THAT the field is locked at a glance; the words
+            beside it say WHY, which a padlock cannot. */}
+        {note && (
+          <span className="vy-field-locked">
+            <Icon name="lock" size={13} />{note}
+          </span>
+        )}
         {error}
         {/* Never both. An error and a hint together make the reader work out
             which one is telling them what to do next. */}
@@ -120,14 +128,27 @@ export function RequiredMark() {
  * styles at all — so every "Not set" on Create BoM rendered as ordinary black
  * text while the same words elsewhere read as absent.
  *
- * `locked` is for a value the system owns and the user might expect to edit;
- * a plain read-out does not need it.
+ * ALWAYS LOCKED, and it says so. Every one of these sits among live controls —
+ * a dialog, a step of Run Quotation — never in a read view, where `FieldRow`'s
+ * own box is the one that renders. So this is the edit view's read-only state,
+ * which the customer defined on 14 Oct 2026 as a lock icon plus a disabled
+ * fill, and there is nothing for a `locked` prop to vary: the three call sites
+ * that passed it were marking as special what all twenty of them are.
+ *
+ * On Run Quotation step 1 that distinction is the whole point of the panel —
+ * eight values carried from the RFQ, three the step can actually change — and
+ * until now all eleven were white boxes.
  */
-export function ReadValue({ children, locked }: { children?: ReactNode; locked?: boolean }) {
+export function ReadValue({ children }: { children?: ReactNode }) {
   const empty = children === undefined || children === null || children === '';
   return (
-    <p className="vy-read-value" data-locked={locked || undefined} data-empty={empty || undefined}>
-      {empty ? 'Not set' : children}
+    <p className="vy-read-value" data-empty={empty || undefined}>
+      <span className="vy-read-value-text">{empty ? 'Not set' : children}</span>
+      <Icon name="lock" size={13} />
+      {/* The glyph is decorative to a screen reader, so the state needs words
+          of its own — otherwise a locked value and an editable one are
+          announced identically. */}
+      <span className="vy-sr-only"> read-only</span>
     </p>
   );
 }

@@ -429,22 +429,45 @@
 .vy-field { display: grid; gap: var(--vy-space-2); padding: var(--vy-space-4) 0; border-bottom: 1px solid var(--vy-border-faint); }
 .vy-field dt { font-size: var(--vy-text-sm); color: var(--vy-on-surface-muted); }
 /* ---- Field values ---------------------------------------------------------
-   VIEW mode renders a WHITE BOX. Customer decision, 25 Aug 2026: "the grey box
-   only shows in EDIT mode; in VIEW mode just show the white box as normal."
+   THREE FILLS, ONE SHAPE. Customer instruction, 14 October 2026:
 
-   This reverses an earlier call of mine. I had rendered read mode as bare
-   values on the argument that a record you are only looking at should not
-   resemble a form — but the customer's users read this screen as a form either
-   way, the boxes give every value a consistent left edge to scan down, and it
-   is what the live system does. The concern that made me drop the boxes was
-   really about GREY ones, which is exactly what the answer confines to edit
-   mode. */
+     "Read view: every value the same, no action inside, no white fill — it
+      looks like the input is active. Edit view: two states: read-only with a
+      lock icon and a disabled fill; editable with a white fill."
+
+   White now carries exactly one meaning in this product: you can type here.
+
+   Read mode KEEPS the boxes — the customer's users read this screen as a form,
+   a box gives every value the same left edge to scan down, and it is what the
+   live system does — but fills them grey-50, which reads as a surface rather
+   than as a control waiting for a caret.
+
+   This reverses the 25 Aug decision ("in VIEW mode just show the white box as
+   normal") on the customer's own say-so, and the two answers are less far apart
+   than they look: 25 Aug was about the GREY of a disabled field, this one is
+   about the WHITE of an active one. So there are two fills, not three:
+
+     grey-100   a value you cannot type into   (read mode; [data-locked] in edit)
+     white      type here                      (.vy-input, .vy-select)
+
+   WHY grey-100 AND NOT grey-50, which was the first attempt and looks calmer in
+   isolation: the page itself is grey-50 (base.css sets it on `body`) and a
+   record's field groups have no fill of their own, so a grey-50 box on a
+   grey-50 page is a 1.0 ratio — the "box the client asked for" would have been
+   an outline and nothing else. Any near-white fill on a near-white ground is
+   subtle, which is why the BORDER carries the shape here and the fill only has
+   to be clearly Not White.
+
+   Read mode and an edit-mode locked field therefore share one fill, which is
+   the point rather than a compromise: the fill means "not typeable". In read
+   mode nothing is, so every value is identical and nothing needs a lock; in
+   edit mode the lock appears exactly where it distinguishes. */
 .vy-field dd {
   margin: 0;
   min-height: var(--vy-control-md);
   padding: var(--vy-space-3) var(--vy-space-5);
-  background: var(--vy-surface);
-  border: 1px solid var(--vy-border);
+  background: var(--vy-surface-sunken);
+  border: 1px solid var(--vy-border-strong);
   border-radius: var(--vy-radius-sm);
   font-size: var(--vy-text-base);
   color: var(--vy-on-surface-strong);
@@ -475,7 +498,14 @@
 }
 .vy-field--editing dt { padding-top: 0; }
 .vy-field--editing dt label { font-size: var(--vy-text-sm); color: var(--vy-on-surface-muted); }
-.vy-field--editing dd { display: flex; flex-direction: column; gap: var(--vy-space-2); min-width: 0; }
+/* An editable row has NO box of its own: the control is the box and white is
+   its state. Before this the row drew both — the dd's border and padding
+   wrapped around an input carrying its own — which doubled the outline and
+   pushed every control 11px to the right of the label it belongs to. */
+.vy-field--editing dd {
+  display: flex; flex-direction: column; gap: var(--vy-space-2); min-width: 0;
+  min-height: 0; padding: 0; background: none; border: 0;
+}
 
 /* Controls fill their field. The select's default minimum is for standalone
    use — inside a field the column decides the width, not the control. */
@@ -769,17 +799,20 @@
    read-only field is indistinguishable from any other, because in view mode
    they all are. */
 .vy-flag-row[data-locked] { color: var(--vy-on-surface-muted); }
+/* The lock and its reason, at the trailing edge of a locked field. No fill of
+   its own any more: the box behind it is already grey, and a sunken pill on a
+   sunken box was invisible. `margin-left: auto` rather than a fixed gap, so
+   the value keeps the same left edge as every other value on the screen. */
 .vy-field-locked {
-  display: inline-block;
-  margin-left: var(--vy-space-4);
-  padding: 0 var(--vy-space-3);
-  border-radius: var(--vy-radius-sm);
-  background: var(--vy-surface-sunken);
+  display: inline-flex; align-items: center; gap: var(--vy-space-2);
+  margin-left: auto;
+  flex: none;
   font-size: var(--vy-text-2xs);
   color: var(--vy-on-surface-muted);
   white-space: nowrap;
   vertical-align: middle;
 }
+.vy-field-locked svg { flex: none; }
 
 /* Undo sits inside the toast, before the dismiss cross, because it is the
    action and the cross is only an exit. Underlined rather than boxed: a filled
@@ -888,26 +921,37 @@
   font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle); line-height: 1.4;
 }
 
-/* ---- Locked fields, in edit mode ----------------------------------------
-   The 25 Aug review: "read-only fields: use gray background and gray border".
+/* ---- Read-only fields, among controls -----------------------------------
+   The second of the two edit-view states, 14 Oct 2026: "read only with lock
+   icon and disable fill bg". The fill and the grey border were asked for on
+   25 Aug and confirmed on 27 Aug; the LOCK is the new part, and it is what
+   carries the state at a glance. A grey fill on its own is ambiguous — it is
+   also what a theme, a zebra stripe or a disabled control look like — while a
+   padlock means one thing in every product these users already work in.
 
-   Applied while EDITING only. Put to the customer and CONFIRMED 27 Aug 2026:
-   the grey fill and grey border appear in edit mode and nowhere else.
+   In read mode every field is read-only, so no field gets this: greying them
+   all would put the record back to looking like a form that failed to load.
+   Editing is the mode where "why can't I type here" is a live question.
 
-   In read mode every field is read-only, so GREYING them all would put the
-   record back to looking like a form that failed to load — which is what the
-   live screen does and what this prototype set out to fix. Editing is the mode
-   where "why can't I type here" is a live question, and there the grey box
-   answers it before the note does. */
-.vy-record-fields[data-editing] .vy-field[data-locked] dd,
-.vy-field--editing[data-locked] dd {
+   KEYED ON [data-locked], which `FieldRow` sets from the presence of a reason
+   note — not on an editing class, which is what this rule used to require. The
+   dialogs that show a system-owned value beside live controls (MPN Mapping's
+   Part Number and Description, Create BoM's Run by and Created Date) never
+   carried that class, so their locked rows rendered as plain boxes among white
+   inputs: the exact confusion this instruction is about. Read mode sets no
+   notes, so nothing can pick this up there by accident. */
+.vy-field[data-locked] dd {
   display: flex; align-items: center; gap: var(--vy-space-4);
   min-height: var(--vy-control-md);
   padding: var(--vy-space-3) var(--vy-space-5);
   background: var(--vy-surface-sunken);
   border: 1px solid var(--vy-border-strong);
   border-radius: var(--vy-radius-sm);
-  color: var(--vy-on-surface-muted);
+  /* grey-700, not the grey-600 this rule used to set. The lock and the fill
+     say "inert" on their own; a value the user still has to READ — a customer
+     name, a part number — does not also need to be dimmed to the AA floor.
+     5.6:1 before, 7.0:1 now. */
+  color: var(--vy-on-surface-soft);
 }
 
 /* ---- Checkboxes ----------------------------------------------------------
@@ -1234,36 +1278,54 @@
 .vy-quote-config-field[data-wide] { grid-column: 1 / -1; }
 
 /* A value the step did not ask for — carried from the RFQ, or filled by the
-   system. `data-locked` is the same grey the record form uses for a field the
-   system owns, so the two screens teach the same thing. */
+   system — sitting among controls that ARE live. That is the same state as a
+   locked field row above, so it is the same box: disabled fill, grey border,
+   lock at the trailing edge. It used to be white, which made eight inherited
+   values on Run Quotation step 1 look exactly like the three the step can
+   actually change. */
 .vy-read-value {
   margin: 0; min-height: var(--vy-control-md);
-  display: flex; align-items: center;
+  display: flex; align-items: center; gap: var(--vy-space-4);
   padding: var(--vy-space-3) var(--vy-space-5);
-  background: var(--vy-surface);
-  border: 1px solid var(--vy-border);
+  background: var(--vy-surface-sunken);
+  border: 1px solid var(--vy-border-strong);
   border-radius: var(--vy-radius-sm);
-  font-size: var(--vy-text-base); color: var(--vy-on-surface-strong);
+  font-size: var(--vy-text-base); color: var(--vy-on-surface-soft);
 }
-.vy-read-value[data-locked] { background: var(--vy-surface-sunken); border-color: var(--vy-border-strong); color: var(--vy-on-surface-muted); }
+.vy-read-value-text { min-width: 0; }
+.vy-read-value > svg { margin-left: auto; flex: none; color: var(--vy-on-surface-muted); }
 .vy-read-value[data-empty] { color: var(--vy-on-surface-subtle); font-style: italic; }
 
-/* ---- The reference panel reads, it does not pretend to be a form ----------
-   Eight inherited values, each in a box the user cannot type into, ran the
-   panel 696px long inside 624px — so it grew a scrollbar, and on macOS that
-   scrollbar is invisible until it moves. The customer reported it as "I cannot
-   scroll to see all the attachments".
+/* ---- The reference panel ---------------------------------------------------
+   These eight values WERE rendered as plain text here, on 6 Oct, to get the
+   panel under its own height: in boxes it ran 696px long inside 624px, grew a
+   scrollbar that on macOS stays invisible until it moves, and the customer
+   reported it as "I cannot scroll to see all the attachments".
 
-   This is the record screen's own rule, which this panel had never followed:
-   "Read mode renders VALUES, not disabled inputs. The live screen puts every
-   field in a read-only Input, so a record you are merely looking at reads as a
-   broken form." Values here; boxes only on the three fields this step can
-   actually change. */
+   The 14 Oct instruction takes that option away — a read-only value is a box,
+   everywhere — so the height is solved where it should have been: the panel
+   scrolls in its own column (below), and the dialog now opens maximised, which
+   is 300px more than it had on 6 Oct. Measured after the change: see
+   docs/design-review-08oct.md. */
+/* The panel's own ground is grey-50, and a grey-100 box on it is a 1.07:1
+   fill difference — the edge is doing all the work, so it gets one step more
+   of it. grey-400, not the grey-500 an INPUT border uses: visible as an edge,
+   and still plainly not a control. */
+/* The panel's own ground is grey-50, and a grey-100 box on it is a 1.07:1
+   fill difference — the edge is doing all the work, so it gets one step more
+   of it. grey-400, not the grey-500 an INPUT border uses: visible as an edge,
+   and still plainly not a control.
+
+   Shorter than a control, too, by 6px. Partly because this column is the one
+   place in the app that is genuinely short of vertical room, and partly
+   because a read box that is not quite control height is one more quiet way
+   of saying it is not a control. */
 .vy-run-ref .vy-read-value {
-  min-height: 0; padding: 0; background: none; border: 0; border-radius: 0;
+  border-color: var(--vy-border-mid);
+  min-height: var(--vy-control-sm);
+  padding-block: var(--vy-space-2);
 }
-.vy-run-ref .vy-read-value[data-locked] { background: none; }
-.vy-run-ref .vy-quote-config-grid { gap: var(--vy-space-5); }
+.vy-run-ref .vy-quote-config-grid { gap: var(--vy-space-4); }
 
 .vy-attachments { margin-top: var(--vy-space-7); }
 .vy-attachments ul { list-style: none; margin: var(--vy-space-3) 0 0; padding: 0; display: flex; flex-direction: column; gap: var(--vy-space-2); }

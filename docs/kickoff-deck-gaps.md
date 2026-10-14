@@ -164,17 +164,21 @@ controls, which is a decision to take deliberately and not a consequence of
 holding a licence. `open-questions.md` item 2 and
 `kendo-license-activation.md` section 6.
 
-**"Value (read-only/editable)" (slide 10).** The deck lists read-only versus
-editable as a distinction the Form View should express. Our view mode does not
-express it: every field renders as a white box whether or not it can be
-edited, and the difference appears only in edit mode, where locked fields go
-grey.
+**"Value (read-only/editable)" (slide 10).** CLOSED, 14 October 2026. The deck
+lists read-only versus editable as a distinction the Form View should express,
+and it now does — in edit mode, which is the only mode where the distinction
+exists to make. An editable field is a white box; a read-only one is a grey box
+with a padlock and a line saying why ("set by the system", "follows Customer").
+In read mode nothing is editable, so every value is the same grey box and no
+field carries a lock.
 
-That is not an oversight. It is the customer's own decision of 25 Aug 2026,
-recorded at `components.css:298` — *"the grey box only shows in EDIT mode; in
-VIEW mode just show the white box as normal"* — which reversed an earlier call
-of mine to render read mode as bare values. **The 25 Aug instruction is newer
-and more specific, so it wins.**
+The two earlier answers are both in that sentence. The customer's 25 Aug
+decision — *"the grey box only shows in EDIT mode; in VIEW mode just show the
+white box as normal"* — kept the boxes and confined the grey to editing, and
+that still holds. Their 14 Oct instruction took the WHITE out of read mode, on
+the grounds that a white box reads as a live input: *"no white fill, it look
+like the input active"*. White now means one thing in this product, which is
+what the deck was asking for.
 
 Worth knowing, though, that the day-one deck asked for the distinction. If the
 customer ever revisits the view-mode question, this is evidence that they

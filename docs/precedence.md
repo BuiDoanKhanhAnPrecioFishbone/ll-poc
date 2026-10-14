@@ -21,7 +21,9 @@ Three documents, plus anything the customer says after them:
   three, so where it and a later source disagree, the later one wins — twice
   already: it asks for KendoUI (no licence, see question 2 below) and for the
   Form View to distinguish read-only from editable values, which the customer's
-  own 25 Aug instruction then overrode in favour of one white box in view mode.
+  own 25 Aug instruction overrode in favour of one white box in view mode — and
+  which their 14 Oct instruction then restored, as a lock icon and a disabled
+  fill, in edit mode only. The deck was right; it took two rounds to get there.
   Coverage and gaps: `docs/kickoff-deck-gaps.md`.
 
 **Where these ask for a change, they win outright**, even against the live

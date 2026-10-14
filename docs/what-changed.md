@@ -142,12 +142,22 @@ finding C3.
 
 ## 1.9 Forms tell you what you can change
 
-**Before / After.** In view mode the record is one white surface, on your own
-25 August instruction — which overrode the kick-off deck's request that
-read-only and editable values look different. We built the deck's version first
-and replaced it when you said otherwise.
+**After.** White means one thing now: you can type here.
 
-**Asked for**, and recorded because the two documents disagree.
+| | Looks like |
+|---|---|
+| Reading a record | Every value in the same grey box. No white, nothing clickable inside |
+| Editing, a field you can change | A white box |
+| Editing, a field you cannot | The same grey box, with a padlock and a short reason — "set by the system", "follows Customer" |
+
+Reading and a locked field share a fill on purpose: the grey means "not
+typeable". When you are only reading, nothing is, so every value looks the same
+and no padlock is needed to say so. The padlock appears where it tells you
+something — among fields you can change.
+
+**Asked for**, 14 October: *"no white fill, it look like the input active"*.
+It also answers the kick-off deck's request that read-only and editable values
+look different, which your 25 August instruction had set aside.
 
 ## 1.10 Dates say when, not roughly when
 

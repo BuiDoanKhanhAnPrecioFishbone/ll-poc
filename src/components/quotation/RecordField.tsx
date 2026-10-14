@@ -6,6 +6,7 @@ import { PEOPLE_DIRECTORY } from '../../data/quotations';
 import { PeoplePicker } from '../../ui/PeoplePicker';
 import { fmtDate, fmtDateTime } from '../../ui/renderCell';
 import { FieldRow, RequiredMark } from '../../ui/FieldRow';
+import { Icon } from '../../ui/icons';
 
 /* Re-exported: four screens import the marker from here, which is where they
    learned to look for it. It now lives beside the row that renders it. */
@@ -324,7 +325,14 @@ function ReadField<T>({ def, value, editing }: { def: FieldDef<T>; value: unknow
       <div className="vy-flag-row" data-on={Boolean(value)} data-locked={editing && def.readOnly || undefined}>
         <span className="vy-flag-mark" aria-hidden>{value ? '✓' : '–'}</span>
         <span>{def.label}{def.required && <RequiredMark />}</span>
-        {editing && def.readOnly && <span className="vy-field-locked">{lockReason(def)}</span>}
+        {/* The same lock the field rows carry — this row renders itself rather
+            than going through FieldRow, which is how it came to be the one
+            locked field on the screen with no padlock on it. */}
+        {editing && def.readOnly && (
+          <span className="vy-field-locked">
+            <Icon name="lock" size={13} />{lockReason(def)}
+          </span>
+        )}
       </div>
     );
   }

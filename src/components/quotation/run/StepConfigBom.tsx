@@ -95,10 +95,13 @@ export function StepConfigBom({ q, cfg, set, invalid = [] }: {
     <div className="vy-run-step vy-run-step--config">
       <section className="vy-run-section vy-run-ref">
         <h3 className="vy-field-group-title">Quoting information</h3>
-        <p className="vy-hint">
-          Carried from the Project Requirement. Quote Focus, Material Package Type and Markup
-          may be changed for this run; the rest is shown for reference.
-        </p>
+        {/* The sentence that used to follow — "Quote Focus, Material Package
+            Type and Markup may be changed for this run; the rest is shown for
+            reference" — is gone because the fields now say it themselves: from
+            14 Oct 2026 a value you cannot edit carries a lock, so naming the
+            three editable ones in prose was the same fact twice, in the one
+            panel short of vertical room. */}
+        <p className="vy-hint">Carried from the Project Requirement.</p>
 
         <div className="vy-quote-config-grid">
           {/* Named on the Standard Quote sheet and not the Quick Quote one.
@@ -206,7 +209,7 @@ export function StepConfigBom({ q, cfg, set, invalid = [] }: {
 
               <Field label="File Name">
                 {/* Read-only and auto-filled, per r23-r25. */}
-                <ReadValue locked>{cfg.attachment}</ReadValue>
+                <ReadValue>{cfg.attachment}</ReadValue>
               </Field>
 
               <Field label="Select template">
@@ -273,7 +276,7 @@ export function StepConfigBom({ q, cfg, set, invalid = [] }: {
                 </Field>
 
                 <Field label="File name">
-                  <ReadValue locked>{cfg.uploadedFile}</ReadValue>
+                  <ReadValue>{cfg.uploadedFile}</ReadValue>
                   <span className="vy-field-hint">Filled in when you upload.</span>
                 </Field>
 
@@ -375,7 +378,7 @@ export function StepConfigBom({ q, cfg, set, invalid = [] }: {
               {/* Locked, not merely read-only: the guideline says it "can't be
                   more adjusted", and it belongs to the assembly rather than to
                   this quote run. */}
-              <ReadValue locked>{cfg.partDesc}</ReadValue>
+              <ReadValue>{cfg.partDesc}</ReadValue>
               <span className="vy-field-hint">Comes from the assembly and cannot be changed here.</span>
             </Field>
 

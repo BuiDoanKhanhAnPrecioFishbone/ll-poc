@@ -91,6 +91,11 @@ shows the normal white box. Done. Note this reverses an earlier call of mine to
 render view mode as bare values — the boxes stay, only the GREY is confined to
 editing.
 
+> **Superseded in part, 14 Oct 2026.** The boxes stay, and the grey still marks
+> a locked field in edit mode — now with a padlock on it. What changed is the
+> other mode: read view is no longer white. *"No white fill, it look like the
+> input active."* White is reserved for a field you can type into.
+
 **My Queues** — parked. "Low priority, so for now just note that we will have it
 in the future rather than handling it. Let's focus on the list view and form
 view of Project Requirement first." The permission model and module queues built

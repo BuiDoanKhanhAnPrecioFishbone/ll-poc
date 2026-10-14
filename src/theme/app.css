@@ -495,7 +495,19 @@
 /* The reference column is the one that can be long — eight inherited fields and
    the attachment list — and it is the one the user reads rather than fills in.
    So it takes the scrolling, and the work beside it never moves. */
-.vy-run-ref { min-height: 0; overflow: auto; }
+/* A SCROLLBAR YOU CAN SEE. This panel holds more than fits on a 720p laptop
+   whatever its values are rendered as — plain text ran 624px into 586px — so
+   the fix for "I cannot scroll to see all the attachments" is not to shrink the
+   content until it happens to fit at one window size. macOS hides an overlay
+   scrollbar until it moves, which is what made a scrollable panel look like a
+   truncated one; this one is always drawn, and the gutter is reserved so the
+   content does not shift when it appears. Same treatment as the nav rail. */
+.vy-run-ref { min-height: 0; overflow: auto; scrollbar-gutter: stable; }
+.vy-run-ref::-webkit-scrollbar { width: var(--vy-space-4); }
+.vy-run-ref::-webkit-scrollbar-thumb {
+  background: var(--vy-border-mid); border-radius: var(--vy-radius-md);
+}
+.vy-run-ref::-webkit-scrollbar-thumb:hover { background: var(--vy-on-surface-faint); }
 .vy-run-work { display: flex; flex-direction: column; gap: var(--vy-space-8); min-width: 0; }
 .vy-run-pair {
   display: grid;
