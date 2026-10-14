@@ -417,6 +417,27 @@
    a measure for a document, not for two sentences explaining an empty table —
    it was what made the box run nearly the full width of the panel. 60ch is the
    figure `.vy-empty-state--tab p` already uses for exactly this kind of prose. */
+/* The document, over who uploaded it and when. Two live COLUMNS folded into
+   one cell on 15 Oct 2026 — they are empty exactly when the document is empty,
+   so as columns they were two blank stripes across a grid with no room for
+   them, and the room was what the Actions column needed. */
+.vy-doc-cell { display: grid; gap: var(--vy-space-1); min-width: 0; }
+.vy-doc-meta {
+  font-size: var(--vy-text-xs); color: var(--vy-on-surface-muted);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* AND A SCROLLBAR YOU CAN SEE, for the widths where five columns still do not
+   fit. The defect being fixed above was not the scrolling, it was that macOS
+   hides an overlay scrollbar until it moves, so a row with more to the right
+   of it looked like a row that ended. Same treatment as the Run Quotation
+   reference panel. */
+.vy-minitable-k .k-grid-content::-webkit-scrollbar { height: var(--vy-space-4); }
+.vy-minitable-k .k-grid-content::-webkit-scrollbar-thumb {
+  background: var(--vy-border-mid); border-radius: var(--vy-radius-md);
+}
+.vy-minitable-k .k-grid-content::-webkit-scrollbar-thumb:hover { background: var(--vy-on-surface-faint); }
+
 .vy-tasks .vy-empty-inline { padding: var(--vy-space-6) var(--vy-space-7); max-width: 60ch; }
 .vy-empty-inline { color: var(--vy-on-surface-subtle); font-size: var(--vy-text-base); background: var(--vy-surface-subtle); border: 1px dashed var(--vy-border-strong); border-radius: var(--vy-radius-md); padding: var(--vy-space-8); max-width: var(--vy-prose-max); }
 

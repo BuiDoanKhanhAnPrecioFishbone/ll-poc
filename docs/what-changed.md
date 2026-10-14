@@ -300,6 +300,20 @@ Three places it does not copy the live screen exactly, each on purpose:
 **Corrected in this mockup, not in yours:** two mangled field labels — `AML` is
 an acronym, and "Out Stock" is missing a word.
 
+**Changed, 15 October:** the task grid on Checklists & Assignment. Its seven
+columns added up to 1320px inside an 840px panel, so Assignee, Status and the
+**Upload** and **Approve** buttons sat past the right-hand edge. The grid did
+scroll, but macOS draws no scrollbar until one moves — so the row looked like it
+ended, and the tab's two main actions were unreachable without discovering an
+invisible scroll. Widening does not fix it: the whole panel is 1104px on a
+1400px screen, so 1320px of columns cannot fit at any width.
+
+`Uploaded By` and `Uploaded Date` now sit **under the document name**, where
+they belong — they are blank exactly when the document is blank, so as columns
+they were two empty stripes taking the room the Actions column needed. Five
+columns now total 820px, and every action is on screen. The one thing it costs:
+you can no longer sort by uploader, on a grid of four to nine rows.
+
 ## 2.4 Part Master
 
 **Kept:** all eleven columns in your order and your words (`CUSTOMER NAME`,

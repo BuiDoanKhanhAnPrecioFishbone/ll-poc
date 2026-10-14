@@ -143,16 +143,43 @@ export function ChecklistsTab({ q, people: controlled, onPeopleChange, touched, 
     toast.undoable(`${type} approved.`, () => setTasks(before));
   };
 
+  /* FIVE COLUMNS, NOT SEVEN. Reported 15 Oct 2026: "the action is hidden in the
+     last column so user will be confused". Measured — it was worse than hidden.
+     The seven columns summed to 1320px of fixed width inside an 840px track, so
+     Assignee, Status and Actions sat past the right edge; the grid body scrolls,
+     but macOS draws no scrollbar until one moves, so there was nothing on screen
+     to say that 480px of the row existed. The primary actions of the tab were
+     unreachable without discovering an invisible scroll.
+
+     Widening does not fix it: the whole tab panel is 1104px at a 1400px window,
+     so even at full width, with the assignee rail removed, 1320px does not fit.
+     The column SET was the problem.
+
+     `Uploaded By` and `Uploaded Date` are live columns (docs/live-spec-25aug.md)
+     and they are kept as facts — they move under the document name, where they
+     belong: they are empty exactly when the document is empty and filled when it
+     is filled, so as columns they were two always-blank stripes across a grid
+     that had no room for them. The Actions column stays, because that one is a
+     written requirement, not an inherited layout.
+
+     Costs, stated: you can no longer sort by uploader. On a grid of four to nine
+     task rows that was never the way anyone found anything. */
   const columns: ColumnSpec<ChecklistTask & { id: string }>[] = [
-    { field: 'type', title: 'Task', role: 'text' },
-    { field: 'documentName', title: 'Document', role: 'text',
+    { field: 'type', title: 'Task', role: 'text', width: 170,
+      widthNote: 'Checklist names, longest "Tooling/Stencil Review".' },
+    { field: 'documentName', title: 'Document', role: 'text', width: 210,
+      widthNote: 'Carries the file name over its uploader and date.',
       render: t => t.documentName
-        ? <a className="vy-cell-link" href="#" onClick={e => { e.preventDefault(); toast.notImplemented(`download ${t.documentName}`); }}>{t.documentName}</a>
+        ? (
+          <span className="vy-doc-cell">
+            <a className="vy-cell-link" href="#" onClick={e => { e.preventDefault(); toast.notImplemented(`download ${t.documentName}`); }}>{t.documentName}</a>
+            <span className="vy-doc-meta">
+              {t.uploadedBy}{t.uploadedDate && <> · {fmtDate(t.uploadedDate)}</>}
+            </span>
+          </span>
+        )
         : <span className="vy-empty">None yet</span> },
-    { field: 'uploadedBy', title: 'Uploaded by', role: 'code', width: 140, widthNote: 'Full names.' },
-    { field: 'uploadedDate', title: 'Uploaded', role: 'date',
-      render: t => t.uploadedDate ? fmtDate(t.uploadedDate) : <span className="vy-empty">—</span> },
-    { field: 'assignee', title: 'Assignee', role: 'code', width: 170,
+    { field: 'assignee', title: 'Assignee', role: 'code', width: 150,
       widthNote: 'Holds a picker, not a code.',
       render: t => <Select label={`Assignee for ${t.type}`} value={t.assignee || 'Unassigned'}
                            options={['Unassigned', ...PEOPLE]}
@@ -161,7 +188,7 @@ export function ChecklistsTab({ q, people: controlled, onPeopleChange, touched, 
        document — To do with none attached, In Progress once one is, Completed
        once it is approved — so offering the user a dropdown let them assert a
        state the document contradicted. */
-    { field: 'approved', title: 'Status', role: 'status', width: 130,
+    { field: 'approved', title: 'Status', role: 'status', width: 120,
       render: t => {
         const st = taskStatus(t);
         return <span className="vy-task-status" data-status={st}>{st}</span>;
