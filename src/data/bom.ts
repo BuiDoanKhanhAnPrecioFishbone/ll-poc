@@ -50,6 +50,17 @@ export type BomLine = {
   level: number;
   mfg: string;
   mpn: string;
+  /**
+   * The ALTERNATE manufacturer/part pairs, after the primary `mfg`/`mpn`.
+   *
+   * Read off the live Review BoM on 15 Oct 2026, which carries six fixed pairs
+   * as twelve columns — MFG1, MFGPN1 ... MFG6, MFGPN6. On the record we read,
+   * MFG3 through MFGPN6 were empty on every one of the thirteen rows and
+   * MFG2/MFGPN2 on twelve of thirteen: 1,200px of horizontal scrolling for
+   * columns no row used. The pairs live on the ROW here, and the grid renders
+   * as many as a row actually has.
+   */
+  alternates: { mfg: string; mpn: string }[];
 
   /* ---- Quoting ---------------------------------------------------------- */
   attrition: number;
@@ -169,6 +180,8 @@ export function autoExcluded(line: Pick<BomLine, 'partSource' | 'qty'>): boolean
 type Seed = {
   part: string; revision: string; description: string; partSource: PartSource;
   qty: number; level: number; mfg: string; mpn: string;
+  /** Second-source AMLs. Most lines have none, which is the point. */
+  alternates?: { mfg: string; mpn: string }[];
   /** What the quote run will find. '' means no supplier — the line stays N/A. */
   supplier: string; unitPrice: number; moq: number; pkg: string; lt: number; stock: number;
   attrition: number;
@@ -189,17 +202,17 @@ type Seed = {
  *   - reels whose MOQ dwarfs the build, which is where excess cost comes from
  */
 const SEEDS: Seed[] = [
-  { part: 'RES-0603-10K', revision: 'A', description: 'Resistor 10k 1% 0603', partSource: 'BUY', qty: 24, level: 1, mfg: 'Vishay', mpn: 'CRCW060310K0FKEA', supplier: 'Digi-Key', unitPrice: 0.012, moq: 5000, pkg: 'Reel', lt: 3, stock: 480000, attrition: 3 },
+  { part: 'RES-0603-10K', revision: 'A', description: 'Resistor 10k 1% 0603', partSource: 'BUY', qty: 24, level: 1, mfg: 'Vishay', mpn: 'CRCW060310K0FKEA', supplier: 'Digi-Key', unitPrice: 0.012, moq: 5000, pkg: 'Reel', lt: 3, stock: 480000, attrition: 3, alternates: [{ mfg: 'Yageo', mpn: 'RC0603FR-0710KL' }, { mfg: 'KOA', mpn: 'RK73H1JTTD1002F' }] },
   { part: 'RES-0603-1K', revision: 'A', description: 'Resistor 1k 1% 0603', partSource: 'BUY', qty: 12, level: 1, mfg: 'Yageo', mpn: 'RC0603FR-071KL', supplier: 'Mouser', unitPrice: 0.009, moq: 5000, pkg: 'Reel', lt: 4, stock: 920000, attrition: 3 },
   { part: 'RES-0805-100R', revision: 'A', description: 'Resistor 100R 1% 0805', partSource: 'BUY', qty: 6, level: 1, mfg: 'Yageo', mpn: 'RC0805FR-07100RL', supplier: 'Digi-Key', unitPrice: 0.011, moq: 5000, pkg: 'Reel', lt: 3, stock: 310000, attrition: 0 },
-  { part: 'CAP-0402-100N', revision: 'A', description: 'Cap 100nF 16V X7R 0402', partSource: 'BUY', qty: 48, level: 1, mfg: 'Murata', mpn: 'GRM155R71C104KA88D', supplier: 'Mouser', unitPrice: 0.008, moq: 10000, pkg: 'Reel', lt: 5, stock: 1200000, attrition: 5 },
-  { part: 'CAP-0603-10U', revision: 'A', description: 'Cap 10uF 25V X5R 0603', partSource: 'BUY', qty: 14, level: 1, mfg: 'TDK', mpn: 'C1608X5R1E106M080AC', supplier: 'Arrow', unitPrice: 0.041, moq: 4000, pkg: 'Reel', lt: 9, stock: 88000, attrition: 4 },
+  { part: 'CAP-0402-100N', revision: 'A', description: 'Cap 100nF 16V X7R 0402', partSource: 'BUY', qty: 48, level: 1, mfg: 'Murata', mpn: 'GRM155R71C104KA88D', supplier: 'Mouser', unitPrice: 0.008, moq: 10000, pkg: 'Reel', lt: 5, stock: 1200000, attrition: 5, alternates: [{ mfg: 'Samsung Electro-Mechanics', mpn: 'CL05B104KO5NNNC' }] },
+  { part: 'CAP-0603-10U', revision: 'A', description: 'Cap 10uF 25V X5R 0603', partSource: 'BUY', qty: 14, level: 1, mfg: 'TDK', mpn: 'C1608X5R1E106M080AC', supplier: 'Arrow', unitPrice: 0.041, moq: 4000, pkg: 'Reel', lt: 9, stock: 88000, attrition: 4, alternates: [{ mfg: 'Taiyo Yuden', mpn: 'EMK107ABJ106MA-T' }] },
   { part: 'CAP-1206-22U', revision: 'B', description: 'Cap 22uF 16V X7R 1206', partSource: 'BUY', qty: 4, level: 1, mfg: 'Murata', mpn: 'GRM31CR71C226KE15L', supplier: '', unitPrice: 0, moq: 2000, pkg: 'Reel', lt: 0, stock: 0, attrition: 0 },
   { part: 'IC-PWR-BUCK-3A', revision: 'B', description: 'Buck converter 3A 17V', partSource: 'BUY', qty: 1, level: 1, mfg: 'Texas Instruments', mpn: 'TPS62130ARGTR', supplier: 'Arrow', unitPrice: 2.41, moq: 1, pkg: 'Cut Tape', lt: 12, stock: 8200, attrition: 0 },
   { part: 'IC-MCU-M4-256K', revision: 'C', description: 'MCU Cortex-M4 256K LQFP64', partSource: 'BUY', qty: 1, level: 1, mfg: 'STMicroelectronics', mpn: 'STM32F411RET6', supplier: 'Avnet', unitPrice: 5.87, moq: 1, pkg: 'Tray', lt: 26, stock: 140, attrition: 0 },
   { part: 'REG-LDO-3V3', revision: 'A', description: 'LDO regulator 3.3V 500mA', partSource: 'BUY', qty: 2, level: 1, mfg: 'Texas Instruments', mpn: 'TLV1117LV33DCYR', supplier: 'Digi-Key', unitPrice: 0.38, moq: 1, pkg: 'Cut Tape', lt: 7, stock: 24000, attrition: 0 },
   { part: 'MOSFET-N-30V', revision: 'A', description: 'MOSFET N-ch 30V 5A SOT-23', partSource: 'BUY', qty: 3, level: 1, mfg: 'Nexperia', mpn: 'PMV45EN,215', supplier: 'Mouser', unitPrice: 0.14, moq: 3000, pkg: 'Reel', lt: 6, stock: 61000, attrition: 2 },
-  { part: 'DIO-SCH-40V', revision: 'A', description: 'Schottky diode 40V 1A', partSource: 'BUY', qty: 5, level: 1, mfg: 'Nexperia', mpn: 'PMEG4010CEJ', supplier: 'Digi-Key', unitPrice: 0.09, moq: 3000, pkg: 'Reel', lt: 5, stock: 74000, attrition: 2 },
+  { part: 'DIO-SCH-40V', revision: 'A', description: 'Schottky diode 40V 1A', partSource: 'BUY', qty: 5, level: 1, mfg: 'Nexperia', mpn: 'PMEG4010CEJ', supplier: 'Digi-Key', unitPrice: 0.09, moq: 3000, pkg: 'Reel', lt: 5, stock: 74000, attrition: 2, alternates: [{ mfg: 'Onsemi', mpn: 'NRVTS540ESFT1G' }] },
   { part: 'IND-4R7-1210', revision: 'A', description: 'Inductor 4.7uH 1210', partSource: 'BUY', qty: 2, level: 1, mfg: 'Bourns', mpn: 'SRN6045TA-4R7M', supplier: 'Arrow', unitPrice: 0.22, moq: 2000, pkg: 'Reel', lt: 11, stock: 15000, attrition: 0 },
   { part: 'CONN-HDR-2X10', revision: 'A', description: 'Header 2x10 2.54mm', partSource: 'BUY', qty: 1, level: 1, mfg: 'Samtec', mpn: 'TSW-110-07-G-D', supplier: '', unitPrice: 0, moq: 1, pkg: '', lt: 0, stock: 0, attrition: 0 },
   { part: 'XTAL-16MHZ', revision: 'A', description: 'Crystal 16MHz 20ppm', partSource: 'BUY', qty: 1, level: 1, mfg: 'Abracon', mpn: 'ABM8G-16.000MHZ', supplier: '', unitPrice: 0, moq: 100, pkg: '', lt: 0, stock: 0, attrition: 0 },
@@ -236,6 +249,7 @@ export function buildBomLines(): BomLine[] {
     level: s.level,
     mfg: s.mfg,
     mpn: s.mpn,
+    alternates: s.alternates ?? [],
     attrition: s.attrition,
     supplier: '',
     orderQty: 0,

@@ -29,9 +29,16 @@ export function StepReviewBom({ cfg, set, lines, setLines }: {
       /* "Search by Part / Description / MPN / MFG" — those four and no others,
          so a keyword that happens to match a part source does not surface a row
          the user cannot explain. */
-      if (k && ![l.part, l.description, l.mpn, l.mfg].some(v => v.toLowerCase().includes(k))) return false;
+      if (k && !amlPairs(l).concat({ mfg: l.description, mpn: l.part })
+        .some(v => `${v.mfg} ${v.mpn}`.toLowerCase().includes(k))) return false;
       if (isExclude && !l.excluded) return false;
-      if (missingMfg && l.mfg.trim() !== '') return false;
+      /* "MISSING MANUFACTURER" MEANS UNRECOGNISED, NOT BLANK. This filter used
+         to test `mfg === ''`, which on the live screen would have matched
+         nothing: of the thirteen rows we read on 15 Oct, MFG1 was filled on all
+         thirteen, yet four were painted red. Their red marks a manufacturer
+         that is not in Manufacturer Management, and their filter is named for
+         it — so the filter and the colour now answer the same question. */
+      if (missingMfg && !unknownMfg(l)) return false;
       return true;
     });
   }, [lines, search, isExclude, missingMfg]);
@@ -61,10 +68,18 @@ export function StepReviewBom({ cfg, set, lines, setLines }: {
                   label={<span className="vy-sr-only">Include {l.part} in the quotation</span>} />
       ),
     },
-    { field: 'number', title: 'NUMBER', role: 'code', width: 84,
+    /* WIDTHS ARE TUNED TO FIT, and that is the whole point of them.
+       The guideline freezes six columns here plus the checkbox. At the role
+       default widths that froze 988px of a 1302px track — 76% — and left the
+       MFG | MPN column, the one this step exists to check, in a 314px scroll
+       window. We had made the live screen's own mistake worse: theirs freezes
+       53%. A frozen column costs nothing when nothing scrolls, so the columns
+       are sized to the content they actually hold and the grid fits. */
+    { field: 'number', title: 'NUMBER', role: 'code', width: 72,
       widthNote: 'A line number, at most three digits.' },
     {
-      field: 'part', title: 'ROCKET_PN', role: 'ident',
+      field: 'part', title: 'ROCKET_PN', role: 'ident', width: 170,
+      widthNote: 'Longest part in the set is "IC-MCU-M4-256K", 14 characters.',
       /* Green when the part exists in Part Master, red when it does not — and
          red is not decorative: "The user cannot confirm Project Requirement
          until all missing part numbers have been created in Part Master." */
@@ -77,29 +92,60 @@ export function StepReviewBom({ cfg, set, lines, setLines }: {
         </span>
       ),
     },
-    { field: 'revision', title: 'REVISION', role: 'code', width: 96 },
-    { field: 'description', title: 'PART DESCRIPTION', role: 'text' },
-    { field: 'partSource', title: 'PART SOURCE', role: 'code', width: 128,
+    { field: 'revision', title: 'REVISION', role: 'code', width: 84,
+      widthNote: 'A single letter in every row of the set.' },
+    { field: 'description', title: 'PART DESCRIPTION', role: 'text', width: 230,
+      widthNote: 'Descriptions run past any width; the cell title carries the rest.' },
+    { field: 'partSource', title: 'PART SOURCE', role: 'code', width: 116,
       widthNote: 'Longest value is "MAKE/PHANT".' },
-    { field: 'qty', title: 'QUANTITY', role: 'number', width: 108,
+    { field: 'qty', title: 'QUANTITY', role: 'number', width: 92,
+      widthNote: 'A per-board count, three digits at most.',
       render: l => l.qty.toLocaleString() },
-    { field: 'level', title: 'LEVEL', role: 'number', width: 84 },
+    { field: 'level', title: 'LEVEL', role: 'number', width: 72,
+      widthNote: 'A single digit.' },
+    /* ONE COLUMN OF PAIRS, NOT TWELVE COLUMNS OF BLANKS.
+       The live Review BoM carries six fixed manufacturer slots as twelve
+       columns — MFG1, MFGPN1 ... MFG6, MFGPN6, 150px each. Measured on 15 Oct:
+       MFG3 through MFGPN6 were empty on 13 of 13 rows and MFG2/MFGPN2 on 12 of
+       13, while the grid scrolled 1,185px sideways. A row carries as many AMLs
+       as it has, so the column holds a list.
+
+       This is not a new idea here: Create BoM already renders its normalised
+       MFG | MPN pairs exactly this way, for exactly this reason. Two screens
+       showing the same fact two ways was the thing to avoid. */
     {
-      field: 'mfg', title: 'MFG', role: 'text', width: 190,
-      widthNote: 'Manufacturer names run long — "STMicroelectronics".',
-      /* "The background color is displayed in yellow because the manufacturer
-         value already exists in Manufacturer Management." */
-      tone: l => (l.mfg && KNOWN_MANUFACTURERS.has(l.mfg) ? 'known-mfg' : undefined),
-      render: l => l.mfg
-        ? <span title={KNOWN_MANUFACTURERS.has(l.mfg)
-            ? 'Already in Manufacturer Management'
-            : 'Not in Manufacturer Management yet'}>{l.mfg}</span>
-        : <span className="vy-empty">—</span>,
+      field: 'mfg', title: 'MFG | MPN', role: 'text', width: 300,
+      widthNote: 'A manufacturer name beside a part number, stacked per AML.',
+      render: l => {
+        const pairs = amlPairs(l);
+        if (!pairs.length) return <span className="vy-empty">—</span>;
+        const shown = pairs.slice(0, 2);
+        const rest = pairs.slice(2);
+        return (
+          <span className="vy-pairs">
+            {shown.map((pr, i) => (
+              <span key={`${pr.mfg}-${pr.mpn}-${i}`} className="vy-pair"
+                    data-known={KNOWN_MANUFACTURERS.has(pr.mfg) || undefined}
+                    title={KNOWN_MANUFACTURERS.has(pr.mfg)
+                      ? `${pr.mfg} is in Manufacturer Management`
+                      : `${pr.mfg} is not in Manufacturer Management`}>
+                {pr.mfg} | <span className="vy-code">{pr.mpn}</span>
+              </span>
+            ))}
+            {/* Two is what a row realistically carries; the rest are counted
+                rather than stacked, so one six-AML line cannot set the height
+                of every row around it. */}
+            {rest.length > 0 && (
+              <span className="vy-pair-more"
+                    title={rest.map(pr => `${pr.mfg} | ${pr.mpn}`).join('\n')}>
+                +{rest.length} more
+              </span>
+            )}
+          </span>
+        );
+      },
     },
-    { field: 'mpn', title: 'MPN', role: 'ident', width: 200,
-      widthNote: 'Manufacturer part numbers are long and must not truncate.',
-      render: l => l.mpn ? <span className="vy-code">{l.mpn}</span> : <span className="vy-empty">—</span> },
-    { field: 'attrition', title: 'TOTAL QTY', role: 'number', width: 120,
+    { field: 'attrition', title: 'TOTAL QTY', role: 'number', width: 108,
       widthNote: 'Holds a computed total, which is larger than a per-board qty.',
       /* Not in the guideline's column list for this step, but the formula runs
          here and Build Qty and Attrition Set are editable on this screen. A
@@ -137,9 +183,27 @@ export function StepReviewBom({ cfg, set, lines, setLines }: {
           { key: 'exclude', label: 'Is Exclude?', on: isExclude, onToggle: setIsExclude,
             count: lines.filter(l => l.excluded).length },
           { key: 'mfg', label: 'Missing Manufacturer', on: missingMfg, onToggle: setMissingMfg,
-            count: lines.filter(l => !l.mfg.trim()).length },
+            count: lines.filter(unknownMfg).length },
         ]}
       />
+
+      {/* THE COLOURS, SAID IN WORDS.
+          The live screen paints three states into this grid — a part missing
+          from Part Master, a manufacturer that is known, one that is not — and
+          explains none of them: no key, no icon, no text, on either of the two
+          steps that use the colours, and two different reds between them. That
+          makes colour the only channel carrying the meaning, which WCAG 1.4.1
+          rules out and which a colour-blind estimator simply cannot read.
+
+          A legend is the cheap half of the fix. The other half is already
+          here: every coloured cell and chip carries a `title` saying what it
+          means in words. */}
+      <ul className="vy-tone-legend">
+        <li><span className="vy-tone-key" data-tone="known" aria-hidden />
+          In Part Master, manufacturer recognised</li>
+        <li><span className="vy-tone-key" data-tone="missing" aria-hidden />
+          Not on file — create it before confirming this RFQ</li>
+      </ul>
 
       {/* Six frozen columns, as the guideline names them: Number, ROCKET_PN,
           Revision, Part Description, Part Source, Quantity — plus the checkbox
@@ -165,4 +229,20 @@ export function StepReviewBom({ cfg, set, lines, setLines }: {
       </p>
     </div>
   );
+}
+
+/**
+ * Every AML on a line: the primary manufacturer first, then its alternates.
+ *
+ * A line with no manufacturer at all returns nothing rather than a blank pair —
+ * the cell then says so once, instead of rendering an empty chip that looks
+ * like a value that failed to load.
+ */
+export function amlPairs(l: BomLine): { mfg: string; mpn: string }[] {
+  return [{ mfg: l.mfg, mpn: l.mpn }, ...l.alternates].filter(p => p.mfg.trim() || p.mpn.trim());
+}
+
+/** No recognised manufacturer anywhere on the line — including none at all. */
+export function unknownMfg(l: BomLine): boolean {
+  return !amlPairs(l).some(p => KNOWN_MANUFACTURERS.has(p.mfg));
 }

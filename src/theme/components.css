@@ -1443,6 +1443,31 @@
 }
 .vy-pair[data-known] { background: var(--vy-tone-covered-bg); color: inherit; }
 
+/* The alternates a row has beyond the two it shows. A count, not a stack: one
+   line with six AMLs would otherwise set the row height for every line around
+   it. The full list is in its `title`. */
+.vy-pair-more {
+  align-self: flex-start;
+  font-size: var(--vy-text-xs); color: var(--vy-on-surface-muted);
+  cursor: help;
+}
+
+/* The colour key. The grid's three states are painted AND stated — the live
+   screen paints them and states nothing, which leaves colour as the only
+   channel (WCAG 1.4.1) and two different reds across adjacent steps. */
+.vy-tone-legend {
+  list-style: none; margin: 0; padding: 0;
+  display: flex; flex-wrap: wrap; gap: var(--vy-space-4) var(--vy-space-8);
+  font-size: var(--vy-text-xs); color: var(--vy-on-surface-muted);
+}
+.vy-tone-legend li { display: flex; align-items: center; gap: var(--vy-space-3); }
+.vy-tone-key {
+  width: var(--vy-space-8); height: var(--vy-space-6); flex: none;
+  border: 1px solid var(--vy-border-strong); border-radius: var(--vy-radius-sm);
+}
+.vy-tone-key[data-tone="known"] { background: var(--vy-tone-covered-bg); }
+.vy-tone-key[data-tone="missing"] { background: var(--vy-tone-missing-bg); }
+
 /* ---- MFG-MPN (AML) -------------------------------------------------------- */
 /* The field groups around it are an auto-fit grid of columns; a ten-column table
    is not one of those, so it takes the whole row. Without this it becomes a

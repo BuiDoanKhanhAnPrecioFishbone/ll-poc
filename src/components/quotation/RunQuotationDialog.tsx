@@ -350,6 +350,9 @@ export function RunQuotationDialog({ q, onClose, resume }: {
              being stored separately. */
           partSource: 'PACKAGING', qty: p.qty, level: 1,
           mfg: p.mfg, mpn: p.mpn,
+          /* A packaging line is bought as specified; there is no second source
+             to offer, so it carries no alternates. */
+          alternates: [],
           attrition: 0, supplier: '—',
           orderQty: p.qty * cfg.buildQty, stock: 0, outStock: 0, lt: 0, pkg: '', moq: 0,
           excessQty: 0, unitPrice: p.unitPrice,

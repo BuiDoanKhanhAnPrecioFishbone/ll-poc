@@ -187,3 +187,105 @@ when a Kendo dialog is open, and it is **not in the DOM** — so it is drawn by
 KendoReact itself, almost certainly the unlicensed/trial indicator described in
 `docs/kendo-license-activation.md`. It needs the licence key in the environment
 the demo runs from. Worth settling before the next demo.
+
+---
+
+# Steps 2 and 3, read live on 15 October 2026
+
+Read on a live RFQ, desktop 1400x900, with the customer driving step 1 — we do
+not complete a BoM import against a production record. Nothing was run: `Run
+Quote`, `Apply`, `Add Attrition`, `Apply Price Range` and `SAVE DRAFT` were not
+touched, and step 4 was not opened.
+
+Confirmed on the way in: the wizard opens at **1400x900, the full window**, which
+is the decision this project already took; and step 3 carries a **SAVE DRAFT**
+button, which is the draft model behind "Run Quotation ▾ → Resume Draft".
+
+## Step 2 — Review BoM, as they ship it
+
+Context bar of 7: Assembly Part Number - Rev · Description · Quote Focus ·
+Material Package Type · Markup (%) · Build Qty · Attrition Set.
+Toolbar: search (`Search by Part/Desc/MPN/MFG/Supplier...`), and two filters,
+`Is Exclude? (Include in quotation = FALSE)` and `Missing Manufacturer`.
+
+Grid — **17 columns, 2515px inside a 1340px track, 1185px of horizontal scroll**:
+
+| | |
+|---|---|
+| Frozen (5, 715px) | ☐ 25 · NUMBER 70 · ROCKET_PN 250 · PART DESCRIPTION 300 · QUANTITY 70 |
+| Scrolling (12, 1800px) | MFG1 · MFGPN1 · MFG2 · MFGPN2 · MFG3 · MFGPN3 · MFG4 · MFGPN4 · MFG5 · MFGPN5 · MFG6 · MFGPN6, 150px each |
+
+Rows 50px, ~58 lines in the BoM, header `#d9ecf5` 12px/700/uppercase.
+
+**Measured fill rate across the 13 rendered rows:** MFG1/MFGPN1 13/13,
+MFG2/MFGPN2 **1/13**, MFG3 through MFGPN6 **0/13**. Eight of the twelve AML
+columns are empty on every row, and the frozen block takes 53% of the visible
+track, so about four of the twelve are on screen at a time.
+
+**Three colours, no key.** ROCKET_PN pink `#f8a4a7` on 13/13; MFG1 amber
+`#fae197` on 9 and pink on 4; MFG2 pink on 1. No legend, no icon, no text
+anywhere on the step — colour is the only channel (WCAG 1.4.1). And step 3 uses
+a *different* pink, `#ffcdd2`.
+
+## Step 3 — Quoting, as they ship it
+
+Context bar adds `Primary Provider` and four buttons: `Run Quote` · `Apply` ·
+`Add Attrition` · `Apply Price Range`. Filters: `Unselected Supplier` · `Not
+Enough Qty` · `Missing Attrition`. Footer: `SAVE DRAFT` · `PREVIOUS` · `NEXT`.
+
+Grid — **21 columns, 2300px in a 1340px track, 970px of scroll, and zero frozen
+columns**: PART · REVISION · SOURCE · DESCRIPTION · MFG · MPN · QTY · ATTRITION ·
+TOTAL QTY · SUPPLIER · ORDER QTY · STOCK · LT · PKG. · MOQ · EXCESS · UNIT PRICE ·
+AMT · EXCESS AMT · STATUS · NOTES. Our column set already matches theirs.
+
+Three findings:
+
+1. **A rendering bug.** The header has 21 columns and a part row has 21 cells,
+   but the alternate-AML row has **15**. Its values land under the wrong
+   headings: the manufacturer renders under PART, its MPN under REVISION, a bare
+   `0.00` under MFG. One such row among the 32 rendered; nothing compensates
+   with a colspan.
+2. **Nothing is frozen**, on the widest grid in the product. Scroll right to read
+   UNIT PRICE or STATUS and PART, DESCRIPTION, MFG and MPN are all gone. Step 2
+   freezes five columns; step 3 freezes none — adjacent steps, opposite rules.
+3. **Error-red for "not calculated yet".** Before Run Quote, pink `#ffcdd2`
+   covers MPN, ORDER QTY, STOCK, LT, PKG., MOQ, EXCESS and UNIT PRICE on 31-32
+   of 32 rows — roughly 250 red cells on arrival at a step where nothing is
+   wrong. Our step 3 already renders these as a `pending` tone.
+
+## What we built for step 2, 15 October
+
+**One column of pairs, not twelve columns of blanks.** `MFG | MPN` holds the
+line's AMLs as a list — primary first, then alternates, each chip green when the
+manufacturer is in Manufacturer Management and red when it is not. Two are
+shown and the rest become `+N more` with the full list in its title, so one
+six-AML line cannot set the height of every row around it. This is not a new
+pattern here: Create BoM already renders normalised pairs exactly this way, for
+exactly this reason, and two screens showing one fact two ways was the thing to
+avoid. `BomLine.alternates` carries them; the seed table gives four lines real
+second sources.
+
+**"Missing Manufacturer" now means what its colour means.** The filter tested
+`mfg === ''`, which on the live screen would match nothing — MFG1 is filled on
+all thirteen rows and four of them are still painted red. Red marks a
+manufacturer that is not in Manufacturer Management, and the filter is named for
+it, so both now ask the same question. On our data: 23 rows → 8.
+
+**A legend.** Two swatches under the toolbar — "In Part Master, manufacturer
+recognised" and "Not on file — create it before confirming this RFQ" — so the
+colours are painted *and* stated. Every coloured cell and chip also carries a
+`title` in words.
+
+**And we fixed the same mistake we were criticising.** At the role default
+widths our frozen block was **988px of a 1302px track, 76%** — worse than their
+53% — leaving the MFG | MPN column, the one the step exists to check, in a 314px
+window. The guideline's six frozen columns are kept; the columns are sized to
+the content they hold instead, and the grid now fits.
+
+| | Live | Ours, before | Ours, after |
+|---|---|---|---|
+| Columns | 17 | 12 | 10 |
+| Table width | 2515px | 1532px | 1296px |
+| Horizontal scroll | 1185px | 246px | **10px** |
+| Frozen share of track | 53% | 76% | 63%, and nothing scrolls past it |
+| Colour legend | none | none | 2 states, stated |
