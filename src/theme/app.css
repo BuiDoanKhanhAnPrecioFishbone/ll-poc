@@ -626,8 +626,22 @@
 
    Holding the frame still and scrolling the grid inside it is worth it on a
    desktop, where the frame is a context bar and a toolbar the user refers back
-   to. On a phone the frame IS most of the height. */
-@media (max-width: 1180px) {
+   to. On a phone the frame IS most of the height.
+
+   THE CONDITION WAS `max-width: 1180px`, AND THAT WAS THE BUG. Reported 15 Oct
+   as "why can I scroll on localhost but Safari is stuck?" — and it was never
+   about the browser. A Retina screenshot 2000px wide is a 1000 CSS px window,
+   which is under 1180, so a perfectly ordinary desktop Safari window took the
+   phone path: the whole dialog scrolled, the grid's header went with it, and
+   the footer sat over the rows. Reproduced at 1000x800 in Chromium — step
+   1171px inside a 629px content box, body scrolling 638px — so it was no more
+   a Safari bug than it was a localhost feature.
+
+   It is also the wrong AXIS. What makes the fixed frame unaffordable is a
+   shortage of HEIGHT, and this asked about width: a 1200x600 laptop kept the
+   desktop treatment it had no room for, while a 1100x1400 window gave it up
+   with height to spare. Now: a real phone, or a genuinely short window. */
+@media (max-width: 720px), (max-height: 620px) {
   .vy-dialog .k-dialog-content:has(> .vy-run) { overflow: auto; }
   .vy-run, .vy-run > .vy-run-step { flex: 0 0 auto; min-height: auto; }
   .vy-run-step > .vy-minitable-k { flex: 0 0 auto; min-height: 0; overflow-y: visible; }

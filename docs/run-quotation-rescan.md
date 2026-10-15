@@ -447,3 +447,39 @@ which could share a line with the search and filters — about 46px more — but
 1302px those two rows hold a select, four buttons, a search box and three
 filters, and merging them buys a row back only until the first width where they
 wrap. Left for the customer to call.
+
+## "Why can I scroll on localhost but Safari is stuck?" — 15 October
+
+It was never the browser, and it was never localhost. It was one media query.
+
+```css
+@media (max-width: 1180px) { /* the dialog scrolls as a whole, as on a phone */ }
+```
+
+A Retina screenshot 2000px wide is a **1000 CSS px** window. 1000 is under 1180,
+so an ordinary desktop Safari window took the phone path: the whole dialog
+scrolled, the grid's header scrolled away with it, and the footer sat over the
+rows. The Claude preview pane happened to be wider than 1180 at the time, so the
+same build behaved differently a metre apart.
+
+**Reproduced in Chromium at 1000x800** before changing anything — phone
+fallback active, step 1171px inside a 629px content box, dialog body scrolling
+638px. Same build, same browser family, no Safari involved.
+
+It was also keyed on the wrong axis. What makes a fixed frame unaffordable is a
+shortage of HEIGHT; this asked about width, so a 1200x600 laptop kept a
+treatment it had no room for while a 1100x1400 window gave it up with height to
+spare. The condition is now `max-width: 720px, max-height: 620px` — a real
+phone, or a genuinely short window.
+
+| Viewport | Phone fallback | Dialog body scroll | Grid |
+|---|---|---|---|
+| 1000x800 — the reported case | **no** | **0px** | 229px, 6 rows |
+| 1200x600 — short laptop | yes | 816px | — |
+| 375x812 — phone | yes | 2059px | — |
+
+**Worth saying plainly:** at 1000x800 the grid now holds its frame but gets only
+229px, six rows, because the chrome above it is ~278px and does not shrink. The
+fix stops the header disappearing; it does not make a 1000px window roomy. That
+is the same chrome budget discussed above, and the Primary Provider row is still
+the next band worth taking.
