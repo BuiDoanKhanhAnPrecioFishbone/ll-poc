@@ -66,14 +66,25 @@ export type RunConfig = {
 };
 
 /**
- * The three fields Next validates on step 1 of the IMPORT NEW BOM flow.
+ * The three fields Next validates on step 1 of the IMPORT NEW BOM flow, with
+ * the words the screen puts above each one.
  *
- * "Please input information for assemblyPartNumber, partRev, partDesc" — the
- * message is the live system's, camel-case field names and all. It is quoted
- * rather than rewritten because a tester matching this sheet against the build
- * is looking for that string.
+ * THE LIVE MESSAGE IS "Please input information for assemblyPartNumber,
+ * partRev, partDesc" — camel-case field names, verbatim. It was quoted here
+ * rather than rewritten so a tester matching the sheet against the build could
+ * find the string, and that was the wrong trade: the string a tester greps for
+ * is not worth showing a user the name of a variable. It is the same fault we
+ * recorded against the live Activity Log, which prints `DtIssuedUtc:` at a
+ * reader and expects them to work it out.
+ *
+ * The original is kept HERE, in the source, where the tester can still find
+ * it; the screen says Assembly Part Number.
  */
-export const STEP1_REQUIRED = ['assemblyPartNumber', 'partRev', 'partDesc'] as const;
+export const STEP1_REQUIRED = [
+  { field: 'assemblyPartNumber', label: 'Assembly Part Number' },
+  { field: 'partRev', label: 'Revision' },
+  { field: 'partDesc', label: 'Description' },
+] as const;
 
 /**
  * What stops Next, and what to say about it.
@@ -84,12 +95,19 @@ export const STEP1_REQUIRED = ['assemblyPartNumber', 'partRev', 'partDesc'] as c
  */
 export function missingStep1(cfg: RunConfig): readonly string[] {
   if (cfg.action === 'load-existing') return cfg.assembly ? [] : ['assembly'];
-  return STEP1_REQUIRED.filter(k => !String(cfg[k]).trim());
+  return STEP1_REQUIRED.filter(f => !String(cfg[f.field]).trim()).map(f => f.field);
 }
 
 export function step1Error(cfg: RunConfig): string | null {
   const missing = missingStep1(cfg);
   if (!missing.length) return null;
   if (cfg.action === 'load-existing') return 'Select assembly first!';
-  return `Please input information for ${missing.join(', ')}`;
+  /* Named in the order the fields appear on the screen, and joined with "and"
+     before the last, because a reader scanning a toast should not have to
+     parse a comma list to find out how many things are wrong. */
+  const labels = STEP1_REQUIRED.filter(f => missing.includes(f.field)).map(f => f.label);
+  const named = labels.length > 1
+    ? `${labels.slice(0, -1).join(', ')} and ${labels[labels.length - 1]}`
+    : labels[0];
+  return `Please fill in ${named}`;
 }

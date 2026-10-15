@@ -112,14 +112,19 @@ export function RunQuotationDialog({ q, onClose, resume }: {
   function leaveStep1() {
     /* Each flow has its own message and the guideline gives both verbatim —
        "Please input information for assemblyPartNumber, partRev, partDesc" and
-       "Select assembly first!". Quoted rather than rewritten, because a tester
-       matching the sheet against the build is looking for those strings.
+       "Select assembly first!".
 
-       THE MESSAGE IS THEIRS; WHERE IT POINTS IS OURS. Those three field names
-       are camel-case internals, and the fields they name sat 648px below the
-       fold — so the toast named three things the user had never seen, nothing
-       was marked, and the dialog did not move. Now the fields carry the error
-       and the first one takes focus; the toast still says their sentence. */
+       THE SECOND IS STILL THEIRS. The first is not, any more: it named three
+       camel-case internals at a user who has never seen a variable, which is
+       the fault we recorded against their Activity Log for printing
+       `DtIssuedUtc:`. It now names the three fields as the screen labels them —
+       Assembly Part Number, Revision and Description — and the original string
+       is kept in `state.ts` for anyone matching the sheet against the build.
+
+       WHERE IT POINTS WAS ALWAYS OURS. Those fields sat 648px below the fold,
+       so the toast named three things nobody could see, nothing was marked and
+       the dialog did not move. The fields carry the error and the first one
+       takes focus. */
     const err = step1Error(cfg);
     if (err) {
       setInvalid(missingStep1(cfg));
