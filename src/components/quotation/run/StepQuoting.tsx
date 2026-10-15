@@ -112,8 +112,20 @@ export function StepQuoting({ cfg, set, lines, setLines, hasRun, onRun, onApply,
       <div className="vy-run-banner" data-tone={hasRun ? (manual ? 'info' : 'ok') : 'info'}>
         {!hasRun
           ? <><strong>Please run quotation for continue process!</strong>{' '}
-              Pricing, availability and suppliers stay blank until the quote runs — the columns
-              in red below are the ones waiting on it.</>
+              Pricing, availability and suppliers stay blank until the quote runs.
+              {/* THE KEY SITS WITH THE SENTENCE THAT EXPLAINS IT, rather than as a
+                  sixth band of its own. Two gains: the words and the swatches
+                  stop being two separate things to find, and step 3's grid gets
+                  the row back — it had 349px of a 627px step, which is nine
+                  lines of a BoM that runs to fifty-eight. Both disappear once
+                  the quote has run, so the grid is at its largest exactly when
+                  there are results to read. */}
+              <ul className="vy-tone-legend">
+                <li><span className="vy-tone-key" data-tone="pending" aria-hidden />
+                  Waiting for the quote run</li>
+                <li><span className="vy-tone-key" data-tone="missing" aria-hidden />
+                  No supplier can cover this line</li>
+              </ul></>
           : manual
             ? <><strong>Quote Focus is {cfg.quoteFocus} — suppliers are yours to choose.</strong>{' '}
                 Quantities are computed; the system selected none.{' '}
@@ -146,13 +158,6 @@ export function StepQuoting({ cfg, set, lines, setLines, hasRun, onRun, onApply,
           a missing part — the fault we had written up against the live screen
           while shipping it ourselves. Grey says "waiting for the run"; red is
           kept for something that is actually wrong. */}
-      <ul className="vy-tone-legend">
-        <li><span className="vy-tone-key" data-tone="pending" aria-hidden />
-          Waiting for the quote run</li>
-        <li><span className="vy-tone-key" data-tone="missing" aria-hidden />
-          No supplier can cover this line</li>
-      </ul>
-
       <MiniTable
         data={shown}
         /* NO PER-COLUMN FILTER ROW. The step already carries a search box and

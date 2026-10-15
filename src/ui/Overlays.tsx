@@ -1,7 +1,6 @@
 import { ComboBox } from '@progress/kendo-react-dropdowns';
 import { Dialog as KendoDialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
 import { TabStrip, TabStripTab } from '@progress/kendo-react-layout';
-import * as RRadio from '@radix-ui/react-radio-group';
 import { DialogDismiss } from './dismiss';
 import { markDialogOpen } from './dialogOpen';
 import { cloneElement, createContext, type ReactNode, useContext, useEffect, useId, useMemo, useRef, useState } from 'react';
@@ -288,21 +287,44 @@ export function Checkbox({ checked, onCheckedChange, label }: {
   );
 }
 
+/**
+ * A radio group — a NATIVE input wearing Kendo's classes, as the checkbox does.
+ *
+ * WAS RADIX, and that was deliberate rather than neglect: the live sweep found
+ * no radio group anywhere in Voyager, only `k-switch` x4, so there was nothing
+ * to match and `docs/radix-to-kendo-scope.md` parked it as open question 17.
+ * Asked on 15 Oct whether this control was Kendo. It was not, and the answer to
+ * "then make it Kendo" costs nothing here: the checkbox already showed the way
+ * in phase C. A plain `<input type="radio">` with `k-radio` gets Kendo's
+ * drawing, its states and its focus ring from the theme we already ship, with
+ * no new dependency and no change to any of the seven call sites.
+ *
+ * It also fixes the bug that prompted the question. Radix rendered the control
+ * as a `<button>`, and a button carries the user agent's `padding: 1px 6px`,
+ * which nothing here reset: on a 20px box with a 2px border and `box-sizing:
+ * border-box` that left 4px of content width for an 8px dot, so the dot sat
+ * 8px from the left edge and 4px from the right. Measured, not guessed.
+ *
+ * `useId` names the group: radios are exclusive by shared `name`, and two
+ * groups on one screen sharing a name would make them one group.
+ */
 export function RadioGroup({ options, value, onChange, label }: {
   options: { value: string; label: string }[]; value: string;
   onChange: (v: string) => void; label: string;
 }) {
+  const name = useId();
   return (
-    <RRadio.Root value={value} onValueChange={onChange} aria-label={label} className="vy-radios">
+    <div role="radiogroup" aria-label={label} className="vy-radios">
       {options.map(o => (
         <label className="vy-radio" key={o.value}>
-          <RRadio.Item value={o.value} className="vy-radio-dot" data-state-layer>
-            <RRadio.Indicator className="vy-radio-fill" />
-          </RRadio.Item>
+          <input type="radio" className="k-radio k-radio-lg"
+                 name={name} value={o.value}
+                 checked={value === o.value}
+                 onChange={() => onChange(o.value)} />
           <span>{o.label}</span>
         </label>
       ))}
-    </RRadio.Root>
+    </div>
   );
 }
 

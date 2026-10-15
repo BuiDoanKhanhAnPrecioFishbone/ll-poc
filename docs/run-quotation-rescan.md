@@ -401,3 +401,49 @@ set `border-top: none`, to cancel the old separator where two regions sat side
 by side. With a section as a card that rule was cancelling the card's own top
 border, and Assembly Details rendered with three sides. Removed with the
 separator it existed to suppress.
+
+## The radio, and the room — 15 October
+
+**"Is this radio style from Kendo? If not, update it to Kendo; if it is, fix the
+dot so it is centred."**
+
+It was not Kendo. It was Radix, and deliberately so: the live sweep found no
+radio group anywhere in Voyager, only `k-switch` ×4, so there was nothing to
+match and `docs/radix-to-kendo-scope.md` parked it as open question 17.
+
+It was also drawing itself wrong, and the cause is worth recording. Radix
+renders the control as a `<button>`, and a button carries the user agent's
+`padding: 1px 6px`. Nothing reset it. On a 20px box with a 2px border and
+`box-sizing: border-box` that leaves **4px** of content width for an 8px dot, so
+the dot sat 8px from the left edge and 4px from the right — measured, not
+guessed, and invisible until someone looked closely enough to ask.
+
+Both answers are the same change: a native `<input type="radio">` wearing
+`k-radio k-radio-lg`, as the checkbox has since phase C. Kendo's theme draws the
+circle, the dot, the states and the focus ring; 24 lines of hand-drawn CSS are
+gone, no new dependency was added, and none of the seven call sites changed.
+`useId` names each group, so two groups on one screen stay independent —
+verified on step 1, where Action and BoM Options are two groups.
+
+### "Too small for this much information"
+
+Step 3's grid had **349px of a 627px step** — nine lines of a BoM that runs to
+fifty-eight — under five stacked bands of chrome: the context strip, the Primary
+Provider row, a banner, the toolbar, and the colour key.
+
+The key moved **inside the banner**, which is the sentence that explains it, and
+the band gap went from 12px to 8px. Both bands disappear once the quote has run,
+so the grid is at its largest exactly when there are results to read.
+
+| | Before | After |
+|---|---|---|
+| Bands above the grid | 5 | 4 |
+| Grid height | 349px | **391px** |
+| Rows visible | 9 | **10** |
+| Grid share of the step | 56% | **62%** |
+
+Not a transformation. The next band worth taking is the Primary Provider row,
+which could share a line with the search and filters — about 46px more — but at
+1302px those two rows hold a select, four buttons, a search box and three
+filters, and merging them buys a row back only until the first width where they
+wrap. Left for the customer to call.

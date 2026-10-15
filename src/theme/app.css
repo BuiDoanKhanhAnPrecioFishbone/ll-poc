@@ -498,7 +498,11 @@
 .vy-inline-field--stack { flex-direction: column; align-items: stretch; }
 
 .vy-run { display: flex; flex-direction: column; gap: var(--vy-space-7); }
-.vy-run-step { display: flex; flex-direction: column; gap: var(--vy-space-6); }
+/* 8px between the bands, not 12. Step 3 stacks five of them above its grid
+   and the grid had 349px of a 627px step — nine lines of a BoM that runs to
+   fifty-eight. Four pixels a join is not a design decision anywhere else in
+   this product; here it is a row of the table. */
+.vy-run-step { display: flex; flex-direction: column; gap: var(--vy-space-4); }
 
 /* ---- Step 1, laid out as three regions ------------------------------------
    It was four sections in one column: 1453px of content in a 669px dialog, so

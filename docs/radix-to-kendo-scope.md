@@ -122,11 +122,19 @@ caveat as Dialog. **Low priority: weak evidence, real cost.**
 
 ### Hold — no evidence, or nothing to gain
 
-**`RadioGroup`.** The live sweep found **no radio group**. It did find
-`k-switch` ×4, which may mean some of our seven radio groups are switches in the
-live UI — but the sweep cannot say which screen uses what, and guessing would be
-inventing a requirement. **Ask the customer which fields are switches** before
-touching this; that question is cheap and the answer changes the work.
+**`RadioGroup`.** ~~Hold.~~ **MOVED, 15 Oct 2026.** The live sweep found no
+radio group — only `k-switch` ×4 — so there was nothing to match and this sat
+here as open question 17. Then the control was looked at directly and asked
+about: was it Kendo? It was not, and it was drawing itself wrong.
+
+The move cost nothing, because it needed no Kendo React component and no new
+dependency: a native `<input type="radio">` carrying `k-radio k-radio-lg`, as
+the checkbox already does since phase C. Twenty-four lines of hand-drawn CSS
+deleted, `@radix-ui/react-radio-group` no longer imported anywhere.
+
+**Question 17 still stands** and is unaffected: whether some of these seven
+groups are switches in the live UI is a question about the CONTROL the customer
+wants, not about which library draws it.
 
 **Popover menus** (`ColumnChooser`, `UserMenu`, `PeoplePicker`). `k-menu` ×8 is
 solid evidence for menus, but ours are not generic menus — they anchor bespoke

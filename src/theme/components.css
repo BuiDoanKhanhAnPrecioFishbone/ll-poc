@@ -133,20 +133,11 @@
    checkbox in the app visually heavier to fix a number; growing the label costs
    nothing visible and is the thing a pointer actually hits (WCAG 2.2, 2.5.8). */
 .vy-check, .vy-radio { display: flex; align-items: center; min-height: var(--vy-space-10); gap: var(--vy-space-4); font-size: var(--vy-text-base); color: var(--vy-on-surface); cursor: pointer; }
-/* Only the RADIO is drawn here now. The checkbox is Kendo's (phase C), so the
-   two no longer share a rule — RadioGroup is still Radix, and the scope holds it
-   there until the customer says which of those fields are switches in their own
-   system. Kept at the same 20px so a radio and a checkbox in the same form still
-   line up. */
-.vy-radio-dot {
-  display: grid; place-items: center; flex: 0 0 auto;
-  width: var(--vy-space-9); height: var(--vy-space-9);
-  background: var(--vy-surface); border: 1px solid var(--vy-border-control); color: var(--vy-on-dark-fg);
-  cursor: pointer; transition: background-color var(--vy-dur-short) var(--vy-ease-standard);
-  border-radius: var(--vy-shape-full);
-}
-.vy-radio-dot[data-state="checked"] { border-color: var(--vy-brand); border-width: var(--vy-border-emphasis); }
-.vy-radio-fill { width: var(--vy-space-4); height: var(--vy-space-4); border-radius: var(--vy-shape-full); background: var(--vy-brand); }
+/* NOTHING IS DRAWN HERE ANY MORE. The radio joined the checkbox on Kendo's own
+   classes (15 Oct) — `k-radio k-radio-lg` on a native input — so the circle,
+   the dot, the states and the focus ring all come from the theme we already
+   ship. The 24 lines that used to draw a radio by hand are gone with it, along
+   with the bug they carried: see RadioGroup in Overlays.tsx. */
 .vy-radios { display: flex; flex-direction: column; gap: var(--vy-space-4); }
 
 
@@ -1483,6 +1474,8 @@
   font-size: var(--vy-text-xs); color: var(--vy-on-surface-muted);
 }
 .vy-tone-legend li { display: flex; align-items: center; gap: var(--vy-space-3); }
+/* Inside a banner it is a continuation of the sentence, not a block under it. */
+.vy-run-banner .vy-tone-legend { display: inline-flex; margin-left: var(--vy-space-5); vertical-align: baseline; }
 .vy-tone-key {
   width: var(--vy-space-8); height: var(--vy-space-6); flex: none;
   border: 1px solid var(--vy-border-strong); border-radius: var(--vy-radius-sm);
