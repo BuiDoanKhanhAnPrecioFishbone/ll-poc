@@ -138,17 +138,23 @@ export function RequiredMark() {
  * On Run Quotation step 1 that distinction is the whole point of the panel —
  * eight values carried from the RFQ, three the step can actually change — and
  * until now all eleven were white boxes.
+ *
+ * `lock` OPTS OUT, for the one case that earns it: a strip where NOTHING is
+ * editable. Run Quotation step 4 shows the same facts as steps 2 and 3 with the
+ * run already finished, and a padlock on every one of seven values says only
+ * what the whole panel already says. The box stays — the fill is what marks a
+ * value you cannot type into — and the lock goes where it distinguishes.
  */
-export function ReadValue({ children }: { children?: ReactNode }) {
+export function ReadValue({ children, lock = true }: { children?: ReactNode; lock?: boolean }) {
   const empty = children === undefined || children === null || children === '';
   return (
     <p className="vy-read-value" data-empty={empty || undefined}>
       <span className="vy-read-value-text">{empty ? 'Not set' : children}</span>
-      <Icon name="lock" size={13} />
+      {lock && <Icon name="lock" size={13} />}
       {/* The glyph is decorative to a screen reader, so the state needs words
           of its own — otherwise a locked value and an editable one are
           announced identically. */}
-      <span className="vy-sr-only"> read-only</span>
+      {lock && <span className="vy-sr-only"> read-only</span>}
     </p>
   );
 }

@@ -1,5 +1,6 @@
 import { Checkbox } from '../../../ui/Overlays';
 import { SearchField, TextField } from '../../../ui/Field';
+import { ReadValue } from '../../../ui/FieldRow';
 
 /**
  * The strip of quoting facts that rides along from step to step.
@@ -27,11 +28,18 @@ export function QuoteContextBar({
 }) {
   return (
     <div className="vy-quote-context">
-      <Fact label="Assembly Part Number - Rev" value={assembly} wide />
-      <Fact label="Description" value={description} wide />
-      <Fact label="Quote Focus" value={quoteFocus} />
-      <Fact label="Material Package Type" value={materialPackageType} />
-      <Fact label="Markup" value={`${markup}%`} />
+      {/* EVERY VALUE IN A BOX, including these. They were bare text, which put
+          five unboxed facts alongside two white input boxes on one strip — the
+          exact "plain text for read only" the customer ruled out on 14 Oct, and
+          the more obvious for sitting next to real controls. `locked` follows
+          the bar: on steps 2 and 3 some of it IS editable, so the padlock
+          earns its place; on step 4 nothing is, so it would be noise on all
+          seven. */}
+      <Fact label="Assembly Part Number - Rev" value={assembly} locked={editable} wide />
+      <Fact label="Description" value={description} locked={editable} wide />
+      <Fact label="Quote Focus" value={quoteFocus} locked={editable} />
+      <Fact label="Material Package Type" value={materialPackageType} locked={editable} />
+      <Fact label="Markup" value={`${markup}%`} locked={editable} />
       {editable ? (
         <>
           <QtyField label="Build Qty" value={buildQty} onChange={onBuildQty!} />
@@ -48,11 +56,13 @@ export function QuoteContextBar({
   );
 }
 
-function Fact({ label, value, wide }: { label: string; value: string; wide?: boolean }) {
+function Fact({ label, value, locked = false, wide }: {
+  label: string; value: string; locked?: boolean; wide?: boolean;
+}) {
   return (
     <div className="vy-quote-fact" data-wide={wide || undefined}>
       <span className="vy-quote-fact-label">{label}</span>
-      <span className="vy-quote-fact-value">{value || '—'}</span>
+      <ReadValue lock={locked}>{value}</ReadValue>
     </div>
   );
 }

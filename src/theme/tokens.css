@@ -417,6 +417,7 @@
   --vy-activity-list-h-stacked: 16rem;
   --vy-activity-detail-min-h: 20rem;
   --vy-change-field-w:        10rem;
+  --vy-quote-fact-min:         9rem;
   --vy-control-md:        34px;  /* input / locked-field height */
   --vy-quote-fact-wide:   220px; /* an assembly number or a description */
   --vy-quote-qty-w:       120px; /* Build Qty / Attrition Set */

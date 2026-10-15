@@ -1261,7 +1261,12 @@
   color: var(--vy-on-surface-subtle); font-weight: var(--vy-weight-medium);
   white-space: nowrap;
 }
-.vy-quote-fact-value { font-size: var(--vy-text-base); color: var(--vy-on-surface-strong); }
+/* The facts are `ReadValue` boxes now, not bare text — see QuoteContext.tsx.
+   They sit in a strip whose other members are real inputs, so they take the
+   control's height and a sensible minimum rather than shrinking to their
+   content and reading as a different kind of thing. */
+.vy-quote-fact .vy-read-value { min-width: var(--vy-quote-fact-min); }
+.vy-quote-fact[data-wide] .vy-read-value { min-width: 0; }
 
 /* ---- Step 1 -------------------------------------------------------------- */
 .vy-quote-config-grid {

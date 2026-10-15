@@ -4,6 +4,7 @@ import { Button } from '../../../ui/Button';
 import { TextField } from '../../../ui/Field';
 import { MiniTable } from '../../../ui/MiniTable';
 import { FileDrop } from '../../../ui/FileDrop';
+import { ReadValue } from '../../../ui/FieldRow';
 import type { ColumnSpec } from '../../column-model';
 import {
   PACKAGING_PARTS, totalQtyOf, money3, type BomLine,
@@ -188,9 +189,11 @@ function ReadOnly({ label, value }: { label: string; value?: string }) {
   return (
     <div className="vy-quote-config-field">
       <span className="vy-quote-fact-label">{label}</span>
-      <p className="vy-read-value" data-locked data-empty={!value || undefined}>
-        {value || 'Choose a part first'}
-      </p>
+      {/* Through the component, not a hand-rolled copy of its markup. This one
+          had drifted: it still carried `data-locked`, an attribute the
+          stylesheet stopped reading on 14 Oct, and it missed the padlock and
+          the screen-reader word that `ReadValue` now adds. */}
+      <ReadValue>{value || 'Choose a part first'}</ReadValue>
     </div>
   );
 }

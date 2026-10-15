@@ -198,3 +198,46 @@ Nothing in the meeting notes asked for it and no screen currently carries a
 banner that contradicts it — `.vy-run-banner` already does the per-grid half on
 Run Quotation steps 2 and 3. Worth doing as its own piece, against a list of
 which conditions deserve which level, rather than inventing the conditions here.
+
+## 8. The field rule, swept across the system — 15 October
+
+*"This section did not follow our rule that every value is an input-field text
+with different state design. Please check clearly all the system."*
+
+Reported against the Run Quotation context strip, and correctly: five of its
+seven facts — Assembly Part Number, Description, Quote Focus, Material Package
+Type, Markup — were bare text sitting beside two white input boxes. The 14
+October rule says a value you cannot type into is a box with a disabled fill;
+these were the plain text that rule exists to remove, and the more obviously
+wrong for being inline with real controls.
+
+**Swept the whole system for the same fault.** Two places had it:
+
+| Where | Was | Now |
+|---|---|---|
+| `QuoteContextBar` (steps 2, 3, 4) | five bare `<span>` values beside two inputs | `ReadValue` boxes, padlocked on steps 2 and 3 |
+| `dialogs.tsx`, Add Package | a hand-rolled copy of `.vy-read-value` markup | the `ReadValue` component |
+
+The second had drifted out of sight: it still carried `data-locked`, an
+attribute the stylesheet stopped reading on 14 Oct, and it missed the padlock
+and the screen-reader word the component now adds. A copy of a component's
+markup does not get the component's fixes.
+
+**What was deliberately NOT boxed.** The summary strips — Quotation Result's
+"Quoted total with markup / Assemblies / Last run", the Stock Report's
+"Quantity / Available / Allocated", and every `.vy-kpi` and `.vy-stat` tile.
+These are statistics, not fields: nobody expects to type in them, they are not
+beside anything editable, and boxing them would make the product look like a
+form in places where there is no form. The rule being applied is "a value that
+belongs to a record or sits among controls is a box", which is what the
+customer's own two states describe.
+
+**One thing the sweep added back.** `ReadValue` gained a `lock` opt-out. Step 4
+shows the same seven facts with the run already finished, and a padlock on each
+of seven values says only what the whole panel already says. The box stays — the
+fill is what marks a value you cannot type into — and the lock goes where it
+distinguishes, which is a strip that mixes the two states.
+
+Measured on step 2 after the change: 7 facts, 5 boxed and padlocked, 2 white
+inputs, **0 bare values**, fill grey-100 on a grey-300 border; the dialog still
+does not scroll vertically and the grid still shows 23 rows.
