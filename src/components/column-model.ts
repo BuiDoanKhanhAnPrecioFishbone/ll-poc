@@ -18,6 +18,17 @@ export type ColumnSpec<T> = {
   role: ColumnRole;
 
   /**
+   * A distinct identity, where `field` is not one.
+   *
+   * `field` is the React key for a column, which holds as long as no two
+   * columns share one. A GENERATED set breaks that: Review BoM renders
+   * MFG1/MFGPN1 ... MFG6/MFGPN6 from one `alternates` array, so six columns
+   * would key on the same name and React would drop five of them. Columns that
+   * borrow an unrelated field to satisfy the type have the same problem.
+   */
+  id?: string;
+
+  /**
    * Overrides the role's default width, in either direction. Legitimate when
    * the column's real content differs materially from what the role assumes:
    * a `code` column holding "Sub-assy Box Build" cannot live in 96px, and an

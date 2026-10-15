@@ -126,7 +126,7 @@ export function MiniTable<T extends { id: string | number }>({
       >
         {columns.map((c, i) => (
           <GridColumn
-            key={String(c.field)}
+            key={c.id ?? String(c.field)}
             field={String(c.field)}
             title={c.title}
             width={widthOf(c)}

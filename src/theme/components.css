@@ -1327,6 +1327,21 @@
 }
 .vy-run-ref .vy-quote-config-grid { gap: var(--vy-space-4); }
 
+/* The file name and the button that fills it, on one line. The value takes the
+   room and the button keeps its own width, so a long file name shortens the
+   value rather than squeezing the control. */
+.vy-file-row { display: flex; align-items: center; gap: var(--vy-space-4); min-width: 0; }
+.vy-file-row .vy-read-value { flex: 1; min-width: 0; }
+/* `> button`, not `.vy-btn`: our Button renders Kendo's own classes and carries
+   no `vy-` class of its own, so the obvious selector matched nothing and the
+   control kept Kendo's shrinkable `flex: 0 1 auto` — a long file name would
+   have squeezed the button instead of itself. */
+.vy-file-row > button { flex: none; }
+/* Scoped to this row, not to every read value: the reference panel's notes
+   fields are read values too and they are meant to wrap. A file name is one
+   token and should shorten rather than grow the row. */
+.vy-file-row .vy-read-value-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
 .vy-attachments { margin-top: var(--vy-space-7); }
 .vy-attachments ul { list-style: none; margin: var(--vy-space-3) 0 0; padding: 0; display: flex; flex-direction: column; gap: var(--vy-space-2); }
 .vy-attachments li { display: flex; align-items: baseline; gap: var(--vy-space-4); opacity: .5; }
@@ -1443,14 +1458,6 @@
 }
 .vy-pair[data-known] { background: var(--vy-tone-covered-bg); color: inherit; }
 
-/* The alternates a row has beyond the two it shows. A count, not a stack: one
-   line with six AMLs would otherwise set the row height for every line around
-   it. The full list is in its `title`. */
-.vy-pair-more {
-  align-self: flex-start;
-  font-size: var(--vy-text-xs); color: var(--vy-on-surface-muted);
-  cursor: help;
-}
 
 /* The colour key. The grid's three states are painted AND stated — the live
    screen paints them and states nothing, which leaves colour as the only
@@ -1466,6 +1473,7 @@
   border: 1px solid var(--vy-border-strong); border-radius: var(--vy-radius-sm);
 }
 .vy-tone-key[data-tone="known"] { background: var(--vy-tone-covered-bg); }
+.vy-tone-key[data-tone="known-mfg"] { background: var(--vy-tone-known-mfg-bg); }
 .vy-tone-key[data-tone="missing"] { background: var(--vy-tone-missing-bg); }
 
 /* ---- MFG-MPN (AML) -------------------------------------------------------- */

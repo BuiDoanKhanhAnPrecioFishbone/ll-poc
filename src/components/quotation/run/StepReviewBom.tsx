@@ -23,6 +23,14 @@ export function StepReviewBom({ cfg, set, lines, setLines }: {
 
   const missingFromMaster = lines.filter(l => !PART_MASTER.has(l.part)).length;
 
+  /* How many AML slots this BoM actually uses. At least one, so a BoM with no
+     manufacturers at all still shows the pair of columns the user expects to
+     fill; never more than the live screen's six. */
+  const amlDepth = useMemo(
+    () => Math.min(6, Math.max(1, ...lines.map(l => amlPairs(l).length))),
+    [lines],
+  );
+
   const shown = useMemo(() => {
     const k = search.trim().toLowerCase();
     return lines.filter(l => {
@@ -103,48 +111,59 @@ export function StepReviewBom({ cfg, set, lines, setLines }: {
       render: l => l.qty.toLocaleString() },
     { field: 'level', title: 'LEVEL', role: 'number', width: 72,
       widthNote: 'A single digit.' },
-    /* ONE COLUMN OF PAIRS, NOT TWELVE COLUMNS OF BLANKS.
-       The live Review BoM carries six fixed manufacturer slots as twelve
-       columns — MFG1, MFGPN1 ... MFG6, MFGPN6, 150px each. Measured on 15 Oct:
-       MFG3 through MFGPN6 were empty on 13 of 13 rows and MFG2/MFGPN2 on 12 of
-       13, while the grid scrolled 1,185px sideways. A row carries as many AMLs
-       as it has, so the column holds a list.
+    /* ONE COLUMN PER AML SLOT, as the live screen has them — MFG1, MFGPN1,
+       MFG2, MFGPN2 and so on. This replaced a single stacked "MFG | MPN" cell
+       of mine, and the reversal is the customer's, with their screen as the
+       evidence: on the BoM they showed, MFG2/MFGPN2 carry real second sources
+       (TREND_TE, ONSEMI), so the alternates are not the dead weight the first
+       BoM I measured suggested.
 
-       This is not a new idea here: Create BoM already renders its normalised
-       MFG | MPN pairs exactly this way, for exactly this reason. Two screens
-       showing the same fact two ways was the thing to avoid. */
-    {
-      field: 'mfg', title: 'MFG | MPN', role: 'text', width: 300,
-      widthNote: 'A manufacturer name beside a part number, stacked per AML.',
-      render: l => {
-        const pairs = amlPairs(l);
-        if (!pairs.length) return <span className="vy-empty">—</span>;
-        const shown = pairs.slice(0, 2);
-        const rest = pairs.slice(2);
-        return (
-          <span className="vy-pairs">
-            {shown.map((pr, i) => (
-              <span key={`${pr.mfg}-${pr.mpn}-${i}`} className="vy-pair"
-                    data-known={KNOWN_MANUFACTURERS.has(pr.mfg) || undefined}
-                    title={KNOWN_MANUFACTURERS.has(pr.mfg)
-                      ? `${pr.mfg} is in Manufacturer Management`
-                      : `${pr.mfg} is not in Manufacturer Management`}>
-                {pr.mfg} | <span className="vy-code">{pr.mpn}</span>
-              </span>
-            ))}
-            {/* Two is what a row realistically carries; the rest are counted
-                rather than stacked, so one six-AML line cannot set the height
-                of every row around it. */}
-            {rest.length > 0 && (
-              <span className="vy-pair-more"
-                    title={rest.map(pr => `${pr.mfg} | ${pr.mpn}`).join('\n')}>
-                +{rest.length} more
-              </span>
-            )}
-          </span>
-        );
+       The argument I had missed is scanning. Separate columns let an estimator
+       read DOWN MFG2 to see which lines have a second source at all, which is
+       the question this step exists to answer. Stacked pairs can only be read
+       row by row.
+
+       WHAT WE DO NOT COPY: the live grid renders all six slots always, and on
+       the record we measured MFG3 through MFGPN6 were empty on 13 of 13 rows —
+       1,200px of horizontal scroll for columns no row used. The slots here are
+       generated to the depth the DATA has, so a BoM with one AML per line gets
+       two columns and a BoM with three gets six. */
+    ...Array.from({ length: amlDepth }).flatMap((_, i) => ([
+      {
+        field: 'mfg' as const, id: `mfg${i + 1}`, title: `MFG${i + 1}`,
+        role: 'text' as const, width: 150,
+        widthNote: 'A manufacturer name, as the live column is sized.',
+        /* "The background color is displayed in yellow because the
+           manufacturer value already exists in Manufacturer Management" —
+           and red where it does not, which is what their Missing Manufacturer
+           filter is named for. A slot the line does not have stays plain. */
+        tone: (l: BomLine) => {
+          const pr = amlPairs(l)[i];
+          if (!pr || !pr.mfg) return undefined;
+          return KNOWN_MANUFACTURERS.has(pr.mfg) ? 'known-mfg' : 'missing';
+        },
+        render: (l: BomLine) => {
+          const pr = amlPairs(l)[i];
+          if (!pr || !pr.mfg) return <span className="vy-empty">—</span>;
+          return (
+            <span title={KNOWN_MANUFACTURERS.has(pr.mfg)
+              ? `${pr.mfg} is in Manufacturer Management`
+              : `${pr.mfg} is not in Manufacturer Management`}>{pr.mfg}</span>
+          );
+        },
       },
-    },
+      {
+        field: 'mpn' as const, id: `mfgpn${i + 1}`, title: `MFGPN${i + 1}`,
+        role: 'ident' as const, width: 170,
+        widthNote: 'Manufacturer part numbers are long and must not truncate.',
+        render: (l: BomLine) => {
+          const pr = amlPairs(l)[i];
+          return pr && pr.mpn
+            ? <span className="vy-code">{pr.mpn}</span>
+            : <span className="vy-empty">—</span>;
+        },
+      },
+    ])),
     { field: 'attrition', title: 'TOTAL QTY', role: 'number', width: 108,
       widthNote: 'Holds a computed total, which is larger than a per-board qty.',
       /* Not in the guideline's column list for this step, but the formula runs
@@ -200,7 +219,9 @@ export function StepReviewBom({ cfg, set, lines, setLines }: {
           means in words. */}
       <ul className="vy-tone-legend">
         <li><span className="vy-tone-key" data-tone="known" aria-hidden />
-          In Part Master, manufacturer recognised</li>
+          Part is in Part Master</li>
+        <li><span className="vy-tone-key" data-tone="known-mfg" aria-hidden />
+          Manufacturer is in Manufacturer Management</li>
         <li><span className="vy-tone-key" data-tone="missing" aria-hidden />
           Not on file — create it before confirming this RFQ</li>
       </ul>

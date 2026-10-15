@@ -275,16 +275,22 @@ export function StepConfigBom({ q, cfg, set, invalid = [] }: {
                   </span>
                 </Field>
 
+                {/* ONE ROW: the file name and the control that fills it.
+                    They were two fields, so the grid put a locked box in one
+                    cell and the button that fills it in another — the reader
+                    had to work out that the two were the same thing, and the
+                    button read as an action on the whole step rather than on
+                    that field. A read-only value whose only way to change is a
+                    button belongs beside the button. */}
                 <Field label="File name">
-                  <ReadValue>{cfg.uploadedFile}</ReadValue>
+                  <div className="vy-file-row">
+                    <ReadValue>{cfg.uploadedFile}</ReadValue>
+                    <Button onClick={() => setImportOpen(true)}
+                            title="Choose a BoM file from Voyager or from this machine">
+                      Upload file
+                    </Button>
+                  </div>
                   <span className="vy-field-hint">Filled in when you upload.</span>
-                </Field>
-
-                <Field label="Upload file">
-                  <Button onClick={() => setImportOpen(true)}
-                          title="Choose a BoM file from Voyager or from this machine">
-                    Upload file
-                  </Button>
                 </Field>
               </div>
             )}

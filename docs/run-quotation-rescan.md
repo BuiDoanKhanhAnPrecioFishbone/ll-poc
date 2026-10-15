@@ -255,15 +255,23 @@ Three findings:
 
 ## What we built for step 2, 15 October
 
-**One column of pairs, not twelve columns of blanks.** `MFG | MPN` holds the
-line's AMLs as a list — primary first, then alternates, each chip green when the
-manufacturer is in Manufacturer Management and red when it is not. Two are
-shown and the rest become `+N more` with the full list in its title, so one
-six-AML line cannot set the height of every row around it. This is not a new
-pattern here: Create BoM already renders normalised pairs exactly this way, for
-exactly this reason, and two screens showing one fact two ways was the thing to
-avoid. `BomLine.alternates` carries them; the seed table gives four lines real
-second sources.
+**One column per AML slot — MFG1, MFGPN1, MFG2, MFGPN2 … as the live screen
+has them.** Built first as a single stacked `MFG | MPN` cell, on the measurement
+that eight of their twelve AML columns were empty on every row. The customer
+corrected it the same day with a second BoM where MFG2/MFGPN2 carry real second
+sources (TREND_TE, ONSEMI), and with the argument I had missed: **separate
+columns let an estimator read DOWN a column** to see which lines have a second
+source at all, which is the question this step exists to answer. Stacked pairs
+can only be read row by row. Their structure wins.
+
+What we do not copy is the fixed six slots. The columns are generated to the
+depth the DATA uses — two columns for a BoM with one AML per line, six for a BoM
+with three — so no row pays for a column no row fills. On our seed data that is
+depth 3: six AML columns instead of twelve, 670px of scroll instead of 1185px.
+
+`BomLine.alternates` carries them, and `ColumnSpec.id` was added so a generated
+set keys on something other than `field`: six columns rendered from one
+`alternates` array would otherwise share a React key and five would be dropped.
 
 **"Missing Manufacturer" now means what its colour means.** The filter tested
 `mfg === ''`, which on the live screen would match nothing — MFG1 is filled on
@@ -284,8 +292,15 @@ the content they hold instead, and the grid now fits.
 
 | | Live | Ours, before | Ours, after |
 |---|---|---|---|
-| Columns | 17 | 12 | 10 |
-| Table width | 2515px | 1532px | 1296px |
-| Horizontal scroll | 1185px | 246px | **10px** |
-| Frozen share of track | 53% | 76% | 63%, and nothing scrolls past it |
-| Colour legend | none | none | 2 states, stated |
+| Columns | 17 (12 of them AML) | 12 | 15 (6 of them AML) |
+| AML slots rendered | 6, always | 1 pair, merged | as many as the data uses |
+| Table width | 2515px | 1532px | 1956px |
+| Horizontal scroll | 1185px | 246px | **670px** |
+| Frozen share of track | 53% | 76% | 63% |
+| Colour legend | none | none | **3 states, stated** |
+
+The scroll is the price of the customer's column structure, and it is their
+call to make; what we removed is the part that was empty. The frozen set is
+theirs too — checkbox, NUMBER, ROCKET_PN, PART_REV, PART_DESC, QTY — and ours
+is narrower than theirs column for column (ROCKET_PN 170 against 250,
+PART_DESC 230 against 300).
