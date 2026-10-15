@@ -1262,10 +1262,20 @@
   white-space: nowrap;
 }
 /* The facts are `ReadValue` boxes now, not bare text — see QuoteContext.tsx.
-   They sit in a strip whose other members are real inputs, so they take the
-   control's height and a sensible minimum rather than shrinking to their
-   content and reading as a different kind of thing. */
-.vy-quote-fact .vy-read-value { min-width: var(--vy-quote-fact-min); }
+   They sit in a strip whose other members are real inputs, so they take a
+   sensible minimum rather than shrinking to nothing.
+
+   COMPACT, because this strip rides along on three steps and every pixel it
+   takes comes off the grid below it. Boxing the facts took the bar from 68px
+   to 126px — two rows where there had been one — and these two declarations
+   buy most of it back: a 28px box instead of 34px, and a floor that lets
+   "27%" occupy the width of "27%". Same treatment as the step 1 reference
+   panel, for the same reason. */
+.vy-quote-fact .vy-read-value {
+  min-width: var(--vy-quote-fact-min);
+  min-height: var(--vy-control-sm);
+  padding-block: var(--vy-space-2);
+}
 .vy-quote-fact[data-wide] .vy-read-value { min-width: 0; }
 
 /* ---- Step 1 -------------------------------------------------------------- */
@@ -1479,6 +1489,7 @@
 }
 .vy-tone-key[data-tone="known"] { background: var(--vy-tone-covered-bg); }
 .vy-tone-key[data-tone="known-mfg"] { background: var(--vy-tone-known-mfg-bg); }
+.vy-tone-key[data-tone="pending"] { background: var(--vy-tone-pending-bg); }
 .vy-tone-key[data-tone="missing"] { background: var(--vy-tone-missing-bg); }
 
 /* ---- MFG-MPN (AML) -------------------------------------------------------- */
@@ -1538,7 +1549,7 @@
 .vy-minitable-k td[data-tone="known"]       { background: var(--vy-tone-covered-bg); }
 .vy-minitable-k td[data-tone="missing"]     { background: var(--vy-tone-missing-bg); color: var(--vy-tone-missing-fg); }
 .vy-minitable-k td[data-tone="known-mfg"]   { background: var(--vy-tone-known-mfg-bg); }
-.vy-minitable-k td[data-tone="pending"]     { background: var(--vy-tone-missing-bg); }
+.vy-minitable-k td[data-tone="pending"]     { background: var(--vy-tone-pending-bg); }
 
 /* ---- DataGrid on the Kendo Grid ------------------------------------------ */
 /* The role model and the density preference, re-expressed for a real <table>.

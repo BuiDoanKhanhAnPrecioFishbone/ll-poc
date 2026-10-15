@@ -304,3 +304,62 @@ call to make; what we removed is the part that was empty. The frozen set is
 theirs too — checkbox, NUMBER, ROCKET_PN, PART_REV, PART_DESC, QTY — and ours
 is narrower than theirs column for column (ROCKET_PN 170 against 250,
 PART_DESC 230 against 300).
+
+## The context strip, tightened — 15 October
+
+Boxing the five read-only facts took the strip from 68px to 126px: two rows
+where there had been one, and every pixel of it comes off the grid below. Three
+changes bought it back without giving up the boxes.
+
+- A 28px box rather than 34px, as in the step 1 reference panel.
+- `--vy-quote-fact-min` from 9rem to 5rem. It was a floor behaving like a width:
+  "27%" was given the same 144px as a part number.
+- `--vy-quote-fact-wide` from 220px to 180px. Flex wraps on the BASIS, before
+  anything grows, so at 220 the seven facts summed to 1329px against a 1278px
+  strip and Attrition Set dropped to a second row on its own.
+
+Measured on step 3: **126px → 76px at 1400x900, and the dialog body scrolls
+0px.** At 1280x720 the strip still wraps to two rows and the body scrolls 52px;
+the footer is outside the scrolling region, so Previous, Save draft and Generate
+Quotation stay put.
+
+**The scrolling rule, stated.** Scroll the data, not the chrome. The stepper,
+context strip, toolbar and footer hold still; the grid scrolls, in both
+directions, with both scrollbars drawn and taking layout space so neither is
+the invisible overlay that caused "I cannot scroll to see all the attachments".
+
+## Step 3, built — 15 October
+
+Two of the three findings against the live screen were true of ours as well,
+and one of them we had written up as criticism while shipping it.
+
+**Red for "not calculated yet".** `tone: pending` pointed at
+`--vy-tone-missing-bg` — the same red-50 as a missing part — so step 3 opened
+with **240 cells painted like failures** for values that had simply not been
+fetched. It now has a token of its own, `--vy-tone-pending-bg`, set to the
+sunken grey that marks every other not-typeable surface in the product. Grey
+says inert; red is kept for something actually wrong. A legend says both in
+words, as on step 2.
+
+**Width.** 21 columns summed to 2814px in a 1302px track — wider than the live
+screen's own 2300px, which is not a position to criticise from. Twelve columns
+came down to the sizes the live uses: **2814px → 2500px, overflow 1528px →
+1214px**, and the frozen block from 52% of the track to **43%**, which widens
+the scrolling window from 626px to 742px.
+
+**Frozen columns.** Ours already froze four — Part, Revision, Source,
+Description — against the live screen's zero, so the identity of a line
+survives the scroll to Unit Price and Status. That one needed no change.
+
+### Not built: the alternate-AML rows
+
+The live step 3 lists each alternate manufacturer as its own row under the part,
+which is how a second source gets its own supplier, order quantity and price.
+Ours does not render alternates on this step at all — `BomLine.alternates`
+reaches step 2's MFG1..MFGPN6 columns and stops there.
+
+That is a gap, not a decision, and it is the one place where copying the live
+screen is unattractive: their alternate row has 15 cells in a 21-column table,
+so its manufacturer renders under PART and its MPN under REVISION. Built here it
+would want a properly indented sub-row with the columns aligned, which is a
+feature rather than a fix. Raised for the customer to decide.

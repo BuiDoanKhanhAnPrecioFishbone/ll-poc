@@ -266,6 +266,12 @@
   --vy-tone-covered-bg:      var(--vy-status-done-bg);
   /* A manufacturer already in Manufacturer Management. */
   --vy-tone-known-mfg-bg:    var(--vy-status-open-bg);
+  /* AWAITING THE QUOTE RUN — not an error. This pointed at the same red-50 as
+     `missing`, so step 3 opened with 240 cells painted like failures for
+     values that simply had not been fetched yet. We had written the criticism
+     of the live screen doing exactly this into docs/run-quotation-rescan.md
+     while shipping it ourselves. Grey says inert; red says wrong. */
+  --vy-tone-pending-bg:      var(--vy-surface-sunken);
 
   /* --- Typography -----------------------------------------------------------
      The legacy app declared NO font stack at all (computed font-family was the
@@ -417,9 +423,17 @@
   --vy-activity-list-h-stacked: 16rem;
   --vy-activity-detail-min-h: 20rem;
   --vy-change-field-w:        10rem;
-  --vy-quote-fact-min:         9rem;
+  /* A FLOOR, not a width. 9rem here gave "27%" the same 144px as a part
+     number and pushed a seven-fact strip onto three rows; the boxes should
+     size to what they hold and only stop being comically narrow. */
+  --vy-quote-fact-min:         5rem;
   --vy-control-md:        34px;  /* input / locked-field height */
-  --vy-quote-fact-wide:   220px; /* an assembly number or a description */
+  /* 180, not 220. Flex wraps on the BASIS, before anything grows, and at 220
+     the seven facts summed to 1329px against a 1278px strip — so Attrition Set
+     dropped to a second row and the bar stood at 126px. At 180 they sum to
+     1249 and the two wide facts grow into whatever is left. An assembly number
+     ("0455-300-0192-01 - 01") measures ~150px, so 180 still holds one. */
+  --vy-quote-fact-wide:   180px; /* an assembly number or a description */
   --vy-quote-qty-w:       120px; /* Build Qty / Attrition Set */
   --vy-quote-field-min:   240px; /* one field on the Config BoM grid */
   --vy-cost-col-min:      170px; /* one figure in the cost summary */

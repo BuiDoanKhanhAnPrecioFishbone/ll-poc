@@ -141,6 +141,18 @@ export function StepQuoting({ cfg, set, lines, setLines, hasRun, onRun, onApply,
         ]}
       />
 
+      {/* THE COLOURS, SAID IN WORDS, as on step 2. Before the run this grid
+          paints 240 cells, and until 15 Oct it painted them in the same red as
+          a missing part — the fault we had written up against the live screen
+          while shipping it ourselves. Grey says "waiting for the run"; red is
+          kept for something that is actually wrong. */}
+      <ul className="vy-tone-legend">
+        <li><span className="vy-tone-key" data-tone="pending" aria-hidden />
+          Waiting for the quote run</li>
+        <li><span className="vy-tone-key" data-tone="missing" aria-hidden />
+          No supplier can cover this line</li>
+      </ul>
+
       <MiniTable
         data={shown}
         /* NO PER-COLUMN FILTER ROW. The step already carries a search box and
@@ -210,14 +222,17 @@ function quotingColumns(cfg: RunConfig, hasRun: boolean,
   return [
     { field: 'part', title: 'Part', role: 'ident', width: 180,
       widthNote: 'Frozen, so it pays for itself; part numbers must not truncate.' },
-    { field: 'revision', title: 'Revision', role: 'code', width: 96 },
-    { field: 'partSource', title: 'Source', role: 'code', width: 120,
+    { field: 'revision', title: 'Revision', role: 'code', width: 80,
+      widthNote: 'A revision is one or two characters; the live column is 80.' },
+    { field: 'partSource', title: 'Source', role: 'code', width: 100,
       widthNote: 'Longest value is "MAKE/PHANT".' },
-    { field: 'description', title: 'Description', role: 'text' },
-    { field: 'mfg', title: 'MFG', role: 'text', width: 170,
+    { field: 'description', title: 'Description', role: 'text', width: 200,
+      widthNote: 'Descriptions outrun any width; the live column is 200 and '
+        + 'this grid is the widest in the product.' },
+    { field: 'mfg', title: 'MFG', role: 'text', width: 140,
       widthNote: 'Manufacturer names run long.' },
     {
-      field: 'mpn', title: 'MPN', role: 'ident', width: 210,
+      field: 'mpn', title: 'MPN', role: 'ident', width: 180,
       widthNote: 'Editable, and manufacturer part numbers are long.',
       tone: pending,
       /* One of the five fields the guideline lets the user edit here. */
@@ -228,7 +243,7 @@ function quotingColumns(cfg: RunConfig, hasRun: boolean,
     { field: 'qty', title: 'Qty', role: 'number', width: 90,
       render: l => l.qty.toLocaleString() },
     {
-      field: 'attrition', title: 'Attrition', role: 'number', width: 110,
+      field: 'attrition', title: 'Attrition', role: 'number', width: 96,
       widthNote: 'Editable, so it holds a control rather than a number.',
       /* "When the Attrition value is changed, the system automatically
           recalculates the Total Qty accordingly" — which happens for free,
@@ -241,11 +256,11 @@ function quotingColumns(cfg: RunConfig, hasRun: boolean,
                    onChange={e => edit(l.id, { attrition: Number(e.target.value) })}
                    onBlur={e => { if (Number(e.target.value) < 0) edit(l.id, { attrition: 0 }); }} />),
     },
-    { field: 'outStock', title: 'Total Qty', role: 'number', width: 110,
+    { field: 'outStock', title: 'Total Qty', role: 'number', width: 100,
       widthNote: 'A computed total, larger than the per-board quantity.',
       render: l => totalQtyOf(l, cfg.buildQty, cfg.attritionSet).toLocaleString() },
     {
-      field: 'supplier', title: 'Supplier', role: 'text', width: 150,
+      field: 'supplier', title: 'Supplier', role: 'text', width: 130,
       render: l => hideIfExcluded(l,
         <Select label={`Supplier for ${l.part}`} value={l.supplier}
                 options={SUPPLIERS}
@@ -262,11 +277,11 @@ function quotingColumns(cfg: RunConfig, hasRun: boolean,
                    onChange={e => edit(l.id, { orderQty: Number(e.target.value) })}
                    onBlur={e => { if (Number(e.target.value) < 0) edit(l.id, { orderQty: 0 }); }} />),
     },
-    { field: 'stock', title: 'Stock', role: 'number', width: 110, tone: pending,
+    { field: 'stock', title: 'Stock', role: 'number', width: 100, tone: pending,
       render: l => hideIfExcluded(l, l.stock ? l.stock.toLocaleString() : <span className="vy-empty">—</span>) },
     { field: 'lt', title: 'LT', role: 'number', width: 80, tone: pending,
       render: l => hideIfExcluded(l, l.lt ? String(l.lt) : <span className="vy-empty">—</span>) },
-    { field: 'pkg', title: 'Pkg.', role: 'code', width: 110, tone: pending,
+    { field: 'pkg', title: 'Pkg.', role: 'code', width: 100, tone: pending,
       render: l => hideIfExcluded(l, l.pkg || <span className="vy-empty">—</span>) },
     { field: 'moq', title: 'MOQ', role: 'number', width: 100, tone: pending,
       render: l => hideIfExcluded(l, l.moq.toLocaleString()) },
@@ -276,13 +291,13 @@ function quotingColumns(cfg: RunConfig, hasRun: boolean,
       render: l => hideIfExcluded(l, l.unitPrice ? money3(l.unitPrice) : <span className="vy-empty">—</span>) },
     { field: 'amount', title: 'AMT', role: 'money', width: 120, tone: pending,
       render: l => hideIfExcluded(l, l.amount ? money(l.amount) : <span className="vy-empty">—</span>) },
-    { field: 'excessAmt', title: 'Excess AMT', role: 'money', width: 130, tone: pending,
+    { field: 'excessAmt', title: 'Excess AMT', role: 'money', width: 116, tone: pending,
       /* $0.000 is the guideline's stated default, three decimals and all. */
       render: l => hideIfExcluded(l, money3(l.excessAmt)) },
     { field: 'status', title: 'Status', role: 'status', width: 110, tone: pending,
       render: l => <span className="vy-line-status" data-status={l.status}>{l.status}</span> },
     {
-      field: 'notes', title: 'Notes', role: 'text', width: 200,
+      field: 'notes', title: 'Notes', role: 'text', width: 140,
       widthNote: 'Editable free text — a cramped note field goes unused.',
       tone: pending,
       render: l => hideIfExcluded(l,
