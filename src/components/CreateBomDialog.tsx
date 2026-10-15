@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { SmartIcon } from './quotation/SmartButtons';
 import { Dialog, Select, RadioGroup } from '../ui/Overlays';
 import { Button } from '../ui/Button';
 import { TextField } from '../ui/Field';
@@ -218,7 +219,7 @@ export function CreateBomDialog({ open, onClose }: { open: boolean; onClose: () 
         <div className="vy-run-step">
           {/* ---- RFQ Information ------------------------------------------ */}
           <section className="vy-run-section">
-            <h3 className="vy-field-group-title">RFQ Information</h3>
+            <h3 className="vy-field-group-title"><SmartIcon name="quote" />RFQ Information</h3>
             <div className="vy-quote-config-grid">
               <FieldRow editing label="Customer" required>
                 <Select label="Customer" value={customer} options={CUSTOMER_OPTIONS}
@@ -235,7 +236,7 @@ export function CreateBomDialog({ open, onClose }: { open: boolean; onClose: () 
 
           {/* ---- Select Action -------------------------------------------- */}
           <section className="vy-run-section">
-            <h3 className="vy-field-group-title">Select Action</h3>
+            <h3 className="vy-field-group-title"><SmartIcon name="task" />Select Action</h3>
             {/* The sheet calls these two "checkbox", with Import New BoM
                 "default selected". They are mutually exclusive — the whole of
                 Assembly Info and Component Info changes with the choice — and a
@@ -257,7 +258,7 @@ export function CreateBomDialog({ open, onClose }: { open: boolean; onClose: () 
 
           {/* ---- Assembly Info -------------------------------------------- */}
           <section className="vy-run-section">
-            <h3 className="vy-field-group-title">Assembly Info</h3>
+            <h3 className="vy-field-group-title"><SmartIcon name="factory" />Assembly Info</h3>
             {action === 'import-new' ? (
               <>
                 <div className="vy-quote-config-grid">
@@ -321,7 +322,7 @@ export function CreateBomDialog({ open, onClose }: { open: boolean; onClose: () 
 
           {/* ---- Component Info ------------------------------------------- */}
           <section className="vy-run-section">
-            <h3 className="vy-field-group-title">Component Info</h3>
+            <h3 className="vy-field-group-title"><SmartIcon name="parts" />Component Info</h3>
 
             <div className="vy-quote-config-grid">
               <FieldRow editing label="Upload file" required>
@@ -475,7 +476,7 @@ function ReviewBom({ rows, code, amlFormat, assembly, unknownMfgs, resolutions, 
 
       {unknownMfgs.length > 0 && (
         <section className="vy-run-section">
-          <h3 className="vy-field-group-title">MFG Mapping</h3>
+          <h3 className="vy-field-group-title"><SmartIcon name="bom" />MFG Mapping</h3>
           <p className="vy-hint">
             Every manufacturer in the file must either map to one the system already holds, or
             be created. Mapping is for the same company written differently; create is for one

@@ -1,5 +1,6 @@
 import { useId, useState } from 'react';
 import { ReadValue } from '../../../ui/FieldRow';
+import { SmartIcon } from '../SmartButtons';
 import { RadioGroup, Select } from '../../../ui/Overlays';
 import { Button } from '../../../ui/Button';
 import { TextField, TextArea } from '../../../ui/Field';
@@ -94,7 +95,7 @@ export function StepConfigBom({ q, cfg, set, invalid = [] }: {
        (Action), then the two halves of it (the file, and the assembly). */
     <div className="vy-run-step vy-run-step--config">
       <section className="vy-run-section vy-run-ref">
-        <h3 className="vy-field-group-title">Quoting information</h3>
+        <h3 className="vy-field-group-title"><SmartIcon name="quote" />Quoting information</h3>
         {/* The sentence that used to follow — "Quote Focus, Material Package
             Type and Markup may be changed for this run; the rest is shown for
             reference" — is gone because the fields now say it themselves: from
@@ -161,7 +162,7 @@ export function StepConfigBom({ q, cfg, set, invalid = [] }: {
 
       <div className="vy-run-work">
       <section className="vy-run-section">
-        <h3 className="vy-field-group-title">Action</h3>
+        <h3 className="vy-field-group-title"><SmartIcon name="task" />Action</h3>
         <RadioGroup label="Action" value={cfg.action}
                     options={ACTIONS}
                     onChange={v => set({ action: v as RunConfig['action'] })} />
@@ -188,7 +189,7 @@ export function StepConfigBom({ q, cfg, set, invalid = [] }: {
           fold. */}
       <div className="vy-run-pair">
       <section className="vy-run-section">
-        <h3 className="vy-field-group-title">BoM Options</h3>
+        <h3 className="vy-field-group-title"><SmartIcon name="bom" />BoM Options</h3>
 
         {cfg.action === 'import-new' ? (
           <>
@@ -300,7 +301,7 @@ export function StepConfigBom({ q, cfg, set, invalid = [] }: {
 
       {/* ---- Assembly Details ------------------------------------------------ */}
       <section className="vy-run-section">
-        <h3 className="vy-field-group-title">Assembly Details</h3>
+        <h3 className="vy-field-group-title"><SmartIcon name="factory" />Assembly Details</h3>
 
         {cfg.action === 'import-new' ? (
           <div className="vy-quote-config-grid">

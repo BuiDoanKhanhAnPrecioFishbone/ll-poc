@@ -363,3 +363,41 @@ screen is unattractive: their alternate row has 15 cells in a 21-column table,
 so its manufacturer renders under PART and its MPN under REVISION. Built here it
 would want a properly indented sub-row with the columns aligned, which is a
 feature rather than a fix. Raised for the customer to decide.
+
+## Sections become cards — 15 October
+
+*"Should we group them into group cards? The BoM quotation was complained hard
+to understand, the structure layout is messy."*
+
+They were describing a real inconsistency rather than a preference. The record
+screen already renders "a named set of fields" as a bordered card with a
+tinted, icon-led title bar — Customer, Project, Schedule & ownership. Step 1 of
+Run Quotation renders the same thing, four times, as a small uppercase label
+floating on white with a hairline rule between regions. Two patterns for one
+job, in one product, two clicks apart. The one that looks unstructured is the
+one without the card.
+
+Applied to both users of `.vy-run-section`: Run Quotation step 1 (Quoting
+information, Action, BoM Options, Assembly Details) and Create BoM (RFQ
+Information, Select Action, Assembly Info, Component Info, MFG Mapping). Each
+takes a border, a radius and a title bar that bleeds to the card's edges, with
+an icon, matching the record screen.
+
+**It costs nothing in height, which is the part worth recording.** A card
+separates itself, so the rule between sections goes — and that rule was
+costing 41px a join in margin, padding and border, more than a title bar. The
+reference rail keeps its grey ground, because that is what says "carried from
+the RFQ, not the work"; it takes the same border and title bar as its siblings.
+
+Measured at 1400x900:
+
+| | Before | After |
+|---|---|---|
+| Step 1, dialog body scroll | 0px | **0px** |
+| Create BoM, dialog body scroll | 220px | **210px** |
+
+**One defect found on the way.** `.vy-run-pair > .vy-run-section + .vy-run-section`
+set `border-top: none`, to cancel the old separator where two regions sat side
+by side. With a section as a card that rule was cancelling the card's own top
+border, and Assembly Details rendered with three sides. Removed with the
+separator it existed to suppress.
