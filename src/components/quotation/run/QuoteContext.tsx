@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Checkbox } from '../../../ui/Overlays';
 import { SearchField, TextField } from '../../../ui/Field';
 import { ReadValue } from '../../../ui/FieldRow';
@@ -97,12 +98,23 @@ export function QtyField({ label, value, onChange }: {
  * their left-to-right order on all three — so order is the caller's array
  * order, not something this component sorts.
  */
-export function QuoteToolbar({ search, onSearch, placeholder, filters }: {
+export function QuoteToolbar({ search, onSearch, placeholder, filters, leading, actions }: {
   search: string; onSearch: (v: string) => void; placeholder: string;
   filters: { key: string; label: string; on: boolean; onToggle: (v: boolean) => void; count?: number }[];
+  /**
+   * Controls that configure the run, before the search — step 3's Primary
+   * Provider. ONE BAND INSTEAD OF TWO, asked for on 15 Oct: the provider and
+   * the four run buttons had a row of their own above this one, and step 3's
+   * grid was down to nine lines of a fifty-eight-line BoM. Everything on this
+   * row acts on the grid below it, so there was never a reason for two.
+   */
+  leading?: ReactNode;
+  /** The run actions, pushed to the trailing edge. */
+  actions?: ReactNode;
 }) {
   return (
     <div className="vy-quote-toolbar">
+      {leading}
       <SearchField placeholder={placeholder} aria-label={placeholder}
                    value={search} onChange={e => onSearch(e.target.value)} />
       <div className="vy-quote-filters">
@@ -111,6 +123,7 @@ export function QuoteToolbar({ search, onSearch, placeholder, filters }: {
                     label={<>{f.label}{f.count !== undefined && <span className="vy-count-badge">{f.count}</span>}</>} />
         ))}
       </div>
+      {actions}
     </div>
   );
 }

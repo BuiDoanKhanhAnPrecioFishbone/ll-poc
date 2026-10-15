@@ -483,3 +483,44 @@ phone, or a genuinely short window.
 fix stops the header disappearing; it does not make a 1000px window roomy. That
 is the same chrome budget discussed above, and the Primary Provider row is still
 the next band worth taking.
+
+## One band of controls — 15 October
+
+Asked for after the chrome budget above: the Primary Provider row merged into
+the search-and-filters row. `QuoteToolbar` grew a `leading` slot for the
+provider and an `actions` slot for the four run buttons, so the band is built
+once rather than copied; `.vy-quote-run-bar` is gone.
+
+Everything on that row acts on the grid below it, which is why two rows were
+never justified: the provider chooses who prices the lines, the buttons price
+them, the search and filters choose which lines you are looking at.
+
+| Viewport | Toolbar | Grid | Rows |
+|---|---|---|---|
+| 1400x900 | 56px, one row | **443px** | **12** |
+| 1200x900 | 94px, wrapped | 346px | 9 |
+| 1000x900 | 94px, wrapped | 336px | 9 |
+
+**It wraps below ~1300px, as predicted — and is still never worse.** Wrapped, the
+single band is 94px against the 108px the two separate bands cost, so a narrow
+window gains 14px rather than 52px. The headline number only holds on a wide
+screen.
+
+Step 3's grid across the whole of 15 October: **349px / 9 rows → 443px / 12
+rows**, and four bands of chrome above it rather than six.
+
+## The deployed build, checked rather than assumed
+
+"Why does local scroll inside the modal while Vercel is fixed?" — the breakpoint
+fix was already live. Read straight off the deployed stylesheet:
+
+```css
+@media (width<=720px),(height<=620px){.vy-dialog .k-dialog-content:has(>.vy-run)
+```
+
+The minifier rewrites `max-width: 720px` as `width<=720px`, which is why a first
+grep for the source spelling found nothing and nearly produced the wrong answer.
+The `@media (width<=1180px)` still in the file is a different rule — step 1's
+three columns collapsing to one — and has nothing to do with scrolling.
+
+So a stale view there is a browser cache, not a stale deploy.

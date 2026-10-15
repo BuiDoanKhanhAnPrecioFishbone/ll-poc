@@ -74,37 +74,6 @@ export function StepQuoting({ cfg, set, lines, setLines, hasRun, onRun, onApply,
         onAttritionSet={n => set({ attritionSet: n })}
       />
 
-      <div className="vy-quote-run-bar">
-        <label className="vy-inline-field">
-          <span>Primary Provider</span>
-          <Select label="Primary Provider" value={cfg.provider}
-                  options={[...PRIMARY_PROVIDERS]}
-                  onChange={v => set({ provider: v as PrimaryProvider })} />
-        </label>
-
-        {/* "The action buttons are displayed in the following order from left to
-            right: Run Quote, Apply, Add Attrition, Apply Price Range. Run Quote
-            is displayed as the primary button. Apply, Add Attrition, and Apply
-            Price Range are displayed as secondary buttons." */}
-        <div className="vy-run-actions">
-          <Button variant="filled" onClick={onRun}
-                  title={manual
-                    ? `Compute quantities through ${cfg.provider}. Quote Focus is ${cfg.quoteFocus}, so no supplier is selected for you.`
-                    : `Price every line through ${cfg.provider}, falling back to the other provider`}>
-            {hasRun ? 'Re-run Quote' : 'Run Quote'}
-          </Button>
-          <Button onClick={onApply} title="Recalculate Total Qty from Build Qty and Attrition Set">
-            Apply
-          </Button>
-          <Button onClick={onAddAttrition} title="Set attrition on the lines that have none">
-            Add Attrition
-          </Button>
-          <Button onClick={onApplyPriceRange} title="Apply the configured Attrition Info price ranges">
-            Apply Price Range
-          </Button>
-        </div>
-      </div>
-
       {/* Three states, because Quote Focus = Other makes a fourth reading of the
           same numbers. "0 of 20 covered, 20 without a supplier" is true after a
           run in that mode and reads as total failure, when it is in fact the
@@ -140,7 +109,42 @@ export function StepQuoting({ cfg, set, lines, setLines, hasRun, onRun, onApply,
                 unselected becomes NO BID when you continue.</>}
       </div>
 
+      {/* ONE BAND. The Primary Provider and the four run buttons had a row of
+          their own above the search; both rows act on the grid below, and step
+          3 could not afford two — its grid was nine lines of a fifty-eight-line
+          BoM. */}
       <QuoteToolbar
+        leading={(
+        <label className="vy-inline-field">
+          <span>Primary Provider</span>
+          <Select label="Primary Provider" value={cfg.provider}
+                  options={[...PRIMARY_PROVIDERS]}
+                  onChange={v => set({ provider: v as PrimaryProvider })} />
+        </label>
+        )}
+        /* "The action buttons are displayed in the following order from left
+           to right: Run Quote, Apply, Add Attrition, Apply Price Range. Run
+           Quote is displayed as the primary button. Apply, Add Attrition, and
+           Apply Price Range are displayed as secondary buttons." */
+        actions={(
+        <div className="vy-run-actions">
+          <Button variant="filled" onClick={onRun}
+                  title={manual
+                    ? `Compute quantities through ${cfg.provider}. Quote Focus is ${cfg.quoteFocus}, so no supplier is selected for you.`
+                    : `Price every line through ${cfg.provider}, falling back to the other provider`}>
+            {hasRun ? 'Re-run Quote' : 'Run Quote'}
+          </Button>
+          <Button onClick={onApply} title="Recalculate Total Qty from Build Qty and Attrition Set">
+            Apply
+          </Button>
+          <Button onClick={onAddAttrition} title="Set attrition on the lines that have none">
+            Add Attrition
+          </Button>
+          <Button onClick={onApplyPriceRange} title="Apply the configured Attrition Info price ranges">
+            Apply Price Range
+          </Button>
+        </div>
+        )}
         search={search} onSearch={setSearch}
         placeholder="Search by Part / Description / MPN / MFG / Supplier"
         filters={[

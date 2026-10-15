@@ -1354,14 +1354,20 @@
 .vy-attachments li[data-usable] { opacity: 1; }
 
 /* ---- Search and filters, shared by steps 2, 3 and 4 ---------------------- */
-.vy-quote-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--vy-space-5) var(--vy-space-8); }
+/* ONE BAND for everything that acts on the grid: the provider, the search, the
+   filters, then the run actions at the trailing edge. `align-items: flex-end`
+   because the provider carries a label above its control and the rest do not —
+   centred, the select floated above the checkboxes. */
+.vy-quote-toolbar {
+  display: flex; flex-wrap: wrap; align-items: flex-end;
+  gap: var(--vy-space-5) var(--vy-space-8);
+}
+.vy-quote-toolbar > .vy-run-actions { margin-left: auto; margin-block: 0; }
+.vy-quote-toolbar > .vy-inline-field { margin-top: 0; flex: none; }
 .vy-quote-filters { display: flex; flex-wrap: wrap; gap: var(--vy-space-6); }
 
-.vy-quote-run-bar {
-  display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
-  gap: var(--vy-space-6);
-}
-.vy-quote-run-bar .vy-run-actions { margin: 0; }
+/* The run bar is gone: the provider and the run actions moved onto the toolbar
+   on 15 Oct, so step 3 has one band of controls instead of two. */
 
 /* ---- An editable cell ---------------------------------------------------- */
 /* Borderless until touched: twenty-one columns of bordered inputs is a wall of
