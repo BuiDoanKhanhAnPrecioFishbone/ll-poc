@@ -1,4 +1,6 @@
 import { useMemo, useState } from 'react';
+import { useColumnChoice } from '../../../ui/useColumnChoice';
+import { ColumnChooser } from '../../../ui/ColumnChooser';
 import { MiniTable } from '../../../ui/MiniTable';
 import { Checkbox } from '../../../ui/Overlays';
 import type { ColumnSpec } from '../../column-model';
@@ -173,6 +175,10 @@ export function StepReviewBom({ cfg, set, lines, setLines }: {
       render: l => totalQtyOf(l, cfg.buildQty, cfg.attritionSet).toLocaleString() },
   ];
 
+  /* The Columns chooser, and the frozen block as its locked set — see
+     useColumnChoice. */
+  const { shown: shownColumns, chooser } = useColumnChoice(columns, { locked: 7, storageKey: 'vy.cols.reviewBom' });
+
   return (
     <div className="vy-run-step">
       <QuoteContextBar
@@ -196,6 +202,7 @@ export function StepReviewBom({ cfg, set, lines, setLines }: {
       )}
 
       <QuoteToolbar
+        trailing={<ColumnChooser {...chooser} />}
         search={search} onSearch={setSearch}
         placeholder="Search by Part / Description / MPN / MFG"
         filters={[
@@ -235,7 +242,7 @@ export function StepReviewBom({ cfg, set, lines, setLines }: {
            was too short. The guideline asks for filter cells on the Part
            record's BoM Components tab; it does not ask for them here. */
         filterable={false}
-        columns={columns}
+        columns={shownColumns}
         freeze={7}
         rowTone={l => (l.excluded ? 'excluded' : undefined)}
         empty={<NoRecords title="No lines match these filters."

@@ -304,6 +304,10 @@
 .vy-page--grid { flex: 1; min-height: 0; display: flex; flex-direction: column; padding-bottom: var(--vy-space-6); }
 .vy-page--grid .vy-grid-shell { flex: 1; min-height: 0; }
 .vy-grid-shell { background: var(--vy-surface); border: 1px solid var(--vy-border); border-radius: var(--vy-shape-md); box-shadow: var(--vy-elev-1); overflow: hidden; display: flex; flex-direction: column; }
+/* The list's own actions, above the table's card and left-aligned. A row of
+   its own rather than a corner of the search strip: the two are different
+   tiers — one acts on the DATA, the other on the VIEW of it. */
+.vy-grid-actions { display: flex; flex-wrap: wrap; gap: var(--vy-space-4); margin-bottom: var(--vy-space-6); }
 
 
 /* --- Toast ----------------------------------------------------------------- */

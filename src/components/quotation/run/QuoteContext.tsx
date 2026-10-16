@@ -98,7 +98,7 @@ export function QtyField({ label, value, onChange }: {
  * their left-to-right order on all three — so order is the caller's array
  * order, not something this component sorts.
  */
-export function QuoteToolbar({ search, onSearch, placeholder, filters, leading, actions }: {
+export function QuoteToolbar({ search, onSearch, placeholder, filters, leading, actions, trailing }: {
   search: string; onSearch: (v: string) => void; placeholder: string;
   filters: { key: string; label: string; on: boolean; onToggle: (v: boolean) => void }[];
   /**
@@ -109,8 +109,10 @@ export function QuoteToolbar({ search, onSearch, placeholder, filters, leading, 
    * row acts on the grid below it, so there was never a reason for two.
    */
   leading?: ReactNode;
-  /** The run actions, pushed to the trailing edge. */
+  /** The run actions, beside the provider on the left. */
   actions?: ReactNode;
+  /** The Columns chooser. Last on the row, which is where the standard puts it. */
+  trailing?: ReactNode;
 }) {
   /* THE ORDER IS THE STANDARD'S, from 16 Oct: "Left: actions that change the
      grid... Right: filters (no counts), then search", with Columns last. Ours
@@ -133,6 +135,7 @@ export function QuoteToolbar({ search, onSearch, placeholder, filters, leading, 
       </div>
       <SearchField placeholder={placeholder} aria-label={placeholder}
                    value={search} onChange={e => onSearch(e.target.value)} />
+      {trailing}
     </div>
   );
 }

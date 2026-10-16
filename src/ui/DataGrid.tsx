@@ -16,7 +16,6 @@ import { widthOf, type ColumnSpec } from '../components/column-model';
 import { GridSkeleton } from './GridSkeleton';
 import { kendoDomProps, kendoHeaderProps } from './kendoDomProps';
 import { renderCell, fmtDate } from './renderCell';
-import { pageActionsProps } from './pageActions';
 
 export type Density = 'compact' | 'comfortable' | 'relaxed';
 /* The density scale, kept here because it is the app's row-height vocabulary
@@ -267,26 +266,30 @@ export function DataGrid<T extends { id: string | number }>({
               highlighting goes in the KPI row below, where it can be clicked. */}
           {subtitle && <p className="vy-page-sub">{subtitle}</p>}
         </div>
-        {/* Page-level actions live in the PAGE header, on the right, together.
-
-            They spent a version in the grid toolbar below — an over-literal
-            reading of the guideline's "Left corner: Add New. Right corner:
-            Select View, Filter Toolbar, Setup View Template." That row is the
-            TABLE's own control strip: search, saved view, filter, density,
-            columns. Putting Add New and Export in it mixed two tiers of
-            control, crowded the search field, and is not a pattern any
-            comparable product uses.
-
-            The guideline's left/right split still holds where it belongs —
-            among the view controls in that toolbar. */}
-        {actions && <div {...pageActionsProps}>{actions}</div>}
       </div>
 
       {kpis && <div className="vy-kpi-row">{kpis}</div>}
 
       {filters && <div className="vy-filter-bar">{filters}</div>}
 
+      {/* ACTIONS IN A ROW OF THEIR OWN, ABOVE THE TOOLBAR AND ON THE LEFT —
+          the shape the UI standard shows for a list: title, then Add New on
+          its own line, then the filter-search-Columns strip, then the table.
+
+          They were in the page header, on the right. Two instructions had
+          pulled at this before: "Left corner: Add New" from the guideline,
+          which an earlier version read over-literally and obeyed by dropping
+          Add New INTO the table's control strip — mixing two tiers of
+          control and crowding the search — after which it moved to the header
+          instead.
+
+          This row settles both. The standard's "all buttons on the left" is
+          satisfied, and the objection that earned the move is too: a row of
+          its own is not the search strip. */}
+      {actions && <div className="vy-grid-actions">{actions}</div>}
+
       <div className="vy-grid-shell">
+
         <div className="vy-grid-toolbar">
           <SearchField value={search} placeholder={searchPlaceholder} aria-label={searchPlaceholder}
                        onChange={e => setSearch(e.target.value)} />

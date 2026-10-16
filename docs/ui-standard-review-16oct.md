@@ -391,15 +391,32 @@ whether a filter is worth clicking before you click it. It is followed because
 the standard says it twice and says it plainly — but we would like to make the
 case.
 
-## Still outstanding from this pass
+## Both outstanding items, now done
 
-- **Columns chooser on the wizard grids.** List screens have one; Review BoM and
-  Quoting do not. The standard wants it on every grid with 3+ columns, with key
-  and editable columns locked as "always shown".
-- **List toolbar puts its actions on the right.** `Add New` and `Setup View
-  Template` sit at the right edge, against *"All buttons on the left: form
-  toolbar, section actions and grid toolbar."* Bigger than it looks — that row
-  also holds the view picker and the filter toggle — so it is sized separately.
+**Columns chooser on the wizard grids.** Review BoM and Quoting are the widest
+grids in the product — fifteen columns and twenty-one — and neither let a user
+put one away. `useColumnChoice` adds it to both, last on the toolbar row where
+the standard puts it, and remembers the choice per user.
+
+*Locked = frozen*, and that is not a shortcut. A frozen column is the one the
+grid keeps on screen while the rest scroll, which is the same judgement as "this
+is how you know which row you are reading" — the standard's **key column**.
+Deriving one from the other means they cannot disagree, and it removes the
+failure where hiding a column inside a seven-column frozen block leaves the
+freeze counting a column that is no longer there. Measured on Review BoM: 15
+columns, 7 locked, hiding `MFG1` takes the header count to 14 and persists.
+
+**List toolbar actions.** `Add New` and `Export` were in the page header on the
+right. They now sit in a row of their own above the table, left-aligned, which
+is the shape the standard's own config-list example shows: title, then Add New
+on its own line, then the filter-search-Columns strip, then the table.
+
+This settles an argument the code had with itself. "Left corner: Add New" from
+the earlier guideline had once been obeyed by dropping Add New *into* the
+table's control strip, which mixed two tiers of control and crowded the search;
+the fix at the time moved it to the header instead. A row of its own satisfies
+the standard's "all buttons on the left" **and** the objection that earned the
+move — because a row of its own is not the search strip.
 
 ## Corrections to the first review
 

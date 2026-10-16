@@ -1,4 +1,6 @@
 import { useMemo, useState } from 'react';
+import { useColumnChoice } from '../../../ui/useColumnChoice';
+import { ColumnChooser } from '../../../ui/ColumnChooser';
 import { MiniTable } from '../../../ui/MiniTable';
 import { Button } from '../../../ui/Button';
 import { Select } from '../../../ui/Overlays';
@@ -60,6 +62,10 @@ export function StepQuoting({ cfg, set, lines, setLines, hasRun, onRun, onApply,
 
   const columns = quotingColumns(cfg, hasRun, edit);
 
+  /* The Columns chooser, and the frozen block as its locked set — see
+     useColumnChoice. */
+  const { shown: shownColumns, chooser } = useColumnChoice(columns, { locked: 4, storageKey: 'vy.cols.quoting' });
+
   return (
     <div className="vy-run-step">
       <QuoteContextBar
@@ -114,6 +120,7 @@ export function StepQuoting({ cfg, set, lines, setLines, hasRun, onRun, onApply,
           3 could not afford two — its grid was nine lines of a fifty-eight-line
           BoM. */}
       <QuoteToolbar
+        trailing={<ColumnChooser {...chooser} />}
         leading={(
         <label className="vy-inline-field">
           <span>Primary Provider</span>
@@ -167,7 +174,7 @@ export function StepQuoting({ cfg, set, lines, setLines, hasRun, onRun, onApply,
            was too short. The guideline asks for filter cells on the Part
            record's BoM Components tab; it does not ask for them here. */
         filterable={false}
-        columns={columns}
+        columns={shownColumns}
         freeze={4}
         rowTone={l => rowTone(l, hasRun)}
         empty={shown.length === 0 && quoted.length > 0
