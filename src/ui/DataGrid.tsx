@@ -290,9 +290,15 @@ export function DataGrid<T extends { id: string | number }>({
 
       <div className="vy-grid-shell">
 
+        {/* FILTERS, THEN SEARCH, THEN COLUMNS — the order the UI standard gives
+            for both a list and a grid inside a form, and the order Run
+            Quotation already uses.
+
+            Search led this row until 16 Oct, which left the product saying two
+            different things two clicks apart: search on the left of a list,
+            search on the right of the quoting grid. Noticed in review, and the
+            list was the one out of step. */}
         <div className="vy-grid-toolbar">
-          <SearchField value={search} placeholder={searchPlaceholder} aria-label={searchPlaceholder}
-                       onChange={e => setSearch(e.target.value)} />
           <span className="vy-toolbar-spacer" />
 
           {views}
@@ -317,6 +323,10 @@ export function DataGrid<T extends { id: string | number }>({
           )}
 
           {viewSetting}
+
+          <SearchField value={search} placeholder={searchPlaceholder} aria-label={searchPlaceholder}
+                       onChange={e => setSearch(e.target.value)} />
+
           {/* "Columns", not "Show 2 more columns". The old label described the
               action's effect on one particular state rather than naming the
               thing it opens, so it read differently depending on what was

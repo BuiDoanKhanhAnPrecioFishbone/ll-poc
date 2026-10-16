@@ -434,3 +434,33 @@ Required marker `(*)` against the standard's red `*`; the six-vs-seven status
 groups and the yellow `open` pill that goes with that question; AML child rows;
 wizard navigation; legend placement. Each contradicts an earlier instruction or
 a measurement of ours, so each is a question rather than a gap.
+
+## One inconsistency the fixes created, caught in review
+
+Moving the Run Quotation toolbar to *filters → search → Columns* left the
+product saying two different things two clicks apart: search on the **left** of
+a list, search on the **right** of the quoting grid.
+
+The standard gives the same order for both — its config-list section says
+"status filter, then search, then Columns last", and its grid-inside-a-form
+section says "filters (no counts), then search… Columns always last" — so the
+**list** was the one out of step, not the wizard. `DataGrid`'s toolbar now reads
+spacer → views → funnel → search → Columns, matching Run Quotation.
+
+Worth recording as a method note: applying a rule to one screen is how you
+create an inconsistency with the screen you did not look at. The standard is
+written per-pattern; the product has to be checked across patterns.
+
+## And a CI failure that was not ours
+
+`touch:check` failed on three overlapping hit areas — all of them
+`a.k-watermark-trial-button "Start Free Trial"` lying across the KPI buttons,
+with **FAIL 0** beside them: no target of ours was too small or too close to
+another. Kendo paints that watermark when it finds no licence, CI has no
+`TELERIK_LICENSE`, and a licensed build never renders it. Our own layout change
+simply moved a KPI row under where it sits.
+
+The check now excludes it, because a gate that fails on something the product
+does not ship is a gate people learn to ignore. **The better fix is one we
+cannot make: set `TELERIK_LICENSE` as a GitHub Actions secret** — the same value
+the Vercel dashboard needs — and the watermark stops being drawn at all.

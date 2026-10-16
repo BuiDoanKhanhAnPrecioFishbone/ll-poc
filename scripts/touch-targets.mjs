@@ -134,7 +134,27 @@ const PROBE = `(async () => {
     '[role=tab]', '[role=switch]', '[role=option]', '[tabindex]:not([tabindex="-1"])'
   ].join(', ');
 
+  /**
+   * NOT OURS, AND NOT IN PRODUCTION. Kendo paints a "Start Free Trial"
+   * watermark over the page when it finds no licence, and it is a full-width
+   * anchor — on 16 Oct 2026 it reported three overlaps against the KPI buttons
+   * on two routes, with FAIL 0 beside them: no target of ours was too small or
+   * too close to another, the third-party banner simply lay across them.
+   *
+   * CI has no TELERIK_LICENSE, so CI is the only place this element exists;
+   * activate-kendo-licence.mjs lifts the key from .env.local locally, and a
+   * licensed build never renders it. A check that fails on a thing the product
+   * does not ship is a check that teaches people to ignore it.
+   *
+   * The right fix is the one we cannot make from here: set TELERIK_LICENSE as
+   * an Actions secret, and the watermark stops being drawn at all.
+   */
+  const isTrialWatermark = el =>
+    el.closest('.k-watermark, .k-watermark-overlay') !== null
+    || /k-watermark/.test(el.className || '');
+
   const visible = el => {
+    if (isTrialWatermark(el)) return false;
     const r = el.getBoundingClientRect();
     if (r.width < 1 || r.height < 1) return false;
     const cs = getComputedStyle(el);
