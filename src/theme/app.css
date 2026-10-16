@@ -170,9 +170,19 @@
    One scale, named once in kendo-bridge.css; nothing here sets a height of its
    own invention. */
 @media (pointer: fine) {
-  .vy-grid-toolbar .vy-funnel,
   .vy-grid-toolbar .vy-input,
   .vy-quote-toolbar .vy-input { block-size: var(--vy-control-dense); padding-block: 0; }
+
+  /* AN ICON BUTTON IS A SQUARE. Both axes from the one token, because setting
+     only the height is exactly how this went wrong: the funnel declares
+     28x28 of its own, the dense height alone made it 28x32, and a rectangle
+     with a glyph centred in it reads as a button that failed to finish
+     loading. The standard says the same thing for a row's buttons — "26px
+     square icon buttons". */
+  .vy-grid-toolbar .vy-funnel {
+    block-size: var(--vy-control-dense);
+    inline-size: var(--vy-control-dense);
+  }
 }
 /* The spacer only earns its keep on one line; once the toolbar wraps it would
    push the density control onto a row of its own. */

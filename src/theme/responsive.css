@@ -106,8 +106,18 @@
      was introduced it would have floated above dialogs. */
   .vy-nav-scrim { position: fixed; inset: 0; background: var(--vy-overlay-scrim); z-index: calc(var(--vy-z-drawer) - 1); }
 
-  .vy-search span { display: none; }        /* icon-only search */
-  .vy-search { width: auto; padding-inline: var(--vy-space-4); }
+  /* ICON-ONLY SEARCH, AND SQUARE WITH IT. `width: auto` plus the vertical
+     padding it keeps from the full control gave 32x28 — a rectangle with a
+     magnifier centred in it, which reads as a button that did not finish
+     loading rather than as an icon button. Once the label is gone this is an
+     icon button like any other, so it takes an icon button's shape. */
+  .vy-search span { display: none; }
+  .vy-search {
+    inline-size: var(--vy-control-dense);
+    block-size: var(--vy-control-dense);
+    padding: 0;
+    justify-content: center;
+  }
   .vy-page-head { flex-direction: column; align-items: stretch; gap: var(--vy-space-5); }
   .vy-page-actions { flex-wrap: wrap; }
   /* `flex-wrap: nowrap` IS THE HALF THAT WAS MISSING, and its absence was the
