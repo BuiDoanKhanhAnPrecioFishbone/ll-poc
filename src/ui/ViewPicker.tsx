@@ -25,7 +25,9 @@ export function ViewPicker({ views, activeId, onChange }: {
 }) {
   return (
     <div className="vy-view-picker">
+      {/* Dense, like the rest of the toolbar it sits in. */}
       <Select
+        size="small"
         label="Select View"
         value={activeId}
         onChange={onChange}

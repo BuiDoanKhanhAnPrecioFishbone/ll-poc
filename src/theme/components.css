@@ -127,7 +127,11 @@
    Matched at the INNER input, where Kendo puts its padding, using the same two
    tokens `.vy-input` uses — so if that field is ever retuned the dropdown
    follows it instead of drifting. */
-.vy-select .k-input-inner { padding: var(--vy-space-4) var(--vy-space-5); }
+/* Scoped away from the dense size, which takes its padding from the size
+   scale in kendo-bridge.css. This override is what dragged Kendo's 29px picker
+   up to 35px to sit beside our 34px form control — kept for the form, kept off
+   the toolbar. */
+.vy-select:not(.k-input-sm):not(.k-picker-sm) .k-input-inner { padding: var(--vy-space-4) var(--vy-space-5); }
 .vy-menu { background: var(--vy-surface); border: 1px solid var(--vy-border); border-radius: var(--vy-shape-md); box-shadow: var(--vy-elev-3); padding: var(--vy-space-2); z-index: var(--vy-z-menu); }
 /* --- Checkbox / radio ------------------------------------------------------ */
 /* The LABEL carries the 24px minimum target, not the box. The whole label is

@@ -354,7 +354,7 @@ export function RadioGroup({ options, value, onChange, label }: {
 /** An option may be a bare string, or a value distinct from what is shown. */
 export type SelectOption = string | { value: string; label: string };
 
-export function Select({ options, value, onChange, label, id, required, invalid }: {
+export function Select({ options, value, onChange, label, id, required, invalid, size }: {
   /**
    * Strings where the text IS the value — which is most of this app — or
    * `{ value, label }` where it is not.
@@ -367,6 +367,8 @@ export function Select({ options, value, onChange, label, id, required, invalid 
    */
   options: readonly SelectOption[];
   value: string; onChange: (v: string) => void;
+  /** Kendo's own size name. The scale it maps to is in kendo-bridge.css. */
+  size?: 'small' | 'medium';
   label?: string; id?: string; required?: boolean; invalid?: boolean;
   /** Accepted and ignored: every list filters now. Kept so call sites compile. */
   filterable?: boolean;
@@ -456,6 +458,7 @@ export function Select({ options, value, onChange, label, id, required, invalid 
           }}>
     <ComboBox
       id={id}
+      size={size}
       className="vy-select"
       /* Observed, not controlled — see the note above. */
       onOpen={() => setListOpen(true)}

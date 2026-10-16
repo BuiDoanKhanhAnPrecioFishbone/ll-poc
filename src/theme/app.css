@@ -165,26 +165,14 @@
    segmented control kept its full width beside it. */
 .vy-grid-toolbar > .vy-search-field { flex: 1 1 var(--vy-grid-search-min); min-width: var(--vy-grid-search-min); max-width: var(--vy-search-w); }
 
-/* EVERY CONTROL IN THE STRIP, ONE HEIGHT. Four different ones shared this row
-   until 16 Oct — funnel 28, Columns 29, view picker 35, search 37 — and a 9px
-   spread reads as the row stepping in and out rather than as a row.
-
-   Fine pointer only. On a coarse one the bridge holds every target at the 44px
-   floor, which touch:check enforces on each push; shrinking to 32 there would
-   trade a tidy row for an unhittable one. */
+/* The row's own controls — a funnel and a search box that are ours, not
+   Kendo's — take the same dense size the Kendo ones take from their `sm` class.
+   One scale, named once in kendo-bridge.css; nothing here sets a height of its
+   own invention. */
 @media (pointer: fine) {
+  .vy-grid-toolbar .vy-funnel,
   .vy-grid-toolbar .vy-input,
-  .vy-grid-toolbar .k-input,
-  .vy-grid-toolbar .k-picker,
-  .vy-grid-toolbar .k-button,
-  .vy-grid-toolbar .vy-funnel {
-    height: var(--vy-toolbar-control-h);
-    min-height: var(--vy-toolbar-control-h);
-  }
-  /* Kendo sizes the INNER box; without this the wrapper obeys and the text
-     inside keeps its taller line, so the control grows back. */
-  .vy-grid-toolbar .k-input-inner,
-  .vy-grid-toolbar .k-button { min-block-size: 0; }
+  .vy-quote-toolbar .vy-input { block-size: var(--vy-control-dense); padding-block: 0; }
 }
 /* The spacer only earns its keep on one line; once the toolbar wraps it would
    push the density control onto a row of its own. */

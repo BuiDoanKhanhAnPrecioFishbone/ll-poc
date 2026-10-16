@@ -29,7 +29,11 @@ export function ColumnChooser({ columns, hiddenCount, onToggle, onReset }: {
         {/* The class is a layout hook, not a style: below 820px the toolbar
             needs to put this button on the search's row so the view picker is
             not squeezed to "Def…". There was nothing to select it by. */}
-        <Button className="vy-columns-btn" variant={hiddenCount > 0 ? 'tonal' : 'outlined'}>
+        {/* The dense size, like everything else on a grid toolbar. The height it
+            resolves to is the size scale in kendo-bridge.css, not a number
+            written here. */}
+        <Button className="vy-columns-btn" size="sm"
+                variant={hiddenCount > 0 ? 'tonal' : 'outlined'}>
           Columns{hiddenCount > 0 && ` (${columns.length - hiddenCount}/${columns.length})`}
         </Button>
       </Popover.Trigger>

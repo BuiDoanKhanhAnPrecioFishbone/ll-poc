@@ -438,3 +438,43 @@ html[data-kendo-bridged] .k-tabstrip-item:focus-visible {
      label once the row is 44. */
   html[data-kendo-bridged] .k-checkbox-wrap { min-block-size: var(--vy-target-min); }
 }
+
+
+/* =============================================================================
+   THE SIZE SCALE — what Kendo's size names mean in this product
+   -----------------------------------------------------------------------------
+   Kendo names its sizes and sizes every component to match: measured in this
+   theme, `md` gives 29px for a button, an input and a picker alike, and `sm`
+   gives 25px for all three. That internal consistency is the thing to USE. A
+   row of controls lines up for free as long as every control in it carries the
+   same size name — which is how Carbon ("extra small 24, small 32, medium 40")
+   and Salt ("--salt-size-base ... ensures the consistent alignment of
+   components in horizontal layouts") both work.
+
+   What we could not do is configure that scale the way a design system should.
+   Kendo's built stylesheet exposes no `--kendo-button-*` or `--kendo-input-*`
+   sizing variables — only SCSS, which we do not compile — so the mapping is
+   written here instead: one table, in the file that exists to reconcile Kendo
+   with our tokens, rather than a height pushed onto a component at each place
+   it appears.
+
+   WHY THIS EXISTS AT ALL: a grid's toolbar held a 28px funnel, a 29px Columns
+   button, a 35px view picker and a 37px search box. The 35 was ours — a
+   padding override on `.k-input-inner` dragging Kendo's picker up towards our
+   34px form control — so the row was uneven because two scales were fighting
+   over it. Only `sm` is re-pointed for now: `md` stays Kendo's own, because
+   moving it would change the height of every button in the product and that
+   belongs in its own change. */
+html[data-kendo-bridged] .k-button-sm,
+html[data-kendo-bridged] .k-input-sm,
+html[data-kendo-bridged] .k-picker-sm {
+  block-size: var(--vy-control-dense);
+}
+/* Kendo measures the INNER box: without this the wrapper takes the height and
+   the text inside keeps its own taller line, so the control grows back. The
+   `.vy-select` padding override is scoped away from `sm` for the same reason. */
+html[data-kendo-bridged] .k-input-sm .k-input-inner,
+html[data-kendo-bridged] .k-picker-sm .k-input-inner {
+  min-block-size: 0;
+  padding-block: 0;
+}

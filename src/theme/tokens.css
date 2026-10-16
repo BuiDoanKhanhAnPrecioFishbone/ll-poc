@@ -454,12 +454,12 @@
      size to what they hold and only stop being comically narrow. */
   --vy-quote-fact-min:         5rem;
   --vy-control-md:        34px;  /* input / locked-field height */
-  /* ONE HEIGHT FOR A TOOLBAR ROW. A grid's control strip held four: a 28px
-     funnel, a 29px Columns button, a 35px view picker and a 37px search — a
-     9px spread that reads as controls stepping in and out as the eye crosses
-     the row. 32px is the standard's compact figure for a screen whose main
-     content is a working grid, which a list is. */
-  --vy-toolbar-control-h:  32px;
+  /* THE DENSE SIZE, which is what Kendo's `small` means in this product. A
+     grid's control strip held four heights — funnel 28, Columns 29, view
+     picker 35, search 37 — and a 9px spread reads as the row stepping in and
+     out rather than as a row. 32px is the standard's compact figure for a
+     screen whose main content is a working grid, which a list is. */
+  --vy-control-dense:      32px;
   /* 180, not 220. Flex wraps on the BASIS, before anything grows, and at 220
      the seven facts summed to 1329px against a 1278px strip — so Attrition Set
      dropped to a second row and the bar stood at 126px. At 180 they sum to
