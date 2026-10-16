@@ -3,7 +3,7 @@
    in a figure while every automated check called the page clean. */
 import { spawn } from 'node:child_process';
 import fs from 'node:fs'; import os from 'node:os'; import path from 'node:path';
-import { cleanupOnKill } from './chrome-cleanup.mjs';
+import { cleanupOnKill, connectToChrome } from './chrome-cleanup.mjs';
 
 const BASE = 'http://localhost:5180';
 const PORT = 9459;
@@ -42,15 +42,6 @@ const STOP = `(()=>{const s=document.createElement('style');
   s.textContent='*,*::before,*::after{transition:none !important;animation:none !important}';
   document.head.appendChild(s);document.body.getBoundingClientRect();})()`;
 
-async function connect() {
-  for (let i = 0; i < 60; i++) {
-    try { const r = await fetch(`http://127.0.0.1:${PORT}/json`);
-      const p = (await r.json()).find(t => t.type === 'page');
-      if (p?.webSocketDebuggerUrl) return p.webSocketDebuggerUrl; } catch {}
-    await sleep(250);
-  }
-  throw new Error('no debuggable page');
-}
 
 fs.mkdirSync(OUT, { recursive: true });
 const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'vy-sweep-'));
@@ -58,7 +49,7 @@ const chrome = spawn('/Applications/Google Chrome.app/Contents/MacOS/Google Chro
   ['--headless=new','--disable-gpu','--hide-scrollbars',`--remote-debugging-port=${PORT}`,
    `--user-data-dir=${profile}`,'--no-first-run','--window-size=375,812','about:blank'],{stdio:'ignore'});
 cleanupOnKill(chrome, profile);
-const ws = new WebSocket(await connect()); await new Promise(r => (ws.onopen = r));
+const ws = new WebSocket(await connectToChrome(PORT, chrome)); await new Promise(r => (ws.onopen = r));
 let id = 0; const pend = new Map();
 ws.onmessage = e => { const m = JSON.parse(e.data); if (m.id && pend.has(m.id)) { pend.get(m.id)(m); pend.delete(m.id); } };
 const send = (m, p = {}) => new Promise(res => { const i = ++id; pend.set(i, res); ws.send(JSON.stringify({ id: i, method: m, params: p })); });

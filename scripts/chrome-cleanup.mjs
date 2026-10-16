@@ -160,3 +160,55 @@ export function cleanupOnKill(chrome, profile) {
     process.off('exit', onExit);
   };
 }
+
+/**
+ * Wait for a launched Chrome to expose a debuggable page, and say what went
+ * wrong when it does not.
+ *
+ * WHY THIS IS SHARED NOW. Seven scripts each carried an identical 11-line
+ * `connect()`: a 60-iteration loop at 250ms, so a **15-second** budget, ending
+ * in `throw new Error('Chrome never exposed a debuggable page')`. On 15 Oct
+ * 2026 three pushes to main failed CI on exactly that message — once in
+ * touch:check, twice in focus:check — each dying at the 15-second mark with
+ * every other check green. A different check each time is the signature of a
+ * startup race, not a defect in the thing being checked.
+ *
+ * TWO THINGS WERE WRONG.
+ *
+ * Fifteen seconds is not a budget, it is a guess, and it was made on a laptop
+ * where Chrome is warm. A CI runner starts it cold, from a page cache that has
+ * never seen the binary. Sixty seconds costs nothing when Chrome is ready in
+ * one — the loop exits on success, not on the clock.
+ *
+ * And the message blamed the wrong thing. Chrome is spawned with
+ * `stdio: 'ignore'`, so a Chrome that CRASHED and a Chrome that was merely slow
+ * produced the same sentence, and neither said which. Watching the child means
+ * the common failure — it died, here is the code — reports itself, and only a
+ * genuine timeout is called a timeout.
+ */
+export async function connectToChrome(port, chrome, { budgetMs = 60_000, everyMs = 250 } = {}) {
+  let death = null;
+  chrome?.once?.('exit', (code, signal) => { death = { code, signal }; });
+  chrome?.once?.('error', err => { death = { err: err.message }; });
+
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  for (let waited = 0; waited < budgetMs; waited += everyMs) {
+    try {
+      const r = await fetch(`http://127.0.0.1:${port}/json`);
+      const page = (await r.json()).find(t => t.type === 'page');
+      if (page?.webSocketDebuggerUrl) return page.webSocketDebuggerUrl;
+    } catch { /* not up yet */ }
+
+    if (death) {
+      const how = death.err ? `could not be started: ${death.err}`
+        : death.signal ? `was killed by ${death.signal}`
+        : `exited with code ${death.code}`;
+      throw new Error(`Chrome ${how}. Tried ${port}; CHROME_PATH=${process.env.CHROME_PATH ?? '(unset)'}`);
+    }
+    await sleep(everyMs);
+  }
+  throw new Error(
+    `Chrome never exposed a debuggable page on port ${port} within ${budgetMs / 1000}s. `
+    + 'It is still running, so this is a timeout rather than a crash.',
+  );
+}

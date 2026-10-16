@@ -40,7 +40,7 @@ import { spawn } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { cleanupOnKill } from './chrome-cleanup.mjs';
+import { cleanupOnKill, connectToChrome } from './chrome-cleanup.mjs';
 
 const BASE = process.env.BASE_URL || 'http://localhost:5180';
 const PORT = Number(process.env.CDP_PORT || 9452);
@@ -199,17 +199,6 @@ const SELFTEST = `(() => {
   b.addEventListener('focus', () => { b.style.outline = 'none'; b.style.boxShadow = 'none'; });
 })()`;
 
-async function connect() {
-  for (let i = 0; i < 60; i++) {
-    try {
-      const r = await fetch(`http://127.0.0.1:${PORT}/json`);
-      const page = (await r.json()).find(t => t.type === 'page');
-      if (page?.webSocketDebuggerUrl) return page.webSocketDebuggerUrl;
-    } catch { /* not up yet */ }
-    await sleep(250);
-  }
-  throw new Error('Chrome never exposed a debuggable page');
-}
 
 async function main() {
   try { await fetch(BASE); }
@@ -221,7 +210,7 @@ async function main() {
     '--window-size=1440,900', 'about:blank'], { stdio: 'ignore' });
   cleanupOnKill(chrome, profile);
 
-  const ws = new WebSocket(await connect());
+  const ws = new WebSocket(await connectToChrome(PORT, chrome));
   await new Promise(r => (ws.onopen = r));
   let id = 0; const pending = new Map();
   ws.onmessage = e => { const m = JSON.parse(e.data);
