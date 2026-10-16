@@ -48,10 +48,7 @@
      critical alerts. Never for decoration; it must stay rare to stay loud. */
   --vy-red-50:  #fdeceb;
   --vy-red-500: #e23a32;
-  /* #9B2226, the standard's `danger`. Darker than our #C62D26, and better:
-     5.52:1 on white becomes 7.92:1, and 7.24:1 on the red-50 fill we use
-     behind error text. Taking theirs costs nothing and buys contrast. */
-  --vy-red-600: #9b2226;
+  --vy-red-600: #c62d26;
   --vy-red-700: #9e231d;
 
   /* --- Neutrals -------------------------------------------------------------
@@ -206,9 +203,23 @@
   /* Danger, by role. The red ramp above is a value; these are the jobs it does,
      and they have to be separable for the same reason brand did — a fill and a
      text colour cannot be one token once a dark theme exists. */
+  /* ONE RED CANNOT DO BOTH JOBS, which is what we learned by trying.
+     On 15 Oct the standard's `danger #9B2226` went straight into red-600 on a
+     contrast argument — 5.52:1 to 7.92:1 on white — and it broke two things at
+     once. It put red-600 DARKER than red-700 (L 0.0825 against 0.0856), so the
+     ramp ran backwards at its dark end; and `--vy-danger` is a FILL in four
+     places — the danger button, the error toast, the queue badge and the
+     Priority High dot — where a darker red is not a better red, it is a muddier
+     one. The dot was the tell: a 10px mark has no text to carry contrast, only
+     presence.
+
+     The contrast argument was about red as TEXT and it still holds, so it goes
+     where it applies. And their value needs no compromise to accept: #9B2226
+     differs from our red-700 #9E231D by at most 9/255 in one channel — the same
+     colour to the eye, at 7.74:1 against their 7.92:1. */
   --vy-danger:            var(--vy-red-600);
   --vy-danger-on:         var(--vy-grey-0);
-  --vy-danger-text:       var(--vy-red-600);
+  --vy-danger-text:       var(--vy-red-700);
   --vy-danger-text-deep:  var(--vy-red-700);
   --vy-danger-subtle:     var(--vy-red-50);
   --vy-danger-boundary:   var(--vy-red-500);
