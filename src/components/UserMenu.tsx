@@ -1,6 +1,7 @@
 import * as Popover from '@radix-ui/react-popover';
 import { Link } from 'react-router-dom';
 import { usePrefs, type Density, type DateStyle } from '../ui/prefs';
+import { REGIONS, fmtDate, fmtMoney, setRegion, useRegion } from '../ui/regional';
 import type { Theme } from '../theme/applyTheme';
 
 /**
@@ -36,6 +37,7 @@ const DATE_STYLES: { id: DateStyle; label: string; note: string }[] = [
 
 export function UserMenu() {
   const { density, setDensity, theme, setTheme, dateStyle, setDateStyle } = usePrefs();
+  const current = useRegion();
   return (
     <Popover.Root>
       <Popover.Trigger asChild>
@@ -80,6 +82,30 @@ export function UserMenu() {
                         className="vy-density-choice" onClick={() => setTheme(t.id)}>
                   <span className="vy-density-label">{t.label}</span>
                   <span className="vy-density-note">{t.note}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* REGIONAL FORMAT, asked for by the UI standard of 14 Oct: dates,
+              numbers and money take their shape from one setting rather than
+              from whoever wrote the line. Voyager has this screen already; this
+              is the prototype's side of it. German is on the list because it is
+              the cheapest way to find a screen that assumed a dot was a decimal
+              point. */}
+          <div className="vy-usermenu-section">
+            <h3>Regional Format</h3>
+            <p className="vy-usermenu-hint">
+              Dates, numbers and money, everywhere. Today: {fmtDate(new Date())} · {fmtMoney(1234.5)}
+            </p>
+            <div className="vy-density-choices" role="radiogroup" aria-label="Regional Format">
+              {REGIONS.map(r => (
+                <button key={r.id} type="button" role="radio" aria-checked={current.id === r.id}
+                        className="vy-density-choice" onClick={() => setRegion(r.id)}>
+                  <span className="vy-density-label">{r.label}</span>
+                  <span className="vy-density-note">
+                    {new Intl.DateTimeFormat(r.locale, { dateStyle: 'short' }).format(new Date())}
+                  </span>
                 </button>
               ))}
             </div>

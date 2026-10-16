@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { region, useRegion } from '../ui/regional';
 import { NavLink } from 'react-router-dom';
 import { QUEUES_PATH } from '../data/sitemap';
 
@@ -38,13 +39,17 @@ export function HeaderClock({ tz }: { tz: string }) {
     return () => clearInterval(id);
   }, []);
 
-  const time = now.toLocaleTimeString('en-GB', {
+  /* The clock keeps its own shape — hours and minutes, no seconds — but takes
+     its locale from the Regional Format like everything else, so a region whose
+     clock is 12-hour gets one here too. The TIME ZONE stays separate: where the
+     user is and how they write a date are two different settings. */
+  const time = new Intl.DateTimeFormat(useRegion().locale, {
     hour: '2-digit', minute: '2-digit', timeZone: tz,
-  });
+  }).format(now);
   const zone = TIMEZONES.find(z => z.id === tz)?.label.split(' · ')[0] ?? '';
 
   return (
-    <div className="vy-clock" title={now.toLocaleString('en-GB', { timeZone: tz })}>
+    <div className="vy-clock" title={new Intl.DateTimeFormat(region().locale, { dateStyle: 'full', timeStyle: 'long', timeZone: tz }).format(now)}>
       <span className="vy-clock-time">{time}</span>
       <span className="vy-clock-zone">{zone}</span>
     </div>

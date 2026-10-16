@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { StatusBadge } from './Badge';
 import type { ColumnSpec } from '../components/column-model';
+import { fmtDate, fmtDateTime, fmtLongDate, fmtMoney, fmtNumber } from './regional';
 
 /**
  * ONE cell renderer, shared by every table.
@@ -34,17 +35,24 @@ export function renderCell<T>(spec: ColumnSpec<T>, row: T): ReactNode {
        the live grid shows `09/09/2026 16:35:29` and we showed `16 May 2026`.
        See gap M10. */
     case 'datetime': return fmtDateTime(v as Date);
-    case 'money':  return (v as number).toLocaleString('en-GB', { style: 'currency', currency: 'USD' });
-    case 'number': return (v as number).toLocaleString();
+    case 'money':  return fmtMoney(v as number);
+    case 'number': return fmtNumber(v as number);
     case 'code':   return <span className="vy-code">{String(v)}</span>;
     default:       return <span className="vy-truncate" title={String(v)}>{String(v)}</span>;
   }
 }
 
-/** One date format for the whole system. */
-export function fmtDate(d: Date) {
-  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-}
+/**
+ * One date format for the whole system — and from 16 Oct 2026 the system gets
+ * it from the user's Regional Format rather than from this line.
+ *
+ * It used to read `'en-GB', { day: '2-digit', month: 'short', year: 'numeric' }`
+ * — "09 Sept 2026" — chosen so that `09/09/2026` could not be misread between
+ * US and European conventions. The customer's standard answers that better: the
+ * reader picks the convention, so the ambiguity never arises. Re-exported here
+ * because sixty-odd call sites import `fmtDate` from this module.
+ */
+export { fmtDate, fmtDateTime, fmtMoney, fmtNumber };
 
 /**
  * Today, as a person would say it — "Tuesday 9 September".
@@ -60,27 +68,9 @@ export function fmtDate(d: Date) {
  * remains the one format for anything that IS one.
  */
 export function fmtToday(d: Date = new Date()) {
-  return d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+  /* Still the long, spoken form, and still no year — a greeting, not a record
+     field — but the month and weekday names now come from the region. */
+  return fmtLongDate(d);
 }
 
-/**
- * Date AND time, for the fields the guideline says carry both.
- *
- * It is explicit about several: Created Date "displays the date and time when
- * the RFQ was created", Run Date "the date and time when the quotation process
- * was executed", and the draft's Created Date likewise. We were formatting all
- * of them with `fmtDate` and dropping the time, on data that carries a real
- * working-hours timestamp — so the information existed and the screen threw it
- * away.
- *
- * HH:MM:SS, and it took a look at the live system to earn the last two digits.
- * This comment used to say HH:MM, on the reasoning that the seed sets seconds to
- * zero so a seconds field would read ":00" on every row — "worth confirming with
- * the customer whether seconds carry meaning". Confirmed on 10 Sep: Part Master's
- * LAST CHANGE column shows `09/09/2026 16:35:29`, `15:51:03`, `10:48:17`. The
- * seconds are real, they are displayed, and the guideline asked for them all
- * along. The generators now vary seconds so the column is not a row of `:00`.
- */
-export function fmtDateTime(d: Date) {
-  return `${fmtDate(d)} ${d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
-}
+

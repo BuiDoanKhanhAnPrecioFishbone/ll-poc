@@ -1,4 +1,5 @@
 import { Button } from '../../ui/Button';
+import { fmtMoney } from '../../ui/regional';
 import { MiniTable } from '../../ui/MiniTable';
 import { fmtDateTime } from '../../ui/renderCell';
 import { useToast } from '../../ui/Toast';
@@ -7,7 +8,7 @@ import type { ColumnSpec } from '../column-model';
 import type { Quotation, QuoteResult } from '../../data/quotations';
 import { pageActionsProps } from '../../ui/pageActions';
 
-const money = (n: number) => n.toLocaleString('en-GB', { style: 'currency', currency: 'USD' });
+const money = (n: number) => fmtMoney(n);
 
 /**
  * The eleven columns, in the order the customer's Testing Guideline lists them:

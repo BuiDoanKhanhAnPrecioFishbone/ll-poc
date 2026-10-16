@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { fmtMoney } from '../ui/regional';
 import { Dialog, Select } from '../ui/Overlays';
 import { Button } from '../ui/Button';
 import { TextField } from '../ui/Field';
@@ -22,7 +23,7 @@ import type { ColumnSpec } from './column-model';
 const RECORD_NOTE = 'Set by the record — not editable here.';
 
 const money = (n: number) =>
-  n.toLocaleString('en-GB', { style: 'currency', currency: 'USD' });
+  fmtMoney(n);
 
 /**
  * MFG–MPN (AML) — the Approved Manufacturer List for one part.

@@ -22,6 +22,7 @@
  * auto-exclusion rule (r81) uses MAKE/PHANT, so that is the spelling kept.
  */
 import { CUSTOMER_MASTER } from './quotations';
+import { fmtMoney } from '../ui/regional';
 
 export type PartSource = 'MAKE' | 'BUY' | 'MAKE/PHANT' | 'FLRSTK' | 'MAKE/BUY' | 'PACKAGING';
 
@@ -440,6 +441,6 @@ export function assembliesFor(customerLabel: string): Assembly[] {
 }
 
 export const money = (n: number) =>
-  n.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 });
+  fmtMoney(n);
 export const money3 = (n: number) =>
-  n.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 3 });
+  fmtMoney(n, { decimals: 3 });

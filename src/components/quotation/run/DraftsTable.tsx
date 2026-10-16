@@ -1,4 +1,5 @@
 import { Button } from '../../../ui/Button';
+import { fmtTime } from '../../../ui/regional';
 import { MiniTable } from '../../../ui/MiniTable';
 import { fmtDate } from '../../../ui/renderCell';
 import type { ColumnSpec } from '../../column-model';
@@ -38,7 +39,7 @@ function draftColumns(onContinue: (d: DraftQuote) => void): ColumnSpec<DraftQuot
      quotation was created", and it is right to: drafts of one assembly are
      saved minutes apart, so a date alone cannot tell two of them apart. */
   { field: 'createdDate', title: 'Created Date', role: 'date',
-    render: d => `${fmtDate(d.createdDate)} · ${d.createdDate.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}` },
+    render: d => `${fmtDate(d.createdDate)} · ${fmtTime(d.createdDate)}` },
 ]; }
 
 export function DraftsTable({ drafts, customer, onContinue }: {

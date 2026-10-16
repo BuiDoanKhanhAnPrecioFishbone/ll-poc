@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { fmtDateTime } from '../../ui/regional';
 import { saveDraftQuote, type DraftQuote } from '../../data/draftQuotes';
 import { Dialog } from '../../ui/Overlays';
 import { Button } from '../../ui/Button';
@@ -154,7 +155,7 @@ export function RunQuotationDialog({ q, onClose, resume }: {
     setLines(ls => runQuote(ls, cfg.buildQty, cfg.attritionSet, cfg.provider, cfg.quoteFocus));
     setHasRun(true);
     setRunVersion(v => v + 1);
-    setRunDate(new Date().toLocaleString('en-GB'));
+    setRunDate(fmtDateTime(new Date()));
     /* "Complete" would be a lie under Other — the run deliberately leaves every
        Supplier empty, and a success message that does not say so sends the user
        looking for the bug. */

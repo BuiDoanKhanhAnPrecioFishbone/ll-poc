@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { fmtDateTime } from '../ui/regional';
 import { SmartIcon } from './quotation/SmartButtons';
 import { Dialog, Select, RadioGroup } from '../ui/Overlays';
 import { Button } from '../ui/Button';
@@ -562,7 +563,5 @@ function reviewColumns(code: string): ColumnSpec<ImportedRow>[] { return [
 
 /** The moment the form was opened, in the system's one format. */
 function stamp() {
-  return new Date().toLocaleString('en-GB', {
-    day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit',
-  });
+  return fmtDateTime(new Date());
 }

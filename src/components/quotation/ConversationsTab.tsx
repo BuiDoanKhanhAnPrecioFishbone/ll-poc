@@ -1,12 +1,11 @@
 import { useState } from 'react';
+import { fmtDateTime } from '../../ui/regional';
 import { Button } from '../../ui/Button';
 import { RichText } from '../../ui/RichText';
 import { useToast } from '../../ui/Toast';
 import type { Comment, Quotation } from '../../data/quotations';
 
-const when = (d: Date) => d.toLocaleString('en-GB', {
-  day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit',
-});
+const when = (d: Date) => fmtDateTime(d);
 
 /**
  * Conversations.

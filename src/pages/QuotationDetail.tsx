@@ -274,7 +274,7 @@ export function QuotationDetail() {
           <div {...pageActionsProps}>
             {editing ? (
               <>
-                <Button onClick={cancelEdit}>Cancel</Button>
+                <Button onClick={cancelEdit}>Discard Changes</Button>
                 {/* Disabled while a required field is empty — "the Save button
                     becomes enabled after the user enters or selects values for
                     all required fields". The label and tooltip say WHICH are
@@ -551,8 +551,8 @@ export function QuotationDetail() {
         subtitle="This cannot be recovered once you leave the record."
         actions={
           <>
-            <Button variant="text" onClick={() => setConfirmDiscard(false)}>Keep editing</Button>
-            <Button variant="danger" onClick={discardEdit}>Discard changes</Button>
+            <Button variant="text" onClick={() => setConfirmDiscard(false)}>Keep Editing</Button>
+            <Button variant="danger" onClick={discardEdit}>Discard Changes</Button>
           </>
         }
       >

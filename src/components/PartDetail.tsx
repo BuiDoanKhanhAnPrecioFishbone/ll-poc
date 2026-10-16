@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { fmtMoney } from '../ui/regional';
 import { Dialog, Tabs } from '../ui/Overlays';
 import { Button } from '../ui/Button';
 import { StatusBadge } from '../ui/Badge';
@@ -176,7 +177,7 @@ export function PartDetail({ part, onClose }: { part: Part; onClose: () => void 
                     ['Available', `${available.toLocaleString()}  (On Hand − Allocated)`],
                   ]} />
                   <Section title="Cost" rows={[
-                    ['Unit Cost', part.unitCost.toLocaleString('en-GB', { style: 'currency', currency: 'USD' })],
+                    ['Unit Cost', fmtMoney(part.unitCost)],
                   ]} />
                   <Section title="History" rows={[
                     ['Last Changed', fmtDate(part.lastChange)],

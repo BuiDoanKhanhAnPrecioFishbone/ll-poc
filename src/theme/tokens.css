@@ -48,7 +48,10 @@
      critical alerts. Never for decoration; it must stay rare to stay loud. */
   --vy-red-50:  #fdeceb;
   --vy-red-500: #e23a32;
-  --vy-red-600: #c62d26;
+  /* #9B2226, the standard's `danger`. Darker than our #C62D26, and better:
+     5.52:1 on white becomes 7.92:1, and 7.24:1 on the red-50 fill we use
+     behind error text. Taking theirs costs nothing and buys contrast. */
+  --vy-red-600: #9b2226;
   --vy-red-700: #9e231d;
 
   /* --- Neutrals -------------------------------------------------------------
@@ -85,7 +88,9 @@
      For boundaries only: inputs, dropdowns, checkboxes, radios. Panel edges,
      card outlines, table rules and dashed drop zones are structure rather than
      controls, 1.4.11 does not cover them, and they stay on the grey scale. */
-  --vy-border-control: #8a94a3;
+  /* #8A94A6, the standard's `border-input`. Ours was #8A94A3 — three
+     hex digits of drift from a value the standard took from us. */
+  --vy-border-control: #8a94a6;
   --vy-grey-600: #4d5766;
   --vy-grey-700: #363e4b;
   --vy-grey-800: #232a34;

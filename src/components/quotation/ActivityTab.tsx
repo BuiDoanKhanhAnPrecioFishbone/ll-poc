@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { fmtLongDate, fmtTime } from '../../ui/regional';
 import type { ActivityEntry, Quotation } from '../../data/quotations';
 import { TODAY } from '../../data/quotations';
 import { Select } from '../../ui/Overlays';
@@ -279,7 +280,7 @@ function dayKey(d: Date): string {
 /** Seconds included, unlike the rest of the app: this is an audit log, and two
  *  edits in the same minute have an order that matters. */
 function clock(d: Date): string {
-  return d.toLocaleTimeString('en-GB', { hour12: false });
+  return fmtTime(d);
 }
 
 /** "1 field changed", not the live screen's "1 field changes". */
@@ -295,5 +296,5 @@ function dayLabel(d: Date): string {
   const days = Math.round((TODAY.getTime() - d.setHours(12, 0, 0, 0)) / 86400000);
   if (days === 0) return 'Today';
   if (days === 1) return 'Yesterday';
-  return d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  return fmtLongDate(d);
 }
