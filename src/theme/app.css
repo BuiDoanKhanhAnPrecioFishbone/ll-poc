@@ -440,6 +440,9 @@
 
 .vy-tasks .vy-empty-inline { padding: var(--vy-space-6) var(--vy-space-7); max-width: 60ch; }
 .vy-empty-inline { color: var(--vy-on-surface-subtle); font-size: var(--vy-text-base); background: var(--vy-surface-subtle); border: 1px dashed var(--vy-border-strong); border-radius: var(--vy-radius-md); padding: var(--vy-space-8); max-width: var(--vy-prose-max); }
+/* The sentence under an empty state's heading — what to do about it. The
+   heading names the emptiness, this names the way out. */
+.vy-empty-hint { margin: var(--vy-space-3) 0 0; font-size: var(--vy-text-sm); color: var(--vy-on-surface-muted); }
 
 /* --- Quotation Result -------------------------------------------------------- */
 .vy-result-summary { display: flex; align-items: flex-end; gap: var(--vy-space-10); flex-wrap: wrap; background: var(--vy-surface); border: 1px solid var(--vy-border); border-radius: var(--vy-radius-md); padding: var(--vy-space-7) var(--vy-space-8); margin-bottom: var(--vy-space-7); box-shadow: var(--vy-shadow-sm); }

@@ -28,8 +28,19 @@ import type { RunConfig } from './state';
  * which flow you are in.
  */
 export const ACTIONS = [
-  { value: 'import-new', label: 'Import New BoM' },
-  { value: 'load-existing', label: 'Load Existing Assembly' },
+  /* RENAMED 16 Oct 2026, and the standard names these two strings itself:
+     "Labels match the user's task — Quick Quote from BoM File · Existing
+     Assembly", against "Import new BoM (when nothing is imported)". The point
+     is sound. "Import New BoM" says NEW against an old one, when the question
+     being asked is which of two things you are quoting from; and these two
+     actions are exactly the customer's two quote types, which the new wording
+     makes visible where the old hid it.
+
+     It overrides their own sheets, which say `Select Action = "Import New BoM"`
+     and `"Load Exisiting Assembly"` — later instruction, same author, about
+     these exact words. */
+  { value: 'import-new', label: 'Quick Quote from BoM File' },
+  { value: 'load-existing', label: 'Existing Assembly' },
   /* RESUME DRAFT QUOTE IS NOT HERE ANY MORE. It was, as a third option, and it
      was the wrong shape: the other two answer "what am I quoting", while
      resuming answers "where was I" — and choosing it replaced both sections

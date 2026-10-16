@@ -240,7 +240,8 @@ export function StepReviewBom({ cfg, set, lines, setLines }: {
         columns={columns}
         freeze={7}
         rowTone={l => (l.excluded ? 'excluded' : undefined)}
-        empty={<NoRecords />}
+        empty={<NoRecords title="No lines match these filters."
+                          hint="Clear the search or a filter above to see the rest of the BoM." />}
       />
 
       {/* ONE LINE. Two lines of explanation under a table is two rows of the

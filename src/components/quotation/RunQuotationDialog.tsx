@@ -293,9 +293,20 @@ export function RunQuotationDialog({ q, onClose, resume }: {
 
           {step === 0 && <Button variant="filled" onClick={leaveStep1}>Next</Button>}
           {step === 1 && <Button variant="filled" onClick={leaveStep2}>Next</Button>}
+          {/* ONE FILLED BUTTON PER STEP. Before the run this step showed two —
+              Run Quote in its toolbar and Generate Quotation here — so the
+              screen offered two "do this next" answers at once. The standard of
+              14 Oct states the rule for a wizard exactly: "If the step's main
+              action is not done yet (Run Quote), that action is primary and
+              Next turns secondary but stays enabled." Stays enabled: a quote
+              with nothing in it is a legitimate outcome to carry forward, and
+              the reason not to is better said by the tooltip than by a dead
+              control. */}
           {step === 2 && (
-            <Button variant="filled" disabled={!canLeaveStep3}
-                    title={canLeaveStep3 ? undefined : 'Run the quote before continuing'}
+            <Button variant={hasRun ? 'filled' : undefined}
+                    title={canLeaveStep3
+                      ? undefined
+                      : 'Run the quote first, or continue with a quote that has no prices'}
                     onClick={generateQuotation}>
               Generate Quotation
             </Button>

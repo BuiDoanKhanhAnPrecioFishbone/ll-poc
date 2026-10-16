@@ -270,7 +270,20 @@ today, and drop the mono line from the standard. If she wants mono anywhere, the
 narrowest case worth it is the record number in the page title — one string, not
 a column.
 
-## D1 · 44px controls
+## D1 · 44px controls — WE MISREAD THIS, correction
+
+Our objection was aimed at something the standard does not ask for. It already
+draws the distinction itself: *"Standard forms use 44px controls; screens whose
+main content is a working grid use compact 32px controls"* — and it names
+**Quoting** as a 32px screen, with 26px cells inside the grid.
+
+So the disagreement is narrower than we wrote: only the **record form** is at
+44px, and the working screens we were worried about are already carved out. The
+note below is kept because the record form is still 27 fields deep, but it is a
+question about one screen, not a principle.
+
+### The original note, which still applies to the record form
+
 
 **What the standards actually require.** 44x44 CSS px is WCAG 2.5.5 *Target
 Size (Enhanced)*, a AAA criterion, and it governs the **pointer target**, not
@@ -300,3 +313,44 @@ Height is the scarcest resource in this product.
   scrolling: https://design.embracecloud.nl/navigation/wizard
 - Ontario Design System, Step indicator — when a stepper is appropriate:
   https://designsystem.ontario.ca/components/detail/step-indicator.html
+
+---
+
+# Run Quotation against the standard — 16 October
+
+Run Quotation is the screen the standard covers most: its wizard pattern is
+written about "Quoting BoM", and its "grid inside a form" example *is* our step
+3, down to the filter names. Checked item by item.
+
+## Fixed today
+
+| Finding | Was | Now |
+|---|---|---|
+| **Two filled primaries on step 3** | `Run Quote` in the toolbar and `Generate Quotation` in the footer, both filled, so the step gave two answers to "what next" | One: before the run `Run Quote` is primary and Generate Quotation is secondary **but stays enabled**, exactly as the standard states for a wizard. A quote with no prices is a legitimate outcome to carry forward, and the tooltip says so better than a dead control |
+| **Empty state did not name the action** | "No records available." — the same shape as the standard's ✕ example, "No data" | Two sentences, because the two causes differ: *"No quote results yet. Click Run Quote to get prices and pick a supplier for each part."* and, when a filter empties the grid, *"No lines match these filters. Clear a filter above…"* |
+| **Step 1 action labels** | `Import New BoM` · `Load Existing Assembly` | `Quick Quote from BoM File` · `Existing Assembly` |
+
+Two of the three overturn earlier instructions from the same customer:
+"No records available" was the old guideline's wording, and `Import New BoM` is
+verbatim from their Quick Quote sheet. The new standard names both strings and
+gives a reason, so the later instruction wins.
+
+## Left for the conversation — too big, or contested
+
+- **"Setup locked after the calculation, with *Used for Current Results*. Edit
+  Setup → Update Results (no external call) / Discard Changes. While editing,
+  navigation and the grid are locked."** Not built at all, and the largest
+  single piece of behaviour the standard asks of this screen.
+- **The quota dialog.** *"This request uses your marketplace API quota… Cancel ·
+  Re-pick Suppliers · Refresh Prices"*. We have no paid-action dialog. It lines
+  up with what the live bundle showed — two run modes, `Run Quotation (Nexar
+  API)` and `Run Quotation (Get Nexar from DB)` — so the free option is real.
+- **Values carried from the Project Requirement shown blue when changed.**
+  Needs the changed-is-blue model (B2).
+- **Columns chooser with locked "always shown" columns** on the wizard grids.
+- **Step 4 after Submit**: read-only result, Export top-left, version selector
+  top-right.
+- **AML as child rows** (C3) and **wizard navigation** (C4) stay open.
+- **Legend placement.** The standard puts it in the grid's footer; ours sits
+  above the grid, and on step 3 it now lives inside the banner that explains it,
+  which bought the grid a row. Worth raising rather than silently moving.

@@ -128,7 +128,26 @@ export function QuoteToolbar({ search, onSearch, placeholder, filters, leading, 
   );
 }
 
-/** "No records available" — the guideline's own words for an empty filter. */
-export function NoRecords() {
-  return <div className="vy-empty-inline"><strong>No records available.</strong></div>;
+/**
+ * An empty grid, saying what to do about it.
+ *
+ * WAS "No records available." — the earlier guideline's own words, and the new
+ * standard of 14 Oct names that shape as the thing not to do: its ✕ example is
+ * "No data", with the note "the user does not know what to do next". Its ✓ is
+ * "No quote results yet. Click Run Quote to get prices and auto-select a
+ * supplier for each part." Two instructions from the same customer, and the
+ * later one is right — so the caller says which emptiness this is.
+ *
+ * The two causes need different sentences and used to share one. A grid with
+ * nothing in it yet is waiting for an action; a grid emptied by a filter is
+ * waiting for the filter to be cleared, and telling that user to run a quote
+ * would be wrong.
+ */
+export function NoRecords({ title, hint }: { title?: string; hint?: string } = {}) {
+  return (
+    <div className="vy-empty-inline">
+      <strong>{title ?? 'No records available.'}</strong>
+      {hint && <p className="vy-empty-hint">{hint}</p>}
+    </div>
+  );
 }

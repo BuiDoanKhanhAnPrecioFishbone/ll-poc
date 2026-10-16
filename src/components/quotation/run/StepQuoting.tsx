@@ -173,7 +173,11 @@ export function StepQuoting({ cfg, set, lines, setLines, hasRun, onRun, onApply,
         columns={columns}
         freeze={4}
         rowTone={l => rowTone(l, hasRun)}
-        empty={<NoRecords />}
+        empty={shown.length === 0 && quoted.length > 0
+          ? <NoRecords title="No lines match these filters."
+                       hint="Clear a filter above to see the rest of the BoM." />
+          : <NoRecords title="No quote results yet."
+                       hint="Click Run Quote to get prices and pick a supplier for each part." />}
       />
     </div>
   );
