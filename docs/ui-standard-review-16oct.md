@@ -189,3 +189,114 @@ In order, assuming the answers to C arrive:
 3. Changed-is-blue (B2) — the biggest single gain in the document.
 4. Delete semantics (B7) and inline-vs-form (B8) — new behaviour, best sized
    once C is answered.
+
+---
+
+# Pattern check, 16 October
+
+Before arguing any of section C or D we checked what the common patterns
+actually say, so the conversation is about evidence rather than taste. Findings
+below, with the position each one leads to.
+
+## C3 · AML: columns, sub-rows, or pairs in a cell
+
+This is the one where the check changed our mind, and it does not land cleanly
+on either side.
+
+**What the pattern says.** SAP Fiori treats the three options as different
+things rather than as styles:
+
+- *Multiple fields in one cell* is a responsive-table-only feature, and it
+  carries a specific defect: **multi-value cells come out empty when the table
+  is exported to a spreadsheet.** For a quoting screen whose output is an Excel
+  file, that disqualifies it.
+- *One-to-many data whose children have their own attributes* is what a tree
+  table or child rows are for — each child row can carry its own values and its
+  own actions.
+- *Many optional attributes on one record* is the wide-sparse-column shape.
+  Fiori handles it with column priority and pop-in rather than by forbidding it.
+
+**Where that leaves the three screens.**
+
+| | Task | Shape of the data | Pattern says |
+|---|---|---|---|
+| Review BoM (step 2) | "Which lines have a second source at all?" | Attributes of the line | **Columns** — scanning down `MFG2` *is* the task |
+| Quoting (step 3) | "Pick a supplier and a price for this AML" | Each AML has its own supplier, order qty, price | **Child rows** — the standard is right |
+| Anywhere | — | — | Pairs stacked in one cell: **worst**, breaks export |
+
+**Our position.** Adopt "never MFG 1 / MFG 2 columns" **for Quoting**, where the
+standard is plainly right and where the live screen already attempts it. Keep
+columns on **Review BoM**, where the user is comparing coverage across lines and
+a column is the only shape that lets them. And drop the pairs-in-a-cell version
+entirely — that was ours, from 15 Oct, and the export gap settles it.
+
+If she wants one rule for both screens, child rows everywhere is the safer of
+the two, and we would rebuild Review BoM accordingly. We would only ask that the
+decision be final: that screen has changed shape three times in three days.
+
+## C4 · Wizard navigation
+
+**What the pattern says.** Design-system documentation consistently puts Back
+and Next at the **bottom right** of a wizard and treats *consistency across
+steps* as the rule that matters most — same place, same order, every step. One
+system adds that navigation should stay visible while the content scrolls, so
+Next is never pushed off-screen. The step indicator's job is to show position
+and what remains, which is what a stepper across the top already does.
+
+**Our position.** Keep navigation in the footer. It is the convention their
+users meet everywhere else, the footer in our dialog does not scroll — verified:
+`modalScrollY: 0` at 1400x900 — so Previous and Next are always reachable, and
+the commit action sits where the eye finishes the form rather than above it.
+
+The standard's reason for top-left is its own "all buttons on the left" rule.
+That rule earns its keep on a record toolbar, where the buttons act on the
+record; wizard navigation acts on the *form*, not on the data, which is why
+every system treats it separately. We would keep "all buttons left" for
+toolbars and exempt wizard navigation, rather than bend the wizard to it.
+
+## C1 · Monospace for record and part numbers
+
+No external check needed: the standard and the 8 October review contradict each
+other, and the question is which reason is better.
+
+Mono is asked for here to make columns of identifiers line up. `tabular-nums`
+does exactly that — every digit the same width, so figures align in a column —
+while keeping the body face's letterforms. It buys the alignment mono was
+wanted for without the legibility cost the customer objected to on 8 October,
+in their own words: *"do not use monotext, hard to read"*.
+
+**Our position.** Keep the body face with `tabular-nums`, which is what ships
+today, and drop the mono line from the standard. If she wants mono anywhere, the
+narrowest case worth it is the record number in the page title — one string, not
+a column.
+
+## D1 · 44px controls
+
+**What the standards actually require.** 44x44 CSS px is WCAG 2.5.5 *Target
+Size (Enhanced)*, a AAA criterion, and it governs the **pointer target**, not
+the height of a visible control — a 34px input inside a 44px row satisfies it.
+The AA criterion in WCAG 2.2 is 2.5.8 *Target Size (Minimum)* at 24x24. Material
+specifies 48dp for the same reason: a finger.
+
+None of them say a desktop form field must be 44px tall. They say what a finger
+needs to hit.
+
+**Our position.** Keep 44px as the floor on a **coarse pointer**, which our
+`touch:check` already enforces on every push, and 34-36px on a fine pointer.
+The cost of the blanket rule is measurable here: a 27-field RFQ record gains
+roughly 270px of height, and on 15 October we spent a day recovering 94px on
+Run Quotation because the grid was down to nine lines of a fifty-eight-line BoM.
+Height is the scarcest resource in this product.
+
+## Sources
+
+- SAP Fiori, responsive table usage and table features — multi-value cells,
+  export behaviour, tree tables, column priority:
+  https://www.sap.com/design-system/fiori-design-web/v1-96/ui-elements/responsive-table/usage
+  and https://experience.sap.com/fiori-design-web/explore_category/elements
+- Visa Product Design System, Wizard pattern — Back/Next placement and
+  consistency across steps: https://design.visa.com/patterns/wizard/usage/
+- Embrace Cloud design system, Wizard — navigation stays visible while
+  scrolling: https://design.embracecloud.nl/navigation/wizard
+- Ontario Design System, Step indicator — when a stepper is appropriate:
+  https://designsystem.ontario.ca/components/detail/step-indicator.html
