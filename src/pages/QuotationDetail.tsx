@@ -166,12 +166,40 @@ export function QuotationDetail() {
       };
     });
 
+  /**
+   * SAVE IS ALWAYS ENABLED AND VALIDATES ON CLICK, from 16 Oct 2026.
+   *
+   * It used to be disabled until every required field was filled, on the
+   * customer's own earlier guideline — "the Save button becomes enabled after
+   * the user enters or selects values for all required fields". Their standard
+   * of 14 Oct replaces that with the opposite rule and a flow to go with it:
+   * "Save is always enabled and validates on click... Move to the first error
+   * (switch tab if needed) and put focus on it. Nothing is saved."
+   *
+   * The newer rule is better and the reason is the one we already half-admitted
+   * in the old comment: a disabled button is a dead end. It tells you that you
+   * cannot proceed and makes you hunt for why. Clicking Save and being taken to
+   * the field that is stopping you is the same information, delivered by the
+   * act of asking for it.
+   */
   function saveEdit() {
     if (!draft) return;
-    /* Belt and braces: the button is already disabled, but a keyboard submit or
-       a future caller should not be able to slip past the same rule. */
     if (missingRequired.length) {
       setTouched(new Set(ALL_FIELDS.map(f => f.name)));
+      toast.error(
+        `${missingRequired.length} required ${missingRequired.length === 1 ? 'field is' : 'fields are'} missing. `
+        + 'Fix the highlighted fields and save again.',
+      );
+      /* After the render that marks them — the field is not an invalid control
+         until React has painted it. Same approach as Run Quotation step 1. */
+      requestAnimationFrame(() => {
+        const first = document.querySelector<HTMLElement>(
+          '.vy-record-fields [data-invalid] input, .vy-record-fields [data-invalid] textarea,'
+          + ' .vy-record-fields [data-invalid] .k-input-inner',
+        );
+        first?.focus();
+        first?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      });
       return;
     }
     setSaved(draft);
@@ -281,14 +309,11 @@ export function QuotationDetail() {
                     outstanding, because a disabled button with no explanation
                     is a dead end: you can see it is off, not why. */}
                 <Button variant="filled"
-                        disabled={!dirty || missingRequired.length > 0}
                         title={missingRequired.length
                           ? `Still needed: ${missingRequired.map(f => f.label).join(', ')}`
                           : undefined}
                         onClick={saveEdit}>
-                  {missingRequired.length
-                    ? `${missingRequired.length} field${missingRequired.length === 1 ? '' : 's'} still needed`
-                    : dirty ? `Save ${changeCount} ${changeCount === 1 ? 'change' : 'changes'}` : 'Save'}
+                  {dirty ? `Save ${changeCount} ${changeCount === 1 ? 'change' : 'changes'}` : 'Save'}
                 </Button>
               </>
             ) : (
@@ -354,6 +379,13 @@ export function QuotationDetail() {
             tab strip printed the same counts itself. The row was a second copy
             of the tab strip. See SmartButtons.tsx for the rule that replaced
             that, and for the links we cannot build honestly yet. */}
+        {/* HIDDEN IN EDIT MODE, from 16 Oct. The standard: "Edit mode: only Save
+            + Discard Changes; smart buttons hidden." It follows from what these
+            are — every one navigates AWAY to another record, and offering that
+            beside unsaved changes invites the one click that loses them. The
+            toolbar already narrows to two buttons in edit mode; this row was
+            still showing four ways out. */}
+        {!editing && (
         <nav className="vy-smart-buttons" aria-label="Related records">
           {smartButtonsFor(q, { customerRfqs, historicalRfqId }).map(b => (
             <button key={b.label} type="button" className="vy-smart-btn"
@@ -366,10 +398,16 @@ export function QuotationDetail() {
             </button>
           ))}
         </nav>
+        )}
         </div>
 
         <div className="vy-record-bar">
           <div className="vy-record-id">
+            {/* "blue Editing pill first" — the standard's own words. The record
+                already said it was in edit mode through a banner further down;
+                a pill beside the record number says it where the user is
+                looking, next to the status it temporarily qualifies. */}
+            {editing && <span className="vy-badge" data-token="editing">Editing</span>}
             <span className="vy-ident vy-record-no">RFQ{q.no}</span>
             <StatusBadge value={q.status} />
             {/* Reads the DRAFT, not the saved record. ITAR follows the customer,

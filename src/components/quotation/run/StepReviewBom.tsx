@@ -199,10 +199,8 @@ export function StepReviewBom({ cfg, set, lines, setLines }: {
         search={search} onSearch={setSearch}
         placeholder="Search by Part / Description / MPN / MFG"
         filters={[
-          { key: 'exclude', label: 'Is Exclude?', on: isExclude, onToggle: setIsExclude,
-            count: lines.filter(l => l.excluded).length },
-          { key: 'mfg', label: 'Missing Manufacturer', on: missingMfg, onToggle: setMissingMfg,
-            count: lines.filter(unknownMfg).length },
+          { key: 'exclude', label: 'Is Exclude?', on: isExclude, onToggle: setIsExclude },
+          { key: 'mfg', label: 'Missing Manufacturer', on: missingMfg, onToggle: setMissingMfg },
         ]}
       />
 

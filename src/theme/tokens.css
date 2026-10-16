@@ -236,8 +236,18 @@
      Solid rather than pale, so it stays distinct from Completed — the guideline
      names them "Green" and "Light Green", which only works if one of them is
      actually saturated. White on this green measures 5.0:1, passing AA. */
-  --vy-status-progress-fg:   #ffffff;
-  --vy-status-progress-bg:   #15803d;
+  /* TINTED, LIKE EVERY OTHER PILL. This was the one solid badge in the set —
+     white on #15803D — and the standard of 14 Oct is explicit: "Pills are
+     always tinted, never solid", with a solid pill as its ✕ example. It was
+     also wearing the wrong family: solid GREEN, while green is the Completed
+     group, so In-Progress and Completed read as the same kind of thing.
+
+     Cyan-leaning teal rather than teal-100: #CCFBF1 sits 18° from the done
+     green at hue 149 and measures 1.01:1 against it, which is no difference at
+     all. #CFFAFE is 36° away and reads as a different colour rather than a
+     paler one. 6.49:1 on the fill, against 6.78:1 for the done pill. */
+  --vy-status-progress-fg:   #155e75;
+  --vy-status-progress-bg:   #cffafe;
   --vy-status-done-fg:       #065f46;
   --vy-status-done-bg:       #d1fae5;
   /* `waiting` is in the StatusToken union and had NO colours, so every

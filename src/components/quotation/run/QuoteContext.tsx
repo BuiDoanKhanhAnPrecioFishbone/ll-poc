@@ -100,7 +100,7 @@ export function QtyField({ label, value, onChange }: {
  */
 export function QuoteToolbar({ search, onSearch, placeholder, filters, leading, actions }: {
   search: string; onSearch: (v: string) => void; placeholder: string;
-  filters: { key: string; label: string; on: boolean; onToggle: (v: boolean) => void; count?: number }[];
+  filters: { key: string; label: string; on: boolean; onToggle: (v: boolean) => void }[];
   /**
    * Controls that configure the run, before the search — step 3's Primary
    * Provider. ONE BAND INSTEAD OF TWO, asked for on 15 Oct: the provider and
@@ -112,18 +112,27 @@ export function QuoteToolbar({ search, onSearch, placeholder, filters, leading, 
   /** The run actions, pushed to the trailing edge. */
   actions?: ReactNode;
 }) {
+  /* THE ORDER IS THE STANDARD'S, from 16 Oct: "Left: actions that change the
+     grid... Right: filters (no counts), then search", with Columns last. Ours
+     ran provider, search, filters, actions — the actions, which are the point
+     of the row, finished last on the right while the search led.
+
+     NO COUNTS on the filters, also theirs, and it is the one rule in this
+     component we would rather argue than obey: a count tells you whether a
+     filter is worth clicking before you click it. Followed here because the
+     standard says it twice and says it plainly; raised in the review instead
+     of quietly kept. */
   return (
     <div className="vy-quote-toolbar">
       {leading}
-      <SearchField placeholder={placeholder} aria-label={placeholder}
-                   value={search} onChange={e => onSearch(e.target.value)} />
+      {actions}
       <div className="vy-quote-filters">
         {filters.map(f => (
-          <Checkbox key={f.key} checked={f.on} onCheckedChange={f.onToggle}
-                    label={<>{f.label}{f.count !== undefined && <span className="vy-count-badge">{f.count}</span>}</>} />
+          <Checkbox key={f.key} checked={f.on} onCheckedChange={f.onToggle} label={f.label} />
         ))}
       </div>
-      {actions}
+      <SearchField placeholder={placeholder} aria-label={placeholder}
+                   value={search} onChange={e => onSearch(e.target.value)} />
     </div>
   );
 }

@@ -64,6 +64,9 @@
 .vy-badge[data-token="done"]      { color: var(--vy-status-done-fg);      background: var(--vy-status-done-bg); }
 .vy-badge[data-token="blocked"]   { color: var(--vy-status-blocked-fg);   background: var(--vy-status-blocked-bg); }
 .vy-badge[data-token="cancelled"] { color: var(--vy-status-cancelled-fg); background: var(--vy-status-cancelled-bg); }
+/* Not a workflow status — a mode. Blue, because the standard's blue means
+   "changed", which is exactly what the record is while this shows. */
+.vy-badge[data-token="editing"] { color: var(--vy-brand-text-deep); background: var(--vy-brand-subtle-strong); }
 .vy-pill { font-size: var(--vy-text-xs); color: var(--vy-on-surface-muted); background: var(--vy-surface-sunken); border-radius: var(--vy-shape-full); padding: 1px var(--vy-space-4); }
 
 /* --- Chip ------------------------------------------------------------------ */
@@ -1362,7 +1365,10 @@
   display: flex; flex-wrap: wrap; align-items: flex-end;
   gap: var(--vy-space-5) var(--vy-space-8);
 }
-.vy-quote-toolbar > .vy-run-actions { margin-left: auto; margin-block: 0; }
+/* Actions sit with the provider on the left; the filters and the search are
+   pushed to the trailing edge as one group. */
+.vy-quote-toolbar > .vy-run-actions { margin-block: 0; }
+.vy-quote-toolbar > .vy-quote-filters { margin-left: auto; }
 .vy-quote-toolbar > .vy-inline-field { margin-top: 0; flex: none; }
 .vy-quote-filters { display: flex; flex-wrap: wrap; gap: var(--vy-space-6); }
 

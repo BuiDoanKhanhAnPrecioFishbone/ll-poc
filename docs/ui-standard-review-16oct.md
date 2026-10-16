@@ -354,3 +354,66 @@ gives a reason, so the later instruction wins.
 - **Legend placement.** The standard puts it in the grid's footer; ours sits
   above the grid, and on step 3 it now lives inside the banner that explains it,
   which bought the grid a row. Worth raising rather than silently moving.
+
+---
+
+# Second pass, 16 October — what the first review missed
+
+Asked to check again, properly. The first review bucketed at the level of
+headline rules and did not test the build against the standard's own **Review
+checklist**, which is the list the customer will actually hold us to. Doing that
+found **nine** things the first pass did not. Seven are fixed below; the first
+review's own wording is corrected where it was wrong.
+
+This is a failure of method, not of information: the document said all of this
+on 14 October and was read in full before the first review was written.
+
+## Fixed in this pass
+
+| # | Checklist item | What ours did | Now |
+|---|---|---|---|
+| 1 | *"Status pills tinted, never solid"* | `In-Progress` was the one **solid** pill — white on `#15803D` | Tinted `#CFFAFE` on `#155E75`, 6.49:1 |
+| 2 | Status groups: *In Progress = teal, Completed = green* | `In-Progress` wore solid **green**, the Completed family, so the two read as the same kind of thing | Cyan-leaning teal, 36° of hue from the done green. Teal-100 was tried first and rejected: 18° away and **1.01:1** against it, which is no difference at all |
+| 3 | *"Edit mode: smart buttons hidden"* | Four ways out of the record were still on screen beside unsaved changes | Hidden while editing |
+| 4 | *"Save is always enabled and validates on click"* | Disabled until every required field was filled | Always enabled. On click: marks the fields, names the count, moves focus to the first one |
+| 5 | *"blue Editing pill first"* | Nothing — edit mode was announced by a banner lower down | Pill beside the record number, before the status |
+| 6 | *"filters (no counts)"*, said twice | Chips carried counts — `Is Exclude? 3`, `Missing Manufacturer 8` | Counts removed |
+| 7 | *"filters → search → Columns"* on the right | Ours ran provider → search → filters → actions, with the actions last | Provider and actions left; filters then search right |
+
+Item 4 overturns the customer's own earlier guideline — *"the Save button
+becomes enabled after the user enters or selects values for all required
+fields"*. The newer rule is better for the reason the old comment half-admitted:
+a disabled button is a dead end. It says you cannot proceed and leaves you to
+hunt for why.
+
+Item 6 is the one rule here we would rather argue than obey. A count tells you
+whether a filter is worth clicking before you click it. It is followed because
+the standard says it twice and says it plainly — but we would like to make the
+case.
+
+## Still outstanding from this pass
+
+- **Columns chooser on the wizard grids.** List screens have one; Review BoM and
+  Quoting do not. The standard wants it on every grid with 3+ columns, with key
+  and editable columns locked as "always shown".
+- **List toolbar puts its actions on the right.** `Add New` and `Setup View
+  Template` sit at the right edge, against *"All buttons on the left: form
+  toolbar, section actions and grid toolbar."* Bigger than it looks — that row
+  also holds the view picker and the filter toggle — so it is sized separately.
+
+## Corrections to the first review
+
+- **D1, 44px.** We objected to something the standard does not ask for; it
+  already exempts working-grid screens at 32px and names Quoting as one.
+  Corrected in place above.
+- **B9, Columns chooser.** Written as "missing" generally. It is missing on the
+  wizard grids only; list screens have had one all along.
+- **B6, short filter labels.** Listed as work. It was already done — the long
+  label the standard objects to is the live system's, not ours.
+
+## Still only in the "ask" bucket, not missed
+
+Required marker `(*)` against the standard's red `*`; the six-vs-seven status
+groups and the yellow `open` pill that goes with that question; AML child rows;
+wizard navigation; legend placement. Each contradicts an earlier instruction or
+a measurement of ours, so each is a question rather than a gap.
