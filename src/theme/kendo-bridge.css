@@ -470,6 +470,28 @@ html[data-kendo-bridged] .k-input-sm,
 html[data-kendo-bridged] .k-picker-sm {
   block-size: var(--vy-control-dense);
 }
+/* AND `md`, 16 Oct. Left alone in the first pass because re-pointing it changes
+   the height of every button in the product — which turned out to be the
+   argument FOR doing it. Measured before: a Kendo button and input at 28.6,
+   the action bar's buttons at 29, `--vy-control-md` and everything reading it
+   at 34, our own `.vy-input` at 36.8. Five heights for one scale, and two of
+   them sat side by side in the record's action bar: a 29px Edit beside a 34px
+   smart button.
+
+   34 because it is what the token already declares and what three of the five
+   already are; the input is the one that drifted, from a padding that was
+   never reconciled with it.
+
+   The customer's standard asks for 44px on a standard form, which we have
+   argued against for a 27-field record. That argument is now worth having
+   either way: with one scale, honouring it is changing this number. */
+html[data-kendo-bridged] .k-button-md,
+html[data-kendo-bridged] .k-input-md,
+html[data-kendo-bridged] .k-picker-md {
+  block-size: var(--vy-control-md);
+}
+html[data-kendo-bridged] .k-input-md .k-input-inner,
+html[data-kendo-bridged] .k-picker-md .k-input-inner { min-block-size: 0; }
 /* Kendo measures the INNER box: without this the wrapper takes the height and
    the text inside keeps its own taller line, so the control grows back. The
    `.vy-select` padding override is scoped away from `sm` for the same reason. */

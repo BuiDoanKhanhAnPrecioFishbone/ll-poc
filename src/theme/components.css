@@ -97,6 +97,15 @@
   border-radius: var(--vy-shape-sm); padding: var(--vy-space-4) var(--vy-space-5); width: 100%;
   transition: border-color var(--vy-dur-short) var(--vy-ease-standard);
 }
+/* ON THE SAME SCALE AS EVERY OTHER CONTROL. Its padding had put it at 36.8px
+   beside a 34px read-value box in the same field — the two shapes the 14 Oct
+   rule says a user reads as one control in two states. A TEXTAREA is exempt:
+   it is sized by its rows, and a height here would flatten it. */
+.vy-input:not(.vy-textarea) {
+  block-size: var(--vy-control-md);
+  padding-block: 0;
+  transition: border-color var(--vy-dur-short) var(--vy-ease-standard);
+}
 /* grey-500, not grey-400. The resting border is now darker than grey-400, so
    the old hover was lighter than the state it was meant to emphasise. */
 .vy-input:hover { border-color: var(--vy-border-heavy); }
@@ -127,11 +136,11 @@
    Matched at the INNER input, where Kendo puts its padding, using the same two
    tokens `.vy-input` uses — so if that field is ever retuned the dropdown
    follows it instead of drifting. */
-/* Scoped away from the dense size, which takes its padding from the size
-   scale in kendo-bridge.css. This override is what dragged Kendo's 29px picker
-   up to 35px to sit beside our 34px form control — kept for the form, kept off
-   the toolbar. */
-.vy-select:not(.k-input-sm):not(.k-picker-sm) .k-input-inner { padding: var(--vy-space-4) var(--vy-space-5); }
+/* THE PADDING OVERRIDE IS GONE. It existed to drag Kendo's 29px picker up to
+   sit beside our 34px form control — one component patched to meet a scale it
+   was never told about. The scale is told to it now, in kendo-bridge.css, so
+   there is nothing left to patch. Horizontal padding only. */
+.vy-select .k-input-inner { padding-inline: var(--vy-space-5); }
 .vy-menu { background: var(--vy-surface); border: 1px solid var(--vy-border); border-radius: var(--vy-shape-md); box-shadow: var(--vy-elev-3); padding: var(--vy-space-2); z-index: var(--vy-z-menu); }
 /* --- Checkbox / radio ------------------------------------------------------ */
 /* The LABEL carries the 24px minimum target, not the box. The whole label is

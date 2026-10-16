@@ -354,7 +354,7 @@ export function RadioGroup({ options, value, onChange, label }: {
 /** An option may be a bare string, or a value distinct from what is shown. */
 export type SelectOption = string | { value: string; label: string };
 
-export function Select({ options, value, onChange, label, id, required, invalid, size }: {
+export function Select({ options, value, onChange, label, id, required, invalid, size = 'medium' }: {
   /**
    * Strings where the text IS the value — which is most of this app — or
    * `{ value, label }` where it is not.
@@ -367,7 +367,15 @@ export function Select({ options, value, onChange, label, id, required, invalid,
    */
   options: readonly SelectOption[];
   value: string; onChange: (v: string) => void;
-  /** Kendo's own size name. The scale it maps to is in kendo-bridge.css. */
+  /**
+   * Kendo's own size name; the scale it maps to is in kendo-bridge.css.
+   *
+   * DEFAULTED, not optional-in-practice. Kendo's ComboBox emits no size class
+   * when it is given none — the control rendered `k-combobox k-input` and
+   * nothing else — so a scale keyed on `k-input-md` could not reach it, and the
+   * form's select sat at 29px beside a 34px input. A component that always
+   * carries a size name is the whole point of having a scale.
+   */
   size?: 'small' | 'medium';
   label?: string; id?: string; required?: boolean; invalid?: boolean;
   /** Accepted and ignored: every list filters now. Kept so call sites compile. */
