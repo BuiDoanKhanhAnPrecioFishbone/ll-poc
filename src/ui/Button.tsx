@@ -87,6 +87,10 @@ export function Button({
    * Radix positions a popover against the node it is given; given
    * `{ element, selected }` it measures an object and never settles.
    */
+  /* An icon with nothing beside it. Kendo has a class for exactly this and it
+     carries the squareness, so the test is here rather than at each call site. */
+  const iconOnly = icon != null && children == null;
+
   const forwardToDom = useCallback((handle: { element?: HTMLElement | null } | null) => {
     const node = (handle?.element ?? null) as HTMLButtonElement | null;
     if (typeof ref === 'function') ref(node);
@@ -118,14 +122,27 @@ export function Button({
          the Kendo subset and every `.vy-btn--*` rule there carries a full
          background at the same specificity as Kendo's, so passing them through
          would silently win and we would be running two button systems at once:
-         Kendo's box with our paint. */
-      className={[variant === 'tonal' && 'vy-btn--tonal', className].filter(Boolean).join(' ')}
+         Kendo's box with our paint.
+
+         `k-icon-button` is Kendo's, and it is what makes an icon-only button a
+         SQUARE: the class gives the box the same padding on both axes and
+         `k-button-icon` floors the glyph at one line box, so width and height
+         arrive at the same number out of the size scale. We add it because
+         KendoReact only adds it for an icon passed through its own `icon` /
+         `svgIcon` props, which take a Kendo icon name or an SVG descriptor —
+         ours are arbitrary nodes and stay children. */
+      className={[iconOnly && 'k-icon-button', variant === 'tonal' && 'vy-btn--tonal', className]
+        .filter(Boolean).join(' ')}
       {...rest}
     >
       {/* Kendo takes an icon NAME or an SVG descriptor, not arbitrary nodes.
           Ours are arbitrary nodes, so they stay children — where they rendered
-          before, in the same order. */}
-      {icon && <span className="vy-btn-icon" aria-hidden>{icon}</span>}
+          before, in the same order. The class is Kendo's only when the icon is
+          the whole button, because that is the case whose geometry Kendo owns;
+          beside a label it is a 0-size inline-flex wrapper either way. */}
+      {icon && (
+        <span className={iconOnly ? 'k-button-icon' : 'vy-btn-icon'} aria-hidden>{icon}</span>
+      )}
       {children}
     </KendoButton>
   );

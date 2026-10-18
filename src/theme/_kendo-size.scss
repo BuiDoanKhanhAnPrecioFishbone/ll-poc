@@ -1,0 +1,35 @@
+/* =============================================================================
+   HOW A CONTROL HEIGHT IS SPELLED IN KENDO
+   -----------------------------------------------------------------------------
+   Kendo does not give a control a height. It gives it a font size, a line
+   height and a vertical padding, and the box comes out as tall as those make
+   it — `$kendo-button-md-calc-size` in the theme's own Sass is literally
+   `(line-height * 1em) + (padding-y * 2) + (border-width * 2)`.
+
+   That is why forcing `block-size` onto `.k-button-md` was the wrong layer: it
+   left Kendo's padding in place underneath and simply out-shouted the result,
+   so the padding and the height disagreed about the same box, and the inner
+   element of every input had to be patched back to zero to stop it winning.
+
+   This function inverts it. Give it the height the design system wants and it
+   returns the padding Kendo needs in order to ARRIVE at that height, which is
+   the one number Kendo's scale asks us for. Nothing then sets a height at all:
+   `.k-icon-button` gets the same value on both axes and comes out square, and
+   a phone's larger base font (`--vy-text-base` is 15px there) makes the line
+   box taller and the padding correspondingly thinner, so the control stays on
+   the scale instead of clipping inside a fixed box.
+
+   IT READS KENDO'S OWN VARIABLES, not ours, for the line box. `--kendo-font-size`
+   is mapped to `--vy-text-base` in kendo-bridge.css, but the line height is
+   Kendo's own and we do not set it — so taking both from Kendo is the only way
+   the arithmetic cannot drift from the box it is describing.
+   ========================================================================== */
+
+/// The vertical padding that makes a Kendo control exactly `$height` tall.
+/// @param {Length} $height - the height from our scale, e.g. `var(--vy-control-md)`
+/// @param {Length} $border-width [1px] - the control's own border, counted twice
+@function control-padding($height, $border-width: 1px) {
+  @return calc(
+    (#{$height} - (var(--kendo-font-size) * var(--kendo-line-height)) - #{$border-width * 2}) / 2
+  );
+}

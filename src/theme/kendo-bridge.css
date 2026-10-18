@@ -441,62 +441,57 @@ html[data-kendo-bridged] .k-tabstrip-item:focus-visible {
 
 
 /* =============================================================================
-   THE SIZE SCALE — what Kendo's size names mean in this product
+   AN ICON BUTTON'S ONE LAYOUT RULE
    -----------------------------------------------------------------------------
-   Kendo names its sizes and sizes every component to match: measured in this
-   theme, `md` gives 29px for a button, an input and a picker alike, and `sm`
-   gives 25px for all three. That internal consistency is the thing to USE. A
-   row of controls lines up for free as long as every control in it carries the
-   same size name — which is how Carbon ("extra small 24, small 32, medium 40")
-   and Salt ("--salt-size-base ... ensures the consistent alignment of
-   components in horizontal layouts") both work.
+   `.k-icon-button` is square by construction in Kendo's stylesheet: the same
+   padding on both axes, and an icon floored at one line box. In KendoReact it
+   is not, and the reason is markup rather than CSS — the React component wraps
+   whatever children it is given in `<span class="k-button-text">`, which is a
+   BLOCK. An inline-flex icon inside a block gets a line box, a line box carries
+   leading, and the button came out 35.3 tall by 32 wide.
 
-   What we could not do is configure that scale the way a design system should.
-   Kendo's built stylesheet exposes no `--kendo-button-*` or `--kendo-input-*`
-   sizing variables — only SCSS, which we do not compile — so the mapping is
-   written here instead: one table, in the file that exists to reconcile Kendo
-   with our tokens, rather than a height pushed onto a component at each place
-   it appears.
+   Kendo's own icon buttons avoid this by having no text wrapper at all: the
+   icon is a direct child, which happens only for an icon passed through the
+   React `icon` / `svgIcon` props, and those take a Kendo icon name or an SVG
+   descriptor string rather than the nodes our icon set is made of.
 
-   WHY THIS EXISTS AT ALL: a grid's toolbar held a 28px funnel, a 29px Columns
-   button, a 35px view picker and a 37px search box. The 35 was ours — a
-   padding override on `.k-input-inner` dragging Kendo's picker up towards our
-   34px form control — so the row was uneven because two scales were fighting
-   over it. Only `sm` is re-pointed for now: `md` stays Kendo's own, because
-   moving it would change the height of every button in the product and that
-   belongs in its own change. */
-html[data-kendo-bridged] .k-button-sm,
-html[data-kendo-bridged] .k-input-sm,
-html[data-kendo-bridged] .k-picker-sm {
-  block-size: var(--vy-control-dense);
+   So the wrapper becomes a flex container and its height is its child's. One
+   declaration, scoped to the one case, and the squareness still comes out of
+   Kendo's padding rather than a size of ours.
+   ========================================================================== */
+html[data-kendo-bridged] .k-icon-button > .k-button-text {
+  display: flex;
 }
-/* AND `md`, 16 Oct. Left alone in the first pass because re-pointing it changes
-   the height of every button in the product — which turned out to be the
-   argument FOR doing it. Measured before: a Kendo button and input at 28.6,
-   the action bar's buttons at 29, `--vy-control-md` and everything reading it
-   at 34, our own `.vy-input` at 36.8. Five heights for one scale, and two of
-   them sat side by side in the record's action bar: a 29px Edit beside a 34px
-   smart button.
-
-   34 because it is what the token already declares and what three of the five
-   already are; the input is the one that drifted, from a padding that was
-   never reconciled with it.
-
-   The customer's standard asks for 44px on a standard form, which we have
-   argued against for a 27-field record. That argument is now worth having
-   either way: with one scale, honouring it is changing this number. */
-html[data-kendo-bridged] .k-button-md,
-html[data-kendo-bridged] .k-input-md,
-html[data-kendo-bridged] .k-picker-md {
-  block-size: var(--vy-control-md);
+/* And the glyph takes Kendo's icon size. Kendo caps its own at
+   `--kendo-icon-size-md` through `.k-svg-icon`; ours are plain `<svg>` elements
+   with their own width and height attributes, and a 20px one made the button
+   33.4px square — square, but off the scale, which is the same bug one axis
+   later. */
+html[data-kendo-bridged] .k-icon-button > .k-button-text > .k-button-icon > svg {
+  width: var(--kendo-icon-size-md);
+  height: var(--kendo-icon-size-md);
 }
-html[data-kendo-bridged] .k-input-md .k-input-inner,
-html[data-kendo-bridged] .k-picker-md .k-input-inner { min-block-size: 0; }
-/* Kendo measures the INNER box: without this the wrapper takes the height and
-   the text inside keeps its own taller line, so the control grows back. The
-   `.vy-select` padding override is scoped away from `sm` for the same reason. */
-html[data-kendo-bridged] .k-input-sm .k-input-inner,
-html[data-kendo-bridged] .k-picker-sm .k-input-inner {
-  min-block-size: 0;
-  padding-block: 0;
-}
+
+/* =============================================================================
+   THE SIZE SCALE — MOVED, 18 Oct
+   -----------------------------------------------------------------------------
+   It used to live here: `block-size: var(--vy-control-dense)` on `.k-button-sm`,
+   `.k-input-sm` and `.k-picker-sm`, the same for `md`, and two `min-block-size: 0`
+   patches to stop the inner element of an input growing the wrapper back.
+
+   It is now CONFIGURED, in `kendo-subset.scss`, through Kendo's own
+   `$kendo-button-*-padding-y` and `$kendo-input-*-padding-y`. The note there
+   says why; the short version is that Kendo sizes a control by padding and line
+   height rather than by a height, so a height set from outside left the
+   component's own stylesheet disagreeing with the box it was drawing — and the
+   patches were us settling that argument one selector at a time.
+
+   The claim that stood here, that the scale could not be configured because
+   Kendo ships it "only [as] SCSS, which we do not compile", was wrong in its
+   second half. `src/main.tsx` imports `kendo-subset.scss`; Vite compiles it
+   with Dart Sass on every build. The variables were reachable the whole time.
+
+   What this file still does for sizing is the 44px touch floor above, which is
+   a MINIMUM on a coarse pointer rather than a scale, and belongs with the other
+   pointer rules.
+   ========================================================================== */

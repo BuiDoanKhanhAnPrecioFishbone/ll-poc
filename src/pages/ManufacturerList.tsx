@@ -60,10 +60,10 @@ export function ManufacturerList() {
         views={<ViewPicker views={L.views.views} activeId={L.views.activeId}
                            onChange={L.views.setActiveId} />}
         viewSetting={
-          <button type="button" className="vy-funnel" aria-label="Setup View Template"
-                  title="Setup View Template" onClick={() => L.setSettingOpen(true)}>
-            <SmartIcon name="settings" />
-          </button>
+          <Button variant="outlined" size="sm" className="vy-funnel"
+                  aria-label="Setup View Template" title="Setup View Template"
+                  icon={<SmartIcon name="settings" />}
+                  onClick={() => L.setSettingOpen(true)} />
         }
         allColumns={MANUFACTURER_COLUMNS}
         onToggleColumn={L.toggleColumn}

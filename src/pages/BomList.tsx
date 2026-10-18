@@ -176,10 +176,10 @@ export function BomList() {
         quickActive={quickOn.length}
         views={<ViewPicker views={savedViews} activeId={activeId} onChange={setActiveId} />}
         viewSetting={
-          <button type="button" className="vy-funnel" aria-label="Setup View Template"
-                  title="Setup View Template" onClick={() => setSettingOpen(true)}>
-            <SmartIcon name="settings" />
-          </button>
+          <Button variant="outlined" size="sm" className="vy-funnel"
+                  aria-label="Setup View Template" title="Setup View Template"
+                  icon={<SmartIcon name="settings" />}
+                  onClick={() => setSettingOpen(true)} />
         }
         allColumns={BOM_LIST_COLUMNS}
         onToggleColumn={toggleColumn}

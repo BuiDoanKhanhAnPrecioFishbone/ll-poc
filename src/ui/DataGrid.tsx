@@ -307,19 +307,24 @@ export function DataGrid<T extends { id: string | number }>({
             /* The funnel. Carries a count when filters are on, because the
                panel it opens is closed by default and a grid silently showing
                a third of its rows is indistinguishable from missing data. */
-            <button type="button"
-                    className="vy-funnel"
+            <Button variant="outlined" size="sm" className="vy-funnel"
                     aria-expanded={filterOpen}
                     aria-label={filterOpen ? 'Hide filter toolbar' : 'Show filter toolbar'}
                     title={filterOpen ? 'Hide filter toolbar' : 'Show filter toolbar'}
                     data-on={filterActive > 0 || undefined}
-                    onClick={() => setFilterOpen(o => !o)}>
-              <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor"
-                   strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                <path d="M3 4h14l-5.5 6.5v5L8.5 17v-6.5z" />
-              </svg>
-              {filterActive > 0 && <span className="vy-count-badge">{filterActive}</span>}
-            </button>
+                    onClick={() => setFilterOpen(o => !o)}
+                    /* THE BADGE TRAVELS WITH THE ICON, not beside it as a
+                       second child. An icon button is only square while the
+                       icon is the whole of its content, and the count is not
+                       content — it is `position: absolute` on the corner, so it
+                       sits in the same place either way. */
+                    icon={<>
+                      <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor"
+                           strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                        <path d="M3 4h14l-5.5 6.5v5L8.5 17v-6.5z" />
+                      </svg>
+                      {filterActive > 0 && <span className="vy-count-badge">{filterActive}</span>}
+                    </>} />
           )}
 
           {viewSetting}

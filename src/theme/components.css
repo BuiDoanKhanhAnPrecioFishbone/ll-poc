@@ -524,7 +524,15 @@
 .vy-field--editing .vy-input,
 .vy-field--editing .vy-field-control,
 .vy-field--editing .vy-suffixed { width: 100%; min-width: 0; }
-.vy-field--editing .vy-suffixed .vy-input { flex: 1; }
+/* NO `flex: 1` ON THE INPUT, and it cost three fields their height.
+   The rule that was here meant "fill the row beside the suffix" — but the
+   input's flex parent is `.vy-field-control`, which is a flex COLUMN, so
+   `flex: 1` resolved against the block axis instead: basis 0, no free space to
+   grow into, and Markup, Acceptable LeadTime and Assembly Turn Time rendered
+   17.5px tall beside 34px everywhere else. The width it was reaching for is
+   already there — `.vy-input` is `width: 100%` and the rule above repeats it,
+   and `.vy-suffixed .vy-field-control { flex: 1 }` is what actually claims the
+   row. Fourth time the wrong axis has cost something in this file. */
 .vy-field--wide { grid-template-columns: 1fr; }
 .vy-field--wide dt { padding-top: 0; }
 .vy-suffixed { display: flex; align-items: center; gap: var(--vy-space-3); }

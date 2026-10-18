@@ -224,10 +224,10 @@ export function PartMaster() {
         onToggleColumn={toggleColumn}
         onResetColumns={() => setWorkingCols(view.columns)}
         viewSetting={
-          <button type="button" className="vy-funnel" aria-label="Setup View Template"
-                  title="Setup View Template" onClick={() => setSettingOpen(true)}>
-            <SmartIcon name="settings" />
-          </button>
+          <Button variant="outlined" size="sm" className="vy-funnel"
+                  aria-label="Setup View Template" title="Setup View Template"
+                  icon={<SmartIcon name="settings" />}
+                  onClick={() => setSettingOpen(true)} />
         }
         loading={loading}
         selected={selected}

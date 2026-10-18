@@ -124,7 +124,12 @@ export function StepQuoting({ cfg, set, lines, setLines, hasRun, onRun, onApply,
         leading={(
         <label className="vy-inline-field">
           <span>Primary Provider</span>
-          <Select label="Primary Provider" value={cfg.provider}
+          {/* `small`, like everything else in this row. Kendo's size names are
+              what make a toolbar line up — a row is level because every control
+              in it carries the SAME name, not because each was nudged — and
+              this one carried `medium` while the search and Columns beside it
+              were dense, so the row ran 34, 34, 34, 34, 32, 32. */}
+          <Select label="Primary Provider" size="small" value={cfg.provider}
                   options={[...PRIMARY_PROVIDERS]}
                   onChange={v => set({ provider: v as PrimaryProvider })} />
         </label>
@@ -135,19 +140,19 @@ export function StepQuoting({ cfg, set, lines, setLines, hasRun, onRun, onApply,
            Apply Price Range are displayed as secondary buttons." */
         actions={(
         <div className="vy-run-actions">
-          <Button variant="filled" onClick={onRun}
+          <Button variant="filled" size="sm" onClick={onRun}
                   title={manual
                     ? `Compute quantities through ${cfg.provider}. Quote Focus is ${cfg.quoteFocus}, so no supplier is selected for you.`
                     : `Price every line through ${cfg.provider}, falling back to the other provider`}>
             {hasRun ? 'Re-run Quote' : 'Run Quote'}
           </Button>
-          <Button onClick={onApply} title="Recalculate Total Qty from Build Qty and Attrition Set">
+          <Button size="sm" onClick={onApply} title="Recalculate Total Qty from Build Qty and Attrition Set">
             Apply
           </Button>
-          <Button onClick={onAddAttrition} title="Set attrition on the lines that have none">
+          <Button size="sm" onClick={onAddAttrition} title="Set attrition on the lines that have none">
             Add Attrition
           </Button>
-          <Button onClick={onApplyPriceRange} title="Apply the configured Attrition Info price ranges">
+          <Button size="sm" onClick={onApplyPriceRange} title="Apply the configured Attrition Info price ranges">
             Apply Price Range
           </Button>
         </div>

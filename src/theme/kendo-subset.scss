@@ -23,6 +23,44 @@
    `_index.scss`, at the bottom, under `// Expose`.
    ========================================================================== */
 
+/* -----------------------------------------------------------------------------
+   THE SIZE SCALE, CONFIGURED RATHER THAN OVERRIDDEN — 18 Oct
+   -----------------------------------------------------------------------------
+   `sm` and `md` are what this product calls dense and standard: 32px and 34px.
+   Kendo shipped them at 24.6 and 28.6, and until today we moved them by setting
+   `block-size` on `.k-button-md`, `.k-input-md` and `.k-picker-md` in
+   kendo-bridge.css — a height pushed onto a component whose own stylesheet was
+   still sizing it from padding, which then needed `min-block-size: 0` patches
+   on the inner element to stop Kendo winning the argument back.
+
+   This is where Kendo asks to be told instead. The theme's Sass is compiled
+   here, so its size variables are configurable, and the heights above now come
+   out of Kendo's own arithmetic. What that buys beyond tidiness:
+
+     - `.k-icon-button` takes the same padding on both axes and is SQUARE by
+       construction, rather than by a rule of ours per place one appears.
+     - a control still fits its text. The old fixed height clipped nothing at
+       13px and would have clipped at the 15px `--vy-text-base` a phone gets.
+     - `$kendo-*-calc-size`, which Kendo uses to size an input's own buttons
+       against the field, is derived from the same number and so agrees with it.
+
+   BUTTON BEFORE INPUT, and it matters: `input/_index.scss` loads the button
+   module, and Sass refuses to configure a module something else has already
+   loaded. Configured in the other order the build fails outright, which is the
+   good failure — the alternative would be a silent half-applied scale.
+
+   The pickers are not missing: `.k-picker-*` is generated from
+   `$kendo-input-sizes` in kendo-theme-core, so a ComboBox follows the input. */
+@use "./kendo-size" as size;
+@use "@progress/kendo-theme-default/scss/button/index.scss" as button with (
+  $kendo-button-sm-padding-y: size.control-padding(var(--vy-control-dense)),
+  $kendo-button-md-padding-y: size.control-padding(var(--vy-control-md))
+);
+@use "@progress/kendo-theme-default/scss/input/index.scss" as input with (
+  $kendo-input-sm-padding-y: size.control-padding(var(--vy-control-dense)),
+  $kendo-input-md-padding-y: size.control-padding(var(--vy-control-md))
+);
+
 @use "@progress/kendo-theme-default/scss/grid/index.scss" as grid;
 @use "@progress/kendo-theme-default/scss/upload/index.scss" as upload;
 @use "@progress/kendo-theme-default/scss/tabstrip/index.scss" as tabstrip;

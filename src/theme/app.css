@@ -165,24 +165,18 @@
    segmented control kept its full width beside it. */
 .vy-grid-toolbar > .vy-search-field { flex: 1 1 var(--vy-grid-search-min); min-width: var(--vy-grid-search-min); max-width: var(--vy-search-w); }
 
-/* The row's own controls — a funnel and a search box that are ours, not
-   Kendo's — take the same dense size the Kendo ones take from their `sm` class.
-   One scale, named once in kendo-bridge.css; nothing here sets a height of its
-   own invention. */
+/* The search box is ours rather than Kendo's — a bare `<input>` with an icon
+   beside it — so the dense height has to be said here. It is the same token the
+   Kendo controls in the row reach through their `sm` class, not a second
+   number.
+
+   THE FUNNEL USED TO BE IN THIS BLOCK and is not any more: it is a Kendo icon
+   button now and takes `sm` with everything else. The rule that lived here set
+   `block-size` without `inline-size` and flattened it to 28x32, which is the
+   argument for not hand-sizing a control that a scale can size. */
 @media (pointer: fine) {
   .vy-grid-toolbar .vy-input,
   .vy-quote-toolbar .vy-input { block-size: var(--vy-control-dense); padding-block: 0; }
-
-  /* AN ICON BUTTON IS A SQUARE. Both axes from the one token, because setting
-     only the height is exactly how this went wrong: the funnel declares
-     28x28 of its own, the dense height alone made it 28x32, and a rectangle
-     with a glyph centred in it reads as a button that failed to finish
-     loading. The standard says the same thing for a row's buttons — "26px
-     square icon buttons". */
-  .vy-grid-toolbar .vy-funnel {
-    block-size: var(--vy-control-dense);
-    inline-size: var(--vy-control-dense);
-  }
 }
 /* The spacer only earns its keep on one line; once the toolbar wraps it would
    push the density control onto a row of its own. */
@@ -1793,13 +1787,28 @@
 .vy-filter-active { font-size: var(--vy-text-sm); color: var(--vy-on-surface-muted); }
 
 /* The funnel. Carries its count, because the panel it opens is closed by
-   default and a grid quietly showing a third of its rows looks like data loss. */
-.vy-funnel {
-  position: relative;
-  display: inline-grid; place-items: center;
-  width: var(--vy-space-11); height: var(--vy-space-11);
+   default and a grid quietly showing a third of its rows looks like data loss.
+
+   NO SIZE HERE, 18 Oct. It was a 28x28 box of its own invention, which then
+   needed a rule in the toolbar to drag it onto the dense height — and that rule
+   set one axis and flattened it to 28x32. It is a Kendo `k-icon-button` at
+   `sm` now, so both axes come out of the one scale and it is square because
+   Kendo's own stylesheet makes an icon button square.
+
+   What stays is the paint and the badge's anchor, neither of which Kendo can
+   know: `position: relative` for the count on the corner, and a palette that
+   matches the other quiet controls in the row rather than Kendo's outline. */
+.vy-funnel { position: relative; flex: 0 0 auto; }
+/* `.k-button.vy-funnel`, NOT `.vy-funnel`. Kendo paints its outline button
+   through `.k-button.k-button-outline`, which is two classes to our one, so a
+   plain `.vy-funnel` lost the border colour and the control came back wearing
+   `currentColor` — a #4d5766 edge where the row's other controls carry #dde2e9.
+   Same shape of override `.k-button.k-button-solid.vy-btn--tonal` already uses
+   in components.css: Kendo owns the box, we name the paint, and the selector
+   says so out loud. */
+.k-button.vy-funnel {
   background: none; border: 1px solid var(--vy-border); border-radius: var(--vy-radius-md);
-  color: var(--vy-on-surface-muted); cursor: pointer; flex: 0 0 auto;
+  color: var(--vy-on-surface-muted); cursor: pointer;
 }
 /* The two icon buttons that DO make room: both are `position: relative`, both
    are square, and on both the count belongs on the corner rather than beside a
@@ -1820,10 +1829,10 @@
 .vy-quote-filters .vy-check:has(input:checked) .vy-count-badge {
   background: var(--vy-brand-subtle-strong); color: var(--vy-brand-text-deep);
 }
-.vy-funnel:hover { background: var(--vy-surface-app); color: var(--vy-on-surface-strong); }
-.vy-funnel[aria-expanded="true"] { background: var(--vy-brand-subtle); border-color: var(--vy-brand-boundary-light); color: var(--vy-brand-text-hover); }
-.vy-funnel[data-on] { border-color: var(--vy-brand-boundary-strong); color: var(--vy-brand-text-hover); }
-.vy-funnel:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
+.k-button.vy-funnel:hover { background: var(--vy-surface-app); color: var(--vy-on-surface-strong); border-color: var(--vy-border); }
+.k-button.vy-funnel[aria-expanded="true"] { background: var(--vy-brand-subtle); border-color: var(--vy-brand-boundary-light); color: var(--vy-brand-text-hover); }
+.k-button.vy-funnel[data-on] { border-color: var(--vy-brand-boundary-strong); color: var(--vy-brand-text-hover); }
+.k-button.vy-funnel:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
 
 /* =============================================================================
    VIEW SETTING — a right sidebar, per the customer's guideline

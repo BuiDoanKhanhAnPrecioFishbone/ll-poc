@@ -371,10 +371,10 @@ export function Quotations() {
       viewSetting={
         /* One definition, in the shared icon set — this button carried its own
            inline copy of the glyph, so the nav and the toolbar could drift. */
-        <button type="button" className="vy-funnel" aria-label="Setup View Template"
-                title="Setup View Template" onClick={() => setSettingOpen(true)}>
-          <SmartIcon name="settings" />
-        </button>
+        <Button variant="outlined" size="sm" className="vy-funnel"
+                aria-label="Setup View Template" title="Setup View Template"
+                icon={<SmartIcon name="settings" />}
+                onClick={() => setSettingOpen(true)} />
       }
       rowHref={q => `/sales-management/quotation/${q.id}`}
     />
