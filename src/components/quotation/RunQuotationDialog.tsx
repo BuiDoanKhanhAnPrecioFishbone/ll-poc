@@ -57,11 +57,16 @@ import {
  * shape is right and whose content is absent still cannot be reviewed.
  */
 
+/* THE NUMBER IS IN THE DOT, not in the label — 21 Oct, following the
+   customer's mockup, which writes `<span className="dot">{n}</span>{label}`.
+   Ours spelled it "1 - Config BoM" beside a pip, which said the same thing
+   twice and cost 24px per step in a row that now shares its line with four
+   buttons. */
 const STEPS = [
-  { label: '1 - Config BoM', text: 'Choose the BoM and the assembly to quote' },
-  { label: '2 - Review BoM', text: 'Check the parsed lines and what is excluded' },
-  { label: '3 - Quoting',    text: 'Run the quote and choose suppliers' },
-  { label: '4 - Summary',    text: 'Cost estimation and submission' },
+  { label: 'Config BoM', text: 'Choose the BoM and the assembly to quote' },
+  { label: 'Review BoM', text: 'Check the parsed lines and what is excluded' },
+  { label: 'Quoting',    text: 'Run the quote and choose suppliers' },
+  { label: 'Summary',    text: 'Cost estimation and submission' },
 ];
 
 export function RunQuotationDialog({ q, onClose, resume }: {
@@ -326,6 +331,60 @@ export function RunQuotationDialog({ q, onClose, resume }: {
   const quotedTotal = quotable.reduce((sum, l) => sum + (l.amount ?? 0), 0);
   const canLeaveStep3 = hasRun;
 
+  /**
+   * The wizard's own navigation.
+   *
+   * ONE FILLED BUTTON PER STEP. Before the run, step 3 showed two — Get Prices
+   * in its toolbar and Generate Quotation here — so the screen offered two
+   * answers to "what now". The standard states the rule for a wizard exactly:
+   * "If the step's main action is not done yet, that action is primary and Next
+   * turns secondary but stays enabled." Stays enabled: a quote with no prices
+   * in it is a legitimate thing to carry forward, and the reason not to is
+   * better said by the tooltip than by a dead control.
+   *
+   * NO CANCEL. The dialog's own close button is the way out, as it is in the
+   * customer's mockup; a second one in a row of four would be the only control
+   * here that does not move the wizard forward or back.
+   */
+  const nav = (
+    <>
+      <Button onClick={() => goTo(Math.max(0, step - 1))} disabled={step === 0}>
+        Previous
+      </Button>
+      {step === 0 && <Button variant="filled" onClick={leaveStep1}>Next</Button>}
+      {step === 1 && <Button variant="filled" onClick={leaveStep2}>Next</Button>}
+      {step === 2 && (
+        <Button variant={hasRun ? 'filled' : undefined}
+                title={canLeaveStep3
+                  ? undefined
+                  : 'Get prices first, or continue with a quote that has none'}
+                onClick={generateQuotation}>
+          Generate Quotation
+        </Button>
+      )}
+      {step === 3 && (
+        <Button variant="filled" onClick={() => { toast.success('Add Quotation Result'); onClose(); }}>
+          Submit
+        </Button>
+      )}
+
+      {/* Save draft appears on steps 3 and 4 only, which is where the guideline
+          puts it — those are the steps holding work worth losing. */}
+      {(step === 2 || step === 3) && <Button onClick={saveDraft}>Save draft</Button>}
+
+      {/* WHAT THE CONFIRMATION DIALOG USED TO SAY, beside the button that acts
+          on it. A modal asking "are you sure" about three numbers is a modal
+          that could have printed the numbers. */}
+      {step === 2 && hasRun && (
+        <span className="vy-run-footnote" aria-live="polite">
+          <strong>{quotable.length}</strong> {quotable.length === 1 ? 'line' : 'lines'}
+          {' · '}{money(quotedTotal)}
+          {noSupplier > 0 && <> · <strong>{noSupplier}</strong> without a supplier → NO BID</>}
+        </span>
+      )}
+    </>
+  );
+
   return (
     <>
       <Dialog
@@ -344,61 +403,24 @@ export function RunQuotationDialog({ q, onClose, resume }: {
            to the grid, which is what a cost estimator is actually reading. */
         subtitle={`${STEPS[step].text} · ${q.customer} · ${q.application} · ${q.rfqType}`}
         onClose={onClose}
-        actions={<>
-          <Button onClick={onClose}>Cancel</Button>
-
-          {/* WHAT THE CONFIRMATION DIALOG USED TO SAY, said in the footer beside
-              the button that acts on it. A modal asking "are you sure" about
-              three numbers is a modal that could have printed the numbers. */}
-          {step === 2 && hasRun && (
-            <span className="vy-run-footnote" aria-live="polite">
-              <strong>{quotable.length}</strong> {quotable.length === 1 ? 'line' : 'lines'}
-              {' · '}{money(quotedTotal)}
-              {noSupplier > 0 && <> · <strong>{noSupplier}</strong> without a supplier → NO BID</>}
-            </span>
-          )}
-
-          {/* Save draft appears on steps 3 and 4 only, which is where the
-              guideline puts it — those are the steps holding work worth losing. */}
-          {(step === 2 || step === 3) && <Button onClick={saveDraft}>Save draft</Button>}
-
-          <Button onClick={() => goTo(Math.max(0, step - 1))} disabled={step === 0}>
-            Previous
-          </Button>
-
-          {step === 0 && <Button variant="filled" onClick={leaveStep1}>Next</Button>}
-          {step === 1 && <Button variant="filled" onClick={leaveStep2}>Next</Button>}
-          {/* ONE FILLED BUTTON PER STEP. Before the run this step showed two —
-              Run Quote in its toolbar and Generate Quotation here — so the
-              screen offered two "do this next" answers at once. The standard of
-              14 Oct states the rule for a wizard exactly: "If the step's main
-              action is not done yet (Run Quote), that action is primary and
-              Next turns secondary but stays enabled." Stays enabled: a quote
-              with nothing in it is a legitimate outcome to carry forward, and
-              the reason not to is better said by the tooltip than by a dead
-              control. */}
-          {step === 2 && (
-            <Button variant={hasRun ? 'filled' : undefined}
-                    title={canLeaveStep3
-                      ? undefined
-                      : 'Run the quote first, or continue with a quote that has no prices'}
-                    onClick={generateQuotation}>
-              Generate Quotation
-            </Button>
-          )}
-          {step === 3 && (
-            <Button variant="filled" onClick={() => {
-              toast.success('Add Quotation Result');
-              onClose();
-            }}>
-              Submit
-            </Button>
-          )}
-        </>}
       >
         <div className="vy-run">
-          <Stepper steps={STEPS} value={step} furthest={furthest} onChange={goTo}
-                   numbered={false} showText={false} />
+          {/* NAVIGATION LEFT, STEPPER RIGHT, ON ONE ROW — 21 Oct.
+              The standard of 14 Oct asks for it and the Quoting BoM mockup of
+              16 Oct ships it: "Top-left toolbar = page navigation only", with
+              the step indicator at the other end. We had argued for a footer,
+              on the grounds that a commit button belongs where the eye finishes
+              the form. That argument is about a FORM; this dialog's content is
+              a scrolling grid, so there is no bottom for the eye to arrive at,
+              and the customer has now shown the layout working twice.
+
+              It also buys the grid 58px: the footer and the full-width stepper
+              band become one 40px row. */}
+          <div className="vy-run-nav">
+            <div className="vy-run-nav-actions">{nav}</div>
+            <Stepper steps={STEPS} value={step} furthest={furthest} onChange={goTo}
+                     showText={false} />
+          </div>
 
           {step === 0 && <StepConfigBom q={q} cfg={cfg} set={set} invalid={invalid} />}
           {step === 1 && <StepReviewBom cfg={cfg} lines={lines} setLines={setLines} />}

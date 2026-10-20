@@ -664,10 +664,41 @@
   .vy-run-step > .vy-minitable-k { flex: 0 0 auto; min-height: 0; overflow-y: visible; }
 }
 
-/* The numbers the Confirm Quote dialog used to carry, in the footer beside the
-   button that acts on them. */
+/* ---- The wizard's own row: navigation left, steps right -------------------
+   The customer's layout, adopted 21 Oct. It replaces a full-width stepper band
+   AND the dialog's footer, which between them cost 98px of a surface whose
+   content is a 21-column grid.
+
+   The stepper is pushed to the end rather than floated: on a narrow window the
+   row wraps and the steps drop under the buttons, which is the right failure —
+   a wizard that scrolls sideways to show you where you are is worse than one
+   that takes a second line. */
+.vy-run-nav {
+  display: flex; align-items: center; gap: var(--vy-space-5) var(--vy-space-8);
+  flex-wrap: wrap;
+}
+/* THE STEPS KEEP THEIR NAMES. The buttons and the footnote share whatever is
+   left, because "Config BoM" truncated to "Config …" is a step indicator that
+   has stopped indicating, while the footnote is a sentence that reads fine
+   shortened — and the numbers in it are repeated in the grid below. */
+.vy-run-nav-actions {
+  display: flex; align-items: center; gap: var(--vy-space-4);
+  flex: 1 1 auto; min-width: 0;
+}
+.vy-run-nav > .vy-stepper { margin-inline-start: auto; flex: 0 0 auto; flex-wrap: nowrap; }
+.vy-run-nav .vy-run-footnote {
+  min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+/* CONTENT-SIZED STEPS. `.vy-step` is `flex: 1 1 0` so that a stepper spanning
+   a dialog divides it evenly; in this row the stepper is a guest and its steps
+   should take what their names need, or they ellipsis to "Config …" while
+   240px of the row sits empty. */
+.vy-run-nav .vy-step { flex: 0 0 auto; }
+
+/* The numbers the Confirm Quote dialog used to carry, beside the button that
+   acts on them. */
 .vy-run-footnote {
-  margin-right: auto; align-self: center;
+  align-self: center;
   font-size: var(--vy-text-base); color: var(--vy-on-surface-muted);
 }
 .vy-run-footnote strong { color: var(--vy-on-surface); font-variant-numeric: tabular-nums; }
