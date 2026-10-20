@@ -119,6 +119,25 @@ export type BomLine = {
    */
   nexar: (NexarLookup | null)[];
 
+  /**
+   * Stock the quote does not have to buy.
+   *
+   * ASKED FOR by the Net Consigned and Rocket Consigned settings, which have
+   * been on the RFQ record since August and until today changed nothing: a
+   * quote that says "the customer supplies 150 of these" priced all of them
+   * anyway. The customer's Quoting BoM mockup spells out the arithmetic —
+   * consigned quantity comes off the total BEFORE a supplier is asked for a
+   * price, and Rocket's own consigned stock may still be charged for.
+   *
+   * `netConsigned` is the customer's material, free by definition — it is
+   * theirs. `rocketConsigned` is ours, and the setting decides whether this
+   * quote charges for it.
+   */
+  netConsigned?: number;
+  rocketConsigned?: number;
+  /** What Rocket charges per piece when the setting says Yes-Charge. */
+  rocketPrice?: number;
+
   /* ---- Quoting ---------------------------------------------------------- */
   /**
    * What each supplier will sell this part for, and on what terms.
@@ -254,6 +273,10 @@ type Seed = {
   /** What the quote run will find. '' means no supplier — the line stays N/A. */
   supplier: string; unitPrice: number; moq: number; pkg: string; lt: number; stock: number;
   attrition: number;
+  /** Consigned stock, where there is any. Most lines have none. */
+  netConsigned?: number;
+  rocketConsigned?: number;
+  rocketPrice?: number;
 };
 
 /**
@@ -273,13 +296,16 @@ type Seed = {
 const SEEDS: Seed[] = [
   { part: 'RES-0603-10K', revision: 'A', description: 'Resistor 10k 1% 0603', partSource: 'BUY', qty: 24, level: 1, mfg: 'Vishay', mpn: 'CRCW060310K0FKEA', supplier: 'Digi-Key', unitPrice: 0.012, moq: 5000, pkg: 'Reel', lt: 3, stock: 480000, attrition: 3, alternates: [{ mfg: 'Yageo', mpn: 'RC0603FR-0710KL' }, { mfg: 'KOA', mpn: 'RK73H1JTTD1002F' }] },
   { part: 'RES-0603-1K', revision: 'A', description: 'Resistor 1k 1% 0603', partSource: 'BUY', qty: 12, level: 1, mfg: 'Yageo', mpn: 'RC0603FR-071KL', supplier: 'Mouser', unitPrice: 0.009, moq: 5000, pkg: 'Reel', lt: 4, stock: 920000, attrition: 3 },
-  { part: 'RES-0805-100R', revision: 'A', description: 'Resistor 100R 1% 0805', partSource: 'BUY', qty: 6, level: 1, mfg: 'Yageo', mpn: 'RC0805FR-07100RL', supplier: 'Digi-Key', unitPrice: 0.011, moq: 5000, pkg: 'Reel', lt: 3, stock: 310000, attrition: 0 },
+  /* The customer supplies these, so the quote should not be buying them. */
+  { part: 'RES-0805-100R', revision: 'A', description: 'Resistor 100R 1% 0805', partSource: 'BUY', qty: 6, level: 1, mfg: 'Yageo', mpn: 'RC0805FR-07100RL', supplier: 'Digi-Key', unitPrice: 0.011, moq: 5000, pkg: 'Reel', lt: 3, stock: 310000, attrition: 0, netConsigned: 2000 },
   { part: 'CAP-0402-100N', revision: 'A', description: 'Cap 100nF 16V X7R 0402', partSource: 'BUY', qty: 48, level: 1, mfg: 'Murata', mpn: 'GRM155R71C104KA88D', supplier: 'Mouser', unitPrice: 0.008, moq: 10000, pkg: 'Reel', lt: 5, stock: 1200000, attrition: 5, alternates: [{ mfg: 'Samsung Electro-Mechanics', mpn: 'CL05B104KO5NNNC' }] },
   { part: 'CAP-0603-10U', revision: 'A', description: 'Cap 10uF 25V X5R 0603', partSource: 'BUY', qty: 14, level: 1, mfg: 'TDK', mpn: 'C1608X5R1E106M080AC', supplier: 'Arrow', unitPrice: 0.041, moq: 4000, pkg: 'Reel', lt: 9, stock: 88000, attrition: 4, alternates: [{ mfg: 'Taiyo Yuden', mpn: 'EMK107ABJ106MA-T' }] },
   { part: 'CAP-1206-22U', revision: 'B', description: 'Cap 22uF 16V X7R 1206', partSource: 'BUY', qty: 4, level: 1, mfg: 'Murata', mpn: 'GRM31CR71C226KE15L', supplier: '', unitPrice: 0, moq: 2000, pkg: 'Reel', lt: 0, stock: 0, attrition: 0 },
   { part: 'IC-PWR-BUCK-3A', revision: 'B', description: 'Buck converter 3A 17V', partSource: 'BUY', qty: 1, level: 1, mfg: 'Texas Instruments', mpn: 'TPS62130ARGTR', supplier: 'Arrow', unitPrice: 2.41, moq: 1, pkg: 'Cut Tape', lt: 12, stock: 8200, attrition: 0 },
   { part: 'IC-MCU-M4-256K', revision: 'C', description: 'MCU Cortex-M4 256K LQFP64', partSource: 'BUY', qty: 1, level: 1, mfg: 'STMicroelectronics', mpn: 'STM32F411RET6', supplier: 'Avnet', unitPrice: 5.87, moq: 1, pkg: 'Tray', lt: 26, stock: 140, attrition: 0 },
-  { part: 'REG-LDO-3V3', revision: 'A', description: 'LDO regulator 3.3V 500mA', partSource: 'BUY', qty: 2, level: 1, mfg: 'Texas Instruments', mpn: 'TLV1117LV33DCYR', supplier: 'Digi-Key', unitPrice: 0.38, moq: 1, pkg: 'Cut Tape', lt: 7, stock: 24000, attrition: 0 },
+  /* Partly from Rocket's own floor stock, which Yes-Charge prices and
+     Yes-No Charge does not — the one line where the two options differ. */
+  { part: 'REG-LDO-3V3', revision: 'A', description: 'LDO regulator 3.3V 500mA', partSource: 'BUY', qty: 2, level: 1, mfg: 'Texas Instruments', mpn: 'TLV1117LV33DCYR', supplier: 'Digi-Key', unitPrice: 0.38, moq: 1, pkg: 'Cut Tape', lt: 7, stock: 24000, attrition: 0, rocketConsigned: 400, rocketPrice: 0.21 },
   { part: 'MOSFET-N-30V', revision: 'A', description: 'MOSFET N-ch 30V 5A SOT-23', partSource: 'BUY', qty: 3, level: 1, mfg: 'Nexperia', mpn: 'PMV45EN,215', supplier: 'Mouser', unitPrice: 0.14, moq: 3000, pkg: 'Reel', lt: 6, stock: 61000, attrition: 2 },
   { part: 'DIO-SCH-40V', revision: 'A', description: 'Schottky diode 40V 1A', partSource: 'BUY', qty: 5, level: 1, mfg: 'Nexperia', mpn: 'PMEG4010CEJ', supplier: 'Digi-Key', unitPrice: 0.09, moq: 3000, pkg: 'Reel', lt: 5, stock: 74000, attrition: 2, alternates: [{ mfg: 'Onsemi', mpn: 'NRVTS540ESFT1G' }] },
   { part: 'IND-4R7-1210', revision: 'A', description: 'Inductor 4.7uH 1210', partSource: 'BUY', qty: 2, level: 1, mfg: 'Bourns', mpn: 'SRN6045TA-4R7M', supplier: 'Arrow', unitPrice: 0.22, moq: 2000, pkg: 'Reel', lt: 11, stock: 15000, attrition: 0 },
@@ -288,7 +314,7 @@ const SEEDS: Seed[] = [
   { part: 'LED-GRN-0805', revision: 'A', description: 'LED green 0805', partSource: 'BUY', qty: 2, level: 1, mfg: 'Lite-On', mpn: 'LTST-C170KGKT', supplier: 'Digi-Key', unitPrice: 0.09, moq: 3000, pkg: 'Reel', lt: 8, stock: 640, attrition: 2 },
   { part: 'FUSE-2A-1206', revision: 'A', description: 'Fuse 2A 1206 fast', partSource: 'BUY', qty: 1, level: 1, mfg: 'Bel Fuse', mpn: '0678L2000-01', supplier: 'Mouser', unitPrice: 0.31, moq: 1000, pkg: 'Reel', lt: 14, stock: 300, attrition: 0 },
   { part: 'SW-TACT-6MM', revision: 'A', description: 'Tactile switch 6mm SMD', partSource: 'BUY', qty: 2, level: 1, mfg: 'C&K Components', mpn: 'PTS645SM43SMTR92', supplier: 'Digi-Key', unitPrice: 0.17, moq: 1500, pkg: 'Reel', lt: 10, stock: 22000, attrition: 0 },
-  { part: 'FER-BEAD-600R', revision: 'A', description: 'Ferrite bead 600R 0603', partSource: 'BUY', qty: 4, level: 1, mfg: 'Wurth Elektronik', mpn: '742792040', supplier: 'Mouser', unitPrice: 0.06, moq: 4000, pkg: 'Reel', lt: 6, stock: 130000, attrition: 2 },
+  { part: 'FER-BEAD-600R', revision: 'A', description: 'Ferrite bead 600R 0603', partSource: 'BUY', qty: 4, level: 1, mfg: 'Wurth Elektronik', mpn: '742792040', supplier: 'Mouser', unitPrice: 0.06, moq: 4000, pkg: 'Reel', lt: 6, stock: 130000, attrition: 2, netConsigned: 500, rocketConsigned: 1000, rocketPrice: 0.04 },
   /* Internally manufactured — auto-excluded. */
   { part: 'PCB-4L-FR4', revision: 'D', description: 'PCB 4-layer FR4 1.6mm', partSource: 'MAKE', qty: 1, level: 0, mfg: '', mpn: '', supplier: '', unitPrice: 0, moq: 0, pkg: '', lt: 0, stock: 0, attrition: 0 },
   { part: 'SUB-ASSY-RF', revision: 'A', description: 'RF sub-assembly (phantom)', partSource: 'MAKE/PHANT', qty: 1, level: 0, mfg: '', mpn: '', supplier: '', unitPrice: 0, moq: 0, pkg: '', lt: 0, stock: 0, attrition: 0 },
@@ -431,6 +457,9 @@ export function buildBomLines(): BomLine[] {
     mpn: s.mpn,
     alternates: s.alternates ?? [],
     nexar: nexarFor(s, i),
+    netConsigned: s.netConsigned,
+    rocketConsigned: s.rocketConsigned,
+    rocketPrice: s.rocketPrice,
     attrition: s.attrition,
     supplier: '',
     orderQty: 0,
@@ -468,6 +497,9 @@ export type QuoteRules = {
   materialPackageType: string;
   /** How much over-ordering the MOQ is allowed to force. */
   excessMoq: string;
+  /** Whether this quote uses the customer's consigned stock, and Rocket's. */
+  netConsigned: string;
+  rocketConsigned: string;
   suppliers: SupplierSetup;
 };
 
@@ -484,6 +516,34 @@ type Candidate = {
 /* "Reels", "$50 Reels" and "$25 Reels" all ask for a reel; the price in the
    label is the reel charge, not a different packaging. */
 const wantsReel = (setting: string) => /reel/i.test(setting);
+
+/**
+ * How much of this line the quote does not have to buy, and what that costs.
+ *
+ * THE ORDER MATTERS. The customer's material goes first because it is free by
+ * definition, and Rocket's floor stock covers whatever is left — charged or
+ * not, as the setting says. Taking them the other way round would bill for
+ * Rocket stock while the customer's own parts sat unused.
+ */
+function consignedFor(line: BomLine, total: number, rules: QuoteRules) {
+  let consigned = 0;
+  let consignedCost = 0;
+  if (rules.netConsigned !== 'No' && line.netConsigned) {
+    consigned += Math.min(line.netConsigned, total);
+  }
+  if (rules.rocketConsigned !== 'No' && line.rocketConsigned) {
+    const q = Math.min(line.rocketConsigned, total - consigned);
+    consigned += q;
+    if (rules.rocketConsigned === 'Yes-Charge') consignedCost += q * (line.rocketPrice ?? 0);
+  }
+  return { consigned, consignedCost };
+}
+
+/** What a line draws from consigned stock, for the grid's own column. */
+export function consignedQty(line: BomLine, total: number,
+                             net: string, rocket: string): number {
+  return consignedFor(line, total, { netConsigned: net, rocketConsigned: rocket } as QuoteRules).consigned;
+}
 
 /**
  * Which offer the quote takes, and why.
@@ -561,7 +621,7 @@ function chooseOffer(line: BomLine, total: number, rules: QuoteRules): Candidate
 }
 
 /** The terms of one offer, written onto the line's flat quoting fields. */
-function priceFrom(line: BomLine, c: Candidate, total: number): BomLine {
+function priceFrom(line: BomLine, c: Candidate, total: number, consignedCost = 0): BomLine {
   const excessQty = Math.max(0, c.orderQty - total);
   const outStock = Math.max(0, c.orderQty - c.offer.stock);
   return {
@@ -575,7 +635,9 @@ function priceFrom(line: BomLine, c: Candidate, total: number): BomLine {
     moq: c.offer.moq,
     orderQty: c.orderQty,
     excessQty,
-    amount: c.offer.unitPrice * c.orderQty,
+    /* Rocket's consigned stock is charged for under Yes-Charge, so the line's
+       amount is what is bought PLUS what is drawn from the floor. */
+    amount: c.offer.unitPrice * c.orderQty + consignedCost,
     excessAmt: c.offer.unitPrice * excessQty,
     /* A shortfall is what makes a line NO; everything else that priced is
        COVER. */
@@ -622,6 +684,17 @@ export function runQuote(lines: BomLine[], rules: QuoteRules): BomLine[] {
       return { ...line, status: 'NO BID' as LineStatus, supplier: '', unitPrice: 0, amount: 0 };
     }
     const total = totalQtyOf(line, rules.buildQty, rules.attritionSet);
+    const { consigned, consignedCost } = consignedFor(line, total, rules);
+    const toBuy = total - consigned;
+
+    /* NOTHING LEFT TO BUY. Consigned stock covers the line, so no supplier is
+       asked and none is shown — "Consigned" is the answer to "where is this
+       coming from", and it is not a gap to be filled. */
+    if (toBuy <= 0) {
+      return { ...line, supplier: 'Consigned', status: 'COVER' as LineStatus,
+               orderQty: 0, moq: 0, excessQty: 0, excessAmt: 0, stock: 0, lt: 0, pkg: '',
+               unitPrice: 0, amount: consignedCost };
+    }
 
     /* Z2data finds the 22uF cap that Nexar does not — the one line in this set
        where the provider changes what comes back, kept because it is the only
@@ -638,14 +711,14 @@ export function runQuote(lines: BomLine[], rules: QuoteRules): BomLine[] {
         return { ...line, status: 'N/A' as LineStatus, supplier: '', orderQty: 0, moq: 0,
                  excessQty: 0, excessAmt: 0, stock: 0, lt: 0, pkg: '', unitPrice: 0, amount: 0 };
       }
-      const orderQty = Math.max(total, held.moq);
+      const orderQty = Math.max(toBuy, held.moq);
       return priceFrom({ ...line, offers }, {
         offer: held, group: rules.suppliers[held.supplier]?.group ?? 9, orderQty,
-        excess: orderQty - total, stockOk: held.stock >= orderQty, pkgOk: true,
-      }, total);
+        excess: orderQty - toBuy, stockOk: held.stock >= orderQty, pkgOk: true,
+      }, toBuy, consignedCost);
     }
 
-    const chosen = chooseOffer({ ...line, offers }, total, rules);
+    const chosen = chooseOffer({ ...line, offers }, toBuy, rules);
     if (!chosen) {
       /* No offer survived the supplier list and the excess policy. Both are
          the user's own settings, so this is a result rather than a failure —
@@ -653,7 +726,7 @@ export function runQuote(lines: BomLine[], rules: QuoteRules): BomLine[] {
       return { ...line, offers, status: 'N/A' as LineStatus, supplier: '', orderQty: 0, moq: 0,
                excessQty: 0, excessAmt: 0, stock: 0, lt: 0, pkg: '', unitPrice: 0, amount: 0 };
     }
-    return priceFrom({ ...line, offers }, chosen, total);
+    return priceFrom({ ...line, offers }, chosen, toBuy, consignedCost);
   });
 }
 

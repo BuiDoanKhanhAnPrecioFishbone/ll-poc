@@ -98,6 +98,8 @@ export function RunQuotationDialog({ q, onClose, resume }: {
     buildQty: 1,
     attritionSet: 1,
     excessMoq: q.excessAndMoq,
+    netConsigned: q.netConsignedInventory,
+    rocketConsigned: q.rocketConsignedInventory,
     provider: 'Nexar',
     /* A copy of the supplier master, which is where every quote starts. */
     suppliers: masterSuppliers(),
@@ -200,7 +202,8 @@ export function RunQuotationDialog({ q, onClose, resume }: {
   const rulesOf = (c: RunConfig): QuoteRules => ({
     buildQty: c.buildQty, attritionSet: c.attritionSet, provider: c.provider,
     quoteFocus: c.quoteFocus, materialPackageType: c.materialPackageType,
-    excessMoq: c.excessMoq, suppliers: c.suppliers,
+    excessMoq: c.excessMoq, netConsigned: c.netConsigned,
+    rocketConsigned: c.rocketConsigned, suppliers: c.suppliers,
   });
 
   /** Move the pending setup into the config the grid reads. */

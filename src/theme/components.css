@@ -1282,9 +1282,11 @@
   color: var(--vy-on-surface-strong); font-variant-numeric: tabular-nums;
 }
 .vy-quote-context-head span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* 12px between fields rather than 16: ten settings on this strip, so the gaps
+   alone were 144px — a column of the grid below, spent on air. */
 .vy-quote-context-fields {
   display: flex; flex-wrap: wrap; align-items: center;
-  gap: var(--vy-space-4) var(--vy-space-8);
+  gap: var(--vy-space-4) var(--vy-space-6);
 }
 /* Label above value, and MEASURED BOTH WAYS on 6 Oct: beside it, the two wide
    facts pushed the strip from one row to two and it grew to 93px. Stacked it is
@@ -1399,23 +1401,26 @@
    The strip's button, and the dialog it opens. The button is a field like the
    ones beside it — label above, value below — so a setting that happens to
    need a dialog still reads as part of the setup rather than as an action. */
-.vy-quote-fact--sup { inline-size: var(--vy-quote-sup-w); flex: 0 0 auto; }
+/* On the heading line, pushed to its end — see QuoteContext.tsx. */
 .vy-sup-btn {
   display: flex; align-items: center; gap: var(--vy-space-3);
-  inline-size: 100%; block-size: var(--vy-control-md);
+  margin-inline-start: auto; flex: 0 0 auto;
+  block-size: var(--vy-control-dense);
   padding-inline: var(--vy-space-5);
-  font: inherit; text-align: start; cursor: pointer;
+  font: inherit; font-size: var(--vy-text-sm); text-align: start; cursor: pointer;
   color: var(--vy-on-surface-strong);
   background: var(--vy-surface);
   border: 1px solid var(--vy-border-control); border-radius: var(--vy-shape-sm);
 }
-.vy-sup-btn-value { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vy-sup-btn-label { color: var(--vy-on-surface-muted); }
+.vy-sup-btn-value { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .vy-sup-btn:hover { border-color: var(--vy-border-heavy); }
 .vy-sup-btn:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
-.vy-quote-fact--sup[data-changed] .vy-sup-btn {
+.vy-sup-btn[data-changed] {
   background: var(--vy-brand-subtle); border-color: var(--vy-brand-boundary-strong);
   color: var(--vy-brand-text-deep); font-weight: var(--vy-weight-medium);
 }
+.vy-sup-btn[data-changed] .vy-sup-btn-label { color: var(--vy-brand-text); }
 
 .vy-sup-top { display: flex; align-items: center; gap: var(--vy-space-6); margin-bottom: var(--vy-space-6); }
 .vy-sup-count { font-size: var(--vy-text-sm); color: var(--vy-on-surface-muted); white-space: nowrap; }

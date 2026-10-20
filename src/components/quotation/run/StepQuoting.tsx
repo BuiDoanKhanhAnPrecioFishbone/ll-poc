@@ -9,7 +9,7 @@ import { TextField } from '../../../ui/Field';
 import type { ColumnSpec } from '../../column-model';
 import { QuoteContextBar, QuoteToolbar, NoRecords } from './QuoteContext';
 import {
-  pickSupplier, totalQtyOf, money, money3,
+  consignedQty, pickSupplier, totalQtyOf, money, money3,
   type BomLine,
 } from '../../../data/bom';
 import { fmtDateTime } from '../../../ui/regional';
@@ -439,6 +439,20 @@ function quotingColumns(cfg: RunConfig, hasRun: boolean,
     { field: 'id', id: 'total', title: 'Total Qty', role: 'number', width: 100,
       widthNote: 'A computed total, larger than the per-board quantity.',
       render: r => p(r, () => totalQtyOf(r.line, cfg.buildQty, cfg.attritionSet).toLocaleString()) },
+    /* WHAT THE QUOTE DOES NOT HAVE TO BUY. Blank on the lines that have none,
+       which is most of them — a column of zeroes would say "considered and
+       found to be none" on twenty lines where the answer is "not applicable".
+       Not frozen: it matters on three lines of a BoM and the Columns chooser
+       can put it away. */
+    { field: 'id', id: 'consigned', title: 'Consigned', role: 'number', width: 110,
+      widthNote: 'A quantity, and only on the lines that carry consigned stock.',
+      render: r => p(r, () => {
+        const qty = consignedQty(r.line, totalQtyOf(r.line, cfg.buildQty, cfg.attritionSet),
+                                 cfg.netConsigned, cfg.rocketConsigned);
+        return qty
+          ? <span title="Covered by consigned stock, so it is not bought">{qty.toLocaleString()}</span>
+          : '';
+      }) },
     {
       field: 'id', id: 'supplier', title: 'Supplier', role: 'text', width: 230,
       widthNote: 'Holds a supplier name, its group and its stock — "G1 Arrow · '
@@ -454,11 +468,13 @@ function quotingColumns(cfg: RunConfig, hasRun: boolean,
          approved but never auto-picked, which is exactly the distinction the
          two halves of this list draw. */
       render: r => p(r, () => hideIfExcluded(r.line,
-        r.line.offers.length
-          ? <Select label={`Supplier for ${r.line.part}`} value={r.line.supplier}
-                    options={supplierOptions(r.line)}
-                    onChange={v => onPickSupplier(r.line, v)} />
-          : <span className="vy-empty">No bid</span>)),
+        r.line.supplier === 'Consigned'
+          ? <span className="vy-empty" title="Covered by consigned stock — nothing to buy">Consigned</span>
+          : r.line.offers.length
+            ? <Select label={`Supplier for ${r.line.part}`} value={r.line.supplier}
+                      options={supplierOptions(r.line)}
+                      onChange={v => onPickSupplier(r.line, v)} />
+            : <span className="vy-empty">No bid</span>)),
     },
     {
       field: 'id', id: 'orderQty', title: 'Order Qty', role: 'number', width: 116,

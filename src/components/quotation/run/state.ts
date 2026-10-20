@@ -66,6 +66,9 @@ export type RunConfig = {
   provider: PrimaryProvider;
   /** None / Low / OK — how much over-ordering an MOQ may force. */
   excessMoq: string;
+  /** Whether this quote draws on the customer's consigned stock, and Rocket's. */
+  netConsigned: string;
+  rocketConsigned: string;
   /**
    * Which suppliers this quote will use, and in what priority.
    *
@@ -149,7 +152,7 @@ export function step1Error(cfg: RunConfig): string | null {
    ======================================================================== */
 export const SETUP_KEYS = [
   'buildQty', 'attritionSet', 'quoteFocus', 'markup', 'materialPackageType',
-  'excessMoq', 'provider',
+  'excessMoq', 'netConsigned', 'rocketConsigned', 'provider',
 ] as const;
 
 /** The scalar fields, plus the supplier list — which is a setting too, and the
@@ -163,6 +166,7 @@ export function setupOf(cfg: RunConfig): QuoteSetup {
     buildQty: cfg.buildQty, attritionSet: cfg.attritionSet,
     quoteFocus: cfg.quoteFocus, markup: cfg.markup,
     materialPackageType: cfg.materialPackageType, excessMoq: cfg.excessMoq,
+    netConsigned: cfg.netConsigned, rocketConsigned: cfg.rocketConsigned,
     provider: cfg.provider, suppliers: cfg.suppliers,
   };
 }

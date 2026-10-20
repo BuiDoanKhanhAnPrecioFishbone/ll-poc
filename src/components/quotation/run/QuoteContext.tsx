@@ -2,7 +2,10 @@ import type { ReactNode } from 'react';
 import { Checkbox, Select } from '../../../ui/Overlays';
 import { SearchField, TextField } from '../../../ui/Field';
 import { ReadValue } from '../../../ui/FieldRow';
-import { EXCESS_AND_MOQ, MATERIAL_PACKAGE_TYPE, QUOTE_FOCUS } from '../../../data/metadata';
+import {
+  EXCESS_AND_MOQ, MATERIAL_PACKAGE_TYPE, NET_CONSIGNED_INVENTORY,
+  QUOTE_FOCUS, ROCKET_CONSIGNED_INVENTORY,
+} from '../../../data/metadata';
 import { sameSuppliers, supplierSummary } from '../../../data/suppliers';
 import { Icon } from '../../../ui/icons';
 import { PRIMARY_PROVIDERS, type PrimaryProvider } from '../../../data/bom';
@@ -63,6 +66,24 @@ export function QuoteContextBar({
       <p className="vy-quote-context-head">
         <strong>{assembly}</strong>
         {description && <span>{description}</span>}
+        {/* THE SUPPLIER LIST IS A SETTING TOO, and the one that changes the
+            answer most — it decides which offers auto-pick may even consider.
+            It sits on the heading line rather than in the row of fields for
+            two reasons: fourteen suppliers are not a value, and ten settings
+            already fill that row to the pixel. What it carries is the line
+            that matters once the list has been touched: "2 not used · 1
+            moved". */}
+        {onSuppliers && (
+          <button type="button" className="vy-sup-btn" onClick={onSuppliers}
+                  data-changed={supChanged || undefined}
+                  title={supChanged
+                    ? 'Preferred suppliers — not yet applied to the results below'
+                    : 'Choose which suppliers this quote may use'}>
+            <span className="vy-sup-btn-label">Preferred Suppliers</span>
+            <span className="vy-sup-btn-value">{supplierSummary(s.suppliers)}</span>
+            <Icon name="chevron-right" />
+          </button>
+        )}
       </p>
 
       <div className="vy-quote-context-fields">
@@ -75,11 +96,16 @@ export function QuoteContextBar({
           <QtyField label="Attrition Set" value={s.attritionSet} changed={changed('attritionSet')}
                     title={was('attritionSet')} onChange={n => onPending!({ attritionSet: n })} />
           <PickField label="Quote Focus" value={s.quoteFocus} options={[...QUOTE_FOCUS]}
+                     width={172}
                      changed={changed('quoteFocus')} title={was('quoteFocus')}
-                     onChange={v => onPending!({ quoteFocus: v })} wide />
-          <QtyField label="Markup (%)" value={s.markup} min={0} changed={changed('markup')}
+                     onChange={v => onPending!({ quoteFocus: v })} />
+          <QtyField label="Markup %" value={s.markup} min={0} changed={changed('markup')}
                     title={was('markup')} onChange={n => onPending!({ markup: n })} />
-          <PickField label="Material Package Type" value={s.materialPackageType}
+          {/* "Package Type", not "Material Package Type" — the customer's own
+              mockup labels it that way, and on a strip of ten settings the
+              dropped word is 30px that the grid gets instead. The full name
+              survives on the read-only strips, where there is room. */}
+          <PickField label="Package Type" value={s.materialPackageType} width={130}
                      options={[...MATERIAL_PACKAGE_TYPE]} changed={changed('materialPackageType')}
                      title={was('materialPackageType')}
                      onChange={v => onPending!({ materialPackageType: v })} />
@@ -87,37 +113,39 @@ export function QuoteContextBar({
               on this strip: a 5,000-piece reel against a 500-piece build is
               where excess comes from, and this is the setting that says whether
               to accept it. */}
-          <PickField label="Excess and MOQ" value={s.excessMoq}
+          <PickField label="Excess and MOQ" value={s.excessMoq} width={132}
                      options={[...EXCESS_AND_MOQ]} changed={changed('excessMoq')}
                      title={was('excessMoq')}
                      onChange={v => onPending!({ excessMoq: v })} />
+          {/* THE TWO CONSIGNED SETTINGS have been on the RFQ record since
+              August and changed nothing until today: a quote that said "the
+              customer supplies 2,000 of these" priced all of them anyway. They
+              come off the quantity before a supplier is asked. */}
+          <PickField label="Net Consigned" value={s.netConsigned} width={136}
+                     options={[...NET_CONSIGNED_INVENTORY]} changed={changed('netConsigned')}
+                     title={was('netConsigned')}
+                     onChange={v => onPending!({ netConsigned: v })} />
+          <PickField label="Rocket Consigned" value={s.rocketConsigned} width={152}
+                     options={[...ROCKET_CONSIGNED_INVENTORY]} changed={changed('rocketConsigned')}
+                     title={was('rocketConsigned')}
+                     onChange={v => onPending!({ rocketConsigned: v })} />
           {/* THE PROVIDER MOVES HERE from the grid toolbar. It is setup, not an
               action: it decides where the next price request goes, and leaving
               it beside Get Prices implied it took effect on its own. */}
-          <PickField label="Primary Provider" value={s.provider} options={[...PRIMARY_PROVIDERS]}
+          <PickField label="Primary Provider" value={s.provider} width={134}
+                     options={[...PRIMARY_PROVIDERS]}
                      changed={changed('provider')} title={was('provider')}
                      onChange={v => onPending!({ provider: v as PrimaryProvider })} />
-          {/* THE SUPPLIER LIST IS A SETTING TOO, and the one that changes the
-              answer most — it decides which offers auto-pick may even consider.
-              Fourteen suppliers do not fit on a strip, so what fits is the line
-              that matters once it has been touched: "2 not used · 1 moved". */}
-          {onSuppliers && (
-            <div className="vy-quote-fact vy-quote-fact--sup"
-                 data-changed={supChanged || undefined}
-                 title={supChanged ? 'Not yet applied to the results below' : undefined}>
-              <span className="vy-quote-fact-label">Preferred Suppliers</span>
-              <button type="button" className="vy-sup-btn" onClick={onSuppliers}>
-                <span className="vy-sup-btn-value">{supplierSummary(s.suppliers)}</span>
-                <Icon name="chevron-right" />
-              </button>
-            </div>
-          )}
+
         </>
       ) : (
         <>
           <Fact label="Quote Focus" value={applied.quoteFocus} />
           <Fact label="Material Package Type" value={applied.materialPackageType} />
           <Fact label="Markup" value={`${applied.markup}%`} />
+          <Fact label="Excess and MOQ" value={applied.excessMoq} />
+          <Fact label="Net Consigned" value={applied.netConsigned} />
+          <Fact label="Rocket Consigned" value={applied.rocketConsigned} />
           <Fact label="Build Qty" value={String(applied.buildQty)} />
           <Fact label="Attrition Set" value={String(applied.attritionSet)} />
           <Fact label="Primary Provider" value={applied.provider} />
@@ -166,13 +194,17 @@ export function QtyField({ label, value, onChange, min = 1, changed, title }: {
   );
 }
 
-function PickField({ label, value, options, onChange, changed, title, wide }: {
+function PickField({ label, value, options, onChange, changed, title, wide, width }: {
   label: string; value: string; options: string[]; onChange: (v: string) => void;
   changed?: boolean; title?: string; wide?: boolean;
+  /** Narrower than the default where the label allows it — the strip is one
+   *  row and every pixel spent here comes off the grid below. */
+  width?: number;
 }) {
   return (
     <div className="vy-quote-fact vy-quote-fact--pick" data-changed={changed || undefined}
-         data-wide={wide || undefined} title={title}>
+         data-wide={wide || undefined} title={title}
+         style={width ? { inlineSize: width } : undefined}>
       <span className="vy-quote-fact-label">{label}</span>
       <Select label={label} size="small" value={value} options={options} onChange={onChange} />
     </div>

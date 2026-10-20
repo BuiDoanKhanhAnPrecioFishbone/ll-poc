@@ -473,7 +473,7 @@
   --vy-quote-qty-w:        92px; /* Build Qty / Attrition Set / Markup */
   --vy-quote-pick-w:      156px; /* fits "Material Package Type" at 152 */
   --vy-quote-pick-wide-w: 186px; /* Quote Focus — "Production - Competitive cost" */
-  --vy-quote-sup-w:       176px; /* "Preferred Suppliers" plus its summary */
+  --vy-quote-sup-w:       158px; /* "Preferred Suppliers" plus its summary */
   --vy-sup-group-w:       118px; /* the Group 1 / Group 2 picker in the dialog */
   --vy-mpn-menu-w:        320px; /* an MPN and a full manufacturer name */
   --vy-quote-field-min:   240px; /* one field on the Config BoM grid */
