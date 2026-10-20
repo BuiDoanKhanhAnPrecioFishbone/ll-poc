@@ -9,14 +9,14 @@ import { TextField } from '../../../ui/Field';
 import type { ColumnSpec } from '../../column-model';
 import { QuoteContextBar, QuoteToolbar, NoRecords } from './QuoteContext';
 import {
-  totalQtyOf, money, money3,
+  pickSupplier, totalQtyOf, money, money3,
   type BomLine,
 } from '../../../data/bom';
 import { fmtDateTime } from '../../../ui/regional';
 import { setupOf, type QuoteSetup, type RunConfig } from './state';
 import { amlPairs, amlRows, type AmlRow } from './amlRows';
-
-const SUPPLIERS = ['', 'Digi-Key', 'Mouser', 'Arrow', 'Avnet', 'Farnell', 'TTI'];
+import { SupplierDialog } from './SupplierDialog';
+import { SUPPLIERS as SUPPLIER_NAMES } from '../../../data/suppliers';
 
 /**
  * Step 3 — Quoting.
@@ -58,6 +58,7 @@ export function StepQuoting({
   onAddAttrition: () => void;
   onApplyPriceRange: () => void;
 }) {
+  const [suppliersOpen, setSuppliersOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [noSupplier, setNoSupplier] = useState(false);
   const [notEnough, setNotEnough] = useState(false);
@@ -100,7 +101,17 @@ export function StepQuoting({
       };
     }));
 
-  const columns = quotingColumns(cfg, hasRun, edit, editAml);
+  /* Choosing by hand re-prices the line from that offer — the quantity, the
+     lead time and the excess all follow the supplier, so changing the name
+     alone would leave five columns describing somebody else's terms. */
+  const pickSupplierFor = (line: BomLine, name: string) => {
+    const id = Object.keys(SUPPLIER_NAMES).find(k => SUPPLIER_NAMES[k] === name);
+    if (!id) return;
+    setLines(ls => ls.map(l =>
+      (l.id === line.id ? pickSupplier(l, id, cfg.buildQty, cfg.attritionSet) : l)));
+  };
+
+  const columns = quotingColumns(cfg, hasRun, edit, editAml, pickSupplierFor);
   const rows = useMemo(() => amlRows(shown), [shown]);
 
   /* The Columns chooser, and the frozen block as its locked set — see
@@ -120,7 +131,16 @@ export function StepQuoting({
         applied={setupOf(cfg)}
         pending={pending}
         onPending={setPending}
+        onSuppliers={() => setSuppliersOpen(true)}
       />
+
+      {suppliersOpen && (
+        <SupplierDialog
+          value={pending.suppliers}
+          onSave={next => { setPending({ suppliers: next }); setSuppliersOpen(false); }}
+          onClose={() => setSuppliersOpen(false)}
+        />
+      )}
 
       {/* NO BANNER BEFORE THE RUN, since 20 Oct. It said "Please run quotation
           for continue process!" above a toolbar that now says "No prices yet"
@@ -293,7 +313,22 @@ export function rowTone(l: BomLine, hasRun = true): string | undefined {
 function quotingColumns(cfg: RunConfig, hasRun: boolean,
                         edit: (id: number, patch: Partial<BomLine>) => void,
                         editAml: (line: BomLine, index: number, mpn: string) => void,
+                        onPickSupplier: (line: BomLine, supplier: string) => void,
                         ): ColumnSpec<AmlRow>[] {
+  /* One option per offer: the supplier's priority group, its stock and its
+     price, in that order — the group says whether the system would have chosen
+     it, the other two say what choosing it does to the line. */
+  const supplierOptions = (l: BomLine) => {
+    const rank = (id: string) => cfg.suppliers[id]?.group ?? 9;
+    return [...l.offers]
+      .sort((a, b) => rank(a.supplier) - rank(b.supplier)
+        || SUPPLIER_NAMES[a.supplier].localeCompare(SUPPLIER_NAMES[b.supplier]))
+      .map(o => ({
+        value: SUPPLIER_NAMES[o.supplier],
+        label: `${cfg.suppliers[o.supplier] ? `G${cfg.suppliers[o.supplier].group} ` : ''}`
+          + `${SUPPLIER_NAMES[o.supplier]} · ${o.stock.toLocaleString()} in stock · ${money3(o.unitPrice)}`,
+      }));
+  };
   /* An excluded line "displays only the following information: Part, Revision,
      Source, Description, MFG, MPN, Qty, Total Qty" — everything else is blank
      on those rows rather than showing a zero that could be read as a price. */
@@ -361,11 +396,25 @@ function quotingColumns(cfg: RunConfig, hasRun: boolean,
       widthNote: 'A computed total, larger than the per-board quantity.',
       render: r => p(r, () => totalQtyOf(r.line, cfg.buildQty, cfg.attritionSet).toLocaleString()) },
     {
-      field: 'id', id: 'supplier', title: 'Supplier', role: 'text', width: 130,
+      field: 'id', id: 'supplier', title: 'Supplier', role: 'text', width: 230,
+      widthNote: 'Holds a supplier name, its group and its stock — "G1 Arrow · '
+        + '24,000 in stock". Wider than a name needs because what is being '
+        + 'chosen is the offer, not the company.',
+      /* THE OFFERS THIS LINE ACTUALLY HAS, not a list of every supplier in the
+         company. Each option carries what the choice costs — "G1 Arrow ·
+         9,000 in stock · $0.920000" — because picking a supplier IS picking a
+         price, a lead time and a quantity, and a bare name asks the quoter to
+         remember all three.
+
+         Preferred first, then the rest: a supplier with no priority group is
+         approved but never auto-picked, which is exactly the distinction the
+         two halves of this list draw. */
       render: r => p(r, () => hideIfExcluded(r.line,
-        <Select label={`Supplier for ${r.line.part}`} value={r.line.supplier}
-                options={SUPPLIERS}
-                onChange={v => edit(r.line.id, { supplier: v })} />)),
+        r.line.offers.length
+          ? <Select label={`Supplier for ${r.line.part}`} value={r.line.supplier}
+                    options={supplierOptions(r.line)}
+                    onChange={v => onPickSupplier(r.line, v)} />
+          : <span className="vy-empty">No bid</span>)),
     },
     {
       field: 'id', id: 'orderQty', title: 'Order Qty', role: 'number', width: 116,

@@ -2,7 +2,9 @@ import type { ReactNode } from 'react';
 import { Checkbox, Select } from '../../../ui/Overlays';
 import { SearchField, TextField } from '../../../ui/Field';
 import { ReadValue } from '../../../ui/FieldRow';
-import { MATERIAL_PACKAGE_TYPE, QUOTE_FOCUS } from '../../../data/metadata';
+import { EXCESS_AND_MOQ, MATERIAL_PACKAGE_TYPE, QUOTE_FOCUS } from '../../../data/metadata';
+import { sameSuppliers, supplierSummary } from '../../../data/suppliers';
+import { Icon } from '../../../ui/icons';
 import { PRIMARY_PROVIDERS, type PrimaryProvider } from '../../../data/bom';
 import type { QuoteSetup } from './state';
 
@@ -28,7 +30,7 @@ import type { QuoteSetup } from './state';
  * press it.
  */
 export function QuoteContextBar({
-  assembly, description, applied, pending, onPending, extra,
+  assembly, description, applied, pending, onPending, onSuppliers, extra,
 }: {
   assembly: string; description: string;
   /** What the grid's numbers were computed from. */
@@ -36,6 +38,9 @@ export function QuoteContextBar({
   /** Step 3 only: the setup being edited. Absent means a read-only strip. */
   pending?: QuoteSetup;
   onPending?: (patch: Partial<QuoteSetup>) => void;
+  /** Opens the Preferred Suppliers dialog. Step 3 only — it is the one step
+   *  where the setup can be changed. */
+  onSuppliers?: () => void;
   /** Run by / Run Date / Run Version, which only step 4 has. */
   extra?: { label: string; value: string }[];
 }) {
@@ -45,18 +50,22 @@ export function QuoteContextBar({
   const changed = (k: keyof QuoteSetup) => editable && String(s[k]) !== String(applied[k]);
   const was = (k: keyof QuoteSetup) =>
     changed(k) ? `Current results use: ${applied[k]}` : undefined;
+  const supChanged = editable && !sameSuppliers(s.suppliers, applied.suppliers);
 
   return (
     <div className="vy-quote-context">
-      {/* EVERY VALUE IN A BOX, including these. They were bare text, which put
-          five unboxed facts alongside two white input boxes on one strip — the
-          exact "plain text for read only" the customer ruled out on 14 Oct, and
-          the more obvious for sitting next to real controls. `locked` follows
-          the bar: where some of it IS editable the padlock earns its place; on
-          step 4 nothing is, so it would be noise on all seven. */}
-      <Fact label="Assembly Part Number - Rev" value={assembly} locked={editable} wide />
-      <Fact label="Description" value={description} locked={editable} wide />
+      {/* THE ASSEMBLY IS A HEADING, NOT A FIELD — 20 Oct, following the
+          customer's mockup, which carries it in the card's title row. As two
+          boxed facts it took 400px of the field row, and with Excess and MOQ
+          and Preferred Suppliers added the row wrapped: 134px, where one row
+          is 76. It is also not a setting — nothing about it can be changed
+          here — so a row of settings is the wrong company for it. */}
+      <p className="vy-quote-context-head">
+        <strong>{assembly}</strong>
+        {description && <span>{description}</span>}
+      </p>
 
+      <div className="vy-quote-context-fields">
       {editable ? (
         <>
           {/* THE ORDER IS THE MOCKUP'S, in pairs: the two quantities, then the
@@ -74,12 +83,35 @@ export function QuoteContextBar({
                      options={[...MATERIAL_PACKAGE_TYPE]} changed={changed('materialPackageType')}
                      title={was('materialPackageType')}
                      onChange={v => onPending!({ materialPackageType: v })} />
+          {/* EXCESS AND MOQ decides more of the quoted cost than anything else
+              on this strip: a 5,000-piece reel against a 500-piece build is
+              where excess comes from, and this is the setting that says whether
+              to accept it. */}
+          <PickField label="Excess and MOQ" value={s.excessMoq}
+                     options={[...EXCESS_AND_MOQ]} changed={changed('excessMoq')}
+                     title={was('excessMoq')}
+                     onChange={v => onPending!({ excessMoq: v })} />
           {/* THE PROVIDER MOVES HERE from the grid toolbar. It is setup, not an
               action: it decides where the next price request goes, and leaving
               it beside Get Prices implied it took effect on its own. */}
           <PickField label="Primary Provider" value={s.provider} options={[...PRIMARY_PROVIDERS]}
                      changed={changed('provider')} title={was('provider')}
                      onChange={v => onPending!({ provider: v as PrimaryProvider })} />
+          {/* THE SUPPLIER LIST IS A SETTING TOO, and the one that changes the
+              answer most — it decides which offers auto-pick may even consider.
+              Fourteen suppliers do not fit on a strip, so what fits is the line
+              that matters once it has been touched: "2 not used · 1 moved". */}
+          {onSuppliers && (
+            <div className="vy-quote-fact vy-quote-fact--sup"
+                 data-changed={supChanged || undefined}
+                 title={supChanged ? 'Not yet applied to the results below' : undefined}>
+              <span className="vy-quote-fact-label">Preferred Suppliers</span>
+              <button type="button" className="vy-sup-btn" onClick={onSuppliers}>
+                <span className="vy-sup-btn-value">{supplierSummary(s.suppliers)}</span>
+                <Icon name="chevron-right" />
+              </button>
+            </div>
+          )}
         </>
       ) : (
         <>
@@ -93,6 +125,7 @@ export function QuoteContextBar({
       )}
 
       {extra?.map(e => <Fact key={e.label} label={e.label} value={e.value} />)}
+      </div>
     </div>
   );
 }

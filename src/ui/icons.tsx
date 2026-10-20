@@ -62,9 +62,11 @@ export const ICONS: Record<string, string> = {
      its teeth have to touch the ring or it becomes a sun again. */
   settings: 'M3 5.5h2.4M8.6 5.5H17M7 3.9a1.6 1.6 0 1 0 0 3.2 1.6 1.6 0 0 0 0-3.2M3 10h6.4M12.6 10H17M11 8.4a1.6 1.6 0 1 0 0 3.2 1.6 1.6 0 0 0 0-3.2M3 14.5h2.4M8.6 14.5H17M7 12.9a1.6 1.6 0 1 0 0 3.2 1.6 1.6 0 0 0 0-3.2',
 
-  /* The only directional glyph in the set, and it points DOWN because its one
-     caller opens a menu below itself. */
+  /* Two directional glyphs, and each has one job: down opens a menu below
+     itself, right says "this opens somewhere else" — the Preferred Suppliers
+     button on the quote setup strip, which opens a dialog rather than a list. */
   'chevron-down': 'M5.5 8 10 12.5 14.5 8',
+  'chevron-right': 'M8 5.5 12.5 10 8 14.5',
   /* The View glyph on a grid row. An outline eye, which is what the live system
      uses and what the customer asked to have back on 13 October. Drawn as one
      lens plus a pupil so it stays legible at 16px without a fill. */

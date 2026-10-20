@@ -1,4 +1,5 @@
 import type { PrimaryProvider } from '../../../data/bom';
+import { sameSuppliers, type SupplierSetup } from '../../../data/suppliers';
 
 /**
  * Everything the four steps share.
@@ -63,6 +64,17 @@ export type RunConfig = {
   attritionSet: number;
 
   provider: PrimaryProvider;
+  /** None / Low / OK — how much over-ordering an MOQ may force. */
+  excessMoq: string;
+  /**
+   * Which suppliers this quote will use, and in what priority.
+   *
+   * A copy of the master, taken when the run starts. It lives on the config
+   * rather than in a store because it is part of what the results were computed
+   * from — the same reason Build Qty is here — and a draft resumed next week
+   * has to price the way it priced when it was saved.
+   */
+  suppliers: SupplierSetup;
 };
 
 /**
@@ -136,20 +148,28 @@ export function step1Error(cfg: RunConfig): string | null {
    there is nothing to hold back.
    ======================================================================== */
 export const SETUP_KEYS = [
-  'buildQty', 'attritionSet', 'quoteFocus', 'markup', 'materialPackageType', 'provider',
+  'buildQty', 'attritionSet', 'quoteFocus', 'markup', 'materialPackageType',
+  'excessMoq', 'provider',
 ] as const;
 
-export type QuoteSetup = Pick<RunConfig, (typeof SETUP_KEYS)[number]>;
+/** The scalar fields, plus the supplier list — which is a setting too, and the
+ *  one that changes the answer most. */
+export type QuoteSetup = Pick<RunConfig, (typeof SETUP_KEYS)[number]> & {
+  suppliers: SupplierSetup;
+};
 
 export function setupOf(cfg: RunConfig): QuoteSetup {
   return {
     buildQty: cfg.buildQty, attritionSet: cfg.attritionSet,
     quoteFocus: cfg.quoteFocus, markup: cfg.markup,
-    materialPackageType: cfg.materialPackageType, provider: cfg.provider,
+    materialPackageType: cfg.materialPackageType, excessMoq: cfg.excessMoq,
+    provider: cfg.provider, suppliers: cfg.suppliers,
   };
 }
 
-/** Compared as strings: `markup` arrives from a number field as either. */
+/** Compared as strings: `markup` arrives from a number field as either. The
+ *  supplier list is compared field by field — see `sameSuppliers`. */
 export function setupChanged(a: QuoteSetup, b: QuoteSetup): boolean {
-  return SETUP_KEYS.some(k => String(a[k]) !== String(b[k]));
+  return SETUP_KEYS.some(k => String(a[k]) !== String(b[k]))
+    || !sameSuppliers(a.suppliers, b.suppliers);
 }

@@ -24,6 +24,11 @@
 import { CUSTOMER_MASTER } from './quotations';
 import { fmtMoney } from '../ui/regional';
 
+import {
+  MASTER_GROUP, SUPPLIERS,
+  type SupplierId, type SupplierSetup,
+} from './suppliers';
+
 export type PartSource = 'MAKE' | 'BUY' | 'MAKE/PHANT' | 'FLRSTK' | 'MAKE/BUY' | 'PACKAGING';
 
 /**
@@ -35,6 +40,23 @@ export type PartSource = 'MAKE' | 'BUY' | 'MAKE/PHANT' | 'FLRSTK' | 'MAKE/BUY' |
  *   NO BID  excluded from the quote, or unselected when leaving step 3 — grey
  */
 export type LineStatus = 'N/A' | 'NO' | 'COVER' | 'NO BID';
+
+/**
+ * One supplier's terms for one part.
+ *
+ * `pkg` matters as much as price here: the Material Package Type setting asks
+ * for reels or cut tape, and a supplier offering the wrong one is a worse
+ * answer at any price — which is why the sort puts it ahead of cost.
+ */
+export type Offer = {
+  supplier: SupplierId;
+  unitPrice: number;
+  stock: number;
+  moq: number;
+  pkg: string;
+  /** Lead time in days. */
+  lt: number;
+};
 
 export type BomLine = {
   id: number;
@@ -64,6 +86,18 @@ export type BomLine = {
   alternates: { mfg: string; mpn: string }[];
 
   /* ---- Quoting ---------------------------------------------------------- */
+  /**
+   * What each supplier will sell this part for, and on what terms.
+   *
+   * ONE PRICE PER PART was the model until 20 Oct, and it made the screen's
+   * central decision undecidable: Quote Focus could not prefer availability
+   * over cost when there was one of each. The customer's Quoting BoM mockup
+   * carries a price list per line and an algorithm that walks it, so the line
+   * carries one too. `runQuote` chooses from these; the Supplier dropdown
+   * offers them; the price, stock, MOQ and lead time below are a copy of
+   * whichever offer won, kept flat because every column in step 3 reads them.
+   */
+  offers: Offer[];
   attrition: number;
   supplier: string;
   orderQty: number;
@@ -238,8 +272,75 @@ const SEEDS: Seed[] = [
  * until the run happens, and seeding them would make step 3 look as if the
  * quote had already been run.
  */
+/* Display name back to id, so a seed written in the customer's own vocabulary
+   ("Digi-Key") lands on the supplier the setup is keyed by. */
+const SUPPLIER_ID = Object.fromEntries(
+  Object.entries(SUPPLIERS).map(([id, name]) => [name, id]),
+) as Record<string, SupplierId>;
+
+const GROUP1 = Object.keys(MASTER_GROUP).filter(id => MASTER_GROUP[id] === 1);
+const GROUP2 = Object.keys(MASTER_GROUP).filter(id => MASTER_GROUP[id] === 2);
+
+/**
+ * The price list for one part.
+ *
+ * DERIVED FROM THE SEED, not invented beside it: the seed's own supplier keeps
+ * the seed's exact numbers, so the figures this prototype has shown since
+ * September are still in the list. The other two are the shapes the algorithm
+ * exists to choose between, and between them they make every setting on the
+ * setup strip change the answer:
+ *
+ *   a cut-tape source    MOQ 1, dearer per piece, thin stock. The only offer
+ *                        that survives Excess and MOQ = None or Low, because a
+ *                        5,000-piece reel against a 2,400-piece build is excess
+ *                        by any reading of the word.
+ *   a group-2 source     cheaper per piece, four times the MOQ. Wins under OK
+ *                        with Stock-Low cost, loses under Production.
+ *
+ * A SUPPLIER WITH NO PRIORITY GROUP GETS THE LINE TO ITSELF. The aluminium
+ * bracket comes from a machine shop, not a distributor, and there is no second
+ * source for it — so that line carries one offer from a supplier auto-pick is
+ * not allowed to reach. It arrives red, and a quoter chooses it by hand out of
+ * the dropdown's second list. That is the preferred/approved distinction doing
+ * its job rather than being described.
+ *
+ * A seed with no supplier gets no offers at all. Those three lines are the ones
+ * the guideline wants arriving as "No Bid", and a price list would take that
+ * away.
+ */
+function offersFor(s: Seed, i: number): Offer[] {
+  const own = SUPPLIER_ID[s.supplier];
+  if (!own) return [];
+  const round = (n: number) => Number(n.toFixed(6));
+  const mine: Offer = {
+    supplier: own, unitPrice: s.unitPrice, stock: s.stock, moq: s.moq, pkg: s.pkg, lt: s.lt,
+  };
+  if (!MASTER_GROUP[own]) return [mine];
+
+  const pick = (pool: string[]) => {
+    const others = pool.filter(id => id !== own);
+    return others[i % others.length];
+  };
+  return [
+    mine,
+    /* CUT TAPE IS STOCKED IN THE LOW THOUSANDS, whatever the reel count says —
+       a distributor cuts from a reel it has opened. The cap is what makes
+       Excess and MOQ a real setting rather than a decorative one: below it the
+       quote takes cut tape and carries no excess, above it the only offer left
+       is a reel, and under None or Low that offer is refused and the line comes
+       back for a decision. Switching to OK buys the reel and shows the excess
+       it costs, which is the trade the setting exists to put in front of
+       somebody. */
+    { supplier: pick(GROUP1), unitPrice: round(s.unitPrice * 1.35),
+      stock: Math.min(s.stock, 2500), moq: 1, pkg: 'Cut Tape', lt: s.lt + 2 },
+    { supplier: pick(GROUP2), unitPrice: round(s.unitPrice * 0.85),
+      stock: s.stock * 2, moq: s.moq > 1 ? s.moq * 4 : 1, pkg: s.pkg, lt: s.lt + 5 },
+  ];
+}
+
 export function buildBomLines(): BomLine[] {
   return SEEDS.map((s, i) => ({
+    offers: offersFor(s, i),
     id: i + 1,
     number: i + 1,
     part: s.part,
@@ -278,8 +379,145 @@ export function buildBomLines(): BomLine[] {
  * Here, Z2data resolves one part Nexar does not, which is the only observable
  * difference a mockup can honestly offer.
  */
-export function runQuote(lines: BomLine[], buildQty: number, attritionSet: number,
-                         provider: PrimaryProvider, quoteFocus?: string): BomLine[] {
+/** Everything the run needs to decide. Named rather than positional: there are
+ *  seven of them now and two are objects. */
+export type QuoteRules = {
+  buildQty: number;
+  attritionSet: number;
+  provider: PrimaryProvider;
+  quoteFocus: string;
+  materialPackageType: string;
+  /** How much over-ordering the MOQ is allowed to force. */
+  excessMoq: string;
+  suppliers: SupplierSetup;
+};
+
+/** A supplier's offer, measured against what this line actually needs. */
+type Candidate = {
+  offer: Offer;
+  group: number;
+  orderQty: number;
+  excess: number;
+  stockOk: boolean;
+  pkgOk: boolean;
+};
+
+/* "Reels", "$50 Reels" and "$25 Reels" all ask for a reel; the price in the
+   label is the reel charge, not a different packaging. */
+const wantsReel = (setting: string) => /reel/i.test(setting);
+
+/**
+ * Which offer the quote takes, and why.
+ *
+ * STRAIGHT FROM THE CUSTOMER'S MOCKUP of 16 Oct, which is the first document
+ * that states the rule rather than describing the screen:
+ *
+ *   "Walk priority groups: the first group that has a supplier with enough
+ *    stock wins" — then, inside that group, Quote Focus decides.
+ *
+ * The order matters and is not arbitrary. A franchised distributor who can
+ * cover the build beats a cheaper one who cannot, because a shortfall is a
+ * schedule problem and a few cents is not. Only when NO group can cover does
+ * price lead, and the line is flagged NO so the shortfall is visible.
+ */
+function chooseOffer(line: BomLine, total: number, rules: QuoteRules): Candidate | null {
+  const setup = rules.suppliers;
+  const evaluate = (offer: Offer): Candidate => {
+    const orderQty = Math.max(total, offer.moq);
+    return {
+      offer,
+      /* 9, not 3: a supplier with no priority group is approved rather than
+         preferred, and sorting it after both groups is how "auto-pick never
+         reaches it, you may still choose it by hand" is expressed. */
+      group: setup[offer.supplier]?.group ?? 9,
+      orderQty,
+      excess: orderQty - total,
+      stockOk: offer.stock >= orderQty,
+      pkgOk: wantsReel(rules.materialPackageType) === /reel/i.test(offer.pkg),
+    };
+  };
+
+  const byName = (a: Candidate, b: Candidate) =>
+    SUPPLIERS[a.offer.supplier].localeCompare(SUPPLIERS[b.offer.supplier]);
+
+  /* EXCESS AND MOQ, the customer's own three settings. "None" takes only an
+     offer whose MOQ it can use exactly; "Low" tolerates a quarter over; "OK"
+     does not care. A reel of 5,000 against a build of 500 is the single
+     biggest source of quoted cost in this product, which is why it is a
+     setting and not a constant. */
+  const withinExcess = (c: Candidate) =>
+    rules.excessMoq === 'OK' ? true
+      : rules.excessMoq === 'Low' ? c.excess <= Math.ceil(total * 0.25)
+        : c.excess === 0;
+
+  const usable = line.offers
+    .filter(o => setup[o.supplier]?.on)
+    .map(evaluate)
+    .filter(withinExcess);
+  if (!usable.length) return null;
+
+  const sort: Record<string, (a: Candidate, b: Candidate) => number> = {
+    /* Availability first, then the shortest wait, then price. */
+    'Production-Competitive Cost': (a, b) =>
+      Number(b.stockOk) - Number(a.stockOk) || a.offer.lt - b.offer.lt
+      || a.offer.unitPrice - b.offer.unitPrice || byName(a, b),
+    /* Stock on the shelf in the packaging asked for, cost accepted. */
+    'Stock-High cost': (a, b) =>
+      Number(b.pkgOk) - Number(a.pkgOk) || b.offer.unitPrice - a.offer.unitPrice || byName(a, b),
+    /* Same, but the cheapest ORDER rather than the cheapest piece — a low unit
+       price on a reel four times too big is not the cheaper answer. */
+    'Stock-Low cost': (a, b) =>
+      Number(b.pkgOk) - Number(a.pkgOk)
+      || a.orderQty * a.offer.unitPrice - b.orderQty * b.offer.unitPrice || byName(a, b),
+  };
+  const within = sort[rules.quoteFocus] ?? sort['Production-Competitive Cost'];
+
+  for (const g of [...new Set(usable.map(c => c.group))].sort((a, b) => a - b)) {
+    const covered = usable.filter(c => c.group === g && c.stockOk).sort(within);
+    if (covered.length) return covered[0];
+  }
+  /* Nobody can cover it. Still choose — the quote needs a price and the line
+     needs to say what is wrong — and let the shortfall mark it NO. */
+  return [...usable].sort((a, b) => a.group - b.group || within(a, b))[0];
+}
+
+/** The terms of one offer, written onto the line's flat quoting fields. */
+function priceFrom(line: BomLine, c: Candidate, total: number): BomLine {
+  const excessQty = Math.max(0, c.orderQty - total);
+  const outStock = Math.max(0, c.orderQty - c.offer.stock);
+  return {
+    ...line,
+    supplier: SUPPLIERS[c.offer.supplier],
+    unitPrice: c.offer.unitPrice,
+    stock: c.offer.stock,
+    outStock,
+    lt: c.offer.lt,
+    pkg: c.offer.pkg,
+    moq: c.offer.moq,
+    orderQty: c.orderQty,
+    excessQty,
+    amount: c.offer.unitPrice * c.orderQty,
+    excessAmt: c.offer.unitPrice * excessQty,
+    /* A shortfall is what makes a line NO; everything else that priced is
+       COVER. */
+    status: (outStock > 0 ? 'NO' : 'COVER') as LineStatus,
+  };
+}
+
+/** Re-price one line against an offer the user picked by hand. */
+export function pickSupplier(line: BomLine, supplier: SupplierId,
+                             buildQty: number, attritionSet: number): BomLine {
+  const offer = line.offers.find(o => o.supplier === supplier);
+  if (!offer) return line;
+  const total = totalQtyOf(line, buildQty, attritionSet);
+  const orderQty = Math.max(total, offer.moq);
+  return priceFrom(line, {
+    offer, group: MASTER_GROUP[supplier] ?? 9, orderQty,
+    excess: orderQty - total, stockOk: offer.stock >= orderQty, pkgOk: true,
+  }, total);
+}
+
+export function runQuote(lines: BomLine[], rules: QuoteRules): BomLine[] {
   /* "Other: Allows the user to manually select suppliers; the system will not
      auto-select suppliers in Step 3 - Run Quote."
 
@@ -294,59 +532,49 @@ export function runQuote(lines: BomLine[], buildQty: number, attritionSet: numbe
      Status = N/A". Under Other the red grid is not a failure report — it is the
      to-do list, and the Unselected Supplier filter counts it down.
 
-     A supplier already chosen SURVIVES this. Apply re-runs the pricing, and
-     wiping the manual selections it exists to support would make the button
-     destroy the work of the mode. */
-  const manual = quoteFocus === 'OTHER';
+     A supplier already chosen SURVIVES this. Update Results re-runs the
+     pricing, and wiping the manual selections it exists to support would make
+     the button destroy the work of the mode. */
+  const manual = rules.quoteFocus === 'OTHER';
 
   return lines.map(line => {
     if (line.excluded) {
       /* "Excluded BOM lines have Status = NO BID" and carry no pricing. */
       return { ...line, status: 'NO BID' as LineStatus, supplier: '', unitPrice: 0, amount: 0 };
     }
-    const seed = SEEDS[line.id - 1];
-    /* Z2data finds the 22uF cap that Nexar does not. */
-    const auto = seed.supplier || (provider === 'Z2data' && line.part === 'CAP-1206-22U' ? 'Arrow' : '');
-    /* Under Other the only supplier a line can have is one the user picked.
-       The price is still the seed's: this mock holds one price per part, so
-       choosing a different supplier changes WHO, not HOW MUCH. Prices that
-       differ by supplier belong to the supplier dropdown — the control that
-       carries UP, MOQ, Stock and LT per supplier — which is recorded as
-       deliberately unbuilt in docs/testing/quick-quote-results.md. */
-    const found = manual ? line.supplier : auto;
-    if (!found) {
-      return { ...line, status: 'N/A' as LineStatus, supplier: '', orderQty: 0, moq: 0,
+    const total = totalQtyOf(line, rules.buildQty, rules.attritionSet);
+
+    /* Z2data finds the 22uF cap that Nexar does not — the one line in this set
+       where the provider changes what comes back, kept because it is the only
+       thing on screen that makes the Primary Provider setting observable. */
+    const offers = line.offers.length === 0
+      && rules.provider === 'Z2data' && line.part === 'CAP-1206-22U'
+      ? [{ supplier: 'arrow', unitPrice: 0.31, stock: 14000, moq: 2000, pkg: 'Reel', lt: 9 }]
+      : line.offers;
+
+    if (manual) {
+      /* Keep whatever the user picked; price it if it is a real offer. */
+      const held = offers.find(o => SUPPLIERS[o.supplier] === line.supplier);
+      if (!held) {
+        return { ...line, status: 'N/A' as LineStatus, supplier: '', orderQty: 0, moq: 0,
+                 excessQty: 0, excessAmt: 0, stock: 0, lt: 0, pkg: '', unitPrice: 0, amount: 0 };
+      }
+      const orderQty = Math.max(total, held.moq);
+      return priceFrom({ ...line, offers }, {
+        offer: held, group: rules.suppliers[held.supplier]?.group ?? 9, orderQty,
+        excess: orderQty - total, stockOk: held.stock >= orderQty, pkgOk: true,
+      }, total);
+    }
+
+    const chosen = chooseOffer({ ...line, offers }, total, rules);
+    if (!chosen) {
+      /* No offer survived the supplier list and the excess policy. Both are
+         the user's own settings, so this is a result rather than a failure —
+         and the red row with Status = N/A is where they see it. */
+      return { ...line, offers, status: 'N/A' as LineStatus, supplier: '', orderQty: 0, moq: 0,
                excessQty: 0, excessAmt: 0, stock: 0, lt: 0, pkg: '', unitPrice: 0, amount: 0 };
     }
-    const unitPrice = seed.unitPrice || 0.052;
-    const stock = seed.stock || 12000;
-    const moq = seed.moq;
-    const total = totalQtyOf(line, buildQty, attritionSet);
-
-    /* Order at least the MOQ, and at least what is needed. What that overshoots
-       by is the excess — the number the whole Excess column exists to show. */
-    const orderQty = Math.max(total, moq);
-    const excessQty = Math.max(0, orderQty - total);
-    /* Stock the supplier cannot cover. A shortfall is what makes a line NO. */
-    const outStock = Math.max(0, orderQty - stock);
-    const status: LineStatus = outStock > 0 ? 'NO' : 'COVER';
-
-    return {
-      ...line,
-      supplier: found,
-      unitPrice,
-      stock,
-      outStock,
-      lt: seed.lt || 15,
-      pkg: seed.pkg || 'Cut Tape',
-      moq,
-      orderQty,
-      excessQty,
-      amount: unitPrice * orderQty,
-      excessAmt: unitPrice * excessQty,
-      status,
-      notes: line.notes,
-    };
+    return priceFrom({ ...line, offers }, chosen, total);
   });
 }
 

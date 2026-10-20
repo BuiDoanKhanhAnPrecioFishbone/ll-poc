@@ -4,12 +4,14 @@ import { saveDraftQuote, type DraftQuote } from '../../data/draftQuotes';
 import { Dialog } from '../../ui/Overlays';
 import { Button } from '../../ui/Button';
 import { ConfirmDialog } from '../../ui/ConfirmDialog';
+import { masterSuppliers } from '../../data/suppliers';
 import { Stepper } from '../../ui/Stepper';
 import { useToast } from '../../ui/Toast';
 import type { Quotation } from '../../data/quotations';
 import { ME } from '../../data/queues';
 import {
-  buildBomLines, runQuote, totalQtyOf, money, type BomLine, type LineStatus,
+  buildBomLines, runQuote, totalQtyOf, money,
+  type BomLine, type LineStatus, type QuoteRules,
 } from '../../data/bom';
 import { StepConfigBom } from './run/StepConfigBom';
 import { StepReviewBom } from './run/StepReviewBom';
@@ -95,7 +97,10 @@ export function RunQuotationDialog({ q, onClose, resume }: {
     /* Both default to 1, stated for each on step 1. */
     buildQty: 1,
     attritionSet: 1,
+    excessMoq: q.excessAndMoq,
     provider: 'Nexar',
+    /* A copy of the supplier master, which is where every quote starts. */
+    suppliers: masterSuppliers(),
   }) as RunConfig);
   /**
    * Step 1's setter, and it writes BOTH copies.
@@ -191,6 +196,13 @@ export function RunQuotationDialog({ q, onClose, resume }: {
      All three apply the pending setup first, because applying it is what makes
      the grid agree with the strip above it. */
 
+  /** The config, as the quote engine reads it. */
+  const rulesOf = (c: RunConfig): QuoteRules => ({
+    buildQty: c.buildQty, attritionSet: c.attritionSet, provider: c.provider,
+    quoteFocus: c.quoteFocus, materialPackageType: c.materialPackageType,
+    excessMoq: c.excessMoq, suppliers: c.suppliers,
+  });
+
   /** Move the pending setup into the config the grid reads. */
   function applyPending(): RunConfig {
     const next = { ...cfg, ...pending };
@@ -208,7 +220,7 @@ export function RunQuotationDialog({ q, onClose, resume }: {
    */
   function getPrices() {
     const next = applyPending();
-    setLines(ls => runQuote(ls, next.buildQty, next.attritionSet, next.provider, next.quoteFocus));
+    setLines(ls => runQuote(ls, rulesOf(next)));
     setHasRun(true);
     setRunVersion(v => v + 1);
     const at = new Date();
@@ -236,7 +248,7 @@ export function RunQuotationDialog({ q, onClose, resume }: {
   function updateResults() {
     const next = applyPending();
     if (!hasRun) { toast.success('Quantities updated.'); return; }
-    setLines(ls => runQuote(ls, next.buildQty, next.attritionSet, next.provider, next.quoteFocus));
+    setLines(ls => runQuote(ls, rulesOf(next)));
     toast.success('Results updated from the prices already loaded.');
   }
 
@@ -444,6 +456,8 @@ export function RunQuotationDialog({ q, onClose, resume }: {
              comes out of the same formula as every other line rather than
              being stored separately. */
           partSource: 'PACKAGING', qty: p.qty, level: 1,
+          /* Priced by hand on step 4, so it has no marketplace offers. */
+          offers: [],
           mfg: p.mfg, mpn: p.mpn,
           /* A packaging line is bought as specified; there is no second source
              to offer, so it carries no alternates. */

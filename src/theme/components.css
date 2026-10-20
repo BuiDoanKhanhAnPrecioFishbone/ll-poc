@@ -1262,12 +1262,29 @@
 
 /* ---- The facts carried from step to step -------------------------------- */
 .vy-quote-context {
-  display: flex; flex-wrap: wrap; align-items: center;
-  gap: var(--vy-space-4) var(--vy-space-8);
   padding: var(--vy-space-4) var(--vy-space-6);
   background: var(--vy-surface-app);
   border: 1px solid var(--vy-border);
   border-radius: var(--vy-shape-md);
+}
+/* The assembly, as a heading above the settings rather than as two more boxes
+   in the row — see QuoteContext.tsx. */
+.vy-quote-context-head {
+  display: flex; align-items: baseline; gap: var(--vy-space-5);
+  margin: 0 0 var(--vy-space-3); min-width: 0;
+  font-size: var(--vy-text-sm); color: var(--vy-on-surface-muted);
+}
+/* NOT MONO. The standard asks for mono on part numbers and the 8 Oct review
+   ruled it out — "do not use monotext, hard to read" — and that contradiction
+   is question 1 in the customer document. Until it is answered this reads like
+   every other identifier in the product: the body face, with `tabular-nums`. */
+.vy-quote-context-head strong {
+  color: var(--vy-on-surface-strong); font-variant-numeric: tabular-nums;
+}
+.vy-quote-context-head span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vy-quote-context-fields {
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: var(--vy-space-4) var(--vy-space-8);
 }
 /* Label above value, and MEASURED BOTH WAYS on 6 Oct: beside it, the two wide
    facts pushed the strip from one row to two and it grew to 93px. Stacked it is
@@ -1331,6 +1348,61 @@
 }
 .vy-quote-fact[data-changed] .k-input-inner { color: var(--vy-brand-text-deep); }
 .vy-quote-fact[data-changed] .vy-quote-fact-label { color: var(--vy-brand-text); }
+
+/* ---- Preferred Suppliers -------------------------------------------------
+   The strip's button, and the dialog it opens. The button is a field like the
+   ones beside it — label above, value below — so a setting that happens to
+   need a dialog still reads as part of the setup rather than as an action. */
+.vy-quote-fact--sup { inline-size: var(--vy-quote-sup-w); flex: 0 0 auto; }
+.vy-sup-btn {
+  display: flex; align-items: center; gap: var(--vy-space-3);
+  inline-size: 100%; block-size: var(--vy-control-md);
+  padding-inline: var(--vy-space-5);
+  font: inherit; text-align: start; cursor: pointer;
+  color: var(--vy-on-surface-strong);
+  background: var(--vy-surface);
+  border: 1px solid var(--vy-border-control); border-radius: var(--vy-shape-sm);
+}
+.vy-sup-btn-value { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vy-sup-btn:hover { border-color: var(--vy-border-heavy); }
+.vy-sup-btn:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
+.vy-quote-fact--sup[data-changed] .vy-sup-btn {
+  background: var(--vy-brand-subtle); border-color: var(--vy-brand-boundary-strong);
+  color: var(--vy-brand-text-deep); font-weight: var(--vy-weight-medium);
+}
+
+.vy-sup-top { display: flex; align-items: center; gap: var(--vy-space-6); margin-bottom: var(--vy-space-6); }
+.vy-sup-count { font-size: var(--vy-text-sm); color: var(--vy-on-surface-muted); white-space: nowrap; }
+.vy-sup-list { display: flex; flex-direction: column; gap: var(--vy-space-7); }
+.vy-sup-group-head {
+  display: flex; align-items: center; gap: var(--vy-space-5);
+  padding-block-end: var(--vy-space-3);
+  border-bottom: 1px solid var(--vy-border);
+}
+/* "Use all" sits at the end of its own row, away from the two labels it would
+   otherwise read as a third of. */
+.vy-sup-group-head .vy-check { margin-inline-start: auto; }
+.vy-sup-row {
+  display: flex; align-items: center; gap: var(--vy-space-4);
+  padding-block: var(--vy-space-3);
+  border-bottom: 1px solid var(--vy-border-faint);
+}
+.vy-sup-row .vy-check { flex: 1; min-width: 0; }
+/* A supplier this quote has moved or dropped. Amber, not blue: unlike the
+   setup fields above, this is not "changed since the last run" — it is a
+   standing departure from the company's own list, and it stays marked. */
+.vy-sup-row[data-changed] { background: var(--vy-tone-known-mfg-bg); }
+.vy-sup-row[data-off] .vy-check { color: var(--vy-on-surface-muted); }
+.vy-sup-tag {
+  font-size: var(--vy-text-xs); color: var(--vy-on-surface-muted);
+  background: var(--vy-surface); border: 1px solid var(--vy-border);
+  border-radius: var(--vy-shape-full); padding: 1px var(--vy-space-4); white-space: nowrap;
+}
+.vy-sup-row .vy-select { inline-size: var(--vy-sup-group-w); flex: 0 0 auto; }
+.vy-sup-empty { font-size: var(--vy-text-sm); color: var(--vy-on-surface-muted); margin: var(--vy-space-4) 0 0; }
+/* Reset to Master undoes rather than commits, so it sits away from the two
+   buttons that end the dialog. */
+.vy-dialog-action-start { margin-inline-end: auto; }
 
 /* ---- How old the prices are ---------------------------------------------
    Sits with the button that renews them. Quiet by default, because a fresh
