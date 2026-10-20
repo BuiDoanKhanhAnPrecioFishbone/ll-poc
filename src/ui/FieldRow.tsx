@@ -98,13 +98,16 @@ export function FieldRow({
 /**
  * The required marker.
  *
- * Rendered as the live system writes it — a trailing `(*)` — rather than the
- * more usual bare asterisk, because that is the convention users here have
- * learned and the customer's requirements do not ask for it to change.
+ * A BARE `*`, since 20 Oct. It was `(*)` — the live system's spelling, which we
+ * followed as tier-2 evidence while the written requirement said nothing. It
+ * does say something now, twice: the standard asks for a red `*`, and the
+ * Quoting BoM mockup of 16 Oct writes `{label}{req && <span className="req">*
+ * </span>}`. A written requirement outranks the live screen, so the parentheses
+ * go.
  *
- * `aria-hidden` on the glyph with the word "required" for screen readers: a
- * reader announcing "open paren star close paren" is noise, and the field also
- * carries `aria-required` where it is a real control.
+ * `aria-hidden` on the glyph with the word "required" for screen readers: an
+ * asterisk read aloud is noise, and the field also carries `aria-required`
+ * where it is a real control.
  *
  * Lives here rather than in `RecordField` so that the row and its marker are
  * one import, and so `ui/` does not depend on `components/`.
@@ -112,7 +115,7 @@ export function FieldRow({
 export function RequiredMark() {
   return (
     <>
-      <span className="vy-required" aria-hidden>(*)</span>
+      <span className="vy-required" aria-hidden>*</span>
       <span className="vy-sr-only"> required</span>
     </>
   );

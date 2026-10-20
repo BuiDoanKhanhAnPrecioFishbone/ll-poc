@@ -206,8 +206,8 @@ export function StepReviewBom({ cfg, set, lines, setLines }: {
         search={search} onSearch={setSearch}
         placeholder="Search by Part / Description / MPN / MFG"
         filters={[
-          { key: 'exclude', label: 'Is Exclude?', on: isExclude, onToggle: setIsExclude },
-          { key: 'mfg', label: 'Missing Manufacturer', on: missingMfg, onToggle: setMissingMfg },
+          { key: 'exclude', label: 'Excluded Only', on: isExclude, onToggle: setIsExclude },
+          { key: 'mfg', label: 'Manufacturer Not Verified', on: missingMfg, onToggle: setMissingMfg },
         ]}
       />
 
@@ -222,15 +222,6 @@ export function StepReviewBom({ cfg, set, lines, setLines }: {
           A legend is the cheap half of the fix. The other half is already
           here: every coloured cell and chip carries a `title` saying what it
           means in words. */}
-      <ul className="vy-tone-legend">
-        <li><span className="vy-tone-key" data-tone="known" aria-hidden />
-          Part is in Part Master</li>
-        <li><span className="vy-tone-key" data-tone="known-mfg" aria-hidden />
-          Manufacturer is in Manufacturer Management</li>
-        <li><span className="vy-tone-key" data-tone="missing" aria-hidden />
-          Not on file — create it before confirming this RFQ</li>
-      </ul>
-
       {/* Six frozen columns, as the guideline names them: Number, ROCKET_PN,
           Revision, Part Description, Part Source, Quantity — plus the checkbox
           in front of them, which would be useless scrolled out of view. */}
@@ -248,6 +239,20 @@ export function StepReviewBom({ cfg, set, lines, setLines }: {
         empty={<NoRecords title="No lines match these filters."
                           hint="Clear the search or a filter above to see the rest of the BoM." />}
       />
+
+      {/* THE LEGEND SITS UNDER THE GRID, since 20 Oct. It was above it, which
+          put a key to the colours before the reader had seen one. The standard
+          puts it in the grid's footer and the Quoting BoM mockup of 16 Oct
+          renders it there too — after `</table>`, in a `gfoot` — so the
+          question we had listed for her is answered and this follows it. */}
+      <ul className="vy-tone-legend">
+        <li><span className="vy-tone-key" data-tone="known" aria-hidden />
+          Part is in Part Master</li>
+        <li><span className="vy-tone-key" data-tone="known-mfg" aria-hidden />
+          Manufacturer is in Manufacturer Management</li>
+        <li><span className="vy-tone-key" data-tone="missing" aria-hidden />
+          Not on file — create it before confirming this RFQ</li>
+      </ul>
 
       {/* ONE LINE. Two lines of explanation under a table is two rows of the
           table, and this sentence is read once and then never again. */}

@@ -161,7 +161,7 @@ export function StepQuoting({ cfg, set, lines, setLines, hasRun, onRun, onApply,
         placeholder="Search by Part / Description / MPN / MFG / Supplier"
         filters={[
           { key: 'sup', label: 'Unselected Supplier', on: noSupplier, onToggle: setNoSupplier },
-          { key: 'qty', label: 'Not enough qty', on: notEnough, onToggle: setNotEnough },
+          { key: 'qty', label: 'Not Enough Qty', on: notEnough, onToggle: setNotEnough },
           { key: 'att', label: 'Missing Attrition', on: missingAttr, onToggle: setMissingAttr },
         ]}
       />

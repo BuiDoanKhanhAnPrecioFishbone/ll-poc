@@ -93,9 +93,9 @@ export function StepSummary({ cfg, lines, run, onAddPackage, setLines }: {
         search={search} onSearch={setSearch}
         placeholder="Search by Part / Description / MPN / MFG / Supplier"
         filters={[
-          { key: 'nobid', label: 'No bid', on: noBid, onToggle: setNoBid },
-          { key: 'qty', label: 'Not enough qty', on: notEnough, onToggle: setNotEnough },
-          { key: 'excess', label: 'Excess qty', on: excess, onToggle: setExcess },
+          { key: 'nobid', label: 'No Bid', on: noBid, onToggle: setNoBid },
+          { key: 'qty', label: 'Not Enough Qty', on: notEnough, onToggle: setNotEnough },
+          { key: 'excess', label: 'Excess Qty', on: excess, onToggle: setExcess },
         ]}
       />
 
