@@ -111,3 +111,45 @@ export function step1Error(cfg: RunConfig): string | null {
     : labels[0];
   return `Please fill in ${named}`;
 }
+
+/* ===========================================================================
+   THE QUOTE SETUP — the fields the results were computed from
+   ---------------------------------------------------------------------------
+   ASKED FOR by the Quoting BoM mockup of 16 Oct, which separates two things
+   this wizard had kept as one: `stg`, "setup the current result uses", and
+   `pend`, "setup shown in Quoting; applied only by Get Prices / Update Results
+   / Refresh Prices". Its rule, written twice in that file:
+
+     "Quantities and prices follow the applied setup only. Editing the setup
+      never recalculates anything."
+
+   Our own guideline said the same thing about two of these fields in August —
+   "If the user changes these values but does not click Apply, the changes are
+   not saved or carried to the next steps" — and step 3's comment claimed we
+   held pending values apart. We did not: Build Qty wrote straight into the
+   config and the grid's Total Qty moved under the reader's hands, which is the
+   one thing a priced grid must not do. A number that changes without being
+   asked to is a number nobody can quote from.
+
+   SIX FIELDS, not the whole config. The rest of `RunConfig` — which BoM, which
+   template, the assembly — is settled on step 1 and cannot be edited later, so
+   there is nothing to hold back.
+   ======================================================================== */
+export const SETUP_KEYS = [
+  'buildQty', 'attritionSet', 'quoteFocus', 'markup', 'materialPackageType', 'provider',
+] as const;
+
+export type QuoteSetup = Pick<RunConfig, (typeof SETUP_KEYS)[number]>;
+
+export function setupOf(cfg: RunConfig): QuoteSetup {
+  return {
+    buildQty: cfg.buildQty, attritionSet: cfg.attritionSet,
+    quoteFocus: cfg.quoteFocus, markup: cfg.markup,
+    materialPackageType: cfg.materialPackageType, provider: cfg.provider,
+  };
+}
+
+/** Compared as strings: `markup` arrives from a number field as either. */
+export function setupChanged(a: QuoteSetup, b: QuoteSetup): boolean {
+  return SETUP_KEYS.some(k => String(a[k]) !== String(b[k]));
+}

@@ -9,7 +9,7 @@ import {
   costSummary, totalQtyOf, money, money3,
   type BomLine, type LineStatus,
 } from '../../../data/bom';
-import type { RunConfig } from './state';
+import { setupOf, type RunConfig } from './state';
 
 const STATUSES: LineStatus[] = ['COVER', 'NO', 'N/A', 'NO BID'];
 
@@ -58,12 +58,7 @@ export function StepSummary({ cfg, lines, run, onAddPackage, setLines }: {
       <QuoteContextBar
         assembly={`${cfg.assemblyPartNumber} - ${cfg.partRev}`}
         description={cfg.partDesc}
-        quoteFocus={cfg.quoteFocus}
-        materialPackageType={cfg.materialPackageType}
-        markup={cfg.markup}
-        buildQty={cfg.buildQty}
-        attritionSet={cfg.attritionSet}
-        editable={false}
+        applied={setupOf(cfg)}
         extra={[
           { label: 'Run by', value: run.by },
           { label: 'Run Date', value: run.date },

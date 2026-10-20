@@ -1274,7 +1274,7 @@
    76px, and with the padding below, 60px. */
 .vy-quote-fact { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .vy-quote-fact[data-wide] { flex: 1 1 var(--vy-quote-fact-wide); }
-.vy-quote-fact--input { min-width: var(--vy-quote-qty-w); }
+.vy-quote-fact--input { inline-size: var(--vy-quote-qty-w); min-width: 0; }
 .vy-quote-fact-label {
   font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .05em;
   color: var(--vy-on-surface-subtle); font-weight: var(--vy-weight-medium);
@@ -1296,6 +1296,53 @@
   padding-block: var(--vy-space-2);
 }
 .vy-quote-fact[data-wide] .vy-read-value { min-width: 0; }
+
+/* ---- The setup strip on step 3 ------------------------------------------
+   Six of these facts are controls there, and three rules hold the row
+   together: a select wide enough for its longest option, a NUMBER of them that
+   still fits on one line, and a mark on the ones the user has changed. */
+/* FIXED, AND MEASURED FROM THE LABEL. Content sizing was tried first and is
+   the wrong tool here: a Kendo ComboBox carries a text input whose intrinsic
+   width is its `size` attribute, so `auto` asked for 198px per picker and the
+   strip wrapped to two rows again. These widths fit the longest label —
+   "Material Package Type" needs 152 — and the label degrades to an ellipsis
+   rather than colliding with its neighbour if a translation outgrows it. */
+.vy-quote-fact--pick { inline-size: var(--vy-quote-pick-w); flex: 0 0 auto; }
+.vy-quote-fact--pick[data-wide] { inline-size: var(--vy-quote-pick-wide-w); }
+.vy-quote-fact--pick .vy-select,
+.vy-quote-fact--pick .k-combobox { width: 100%; min-width: 0; }
+.vy-quote-fact-label { overflow: hidden; text-overflow: ellipsis; }
+
+/* CHANGED, NOT WRONG. This field holds an edit the grid below has not been
+   told about — the numbers in it still come from the setup that was applied —
+   so it is marked in the brand blue the 14 Oct standard reserves for "value
+   changed", not in a warning colour. It clears when Update Results or a price
+   request applies it.
+
+   The customer's own mockup paints exactly this: `.fld.chg .inp` takes a blue
+   fill, blue text and a brand border. */
+.vy-quote-fact[data-changed] .vy-input,
+.vy-quote-fact[data-changed] .k-input,
+.vy-quote-fact[data-changed] .k-picker {
+  background: var(--vy-brand-subtle);
+  border-color: var(--vy-brand-boundary-strong);
+  color: var(--vy-brand-text-deep);
+  font-weight: var(--vy-weight-medium);
+}
+.vy-quote-fact[data-changed] .k-input-inner { color: var(--vy-brand-text-deep); }
+.vy-quote-fact[data-changed] .vy-quote-fact-label { color: var(--vy-brand-text); }
+
+/* ---- How old the prices are ---------------------------------------------
+   Sits with the button that renews them. Quiet by default, because a fresh
+   price is not news; amber past a day, which is the line the customer's mockup
+   draws too. */
+.vy-price-age {
+  font-size: var(--vy-text-sm); color: var(--vy-on-surface-subtle);
+  white-space: nowrap; align-self: center;
+}
+.vy-price-age[data-stale] {
+  color: var(--vy-accent-warning); font-weight: var(--vy-weight-medium);
+}
 
 /* ---- Step 1 -------------------------------------------------------------- */
 .vy-quote-config-grid {
@@ -1521,6 +1568,9 @@
 .vy-tone-key[data-tone="known-mfg"] { background: var(--vy-tone-known-mfg-bg); }
 .vy-tone-key[data-tone="pending"] { background: var(--vy-tone-pending-bg); }
 .vy-tone-key[data-tone="missing"] { background: var(--vy-tone-missing-bg); }
+/* Step 3's legend names this one too: a supplier was found but cannot cover
+   the quantity, which is the yellow its rows already carry. */
+.vy-tone-key[data-tone="short"] { background: var(--vy-tone-short-bg); }
 
 /* ---- MFG-MPN (AML) -------------------------------------------------------- */
 /* The field groups around it are an auto-fit grid of columns; a ten-column table

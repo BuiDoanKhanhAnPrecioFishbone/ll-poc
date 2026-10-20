@@ -1,6 +1,6 @@
 # VIQ UI Standard v1.0 — những điểm cần chị quyết
 
-Cập nhật 20/10/2026. Prototype đã theo standard **22 mục, không còn khoảng trống
+Cập nhật 20/10/2026 (bản 2: rút mục 4, thêm mục 22–24 sau khi đọc mockup Quoting BoM 16/10). Prototype đã theo standard **22 mục, không còn khoảng trống
 nào mình biết mà chưa làm**. Phần còn lại nằm trong bốn bảng dưới đây: mỗi dòng
 chị chỉ cần trả lời đồng ý hoặc không, mình làm theo.
 
@@ -16,7 +16,13 @@ bên chị đang ngược nhau**, nên chỉ chị chốt được.
 | 1 | Mã hồ sơ và mã part có dùng mono không? | Standard 14/10: *"JetBrains Mono for record numbers and part numbers"*. Review thiết kế 8/10: *"do not use monotext, hard to read"* — mình đã gỡ mono toàn hệ thống ngày 13/10 | Giữ font body + `tabular-nums`: mọi chữ số cùng bề ngang nên cột số vẫn thẳng hàng — đúng thứ mono được dùng để đạt — mà không mất phần dễ đọc chị đã phản ánh. Đề nghị bỏ dòng mono khỏi standard. Nếu chị vẫn muốn mono ở đâu đó, chỗ đáng nhất là **số hồ sơ trên tiêu đề trang**: một chuỗi, không phải một cột |
 | 2 | Vàng và xanh trong Review BoM | Standard: vàng **chỉ** mang nghĩa cảnh báo, xanh *"not used to colour rows or cells in a normal list"*. Guideline 25/8: *"The background color is displayed in yellow because the manufacturer value already exists in Manufacturer Management"* — tức vàng cho một trạng thái hoàn toàn bình thường | Chỉ tô màu **những trạng thái có vấn đề**: part chưa có trong Part Master, manufacturer chưa nhận diện được. Trạng thái bình thường để trắng. Đo trên màn live ngày 15/10: cột `ROCKET_PN` được tô **13/13 dòng** — một màu mà dòng nào cũng mang thì không còn nói lên điều gì. Cách này vừa đúng standard mới, vừa giữ đỏ cho đúng thứ đang chặn Confirm |
 | 3 | AML: tách cột hay dòng con? | Standard: *"Child lists as rows: one AML pair per row… never MFG 1 / MFG 2 columns"*. Chỉ đạo 15/10: *"each mfg and mfgpn is in different column now"* — mình đã build lại Review BoM theo đúng chỉ đạo này | Hai màn hai việc khác nhau, nên mình đề xuất hai hình khác nhau:<br>· **Step 2 — Review BoM: giữ cột.** Việc của người dùng ở đây là quét dọc xem dòng nào có nguồn thứ hai; chỉ cột mới cho phép quét như vậy.<br>· **Step 3 — Quoting: dòng con**, standard đúng ở màn này: mỗi AML có supplier, order qty và giá riêng.<br>· **Không gộp cặp trong một ô** (bản mình làm 15/10): SAP Fiori ghi rõ ô nhiều giá trị **xuất ra Excel bị rỗng** — với màn mà đầu ra là file Excel thì điều đó loại luôn phương án.<br>Nếu chị muốn một quy tắc chung cho cả hai màn thì dòng con cho cả hai là phương án an toàn hơn, mình sẽ làm lại Review BoM. Chỉ xin chị chốt lần cuối: màn này đã đổi hình ba lần trong ba ngày |
-| 4 | Điều hướng wizard đặt ở đâu? | Standard: `‹ Previous`, `Next ›`, `Save Draft` ở **trên bên trái**, chỉ báo bước ở trên bên phải. Mình **và Voyager bản live**: stepper chạy ngang phía trên, điều hướng ở footer | Giữ ở footer. Footer trong dialog của mình không cuộn — đã đo `modalScrollY: 0` ở 1400×900 — nên Previous và Next luôn với tới được, và nút kết thúc nằm đúng chỗ mắt người dùng dừng lại sau khi điền xong.<br>Quy tắc *"all buttons on the left"* rất đáng giữ cho toolbar của record, nơi các nút tác động lên **dữ liệu**. Điều hướng wizard tác động lên **form**, nên các design system đều tách riêng. Mình đề nghị giữ quy tắc đó cho toolbar và miễn trừ điều hướng wizard.<br>Liên quan: standard ghi "Submit" ở bước cuối. Theo đúng quy tắc *nút gọi tên kết quả* của chính standard, mình đề nghị giữ **Generate Quotation** |
+
+
+**Mục 4 (điều hướng wizard) đã rút khỏi bảng, 20/10.** Mockup *Quoting BoM 16 Oct*
+đặt `Previous` / `Next` / `Save Draft` ở trên bên trái và stepper bên phải, có bản
+chạy được — lần thứ hai chị nói cùng một điều. Mình theo chị, không hỏi lại nữa.
+Riêng chữ "Submit" ở bước cuối mình vẫn đề nghị **Generate Quotation**, theo đúng
+quy tắc *nút gọi tên kết quả* của chính standard.
 
 ---
 
@@ -44,6 +50,14 @@ bên chị đang ngược nhau**, nên chỉ chị chốt được.
 | 15 | Accessibility | Standard viết rất kỹ về mù màu, nhưng chưa nói gì về thứ tự focus và điều hướng bàn phím. Mình đang kiểm **1.068 control trên 10 route** mỗi lần push. Mình soạn mục này cho standard nhé? |
 | 16 | Attachments | Standard ghi rõ nằm ngoài v1.0, nhưng mình đã ship hành vi attachment ở Run Quotation step 1 và ở record. Giữ nguyên bản hiện tại hay đóng băng chờ v1.1? |
 | 17 | *"Status not counted"* trong quy tắc ≤ 3 field | Xin chị liệt kê đủ các field audit không được tính (Created Date, Created By, Updated Date…) |
+
+### Ba câu hỏi mới, từ chính mockup Quoting BoM 16/10
+
+| # | Câu hỏi |
+|---|---|
+| 22 | **Alias MPN được lưu lúc nào?** Chính file của chị ghi: *"Known limitation: when the alias is saved (on pick or on Submit) is not confirmed yet"*. Lưu ngay khi chọn thì một lần bấm nhầm đã thành alias của khách; lưu khi Submit thì bỏ dở quote là mất lựa chọn |
+| 23 | **"Low" của Excess & MOQ = excess ≤ 25% lượng cần mua.** Con số 25% trong `quoteLine()` là cố định hay cấu hình được? Không thấy nó ở tài liệu nào khác |
+| 24 | **Công thức attrition.** `Total = Qty × Build Qty + Attrition × Attrition Set`, với Attrition = **max** của mô tả part và mô tả các AML, người dùng sửa đè được cho riêng quote này. Xin chị xác nhận — nó đổi con số thật trên báo giá |
 
 ---
 

@@ -4,33 +4,56 @@ import { ColumnChooser } from '../../../ui/ColumnChooser';
 import { MiniTable } from '../../../ui/MiniTable';
 import { Button } from '../../../ui/Button';
 import { Select } from '../../../ui/Overlays';
+import { MoreMenu } from '../../../ui/MoreMenu';
 import { TextField } from '../../../ui/Field';
 import type { ColumnSpec } from '../../column-model';
 import { QuoteContextBar, QuoteToolbar, NoRecords } from './QuoteContext';
 import {
-  PRIMARY_PROVIDERS, totalQtyOf, money, money3,
-  type BomLine, type PrimaryProvider,
+  totalQtyOf, money, money3,
+  type BomLine,
 } from '../../../data/bom';
-import type { RunConfig } from './state';
+import { fmtDateTime } from '../../../ui/regional';
+import { setupOf, type QuoteSetup, type RunConfig } from './state';
 
 const SUPPLIERS = ['', 'Digi-Key', 'Mouser', 'Arrow', 'Avnet', 'Farnell', 'TTI'];
 
 /**
  * Step 3 — Quoting.
  *
- * The only step that costs money to run, so nothing here happens implicitly:
- * Run Quote is a button, Apply is a button, and changing Build Qty without
- * pressing Apply changes nothing. The guideline is unusually explicit about
- * that last point — "If the user changes these values but does not click Apply,
- * the changes are not saved or carried to the next steps" — so the pending
- * values are held apart from the applied ones and the difference is shown.
+ * The only step that costs money to run, so nothing here happens implicitly,
+ * and since 20 Oct that is true rather than merely claimed. The setup strip
+ * writes to a PENDING copy; the grid reads the applied one. Editing Build Qty
+ * moves nothing until the user presses something.
+ *
+ * THREE ACTIONS, WITH THREE DIFFERENT COSTS, named as the customer's Quoting
+ * BoM mockup names them:
+ *
+ *   Get Prices       first call to the marketplace. Costs quota.
+ *   Refresh Prices   another call, once prices exist. Costs quota, so it asks.
+ *   Update Results   recompute from the prices already loaded. Costs nothing.
+ *
+ * Which one is primary is decided by the state, not by rank: with unapplied
+ * edits, Update Results is the way forward and the price buttons are disabled —
+ * fetching prices for a setup the user has already moved past would spend quota
+ * on an answer to the wrong question.
  */
-export function StepQuoting({ cfg, set, lines, setLines, hasRun, onRun, onApply, onAddAttrition, onApplyPriceRange }: {
-  cfg: RunConfig; set: (patch: Partial<RunConfig>) => void;
+export function StepQuoting({
+  cfg, lines, setLines, hasRun, pricedAt, pending, setPending, dirty,
+  onGetPrices, onRefreshPrices, onUpdateResults, onAddAttrition, onApplyPriceRange,
+}: {
+  /** The APPLIED setup — what every number in the grid was computed from. */
+  cfg: RunConfig;
   lines: BomLine[]; setLines: (fn: (l: BomLine[]) => BomLine[]) => void;
   hasRun: boolean;
-  onRun: () => void;
-  onApply: () => void;
+  /** When the prices in the grid were fetched, for the age beside the actions. */
+  pricedAt: Date | null;
+  /** The setup being edited here, which reaches the grid only when applied. */
+  pending: QuoteSetup;
+  setPending: (patch: Partial<QuoteSetup>) => void;
+  dirty: boolean;
+  onGetPrices: () => void;
+  onRefreshPrices: () => void;
+  onUpdateResults: () => void;
   onAddAttrition: () => void;
   onApplyPriceRange: () => void;
 }) {
@@ -66,54 +89,46 @@ export function StepQuoting({ cfg, set, lines, setLines, hasRun, onRun, onApply,
      useColumnChoice. */
   const { shown: shownColumns, chooser } = useColumnChoice(columns, { locked: 4, storageKey: 'vy.cols.quoting' });
 
+  /* A price older than a day is not wrong, but it is worth saying out loud on a
+     screen whose numbers go into a customer quotation. The mockup draws the
+     same line at 24 hours. */
+  const stale = Boolean(pricedAt && Date.now() - pricedAt.getTime() > 24 * 3600 * 1000);
+
   return (
     <div className="vy-run-step">
       <QuoteContextBar
         assembly={`${cfg.assemblyPartNumber} - ${cfg.partRev}`}
         description={cfg.partDesc}
-        quoteFocus={cfg.quoteFocus}
-        materialPackageType={cfg.materialPackageType}
-        markup={cfg.markup}
-        buildQty={cfg.buildQty}
-        attritionSet={cfg.attritionSet}
-        onBuildQty={n => set({ buildQty: n })}
-        onAttritionSet={n => set({ attritionSet: n })}
+        applied={setupOf(cfg)}
+        pending={pending}
+        onPending={setPending}
       />
 
-      {/* Three states, because Quote Focus = Other makes a fourth reading of the
-          same numbers. "0 of 20 covered, 20 without a supplier" is true after a
-          run in that mode and reads as total failure, when it is in fact the
-          mode working exactly as asked. */}
-      <div className="vy-run-banner" data-tone={hasRun ? (manual ? 'info' : 'ok') : 'info'}>
-        {!hasRun
-          ? <><strong>Please run quotation for continue process!</strong>{' '}
-              Pricing, availability and suppliers stay blank until the quote runs.
-              {/* THE KEY SITS WITH THE SENTENCE THAT EXPLAINS IT, rather than as a
-                  sixth band of its own. Two gains: the words and the swatches
-                  stop being two separate things to find, and step 3's grid gets
-                  the row back — it had 349px of a 627px step, which is nine
-                  lines of a BoM that runs to fifty-eight. Both disappear once
-                  the quote has run, so the grid is at its largest exactly when
-                  there are results to read. */}
-              <ul className="vy-tone-legend">
-                <li><span className="vy-tone-key" data-tone="pending" aria-hidden />
-                  Waiting for the quote run</li>
-                <li><span className="vy-tone-key" data-tone="missing" aria-hidden />
-                  No supplier can cover this line</li>
-              </ul></>
-          : manual
+      {/* NO BANNER BEFORE THE RUN, since 20 Oct. It said "Please run quotation
+          for continue process!" above a toolbar that now says "No prices yet"
+          beside a primary Get Prices, and an empty grid that says the same
+          thing a third time. Three statements of one fact, and the banner was
+          the one costing a row of the BoM.
+
+          The two states that remain are the ones carrying information the
+          screen does not otherwise have: what Quote Focus = Other did, and how
+          much of the BoM a finished run covered. */}
+      {hasRun && (
+        <div className="vy-run-banner" data-tone={manual ? 'info' : 'ok'}>
+          {manual
             ? <><strong>Quote Focus is {cfg.quoteFocus} — suppliers are yours to choose.</strong>{' '}
                 Quantities are computed; the system selected none.{' '}
                 {quoted.filter(l => !l.supplier).length} of {quoted.length} lines still need one,
                 and the Unselected Supplier filter below lists them. Choose a supplier, then
-                Apply to price the line. Anything left unselected becomes NO BID when you
-                continue.</>
+                Update Results to price the line. Anything left unselected becomes NO BID when
+                you continue.</>
             : <><strong>{quoted.filter(l => l.status === 'COVER').length} of {quoted.length} lines
                 covered.</strong>{' '}
                 {quoted.filter(l => l.status === 'N/A').length} without a supplier,{' '}
                 {quoted.filter(l => l.status === 'NO').length} short on quantity. Anything left
                 unselected becomes NO BID when you continue.</>}
-      </div>
+        </div>
+      )}
 
       {/* ONE BAND. The Primary Provider and the four run buttons had a row of
           their own above the search; both rows act on the grid below, and step
@@ -121,40 +136,50 @@ export function StepQuoting({ cfg, set, lines, setLines, hasRun, onRun, onApply,
           BoM. */}
       <QuoteToolbar
         trailing={<ColumnChooser {...chooser} />}
-        leading={(
-        <label className="vy-inline-field">
-          <span>Primary Provider</span>
-          {/* `small`, like everything else in this row. Kendo's size names are
-              what make a toolbar line up — a row is level because every control
-              in it carries the SAME name, not because each was nudged — and
-              this one carried `medium` while the search and Columns beside it
-              were dense, so the row ran 34, 34, 34, 34, 32, 32. */}
-          <Select label="Primary Provider" size="small" value={cfg.provider}
-                  options={[...PRIMARY_PROVIDERS]}
-                  onChange={v => set({ provider: v as PrimaryProvider })} />
-        </label>
-        )}
-        /* "The action buttons are displayed in the following order from left
-           to right: Run Quote, Apply, Add Attrition, Apply Price Range. Run
-           Quote is displayed as the primary button. Apply, Add Attrition, and
-           Apply Price Range are displayed as secondary buttons." */
+        /* THE PROVIDER IS NOT HERE ANY MORE. It sat at the head of this row,
+           beside the button that spends it, which read as though choosing it
+           did something; it is setup, so it lives on the setup strip with the
+           rest of what a price request is made of. */
         actions={(
         <div className="vy-run-actions">
-          <Button variant="filled" size="sm" onClick={onRun}
-                  title={manual
-                    ? `Compute quantities through ${cfg.provider}. Quote Focus is ${cfg.quoteFocus}, so no supplier is selected for you.`
-                    : `Price every line through ${cfg.provider}, falling back to the other provider`}>
-            {hasRun ? 'Re-run Quote' : 'Run Quote'}
+          {/* PRIMARY FOLLOWS THE STATE. With unapplied edits the way forward is
+              Update Results, and both price buttons are disabled — spending
+              quota on the setup the user has already typed past answers a
+              question nobody asked. */}
+          <Button variant={!dirty && !hasRun ? 'filled' : undefined} size="sm"
+                  disabled={dirty}
+                  onClick={hasRun ? onRefreshPrices : onGetPrices}
+                  title={dirty
+                    ? 'Apply the setup changes first — Update Results'
+                    : hasRun
+                      ? `Ask ${pending.provider} for new prices. Uses marketplace quota.`
+                      : manual
+                        ? `Get prices through ${pending.provider}. Quote Focus is ${pending.quoteFocus}, so no supplier is selected for you.`
+                        : `Price every line through ${pending.provider}, falling back to the other provider`}>
+            {hasRun ? 'Refresh Prices' : 'Get Prices'}
           </Button>
-          <Button size="sm" onClick={onApply} title="Recalculate Total Qty from Build Qty and Attrition Set">
-            Apply
+          <Button variant={dirty ? 'filled' : undefined} size="sm" disabled={!dirty}
+                  onClick={onUpdateResults}
+                  title={dirty
+                    ? 'Recalculate with the prices already loaded — no marketplace request'
+                    : 'Nothing to apply: the grid already uses this setup'}>
+            Update Results
           </Button>
-          <Button size="sm" onClick={onAddAttrition} title="Set attrition on the lines that have none">
-            Add Attrition
-          </Button>
-          <Button size="sm" onClick={onApplyPriceRange} title="Apply the configured Attrition Info price ranges">
-            Apply Price Range
-          </Button>
+          {/* THE TWO RARE ONES GO BEHIND `More`, where the customer's mockup
+              puts them and where the 8 Oct review asked for "less use actions"
+              to live. Both act on attrition, both are pressed once a quote. */}
+          <MoreMenu items={[
+            { label: 'Add Attrition', onSelect: onAddAttrition,
+              note: 'Set attrition on the lines that have none' },
+            { label: 'Apply Price Range', onSelect: onApplyPriceRange,
+              note: 'Apply the configured Attrition Info price ranges' },
+          ]} />
+          {/* HOW OLD THE PRICES ARE, beside the button that renews them. A
+              marketplace price is a fact with a shelf life, and the only thing
+              that made ours look current was that nothing said otherwise. */}
+          <span className="vy-price-age" data-stale={stale || undefined}>
+            {pricedAt ? `Prices updated ${fmtDateTime(pricedAt)}` : 'No prices yet'}
+          </span>
         </div>
         )}
         search={search} onSearch={setSearch}
@@ -186,8 +211,23 @@ export function StepQuoting({ cfg, set, lines, setLines, hasRun, onRun, onApply,
           ? <NoRecords title="No lines match these filters."
                        hint="Clear a filter above to see the rest of the BoM." />
           : <NoRecords title="No quote results yet."
-                       hint="Click Run Quote to get prices and pick a supplier for each part." />}
+                       hint="Click Get Prices to price the BoM and pick a supplier for each part." />}
       />
+
+      {/* THE COLOURS, SAID IN WORDS, under the grid they describe — where the
+          standard puts a legend and where step 2 now carries its own. It used
+          to live inside the pre-run banner, which meant it disappeared at the
+          moment the grid started using three of the four colours. */}
+      <ul className="vy-tone-legend">
+        {!hasRun && (
+          <li><span className="vy-tone-key" data-tone="pending" aria-hidden />
+            Waiting for prices</li>
+        )}
+        <li><span className="vy-tone-key" data-tone="missing" aria-hidden />
+          No supplier can cover this line</li>
+        <li><span className="vy-tone-key" data-tone="short" aria-hidden />
+          A supplier is selected but cannot cover the quantity</li>
+      </ul>
     </div>
   );
 }

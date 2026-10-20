@@ -1,57 +1,97 @@
 import type { ReactNode } from 'react';
-import { Checkbox } from '../../../ui/Overlays';
+import { Checkbox, Select } from '../../../ui/Overlays';
 import { SearchField, TextField } from '../../../ui/Field';
 import { ReadValue } from '../../../ui/FieldRow';
+import { MATERIAL_PACKAGE_TYPE, QUOTE_FOCUS } from '../../../data/metadata';
+import { PRIMARY_PROVIDERS, type PrimaryProvider } from '../../../data/bom';
+import type { QuoteSetup } from './state';
 
 /**
- * The strip of quoting facts that rides along from step to step.
+ * Quote Setup — the strip of facts the results were computed from.
  *
  * Steps 2, 3 and 4 each open with "System show quoting BoM information get from
  * previous step", listing the same fields. Building it once means the three
- * steps cannot drift apart — which matters more than it sounds, because the two
- * editable values on it (Build Qty and Attrition Set) feed the total-quantity
- * formula, and a user who sees a different Build Qty on step 3 than on step 2
- * has no way to tell which one the numbers were computed from.
+ * steps cannot drift apart — which matters more than it sounds, because the
+ * values on it feed the total-quantity formula, and a user who sees a different
+ * Build Qty on step 3 than on step 2 has no way to tell which one the numbers
+ * were computed from.
+ *
+ * TWO SETUPS, since 20 Oct, after the customer's Quoting BoM mockup of 16 Oct:
+ * `applied` is what the numbers in the grid below came from, `pending` is what
+ * the user has typed since. Step 3 passes both and the fields become controls;
+ * everywhere else passes `applied` alone and they stay boxed and locked.
+ *
+ * A field whose pending value differs from the applied one is marked, and says
+ * so on hover — "Current results use: 100". It is not an error and not a
+ * warning: it is work the user has done that the grid has not been told about
+ * yet, which is exactly what Update Results is for. The mark clears when they
+ * press it.
  */
 export function QuoteContextBar({
-  assembly, description, quoteFocus, materialPackageType, markup,
-  buildQty, attritionSet, onBuildQty, onAttritionSet, editable = true, extra,
+  assembly, description, applied, pending, onPending, extra,
 }: {
-  assembly: string; description: string; quoteFocus: string;
-  materialPackageType: string; markup: number;
-  buildQty: number; attritionSet: number;
-  onBuildQty?: (n: number) => void;
-  onAttritionSet?: (n: number) => void;
-  /** Step 4 shows the same facts but the run is finished — nothing to adjust. */
-  editable?: boolean;
+  assembly: string; description: string;
+  /** What the grid's numbers were computed from. */
+  applied: QuoteSetup;
+  /** Step 3 only: the setup being edited. Absent means a read-only strip. */
+  pending?: QuoteSetup;
+  onPending?: (patch: Partial<QuoteSetup>) => void;
   /** Run by / Run Date / Run Version, which only step 4 has. */
   extra?: { label: string; value: string }[];
 }) {
+  const editable = Boolean(pending && onPending);
+  const s = pending ?? applied;
+  /* The same comparison `setupChanged` makes, one field at a time. */
+  const changed = (k: keyof QuoteSetup) => editable && String(s[k]) !== String(applied[k]);
+  const was = (k: keyof QuoteSetup) =>
+    changed(k) ? `Current results use: ${applied[k]}` : undefined;
+
   return (
     <div className="vy-quote-context">
       {/* EVERY VALUE IN A BOX, including these. They were bare text, which put
           five unboxed facts alongside two white input boxes on one strip — the
           exact "plain text for read only" the customer ruled out on 14 Oct, and
           the more obvious for sitting next to real controls. `locked` follows
-          the bar: on steps 2 and 3 some of it IS editable, so the padlock
-          earns its place; on step 4 nothing is, so it would be noise on all
-          seven. */}
+          the bar: where some of it IS editable the padlock earns its place; on
+          step 4 nothing is, so it would be noise on all seven. */}
       <Fact label="Assembly Part Number - Rev" value={assembly} locked={editable} wide />
       <Fact label="Description" value={description} locked={editable} wide />
-      <Fact label="Quote Focus" value={quoteFocus} locked={editable} />
-      <Fact label="Material Package Type" value={materialPackageType} locked={editable} />
-      <Fact label="Markup" value={`${markup}%`} locked={editable} />
+
       {editable ? (
         <>
-          <QtyField label="Build Qty" value={buildQty} onChange={onBuildQty!} />
-          <QtyField label="Attrition Set" value={attritionSet} onChange={onAttritionSet!} />
+          {/* THE ORDER IS THE MOCKUP'S, in pairs: the two quantities, then the
+              two that price them, then packaging, then the provider. */}
+          <QtyField label="Build Qty" value={s.buildQty} changed={changed('buildQty')}
+                    title={was('buildQty')} onChange={n => onPending!({ buildQty: n })} />
+          <QtyField label="Attrition Set" value={s.attritionSet} changed={changed('attritionSet')}
+                    title={was('attritionSet')} onChange={n => onPending!({ attritionSet: n })} />
+          <PickField label="Quote Focus" value={s.quoteFocus} options={[...QUOTE_FOCUS]}
+                     changed={changed('quoteFocus')} title={was('quoteFocus')}
+                     onChange={v => onPending!({ quoteFocus: v })} wide />
+          <QtyField label="Markup (%)" value={s.markup} min={0} changed={changed('markup')}
+                    title={was('markup')} onChange={n => onPending!({ markup: n })} />
+          <PickField label="Material Package Type" value={s.materialPackageType}
+                     options={[...MATERIAL_PACKAGE_TYPE]} changed={changed('materialPackageType')}
+                     title={was('materialPackageType')}
+                     onChange={v => onPending!({ materialPackageType: v })} />
+          {/* THE PROVIDER MOVES HERE from the grid toolbar. It is setup, not an
+              action: it decides where the next price request goes, and leaving
+              it beside Get Prices implied it took effect on its own. */}
+          <PickField label="Primary Provider" value={s.provider} options={[...PRIMARY_PROVIDERS]}
+                     changed={changed('provider')} title={was('provider')}
+                     onChange={v => onPending!({ provider: v as PrimaryProvider })} />
         </>
       ) : (
         <>
-          <Fact label="Build Qty" value={String(buildQty)} />
-          <Fact label="Attrition Set" value={String(attritionSet)} />
+          <Fact label="Quote Focus" value={applied.quoteFocus} />
+          <Fact label="Material Package Type" value={applied.materialPackageType} />
+          <Fact label="Markup" value={`${applied.markup}%`} />
+          <Fact label="Build Qty" value={String(applied.buildQty)} />
+          <Fact label="Attrition Set" value={String(applied.attritionSet)} />
+          <Fact label="Primary Provider" value={applied.provider} />
         </>
       )}
+
       {extra?.map(e => <Fact key={e.label} label={e.label} value={e.value} />)}
     </div>
   );
@@ -69,25 +109,40 @@ function Fact({ label, value, locked = false, wide }: {
 }
 
 /**
- * Build Qty and Attrition Set.
+ * Build Qty, Attrition Set and Markup.
  *
- * Both revert to 1 rather than accepting a value at or below zero: "If the user
- * adjust Build Quantity <= 0 — the value automatically reverts to the default
- * value of 1", stated three times across steps 1, 2 and 3. Correcting on BLUR
- * rather than on keystroke, because a field that snaps back to 1 the moment you
- * clear it cannot be retyped.
+ * The two quantities revert to 1 rather than accepting a value at or below
+ * zero: "If the user adjust Build Quantity <= 0 — the value automatically
+ * reverts to the default value of 1", stated three times across steps 1, 2 and
+ * 3. Correcting on BLUR rather than on keystroke, because a field that snaps
+ * back to 1 the moment you clear it cannot be retyped. Markup takes 0, which is
+ * a real answer.
  */
-export function QtyField({ label, value, onChange }: {
+export function QtyField({ label, value, onChange, min = 1, changed, title }: {
   label: string; value: number; onChange: (n: number) => void;
+  min?: number; changed?: boolean; title?: string;
 }) {
   return (
-    <label className="vy-quote-fact vy-quote-fact--input">
+    <label className="vy-quote-fact vy-quote-fact--input" data-changed={changed || undefined} title={title}>
       <span className="vy-quote-fact-label">{label}</span>
-      <TextField type="number" min={1} value={String(value)}
+      <TextField type="number" min={min} value={String(value)}
                  aria-label={label}
                  onChange={e => onChange(Number(e.target.value))}
-                 onBlur={e => { if (!(Number(e.target.value) > 0)) onChange(1); }} />
+                 onBlur={e => { if (!(Number(e.target.value) >= min)) onChange(min); }} />
     </label>
+  );
+}
+
+function PickField({ label, value, options, onChange, changed, title, wide }: {
+  label: string; value: string; options: string[]; onChange: (v: string) => void;
+  changed?: boolean; title?: string; wide?: boolean;
+}) {
+  return (
+    <div className="vy-quote-fact vy-quote-fact--pick" data-changed={changed || undefined}
+         data-wide={wide || undefined} title={title}>
+      <span className="vy-quote-fact-label">{label}</span>
+      <Select label={label} size="small" value={value} options={options} onChange={onChange} />
+    </div>
   );
 }
 

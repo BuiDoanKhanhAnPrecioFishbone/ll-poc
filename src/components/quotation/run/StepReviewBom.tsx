@@ -6,7 +6,7 @@ import { Checkbox } from '../../../ui/Overlays';
 import type { ColumnSpec } from '../../column-model';
 import { QuoteContextBar, QuoteToolbar, NoRecords } from './QuoteContext';
 import { KNOWN_MANUFACTURERS, PART_MASTER, totalQtyOf, type BomLine } from '../../../data/bom';
-import type { RunConfig } from './state';
+import { setupOf, type RunConfig } from './state';
 
 /**
  * Step 2 — Review BoM.
@@ -15,8 +15,8 @@ import type { RunConfig } from './state';
  * three colours in it are the only place the user learns that a part is missing
  * from Part Master before the quote refuses to confirm.
  */
-export function StepReviewBom({ cfg, set, lines, setLines }: {
-  cfg: RunConfig; set: (patch: Partial<RunConfig>) => void;
+export function StepReviewBom({ cfg, lines, setLines }: {
+  cfg: RunConfig;
   lines: BomLine[]; setLines: (fn: (l: BomLine[]) => BomLine[]) => void;
 }) {
   const [search, setSearch] = useState('');
@@ -181,16 +181,16 @@ export function StepReviewBom({ cfg, set, lines, setLines }: {
 
   return (
     <div className="vy-run-step">
+      {/* READ-ONLY HERE, since 20 Oct. Build Qty and Attrition Set were
+          editable on this step, and editing them changed the quantities a user
+          would later price on step 3 with nothing to show it had happened. The
+          customer's mockup marks this strip read-only and makes Quoting the one
+          place the setup is changed, which is also the only place the change
+          can be applied deliberately. */}
       <QuoteContextBar
         assembly={`${cfg.assemblyPartNumber} - ${cfg.partRev}`}
         description={cfg.partDesc}
-        quoteFocus={cfg.quoteFocus}
-        materialPackageType={cfg.materialPackageType}
-        markup={cfg.markup}
-        buildQty={cfg.buildQty}
-        attritionSet={cfg.attritionSet}
-        onBuildQty={n => set({ buildQty: n })}
-        onAttritionSet={n => set({ attritionSet: n })}
+        applied={setupOf(cfg)}
       />
 
       {missingFromMaster > 0 && (

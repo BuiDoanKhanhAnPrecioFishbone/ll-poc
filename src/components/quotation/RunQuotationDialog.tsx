@@ -3,6 +3,7 @@ import { fmtDateTime } from '../../ui/regional';
 import { saveDraftQuote, type DraftQuote } from '../../data/draftQuotes';
 import { Dialog } from '../../ui/Overlays';
 import { Button } from '../../ui/Button';
+import { ConfirmDialog } from '../../ui/ConfirmDialog';
 import { Stepper } from '../../ui/Stepper';
 import { useToast } from '../../ui/Toast';
 import type { Quotation } from '../../data/quotations';
@@ -17,7 +18,10 @@ import { StepSummary } from './run/StepSummary';
 import {
   AddAttritionDialog, AddPackageDialog,
 } from './run/dialogs';
-import { step1Error, missingStep1, type RunConfig } from './run/state';
+import {
+  SETUP_KEYS, setupOf, setupChanged,
+  type QuoteSetup, step1Error, missingStep1, type RunConfig
+} from './run/state';
 
 /**
  * Run Quotation — Quick Quote.
@@ -93,15 +97,42 @@ export function RunQuotationDialog({ q, onClose, resume }: {
     attritionSet: 1,
     provider: 'Nexar',
   }) as RunConfig);
-  const set = (patch: Partial<RunConfig>) => setCfg(c => ({ ...c, ...patch }));
+  /**
+   * Step 1's setter, and it writes BOTH copies.
+   *
+   * Before any prices exist there is nothing to hold back: the setup the user
+   * is filling in IS the setup the first request will use. The two copies only
+   * diverge on step 3, where `setPending` writes one of them.
+   */
+  /** The setup keys out of a config patch, so step 1 can mirror them. */
+  const setupPatch = (patch: Partial<RunConfig>): Partial<QuoteSetup> =>
+    Object.fromEntries(Object.entries(patch).filter(([k]) =>
+      (SETUP_KEYS as readonly string[]).includes(k))) as Partial<QuoteSetup>;
+
+  const set = (patch: Partial<RunConfig>) => {
+    setCfg(c => ({ ...c, ...patch }));
+    setPendingState(p => ({ ...p, ...setupPatch(patch) }));
+  };
 
   const [lines, setLinesState] = useState<BomLine[]>(() => resume ? resume.lines : buildBomLines());
   const setLines = (fn: (l: BomLine[]) => BomLine[]) => setLinesState(fn);
 
+  /* THE PENDING SETUP — see `state.ts`. `cfg` is what the grid's numbers were
+     computed from; this is what the user has typed on step 3 since. Nothing
+     moves it into `cfg` except Get Prices, Refresh Prices or Update Results. */
+  const [pending, setPendingState] = useState<QuoteSetup>(() => setupOf(cfg));
+  const setPending = (patch: Partial<QuoteSetup>) => setPendingState(p => ({ ...p, ...patch }));
+  /* Unapplied edits. The grid is still showing the old setup's numbers, which
+     is correct and is why this has to be visible. */
+  const dirty = setupChanged(pending, setupOf(cfg));
   const [hasRun, setHasRun] = useState(Boolean(resume?.hasRun));
+  /* When the prices in the grid were fetched. Null until the first request —
+     "No prices yet" is a different state from "priced a while ago". */
+  const [pricedAt, setPricedAt] = useState<Date | null>(resume?.hasRun ? new Date() : null);
   const [runVersion, setRunVersion] = useState(resume?.runVersion ?? 0);
   const [runDate, setRunDate] = useState(resume?.runDate ?? '');
 
+  const [refreshOpen, setRefreshOpen] = useState(false);
   const [attritionOpen, setAttritionOpen] = useState(false);
   const [packageOpen, setPackageOpen] = useState(false);
   /* Which step-1 fields failed, so the fields themselves can say so. */
@@ -150,34 +181,63 @@ export function RunQuotationDialog({ q, onClose, resume }: {
      way forward is just forward. */
   function leaveStep2() { goTo(2); }
 
-  /* ---- The run ----------------------------------------------------------- */
-  function run() {
-    setLines(ls => runQuote(ls, cfg.buildQty, cfg.attritionSet, cfg.provider, cfg.quoteFocus));
-    setHasRun(true);
-    setRunVersion(v => v + 1);
-    setRunDate(fmtDateTime(new Date()));
-    /* "Complete" would be a lie under Other — the run deliberately leaves every
-       Supplier empty, and a success message that does not say so sends the user
-       looking for the bug. */
-    toast.success(cfg.quoteFocus === 'OTHER'
-      ? `Quantities computed for RFQ${q.no}. Quote Focus is OTHER, so no suppliers were selected — choose them per line.`
-      : `Quote run complete for RFQ${q.no} via ${cfg.provider}.`);
+  /* ---- The three actions on step 3 ---------------------------------------
+     They differ in what they cost, which is the only distinction that matters
+     to the person pressing them:
+
+       Get Prices / Refresh Prices   a marketplace request. Costs quota.
+       Update Results                arithmetic on prices already here. Free.
+
+     All three apply the pending setup first, because applying it is what makes
+     the grid agree with the strip above it. */
+
+  /** Move the pending setup into the config the grid reads. */
+  function applyPending(): RunConfig {
+    const next = { ...cfg, ...pending };
+    setCfg(next);
+    return next;
   }
 
   /**
-   * Apply — recalculates Total Qty, and re-prices if a run has happened.
+   * Get Prices / Refresh Prices — the request that costs money.
    *
-   * "Recalculates the Total Qty for each part based on the updated Build Qty and
-   * Attrition Set values when the user clicks this button." Total Qty is
-   * computed rather than stored, so the recalculation is already visible; what
-   * Apply genuinely changes is the ORDER quantities and therefore the excess,
-   * which is why it re-runs the pricing arithmetic without re-calling the
-   * provider — "they no need to re-run, just click APPLY".
+   * `runQuote` is handed the values from `next` rather than from `cfg`: the
+   * state update above has not landed yet when this runs, and pricing a BoM
+   * with the previous Build Qty is exactly the silent wrong answer this whole
+   * split exists to prevent.
    */
-  function apply() {
-    if (!hasRun) { toast.success('Total Qty updated.'); return; }
-    setLines(ls => runQuote(ls, cfg.buildQty, cfg.attritionSet, cfg.provider, cfg.quoteFocus));
-    toast.success('Total Qty and supplier quantities recalculated.');
+  function getPrices() {
+    const next = applyPending();
+    setLines(ls => runQuote(ls, next.buildQty, next.attritionSet, next.provider, next.quoteFocus));
+    setHasRun(true);
+    setRunVersion(v => v + 1);
+    const at = new Date();
+    setPricedAt(at);
+    setRunDate(fmtDateTime(at));
+    /* "Complete" would be a lie under Other — the run deliberately leaves every
+       Supplier empty, and a success message that does not say so sends the user
+       looking for the bug. */
+    toast.success(next.quoteFocus === 'OTHER'
+      ? `Quantities computed for RFQ${q.no}. Quote Focus is OTHER, so no suppliers were selected — choose them per line.`
+      : `Prices loaded for RFQ${q.no} via ${next.provider}.`);
+  }
+
+  /**
+   * Update Results — the same arithmetic, no request.
+   *
+   * "they no need to re-run, just click APPLY", from the August guideline, and
+   * the customer's October mockup names the same action Update Results and
+   * states what it does not do: "apply the setup with the prices already
+   * loaded. No marketplace request."
+   *
+   * Total Qty is computed rather than stored, so what this genuinely changes is
+   * the ORDER quantities and therefore the excess.
+   */
+  function updateResults() {
+    const next = applyPending();
+    if (!hasRun) { toast.success('Quantities updated.'); return; }
+    setLines(ls => runQuote(ls, next.buildQty, next.attritionSet, next.provider, next.quoteFocus));
+    toast.success('Results updated from the prices already loaded.');
   }
 
   /**
@@ -326,13 +386,20 @@ export function RunQuotationDialog({ q, onClose, resume }: {
                    numbered={false} showText={false} />
 
           {step === 0 && <StepConfigBom q={q} cfg={cfg} set={set} invalid={invalid} />}
-          {step === 1 && <StepReviewBom cfg={cfg} set={set} lines={lines} setLines={setLines} />}
+          {step === 1 && <StepReviewBom cfg={cfg} lines={lines} setLines={setLines} />}
           {step === 2 && (
             <StepQuoting
-              cfg={cfg} set={set} lines={lines} setLines={setLines}
-              hasRun={hasRun}
-              onRun={run}
-              onApply={apply}
+              cfg={cfg} lines={lines} setLines={setLines}
+              hasRun={hasRun} pricedAt={pricedAt}
+              pending={pending} setPending={setPending} dirty={dirty}
+              onGetPrices={getPrices}
+              /* THE ONLY ONE THAT ASKS FIRST, and it asks because it spends
+                 something the user cannot get back — a marketplace request is
+                 charged whether or not the answer differs. Get Prices does not
+                 ask: it is the step's whole purpose and there is nothing to
+                 lose yet. */
+              onRefreshPrices={() => setRefreshOpen(true)}
+              onUpdateResults={updateResults}
               onAddAttrition={() => setAttritionOpen(true)}
               onApplyPriceRange={applyPriceRange}
             />
@@ -346,6 +413,17 @@ export function RunQuotationDialog({ q, onClose, resume }: {
           )}
         </div>
       </Dialog>
+
+      {refreshOpen && (
+        <ConfirmDialog
+          title="Refresh Prices"
+          body={`This request uses your marketplace API quota. It gets new prices for ${quotable.length} ${quotable.length === 1 ? 'part' : 'parts'} from ${pending.provider}, then the other provider for anything it cannot find — and every refresh is charged, even when the parts are the same. Suppliers are picked again by the quote strategy, so manual supplier choices are replaced; attrition stays as you set it.`}
+          confirmLabel="Refresh Prices"
+          dismissLabel="Cancel"
+          onConfirm={() => { setRefreshOpen(false); getPrices(); }}
+          onClose={() => setRefreshOpen(false)}
+        />
+      )}
 
       <AddAttritionDialog
         open={attritionOpen} cfg={cfg} lines={lines}

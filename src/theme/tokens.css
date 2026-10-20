@@ -466,7 +466,13 @@
      1249 and the two wide facts grow into whatever is left. An assembly number
      ("0455-300-0192-01 - 01") measures ~150px, so 180 still holds one. */
   --vy-quote-fact-wide:   180px; /* an assembly number or a description */
-  --vy-quote-qty-w:       120px; /* Build Qty / Attrition Set */
+  /* The setup strip's controls, sized to their content so the strip stays ONE
+     ROW. Measured at 1440: left to themselves a number input takes its
+     browser-default 170px and the row wrapped to 123px, which is a row of the
+     BoM spent on air around three two-digit numbers. */
+  --vy-quote-qty-w:        92px; /* Build Qty / Attrition Set / Markup */
+  --vy-quote-pick-w:      156px; /* fits "Material Package Type" at 152 */
+  --vy-quote-pick-wide-w: 186px; /* Quote Focus — "Production - Competitive cost" */
   --vy-quote-field-min:   240px; /* one field on the Config BoM grid */
   --vy-cost-col-min:      170px; /* one figure in the cost summary */
   /* ONE reading measure, and it caps TEXT — never a container.
