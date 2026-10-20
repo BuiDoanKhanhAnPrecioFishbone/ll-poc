@@ -1349,6 +1349,52 @@
 .vy-quote-fact[data-changed] .k-input-inner { color: var(--vy-brand-text-deep); }
 .vy-quote-fact[data-changed] .vy-quote-fact-label { color: var(--vy-brand-text); }
 
+/* ---- The official MPN, picked from the provider's list --------------------
+   The cell reads as a value with something behind it rather than as a control:
+   no box until it is hovered, because twenty of these in a column of inputs
+   would make the grid look like a form. The `*` is the affordance. */
+.vy-mpn-pick {
+  display: flex; align-items: center; gap: var(--vy-space-2);
+  inline-size: 100%; min-block-size: var(--vy-control-sm);
+  padding: var(--vy-space-1) var(--vy-space-3);
+  font: inherit; text-align: start; cursor: pointer;
+  color: inherit; background: none;
+  border: 1px solid transparent; border-radius: var(--vy-shape-sm);
+}
+.vy-mpn-pick:hover { background: var(--vy-surface); border-color: var(--vy-border-control); }
+.vy-mpn-pick:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
+.vy-mpn-value { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vy-mpn-star { color: var(--vy-brand-text); font-weight: var(--vy-weight-semibold); }
+/* A row the user resolved themselves, so a reviewer can see which values are
+   the system's and which are somebody's judgement. */
+.vy-mpn-pick[data-picked] .vy-mpn-value {
+  color: var(--vy-brand-text-deep); font-weight: var(--vy-weight-medium);
+}
+.vy-mpn-pick[data-unmatched] .vy-mpn-star { color: var(--vy-danger-text); }
+
+.vy-mpn-menu { padding: 0; min-inline-size: var(--vy-mpn-menu-w); }
+.vy-mpn-table { border-collapse: collapse; inline-size: 100%; font-size: var(--vy-text-sm); }
+.vy-mpn-table th {
+  text-align: start; font-size: var(--vy-text-xs); text-transform: uppercase;
+  letter-spacing: .05em; color: var(--vy-on-surface-subtle);
+  padding: var(--vy-space-4) var(--vy-space-5) var(--vy-space-2);
+  border-bottom: 1px solid var(--vy-border);
+}
+.vy-mpn-table td { padding: 0 var(--vy-space-5); border-bottom: 1px solid var(--vy-border-faint); }
+.vy-mpn-table td:last-child { color: var(--vy-on-surface-muted); white-space: nowrap; }
+.vy-mpn-table td button {
+  inline-size: 100%; text-align: start; font: inherit; color: inherit;
+  background: none; border: 0; padding: var(--vy-space-3) 0; cursor: pointer;
+}
+.vy-mpn-table tr:hover td { background: var(--vy-surface-app); }
+.vy-mpn-table tr[data-on] td { background: var(--vy-brand-subtle); color: var(--vy-brand-text-deep); }
+.vy-mpn-table tr[data-on] td:first-child button { font-weight: var(--vy-weight-medium); }
+.vy-mpn-foot {
+  margin: 0; padding: var(--vy-space-4) var(--vy-space-5);
+  font-size: var(--vy-text-xs); color: var(--vy-on-surface-muted);
+  border-top: 1px solid var(--vy-border);
+}
+
 /* ---- Preferred Suppliers -------------------------------------------------
    The strip's button, and the dialog it opens. The button is a field like the
    ones beside it — label above, value below — so a setting that happens to

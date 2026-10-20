@@ -16,6 +16,7 @@ import { fmtDateTime } from '../../../ui/regional';
 import { setupOf, type QuoteSetup, type RunConfig } from './state';
 import { amlPairs, amlRows, type AmlRow } from './amlRows';
 import { SupplierDialog } from './SupplierDialog';
+import { MpnPicker } from './MpnPicker';
 import { SUPPLIERS as SUPPLIER_NAMES } from '../../../data/suppliers';
 
 /**
@@ -111,7 +112,16 @@ export function StepQuoting({
       (l.id === line.id ? pickSupplier(l, id, cfg.buildQty, cfg.attritionSet) : l)));
   };
 
-  const columns = quotingColumns(cfg, hasRun, edit, editAml, pickSupplierFor);
+  /* The pick is an edit of the LINE, not of the row: it is remembered per AML
+     and travels with the quote, which is what "saved as an alias for this
+     customer" means once this is a real system. */
+  const pickMpn = (line: BomLine, aml: number, candidate: number) =>
+    setLines(ls => ls.map(l => (l.id !== line.id ? l : {
+      ...l,
+      nexar: l.nexar.map((n, i) => (i === aml && n ? { ...n, picked: candidate } : n)),
+    })));
+
+  const columns = quotingColumns(cfg, hasRun, edit, editAml, pickSupplierFor, pickMpn);
   const rows = useMemo(() => amlRows(shown), [shown]);
 
   /* The Columns chooser, and the frozen block as its locked set — see
@@ -264,7 +274,10 @@ export function StepQuoting({
             Waiting for prices</li>
         )}
         <li><span className="vy-tone-key" data-tone="missing" aria-hidden />
-          No supplier can cover this line</li>
+          No supplier can cover this line, or no official MPN matched</li>
+        <li><span className="vy-mpn-star" aria-hidden>*</span>
+          The provider returned a list — click the MPN to pick the official
+          part. The BoM keeps its own value</li>
         <li><span className="vy-tone-key" data-tone="short" aria-hidden />
           A supplier is selected but cannot cover the quantity</li>
       </ul>
@@ -314,7 +327,14 @@ function quotingColumns(cfg: RunConfig, hasRun: boolean,
                         edit: (id: number, patch: Partial<BomLine>) => void,
                         editAml: (line: BomLine, index: number, mpn: string) => void,
                         onPickSupplier: (line: BomLine, supplier: string) => void,
+                        onPickMpn: (line: BomLine, aml: number, candidate: number) => void,
                         ): ColumnSpec<AmlRow>[] {
+  /** The catalogue entry in force for a row: the user's pick, else the
+   *  system's match, else nothing. */
+  const picked = (r: AmlRow) => {
+    const i = r.lookup ? (r.lookup.picked ?? r.lookup.matched) : null;
+    return i == null || !r.lookup ? undefined : r.lookup.candidates[i];
+  };
   /* One option per offer: the supplier's priority group, its stock and its
      price, in that order — the group says whether the system would have chosen
      it, the other two say what choosing it does to the line. */
@@ -363,19 +383,43 @@ function quotingColumns(cfg: RunConfig, hasRun: boolean,
        facts about one source of it. */
     { field: 'mfg', id: 'mfg', title: 'MFG', role: 'text', width: 140,
       widthNote: 'Manufacturer names run long.',
-      render: r => r.mfg || <span className="vy-empty">—</span> },
+      /* THE MANUFACTURER FOLLOWS THE PICK. The catalogue spells it in full —
+         "NXP USA Inc." where the file said "NXP" — and the quote goes out with
+         the catalogue's name, so that is what this shows once a part has been
+         resolved. What the file said is on the cell, because a reader comparing
+         the quote to the customer's own BoM needs to find it. */
+      render: r => {
+        const c = picked(r);
+        if (!c) return r.mfg || <span className="vy-empty">—</span>;
+        return <span title={c.mfg === r.mfg ? undefined : `In the BoM file: ${r.mfg}`}>{c.mfg}</span>;
+      } },
     {
       field: 'mpn', id: 'mpn', title: 'MPN', role: 'ident', width: 180,
       widthNote: 'Editable, and manufacturer part numbers are long.',
-      tone: r => (!hasRun && !r.line.excluded ? 'pending' : undefined),
-      /* One of the five fields the guideline lets the user edit here, and now
-         it edits the manufacturer part number ON THIS ROW rather than always
-         the primary one — which is what a grid with one row per AML has to
-         mean for the edit to make sense. */
+      /* Red before the run because nothing has been looked up yet, and red
+         after it when the lookup came back with no match — a part nobody has
+         resolved is the one thing on this grid that stops a quotation. */
+      tone: r => (r.line.excluded ? undefined
+        : !hasRun ? 'pending'
+          : r.lookup && (r.lookup.picked ?? r.lookup.matched) == null ? 'missing'
+            : undefined),
+      /* TWO CELLS IN ONE, and which one appears is not a style choice.
+         Before the run, and for a part the catalogue had nothing to say about,
+         this is the free-text field the guideline asks for — one of the five
+         it lets the user edit — now editing the manufacturer part number ON
+         THIS ROW rather than always the primary one.
+         Once the provider has returned a list for this MPN, typing is the
+         wrong control: the answer is one of theirs, and inventing a sixth is
+         how an unorderable part number reaches a customer. It becomes a
+         picker. */
       render: r => hideIfExcluded(r.line,
-        <TextField className="vy-cell-input" aria-label={`MPN ${r.index + 1} for ${r.line.part}`}
-                   value={r.mpn}
-                   onChange={e => editAml(r.line, r.index, e.target.value)} />),
+        hasRun && r.lookup
+          ? <MpnPicker bomValue={r.mpn} lookup={r.lookup}
+                       label={`Official MPN for ${r.line.part}, manufacturer ${r.index + 1}`}
+                       onPick={i => onPickMpn(r.line, r.index, i)} />
+          : <TextField className="vy-cell-input" aria-label={`MPN ${r.index + 1} for ${r.line.part}`}
+                       value={r.mpn}
+                       onChange={e => editAml(r.line, r.index, e.target.value)} />),
     },
     { field: 'id', id: 'qty', title: 'Qty', role: 'number', width: 90,
       render: r => p(r, () => r.line.qty.toLocaleString()) },

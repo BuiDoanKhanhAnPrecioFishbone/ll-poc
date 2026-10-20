@@ -1,4 +1,4 @@
-import type { BomLine } from '../../../data/bom';
+import type { BomLine, NexarLookup } from '../../../data/bom';
 
 /**
  * A BoM line, split into one row per manufacturer.
@@ -39,6 +39,8 @@ export type AmlRow = {
   last: boolean;
   mfg: string;
   mpn: string;
+  /** What the provider returned for THIS manufacturer part number, if anything. */
+  lookup: NexarLookup | null;
 };
 
 /**
@@ -68,6 +70,7 @@ export function amlRows(lines: BomLine[]): AmlRow[] {
       line, index: i, count: list.length,
       first: i === 0, last: i === list.length - 1,
       mfg: p.mfg, mpn: p.mpn,
+      lookup: line.nexar[i] ?? null,
     }));
   });
 }

@@ -460,8 +460,9 @@ export function RunQuotationDialog({ q, onClose, resume }: {
           offers: [],
           mfg: p.mfg, mpn: p.mpn,
           /* A packaging line is bought as specified; there is no second source
-             to offer, so it carries no alternates. */
+             to offer, so it carries no alternates and nothing to look up. */
           alternates: [],
+          nexar: [null],
           attrition: 0, supplier: '—',
           orderQty: p.qty * cfg.buildQty, stock: 0, outStock: 0, lt: 0, pkg: '', moq: 0,
           excessQty: 0, unitPrice: p.unitPrice,

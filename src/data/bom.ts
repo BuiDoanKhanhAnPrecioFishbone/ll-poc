@@ -58,6 +58,33 @@ export type Offer = {
   lt: number;
 };
 
+/**
+ * What the marketplace returned for one manufacturer part number.
+ *
+ * ASKED FOR by the customer's Quoting BoM mockup of 16 Oct, whose note on the
+ * BoM data is the clearest statement of this rule anywhere in their material:
+ *
+ *   "nx: per AML, the list Nexar returned for the MPN in the BoM file (shown
+ *    with '*'). Each candidate = official MPN + MFG (MPN_MST). m = index the
+ *    system matched, or null when it could not match (user must pick). The BoM
+ *    value is never changed; the pick is kept as an alias for this customer
+ *    (MPN_MAPPING -> MPN_MST)."
+ *
+ * THE LAST SENTENCE IS THE WHOLE DESIGN. A customer's BoM says
+ * `PCA9517ATP`; the catalogue says `PCA9517ATP,118` and `PCA9517ATPZ`, which
+ * are different orderable parts. Overwriting the customer's value would lose
+ * what they actually asked for and make the next revision of their BoM look
+ * like a change. So the file keeps its value, the quote carries the official
+ * one, and the pair is remembered for this customer.
+ */
+export type NexarLookup = {
+  candidates: { mpn: string; mfg: string }[];
+  /** What the system matched on its own, or null when it could not. */
+  matched: number | null;
+  /** What the user chose instead. `undefined` means they have not. */
+  picked?: number;
+};
+
 export type BomLine = {
   id: number;
   /** Sequential, ascending, as displayed in the NUMBER column. */
@@ -84,6 +111,13 @@ export type BomLine = {
    * as many as a row actually has.
    */
   alternates: { mfg: string; mpn: string }[];
+
+  /**
+   * One entry per AML — the primary pair first, then the alternates — holding
+   * what the provider returned for that manufacturer part number, or `null`
+   * where it returned nothing to choose between.
+   */
+  nexar: (NexarLookup | null)[];
 
   /* ---- Quoting ---------------------------------------------------------- */
   /**
@@ -338,6 +372,50 @@ function offersFor(s: Seed, i: number): Offer[] {
   ];
 }
 
+/**
+ * What the marketplace has to say about each manufacturer part number.
+ *
+ * NOT EVERY LINE, because that is not what a lookup looks like: most parts
+ * match exactly and have nothing to decide. Three shapes are seeded, and every
+ * one of them appears on this BoM:
+ *
+ *   nothing        the catalogue has one answer and it is the file's value.
+ *                  No `*`, no popover, nothing to do. Most lines.
+ *   matched        two orderable variants and the system picked one. The `*`
+ *                  says a choice exists; the cell is not an error.
+ *   unmatched      the file's value is close to several and identical to none,
+ *                  so the system will not guess. Red, and the quote cannot be
+ *                  finished until somebody says which.
+ *
+ * The packaging suffix is the real reason this exists. `,118` and `Z` are tape
+ * and tray of the same die; an estimator who picks the wrong one quotes a part
+ * the line cannot use.
+ */
+function nexarFor(s: Seed, i: number): (NexarLookup | null)[] {
+  const pairs = [{ mfg: s.mfg, mpn: s.mpn }, ...(s.alternates ?? [])];
+  return pairs.map((pair, j) => {
+    if (!pair.mpn) return null;
+    /* Deterministic, and spread across the BoM rather than clustered: every
+       third AML carries a lookup, and every second of those is one the system
+       could not resolve. */
+    if ((i + j) % 3 !== 0) return null;
+    /* The second variant is sold by the manufacturer's US entity, which is how
+       the catalogue spells it and not how the BoM does. That difference is the
+       reason the MFG column follows the pick at all — "NXP" in the file,
+       "NXP USA Inc." in the quote — so one of the two candidates carries it. */
+    const candidates = [
+      { mpn: `${pair.mpn},118`, mfg: pair.mfg },
+      { mpn: `${pair.mpn}Z`, mfg: `${pair.mfg} USA Inc.` },
+    ];
+    const resolvable = (i + j) % 6 === 0;
+    return resolvable
+      /* The file's own value is orderable, and it is first in the list. */
+      ? { candidates: [{ mpn: pair.mpn, mfg: pair.mfg }, ...candidates], matched: 0 }
+      /* Close to both, identical to neither. */
+      : { candidates, matched: null };
+  });
+}
+
 export function buildBomLines(): BomLine[] {
   return SEEDS.map((s, i) => ({
     offers: offersFor(s, i),
@@ -352,6 +430,7 @@ export function buildBomLines(): BomLine[] {
     mfg: s.mfg,
     mpn: s.mpn,
     alternates: s.alternates ?? [],
+    nexar: nexarFor(s, i),
     attrition: s.attrition,
     supplier: '',
     orderQty: 0,
