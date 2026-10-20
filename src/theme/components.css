@@ -1713,6 +1713,19 @@
    of it, centred, leaving ~1.5px top and bottom. */
 .vy-grid-k .k-grid td:has(> .vy-cell-link),
 .vy-minitable-k .k-grid td:has(> .vy-cell-link) { padding: 0; }
+
+/* ---- A record that takes more than one row -------------------------------
+   The Review BoM and Quoting grids render one row per manufacturer, with the
+   line's own cells on the first row and blank on the rest. Two declarations
+   make that read as ONE record rather than as three rows that happen to share
+   a part number: no rule between the rows of a group, one rule under the last
+   of them. The blank cells then look merged, which is what the standard asks
+   for — "parent cells merged" — without a `rowSpan` the grid could not keep in
+   step with its own frozen columns. */
+.vy-minitable-k[data-grouped] .k-grid tbody td { border-block-end-color: transparent; }
+.vy-minitable-k[data-grouped] .k-grid tbody tr[data-group-end] > td {
+  border-block-end-color: var(--vy-border);
+}
 .vy-grid-k .k-grid td > .vy-cell-link,
 .vy-minitable-k .k-grid td > .vy-cell-link {
   width: 100%;

@@ -14,6 +14,7 @@ import {
 } from '../../../data/bom';
 import { fmtDateTime } from '../../../ui/regional';
 import { setupOf, type QuoteSetup, type RunConfig } from './state';
+import { amlPairs, amlRows, type AmlRow } from './amlRows';
 
 const SUPPLIERS = ['', 'Digi-Key', 'Mouser', 'Arrow', 'Avnet', 'Farnell', 'TTI'];
 
@@ -69,7 +70,11 @@ export function StepQuoting({
   const shown = useMemo(() => {
     const k = search.trim().toLowerCase();
     return lines.filter(l => {
-      if (k && ![l.part, l.description, l.mpn, l.mfg, l.supplier]
+      /* EVERY manufacturer on the line, not just the first. The grid shows all
+         of them on rows of their own now, so a search that only looked at the
+         primary pair would hide a line whose SECOND source is the one the user
+         typed. */
+      if (k && ![l.part, l.description, l.supplier, ...amlPairs(l).flatMap(a => [a.mfg, a.mpn])]
         .some(v => v.toLowerCase().includes(k))) return false;
       /* All three filters describe what the RUN produced, so before it they
          have nothing to select and are disabled rather than returning nothing. */
@@ -83,7 +88,20 @@ export function StepQuoting({
   const edit = (id: number, patch: Partial<BomLine>) =>
     setLines(ls => ls.map(l => (l.id === id ? { ...l, ...patch } : l)));
 
-  const columns = quotingColumns(cfg, hasRun, edit);
+  /* An MPN belongs to ONE manufacturer, so editing it has to know which row it
+     was typed on: index 0 is the line's own pair, the rest are its alternates. */
+  const editAml = (line: BomLine, index: number, mpn: string) =>
+    setLines(ls => ls.map(l => {
+      if (l.id !== line.id) return l;
+      if (index === 0) return { ...l, mpn };
+      return {
+        ...l,
+        alternates: l.alternates.map((a, i) => (i === index - 1 ? { ...a, mpn } : a)),
+      };
+    }));
+
+  const columns = quotingColumns(cfg, hasRun, edit, editAml);
+  const rows = useMemo(() => amlRows(shown), [shown]);
 
   /* The Columns chooser, and the frozen block as its locked set — see
      useColumnChoice. */
@@ -197,7 +215,9 @@ export function StepQuoting({
           while shipping it ourselves. Grey says "waiting for the run"; red is
           kept for something that is actually wrong. */}
       <MiniTable
-        data={shown}
+        data={rows}
+        /* One BoM line is one record however many manufacturers it carries. */
+        rowGroup={{ key: r => String(r.line.id), end: r => r.last }}
         /* NO PER-COLUMN FILTER ROW. The step already carries a search box and
            the filters that matter for it, so the grid's own row filtered the
            same rows a second way and cost 48px of a grid the customer told us
@@ -206,7 +226,7 @@ export function StepQuoting({
         filterable={false}
         columns={shownColumns}
         freeze={4}
-        rowTone={l => rowTone(l, hasRun)}
+        rowTone={r => rowTone(r.line, hasRun)}
         empty={shown.length === 0 && quoted.length > 0
           ? <NoRecords title="No lines match these filters."
                        hint="Clear a filter above to see the rest of the BoM." />
@@ -271,7 +291,9 @@ export function rowTone(l: BomLine, hasRun = true): string | undefined {
  * rather than leaving them plainly blank.
  */
 function quotingColumns(cfg: RunConfig, hasRun: boolean,
-                        edit: (id: number, patch: Partial<BomLine>) => void): ColumnSpec<BomLine>[] {
+                        edit: (id: number, patch: Partial<BomLine>) => void,
+                        editAml: (line: BomLine, index: number, mpn: string) => void,
+                        ): ColumnSpec<AmlRow>[] {
   /* An excluded line "displays only the following information: Part, Revision,
      Source, Description, MFG, MPN, Qty, Total Qty" — everything else is blank
      on those rows rather than showing a zero that could be read as a price. */
@@ -279,92 +301,113 @@ function quotingColumns(cfg: RunConfig, hasRun: boolean,
     l.excluded ? <span className="vy-empty">—</span> : node;
 
   /** Red until the run fills it in. */
-  const pending = (l: BomLine) => (!hasRun && !l.excluded ? 'pending' : undefined);
+  const pending = (r: AmlRow) => (!hasRun && !r.line.excluded && r.first ? 'pending' : undefined);
+
+  /* The line's own cells belong to the FIRST of its manufacturer rows; the
+     rest leave them blank, which is the merged cell the standard asks for.
+     Supplier, price and quantity are line facts too — a BoM line is bought
+     once, from one supplier, whichever of its manufacturers was chosen. */
+  const p = <V,>(r: AmlRow, value: () => V) => (r.first ? value() : null);
 
   return [
-    { field: 'part', title: 'Part', role: 'ident', width: 180,
-      widthNote: 'Frozen, so it pays for itself; part numbers must not truncate.' },
-    { field: 'revision', title: 'Revision', role: 'code', width: 80,
-      widthNote: 'A revision is one or two characters; the live column is 80.' },
-    { field: 'partSource', title: 'Source', role: 'code', width: 100,
-      widthNote: 'Longest value is "MAKE/PHANT".' },
-    { field: 'description', title: 'Description', role: 'text', width: 200,
+    { field: 'id', id: 'part', title: 'Part', role: 'ident', width: 180,
+      widthNote: 'Frozen, so it pays for itself; part numbers must not truncate.',
+      render: r => p(r, () => r.line.part) },
+    { field: 'id', id: 'revision', title: 'Revision', role: 'code', width: 80,
+      widthNote: 'A revision is one or two characters; the live column is 80.',
+      render: r => p(r, () => r.line.revision) },
+    { field: 'id', id: 'partSource', title: 'Source', role: 'code', width: 100,
+      widthNote: 'Longest value is "MAKE/PHANT".',
+      render: r => p(r, () => r.line.partSource) },
+    { field: 'id', id: 'description', title: 'Description', role: 'text', width: 200,
       widthNote: 'Descriptions outrun any width; the live column is 200 and '
-        + 'this grid is the widest in the product.' },
-    { field: 'mfg', title: 'MFG', role: 'text', width: 140,
-      widthNote: 'Manufacturer names run long.' },
+        + 'this grid is the widest in the product.',
+      render: r => p(r, () => r.line.description) },
+    /* ONE ROW PER MANUFACTURER, and these two are the reason the rows exist.
+       Everything above and below is a fact about the LINE; MFG and MPN are
+       facts about one source of it. */
+    { field: 'mfg', id: 'mfg', title: 'MFG', role: 'text', width: 140,
+      widthNote: 'Manufacturer names run long.',
+      render: r => r.mfg || <span className="vy-empty">—</span> },
     {
-      field: 'mpn', title: 'MPN', role: 'ident', width: 180,
+      field: 'mpn', id: 'mpn', title: 'MPN', role: 'ident', width: 180,
       widthNote: 'Editable, and manufacturer part numbers are long.',
-      tone: pending,
-      /* One of the five fields the guideline lets the user edit here. */
-      render: l => hideIfExcluded(l,
-        <TextField className="vy-cell-input" aria-label={`MPN for ${l.part}`} value={l.mpn}
-                   onChange={e => edit(l.id, { mpn: e.target.value })} />),
+      tone: r => (!hasRun && !r.line.excluded ? 'pending' : undefined),
+      /* One of the five fields the guideline lets the user edit here, and now
+         it edits the manufacturer part number ON THIS ROW rather than always
+         the primary one — which is what a grid with one row per AML has to
+         mean for the edit to make sense. */
+      render: r => hideIfExcluded(r.line,
+        <TextField className="vy-cell-input" aria-label={`MPN ${r.index + 1} for ${r.line.part}`}
+                   value={r.mpn}
+                   onChange={e => editAml(r.line, r.index, e.target.value)} />),
     },
-    { field: 'qty', title: 'Qty', role: 'number', width: 90,
-      render: l => l.qty.toLocaleString() },
+    { field: 'id', id: 'qty', title: 'Qty', role: 'number', width: 90,
+      render: r => p(r, () => r.line.qty.toLocaleString()) },
     {
-      field: 'attrition', title: 'Attrition', role: 'number', width: 96,
+      field: 'id', id: 'attrition', title: 'Attrition', role: 'number', width: 96,
       widthNote: 'Editable, so it holds a control rather than a number.',
       /* "When the Attrition value is changed, the system automatically
           recalculates the Total Qty accordingly" — which happens for free,
           since Total Qty is computed from it rather than stored.
           "If the user enters an Attrition value less than 0, the system
           automatically resets the value to 0." */
-      render: l => hideIfExcluded(l,
-        <TextField className="vy-cell-input" type="number" min={0} value={String(l.attrition)}
-                   aria-label={`Attrition for ${l.part}`}
-                   onChange={e => edit(l.id, { attrition: Number(e.target.value) })}
-                   onBlur={e => { if (Number(e.target.value) < 0) edit(l.id, { attrition: 0 }); }} />),
-    },
-    { field: 'outStock', title: 'Total Qty', role: 'number', width: 100,
+      render: r => p(r, () => hideIfExcluded(r.line,
+        <TextField className="vy-cell-input" type="number" min={0} value={String(r.line.attrition)}
+                   aria-label={`Attrition for ${r.line.part}`}
+                   onChange={e => edit(r.line.id, { attrition: Number(e.target.value) })}
+                   onBlur={e => { if (Number(e.target.value) < 0) edit(r.line.id, { attrition: 0 }); }} />)) },
+    { field: 'id', id: 'total', title: 'Total Qty', role: 'number', width: 100,
       widthNote: 'A computed total, larger than the per-board quantity.',
-      render: l => totalQtyOf(l, cfg.buildQty, cfg.attritionSet).toLocaleString() },
+      render: r => p(r, () => totalQtyOf(r.line, cfg.buildQty, cfg.attritionSet).toLocaleString()) },
     {
-      field: 'supplier', title: 'Supplier', role: 'text', width: 130,
-      render: l => hideIfExcluded(l,
-        <Select label={`Supplier for ${l.part}`} value={l.supplier}
+      field: 'id', id: 'supplier', title: 'Supplier', role: 'text', width: 130,
+      render: r => p(r, () => hideIfExcluded(r.line,
+        <Select label={`Supplier for ${r.line.part}`} value={r.line.supplier}
                 options={SUPPLIERS}
-                onChange={v => edit(l.id, { supplier: v })} />),
+                onChange={v => edit(r.line.id, { supplier: v })} />)),
     },
     {
-      field: 'orderQty', title: 'Order Qty', role: 'number', width: 116,
+      field: 'id', id: 'orderQty', title: 'Order Qty', role: 'number', width: 116,
       tone: pending,
       /* "If the user enters an Order Qty value less than 0, the system
          automatically resets the value to 0." */
-      render: l => hideIfExcluded(l,
-        <TextField className="vy-cell-input" type="number" min={0} value={String(l.orderQty)}
-                   aria-label={`Order quantity for ${l.part}`}
-                   onChange={e => edit(l.id, { orderQty: Number(e.target.value) })}
-                   onBlur={e => { if (Number(e.target.value) < 0) edit(l.id, { orderQty: 0 }); }} />),
-    },
-    { field: 'stock', title: 'Stock', role: 'number', width: 100, tone: pending,
-      render: l => hideIfExcluded(l, l.stock ? l.stock.toLocaleString() : <span className="vy-empty">—</span>) },
-    { field: 'lt', title: 'LT', role: 'number', width: 80, tone: pending,
-      render: l => hideIfExcluded(l, l.lt ? String(l.lt) : <span className="vy-empty">—</span>) },
-    { field: 'pkg', title: 'Pkg.', role: 'code', width: 100, tone: pending,
-      render: l => hideIfExcluded(l, l.pkg || <span className="vy-empty">—</span>) },
-    { field: 'moq', title: 'MOQ', role: 'number', width: 100, tone: pending,
-      render: l => hideIfExcluded(l, l.moq.toLocaleString()) },
-    { field: 'excessQty', title: 'Excess', role: 'number', width: 106, tone: pending,
-      render: l => hideIfExcluded(l, l.excessQty.toLocaleString()) },
-    { field: 'unitPrice', title: 'Unit Price', role: 'money', width: 116, tone: pending,
-      render: l => hideIfExcluded(l, l.unitPrice ? money3(l.unitPrice) : <span className="vy-empty">—</span>) },
-    { field: 'amount', title: 'AMT', role: 'money', width: 120, tone: pending,
-      render: l => hideIfExcluded(l, l.amount ? money(l.amount) : <span className="vy-empty">—</span>) },
-    { field: 'excessAmt', title: 'Excess AMT', role: 'money', width: 116, tone: pending,
+      render: r => p(r, () => hideIfExcluded(r.line,
+        <TextField className="vy-cell-input" type="number" min={0} value={String(r.line.orderQty)}
+                   aria-label={`Order quantity for ${r.line.part}`}
+                   onChange={e => edit(r.line.id, { orderQty: Number(e.target.value) })}
+                   onBlur={e => { if (Number(e.target.value) < 0) edit(r.line.id, { orderQty: 0 }); }} />)) },
+    { field: 'id', id: 'stock', title: 'Stock', role: 'number', width: 100, tone: pending,
+      render: r => p(r, () => hideIfExcluded(r.line,
+        r.line.stock ? r.line.stock.toLocaleString() : <span className="vy-empty">—</span>)) },
+    { field: 'id', id: 'lt', title: 'LT', role: 'number', width: 80, tone: pending,
+      render: r => p(r, () => hideIfExcluded(r.line,
+        r.line.lt ? String(r.line.lt) : <span className="vy-empty">—</span>)) },
+    { field: 'id', id: 'pkg', title: 'Pkg.', role: 'code', width: 100, tone: pending,
+      render: r => p(r, () => hideIfExcluded(r.line, r.line.pkg || <span className="vy-empty">—</span>)) },
+    { field: 'id', id: 'moq', title: 'MOQ', role: 'number', width: 100, tone: pending,
+      render: r => p(r, () => hideIfExcluded(r.line, r.line.moq.toLocaleString())) },
+    { field: 'id', id: 'excessQty', title: 'Excess', role: 'number', width: 106, tone: pending,
+      render: r => p(r, () => hideIfExcluded(r.line, r.line.excessQty.toLocaleString())) },
+    { field: 'id', id: 'unitPrice', title: 'Unit Price', role: 'money', width: 116, tone: pending,
+      render: r => p(r, () => hideIfExcluded(r.line,
+        r.line.unitPrice ? money3(r.line.unitPrice) : <span className="vy-empty">—</span>)) },
+    { field: 'id', id: 'amount', title: 'AMT', role: 'money', width: 120, tone: pending,
+      render: r => p(r, () => hideIfExcluded(r.line,
+        r.line.amount ? money(r.line.amount) : <span className="vy-empty">—</span>)) },
+    { field: 'id', id: 'excessAmt', title: 'Excess AMT', role: 'money', width: 116, tone: pending,
       /* $0.000 is the guideline's stated default, three decimals and all. */
-      render: l => hideIfExcluded(l, money3(l.excessAmt)) },
-    { field: 'status', title: 'Status', role: 'status', width: 110, tone: pending,
-      render: l => <span className="vy-line-status" data-status={l.status}>{l.status}</span> },
+      render: r => p(r, () => hideIfExcluded(r.line, money3(r.line.excessAmt))) },
+    { field: 'id', id: 'status', title: 'Status', role: 'status', width: 110, tone: pending,
+      render: r => p(r, () => (
+        <span className="vy-line-status" data-status={r.line.status}>{r.line.status}</span>)) },
     {
-      field: 'notes', title: 'Notes', role: 'text', width: 140,
+      field: 'id', id: 'notes', title: 'Notes', role: 'text', width: 140,
       widthNote: 'Editable free text — a cramped note field goes unused.',
       tone: pending,
-      render: l => hideIfExcluded(l,
-        <TextField className="vy-cell-input" aria-label={`Notes for ${l.part}`} value={l.notes}
-                   onChange={e => edit(l.id, { notes: e.target.value })} />),
-    },
+      render: r => p(r, () => hideIfExcluded(r.line,
+        <TextField className="vy-cell-input" aria-label={`Notes for ${r.line.part}`}
+                   value={r.line.notes}
+                   onChange={e => edit(r.line.id, { notes: e.target.value })} />)) },
   ];
 }

@@ -50,7 +50,7 @@ import { renderCell } from './renderCell';
  * ---------------------------------------------------------------------------
  */
 export function MiniTable<T extends { id: string | number }>({
-  data, columns, empty, rowTone, freeze = 0, filterable = true,
+  data, columns, empty, rowTone, freeze = 0, filterable = true, rowGroup,
 }: {
   data: T[]; columns: ColumnSpec<T>[]; empty?: ReactNode;
   /**
@@ -79,6 +79,27 @@ export function MiniTable<T extends { id: string | number }>({
    * not get one even when this is true.
    */
   filterable?: boolean;
+  /**
+   * Rows that are not records but PARTS of one.
+   *
+   * ASKED FOR by the VIQ UI Standard — "Child lists as rows: one AML pair per
+   * row, parent cells merged" — and shown working in the customer's Quoting
+   * BoM mockup of 16 Oct. A BoM line with two manufacturers is two rows: the
+   * line's own cells on the first, blank on the second, and one rule under the
+   * pair rather than between them.
+   *
+   * WHY THE GRID HAS TO KNOW. Sorting. Kendo's `process` reorders a flat array,
+   * and a flat array of child rows sorted by Part scatters the children away
+   * from the parent they belong to — the group is only a group because the rows
+   * are adjacent. Given this, the sort is applied to one row per group and the
+   * rest follow their own, so a sorted grid still reads as records.
+   */
+  rowGroup?: {
+    /** Rows sharing a key are one record. */
+    key: (row: T) => string;
+    /** True on the last row of a group: the rule is drawn under it. */
+    end: (row: T) => boolean;
+  };
 }) {
   const [sort, setSort] = useState<SortDescriptor[]>([]);
   const [filter, setFilter] = useState<CompositeFilterDescriptor | undefined>(undefined);
@@ -87,7 +108,22 @@ export function MiniTable<T extends { id: string | number }>({
      cells' own operators. The previous hand-written comparator sank blanks in
      both directions; `process` does not, which is a real behaviour change and
      is recorded in the scope rather than hidden. */
-  const view = useMemo(() => process(data as object[], { sort, filter }), [data, sort, filter]);
+  const view = useMemo(() => {
+    if (!rowGroup) return process(data as object[], { sort, filter });
+    /* One entry per group, in the order the data arrived. */
+    const groups = new Map<string, T[]>();
+    for (const row of data) {
+      const k = rowGroup.key(row);
+      (groups.get(k) ?? groups.set(k, []).get(k)!).push(row);
+    }
+    /* Sort and filter the HEADS — the row carrying the record's own values —
+       then put each group back together behind the head that survived. A
+       filter matching a child row keeps the whole record, which is the only
+       reading that makes sense: the record is what the user is looking for. */
+    const heads = [...groups.values()].map(g => g[0]);
+    const kept = process(heads as object[], { sort, filter }).data as T[];
+    return { data: kept.flatMap(h => groups.get(rowGroup.key(h))!) as object[], total: data.length };
+  }, [data, sort, filter, rowGroup]);
 
   /* A filter row over three rows costs a row of chrome to search three things,
      and this component backs both a 23-line BoM and a 1-line Where-Used. The
@@ -99,7 +135,8 @@ export function MiniTable<T extends { id: string | number }>({
   if (data.length === 0 && empty) return <>{empty}</>;
 
   return (
-    <div className="vy-minitable-k" data-frozen={freeze || undefined}>
+    <div className="vy-minitable-k" data-frozen={freeze || undefined}
+         data-grouped={rowGroup ? '' : undefined}>
       <Grid
         data={view.data}
         /* Without this the grid is MOUSE-ONLY for sorting. Kendo puts the sort
@@ -120,7 +157,13 @@ export function MiniTable<T extends { id: string | number }>({
            This puts our row state back on the row Kendo renders. */
         rows={{
           data: ({ dataItem, trProps, children }: GridCustomRowProps) => (
-            <tr {...kendoDomProps(trProps)} data-tone={rowTone?.(dataItem as T)}>{children}</tr>
+            <tr {...kendoDomProps(trProps)} data-tone={rowTone?.(dataItem as T)}
+                /* The rule goes under the LAST row of a record, so the rows of
+                   one BoM line read as one block rather than as three lines
+                   that happen to share a part number. */
+                data-group-end={rowGroup ? (rowGroup.end(dataItem as T) || undefined) : undefined}>
+              {children}
+            </tr>
           ),
         }}
       >

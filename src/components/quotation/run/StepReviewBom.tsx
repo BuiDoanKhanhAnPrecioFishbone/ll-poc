@@ -7,6 +7,7 @@ import type { ColumnSpec } from '../../column-model';
 import { QuoteContextBar, QuoteToolbar, NoRecords } from './QuoteContext';
 import { KNOWN_MANUFACTURERS, PART_MASTER, totalQtyOf, type BomLine } from '../../../data/bom';
 import { setupOf, type RunConfig } from './state';
+import { amlPairs, amlRows, type AmlRow } from './amlRows';
 
 /**
  * Step 2 — Review BoM.
@@ -24,14 +25,6 @@ export function StepReviewBom({ cfg, lines, setLines }: {
   const [missingMfg, setMissingMfg] = useState(false);
 
   const missingFromMaster = lines.filter(l => !PART_MASTER.has(l.part)).length;
-
-  /* How many AML slots this BoM actually uses. At least one, so a BoM with no
-     manufacturers at all still shows the pair of columns the user expects to
-     fill; never more than the live screen's six. */
-  const amlDepth = useMemo(
-    () => Math.min(6, Math.max(1, ...lines.map(l => amlPairs(l).length))),
-    [lines],
-  );
 
   const shown = useMemo(() => {
     const k = search.trim().toLowerCase();
@@ -65,18 +58,25 @@ export function StepReviewBom({ cfg, lines, setLines }: {
      leave the rest excluded. */
   const toggleAll = (on: boolean) => setLines(ls => ls.map(l => ({ ...l, excluded: !on })));
 
-  const columns: ColumnSpec<BomLine>[] = [
+  /* ONE ROW PER MANUFACTURER, and the line's own cells on the first of them.
+     See `amlRows.ts` for why this replaced the generated MFG1..MFGPN6 columns.
+     Every parent cell is written `r.first ? … : null`, which is the blank half
+     of a merged cell; the rule under the group is drawn by `rowGroup`. */
+  const parent = <V,>(r: AmlRow, value: () => V) => (r.first ? value() : null);
+
+  const columns: ColumnSpec<AmlRow>[] = [
     {
-      field: 'excluded', title: '', role: 'priority', width: 52,
+      field: 'id', id: 'include', title: '', role: 'priority', width: 52,
       widthNote: 'A checkbox, nothing else.',
+      sortable: false,
       headerRender: () => (
         <Checkbox checked={allOn} onCheckedChange={toggleAll}
                   label={<span className="vy-sr-only">Select all BoM lines</span>} />
       ),
-      render: l => (
-        <Checkbox checked={!l.excluded} onCheckedChange={on => toggle(l.id, on)}
-                  label={<span className="vy-sr-only">Include {l.part} in the quotation</span>} />
-      ),
+      render: r => parent(r, () => (
+        <Checkbox checked={!r.line.excluded} onCheckedChange={on => toggle(r.line.id, on)}
+                  label={<span className="vy-sr-only">Include {r.line.part} in the quotation</span>} />
+      )),
     },
     /* WIDTHS ARE TUNED TO FIT, and that is the whole point of them.
        The guideline freezes six columns here plus the checkbox. At the role
@@ -85,95 +85,70 @@ export function StepReviewBom({ cfg, lines, setLines }: {
        window. We had made the live screen's own mistake worse: theirs freezes
        53%. A frozen column costs nothing when nothing scrolls, so the columns
        are sized to the content they actually hold and the grid fits. */
-    { field: 'number', title: 'NUMBER', role: 'code', width: 72,
-      widthNote: 'A line number, at most three digits.' },
+    { field: 'id', id: 'number', title: 'NUMBER', role: 'code', width: 72,
+      widthNote: 'A line number, at most three digits.',
+      render: r => parent(r, () => r.line.number) },
     {
-      field: 'part', title: 'ROCKET_PN', role: 'ident', width: 170,
+      field: 'id', id: 'part', title: 'ROCKET_PN', role: 'ident', width: 170,
       widthNote: 'Longest part in the set is "IC-MCU-M4-256K", 14 characters.',
       /* Green when the part exists in Part Master, red when it does not — and
          red is not decorative: "The user cannot confirm Project Requirement
-         until all missing part numbers have been created in Part Master." */
-      tone: l => (PART_MASTER.has(l.part) ? 'known' : 'missing'),
-      render: l => (
-        <span className="vy-ident" title={PART_MASTER.has(l.part)
+         until all missing part numbers have been created in Part Master."
+         The tone is on the FIRST row only, because that is the cell that
+         carries the part number; painting the blank continuation cell would
+         colour a cell with nothing in it. */
+      tone: r => (r.first ? (PART_MASTER.has(r.line.part) ? 'known' : 'missing') : undefined),
+      render: r => parent(r, () => (
+        <span className="vy-ident" title={PART_MASTER.has(r.line.part)
           ? 'In Part Master'
           : 'Not in Part Master — create it before confirming this RFQ'}>
-          {l.part}
+          {r.line.part}
         </span>
-      ),
+      )),
     },
-    { field: 'revision', title: 'REVISION', role: 'code', width: 84,
-      widthNote: 'A single letter in every row of the set.' },
-    { field: 'description', title: 'PART DESCRIPTION', role: 'text', width: 230,
-      widthNote: 'Descriptions run past any width; the cell title carries the rest.' },
-    { field: 'partSource', title: 'PART SOURCE', role: 'code', width: 116,
-      widthNote: 'Longest value is "MAKE/PHANT".' },
-    { field: 'qty', title: 'QUANTITY', role: 'number', width: 92,
+    { field: 'id', id: 'revision', title: 'REVISION', role: 'code', width: 84,
+      widthNote: 'A single letter in every row of the set.',
+      render: r => parent(r, () => r.line.revision) },
+    { field: 'id', id: 'description', title: 'PART DESCRIPTION', role: 'text', width: 230,
+      widthNote: 'Descriptions run past any width; the cell title carries the rest.',
+      render: r => parent(r, () => r.line.description) },
+    { field: 'id', id: 'partSource', title: 'PART SOURCE', role: 'code', width: 116,
+      widthNote: 'Longest value is "MAKE/PHANT".',
+      render: r => parent(r, () => r.line.partSource) },
+    { field: 'id', id: 'qty', title: 'QUANTITY', role: 'number', width: 92,
       widthNote: 'A per-board count, three digits at most.',
-      render: l => l.qty.toLocaleString() },
-    { field: 'level', title: 'LEVEL', role: 'number', width: 72,
-      widthNote: 'A single digit.' },
-    /* ONE COLUMN PER AML SLOT, as the live screen has them — MFG1, MFGPN1,
-       MFG2, MFGPN2 and so on. This replaced a single stacked "MFG | MPN" cell
-       of mine, and the reversal is the customer's, with their screen as the
-       evidence: on the BoM they showed, MFG2/MFGPN2 carry real second sources
-       (TREND_TE, ONSEMI), so the alternates are not the dead weight the first
-       BoM I measured suggested.
-
-       The argument I had missed is scanning. Separate columns let an estimator
-       read DOWN MFG2 to see which lines have a second source at all, which is
-       the question this step exists to answer. Stacked pairs can only be read
-       row by row.
-
-       WHAT WE DO NOT COPY: the live grid renders all six slots always, and on
-       the record we measured MFG3 through MFGPN6 were empty on 13 of 13 rows —
-       1,200px of horizontal scroll for columns no row used. The slots here are
-       generated to the depth the DATA has, so a BoM with one AML per line gets
-       two columns and a BoM with three gets six. */
-    ...Array.from({ length: amlDepth }).flatMap((_, i) => ([
-      {
-        field: 'mfg' as const, id: `mfg${i + 1}`, title: `MFG${i + 1}`,
-        role: 'text' as const, width: 150,
-        widthNote: 'A manufacturer name, as the live column is sized.',
-        /* "The background color is displayed in yellow because the
-           manufacturer value already exists in Manufacturer Management" —
-           and red where it does not, which is what their Missing Manufacturer
-           filter is named for. A slot the line does not have stays plain. */
-        tone: (l: BomLine) => {
-          const pr = amlPairs(l)[i];
-          if (!pr || !pr.mfg) return undefined;
-          return KNOWN_MANUFACTURERS.has(pr.mfg) ? 'known-mfg' : 'missing';
-        },
-        render: (l: BomLine) => {
-          const pr = amlPairs(l)[i];
-          if (!pr || !pr.mfg) return <span className="vy-empty">—</span>;
-          return (
-            <span title={KNOWN_MANUFACTURERS.has(pr.mfg)
-              ? `${pr.mfg} is in Manufacturer Management`
-              : `${pr.mfg} is not in Manufacturer Management`}>{pr.mfg}</span>
-          );
-        },
-      },
-      {
-        field: 'mpn' as const, id: `mfgpn${i + 1}`, title: `MFGPN${i + 1}`,
-        role: 'ident' as const, width: 170,
-        widthNote: 'Manufacturer part numbers are long and must not truncate.',
-        render: (l: BomLine) => {
-          const pr = amlPairs(l)[i];
-          return pr && pr.mpn
-            ? <span className="vy-code">{pr.mpn}</span>
-            : <span className="vy-empty">—</span>;
-        },
-      },
-    ])),
-    { field: 'attrition', title: 'TOTAL QTY', role: 'number', width: 108,
+      render: r => parent(r, () => r.line.qty.toLocaleString()) },
+    { field: 'id', id: 'level', title: 'LEVEL', role: 'number', width: 72,
+      widthNote: 'A single digit.',
+      render: r => parent(r, () => r.line.level) },
+    {
+      field: 'mfg', id: 'mfg', title: 'MFG', role: 'text', width: 170,
+      widthNote: 'A manufacturer name, as the live column is sized.',
+      /* "The background color is displayed in yellow because the manufacturer
+         value already exists in Manufacturer Management" — and red where it
+         does not, which is what their Manufacturer Not Verified filter is
+         named for. */
+      tone: r => (r.mfg ? (KNOWN_MANUFACTURERS.has(r.mfg) ? 'known-mfg' : 'missing') : undefined),
+      render: r => (r.mfg
+        ? <span title={KNOWN_MANUFACTURERS.has(r.mfg)
+            ? `${r.mfg} is in Manufacturer Management`
+            : `${r.mfg} is not in Manufacturer Management`}>{r.mfg}</span>
+        : <span className="vy-empty">—</span>),
+    },
+    {
+      field: 'mpn', id: 'mpn', title: 'MFGPN', role: 'ident', width: 190,
+      widthNote: 'Manufacturer part numbers are long and must not truncate.',
+      render: r => (r.mpn ? <span className="vy-code">{r.mpn}</span> : <span className="vy-empty">—</span>),
+    },
+    { field: 'id', id: 'total', title: 'TOTAL QTY', role: 'number', width: 108,
       widthNote: 'Holds a computed total, which is larger than a per-board qty.',
       /* Not in the guideline's column list for this step, but the formula runs
-         here and Build Qty and Attrition Set are editable on this screen. A
-         user changing Build Qty with no visible consequence has no way to tell
-         whether it took. */
-      render: l => totalQtyOf(l, cfg.buildQty, cfg.attritionSet).toLocaleString() },
+         here and the setup that feeds it is on the strip above. */
+      render: r => parent(r, () =>
+        totalQtyOf(r.line, cfg.buildQty, cfg.attritionSet).toLocaleString()) },
   ];
+
+  const rows = useMemo(() => amlRows(shown), [shown]);
 
   /* The Columns chooser, and the frozen block as its locked set — see
      useColumnChoice. */
@@ -226,7 +201,10 @@ export function StepReviewBom({ cfg, lines, setLines }: {
           Revision, Part Description, Part Source, Quantity — plus the checkbox
           in front of them, which would be useless scrolled out of view. */}
       <MiniTable
-        data={shown}
+        data={rows}
+        /* The rows of one BoM line are one record: they sort together and
+           carry a single rule under the last of them. */
+        rowGroup={{ key: r => String(r.line.id), end: r => r.last }}
         /* NO PER-COLUMN FILTER ROW. The step already carries a search box and
            the filters that matter for it, so the grid's own row filtered the
            same rows a second way and cost 48px of a grid the customer told us
@@ -235,7 +213,7 @@ export function StepReviewBom({ cfg, lines, setLines }: {
         filterable={false}
         columns={shownColumns}
         freeze={7}
-        rowTone={l => (l.excluded ? 'excluded' : undefined)}
+        rowTone={r => (r.line.excluded ? 'excluded' : undefined)}
         empty={<NoRecords title="No lines match these filters."
                           hint="Clear the search or a filter above to see the rest of the BoM." />}
       />
@@ -261,17 +239,6 @@ export function StepReviewBom({ cfg, lines, setLines }: {
       </p>
     </div>
   );
-}
-
-/**
- * Every AML on a line: the primary manufacturer first, then its alternates.
- *
- * A line with no manufacturer at all returns nothing rather than a blank pair —
- * the cell then says so once, instead of rendering an empty chip that looks
- * like a value that failed to load.
- */
-export function amlPairs(l: BomLine): { mfg: string; mpn: string }[] {
-  return [{ mfg: l.mfg, mpn: l.mpn }, ...l.alternates].filter(p => p.mfg.trim() || p.mpn.trim());
 }
 
 /** No recognised manufacturer anywhere on the line — including none at all. */
