@@ -16,7 +16,9 @@ Cập nhật 21/10/2026.
 
 **Đã làm:** Quote Setup tách khỏi kết quả (`Get Prices` / `Update Results` / `Refresh Prices` + dialog cảnh báo quota) · AML thành dòng con ở cả step 2 và 3 · Preferred Suppliers theo nhóm ưu tiên + thuật toán chọn nhà cung cấp · chọn MPN chính thức từ danh sách Nexar (file BoM giữ nguyên giá trị) · Consigned trừ trước khi mua · điều hướng wizard trên trái, stepper trên phải.
 
-**Còn thiếu:** thẻ Quote Run + chọn phiên bản sau khi Submit · bảng Cost Estimation 2×2 (Per Board / Total × có-không markup) · *Continue from Drafts* ở step 1 · giá trị mang từ Project Requirement tô xanh khi bị đổi.
+**Đã làm nốt 21/10:** thẻ *Quote Run · Version N* + *Prices From* ở step 4 · Cost Estimation 2×2 · *Continue from Drafts* ở step 1 · giá trị mang từ RFQ tô xanh kèm tooltip *"RFQ value: 27"*.
+
+**Còn lại một điểm:** bộ chọn phiên bản sau khi Submit. Tab **Result** trên hồ sơ đã liệt kê mỗi phiên bản một dòng (ngày chạy, người chạy, tổng tiền) — mình thấy một bảng đủ phiên bản tốt hơn một bộ chọn chỉ hiện một. Xin chị cho ý kiến.
 
 ## Cần chị quyết
 
