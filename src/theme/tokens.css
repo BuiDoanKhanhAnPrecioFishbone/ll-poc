@@ -478,6 +478,7 @@
   --vy-mpn-menu-w:        320px; /* an MPN and a full manufacturer name */
   --vy-quote-field-min:   240px; /* one field on the Config BoM grid */
   --vy-cost-col-min:      170px; /* one figure in the cost summary */
+  --vy-cost-table-min:    340px; /* two money columns and their headings */
   /* ONE reading measure, and it caps TEXT — never a container.
      Panels, cards and dialogs take their width from the layout they sit in; only
      the prose inside them is capped, because line length is a property of text.

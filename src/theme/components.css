@@ -1278,6 +1278,12 @@
    ruled it out — "do not use monotext, hard to read" — and that contradiction
    is question 1 in the customer document. Until it is answered this reads like
    every other identifier in the product: the body face, with `tabular-nums`. */
+/* Step 4 names the run this strip describes, ahead of the assembly. */
+.vy-quote-context-heading {
+  font-weight: var(--vy-weight-semibold); color: var(--vy-on-surface-strong);
+  padding-inline-end: var(--vy-space-5);
+  border-inline-end: 1px solid var(--vy-border);
+}
 .vy-quote-context-head strong {
   color: var(--vy-on-surface-strong); font-variant-numeric: tabular-nums;
 }
@@ -1395,6 +1401,34 @@
   margin: 0; padding: var(--vy-space-4) var(--vy-space-5);
   font-size: var(--vy-text-xs); color: var(--vy-on-surface-muted);
   border-top: 1px solid var(--vy-border);
+}
+
+/* Saved drafts, under the work on step 1. Full width, because a table of seven
+   columns in a half-width column is a table nobody reads.
+
+   NOT `.vy-run-drafts`, which was taken: that name belongs to the "Don't see
+   your template?" line a few hundred lines up, and reusing it put this section
+   under that one's border rule — and, for one confusing measurement, made the
+   template link look like the drafts table. */
+.vy-run-draft-list { grid-column: 1 / -1; }
+
+/* ---- A value this quote changed from the record it came out of -----------
+   Three fields on step 1 arrive from the Project Requirement and may be
+   overridden for one quote. The mark is on the QUOTE: without it a reader has
+   no way to tell which figures are the customer's and which are this quote's,
+   and that difference is what a reviewer is looking for. Blue, as the standard
+   reserves it for "changed"; the original is in the field's tooltip. */
+.vy-quote-config-field[data-changed] .vy-input,
+.vy-quote-config-field[data-changed] .k-input,
+.vy-quote-config-field[data-changed] .k-picker {
+  background: var(--vy-brand-subtle);
+  border-color: var(--vy-brand-boundary-strong);
+  color: var(--vy-brand-text-deep);
+  font-weight: var(--vy-weight-medium);
+}
+.vy-quote-config-field[data-changed] .k-input-inner { color: var(--vy-brand-text-deep); }
+.vy-field-changed {
+  font-size: var(--vy-text-xs); color: var(--vy-brand-text);
 }
 
 /* ---- Preferred Suppliers -------------------------------------------------
@@ -1590,18 +1624,34 @@
 .vy-line-status[data-status="N/A"]    { background: var(--vy-tone-missing-bg); color: var(--vy-tone-missing-fg); }
 .vy-line-status[data-status="NO BID"] { background: var(--vy-surface-strong); color: var(--vy-on-surface-muted); }
 
-/* ---- Step 4 cost summary ------------------------------------------------- */
+/* ---- Step 4 cost estimation ----------------------------------------------
+   Two measures down, with and without markup across — see StepSummary.tsx for
+   why this is a table and not the list of five it replaced. */
 .vy-cost-card--wide { display: flex; flex-direction: column; align-items: flex-start; gap: var(--vy-space-6); }
-.vy-cost-grid {
-  margin: 0; width: 100%;
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(var(--vy-cost-col-min), 1fr));
-  gap: var(--vy-space-5) var(--vy-space-9);
+.vy-cost-table { border-collapse: collapse; min-inline-size: var(--vy-cost-table-min); }
+.vy-cost-table th[scope="col"] {
+  font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .05em;
+  font-weight: var(--vy-weight-medium); color: var(--vy-on-surface-subtle);
+  text-align: end; padding: 0 0 var(--vy-space-3) var(--vy-space-9);
 }
-.vy-cost-grid .vy-cost-row { flex-direction: column; align-items: flex-start; gap: var(--vy-space-1); }
-.vy-cost-grid .vy-cost-row[data-emphasis] { margin: 0; padding: 0; border: 0; }
-/* Excess is the one figure in red: it is money spent on material the build
-   does not consume, which is a different kind of number from the other four. */
-.vy-cost-row[data-tone="excess"] dd { color: var(--vy-danger-text-deep); }
+.vy-cost-table th[scope="row"] {
+  text-align: start; font-weight: var(--vy-weight-regular);
+  color: var(--vy-on-surface-muted); padding: var(--vy-space-3) 0;
+}
+.vy-cost-table td {
+  text-align: end; padding: var(--vy-space-3) 0 var(--vy-space-3) var(--vy-space-9);
+  font-variant-numeric: tabular-nums; color: var(--vy-on-surface-strong);
+}
+/* The number the quotation is actually for. */
+.vy-cost-table td[data-emphasis] {
+  font-size: var(--vy-text-lg); font-weight: var(--vy-weight-semibold);
+}
+.vy-cost-table tfoot th, .vy-cost-table tfoot td {
+  border-block-start: 1px solid var(--vy-border); padding-block-start: var(--vy-space-4);
+}
+/* Excess is money spent on material the build does not consume, which is a
+   different kind of number from the four above it. */
+.vy-cost-table td[data-tone="excess"] { color: var(--vy-danger-text-deep); }
 
 /* ---- View Setting: the filter preview ------------------------------------
    Two screens on this app say "filter". The toolbar over the grid is where you

@@ -33,8 +33,14 @@ import type { QuoteSetup } from './state';
  * press it.
  */
 export function QuoteContextBar({
-  assembly, description, applied, pending, onPending, onSuppliers, extra,
+  heading, assembly, description, applied, pending, onPending, onSuppliers, rfq, extra,
 }: {
+  /**
+   * What this strip IS, where it is not simply the setup — step 4 names the
+   * run it is describing, "Quote Run · Version 3", because by then the setup
+   * is history rather than a control.
+   */
+  heading?: string;
   assembly: string; description: string;
   /** What the grid's numbers were computed from. */
   applied: QuoteSetup;
@@ -44,6 +50,12 @@ export function QuoteContextBar({
   /** Opens the Preferred Suppliers dialog. Step 3 only — it is the one step
    *  where the setup can be changed. */
   onSuppliers?: () => void;
+  /**
+   * What the Project Requirement holds for these fields, where it holds
+   * anything. Only the three carried from it — Quote Focus, Package Type and
+   * Markup — and it is shown as a tooltip rather than a second colour.
+   */
+  rfq?: Partial<Record<keyof QuoteSetup, string | number>>;
   /** Run by / Run Date / Run Version, which only step 4 has. */
   extra?: { label: string; value: string }[];
 }) {
@@ -51,8 +63,21 @@ export function QuoteContextBar({
   const s = pending ?? applied;
   /* The same comparison `setupChanged` makes, one field at a time. */
   const changed = (k: keyof QuoteSetup) => editable && String(s[k]) !== String(applied[k]);
-  const was = (k: keyof QuoteSetup) =>
-    changed(k) ? `Current results use: ${applied[k]}` : undefined;
+  /**
+   * The tooltip on a setup field, which may have two things to say.
+   *
+   * BLUE MEANS "not applied yet" — the grid below still uses the other value —
+   * and that is the mark. The RFQ's own value is a second fact about the same
+   * field and does not deserve a second colour: it goes in the tooltip, which
+   * is where the customer's mockup puts it ("RFQ value: Reels").
+   */
+  const was = (k: keyof QuoteSetup) => {
+    const parts = [
+      changed(k) ? `Current results use: ${applied[k]}` : '',
+      rfq && String(rfq[k] ?? '') !== String(s[k]) ? `RFQ value: ${rfq[k]}` : '',
+    ].filter(Boolean);
+    return parts.length ? parts.join(' · ') : undefined;
+  };
   const supChanged = editable && !sameSuppliers(s.suppliers, applied.suppliers);
 
   return (
@@ -64,6 +89,7 @@ export function QuoteContextBar({
           is 76. It is also not a setting — nothing about it can be changed
           here — so a row of settings is the wrong company for it. */}
       <p className="vy-quote-context-head">
+        {heading && <span className="vy-quote-context-heading">{heading}</span>}
         <strong>{assembly}</strong>
         {description && <span>{description}</span>}
         {/* THE SUPPLIER LIST IS A SETTING TOO, and the one that changes the

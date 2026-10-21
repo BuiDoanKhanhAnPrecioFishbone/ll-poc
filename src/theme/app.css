@@ -925,13 +925,9 @@
 /* ---- Step 4: Cost Estimation -------------------------------------------- */
 .vy-cost-card { padding: var(--vy-space-8); background: var(--vy-surface-app); border: 1px solid var(--vy-border); border-radius: var(--vy-radius-lg); }
 .vy-cost-title { margin: 0 0 var(--vy-space-6); font-size: var(--vy-text-sm); font-weight: var(--vy-weight-semibold); color: var(--vy-on-surface-muted); text-transform: uppercase; letter-spacing: .04em; }
-.vy-cost-row { display: flex; justify-content: space-between; align-items: baseline; gap: var(--vy-space-6); }
-.vy-cost-row dt { font-size: var(--vy-text-sm); color: var(--vy-on-surface-muted); }
-.vy-cost-row dd { margin: 0; font-family: var(--vy-font-mono); font-size: var(--vy-text-base); color: var(--vy-on-surface-strong); font-variant-numeric: tabular-nums; }
-/* The number the quote is actually judged on. */
-.vy-cost-row[data-emphasis] { margin-top: var(--vy-space-3); padding-top: var(--vy-space-5); border-top: 1px solid var(--vy-border-strong); }
-.vy-cost-row[data-emphasis] dt { color: var(--vy-on-surface-strong); font-weight: var(--vy-weight-semibold); }
-.vy-cost-row[data-emphasis] dd { font-size: var(--vy-text-lg); font-weight: var(--vy-weight-bold); }
+/* The cost-summary ROWS lived here until 21 Oct: five figures as a definition
+   list, the money in a mono face. Both went with the matrix — see the cost
+   table in components.css, and the 8 Oct review on mono. */
 
 /* =============================================================================
    BOM COMPARISON RESULT

@@ -41,7 +41,7 @@ import { SUPPLIERS as SUPPLIER_NAMES } from '../../../data/suppliers';
  */
 export function StepQuoting({
   cfg, lines, setLines, hasRun, pricedAt, pending, setPending, dirty,
-  onGetPrices, onRefreshPrices, onUpdateResults, onAddAttrition, onApplyPriceRange,
+  onGetPrices, onRefreshPrices, onUpdateResults, onAddAttrition, onApplyPriceRange, rfq,
 }: {
   /** The APPLIED setup — what every number in the grid was computed from. */
   cfg: RunConfig;
@@ -58,6 +58,8 @@ export function StepQuoting({
   onUpdateResults: () => void;
   onAddAttrition: () => void;
   onApplyPriceRange: () => void;
+  /** The RFQ's own values for the fields this quote carried from it. */
+  rfq?: Partial<Record<'quoteFocus' | 'materialPackageType' | 'markup', string | number>>;
 }) {
   const [suppliersOpen, setSuppliersOpen] = useState(false);
   const [search, setSearch] = useState('');
@@ -142,6 +144,7 @@ export function StepQuoting({
         pending={pending}
         onPending={setPending}
         onSuppliers={() => setSuppliersOpen(true)}
+        rfq={rfq}
       />
 
       {suppliersOpen && (

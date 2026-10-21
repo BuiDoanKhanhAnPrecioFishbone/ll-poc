@@ -24,7 +24,7 @@ const STATUSES: LineStatus[] = ['COVER', 'NO', 'N/A', 'NO BID'];
  */
 export function StepSummary({ cfg, lines, run, onAddPackage, setLines }: {
   cfg: RunConfig; lines: BomLine[];
-  run: { by: string; date: string; version: number };
+  run: { by: string; date: string; version: number; pricedAt?: string };
   onAddPackage: () => void;
   setLines: (fn: (l: BomLine[]) => BomLine[]) => void;
 }) {
@@ -55,29 +55,71 @@ export function StepSummary({ cfg, lines, run, onAddPackage, setLines }: {
 
   return (
     <div className="vy-run-step">
+      {/* THE RUN, NOT THE SETUP. On steps 2 and 3 this strip is what the quote
+          will be computed from; here it is what it WAS computed from, and the
+          version is the thing a reader needs first — a quotation is sent,
+          revised and sent again, and "which one am I looking at" has to be
+          answerable from the top of the screen. */}
       <QuoteContextBar
+        heading={`Quote Run · Version ${run.version || 1}`}
         assembly={`${cfg.assemblyPartNumber} - ${cfg.partRev}`}
         description={cfg.partDesc}
         applied={setupOf(cfg)}
         extra={[
+          /* Prices and the run are not the same event: Update Results re-runs
+             the arithmetic without asking the marketplace again, so a quote can
+             be newer than the prices in it. */
+          { label: 'Prices From', value: run.pricedAt || 'No prices · zero quote' },
           { label: 'Run by', value: run.by },
           { label: 'Run Date', value: run.date },
-          { label: 'Run Version', value: String(run.version) },
         ]}
       />
 
+      {/* A MATRIX, NOT A LIST — 21 Oct, following the customer's mockup. The
+          five figures were five rows of a definition list: Cost/Board,
+          Cost/Board with Markup, Total Cost, Total Cost with Markup, Excess
+          Amount. Four of those are ONE measure under two conditions, and a
+          list makes the reader pair them up by reading the labels. A table
+          says it in its shape: two rows, two columns, and the markup is a
+          column heading rather than a suffix repeated twice.
+
+          Excess Amount keeps its own row under the rule, because it is not a
+          third way of measuring the same material — it is money spent on
+          material the build does not consume. */}
       <section className="vy-cost-card vy-cost-card--wide">
-        <h3 className="vy-cost-title">Cost summary</h3>
-        <dl className="vy-cost-grid">
-          {/* Black for the cost figures, red for Excess Amount — the guideline
-              asks for exactly that split, and it is a real distinction: excess
-              is the money spent on material the build does not consume. */}
-          <Cost label="Cost/Board" value={money3(cost.costBoard)} />
-          <Cost label="Cost/Board with Markup" value={money3(cost.costBoardMarkup)} />
-          <Cost label="Total Cost" value={money(cost.totalCost)} />
-          <Cost label="Total Cost with Markup" value={money(cost.totalCostMarkup)} emphasis />
-          <Cost label="Excess Amount" value={money(cost.excessAmount)} tone="excess" />
-        </dl>
+        <h3 className="vy-cost-title">Cost estimation</h3>
+        <table className="vy-cost-table">
+          <thead>
+            <tr>
+              <th scope="col"><span className="vy-sr-only">Measure</span></th>
+              <th scope="col">Without Markup</th>
+              <th scope="col">With Markup ({cfg.markup}%)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Per Board</th>
+              <td>{money3(cost.costBoard)}</td>
+              <td>{money3(cost.costBoardMarkup)}</td>
+            </tr>
+            <tr>
+              <th scope="row">Total</th>
+              <td>{money(cost.totalCost)}</td>
+              <td data-emphasis>{money(cost.totalCostMarkup)}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <th scope="row">Excess Amount</th>
+              <td />
+              {/* Red only when there IS excess: $0.00 in red reads as a problem
+                  that has been found, and finding none is the good outcome. */}
+              <td data-tone={cost.excessAmount > 0 ? 'excess' : undefined}>
+                {money(cost.excessAmount)}
+              </td>
+            </tr>
+          </tfoot>
+        </table>
         {/* "The Add Package button is displayed below the cost summary section." */}
         <Button onClick={onAddPackage} title="Add a packaging part to this quotation">
           Add Package
@@ -94,23 +136,20 @@ export function StepSummary({ cfg, lines, run, onAddPackage, setLines }: {
         ]}
       />
 
-      <MiniTable data={shown} columns={columns} freeze={3} rowTone={rowTone} empty={<NoRecords />} />
-        /* NO PER-COLUMN FILTER ROW. The step already carries a search box and
-           the filters that matter for it, so the grid's own row filtered the
-           same rows a second way and cost 48px of a grid the customer told us
-           was too short. The guideline asks for filter cells on the Part
-           record's BoM Components tab; it does not ask for them here. */
-        filterable={false}
-    </div>
-  );
-}
+      {/* NO PER-COLUMN FILTER ROW. The step already carries a search box and
+          the filters that matter for it, so the grid's own row filtered the
+          same rows a second way and cost 48px of a grid the customer told us
+          was too short. The guideline asks for filter cells on the Part
+          record's BoM Components tab; it does not ask for them here.
 
-function Cost({ label, value, emphasis, tone }: {
-  label: string; value: string; emphasis?: boolean; tone?: string;
-}) {
-  return (
-    <div className="vy-cost-row" data-emphasis={emphasis || undefined} data-tone={tone}>
-      <dt>{label}</dt><dd>{value}</dd>
+          THIS SAID SO AND DID NOT DO IT, until 21 Oct. The element above was
+          self-closed and the comment and `filterable` were left outside it, so
+          two things happened on every visit to step 4: the filter row the note
+          forbids was rendered, and the note itself was printed on screen as a
+          paragraph of source code. Found by opening step 4 on a draft — it is
+          three clicks deep, and no check we run walks that far. */}
+      <MiniTable data={shown} columns={columns} freeze={3} rowTone={rowTone}
+                 filterable={false} empty={<NoRecords />} />
     </div>
   );
 }

@@ -6,6 +6,8 @@ import { Button } from '../../../ui/Button';
 import { TextField, TextArea } from '../../../ui/Field';
 import { useToast } from '../../../ui/Toast';
 import { QtyField } from './QuoteContext';
+import { DraftsTable } from './DraftsTable';
+import { draftQuotesFor, type DraftQuote } from '../../../data/draftQuotes';
 import { ImportFileDialog } from './dialogs';
 import { BOM_TEMPLATES, COLUMN_DETECTION, assembliesFor } from '../../../data/bom';
 import { findCustomer, type Quotation } from '../../../data/quotations';
@@ -86,16 +88,19 @@ const ATTACHMENTS = [
  * the Action that decides everything below it, then BoM Options and Assembly
  * Details, whose contents follow from the Action.
  */
-export function StepConfigBom({ q, cfg, set, invalid = [] }: {
+export function StepConfigBom({ q, cfg, set, invalid = [], onResume }: {
   q: Quotation; cfg: RunConfig; set: (patch: Partial<RunConfig>) => void;
   /** Field names that failed on the last press of Next, so they can say so. */
   invalid?: readonly string[];
+  /** Pick up a saved draft in this same dialog. */
+  onResume?: (d: DraftQuote) => void;
 }) {
   const toast = useToast();
   const [importOpen, setImportOpen] = useState(false);
   const customer = findCustomer(q.customer);
   const xlsx = ATTACHMENTS.filter(a => a.ok);
   const assemblies = assembliesFor(q.customer);
+  const drafts = draftQuotesFor(q.customer);
 
   return (
     /* THREE REGIONS, NOT FOUR STACKED SECTIONS.
@@ -129,13 +134,14 @@ export function StepConfigBom({ q, cfg, set, invalid = [] }: {
             <ReadValue>{q.customer}</ReadValue>
           </Field>
 
-          <Field label="Quote Focus">
+          <Field label="Quote Focus" rfq={q.quoteFocus} value={cfg.quoteFocus}>
             <Select label="Quote Focus" value={cfg.quoteFocus}
                     options={[...QUOTE_FOCUS]}
                     onChange={v => set({ quoteFocus: v })} />
           </Field>
 
-          <Field label="Material Package Type">
+          <Field label="Material Package Type"
+                 rfq={q.materialPackageType} value={cfg.materialPackageType}>
             {/* The customer's own two sheets disagree: Quick Quote lists "Reel",
                 Create PR lists "Reels". The shared constant wins, because the
                 value arrives here from the Project Requirement — a second
@@ -146,7 +152,7 @@ export function StepConfigBom({ q, cfg, set, invalid = [] }: {
                     onChange={v => set({ materialPackageType: v })} />
           </Field>
 
-          <Field label="Mark up">
+          <Field label="Mark up" rfq={q.markup} value={cfg.markup}>
             <div className="vy-suffixed">
               <TextField type="number" min={0} aria-label="Mark up" value={String(cfg.markup)}
                          onChange={e => set({ markup: Number(e.target.value) })}
@@ -408,6 +414,24 @@ export function StepConfigBom({ q, cfg, set, invalid = [] }: {
         )}
       </section>
       </div>
+
+      {/* CONTINUE FROM DRAFTS — 21 Oct, from the customer's mockup, which puts
+          the saved drafts on step 1 under the work rather than behind a menu.
+
+          They were reachable before, through the chevron on the Run Quotation
+          button, and that is a worse place for them: by the time this dialog is
+          open the user has already answered "new or saved", and if the answer
+          was "saved" they have to close it and find a control they did not know
+          was a menu. A draft is picked up where a quote is set up. */}
+      {drafts.length > 0 && onResume && (
+        <section className="vy-run-section vy-run-draft-list">
+          <h3 className="vy-field-group-title">
+            <SmartIcon name="quote" />Continue from Drafts
+            <span className="vy-pill">{drafts.length} saved</span>
+          </h3>
+          <DraftsTable drafts={drafts} customer={q.customer} onContinue={onResume} />
+        </section>
+      )}
       </div>
 
       <ImportFileDialog
@@ -419,20 +443,38 @@ export function StepConfigBom({ q, cfg, set, invalid = [] }: {
   );
 }
 
-function Field({ label, required, wide, error, children }: {
+function Field({ label, required, wide, error, rfq, value, children }: {
   label: string; required?: boolean; wide?: boolean; error?: boolean;
+  /**
+   * What the Project Requirement holds for this field.
+   *
+   * ASKED FOR by the standard — a value changed from the one it was carried
+   * with is shown blue — and by the mockup, which puts the original in the
+   * field's own tooltip as "RFQ value: Reels".
+   *
+   * THE MARK IS ON THE QUOTE, NOT ON THE RECORD. These three fields arrive
+   * from the RFQ and this screen may override them for one quote; the record
+   * keeps its own value either way. Without the mark a reader has no way to
+   * tell which numbers are the customer's and which are this quote's, and the
+   * difference is exactly what a reviewer is looking for.
+   */
+  rfq?: string | number;
+  value?: string | number;
   children: React.ReactNode;
 }) {
+  const changed = rfq !== undefined && String(rfq) !== String(value);
   return (
     /* `data-invalid` is what the step's Next scrolls to and focuses, and what
        paints the field. The error is on the FIELD because that is where the fix
        is; the toast keeps the customer's own sentence. */
     <div className="vy-quote-config-field" data-wide={wide || undefined}
-         data-invalid={error || undefined}>
+         data-invalid={error || undefined} data-changed={changed || undefined}
+         title={changed ? `RFQ value: ${rfq}` : undefined}>
       <span className="vy-quote-fact-label">
-        {label}{required && <span className="vy-required" aria-hidden> (*)</span>}
+        {label}{required && <span className="vy-required" aria-hidden>*</span>}
       </span>
       {children}
+      {changed && <span className="vy-field-changed">Changed for this quote</span>}
       {error && <span className="vy-field-error" role="alert">Required to continue</span>}
     </div>
   );

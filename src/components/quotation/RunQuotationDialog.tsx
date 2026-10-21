@@ -203,6 +203,29 @@ export function RunQuotationDialog({ q, onClose, resume }: {
      All three apply the pending setup first, because applying it is what makes
      the grid agree with the strip above it. */
 
+  /**
+   * Pick up a saved draft without leaving this dialog.
+   *
+   * The same jump the record's Run Quotation menu performs, from the table on
+   * step 1 — a draft is resumed where a quote is set up, rather than behind a
+   * control the user has already walked past. Everything the draft holds
+   * replaces what this dialog had: its config, its lines, and whether it had
+   * prices, because a draft resumed with somebody else's Build Qty would
+   * quietly re-price work that was already finished.
+   */
+  function resumeDraft(d: DraftQuote) {
+    setCfg(d.cfg);
+    setPendingState(setupOf(d.cfg));
+    setLinesState(d.lines);
+    setHasRun(d.hasRun);
+    setRunVersion(d.runVersion);
+    setRunDate(d.runDate);
+    setPricedAt(d.hasRun ? new Date() : null);
+    setStep(2);
+    setFurthest(f => Math.max(f, 2));
+    toast.success(`Draft for ${d.assemblyName} opened at Quoting.`);
+  }
+
   /** The config, as the quote engine reads it. */
   const rulesOf = (c: RunConfig): QuoteRules => ({
     buildQty: c.buildQty, attritionSet: c.attritionSet, provider: c.provider,
@@ -422,7 +445,9 @@ export function RunQuotationDialog({ q, onClose, resume }: {
                      showText={false} />
           </div>
 
-          {step === 0 && <StepConfigBom q={q} cfg={cfg} set={set} invalid={invalid} />}
+          {step === 0 && (
+            <StepConfigBom q={q} cfg={cfg} set={set} invalid={invalid} onResume={resumeDraft} />
+          )}
           {step === 1 && <StepReviewBom cfg={cfg} lines={lines} setLines={setLines} />}
           {step === 2 && (
             <StepQuoting
@@ -439,12 +464,17 @@ export function RunQuotationDialog({ q, onClose, resume }: {
               onUpdateResults={updateResults}
               onAddAttrition={() => setAttritionOpen(true)}
               onApplyPriceRange={applyPriceRange}
+              /* So a field the quote overrode can still say what the record
+                 holds, three steps away from where it was overridden. */
+              rfq={{ quoteFocus: q.quoteFocus, materialPackageType: q.materialPackageType,
+                     markup: q.markup }}
             />
           )}
           {step === 3 && (
             <StepSummary
               cfg={cfg} lines={lines} setLines={setLines}
-              run={{ by: ME, date: runDate, version: runVersion }}
+              run={{ by: ME, date: runDate, version: runVersion,
+                     pricedAt: pricedAt ? fmtDateTime(pricedAt) : undefined }}
               onAddPackage={() => setPackageOpen(true)}
             />
           )}
