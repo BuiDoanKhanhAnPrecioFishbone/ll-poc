@@ -18,7 +18,7 @@ Cập nhật 21/10/2026.
 
 **Đã làm nốt 21/10:** thẻ *Quote Run · Version N* + *Prices From* ở step 4 · Cost Estimation 2×2 · *Continue from Drafts* ở step 1 · giá trị mang từ RFQ tô xanh kèm tooltip *"RFQ value: 27"*.
 
-**Còn lại một điểm:** bộ chọn phiên bản sau khi Submit. Tab **Result** trên hồ sơ đã liệt kê mỗi phiên bản một dòng (ngày chạy, người chạy, tổng tiền) — mình thấy một bảng đủ phiên bản tốt hơn một bộ chọn chỉ hiện một. Xin chị cho ý kiến.
+**Một điểm mình làm khác:** mockup có bộ chọn phiên bản sau khi Submit; mình giữ **bảng Result** trên hồ sơ — mỗi phiên bản một dòng, kèm ngày chạy, người chạy và tổng tiền. Một bảng cho thấy đủ các phiên bản cạnh nhau, so sánh được và xuất Excel được; bộ chọn chỉ hiện một bản tại một lúc. Nếu chị vẫn muốn bộ chọn thì mình thêm.
 
 ## Cần chị quyết
 
