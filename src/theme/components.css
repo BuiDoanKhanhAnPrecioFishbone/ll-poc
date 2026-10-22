@@ -1341,7 +1341,13 @@
    76px, and with the padding below, 60px. */
 .vy-quote-fact { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .vy-quote-fact[data-wide] { flex: 1 1 var(--vy-quote-fact-wide); }
-.vy-quote-fact--input { inline-size: var(--vy-quote-qty-w); min-width: 0; }
+/* THE 92px CAP IS THE STRIP'S, not the field's. On the Quote Setup strip it
+   is what keeps nine settings on one row; in step 1's Assembly Details the
+   same component carries "BUILD QUANTITY" and "ATTRITION SET", and 92px
+   truncated both labels to "BUILD QUAN…". A width that exists to fit a row
+   belongs to the row. */
+.vy-quote-context-fields .vy-quote-fact--input { inline-size: var(--vy-quote-qty-w); }
+.vy-quote-fact--input { min-width: 0; }
 .vy-quote-fact-label {
   font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .05em;
   color: var(--vy-on-surface-subtle); font-weight: var(--vy-weight-semibold);
