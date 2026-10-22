@@ -2157,9 +2157,15 @@
 }
 .vy-datarec-ident { display: flex; flex-direction: column; gap: var(--vy-space-3); min-width: 0; }
 .vy-datarec-caption { font-size: var(--vy-text-sm); color: var(--vy-on-surface-subtle); }
+/* The part number at the head of a Part record. Mono until 22 Oct, which was
+   the same oversight as the MiniTable's identifier cells: the face went on
+   13 Oct and these two rules were missed. At 24px it is already the most
+   prominent thing on the screen, which is the job the customer wants an
+   identifier doing. */
 .vy-datarec-ident > strong {
   font-size: var(--vy-text-2xl); font-weight: var(--vy-weight-bold);
-  color: var(--vy-on-surface-strong); font-family: var(--vy-font-mono); letter-spacing: -.01em;
+  color: var(--vy-on-surface-strong); font-variant-numeric: tabular-nums;
+  letter-spacing: -.01em;
 }
 /* The revision is part of the identity but not the identity — quieter, so the
    part number reads first and the two do not fight at the same weight. */

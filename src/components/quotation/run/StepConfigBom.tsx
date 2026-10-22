@@ -125,43 +125,58 @@ export function StepConfigBom({ q, cfg, set, invalid = [], onResume }: {
         </p>
 
         <div className="vy-quote-config-grid">
-          {/* Named on the Standard Quote sheet and not the Quick Quote one.
-              Shown for both: it is one panel, and a field that appears on only
-              one of two paths through one screen reads as a bug. */}
-          <Field label="Project Requirement">
-            <ReadValue>{`RFQ${q.no} — ${q.projectName}`}</ReadValue>
-          </Field>
-
+          {/* THE PROJECT REQUIREMENT'S OWN NUMBER IS GONE, 22 Oct — the
+              customer removed it from her step 1 and she is right: the dialog
+              is titled "Run Quotation — RFQ0000000358", so the panel under it
+              was repeating the title. */}
           <Field label="Customer">
             {/* "[Customer Code] - Full Customer name" — which is what the
                 customer label already is, so it is not reassembled here. */}
             <ReadValue>{q.customer}</ReadValue>
           </Field>
 
-          {/* READ-ONLY HERE, SINCE 22 OCT. These three were editable on this
-              step and on step 3, and the customer closed that: "Các trường là
-              chốt rùi, và chỉ đc sửa ở step 3 nha."
-
-              It is the same rule the Quote Setup strip already follows for
-              Build Qty — one place to change a setting, and that place is the
-              one where the change can be applied deliberately and the results
-              recomputed. Two places to change the same number is how a quote
-              ends up priced from a setting nobody remembers choosing. */}
-          <Field label="Quote Focus">
-            <ReadValue>{cfg.quoteFocus}</ReadValue>
+          {/* "Qty to Quote", her label. Ours was the Testing Guideline's "Item
+              Ant Quantities to Quote", which is the live system's spelling of
+              a field whose meaning nobody has ever had trouble with. Two of
+              the customer's own documents, and the later one is the one she
+              asked us to follow. */}
+          <Field label="Qty to Quote">
+            <ReadValue>{q.quantitiesToQuote}</ReadValue>
           </Field>
 
-          <Field label="Material Package Type">
-            <ReadValue>{cfg.materialPackageType}</ReadValue>
+          {/* ALL SIX STRATEGY FIELDS, READ-ONLY — "Các trường là chốt rùi, và
+              chỉ đc sửa ở step 3 nha." Three of them were missing from this
+              panel entirely: Excess and MOQ, Net Consigned and Rocket
+              Consigned decide how much gets bought and what gets charged, and
+              a quoter setting up a run could not see what they were set to
+              without walking two steps forward. */}
+          <Divider>Quote Strategy</Divider>
+
+          <Field label="Quote Focus">
+            <ReadValue>{cfg.quoteFocus}</ReadValue>
           </Field>
 
           <Field label="Mark up">
             <ReadValue>{`${cfg.markup}%`}</ReadValue>
           </Field>
 
-          <Field label="Item Ant Quantities to Quote">
-            <ReadValue>{q.quantitiesToQuote}</ReadValue>
+          <Field label="Excess and MOQ">
+            <ReadValue>{cfg.excessMoq}</ReadValue>
           </Field>
+
+          <Field label="Material Package Type">
+            <ReadValue>{cfg.materialPackageType}</ReadValue>
+          </Field>
+
+          <Field label="Net Consigned">
+            <ReadValue>{cfg.netConsigned}</ReadValue>
+          </Field>
+
+          <Field label="Rocket Consigned">
+            <ReadValue>{cfg.rocketConsigned}</ReadValue>
+          </Field>
+
+          <Divider>Notes</Divider>
 
           <Field label="Customer Special Need" wide>
             <ReadValue>{q.customerNotes}</ReadValue>
@@ -441,6 +456,12 @@ export function StepConfigBom({ q, cfg, set, invalid = [], onResume }: {
   );
 }
 
+/** A labelled rule inside the reference panel — the customer's own device for
+ *  breaking it into Quote Strategy, Notes and Attachments. */
+function Divider({ children }: { children: React.ReactNode }) {
+  return <p className="vy-config-divider">{children}</p>;
+}
+
 function Field({ label, required, wide, error, rfq, value, children }: {
   label: string; required?: boolean; wide?: boolean; error?: boolean;
   /**
@@ -501,7 +522,10 @@ function Attachments() {
 
   return (
     <div className="vy-attachments">
-      <span className="vy-quote-fact-label">Attachments</span>
+      {/* The count is the customer's — "Attachments (6)" — and it earns its
+          place on a list this one collapses: it says how much is behind
+          "View more" without expanding it. */}
+      <p className="vy-config-divider">Attachments ({ATTACHMENTS.length})</p>
       <ul id={listId}>
         {shown.map(a => (
           <li key={a.name} data-usable={a.ok || undefined}>

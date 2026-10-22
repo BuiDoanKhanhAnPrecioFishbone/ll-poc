@@ -572,11 +572,21 @@
    people who know their catalogue, and at 12-13px in a dense grid the mono face
    is the one that slows them down. What made these scannable was never the
    face: it is `tabular-nums`, which keeps digits in columns, and that stays.
-   Weight does the rest of the work the font was doing. */
+   Weight does the rest of the work the font was doing.
+
+   22 OCT, AND IT IS THE SAME ARGUMENT FROM THE OTHER END. The customer did not
+   ask for mono back; she said what mono was FOR: "vì nó là unique value. Nếu e
+   để giống field bình thường thì nó k đc nổi bật lắm" — and then handed us the
+   decision. So the requirement is prominence, not a typeface, and prominence
+   is cheaper than a second font: semibold rather than medium, and the strong
+   ink rather than the body's. An identifier now reads as the thing the row is
+   ABOUT, which is what a unique value is, while the sentence next to it stays
+   a sentence. */
 .vy-ident {
   font-size: var(--vy-text-base);
-  font-weight: var(--vy-weight-medium);
+  font-weight: var(--vy-weight-semibold);
   font-variant-numeric: tabular-nums;
+  letter-spacing: .01em;
   white-space: nowrap;
   color: var(--vy-on-surface-strong);
 }
@@ -1444,6 +1454,19 @@
    template link look like the drafts table. */
 .vy-run-draft-list { grid-column: 1 / -1; }
 
+/* A labelled rule inside step 1's reference panel. The customer's own device:
+   one panel holding the strategy, the notes and the attachments reads as three
+   things when it is ruled and as a long list when it is not. */
+.vy-config-divider {
+  grid-column: 1 / -1; margin: var(--vy-space-5) 0 0;
+  display: flex; align-items: center; gap: var(--vy-space-4);
+  font-size: var(--vy-text-xs); font-weight: var(--vy-weight-semibold);
+  text-transform: uppercase; letter-spacing: .05em; color: var(--vy-on-surface-subtle);
+}
+.vy-config-divider::after {
+  content: ''; flex: 1; border-top: 1px solid var(--vy-border);
+}
+
 /* ---- A value this quote changed from the record it came out of -----------
    Three fields on step 1 arrive from the Project Requirement and may be
    overridden for one quote. The mark is on the QUOTE: without it a reader has
@@ -1819,8 +1842,18 @@
 .vy-minitable-k td[data-role="number"],
 .vy-minitable-k td[data-role="money"],
 .vy-minitable-k td[data-role="date"] { text-align: right; font-variant-numeric: tabular-nums; }
+/* NOT MONO, and this one had been missed. The product dropped the monospaced
+   face on 13 Oct — "do not use monotext, hard to read" — and `.vy-ident` was
+   rewritten then, but the MiniTable grids kept their own rule: every part
+   number and MPN in Run Quotation's three grids was still being set in
+   JetBrains Mono. Which means the identifiers the customer was looking at on
+   22 Oct, when she said a unique value should stand out, were the ones still
+   in the face she had asked us to remove.
+   Same treatment as everywhere else now: the body face, semibold, with the
+   digits kept in columns. */
 .vy-minitable-k td[data-role="ident"] {
-  font-family: var(--vy-font-mono); font-size: var(--vy-text-sm); color: var(--vy-on-surface-strong);
+  font-size: var(--vy-text-sm); font-weight: var(--vy-weight-semibold);
+  font-variant-numeric: tabular-nums; color: var(--vy-on-surface-strong);
 }
 
 /* Row and cell states. The vocabulary is the guideline's — grey excluded, red
@@ -1941,7 +1974,9 @@
 .vy-grid-k td[data-role="number"],
 .vy-grid-k td[data-role="money"],
 .vy-grid-k td[data-role="date"] { text-align: right; font-variant-numeric: tabular-nums; }
-.vy-grid-k td[data-role="ident"] { font-weight: var(--vy-weight-medium); font-variant-numeric: tabular-nums; }
+/* Semibold, with `.vy-ident` — see the note there: the customer asked for a
+   unique value to stand out, not for a monospaced face. */
+.vy-grid-k td[data-role="ident"] { font-weight: var(--vy-weight-semibold); font-variant-numeric: tabular-nums; }
 .vy-grid-k td[data-role="status"] { overflow: visible; }
 
 /* KNOWN, MEASURED, NOT FIXED: a grid header is 41px where the grid is
