@@ -5,7 +5,16 @@ import { MiniTable } from '../../../ui/MiniTable';
 import { Checkbox } from '../../../ui/Overlays';
 import type { ColumnSpec } from '../../column-model';
 import { QuoteContextBar, QuoteToolbar, NoRecords } from './QuoteContext';
-import { KNOWN_MANUFACTURERS, PART_MASTER, totalQtyOf, type BomLine } from '../../../data/bom';
+import {
+  PART_MASTER, manufacturerStatus, totalQtyOf, type BomLine,
+} from '../../../data/bom';
+
+/** What each colour means, said in words on the cell itself (WCAG 1.4.1). */
+const MFG_TITLE = {
+  verified: 'Verified in Manufacturer Management',
+  unverified: 'On file in Manufacturer Management, but not verified',
+  missing: 'Not in Manufacturer Management — create it before confirming this RFQ',
+};
 import { setupOf, type RunConfig } from './state';
 import { amlPairs, amlRows, type AmlRow } from './amlRows';
 
@@ -41,7 +50,7 @@ export function StepReviewBom({ cfg, lines, setLines }: {
          thirteen, yet four were painted red. Their red marks a manufacturer
          that is not in Manufacturer Management, and their filter is named for
          it — so the filter and the colour now answer the same question. */
-      if (missingMfg && !unknownMfg(l)) return false;
+      if (missingMfg && !unverifiedMfg(l)) return false;
       return true;
     });
   }, [lines, search, isExclude, missingMfg]);
@@ -97,7 +106,13 @@ export function StepReviewBom({ cfg, lines, setLines }: {
          The tone is on the FIRST row only, because that is the cell that
          carries the part number; painting the blank continuation cell would
          colour a cell with nothing in it. */
-      tone: r => (r.first ? (PART_MASTER.has(r.line.part) ? 'known' : 'missing') : undefined),
+      /* RED WHEN IT IS NOT ON FILE, AND NOTHING WHEN IT IS — 22 Oct. It was
+         green for "in Part Master", which painted 13 of 13 rows on the live
+         screen we measured: a colour every row carries tells the reader
+         nothing. The customer's own answer settles it — "Trường hợp data đã đc
+         verify thì để trắng" — and red keeps its meaning, which is that this
+         part blocks confirming the RFQ. */
+      tone: r => (r.first && !PART_MASTER.has(r.line.part) ? 'missing' : undefined),
       render: r => parent(r, () => (
         <span className="vy-ident" title={PART_MASTER.has(r.line.part)
           ? 'In Part Master'
@@ -128,11 +143,14 @@ export function StepReviewBom({ cfg, lines, setLines }: {
          value already exists in Manufacturer Management" — and red where it
          does not, which is what their Manufacturer Not Verified filter is
          named for. */
-      tone: r => (r.mfg ? (KNOWN_MANUFACTURERS.has(r.mfg) ? 'known-mfg' : 'missing') : undefined),
+      /* THREE STATES, the customer's own: verified is plain, a manufacturer in
+         the system that nobody has verified is amber, one that is not in the
+         system at all is red. */
+      tone: r => (r.mfg && manufacturerStatus(r.mfg) !== 'verified'
+        ? (manufacturerStatus(r.mfg) === 'unverified' ? 'known-mfg' : 'missing')
+        : undefined),
       render: r => (r.mfg
-        ? <span title={KNOWN_MANUFACTURERS.has(r.mfg)
-            ? `${r.mfg} is in Manufacturer Management`
-            : `${r.mfg} is not in Manufacturer Management`}>{r.mfg}</span>
+        ? <span title={MFG_TITLE[manufacturerStatus(r.mfg)]}>{r.mfg}</span>
         : <span className="vy-empty">—</span>),
     },
     {
@@ -224,12 +242,11 @@ export function StepReviewBom({ cfg, lines, setLines }: {
           renders it there too — after `</table>`, in a `gfoot` — so the
           question we had listed for her is answered and this follows it. */}
       <ul className="vy-tone-legend">
-        <li><span className="vy-tone-key" data-tone="known" aria-hidden />
-          Part is in Part Master</li>
         <li><span className="vy-tone-key" data-tone="known-mfg" aria-hidden />
-          Manufacturer is in Manufacturer Management</li>
+          Warning: manufacturer is on file but not verified</li>
         <li><span className="vy-tone-key" data-tone="missing" aria-hidden />
-          Not on file — create it before confirming this RFQ</li>
+          Error: part or manufacturer is not in the system — create it before
+          confirming this RFQ</li>
       </ul>
 
       {/* ONE LINE. Two lines of explanation under a table is two rows of the
@@ -241,7 +258,16 @@ export function StepReviewBom({ cfg, lines, setLines }: {
   );
 }
 
-/** No recognised manufacturer anywhere on the line — including none at all. */
-export function unknownMfg(l: BomLine): boolean {
-  return !amlPairs(l).some(p => KNOWN_MANUFACTURERS.has(p.mfg));
+/**
+ * A line carrying a manufacturer that is not verified — amber or red.
+ *
+ * WAS "no recognised manufacturer anywhere", which matched only the red case.
+ * The filter is named "Manufacturer Not Verified" and the customer's answer of
+ * 22 Oct defines verified, so the filter now selects exactly what it says: any
+ * AML on the line that is unverified or missing. A line with no manufacturer
+ * at all is included — an absent one is certainly not verified.
+ */
+export function unverifiedMfg(l: BomLine): boolean {
+  const pairs = amlPairs(l);
+  return !pairs.length || pairs.some(p => manufacturerStatus(p.mfg) !== 'verified');
 }

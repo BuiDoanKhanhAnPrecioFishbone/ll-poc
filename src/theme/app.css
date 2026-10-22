@@ -498,7 +498,9 @@
 .vy-dropzone { border: 1px dashed var(--vy-border-strong); border-radius: var(--vy-radius-md); background: var(--vy-surface-subtle); padding: var(--vy-space-9); text-align: center; display: flex; flex-direction: column; align-items: center; gap: var(--vy-space-3); }
 .vy-dropzone strong { color: var(--vy-on-surface); font-size: var(--vy-text-md); }
 .vy-dropzone span { color: var(--vy-on-surface-subtle); font-size: var(--vy-text-sm); }
-.vy-hint { font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle); margin: var(--vy-space-2) 0 0; max-width: 56ch; }
+/* Italic, like `.vy-field-hint` — the same guidance in the same voice, whether
+   it sits under one field or under a section. */
+.vy-hint { font-size: var(--vy-text-xs); font-style: italic; color: var(--vy-on-surface-subtle); margin: var(--vy-space-2) 0 0; max-width: 56ch; }
 /* 56ch is right for a hint under a field; under a full-width table it forces a
    one-sentence note into two rows of the table's height. */
 .vy-hint--wide { max-width: none; }
@@ -1136,9 +1138,12 @@
    labels are already Title Case in the data because they are the live system's
    own words; upper-casing them in CSS made one screen carry two conventions and
    cost legibility at 11px for the readers who need it most. */
+/* Semibold, like every other field label since 22 Oct — this rule is more
+   specific than the base one and would otherwise have kept the record form,
+   the densest 27-field screen in the product, on the old weight. */
 .vy-record-fields .vy-field dt {
   font-size: var(--vy-text-sm);
-  font-weight: var(--vy-weight-medium);
+  font-weight: var(--vy-weight-semibold);
   color: var(--vy-on-surface-muted);
   margin-bottom: var(--vy-space-2);
 }

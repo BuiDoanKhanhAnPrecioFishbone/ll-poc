@@ -579,13 +579,22 @@ export function QuotationDetail() {
         ]}
       />
 
-      {/* Names the fields, which is the whole reason this is not a confirm().
-          Someone reaching for Cancel is usually unsure what they touched; a
-          count answers a question they were not asking. */}
+      {/* THE TITLE NAMES THE RECORD, the body names the fields — 22 Oct, the
+          customer's own answer: "ý của chị là Discard [unique name của record]
+          chứ không phải tất cả các trường", with her example "Discard sản phẩm
+          ABC unchanges".
+
+          She is right about the title and we were right about the body. A
+          dialog that opens over a record the user has been editing for ten
+          minutes is not asking "which fields" first — it is asking "am I
+          throwing away THIS one", and on a screen that stacks dialogs three
+          deep the record's own number is the fastest answer. The list of
+          changed fields stays underneath, where it answers the second
+          question. */}
       <Dialog
         open={confirmDiscard}
         onClose={() => setConfirmDiscard(false)}
-        title={`Discard ${changeCount} unsaved ${changeCount === 1 ? 'change' : 'changes'}?`}
+        title={`Discard changes to RFQ${q.no}?`}
         subtitle="This cannot be recovered once you leave the record."
         actions={
           <>
@@ -594,7 +603,9 @@ export function QuotationDetail() {
           </>
         }
       >
-        <p className="vy-dialog-lead">You changed:</p>
+        <p className="vy-dialog-lead">
+          {changeCount === 1 ? 'One field was changed:' : `${changeCount} fields were changed:`}
+        </p>
         <ul className="vy-discard-list">
           {changed.map(label => <li key={label}>{label}</li>)}
         </ul>

@@ -89,8 +89,20 @@
 
 /* --- Fields ---------------------------------------------------------------- */
 .vy-field-control { display: flex; flex-direction: column; gap: var(--vy-space-2); }
-.vy-field-label { font-size: var(--vy-text-sm); color: var(--vy-on-surface-muted); }
-.vy-field-hint  { font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle); }
+/* THE LABEL IS BOLD AND THE HELPER IS ITALIC — the customer's own answer of
+   22 Oct: "helper text-size nên nhỏ hơn hoặc bằng label của field. Có thể in
+   nghiêng để phân biệt dễ hơn; Label của trường thì in đậm (bold)".
+
+   Semibold rather than 700: at 12px on a form of 27 fields, bold reads as a
+   page of headings. Italic does the separating work she is asking for, and it
+   does it without a second colour or a second size. */
+.vy-field-label {
+  font-size: var(--vy-text-sm); font-weight: var(--vy-weight-semibold);
+  color: var(--vy-on-surface-muted);
+}
+.vy-field-hint  {
+  font-size: var(--vy-text-xs); font-style: italic; color: var(--vy-on-surface-subtle);
+}
 .vy-input {
   font-family: inherit; font-size: var(--vy-text-base); color: var(--vy-on-surface-strong);
   background: var(--vy-surface); border: 1px solid var(--vy-border-control);
@@ -438,7 +450,10 @@
    narrow column, a long label and a translated label, none of which the
    side-by-side version does. The customer's own mock-ups stack. */
 .vy-field { display: grid; gap: var(--vy-space-2); padding: var(--vy-space-4) 0; border-bottom: 1px solid var(--vy-border-faint); }
-.vy-field dt { font-size: var(--vy-text-sm); color: var(--vy-on-surface-muted); }
+.vy-field dt {
+  font-size: var(--vy-text-sm); font-weight: var(--vy-weight-semibold);
+  color: var(--vy-on-surface-muted);
+}
 /* ---- Field values ---------------------------------------------------------
    THREE FILLS, ONE SHAPE. Customer instruction, 14 October 2026:
 
@@ -852,13 +867,30 @@
    count, and two-of-three means nothing unless you already know the scale.
    The dot carries the colour so a grid still scans; the word carries the
    meaning so nothing has to be decoded. */
+/* AN INTENSITY RAMP, NOT THE SEMANTIC PALETTE — 22 Oct, and the customer
+   handed the decision to us: "Phần màu sắc em xem thêm giúp c ha."
+
+   High was red and Medium amber, which borrowed the two colours this product
+   uses for "something is wrong" and spent them on a CATEGORY. A high-priority
+   RFQ is not an error; an overdue one is, and on a list that shows both the
+   reader had no way to tell the two reds apart. The standard never mentions
+   Priority, so the palette was ours to choose and ours to fix.
+
+   Three steps of one ink: solid, half, hollow. It reads as a scale because it
+   IS one, it keeps working for a colour-blind reader, and it leaves red to
+   mean what it means everywhere else. The word is still beside it. */
 .vy-priority { display: inline-flex; align-items: center; gap: var(--vy-space-3); white-space: nowrap; }
-.vy-priority-dot { width: var(--vy-space-5); height: var(--vy-space-5); border-radius: 50%; flex: 0 0 auto; }
-.vy-priority[data-level="High"]   .vy-priority-dot { background: var(--vy-danger); }
-.vy-priority[data-level="Medium"] .vy-priority-dot { background: var(--vy-accent-caution); }
-/* Low is a hollow dot, not a pale one: on a grid at 11px a light fill and an
-   empty cell look the same, and "no priority set" is a different fact. */
-.vy-priority[data-level="Low"]    .vy-priority-dot { background: none; box-shadow: inset 0 0 0 1.5px var(--vy-border-mid); }
+.vy-priority-dot {
+  width: var(--vy-space-5); height: var(--vy-space-5); border-radius: 50%; flex: 0 0 auto;
+  background: var(--vy-on-surface-strong);
+}
+.vy-priority[data-level="Medium"] .vy-priority-dot { background: var(--vy-on-surface-faint); }
+/* Low is a hollow dot, not a pale one: on a grid a light fill and an empty
+   cell look the same, and "no priority set" is a different fact. */
+.vy-priority[data-level="Low"]    .vy-priority-dot {
+  background: none; box-shadow: inset 0 0 0 1.5px var(--vy-border-mid);
+}
+.vy-priority[data-level="High"] { font-weight: var(--vy-weight-medium); }
 .vy-priority[data-level="Low"] { color: var(--vy-on-surface-muted); }
 
 /* ---- Popover + column chooser -------------------------------------------- */
@@ -1302,7 +1334,7 @@
 .vy-quote-fact--input { inline-size: var(--vy-quote-qty-w); min-width: 0; }
 .vy-quote-fact-label {
   font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .05em;
-  color: var(--vy-on-surface-subtle); font-weight: var(--vy-weight-medium);
+  color: var(--vy-on-surface-subtle); font-weight: var(--vy-weight-semibold);
   white-space: nowrap;
 }
 /* The facts are `ReadValue` boxes now, not bare text — see QuoteContext.tsx.

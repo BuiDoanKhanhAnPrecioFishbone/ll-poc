@@ -11,7 +11,6 @@ import { draftQuotesFor, type DraftQuote } from '../../../data/draftQuotes';
 import { ImportFileDialog } from './dialogs';
 import { BOM_TEMPLATES, COLUMN_DETECTION, assembliesFor } from '../../../data/bom';
 import { findCustomer, type Quotation } from '../../../data/quotations';
-import { MATERIAL_PACKAGE_TYPE, QUOTE_FOCUS } from '../../../data/metadata';
 import type { RunConfig } from './state';
 
 /**
@@ -111,14 +110,19 @@ export function StepConfigBom({ q, cfg, set, invalid = [], onResume }: {
        (Action), then the two halves of it (the file, and the assembly). */
     <div className="vy-run-step vy-run-step--config">
       <section className="vy-run-section vy-run-ref">
-        <h3 className="vy-field-group-title"><SmartIcon name="quote" />Quoting information</h3>
+        {/* "Quote Strategy", her own name for it — 22 Oct. It was "Quoting
+            information", which named the panel after the fact that it contains
+            facts. */}
+        <h3 className="vy-field-group-title"><SmartIcon name="quote" />Quote Strategy</h3>
         {/* The sentence that used to follow — "Quote Focus, Material Package
             Type and Markup may be changed for this run; the rest is shown for
             reference" — is gone because the fields now say it themselves: from
             14 Oct 2026 a value you cannot edit carries a lock, so naming the
             three editable ones in prose was the same fact twice, in the one
             panel short of vertical room. */}
-        <p className="vy-hint">Carried from the Project Requirement.</p>
+        <p className="vy-hint">
+          Carried from the Project Requirement. Change them in Quoting, step 3.
+        </p>
 
         <div className="vy-quote-config-grid">
           {/* Named on the Standard Quote sheet and not the Quick Quote one.
@@ -134,31 +138,25 @@ export function StepConfigBom({ q, cfg, set, invalid = [], onResume }: {
             <ReadValue>{q.customer}</ReadValue>
           </Field>
 
-          <Field label="Quote Focus" rfq={q.quoteFocus} value={cfg.quoteFocus}>
-            <Select label="Quote Focus" value={cfg.quoteFocus}
-                    options={[...QUOTE_FOCUS]}
-                    onChange={v => set({ quoteFocus: v })} />
+          {/* READ-ONLY HERE, SINCE 22 OCT. These three were editable on this
+              step and on step 3, and the customer closed that: "Các trường là
+              chốt rùi, và chỉ đc sửa ở step 3 nha."
+
+              It is the same rule the Quote Setup strip already follows for
+              Build Qty — one place to change a setting, and that place is the
+              one where the change can be applied deliberately and the results
+              recomputed. Two places to change the same number is how a quote
+              ends up priced from a setting nobody remembers choosing. */}
+          <Field label="Quote Focus">
+            <ReadValue>{cfg.quoteFocus}</ReadValue>
           </Field>
 
-          <Field label="Material Package Type"
-                 rfq={q.materialPackageType} value={cfg.materialPackageType}>
-            {/* The customer's own two sheets disagree: Quick Quote lists "Reel",
-                Create PR lists "Reels". The shared constant wins, because the
-                value arrives here from the Project Requirement — a second
-                spelling blanks the field on open, which is what it did.
-                Raised as part of open question 3. */}
-            <Select label="Material Package Type" value={cfg.materialPackageType}
-                    options={[...MATERIAL_PACKAGE_TYPE]}
-                    onChange={v => set({ materialPackageType: v })} />
+          <Field label="Material Package Type">
+            <ReadValue>{cfg.materialPackageType}</ReadValue>
           </Field>
 
-          <Field label="Mark up" rfq={q.markup} value={cfg.markup}>
-            <div className="vy-suffixed">
-              <TextField type="number" min={0} aria-label="Mark up" value={String(cfg.markup)}
-                         onChange={e => set({ markup: Number(e.target.value) })}
-                         onBlur={e => { if (Number(e.target.value) < 0) set({ markup: 0 }); }} />
-              <span className="vy-suffix">%</span>
-            </div>
+          <Field label="Mark up">
+            <ReadValue>{`${cfg.markup}%`}</ReadValue>
           </Field>
 
           <Field label="Item Ant Quantities to Quote">

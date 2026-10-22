@@ -307,7 +307,14 @@
   --vy-font-mono: "JetBrains Mono", ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
 
   --vy-text-2xs:  10px;
-  --vy-text-xs:   11px;
+  /* 12px IS THE FLOOR, since 22 Oct. It was 11px, and the customer agreed to
+     raise it when we proposed it — "hệ thống mình xử lý chữ và dữ liệu nhiều",
+     and our own small-text check has flagged anything under 12 all along.
+     `xs` and `sm` therefore hold the same size for now. The two names stay
+     because they mean different things — `xs` is metadata and labels, `sm` is
+     secondary text — and a scale that has nowhere left to go downwards is the
+     point rather than an oversight. */
+  --vy-text-xs:   12px;
   --vy-text-sm:   12px;
   --vy-text-base: 13px;   /* grid + form default */
   --vy-text-md:   14px;

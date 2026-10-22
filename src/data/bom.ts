@@ -196,6 +196,31 @@ export const KNOWN_MANUFACTURERS = new Set([
 ]);
 
 /**
+ * Of the manufacturers in the system, the ones somebody has checked.
+ *
+ * THREE STATES, NOT TWO — the customer's answer of 22 Oct, which is the first
+ * time the two colours have been defined rather than demonstrated:
+ *
+ *   "Vàng là warning MFG đã có nhưng chưa đc verify; đỏ cảnh báo (high risk)
+ *    là data không có trong hệ thống lun. Trường hợp data đã đc verify thì để
+ *    trắng."
+ *
+ * So the yellow we have been painting on every recognised manufacturer was
+ * wrong in the same way the green was: it marked the normal case. Yellow is a
+ * manufacturer in Manufacturer Management that nobody has verified; red is one
+ * that is not there at all; verified is plain.
+ */
+export const VERIFIED_MANUFACTURERS = new Set([
+  'Vishay', 'Texas Instruments', 'Yageo', 'TDK', 'Nexperia', 'Samtec',
+]);
+
+/** `verified` | `unverified` | `missing` — the three the customer named. */
+export function manufacturerStatus(mfg: string): 'verified' | 'unverified' | 'missing' {
+  if (VERIFIED_MANUFACTURERS.has(mfg)) return 'verified';
+  return KNOWN_MANUFACTURERS.has(mfg) ? 'unverified' : 'missing';
+}
+
+/**
  * Parts that exist in Part Master.
  *
  * Green background when present, red when not — and the guideline attaches a
