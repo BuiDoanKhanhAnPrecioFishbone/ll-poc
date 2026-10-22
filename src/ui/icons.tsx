@@ -71,6 +71,11 @@ export const ICONS: Record<string, string> = {
      uses and what the customer asked to have back on 13 October. Drawn as one
      lens plus a pupil so it stays legible at 16px without a fill. */
   eye: 'M2.5 10s3-5.5 7.5-5.5S17.5 10 17.5 10s-3 5.5-7.5 5.5S2.5 10 2.5 10M10 7.75a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5',
+  /* An attachment, and what you may do with it. The arrow points INTO the
+     tray rather than out of a cloud: a file on a Project Requirement is
+     already on the server, and a cloud would be describing where it is not. */
+  download: 'M10 3v9M6.5 8.5 10 12l3.5-3.5M4 14.5V16a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-1.5',
+  clip: 'M14 8.5 9 13.5a2.8 2.8 0 0 1-4-4l5.5-5.5a1.9 1.9 0 0 1 2.7 2.7L7.7 12.2a1 1 0 0 1-1.4-1.4L11 6',
 };
 
 /**

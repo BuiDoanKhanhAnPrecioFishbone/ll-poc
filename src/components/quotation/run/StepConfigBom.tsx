@@ -1,9 +1,10 @@
-import { useId, useState } from 'react';
+import { useState } from 'react';
 import { ReadValue } from '../../../ui/FieldRow';
 import { SmartIcon } from '../SmartButtons';
 import { RadioGroup, Select } from '../../../ui/Overlays';
 import { Button } from '../../../ui/Button';
 import { TextField, TextArea } from '../../../ui/Field';
+import { Icon } from '../../../ui/icons';
 import { useToast } from '../../../ui/Toast';
 import { QtyField } from './QuoteContext';
 import { DraftsTable } from './DraftsTable';
@@ -187,7 +188,7 @@ export function StepConfigBom({ q, cfg, set, invalid = [], onResume }: {
           </Field>
         </div>
 
-        <Attachments />
+        <Attachments onOpen={what => toast.notImplemented(what)} />
       </section>
 
       <div className="vy-run-work">
@@ -244,9 +245,26 @@ export function StepConfigBom({ q, cfg, set, invalid = [], onResume }: {
               </Field>
 
               <Field label="Select template">
-                <Select label="Select template" value={cfg.template}
-                        options={[...BOM_TEMPLATES]}
-                        onChange={v => set({ template: v })} />
+                {/* PREVIEW AND DOWNLOAD BESIDE THE PICKER, as her prototype has
+                    them. A template is a column map, and the question somebody
+                    has before choosing one is "what does this map" — which a
+                    name cannot answer and a preview can. Disabled until one is
+                    chosen, because there is nothing to look at before that. */}
+                <div className="vy-with-actions">
+                  <Select label="Select template" value={cfg.template}
+                          options={[...BOM_TEMPLATES]}
+                          onChange={v => set({ template: v })} />
+                  <button type="button" className="vy-icon-btn" disabled={!cfg.template}
+                          title="Preview Template" aria-label="Preview Template"
+                          onClick={() => toast.notImplemented(`preview ${cfg.template}`)}>
+                    <Icon name="eye" size={15} />
+                  </button>
+                  <button type="button" className="vy-icon-btn" disabled={!cfg.template}
+                          title="Download Template" aria-label="Download Template"
+                          onClick={() => toast.notImplemented(`download ${cfg.template}`)}>
+                    <Icon name="download" size={15} />
+                  </button>
+                </div>
                 <span className="vy-field-hint">
                   Maps and validates the file. It must find Qty, MFG and MPN, or you cannot continue.
                 </span>
@@ -512,36 +530,49 @@ function Field({ label, required, wide, error, rfq, value, children }: {
  * two, "shortened" can only mean one, which is why the collapsed list is the
  * first file rather than a fixed handful.
  */
-function Attachments() {
-  const [expanded, setExpanded] = useState(false);
-  const listId = useId();
-  /* Read-only reference on a step about choosing a file to quote FROM. The
-     list is worth having; three lines of it above the choice is not. */
-  const many = ATTACHMENTS.length > 1;
-  const shown = many && !expanded ? ATTACHMENTS.slice(0, 1) : ATTACHMENTS;
-
+function Attachments({ onOpen }: { onOpen: (what: string) => void }) {
+  /**
+   * The files on the Project Requirement, each with the two things a reader
+   * wants to do with one.
+   *
+   * ASKED FOR 22 Oct — "attachment thiết kế có thể xem hoặc tải như prototype
+   * chị ấy gửi". Her list is a clip, the file name, and an action per row; ours
+   * was a name in a code face and a "View more" link, which is a list you can
+   * read and not use.
+   *
+   * VIEW AND DOWNLOAD, not download alone. Her prototype offers download for
+   * an attachment and preview for a template; on this screen the question
+   * someone has about a BoM file is usually "is this the revision I think it
+   * is", which is a look rather than a copy on a laptop.
+   *
+   * ALL OF THEM, no expander. The panel scrolls and is ruled into three parts
+   * now, so a list of three hiding two of itself behind a link cost a click to
+   * answer "what else is attached" — which is most of why the section is here.
+   */
   return (
     <div className="vy-attachments">
-      {/* The count is the customer's — "Attachments (6)" — and it earns its
-          place on a list this one collapses: it says how much is behind
-          "View more" without expanding it. */}
+      {/* The count is the customer's — "Attachments (6)" — and it says how
+          much is in the section before the eye has counted. */}
       <p className="vy-config-divider">Attachments ({ATTACHMENTS.length})</p>
-      <ul id={listId}>
-        {shown.map(a => (
+      <ul className="vy-attach-list">
+        {ATTACHMENTS.map(a => (
           <li key={a.name} data-usable={a.ok || undefined}>
-            <span className="vy-code">{a.name}</span>
-            {!a.ok && <span className="vy-field-hint">not .xlsx — cannot be quoted from</span>}
+            <Icon name="clip" size={13} />
+            <span className="vy-attach-name" title={a.name}>{a.name}</span>
+            {/* Not an error — a .pdf on an RFQ is perfectly normal. It is here
+                to say why this one is not in the Attachment dropdown above. */}
+            {!a.ok && <span className="vy-attach-note">not .xlsx</span>}
+            <button type="button" className="vy-icon-btn" title={`View ${a.name}`}
+                    aria-label={`View ${a.name}`} onClick={() => onOpen(`view ${a.name}`)}>
+              <Icon name="eye" size={14} />
+            </button>
+            <button type="button" className="vy-icon-btn" title={`Download ${a.name}`}
+                    aria-label={`Download ${a.name}`} onClick={() => onOpen(`download ${a.name}`)}>
+              <Icon name="download" size={14} />
+            </button>
           </li>
         ))}
       </ul>
-      {many && (
-        /* The count goes in the label. "View more" alone makes you click to find
-           out whether it is worth clicking. */
-        <button type="button" className="vy-link" aria-expanded={expanded}
-                aria-controls={listId} onClick={() => setExpanded(e => !e)}>
-          {expanded ? 'View less' : `View more (${ATTACHMENTS.length - 1} more)`}
-        </button>
-      )}
     </div>
   );
 }

@@ -1635,10 +1635,40 @@
    token and should shorten rather than grow the row. */
 .vy-file-row .vy-read-value-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+/* A control with its own actions beside it — the template picker and its
+   preview and download. The control takes the slack; the buttons do not move
+   when the name inside it gets longer. */
+.vy-with-actions { display: flex; align-items: center; gap: var(--vy-space-2); }
+.vy-with-actions > .vy-select,
+.vy-with-actions > .k-combobox { flex: 1; min-width: 0; }
+.vy-icon-btn:disabled { opacity: .4; cursor: default; }
+.vy-icon-btn:disabled:hover { background: none; color: var(--vy-on-surface-subtle); }
+
+/* ---- Attachments on step 1 ----------------------------------------------
+   A clip, the name, and the two things you can do with the file — the
+   customer's own row, asked for on 22 Oct. The name takes the slack and
+   truncates; the actions never move, so a column of them stays a column. */
 .vy-attachments { margin-top: var(--vy-space-7); }
-.vy-attachments ul { list-style: none; margin: var(--vy-space-3) 0 0; padding: 0; display: flex; flex-direction: column; gap: var(--vy-space-2); }
-.vy-attachments li { display: flex; align-items: baseline; gap: var(--vy-space-4); opacity: .5; }
-.vy-attachments li[data-usable] { opacity: 1; }
+.vy-attach-list { list-style: none; margin: var(--vy-space-3) 0 0; padding: 0; display: flex; flex-direction: column; }
+.vy-attach-list li {
+  display: flex; align-items: center; gap: var(--vy-space-3);
+  padding-block: var(--vy-space-1);
+  color: var(--vy-on-surface-muted);
+}
+.vy-attach-list li[data-usable] { color: var(--vy-on-surface); }
+.vy-attach-name {
+  flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-size: var(--vy-text-sm);
+}
+/* Why this one is not in the Attachment dropdown. Not an error — a drawing on
+   an RFQ is perfectly normal — so it is quiet and in words. */
+.vy-attach-note {
+  font-size: var(--vy-text-xs); font-style: italic; color: var(--vy-on-surface-subtle);
+  white-space: nowrap;
+}
+/* The file's own icon is decoration beside its name; it should not compete
+   with the two buttons, which are the controls. */
+.vy-attach-list li > svg { color: var(--vy-on-surface-faint); flex: 0 0 auto; }
 
 /* ---- Search and filters, shared by steps 2, 3 and 4 ---------------------- */
 /* ONE BAND for everything that acts on the grid: the provider, the search, the
