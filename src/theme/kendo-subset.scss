@@ -53,6 +53,21 @@
    `$kendo-input-sizes` in kendo-theme-core, so a ComboBox follows the input. */
 @use "./kendo-size" as size;
 @use "@progress/kendo-theme-default/scss/button/index.scss" as button with (
+  /* `xs` IS KENDO'S OWN RUNG — 25 Oct. The standard asks for 26px square icon
+     buttons on a grid row, and the control carrying that number was
+     `.vy-icon-btn` / `.vy-view-btn`: two hand-rolled boxes at 24 and 28, on no
+     scale, which the 18 Oct audit left open precisely because changing them
+     meant choosing between a token of ours and a rung of Kendo's.
+
+     This is the rung. `size="xs"` ships in KendoReact's Button type and the
+     theme ships `$kendo-button-xs-*`, so the row number comes out of the same
+     arithmetic as 32 and 34 instead of beside it. `.k-icon-button` then takes
+     `padding: $padding-y` on both axes and the box is square by construction —
+     the squareness is not ours to maintain.
+
+     Only the button, not the input: Kendo's input scale has no `xs`, and
+     nothing in this product puts a text field inside a 26px row. */
+  $kendo-button-xs-padding-y: size.control-padding(var(--vy-control-row)),
   $kendo-button-sm-padding-y: size.control-padding(var(--vy-control-dense)),
   $kendo-button-md-padding-y: size.control-padding(var(--vy-control-md))
 );

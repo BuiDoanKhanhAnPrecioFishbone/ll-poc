@@ -447,6 +447,21 @@
   /* --- Layout sizes ----------------------------------------------------------
      Named because they are component dimensions, not spacing. */
   --vy-control-sm:        28px;  /* avatar, brand mark */
+  /* THE ROW RUNG, which the standard asks for at 26 and Kendo already has a
+     name for. It feeds `$kendo-button-xs-padding-y` in kendo-subset.scss, so
+     `size="xs"` on any Kendo control lands here — the number is not applied to
+     a box anywhere, it is inverted into the padding Kendo sizes from.
+
+     Why a fourth rung rather than reusing `sm` at 28: an icon button inside a
+     grid row is the one control whose height is bounded from above by the row
+     it sits in, and the row is 28 on compact. A control as tall as its row
+     leaves the cell no padding, which is what made the old hand-rolled version
+     24 — below the 24px AA floor's own threshold with nothing to spare.
+
+     26 is a MOUSE number. On a coarse pointer the 44px minimum in
+     kendo-bridge.css covers it, and `touch:check` reports it as THIN by
+     design — the row is not a touch surface. */
+  --vy-control-row:       26px;  /* icon button inside a grid row */
   /* Activity log. The rail is fixed rather than a fraction: the list holds a
      name, a time and one short line, and half a tab would stretch three short
      strings while the diffs beside them wrapped. */

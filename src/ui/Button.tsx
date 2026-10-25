@@ -3,7 +3,7 @@ import { Slot } from '@radix-ui/react-slot';
 import { Button as KendoButton } from '@progress/kendo-react-buttons';
 
 type Variant = 'filled' | 'tonal' | 'outlined' | 'text' | 'danger';
-type Size = 'sm' | 'md';
+type Size = 'xs' | 'sm' | 'md';
 
 /**
  * Button — our API, KendoReact underneath.
@@ -62,6 +62,13 @@ type Size = 'sm' | 'md';
 const THEME: Record<Variant, 'primary' | 'error' | 'base'> = {
   filled: 'primary', danger: 'error', outlined: 'base', text: 'primary', tonal: 'primary',
 };
+/* Kendo's own size names. `xs` is the row rung the standard asks for at 26px,
+   configured in kendo-subset.scss out of `--vy-control-row`; `small` and
+   `medium` are this product's dense and standard. The names differ on one rung
+   only because Kendo spells it `xs` and not `xsmall`. */
+const KSIZE: Record<Size, 'xs' | 'small' | 'medium'> = {
+  xs: 'xs', sm: 'small', md: 'medium',
+};
 const FILL: Record<Variant, 'solid' | 'outline' | 'flat'> = {
   filled: 'solid', danger: 'solid', outlined: 'outline', text: 'flat',
   /* SOLID, not flat, and the reason is Kendo's stylesheet rather than taste.
@@ -116,7 +123,7 @@ export function Button({
       ref={forwardToDom}
       themeColor={THEME[variant]}
       fillMode={FILL[variant]}
-      size={size === 'sm' ? 'small' : 'medium'}
+      size={KSIZE[size]}
       rounded="medium"
       /* ONLY the tonal class, and only for tonal. `components.css` loads after
          the Kendo subset and every `.vy-btn--*` rule there carries a full
