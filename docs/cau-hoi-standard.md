@@ -1,62 +1,71 @@
 # VIQ — tình trạng và những điểm cần chị quyết
 
-Cập nhật 21/10/2026.
+Cập nhật 25/10/2026. Bản trước (21/10) hỏi 17 câu; mail của chị ngày 22/10 trả
+lời 7 câu, nên bảng dưới còn **10**.
+
+## Chị đã chốt 22/10 — đã làm xong
+
+| | Chị trả lời | Đã ship |
+|---|---|---|
+| Mono cho mã hồ sơ | *"e cứ thử xem ntn sẽ đẹp hơn"* | Bỏ mono, giữ `tabular-nums`. Hai chỗ còn sót (mã trong lưới nhỏ và trong khối dữ liệu) đã dọn |
+| Cỡ chữ 11px | helper ≤ label, in nghiêng; label in đậm | Sàn 12px, helper 12px nghiêng, label bold |
+| Màu trong Review BoM | vàng = MFG chưa verify · đỏ = không có trong hệ thống · trắng = đã verify | Ba trạng thái đúng như vậy, kèm chữ trong ô để không chỉ dựa vào màu |
+| Toolbar wrap | *"show full toolbar cho filter… có thể extend ra"* | Một hàng tới 1280px, dưới đó cho wrap |
+| Popup Discard | *"Discard 'unique name của record'"* | *"Discard Assembly 0455-300-0192-01?"* |
+| Màu Priority | theo đề xuất của mình | Thang đậm–nhạt trung tính; đỏ–vàng trả về nghĩa cảnh báo |
+| Thứ tự focus | BA định nghĩa, hotkey để sau | Nhận — xin xem câu 8 |
+
+Thêm: **Step 2 chị đã OK**; panel step 1 đổi tên **Quote Strategy**, các trường
+chỉ sửa được ở step 3; step 1 dựng lại theo mockup của chị, kèm attachment xem
+và tải được như prototype chị gửi.
 
 ## Đã làm trong tháng 10
 
 | | |
 |---|---|
-| **Standard v1.0** | 22 mục theo đúng chuẩn, không còn khoảng trống nào mình biết. Regional Format (ngày / số / tiền theo thiết lập vùng), Title Case, `Discard Changes`, dấu bắt buộc `*` đỏ, legend xuống chân lưới, Columns trên lưới của wizard, thang kích thước control thống nhất |
-| **Review thiết kế 8/10 + họp 13/10** | bỏ mono, trả lại cột con mắt, định dạng đọc/sửa (mọi giá trị trong khung, read-only có khoá) |
-| **Activity Log** | dựng lại theo bản mới chị đã làm trên Voyager |
-| **Run Quotation** | step 1 dùng hết màn hình; step 2–3 gọn lại; thẻ nhóm cho BoM Quotation; sửa lỗi hàng nút, lỗi cuộn Safari |
-| **Quoting BoM (file 16/10)** | 6 trên 8 mục — xem dưới |
+| **Standard v1.0** | 22 mục, không còn khoảng trống nào mình biết: Regional Format, Title Case, `Discard Changes`, dấu `*` đỏ, legend xuống chân lưới, Columns trên lưới của wizard, thang kích thước control thống nhất |
+| **Review 8/10 + họp 13/10** | bỏ mono, trả lại cột con mắt, định dạng đọc/sửa |
+| **Activity Log** | dựng lại theo bản chị đã làm trên Voyager |
+| **Run Quotation** | step 1 dùng hết màn hình · step 2–3 gọn lại · điều hướng wizard trên trái, stepper trên phải · thẻ *Quote Run · Version N* + *Prices From* ở step 4 · Cost Estimation 2×2 · *Continue from Drafts* |
+| **Quoting BoM (16/10)** | đủ 8 trên 8 mục: Quote Setup tách khỏi kết quả · AML thành dòng con ở step 2 và 3 · Preferred Suppliers theo nhóm ưu tiên · chọn MPN chính thức từ Nexar · Consigned trừ trước khi mua · giá trị mang từ RFQ tô xanh kèm tooltip |
+| **25/10** | nút icon trong hàng về **26px** đúng standard — lấy đúng bậc `xs` của Kendo chứ không tự đặt số, nên 26 nằm cùng một phép tính với 32 và 34 |
 
-## File *Quoting BoM 16 Oct*
+**Một điểm mình làm khác:** mockup có bộ chọn phiên bản sau khi Submit; mình giữ
+**bảng Result** — mỗi phiên bản một dòng, kèm ngày chạy, người chạy, tổng tiền.
+Một bảng cho thấy đủ các phiên bản cạnh nhau, so sánh được và xuất Excel được.
+Nếu chị vẫn muốn bộ chọn thì mình thêm.
 
-**Đã làm:** Quote Setup tách khỏi kết quả (`Get Prices` / `Update Results` / `Refresh Prices` + dialog cảnh báo quota) · AML thành dòng con ở cả step 2 và 3 · Preferred Suppliers theo nhóm ưu tiên + thuật toán chọn nhà cung cấp · chọn MPN chính thức từ danh sách Nexar (file BoM giữ nguyên giá trị) · Consigned trừ trước khi mua · điều hướng wizard trên trái, stepper trên phải.
+## Cần chị quyết — 10 câu
 
-**Đã làm nốt 21/10:** thẻ *Quote Run · Version N* + *Prices From* ở step 4 · Cost Estimation 2×2 · *Continue from Drafts* ở step 1 · giá trị mang từ RFQ tô xanh kèm tooltip *"RFQ value: 27"*.
-
-**Một điểm mình làm khác:** mockup có bộ chọn phiên bản sau khi Submit; mình giữ **bảng Result** trên hồ sơ — mỗi phiên bản một dòng, kèm ngày chạy, người chạy và tổng tiền. Một bảng cho thấy đủ các phiên bản cạnh nhau, so sánh được và xuất Excel được; bộ chọn chỉ hiện một bản tại một lúc. Nếu chị vẫn muốn bộ chọn thì mình thêm.
-
-## Cần chị quyết
-
-**Hai chỉ đạo đang ngược nhau**
+**Đang ngược nhau trong tài liệu**
 
 | | | Đề xuất của mình |
 |---|---|---|
-| 1 | Mã hồ sơ / part có dùng mono không? (standard 14/10 ↔ review 8/10 *"do not use monotext"*) | Giữ font body + `tabular-nums`: cột số vẫn thẳng, không mất dễ đọc |
-| 2 | Vàng / xanh trong Review BoM (standard: vàng chỉ để cảnh báo ↔ guideline 25/8: vàng = MFG đã có) | Chỉ tô trạng thái **có vấn đề**. Đo trên live: `ROCKET_PN` xanh 13/13 dòng — màu mà dòng nào cũng có thì không nói gì |
-| 3 | AML dòng con — mình đã làm theo chị | Xin chị **chốt lần cuối**: màn này đã đổi hình ba lần trong ba ngày |
+| 1 | AML dòng con — mình đã làm theo chị | Xin chị **chốt lần cuối**: màn này đã đổi hình ba lần trong ba ngày |
 
 **Mình xin đề xuất ngược, kèm số đo**
 
 | | | Đề xuất |
 |---|---|---|
-| 4 | 44px cho form hồ sơ (chỉ còn form RFQ; standard đã miễn trừ màn lưới ở 32px) | 44px là sàn cho **cảm ứng**, 34–36px cho chuột. Form 27 trường cao thêm ~270px. WCAG 2.5.5 nói về vùng chạm, không nói ô nhập phải cao 44 |
-| 5 | Label / helper 11px | Sàn 12px |
-| 6 | *"Toolbar không bao giờ xuống dòng, hẹp thì cuộn ngang"* | Không wrap tới 1280px, dưới đó cho wrap. Đo: 1 hàng 56px @1400 · wrap 94px @1200 · hai băng cũ 108px |
-| 7 | Popup Discard không liệt kê field | Giữ **số đếm** — *"Discard 3 unsaved changes?"* trả lời đúng câu người bấm Discard tự hỏi |
-| 8 | Sáu hay bảy nhóm trạng thái | Giữ **bảy**: RFQ mới và bản nháp không phải một thứ. Kèm pill vàng `open` |
-| 9 | Filter chip bỏ số đếm — **mình đã làm theo** | Chỉ xin nói lại: panel lọc mặc định đóng, lưới lặng lẽ hiện 1/3 số dòng trông như mất dữ liệu |
-| 10 | Màu Priority — standard không nhắc tới, màu High đỏ / Medium hổ phách là **của mình** | Đổi sang thang đậm–nhạt trung tính, trả đỏ–vàng về nghĩa cảnh báo |
+| 2 | 44px cho form hồ sơ (chỉ còn form RFQ) | 44px là sàn cho **cảm ứng**, 34–36px cho chuột. Form 27 trường cao thêm ~270px. WCAG 2.5.5 nói về vùng chạm, không nói ô nhập phải cao 44 |
+| 3 | Sáu hay bảy nhóm trạng thái | Giữ **bảy**: RFQ mới và bản nháp không phải một thứ. Kèm pill vàng `open` |
 
 **Ba câu từ chính file 16/10**
 
 | | |
 |---|---|
-| 11 | **Alias MPN lưu lúc nào** — khi chọn hay khi Submit? File chị ghi *"not confirmed yet"* |
-| 12 | **"Low" của Excess & MOQ = dư ≤ 25%** — con số 25% cố định hay cấu hình được? |
-| 13 | **Công thức attrition**: `Total = Qty × Build Qty + Attrition × Attrition Set`, Attrition = max của mô tả part và các AML, sửa đè được cho riêng quote. Xin chị xác nhận — nó đổi con số trên báo giá |
+| 4 | **Alias MPN lưu lúc nào** — khi chọn hay khi Submit? File chị ghi *"not confirmed yet"* |
+| 5 | **"Low" của Excess & MOQ = dư ≤ 25%** — 25% cố định hay cấu hình được? |
+| 6 | **Công thức attrition**: `Total = Qty × Build Qty + Attrition × Attrition Set`, Attrition = max của mô tả part và các AML, sửa đè được cho riêng quote. Xin chị xác nhận — nó đổi con số trên báo giá |
 
 **Mình xin đóng góp thêm vào standard**
 
 | | |
 |---|---|
-| 14 | **Dark mode** — standard liệt kê 8 mã màu sáng, không sống qua dark mode. Mình đã có 69 token ngữ nghĩa, xin đóng góp lớp đó |
-| 15 | **Accessibility** — standard chưa nói về thứ tự focus và bàn phím. Mình kiểm 1.068 control / 10 route mỗi lần push, xin soạn mục này |
-| 16 | **Attachments** — ngoài phạm vi v1.0 nhưng mình đã ship. Giữ hay đóng băng tới v1.1? |
-| 17 | **"Status not counted"** — xin danh sách đủ các field audit không được tính |
+| 7 | **Lớp token màu.** Chị giao mình xem phần màu, và muốn cho user tự chỉnh palette theo custom profile. Hai việc đó cùng một điều kiện: màu phải được gọi theo **ý nghĩa** (`warning`, `danger`, `verified`) chứ không theo mã. Standard hiện liệt kê 8 mã màu sáng — không sống qua dark mode và không chỉnh được theo profile. Mình đã có 69 token ngữ nghĩa, xin đóng góp lớp đó làm nền cho cả hai |
+| 8 | **Accessibility.** Chị giao BA định nghĩa thứ tự focus — mình xin soạn **bản nháp** để BA review, vì mình đang kiểm 1.068 control / 12 route mỗi lần push và đã có số liệu sẵn |
+| 9 | **Attachments** — ngoài phạm vi v1.0 nhưng mình đã ship (xem / tải). Giữ ở v1.0 hay đóng băng tới v1.1? |
+| 10 | **"Status not counted"** — xin danh sách đủ các field audit không được tính |
 
-*Điều hướng wizard (hỏi cũ số 4) đã rút: mockup 16/10 đặt trên trái lần thứ hai, mình theo chị. Riêng "Submit" ở bước cuối mình vẫn đề nghị **Generate Quotation**, theo quy tắc nút gọi tên kết quả của chính standard.*
+*Nút cuối wizard: mình vẫn đề nghị **Generate Quotation** thay cho "Submit",
+theo đúng quy tắc "nút gọi tên kết quả" của chính standard.*
