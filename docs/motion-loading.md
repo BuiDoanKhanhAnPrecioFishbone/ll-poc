@@ -240,3 +240,66 @@ Và ngưỡng thời gian — thứ quyết định *có* hiện hay không:
 | Lọc / sắp xếp / đổi cột phía client | Cục bộ, tức thì |
 | Mở dialog | Không có gì phải nạp |
 | 700ms giữ skeleton ở các lưới của prototype | Chỉ là giả lập để trạng thái loading nhìn thấy được (`useListScreen.ts:35`). Trên hệ thống thật nó đến từ request, không phải `setTimeout` |
+
+---
+
+## 10. Hình tàu bay — nên đặt ở đâu
+
+Trước hết, một dữ kiện: **hệ thống live không có hình tàu bay nào.** Tìm trong
+bundle: `plane` / `airplane` / `aircraft` / `lottie` = 0 lần. `rocket` 4 lần là
+dữ liệu nghiệp vụ (`/BomSetups/rocket-columns`, `NET_ROCKET_INVENTORY`), không
+phải hình. Nên đây là ý mới của chị ấy, không phải thứ mình đang thiếu.
+
+### Nguyên tắc: **tần suất quyết định, không phải chỗ nào cũng được**
+
+Một hình minh hoạ có tính cách chỉ "lời" ở nơi người dùng **hiếm khi** gặp và
+**không có gì khác để nhìn**. Ở nơi gặp mỗi ngày vài chục lần, nó chuyển từ
+duyên sang phiền — và không rút lại được, vì lúc đó nó đã là thương hiệu.
+
+### Nên đặt
+
+| Chỗ | Vì sao hợp |
+|---|---|
+| **Boot screen sau đăng nhập** | Một lần một phiên, vài giây, cả màn hình trống. Đây là chỗ đúng nhất — và nó đã dựng sẵn (`BootScreen`) |
+| **Panel thương hiệu ở màn đăng nhập** | Không phải loading, mà là *khoảnh khắc thương hiệu*: một lần một phiên, đã có 45% màn hình dành cho nó |
+| **Trang lỗi / mất kết nối** | Hiếm, và là lúc đáng làm dịu. Tàu bay đã hạ cánh / đang đỗ — hình nói đúng trạng thái |
+| **Màn trống lần đầu** (chưa có RFQ nào) | Cùng khe "không có gì để nhìn", dù không phải loading |
+
+### Không nên đặt
+
+| Chỗ | Vì sao |
+|---|---|
+| Skeleton của lưới | Mỗi lần mở một màn danh sách. Vài chục lần một ngày |
+| Spinner trong nút | **20px** — xem số đo dưới. Một chiếc tàu bay ở 20px là một vết mực |
+| Thanh progress khi đổi route | Vài lần một phút |
+| **Get Prices** | Nghe thì hợp nhất — nhưng đây là thao tác lặp lại suốt ngày của người báo giá. Giữ Kendo `Loader` |
+| Bất kỳ chờ nào dưới 1 giây | Hình chưa kịp chạy hết một vòng đã biến mất, thành ra nhấp nháy |
+
+### Ràng buộc kỹ thuật cần biết trước khi vẽ
+
+Đo trong DOM — ba bậc của Kendo `Loader`:
+
+| | `small` | `medium` | `large` |
+|---|---|---|---|
+| Kích thước | **20×20** | **40×40** | **80×80** |
+
+Một chiếc tàu bay chỉ đọc được từ khoảng **64px trở lên**, tức là chỉ ở bậc
+`large` — đúng bằng boot screen và trang lỗi, và không phải trong nút.
+
+Ba điều nữa:
+
+1. **SVG nội tuyến, không GIF/Lottie, không CDN.** Màn đăng nhập của mình đã từ
+   chối `<img>` tới CDN cho logo Microsoft vì đúng lý do này: một màn đăng nhập
+   không nên phụ thuộc mạng ngoài. Hình tàu bay chịu cùng luật.
+2. **`prefers-reduced-motion`: hiện tàu bay *tĩnh*, đừng cho bay.** Hình vẫn
+   nói được "đang tải" mà không chuyển động.
+3. **Phải sống trên cả nền sáng và nền tối** — panel đăng nhập là nền tối, boot
+   screen là nền sáng.
+
+### Một câu nên hỏi lại chị ấy
+
+`logo-ideas.md` quyết định **D2: "Rocket EMS colours are out — Voyager IQ là
+bản sắc riêng."** Một hình tàu bay / tên lửa mượn từ thương hiệu mẹ sẽ đi ngược
+quyết định đó. Ngược lại, chính chữ **"Voyager"** là một từ về hành trình, nên
+tàu bay hoàn toàn bảo vệ được *như hình của Voyager IQ*, không phải của Rocket.
+Xin chị xác nhận chị đang nghĩ theo hướng nào — nó đổi cả hình lẫn màu.
