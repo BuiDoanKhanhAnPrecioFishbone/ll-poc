@@ -96,26 +96,93 @@ touch:check pass.
 | `app.css` | `.vy-run-step > .vy-minitable-k` in-cell padding | **For now.** It no longer compacts anything — the in-cell combobox is 34 because its own arrow button is, and the override's job today is to stop the inner element pushing the wrapper past it. The honest version is a size name on the in-cell editors, and Kendo's input scale stops at `sm` (32), so a 40px row in step 3 needs a rung Kendo does not ship. Its own change. |
 | `components.css` | `.vy-select .k-input-inner { padding-inline }` | **Yes.** Horizontal only; nothing to do with the scale. |
 | `components.css` | `.k-button.k-button-solid.vy-btn--tonal` | **Yes.** MD3's tonal has no rung in Kendo's fill ladder; documented in `Button.tsx`. |
+| `app.css` | `.vy-icon-btn` — *missing from this table until 25 Oct; see the finding below* | **Yes.** On the row rung at 26 now, and it stays ours: Kendo's flat button forbids a background with `!important` and ships no hover state. |
 | everywhere | `.vy-input`, `SearchField`, `.vy-view-btn` are ours, not Kendo's | **Open.** They are not overrides — they are a second implementation, and they only line up because they read the same token. Kendo ships a TextBox; adopting it would delete the dense rule in the grid toolbar and leave one input in the product. Not today. |
 | `Button.tsx` | the `asChild` path emits `.vy-btn--*`, a parallel size ladder | **Open.** It exists so a link can look like a button. Kendo's own answer is `.k-button` classes on an `<a>`, which would fold the ladder away. |
 
-## So, about 26
+## So, about 26 — answered 25 October
 
-The standard asks for "26px square icon buttons" on a row. Ours are 28 and square
-— `.vy-view-btn`, an anchor of our own, which is **not** on Kendo's scale and
-carries its own number. Changing it to 26 is therefore not the same kind of edit
-as changing 34 to 44: it touches a control the scale does not reach.
+The standard asks for "26px square icon buttons" on a row. The audit above left
+two ways open: give it a rung of Kendo's, or a token of ours. **It is a rung of
+Kendo's**, and the audit pointed at the right one.
 
-Two ways, and the choice is worth making deliberately:
+`size="xs"` ships in KendoReact's `Button` type — `'xs' | 'small' | 'medium' |
+'large'` in `Button.d.ts:30` — and the theme ships the matching
+`$kendo-button-xs-*` family. One more line in the file that already holds the
+scale:
 
-1. **Give it a rung.** Kendo has an `xs` button size we do not use.
-   `$kendo-button-xs-padding-y: control-padding(26px)` and the row's buttons
-   become Kendo buttons at `xs` — one more line in the file that already holds
-   the scale, and the number lands where every other control height lives.
-2. **Give it a token.** `--vy-control-row: 26px` beside the other two, and the
-   anchor keeps being ours.
+```scss
+$kendo-button-xs-padding-y: size.control-padding(var(--vy-control-row)),
+```
 
-(1) is the Kendo answer and the one this audit points at. Worth knowing either
-way: at 26 the row button is still above the 24px AA floor and further from the
-44px AAA one, and `touch:check` already reports it as THIN at 28 — on a coarse
-pointer the 44px minimum covers it, so this is a mouse-only number.
+Verified in the shipped stylesheet rather than assumed:
+
+```css
+.k-button-xs.k-icon-button { padding: calc((var(--vy-control-row)
+   - var(--kendo-font-size) * var(--kendo-line-height) - 2px) / 2) }
+```
+
+~2.71px around an 18.57px line box, and `.k-button-icon` floors the glyph at
+that same line box, so the button is 26 square by Kendo's construction. Measured
+in the DOM: **25.99 × 25.99**, against `sm` at 31.99 × 31.99.
+
+Only the button gains the rung. Kendo's input scale has no `xs`, and nothing in
+this product puts a text field inside a 26px row.
+
+## The finding this audit missed on 18 October
+
+The table above lists `.vy-input`, `SearchField`, `.vy-view-btn` and the
+`asChild` ladder as parallel implementations. **`.vy-icon-btn` was not in it,
+and should have been.** Found on 25 October by stripping the comments out of
+every stylesheet and listing what was left:
+
+| | |
+|---|---|
+| What | `<button>` with `padding: 4px` around a 16px glyph |
+| Size | **24px square**, arrived at by arithmetic written down nowhere — sitting exactly on the 24px AA floor with nothing in hand |
+| Reach | **ten call sites**: dialog maximise, view-setting maximise and close, the queue bell, the nav toggle, notifications, the step-1 template preview and download, the two attachment actions |
+| Recorded in | **nothing**. Not this document, not `radix-to-kendo-scope.md`, not the worklog |
+
+It is now on the rung — 26 from `--vy-control-row`, the same number Kendo's `xs`
+derives from — and recorded here. `.vy-view-btn` moved with it, off
+`--vy-control-sm`, a token named "avatar, brand mark".
+
+**Why both stay ours rather than becoming Kendo buttons.** Kendo v16's default
+theme ships exactly one flat-button rule:
+
+```css
+.k-button-flat { color: inherit; box-shadow: none!important;
+                 background: 0 0!important; border-color: #0000!important }
+```
+
+No theme-colour variants (`.k-button-flat-base` does not exist, in the subset or
+in the full theme) and **no hover state at all**. A grey chrome icon button with
+a hover surface is not a thing that button can be: `background: 0 0 !important`
+in a third-party stylesheet is not a specificity contest to enter, and
+solid-plus-our-paint is the tonal compromise already made once — worth making
+once, not twice.
+
+`.vy-view-btn` has a second reason of its own. It is one control with two tags:
+a `<Link>` on the grids that open through `rowHref`, a `<button>` on the five
+that open through `onOpenRow`. Kendo's button cannot be an anchor except through
+our `asChild` ladder, which would paint the two tags differently — the exact
+defect the `.k-grid a.vy-view-btn` rules exist to fix.
+
+## The rest of the sweep, 25 October
+
+Method: strip every CSS comment, then list each remaining line that names a
+Kendo class. Comments are where this project keeps its reasoning, so a rule
+with no comment above it is the thing being looked for.
+
+| | |
+|---|---|
+| Rules reaching into a `.k-` class | **33** — `app.css` 5, `components.css` 16, `responsive.css` 1, `kendo-bridge.css` 11 |
+| With no note above them | **0** |
+| `!important` outside the bridge | **0** (the bridge has 5, each with its own paragraph; `app.css` has the `prefers-reduced-motion` block, which is not Kendo's) |
+| Added by the four commits of 21-24 Oct | **one** — `.vy-with-actions > .k-combobox { flex: 1; min-width: 0 }`, layout only, noted |
+| `@radix-ui/react-radio-group` | in `package.json` since 15 Oct with nothing importing it. **Removed** |
+
+One thing worth knowing and not a finding: `dist/assets/all-*.css` is 724 KB of
+the full Kendo theme, and it is **not** on the critical path — `KendoCheck.tsx`
+pulls it through a dynamic `import()`, so Vite splits it into a chunk only that
+diagnostic route loads. The shipped stylesheet is the subset.
