@@ -142,8 +142,9 @@ màu được gọi theo tên.
 | `vy-mode-read` / `-edit` | đổi giữa đọc và sửa hồ sơ | `--vy-dur-medium` |
 
 Tất cả đi lên/xuống theo trục Y và dùng `--vy-ease-standard`. Không có chuyển
-động ngang nào ngoài shimmer, và không có gì xoay — nếu thêm spinner thì nó là
-chuyển động xoay đầu tiên trong sản phẩm.
+động ngang nào ngoài shimmer, và trong *prototype của mình* không có gì xoay.
+(~~Nếu thêm spinner thì nó là chuyển động xoay đầu tiên trong sản phẩm.~~ Sai —
+xem mục 8: hệ thống live đã xoay bằng Kendo `Loader`.)
 
 ---
 
@@ -155,3 +156,87 @@ chuyển động xoay đầu tiên trong sản phẩm.
 - `/engineering/part-mst` — nạp lại trang để thấy skeleton (giữ ~700ms, cố ý:
   dữ liệu là cục bộ nên nếu không giữ thì trạng thái loading không bao giờ
   thấy được — xem `useListScreen.ts:35`).
+
+---
+
+## 8. Hệ thống live đã có gì — đọc từ bundle, 25/10
+
+Chuỗi trong `assets/lib-bundle-B_5Gimit.js` của `erp.linhlongengineering.com`.
+Đây là tier 2 theo `precedence.md`: hành vi của hệ thống thật, trên cả phán
+đoán của mình.
+
+**Chị ấy đã có hai bộ chỉ báo loading, và mình đang không ship cái nào:**
+
+| | Bằng chứng trong bundle |
+|---|---|
+| **KendoReact `Loader`** | `k-loader`, `k-loader-sm/md/lg`, `k-loader-primary/secondary/tertiary/info/success/warning/error/dark/light/inverse`, `k-loader-canvas`, và ba kiểu `type`: `pulsing` (2 đoạn) · `infinite-spinner` (3) · `converging-spinner` (4) |
+| **Một `Skeleton` riêng** | `className: "skeleton relative overflow-hidden"` + `animate-wave before:absolute before:inset-0`, prop `animate` mặc định `true` |
+
+**Và ba tầng state chờ trong store:**
+
+| State | Nghĩa |
+|---|---|
+| `isLoading` trong auth | `LOGIN_REQUEST → isLoading: true`, `LOGIN_SUCCESS` / `LOGIN_FAILURE → false`, `MFA_REQUIRED`, `FORGOT_PASSWORD_REQUEST → true` |
+| `apiLoading` + action `API_LOAD` + `setApiLoading()` | cờ loading toàn cục cho mọi request, tách khỏi auth |
+| `LoadingProvider` / `useLoading` → `{ isLoading, setLoading }` | context bọc toàn app. Lần re-check 10/9 gặp `useNavigationLoading must be used within a NavigationLoadingProvider`; bundle hôm nay là `useLoading` / `LoadingProvider` — app đã rebuild và tên đổi, cơ chế thì vẫn đó |
+
+Thành phần notification cũng đã nhận `{ items, isLoading, isError, showUnreadOnly }`
+— **loading và error là hai prop riêng**, đúng quy tắc ba trạng thái.
+
+`k-loading-mask` = **0 lần**: overlay loading dựng sẵn của Kendo Grid không
+được dùng.
+
+**Hệ quả cho mình.** Ghi chú ở mục 6 rằng "thêm spinner thì nó là chuyển động
+xoay đầu tiên trong sản phẩm" là **sai** — sản phẩm thật đã xoay, bằng Kendo
+`Loader`. Việc đúng là **thêm `@progress/kendo-react-indicators`** (mình đang
+có 8 package Kendo, không có package này) rồi dùng `Loader` của Kendo, chứ
+không tự viết spinner. Giống hệt lý do bậc `xs` hôm nay lấy của Kendo.
+
+---
+
+## 9. Chỗ nào nên có loading motion
+
+Nguyên tắc trước danh sách: **mỗi chỉ báo trả lời một câu khác nhau.**
+
+| Chỉ báo | Trả lời | Dùng khi |
+|---|---|---|
+| **Skeleton** | *"nó sẽ trông như thế nào"* | biết trước hình dáng: lưới, form hồ sơ, thẻ |
+| **Spinner trong nút** (Kendo `Loader` `pulsing`, `sm`) | *"việc tôi vừa bấm đang chạy"* | một hành động, phần còn lại của trang vẫn dùng được |
+| **Thanh progress mảnh dưới header** | *"trang đang đổi"* | đổi route, chưa biết sắp ra gì |
+| **Overlay chặn cả màn** | *"đừng chạm gì lúc này"* | đăng nhập, boot app. Dùng tiết kiệm |
+
+Và ngưỡng thời gian — thứ quyết định *có* hiện hay không:
+
+| Thời gian | Hiện gì |
+|---|---|
+| < 150ms | **không gì cả.** Chỉ báo nhấp nháy làm app chậm đi trong cảm nhận |
+| 150–400ms | khoá control, không spinner |
+| 400ms – 1s | spinner / skeleton |
+| > 1s | spinner **kèm chữ nói đang làm gì** |
+| > 5s | tiến độ xác định nếu đếm được (*"đang hỏi giá 142/318 dòng"*) |
+
+### Danh sách, theo mức quan trọng
+
+| | Chỗ chờ | Live có sẵn | Nên là |
+|---|---|---|---|
+| 1 | **Get Prices / Refresh Prices** | — | **Quan trọng nhất.** Request Nexar cho hàng trăm dòng. Spinner trong nút + chữ đếm dòng; lưới giữ dữ liệu cũ mờ đi chứ không trống. `getPrices()` hiện đồng bộ, chưa có gì |
+| 2 | **Đăng nhập** | `LOGIN_REQUEST → isLoading` | Spinner trong nút *Sign in* + khoá form. MFA và *Forgot password* dùng lại y vậy — store đã có state cho cả ba |
+| 3 | **Boot app sau đăng nhập** | `isInitialized`, `isAuthInitialized` | Overlay toàn màn: logo + Kendo `Loader`. Đây là lúc app lấy navigation và permission — chưa có gì để vẽ skeleton theo |
+| 4 | **Đổi route** | `LoadingProvider` | Thanh progress mảnh dưới header. **Không** skeleton: chưa biết route đích là lưới hay hồ sơ |
+| 5 | **Mở hồ sơ** (Quotation Detail, Part) | — | Skeleton theo hình form — nhãn và ô ở đúng chỗ, để trang không nhảy |
+| 6 | **Lưới danh sách** | `Skeleton` + `animate-wave` | **Đã có.** Giữ nguyên |
+| 7 | **Phân trang / filter phía server** | — | Overlay mờ **trên dòng cũ**, không thay bằng skeleton: người dùng vừa thấy dữ liệu, xoá đi là bước lùi |
+| 8 | **Save / Confirm RFQ / Generate Quotation** | — | Nút khoá + spinner, toast sau khi xong. Khoá là phần quan trọng hơn spinner — nó chặn bấm hai lần |
+| 9 | **Export Excel** | — | Spinner trong nút. Lưới 300 dòng × 21 cột không tức thì |
+| 10 | **Nexar MPN lookup trong ô** | — | Spinner nhỏ trong chính picker, không chặn hàng |
+| 11 | **Upload BoM / attachment** | Kendo Upload | Dùng progress sẵn của Kendo Upload, đừng viết lại |
+| 12 | **Notification panel** | `isLoading` + `isError` | Skeleton 3 dòng |
+
+### Chỗ **không** nên thêm
+
+| | Vì sao |
+|---|---|
+| **Update Results** | Cùng phép tính, không request. Đo được là dưới 50ms. Spinner ở đây là nói dối và làm app có cảm giác chậm hơn |
+| Lọc / sắp xếp / đổi cột phía client | Cục bộ, tức thì |
+| Mở dialog | Không có gì phải nạp |
+| 700ms giữ skeleton ở các lưới của prototype | Chỉ là giả lập để trạng thái loading nhìn thấy được (`useListScreen.ts:35`). Trên hệ thống thật nó đến từ request, không phải `setTimeout` |
