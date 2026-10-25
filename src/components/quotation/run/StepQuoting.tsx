@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useColumnChoice } from '../../../ui/useColumnChoice';
 import { ColumnChooser } from '../../../ui/ColumnChooser';
 import { MiniTable } from '../../../ui/MiniTable';
+import { BusyOverlay } from '../../../ui/Loader';
 import { Button } from '../../../ui/Button';
 import { Select } from '../../../ui/Overlays';
 import { MoreMenu } from '../../../ui/MoreMenu';
@@ -40,7 +41,7 @@ import { SUPPLIERS as SUPPLIER_NAMES } from '../../../data/suppliers';
  * on an answer to the wrong question.
  */
 export function StepQuoting({
-  cfg, lines, setLines, hasRun, pricedAt, pending, setPending, dirty,
+  cfg, lines, setLines, hasRun, pricedAt, pending, setPending, dirty, pricing,
   onGetPrices, onRefreshPrices, onUpdateResults, onAddAttrition, onApplyPriceRange, rfq,
 }: {
   /** The APPLIED setup — what every number in the grid was computed from. */
@@ -53,6 +54,15 @@ export function StepQuoting({
   pending: QuoteSetup;
   setPending: (patch: Partial<QuoteSetup>) => void;
   dirty: boolean;
+  /**
+   * A price request is in flight.
+   *
+   * THE ONE WAIT IN THIS PRODUCT THAT IS REALLY A WAIT. On the live system
+   * this is a marketplace request across every line of the BoM — hundreds of
+   * them — and it was the only long operation in the flow with nothing on
+   * screen while it ran.
+   */
+  pricing: boolean;
   onGetPrices: () => void;
   onRefreshPrices: () => void;
   onUpdateResults: () => void;
@@ -199,6 +209,7 @@ export function StepQuoting({
               question nobody asked. */}
           <Button variant={!dirty && !hasRun ? 'filled' : undefined} size="sm"
                   disabled={dirty}
+                  busy={pricing}
                   onClick={hasRun ? onRefreshPrices : onGetPrices}
                   title={dirty
                     ? 'Apply the setup changes first — Update Results'
@@ -207,9 +218,9 @@ export function StepQuoting({
                       : manual
                         ? `Get prices through ${pending.provider}. Quote Focus is ${pending.quoteFocus}, so no supplier is selected for you.`
                         : `Price every line through ${pending.provider}, falling back to the other provider`}>
-            {hasRun ? 'Refresh Prices' : 'Get Prices'}
+            {pricing ? 'Pricing…' : hasRun ? 'Refresh Prices' : 'Get Prices'}
           </Button>
-          <Button variant={dirty ? 'filled' : undefined} size="sm" disabled={!dirty}
+          <Button variant={dirty ? 'filled' : undefined} size="sm" disabled={!dirty || pricing}
                   onClick={onUpdateResults}
                   title={dirty
                     ? 'Recalculate with the prices already loaded — no marketplace request'
@@ -247,6 +258,16 @@ export function StepQuoting({
           a missing part — the fault we had written up against the live screen
           while shipping it ourselves. Grey says "waiting for the run"; red is
           kept for something that is actually wrong. */}
+      {/* THE ROWS STAY while they are being re-priced. A refresh replaces
+          numbers the user is looking at, and a skeleton here would take away
+          the previous answer — which is the thing they are comparing against.
+          `blocking` because a cell edit landing mid-request would be applied
+          to a row the response is about to overwrite.
+
+          Counted rather than vague: "Pricing 58 lines…" is the difference
+          between a wait the user can estimate and one they cannot. */}
+      <BusyOverlay busy={pricing} blocking
+                   label={`Asking ${pending.provider} for prices · ${quoted.length} lines`}>
       <MiniTable
         data={rows}
         /* One BoM line is one record however many manufacturers it carries. */
@@ -266,6 +287,7 @@ export function StepQuoting({
           : <NoRecords title="No quote results yet."
                        hint="Click Get Prices to price the BoM and pick a supplier for each part." />}
       />
+      </BusyOverlay>
 
       {/* THE COLOURS, SAID IN WORDS, under the grid they describe — where the
           standard puts a legend and where step 2 now carries its own. It used

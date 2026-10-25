@@ -76,6 +76,7 @@
   $kendo-input-md-padding-y: size.control-padding(var(--vy-control-md))
 );
 
+@use "@progress/kendo-theme-default/scss/loader/index.scss" as loader;
 @use "@progress/kendo-theme-default/scss/grid/index.scss" as grid;
 @use "@progress/kendo-theme-default/scss/upload/index.scss" as upload;
 @use "@progress/kendo-theme-default/scss/tabstrip/index.scss" as tabstrip;
@@ -87,6 +88,15 @@
    Measured: 344 KB raw, **40 KB gzipped**, against 97 KB for the full theme. */
 @include grid.kendo-grid--styles();
 /* Phase 7. ExcelExport needs no CSS — it produces a file and renders nothing. */
+/* Phase 8 — the loader, 25 Oct. Not a new idea of ours: the customer's live
+   bundle already ships KendoReact's Loader, with `k-loader-sm/md/lg`, the
+   eleven theme colours and all three animation types. We had eight Kendo
+   packages and not `kendo-react-indicators`, so the one indicator the product
+   already uses was the one we could not render. Pinned at 16.0.0 to match the
+   peer set — `@latest` is 16.2.0 and resolves against a different
+   `kendo-react-intl`.
+   `kendo-loader--styles()` pulls `kendo-overlay--styles()` in with it. */
+@include loader.kendo-loader--styles();
 @include upload.kendo-upload--styles();
 /* Phase B of the Radix scope. The live system ships `k-tabstrip` twelve times
    over, so these are the tabs the customer already uses every day. */

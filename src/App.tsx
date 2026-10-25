@@ -11,6 +11,7 @@ import { Quotations } from './pages/Quotations';
 import { QuotationDetail } from './pages/QuotationDetail';
 import { SitemapPage } from './pages/Sitemap';
 import { DesignSystemPage } from './pages/DesignSystem';
+import { BootScreen } from './ui/Loader';
 import { AuditPage } from './pages/Audit';
 import { Placeholder } from './pages/Placeholder';
 import { Login } from './pages/Login';
@@ -77,7 +78,12 @@ export default function App() {
           <Route path="/audit" element={<AuditPage />} />
           {/* A licence check, not a migration — see the page's own note. */}
           <Route path="/kendo-check" element={
-            <Suspense fallback={<div className="vy-page"><p className="vy-empty-inline">Loading the Kendo check…</p></div>}>
+            /* THE ONE REAL ROUTE WAIT IN THIS BUILD, and the case a skeleton
+               cannot answer: this route pulls a chunk AND the full 724 KB Kendo
+               theme over the network, and until they land there is nothing
+               whose shape could be drawn. A sentence of grey text said the same
+               thing while looking like an empty state. */
+            <Suspense fallback={<BootScreen label="Loading the Kendo check" />}>
               <KendoCheck />
             </Suspense>
           } />

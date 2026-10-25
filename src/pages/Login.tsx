@@ -67,6 +67,17 @@ export function Login() {
      password. Read from the key event's modifier state — no key logging. */
   const [caps, setCaps] = useState(false);
   const [attempted, setAttempted] = useState(false);
+  /* SIGNING IN IS A WAIT, and on the live system it is the first one a user
+     meets. Their own auth store already models it — `LOGIN_REQUEST` sets
+     `isLoading: true`, `LOGIN_SUCCESS` and `LOGIN_FAILURE` clear it, and MFA
+     and Forgot Password reuse the same flag — so this is not a state we are
+     inventing for the mockup, it is the state they already keep and we were
+     not showing.
+
+     The 900ms is simulated, like the 700ms in `useListScreen`: nothing is
+     authenticated here, so without a delay the designed state cannot be seen
+     at all. On the real system it ends when the request does. */
+  const [signing, setSigning] = useState(false);
   const userRef = useRef<HTMLInputElement>(null);
 
   /* The cursor belongs in the first field. This page has one job. */
@@ -82,10 +93,15 @@ export function Login() {
     e.preventDefault();
     setAttempted(true);
     if (!ready) { userRef.current?.focus(); return; }
-    /* Deliberately not "signed in as {username}" — echoing back what was typed
-       into a password form is the shape of a thing that checked it. */
-    toast.success('Not in this prototype — this would sign you in. No credentials are sent or stored.');
-    navigate('/');
+    setSigning(true);
+    /* No cleanup on unmount: this timer's own callback navigates away, and the
+       page it leaves cannot be returned to without a fresh mount. */
+    window.setTimeout(() => {
+      /* Deliberately not "signed in as {username}" — echoing back what was
+         typed into a password form is the shape of a thing that checked it. */
+      toast.success('Not in this prototype — this would sign you in. No credentials are sent or stored.');
+      navigate('/');
+    }, 900);
   }
 
   return (
@@ -194,8 +210,11 @@ export function Login() {
               gives a keyboard or screen-reader user nothing to act on and does
               not say which field is missing. Pressing it now names the field
               instead. */}
-          <Button type="submit" variant="filled" className="vy-login-submit">
-            Sign In
+          {/* `busy` disables it as well as marking it, which is the half that
+              matters: a second submit while the first is in flight is how a
+              login form sends two requests and shows two errors. */}
+          <Button type="submit" variant="filled" className="vy-login-submit" busy={signing}>
+            {signing ? 'Signing in…' : 'Sign In'}
           </Button>
 
           {/* MICROSOFT SSO — gap M1. The live page offers a second way in and

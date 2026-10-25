@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { fmtDateTime } from '../../ui/regional';
 import { saveDraftQuote, type DraftQuote } from '../../data/draftQuotes';
 import { Dialog } from '../../ui/Overlays';
@@ -142,6 +142,15 @@ export function RunQuotationDialog({ q, onClose, resume }: {
      "No prices yet" is a different state from "priced a while ago". */
   const [pricedAt, setPricedAt] = useState<Date | null>(resume?.hasRun ? new Date() : null);
   const [runVersion, setRunVersion] = useState(resume?.runVersion ?? 0);
+  /* A PRICE REQUEST IN FLIGHT. The longest wait in this flow and the only one
+     that leaves the browser on the real system: a marketplace call across
+     every line of the BoM. The 1200ms below is simulated for the same reason
+     `useListScreen` simulates 700 — the data is in memory, so without it the
+     state cannot be seen; on the real system it ends when the response lands.
+     Cleared on unmount, because this dialog CAN be closed mid-request. */
+  const [pricing, setPricing] = useState(false);
+  const priceTimer = useRef<number>(0);
+  useEffect(() => () => window.clearTimeout(priceTimer.current), []);
   const [runDate, setRunDate] = useState(resume?.runDate ?? '');
 
   const [refreshOpen, setRefreshOpen] = useState(false);
@@ -251,6 +260,19 @@ export function RunQuotationDialog({ q, onClose, resume }: {
    */
   function getPrices() {
     const next = applyPending();
+    /* THE SETUP IS APPLIED NOW, THE PRICES LAND LATER. `applyPending` moves
+       the edited setup into `cfg` so the strip stops saying "pending" the
+       moment the request starts — the user asked for these values to be used,
+       and they now are. The numbers they produce arrive with the response. */
+    setPricing(true);
+    priceTimer.current = window.setTimeout(() => {
+      setPricing(false);
+      finishPrices(next);
+    }, 1200);
+  }
+
+  /** What `getPrices` does once the marketplace has answered. */
+  function finishPrices(next: ReturnType<typeof applyPending>) {
     setLines(ls => runQuote(ls, rulesOf(next)));
     setHasRun(true);
     setRunVersion(v => v + 1);
@@ -454,6 +476,7 @@ export function RunQuotationDialog({ q, onClose, resume }: {
               cfg={cfg} lines={lines} setLines={setLines}
               hasRun={hasRun} pricedAt={pricedAt}
               pending={pending} setPending={setPending} dirty={dirty}
+              pricing={pricing}
               onGetPrices={getPrices}
               /* THE ONLY ONE THAT ASKS FIRST, and it asks because it spends
                  something the user cannot get back — a marketplace request is

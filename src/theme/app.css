@@ -837,6 +837,52 @@
 .vy-skeleton-cell { height: var(--vy-space-5); border-radius: var(--vy-radius-sm); background: linear-gradient(90deg, var(--vy-surface-sunken) 25%, var(--vy-surface-app) 50%, var(--vy-surface-sunken) 75%); background-size: 200% 100%; animation: vy-shimmer 1.4s ease-in-out infinite; }
 @keyframes vy-shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
 
+/* --- Busy over content that stays ------------------------------------------
+   The second loading state, and the one a skeleton gets wrong. A skeleton
+   answers "what will this look like"; once the user has already seen rows,
+   that question is answered and replacing them asks it again. So a re-price,
+   a server-side filter or a second page DIMS what is there and puts the
+   indicator over it. See BusyOverlay in ui/Loader.tsx.
+
+   `position: relative` on the wrapper, not on the content: the content keeps
+   whatever layout it had, so dropping an overlay around a grid does not
+   re-stack anything inside it. */
+.vy-busy { position: relative; display: flex; flex-direction: column; min-height: 0; flex: 1 1 auto; }
+.vy-busy-content { display: flex; flex-direction: column; min-height: 0; flex: 1 1 auto; }
+/* HALF OPACITY, NOT A GREY WASH. The numbers underneath have to stay legible
+   enough to be recognised as the previous answer — the point of keeping them
+   is that the user can see the shape of what is being refreshed. A solid scrim
+   would make this the same as an empty state with extra steps. */
+.vy-busy[data-busy] > .vy-busy-content { opacity: .45; pointer-events: none; }
+.vy-busy-veil {
+  position: absolute; inset: 0; z-index: 2;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--vy-space-5);
+}
+.vy-busy-label { margin: 0; font-size: var(--vy-text-base); color: var(--vy-on-surface-subtle); }
+
+/* --- The boot screen --------------------------------------------------------
+   One wait cannot be a skeleton: the app after sign-in, fetching the
+   navigation tree and the permission set, which is what decides what there is
+   to draw. The mark is on it because this is the first screen after a
+   password, and a bare spinner on white is indistinguishable from a page that
+   has failed to load. */
+.vy-boot {
+  position: fixed; inset: 0; z-index: 100; background: var(--vy-surface);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--vy-space-7);
+}
+.vy-boot-mark {
+  inline-size: var(--vy-space-14); block-size: var(--vy-space-14);
+  display: grid; place-items: center; border-radius: var(--vy-radius-md);
+  background: var(--vy-brand); color: var(--vy-brand-on);
+  font-size: var(--vy-text-xl); font-weight: var(--vy-weight-bold);
+}
+
+/* The loader inside a button: it replaces the icon, so it takes the icon's
+   box and nothing in the row moves when the action starts. */
+.vy-btn-busy { display: inline-flex; align-items: center; }
+
 /* --- Error state -------------------------------------------------------------
    The third of the three. Names the failure and offers the way out, rather than
    rendering an empty grid that looks like "no data". */

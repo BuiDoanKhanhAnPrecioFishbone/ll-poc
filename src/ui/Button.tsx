@@ -1,6 +1,7 @@
 import { useCallback, type ButtonHTMLAttributes, type ReactNode, type Ref } from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { Button as KendoButton } from '@progress/kendo-react-buttons';
+import { Loader } from './Loader';
 
 type Variant = 'filled' | 'tonal' | 'outlined' | 'text' | 'danger';
 type Size = 'xs' | 'sm' | 'md';
@@ -82,9 +83,26 @@ const FILL: Record<Variant, 'solid' | 'outline' | 'flat'> = {
 };
 
 export function Button({
-  variant = 'outlined', size = 'md', icon, asChild, className = '', children, ref, ...rest
+  variant = 'outlined', size = 'md', icon, busy, disabled, asChild, className = '', children, ref, ...rest
 }: {
   variant?: Variant; size?: Size; icon?: ReactNode; asChild?: boolean; children?: ReactNode;
+  /**
+   * The action this button started is still running.
+   *
+   * Kendo's Button has no loading state of its own — `disabled` is the only
+   * related prop it takes — so this composes the two things the state actually
+   * needs: a Kendo `Loader` in the ICON slot, and `disabled`.
+   *
+   * DISABLING IS THE LOAD-BEARING HALF. The indicator tells the user something
+   * is happening; the disable is what stops a second click spending a second
+   * marketplace request. A spinner without it is decoration over a bug.
+   *
+   * The loader replaces the icon rather than sitting beside the label, so the
+   * button keeps its width and nothing in the toolbar moves when the action
+   * starts. `pulsing` rather than a spinner: the dots hold still, so the
+   * control does not appear to rotate.
+   */
+  busy?: boolean;
   /** Pulled out of the spread deliberately — see the note above. */
   ref?: Ref<HTMLButtonElement>;
 } & Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'ref'>) {
@@ -97,6 +115,11 @@ export function Button({
   /* An icon with nothing beside it. Kendo has a class for exactly this and it
      carries the squareness, so the test is here rather than at each call site. */
   const iconOnly = icon != null && children == null;
+  const shown = busy
+    ? <span className="vy-btn-busy"><Loader size="small" type="pulsing"
+             themeColor={variant === 'filled' || variant === 'danger' ? 'base' : 'primary'}
+             label="Working" /></span>
+    : icon;
 
   const forwardToDom = useCallback((handle: { element?: HTMLElement | null } | null) => {
     const node = (handle?.element ?? null) as HTMLButtonElement | null;
@@ -112,6 +135,7 @@ export function Button({
             data-state-layer
             data-on-dark={variant === 'filled' || variant === 'danger' ? '' : undefined}
             ref={ref}
+            aria-disabled={disabled || undefined}
             {...rest}>
         {children}
       </Slot>
@@ -121,6 +145,14 @@ export function Button({
   return (
     <KendoButton
       ref={forwardToDom}
+      /* `disabled` IS DESTRUCTURED OUT OF `rest` ON PURPOSE. Written as
+         `disabled={busy || rest.disabled}` above the spread, `{...rest}` put
+         its own `disabled={false}` back on top and the busy button stayed
+         clickable — measured on Get Prices, which is the one button in this
+         product where a second click costs money. Props are applied in source
+         order, and the spread is the last word on anything still inside it. */
+      disabled={busy || disabled}
+      aria-busy={busy || undefined}
       themeColor={THEME[variant]}
       fillMode={FILL[variant]}
       size={KSIZE[size]}
@@ -147,8 +179,11 @@ export function Button({
           before, in the same order. The class is Kendo's only when the icon is
           the whole button, because that is the case whose geometry Kendo owns;
           beside a label it is a 0-size inline-flex wrapper either way. */}
-      {icon && (
-        <span className={iconOnly ? 'k-button-icon' : 'vy-btn-icon'} aria-hidden>{icon}</span>
+      {shown && (
+        <span className={iconOnly ? 'k-button-icon' : 'vy-btn-icon'}
+              /* Not hidden while busy: the Loader carries the only
+                 machine-readable statement that the action is running. */
+              aria-hidden={busy ? undefined : true}>{shown}</span>
       )}
       {children}
     </KendoButton>
