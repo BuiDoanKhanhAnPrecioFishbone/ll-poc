@@ -92,7 +92,36 @@
   border-radius: var(--vy-radius-sm); padding: 1px var(--vy-space-2); background: var(--vy-surface);
 }
 .vy-topbar-right { display: flex; align-items: center; gap: var(--vy-space-5); }
-.vy-icon-btn { position: relative; background: none; border: 0; color: var(--vy-on-surface-subtle); cursor: pointer; padding: var(--vy-space-2); border-radius: var(--vy-radius-md); }
+/* ON THE ROW RUNG — 25 Oct, and it took an audit to notice it was on no rung
+   at all. This was `padding: 4px` around a 16px glyph: 24px square, arrived at
+   by arithmetic nobody had written down, right on the 24px AA floor with
+   nothing in hand. It now reads `--vy-control-row`, the same 26 the standard
+   asks for and the same number `$kendo-button-xs-padding-y` is derived from,
+   so our icon button and a Kendo `size="xs"` one are the same size.
+
+   WHY IT IS STILL OURS AND NOT KENDO'S. Kendo v16's default theme ships
+   exactly one flat-button rule, `.k-button-flat { background: 0 0 !important }`
+   — no theme-colour variants and no hover state whatsoever. A grey chrome icon
+   button WITH a hover surface is not a thing that button can be: `!important`
+   in a third-party stylesheet is not a specificity contest we can win, and
+   solid-plus-our-paint is the tonal compromise we already made once and do not
+   want to multiply. Recorded in docs/kendo-control-scale-18oct.md.
+
+   The explicit box rather than padding: a 44px minimum arrives on a coarse
+   pointer (responsive.css), and a min-size on a padding-sized box leaves the
+   glyph off-centre in the bigger one. */
+.vy-icon-btn {
+  position: relative; display: inline-grid; place-items: center;
+  /* `flex: none`, because a square is only square if it cannot be squeezed.
+     Measured with the box in place: the two beside the template picker came
+     out 24x26 — a flex item's `inline-size` is its BASIS, and the default
+     `flex-shrink: 1` spent 2px of it on the combobox beside them. Every place
+     this button appears, it appears in a row of something wider. */
+  flex: none;
+  inline-size: var(--vy-control-row); block-size: var(--vy-control-row);
+  background: none; border: 0; color: var(--vy-on-surface-subtle);
+  cursor: pointer; border-radius: var(--vy-radius-md);
+}
 .vy-icon-btn:hover { background: var(--vy-surface-sunken); color: var(--vy-on-surface); }
 .vy-avatar { width: var(--vy-control-sm); height: var(--vy-control-sm); border-radius: 50%; background: var(--vy-brand-subtle-strong); color: var(--vy-brand-text-deep); display: grid; place-items: center; font-weight: var(--vy-weight-semibold); font-size: var(--vy-text-sm); }
 
@@ -2223,9 +2252,17 @@
    the body, wrapping every part number over four lines and standing the rows at
    72px. The cell stays a table cell; the button centres itself. */
 .vy-td--view { text-align: center; }
+/* 26, NOT 28 — the standard's figure for an icon button on a row, now read
+   from `--vy-control-row` so it is the same number Kendo's `xs` rung derives
+   its padding from. It stays ours for the reason the audit records: this one
+   control renders as a `<Link>` on the grids that open through `rowHref` and
+   as a `<button>` on the five that open through `onOpenRow`, and Kendo's
+   button cannot be an anchor without going through our `asChild` ladder —
+   which would paint the two tags differently, the exact defect the colour
+   rules below were written to fix. */
 .vy-view-btn {
   display: inline-grid; place-items: center; vertical-align: middle;
-  width: var(--vy-control-sm); height: var(--vy-control-sm);
+  width: var(--vy-control-row); height: var(--vy-control-row);
   border: 0; border-radius: var(--vy-radius-sm);
   background: none; color: var(--vy-on-surface-subtle); cursor: pointer;
 }
