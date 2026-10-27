@@ -2,6 +2,7 @@ import { ROLE_WIDTH } from '../components/column-model';
 import { useEffect, useState } from 'react';
 import { RocketJourney } from '../ui/RocketJourney';
 import { BOOT_STAGES } from '../ui/bootStages';
+import { ErrorBoundary } from '../ui/ErrorBoundary';
 import { StatusBadge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 
@@ -190,6 +191,19 @@ export function DesignSystemPage() {
         </div>
       </Section>
 
+      {/* THE THIRD STATE, shown by actually failing. A mock of an error state
+          is a picture of one; this panel throws for real and the same
+          ErrorBoundary the app runs catches it, so what you see is what a
+          broken screen does — including that Reload puts it back. */}
+      <Section title="The third state"
+        note="Loading, empty and error are three states, not two. Audit finding T5 records the live system conflating the first two; this prototype had the opposite gap — a comment in app.css declared an error state for weeks with no rule under it. Press the button: the panel below throws, and the boundary that wraps every route catches it.">
+        <div className="vy-ds-errorstate">
+          <ErrorBoundary>
+            <Breakable />
+          </ErrorBoundary>
+        </div>
+      </Section>
+
       <Section title="Type scale" note="The production app declares no font-family at all — the computed value is the bare keyword `sans-serif`, so it renders differently on every OS. English only, per design decision D12, so the scale carries no CJK line-height allowance.">
         <div className="vy-type-scale">
           {[['--vy-text-2xl','24px','Page title'],['--vy-text-xl','20px','Section title'],['--vy-text-lg','16px','Subsection'],['--vy-text-md','14px','Body emphasis'],['--vy-text-base','13px','Body / grid default'],['--vy-text-sm','12px','Secondary'],['--vy-text-xs','11px','Column headers, meta']].map(([v,size,use]) => (
@@ -234,6 +248,25 @@ function BootSpecimen() {
         Specimen — stepping on a timer. In the product each station waits on{' '}
         <code>{stage.liveSignal}</code>.
       </p>
+    </div>
+  );
+}
+
+/**
+ * A panel that can be made to fail on purpose.
+ *
+ * It throws during RENDER rather than in the click handler, because that is
+ * what an error boundary catches — a handler that throws goes to
+ * `window.onerror` and the screen carries on, which is a different bug with a
+ * different fix. Pressing the button sets state; the next render throws.
+ */
+function Breakable() {
+  const [broken, setBroken] = useState(false);
+  if (broken) throw new Error('Specimen: a deliberate render failure');
+  return (
+    <div className="vy-ds-breakable">
+      <p>This panel is working.</p>
+      <Button variant="danger" onClick={() => setBroken(true)}>Break this panel</Button>
     </div>
   );
 }

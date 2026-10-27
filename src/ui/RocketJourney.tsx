@@ -63,7 +63,7 @@ function flameFit(x: number) {
   return Math.max(0, Math.min(1, room / (FLAME_TIP - NOZZLE)));
 }
 
-export function RocketJourney({ step = 0 }: {
+export function RocketJourney({ step = 0, state = 'loading' }: {
   /**
    * How many boot stages have finished — lights that many route segments.
    *
@@ -80,6 +80,19 @@ export function RocketJourney({ step = 0 }: {
    * right count for production and the wrong one for this build.
    */
   step?: number;
+  /**
+   * `loading` hovers and burns; `error` is the same craft stopped.
+   *
+   * THE ERROR POSE IS NOT A DIFFERENT DRAWING. It is this one with the engine
+   * out, crosses for eyes, two puffs of smoke and the destination dimmed —
+   * the designer's own `error` state, and the reason it works is that the
+   * reader has already met this rocket on the way in. A separate illustration
+   * for failure would be a second thing to learn at the worst moment.
+   *
+   * It never animates. A failure that is still moving reads as a failure that
+   * is still trying.
+   */
+  state?: 'loading' | 'error';
 }) {
   const uid = useId();
   const clip = `vy-rocket-clip-${uid}`;
@@ -102,6 +115,7 @@ export function RocketJourney({ step = 0 }: {
    * the rocket off the route line it is meant to be following.
    */
   useEffect(() => {
+    if (state === 'error') return;
     const reduce = matchMedia('(prefers-reduced-motion: reduce)');
     let frame = 0;
 
@@ -137,8 +151,10 @@ export function RocketJourney({ step = 0 }: {
     const tick = (t: number) => { draw(t); frame = requestAnimationFrame(tick); };
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
-  }, [step]);
+  }, [step, state]);
 
+  /* The error pose does not hover, so one value covers it. */
+  const errFit = flameFit(STATIONS[Math.min(step, 4)]);
   const star = 'M0 -3.2 Q0 0 3.2 0 Q0 0 0 3.2 Q0 0 -3.2 0 Q0 0 0 -3.2Z';
   const dot = { fill: 'none', strokeWidth: 2.4, strokeLinecap: 'round' as const,
                 strokeDasharray: '0.1 6.9' };
@@ -166,7 +182,7 @@ export function RocketJourney({ step = 0 }: {
                 clipPath={`url(#${clip})`} />
       </g>
 
-      <g transform="rotate(-14 122 48)">
+      <g transform="rotate(-14 122 48)" opacity={state === 'error' ? 0.5 : 1}>
         <path d="M109 48 A13 4 0 0 1 135 48" fill="none"
               stroke="var(--vy-blue-200, #b0c2ea)" strokeWidth="2.4" strokeLinecap="round" />
         <circle cx="122" cy="48" r="7" fill="var(--vy-blue-300, #7f9ce1)" />
@@ -186,7 +202,7 @@ export function RocketJourney({ step = 0 }: {
         {/* The resting pose carries the cap too. Left at `scale(1 1)` the flame
             painted at full length for one frame before the first animation
             tick trimmed it — a flicker through the planet on every mount. */}
-        <g ref={flame}
+        <g ref={flame} opacity={state === 'error' ? 0 : 1}
            transform={`translate(0 22) scale(1 ${flameFit(STATIONS[Math.min(step, 4)]).toFixed(3)}) translate(0 -22)`}>
           <path d="M-5.5 22 C-8 33 -3 42 0 53 C3 42 8 33 5.5 22 Z" fill="var(--vy-blue-300, #7f9ce1)" />
           <path d="M-3.4 22 C-4 29 -1.5 36 0 42 C1.5 36 4 29 3.4 22 Z" fill="var(--vy-blue-100, #dae2f3)" />
@@ -195,6 +211,22 @@ export function RocketJourney({ step = 0 }: {
               have become a hole in the middle of the flame. */}
           <path d="M-1.6 22 C-1.6 26 0 31 0 31 C0 31 1.6 26 1.6 22 Z" fill="var(--vy-grey-0, #ffffff)" />
         </g>
+        {/* Smoke where the flame was. Two puffs, the second fainter and
+            further out, so it reads as drifting rather than as a second
+            exhaust.
+
+            THEY TAKE THE SAME CAP AS THE FLAME, and they needed it: measured
+            at station 0, the puffs sat at x 23.7 and 19.1 inside a planet that
+            ends at 24 — the flame bug again, in the state nobody looks at
+            until something has gone wrong. Their offsets from the nozzle are
+            scaled rather than their radii, so the smoke stays the same size
+            and only drifts less far. */}
+        {state === 'error' && (
+          <g fill="var(--vy-blue-200, #b0c2ea)">
+            <circle cx="0" cy={NOZZLE + 12 * errFit} r="4.4" />
+            <circle cx="0" cy={NOZZLE + 23 * errFit} r="3" opacity=".6" />
+          </g>
+        )}
         <path d="M-12 6 C-19 10 -24 18 -23 27 C-23 28.5 -21.5 28.5 -20.5 27.5 L-11 20 Z M12 6 C19 10 24 18 23 27 C23 28.5 21.5 28.5 20.5 27.5 L11 20 Z M-6.5 19 H6.5 L5 24.5 H-5 Z"
               fill="var(--vy-blue-800, #112960)" />
         <path d="M0 -31 C13 -23 15 -4 14 10 C14 16.5 11 20.5 0 20.5 C-11 20.5 -14 16.5 -14 10 C-15 -4 -13 -23 0 -31 Z"
@@ -206,11 +238,17 @@ export function RocketJourney({ step = 0 }: {
         <rect x="-14.4" y="11" width="28.8" height="3.4" fill="var(--vy-blue-100, #dae2f3)" />
         <circle cx="0" cy="-4" r="9.4" fill="var(--vy-blue-100, #dae2f3)" />
         <circle cx="0" cy="-4" r="7" fill="var(--vy-blue-800, #112960)" />
-        <g ref={eyes} fill="var(--vy-blue-100, #dae2f3)"
-           transform="translate(0 -5.6) scale(1 1) translate(0 5.6)">
-          <circle cx="-2.3" cy="-5.6" r="1.9" />
-          <circle cx="2.9" cy="-5.6" r="1.9" />
-        </g>
+        {state === 'error' ? (
+          <path d="M-4.6 -6.6 L-1.4 -3.4 M-1.4 -6.6 L-4.6 -3.4 M1.4 -6.6 L4.6 -3.4 M4.6 -6.6 L1.4 -3.4"
+                fill="none" stroke="var(--vy-blue-100, #dae2f3)"
+                strokeWidth="1.5" strokeLinecap="round" />
+        ) : (
+          <g ref={eyes} fill="var(--vy-blue-100, #dae2f3)"
+             transform="translate(0 -5.6) scale(1 1) translate(0 5.6)">
+            <circle cx="-2.3" cy="-5.6" r="1.9" />
+            <circle cx="2.9" cy="-5.6" r="1.9" />
+          </g>
+        )}
       </g>
     </svg>
   );

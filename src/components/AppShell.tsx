@@ -1,6 +1,7 @@
 import { useAnyDialogOpen } from '../ui/dialogOpen';
 import { useEffect, useMemo, useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import { ErrorBoundary } from '../ui/ErrorBoundary';
 import { liveNav, reviewPages } from '../data/sitemap';
 import { CommandPalette } from './CommandPalette';
 import { HeaderClock, TimezonePicker, LanguagePicker, QueueBell } from './GlobalHeader';
@@ -277,7 +278,14 @@ export function AppShell() {
           </div>
         </header>
 
-        <main className="vy-content" id="vy-main" tabIndex={-1}><Outlet /></main>
+        {/* The boundary wraps the OUTLET, not the shell. A thrown page then
+            loses the page and keeps the sidebar and the top bar — which is the
+            navigation the user needs in order to leave the broken screen. The
+            `key` makes it reset per route too: walking away from a screen that
+            threw should not carry its error to the next one. */}
+        <main className="vy-content" id="vy-main" tabIndex={-1}>
+          <ErrorBoundary key={pathname}><Outlet /></ErrorBoundary>
+        </main>
       </div>
 
       <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />

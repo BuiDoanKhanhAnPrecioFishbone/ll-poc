@@ -917,7 +917,46 @@
 
 /* --- Error state -------------------------------------------------------------
    The third of the three. Names the failure and offers the way out, rather than
-   rendering an empty grid that looks like "no data". */
+   rendering an empty grid that looks like "no data".
+
+   THIS COMMENT STOOD ALONE FOR WEEKS. It was written when the loading state was
+   built, declaring a third state — and not one rule followed it. The state was
+   asserted in a comment and never drawn, which is the same gap we had recorded
+   against the live system from the other direction. 27 Oct.
+
+   Centred in whatever it is given, because its two callers are different sizes:
+   the whole content area when a route throws, and a tab's panel when one part
+   of a record fails. */
+.vy-errorstate {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--vy-space-7); padding: var(--vy-space-14) var(--vy-space-9);
+  min-block-size: 0; flex: 1 1 auto; text-align: center;
+}
+.vy-errorstate-title {
+  margin: 0; font-size: var(--vy-text-xl); font-weight: var(--vy-weight-bold);
+  color: var(--vy-on-surface-strong); text-wrap: balance;
+}
+/* 60ch, like every other block of prose here: an explanation set across the
+   full width of a 1440px screen is one the eye loses its place in. */
+.vy-errorstate-body {
+  margin: 0; max-inline-size: 60ch; color: var(--vy-on-surface-subtle);
+  font-size: var(--vy-text-base);
+}
+.vy-errorstate-actions { display: flex; flex-wrap: wrap; gap: var(--vy-space-5); justify-content: center; }
+
+/* The design system's specimen of it. A fixed height so the section does not
+   jump when the panel fails — the point is to compare the two states, and a
+   layout that moves under the press makes that harder than it needs to be. */
+.vy-ds-errorstate {
+  display: flex; min-block-size: 24rem;
+  border: 1px solid var(--vy-border); border-radius: var(--vy-radius-md);
+  background: var(--vy-surface);
+}
+.vy-ds-breakable {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: var(--vy-space-7); color: var(--vy-on-surface-subtle);
+}
+
 
 /* Skeleton cells are proportioned by column role rather than exact pixel width;
    see GridSkeleton. Flex weights, so no inline style is needed per cell. */
