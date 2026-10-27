@@ -14,6 +14,7 @@ import { usePrefs } from './prefs';
 import { Button } from './Button';
 import { widthOf, type ColumnSpec } from '../components/column-model';
 import { GridSkeleton } from './GridSkeleton';
+import { BusyOverlay } from './Loader';
 import { kendoDomProps, kendoHeaderProps } from './kendoDomProps';
 import { renderCell, fmtDate } from './renderCell';
 
@@ -74,7 +75,7 @@ const VIEW_COL_W_TOUCH = 44;
  */
 export function DataGrid<T extends { id: string | number }>({
   data, columns, title, subtitle, actions, filters,
-  searchPlaceholder = 'Search', rowHref, onOpenRow, emptyHint, loading, kpis,
+  searchPlaceholder = 'Search', rowHref, onOpenRow, emptyHint, loading, busy, busyLabel, kpis,
   selected, onSelectedChange,
   filterPanel, filterActive = 0, quickActive = 0, views, viewSetting,
   allColumns, onToggleColumn, onResetColumns,
@@ -142,6 +143,24 @@ export function DataGrid<T extends { id: string | number }>({
   emptyHint?: string;
   /** Loading, empty and error are three distinct states, not one. */
   loading?: boolean;
+  /**
+   * The rows on screen are being REPLACED, as opposed to arriving.
+   *
+   * NOT THE SAME STATE AS `loading`, and the difference is what the user can
+   * still see. `loading` is the first paint: there is nothing to keep, so the
+   * skeleton draws the shape of what is coming. `busy` is a second page, a
+   * server-side filter or a refresh — the user is looking at an answer, and
+   * taking it away to show a skeleton asks a question they have already had
+   * answered. The rows stay, dimmed and inert, under the indicator.
+   *
+   * NOTHING SETS IT YET. Every grid in this prototype filters and pages an
+   * array that is already in memory, so there is no wait to cover and none is
+   * invented. This is the seam: on the live system, where paging is a request,
+   * it is one line at the call site.
+   */
+  busy?: boolean;
+  /** What the wait is for, in words. Shown and read aloud while `busy`. */
+  busyLabel?: string;
   /**
    * Row selection, opt-in.
    *
@@ -353,7 +372,18 @@ export function DataGrid<T extends { id: string | number }>({
 
         {filterOpen && filterPanel}
 
+        {/* THE OVERLAY WRAPS THE BODY, NOT THE TOOLBAR. Whatever is being
+            waited for, the search box and the filters above stay usable —
+            they are how a user corrects the request that is taking too long.
+
+            It is always mounted rather than conditionally wrapped, so toggling
+            `busy` does not change the tree the Grid sits in: a conditional
+            wrapper would remount it and throw away the scroll position, on the
+            one action whose whole purpose is to keep what the user was looking
+            at. Verified against the unwrapped layout — grid 841, content 800,
+            unchanged. */}
         <div className="vy-grid-k" data-density={density}>
+          <BusyOverlay busy={!!busy} blocking label={busyLabel ?? 'Updating the rows'}>
           {loading ? (
             <GridSkeleton columns={visible} rows={14} />
           ) : rows.length === 0 ? (
@@ -538,6 +568,7 @@ export function DataGrid<T extends { id: string | number }>({
               ))}
             </Grid>
           )}
+          </BusyOverlay>
         </div>
 
         <Pager page={safePage} pageSize={pageSize} total={allRows.length}

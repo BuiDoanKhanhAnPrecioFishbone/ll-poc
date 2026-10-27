@@ -104,7 +104,7 @@ export function BomComparisonDialog({ onClose }: { onClose: () => void }) {
     setExpanded(s => { const n = new Set(s); if (n.has(id)) n.delete(id); else n.add(id); return n; });
 
   const totalDiffs = RESULT.reduce((n, p) => n + p.differences.length, 0);
-  const { exportRows, excel } = useExcelExport<ExportRow>();
+  const { exportRows, excel, busy: exporting } = useExcelExport<ExportRow>();
 
   return (
     <Dialog
@@ -120,7 +120,7 @@ export function BomComparisonDialog({ onClose }: { onClose: () => void }) {
             FLATTENED to one row per difference, which is how you would filter
             or pivot it, and how the live system's own flat result is shaped
             (see the note on RESULT). */}
-        <Button onClick={() => exportRows(
+        <Button busy={exporting} onClick={() => exportRows(
           RESULT.flatMap(part => part.differences.map(d => ({
             partId: part.partId,
             columnName: d.columnName,
@@ -131,11 +131,18 @@ export function BomComparisonDialog({ onClose }: { onClose: () => void }) {
           EXPORT_COLUMNS,
           'BOMCompare.xlsx',
         )}>
-          Export
+          {exporting ? 'Building the file…' : 'Export'}
         </Button>
         <Button variant="filled" onClick={onClose}>Done</Button>
       </> : <>
         <Button onClick={onClose}>Cancel</Button>
+        {/* NO `busy` HERE, AND THAT IS THE HONEST VERSION. On the live system
+            this press is a request — their bundle splits the comparison into
+            its own chunk — but here `RESULT` is a constant and this only
+            reveals it. A state that can never be true is not a seam, it is a
+            prop pretending to be one: `Button` already takes `busy`, so wiring
+            production is the state plus one attribute, with or without a
+            placeholder sitting here now. */}
         <Button variant="filled" onClick={() => setCompared(true)}>Compare</Button>
       </>}
     >
