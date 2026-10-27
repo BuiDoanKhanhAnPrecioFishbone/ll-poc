@@ -35,6 +35,34 @@ import { useEffect, useId, useRef } from 'react';
 /** The flight axis, in viewBox units: the five stations, then the landing. */
 const STATIONS = [38, 59, 73, 87, 94] as const;
 
+/* The rocket's own geometry, read off the art rather than guessed, because the
+   flame length below is computed from it. The ship group is drawn at scale
+   0.42 and rotated 90°, so a local `y` of `n` sits at `station - 0.42n` on the
+   flight axis. The flame runs from the nozzle at y=22 to its tip at y=53, and
+   its transform scales about the nozzle — so scaling it shortens the flame
+   rather than moving it. Planet A's disc ends at x=24: centre 14, radius 10. */
+const SHIP_SCALE = 0.42, NOZZLE = 22, FLAME_TIP = 53, PLANET_A_EDGE = 24;
+
+/**
+ * How much of the flame fits between the rocket and the planet behind it.
+ *
+ * AT THE FIRST STATION THE FULL FLAME IS INSIDE PLANET A. The rocket rests at
+ * x=38 and a full flame reaches back to 38 - 0.42 × 53 = 15.7, which is 8.3
+ * units inside a disc that ends at 24 — on screen, the white-hot core sitting
+ * on the planet's pale face as a notch cut out of it. Found by photographing
+ * the boot screen and magnifying it, not by reading the file.
+ *
+ * Capping it by the room available is better than a short flame hard-coded for
+ * station 0, for a reason that is about the drawing rather than the arithmetic:
+ * the rocket hovers, and a cap computed from where it actually IS makes the
+ * flame breathe as it drifts — the engine throttling up as it pulls away. By
+ * the second station there is room for all of it and the cap stops applying.
+ */
+function flameFit(x: number) {
+  const room = (x - PLANET_A_EDGE) / SHIP_SCALE - NOZZLE;
+  return Math.max(0, Math.min(1, room / (FLAME_TIP - NOZZLE)));
+}
+
 export function RocketJourney({ step = 0 }: {
   /**
    * How many boot stages have finished — lights that many route segments.
@@ -81,13 +109,14 @@ export function RocketJourney({ step = 0 }: {
       /* One loop length for all three, so they never drift apart on screen. */
       const loop = 1400;
       const hover = 2 * (0.5 - 0.5 * Math.cos((2 * Math.PI * (t % loop)) / loop));
+      const x = STATIONS[Math.min(step, 4)] + hover;
       ship.current?.setAttribute(
-        'transform',
-        `translate(${(STATIONS[Math.min(step, 4)] + hover).toFixed(2)} 48) rotate(90) scale(0.42)`);
+        'transform', `translate(${x.toFixed(2)} 48) rotate(90) scale(${SHIP_SCALE})`);
 
       /* Half the loop, so the flame beats twice per pass — a flame that
-         flickers at the speed of the hover reads as one movement, not two. */
-      const f = 1 + 0.1 * Math.sin((2 * Math.PI * (t % (loop / 2))) / (loop / 2));
+         flickers at the speed of the hover reads as one movement, not two.
+         Multiplied by the room it has, so it never reaches into the planet. */
+      const f = flameFit(x) * (1 + 0.1 * Math.sin((2 * Math.PI * (t % (loop / 2))) / (loop / 2)));
       flame.current?.setAttribute(
         'transform', `translate(0 22) scale(1 ${f.toFixed(3)}) translate(0 -22)`);
 
@@ -152,8 +181,13 @@ export function RocketJourney({ step = 0 }: {
       <path d="M87 48 L94 48"  {...seg} opacity={step >= 4 ? 1 : 0} />
       <path d="M94 48 L108 48" {...seg} opacity={step >= 5 ? 1 : 0} />
 
-      <g ref={ship} transform={`translate(${STATIONS[Math.min(step, 4)]} 48) rotate(90) scale(0.42)`}>
-        <g ref={flame} transform="translate(0 22) scale(1 1) translate(0 -22)">
+      <g ref={ship}
+         transform={`translate(${STATIONS[Math.min(step, 4)]} 48) rotate(90) scale(${SHIP_SCALE})`}>
+        {/* The resting pose carries the cap too. Left at `scale(1 1)` the flame
+            painted at full length for one frame before the first animation
+            tick trimmed it — a flicker through the planet on every mount. */}
+        <g ref={flame}
+           transform={`translate(0 22) scale(1 ${flameFit(STATIONS[Math.min(step, 4)]).toFixed(3)}) translate(0 -22)`}>
           <path d="M-5.5 22 C-8 33 -3 42 0 53 C3 42 8 33 5.5 22 Z" fill="var(--vy-blue-300, #7f9ce1)" />
           <path d="M-3.4 22 C-4 29 -1.5 36 0 42 C1.5 36 4 29 3.4 22 Z" fill="var(--vy-blue-100, #dae2f3)" />
           {/* White because it is the hottest part of a flame, not because it is
