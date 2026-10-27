@@ -149,6 +149,18 @@ export function RunQuotationDialog({ q, onClose, resume }: {
      state cannot be seen; on the real system it ends when the response lands.
      Cleared on unmount, because this dialog CAN be closed mid-request. */
   const [pricing, setPricing] = useState(false);
+  /**
+   * The quotation has been submitted and the dialog is on its way out.
+   *
+   * THE PRESS THAT ACTUALLY WRITES IS THIS ONE, not Generate Quotation. Step
+   * 3's button sets NO BID on the supplier-less lines and moves to step 4 —
+   * both idempotent, so pressing it twice does nothing twice. Submit creates
+   * the quotation record; on the live system that is a write, and here it
+   * already fires a toast and closes, so two presses give two of each.
+   *
+   * It never resets, because there is nothing to reset to: the dialog closes.
+   */
+  const [submitting, setSubmitting] = useState(false);
   const priceTimer = useRef<number>(0);
   useEffect(() => () => window.clearTimeout(priceTimer.current), []);
   const [runDate, setRunDate] = useState(resume?.runDate ?? '');
@@ -408,7 +420,12 @@ export function RunQuotationDialog({ q, onClose, resume }: {
         </Button>
       )}
       {step === 3 && (
-        <Button variant="filled" onClick={() => { toast.success('Add Quotation Result'); onClose(); }}>
+        <Button variant="filled" busy={submitting}
+                onClick={() => {
+                  setSubmitting(true);
+                  toast.success('Add Quotation Result');
+                  onClose();
+                }}>
           Submit
         </Button>
       )}

@@ -69,7 +69,7 @@ function resultColumns(onOpen: (r: QuoteResult) => void): ColumnSpec<QuoteResult
  */
 export function ResultTab({ q, onRun }: { q: Quotation; onRun: () => void }) {
   const toast = useToast();
-  const { exportRows, excel } = useExcelExport<QuoteResult>();
+  const { exportRows, excel, busy: exporting } = useExcelExport<QuoteResult>();
 
   if (q.results.length === 0) {
     return (
@@ -107,12 +107,12 @@ export function ResultTab({ q, onRun }: { q: Quotation; onRun: () => void }) {
           {/* The costed lines, in the columns the tab shows. Kendo writes real
               numbers with a currency format, so the totals are summable rather
               than a column of text. */}
-          <Button onClick={() => exportRows(
+          <Button busy={exporting} onClick={() => exportRows(
             q.results,
             resultColumns(() => {}),
             `QuotationResult-RFQ${q.no}.xlsx`,
           )}>
-            Export
+            {exporting ? 'Building the file…' : 'Export'}
           </Button>
           <Button variant="filled" onClick={onRun}>Re-run quotation</Button>
         </div>

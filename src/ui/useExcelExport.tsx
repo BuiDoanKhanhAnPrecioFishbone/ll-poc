@@ -54,6 +54,7 @@ export function useExcelExport<T>() {
      moment and is a lie to React: the next render puts the old name back. */
   const [fileName, setFileName] = useState('export.xlsx');
   const pending = useRef<{ rows: object[]; cols: ExcelExportColumnProps[] } | null>(null);
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     if (!pending.current) return;
@@ -64,7 +65,16 @@ export function useExcelExport<T>() {
        appears. `toDataURL(rows, cols)` returns the same workbook as a string
        and is the way to prove it works — verified as a 231 KB xlsx with a real
        PK header for 2,000 rows. In a normal browser the download just runs. */
-    ref.current?.save(rows, cols);
+    /* A PAINT BEFORE THE WORK, and without it the indicator is decoration.
+       `save()` builds the whole workbook synchronously — measured at 231 KB
+       for 2,000 rows — so calling it in the same task that set `busy` means
+       the browser never gets a frame in which to draw the spinner: the button
+       would go from idle to done having shown nothing. Two hops get us a
+       committed, painted frame first: `requestAnimationFrame` runs before the
+       paint, the `setTimeout` inside it after. */
+    requestAnimationFrame(() => setTimeout(() => {
+      try { ref.current?.save(rows, cols); } finally { setBusy(false); }
+    }, 0));
   }, [fileName]);
 
   /**
@@ -75,6 +85,7 @@ export function useExcelExport<T>() {
    * @param fileName including the extension.
    */
   function exportRows(rows: T[], columns: ColumnSpec<T>[], name: string) {
+    setBusy(true);
     pending.current = {
       rows: rows as object[],
       cols: columns.filter(c => c.sortable !== false).map(toExcelColumn),
@@ -87,5 +98,6 @@ export function useExcelExport<T>() {
      to own the workbook and trigger the download. */
   const excel = <ExcelExport ref={ref} fileName={fileName.trim()} />;
 
-  return { exportRows, excel };
+  /** True from the press until the workbook has been handed to the browser. */
+  return { exportRows, excel, busy };
 }

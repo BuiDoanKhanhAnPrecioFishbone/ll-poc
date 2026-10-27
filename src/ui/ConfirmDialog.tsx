@@ -21,13 +21,24 @@ import { Button } from './Button';
  */
 export function ConfirmDialog({
   title, body, confirmLabel, dismissLabel = 'Go back', tone = 'default',
-  onConfirm, onClose,
+  busy = false, onConfirm, onClose,
 }: {
   title: string;
   body: string;
   confirmLabel: string;
   dismissLabel?: string;
   tone?: 'default' | 'danger';
+  /**
+   * The confirmed action is in flight.
+   *
+   * THE DISABLE IS THE POINT, not the spinner. Every confirmation here guards
+   * something a second press would do twice — confirm an RFQ, cancel one,
+   * spend marketplace quota — and the window between the press and the answer
+   * is exactly when a user presses again because nothing happened yet. The
+   * dismiss button goes with it: leaving mid-write is how a record ends up
+   * confirmed with nobody watching the result.
+   */
+  busy?: boolean;
   onConfirm: () => void;
   onClose: () => void;
 }) {
@@ -38,8 +49,9 @@ export function ConfirmDialog({
       title={title}
       onClose={onClose}
       actions={<>
-        <Button onClick={onClose}>{dismissLabel}</Button>
-        <Button variant={tone === 'danger' ? 'danger' : 'filled'} onClick={onConfirm}>
+        <Button onClick={onClose} disabled={busy}>{dismissLabel}</Button>
+        <Button variant={tone === 'danger' ? 'danger' : 'filled'}
+                busy={busy} onClick={onConfirm}>
           {confirmLabel}
         </Button>
       </>}
