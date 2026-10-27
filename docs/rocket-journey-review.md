@@ -7,6 +7,13 @@ Kết luận ngắn: **ý tưởng và phần lớn thi công là đúng.** Có 
 chính điều concept hứa**, bảy mục phải sửa trước khi dùng, và năm câu cần quyết
 — trong đó hai câu không phải lỗi kỹ thuật mà là quyết định.
 
+> **Cập nhật cùng ngày.** Năm mục cơ học ở phần 2 đã sửa xong, file nằm ở
+> `docs/assets/rocket-journey/` kèm README ghi rõ từng thay đổi: gỡ C2PA
+> (12.209 → ~4.460 bytes), bỏ hẳn id dùng chung `vy-plane-sp`, chấm tiến độ lên
+> `--vy-blue-500` (1.52 → **3.81 : 1**), `--vy-login-bg` thay bằng
+> `--vy-surface-chrome`, đổi tên `vy-plane` → `vy-rocket`. Mục **2.2** (cỡ
+> hình) và toàn bộ phần **3** vẫn mở — chúng cần quyết định, không phải sửa.
+
 ---
 
 ## 1. Đã kiểm và ĐÚNG

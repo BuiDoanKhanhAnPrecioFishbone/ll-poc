@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 144" class="vy-rocket" data-layout="v" data-step="2" data-state="idle" aria-hidden="true" focusable="false">
+<path d="M0 -3.2 Q0 0 3.2 0 Q0 0 0 3.2 Q0 0 -3.2 0 Q0 0 0 -3.2Z" transform="translate(20 30) scale(1.2)" fill="var(--vy-blue-200, #b0c2ea)"/>
+<path d="M0 -3.2 Q0 0 3.2 0 Q0 0 0 3.2 Q0 0 -3.2 0 Q0 0 0 -3.2Z" transform="translate(76 14) scale(0.8)" fill="var(--vy-blue-200, #b0c2ea)"/>
+<path d="M0 -3.2 Q0 0 3.2 0 Q0 0 0 3.2 Q0 0 -3.2 0 Q0 0 0 -3.2Z" transform="translate(80 70) scale(1)" fill="var(--vy-blue-200, #b0c2ea)"/>
+<clipPath id="vy-rocket-clip-v-dark"><circle cx="48" cy="130" r="10"/></clipPath>
+<g data-r="no" transform="translate(48 130) scale(0.9) translate(-48 -130)"><circle cx="48" cy="130" r="10" fill="var(--vy-blue-300, #7f9ce1)"/><circle cx="51" cy="126.5" r="10" fill="var(--vy-blue-200, #b0c2ea)" clip-path="url(#vy-rocket-clip-v-dark)"/></g>
+<g data-r="nd" transform="translate(48 22) scale(1.1) translate(-48 -22)"><circle data-r="bc" cx="48" cy="22" r="7" fill="none" stroke="var(--vy-blue-200, #b0c2ea)" stroke-width="1.5" opacity="0"/><g transform="rotate(-14 48 22)"><path d="M35 22 A13 4 0 0 1 61 22" fill="none" stroke="var(--vy-blue-300, #7f9ce1)" stroke-width="2.4" stroke-linecap="round"/><circle cx="48" cy="22" r="7" fill="var(--vy-blue-200, #b0c2ea)"/><path d="M35 22 A13 4 0 0 0 61 22" fill="none" stroke="var(--vy-blue-300, #7f9ce1)" stroke-width="2.4" stroke-linecap="round"/></g></g>
+<path d="M48 106 L48 36" fill="none" stroke="var(--vy-blue-300, #7f9ce1)" opacity=".4" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="0.1 6.9"/>
+<path data-r="seg1" d="M48 106 L48 85" fill="none" stroke="var(--vy-blue-100, #dae2f3)" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="0.1 6.9" opacity="1"/>
+<path data-r="seg2" d="M48 85 L48 71" fill="none" stroke="var(--vy-blue-100, #dae2f3)" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="0.1 6.9" opacity="1"/>
+<path data-r="seg3" d="M48 71 L48 57" fill="none" stroke="var(--vy-blue-100, #dae2f3)" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="0.1 6.9" opacity="0"/>
+<path data-r="seg4" d="M48 57 L48 50" fill="none" stroke="var(--vy-blue-100, #dae2f3)" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="0.1 6.9" opacity="0"/>
+<path data-r="seg5" d="M48 50 L48 36" fill="none" stroke="var(--vy-blue-100, #dae2f3)" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="0.1 6.9" opacity="0"/>
+<g data-r="ship" transform="translate(48 71) rotate(0) scale(0.42)">
+<g data-r="fl" transform="translate(0 22) scale(1 1) translate(0 -22)"><path d="M-5.5 22 C-8 33 -3 42 0 53 C3 42 8 33 5.5 22 Z" fill="var(--vy-blue-300, #7f9ce1)"/><path d="M-3.4 22 C-4 29 -1.5 36 0 42 C1.5 36 4 29 3.4 22 Z" fill="var(--vy-blue-100, #dae2f3)"/><path d="M-1.6 22 C-1.6 26 0 31 0 31 C0 31 1.6 26 1.6 22 Z" fill="var(--vy-surface, #ffffff)"/></g>
+<g data-r="pf" fill="var(--vy-blue-200, #b0c2ea)" opacity="0"><circle cx="0" cy="34" r="4.4"/><circle cx="0" cy="45" r="3" opacity=".6"/></g>
+<path d="M-12 6 C-19 10 -24 18 -23 27 C-23 28.5 -21.5 28.5 -20.5 27.5 L-11 20 Z M12 6 C19 10 24 18 23 27 C23 28.5 21.5 28.5 20.5 27.5 L11 20 Z M-6.5 19 H6.5 L5 24.5 H-5 Z" fill="var(--vy-blue-300, #7f9ce1)"/>
+<path d="M0 -31 C13 -23 15 -4 14 10 C14 16.5 11 20.5 0 20.5 C-11 20.5 -14 16.5 -14 10 C-15 -4 -13 -23 0 -31 Z" fill="var(--vy-blue-100, #dae2f3)"/>
+<path d="M0 -31 C13 -23 15 -4 14 10 C14 16.5 11 20.5 0 20.5 Z" fill="var(--vy-blue-200, #b0c2ea)"/>
+<path d="M0 -31 C5 -27.5 9 -23 11 -17.5 H-11 C-9 -23 -5 -27.5 0 -31 Z" fill="var(--vy-blue-300, #7f9ce1)"/>
+<rect x="-14.4" y="11" width="28.8" height="3.4" fill="var(--vy-blue-300, #7f9ce1)"/>
+<circle cx="0" cy="-4" r="9.4" fill="var(--vy-blue-300, #7f9ce1)"/><circle cx="0" cy="-4" r="7" fill="var(--vy-surface-chrome, #131820)"/>
+<g data-r="el" fill="var(--vy-blue-100, #dae2f3)" transform="translate(0 -5.6) scale(1 1) translate(0 5.6)"><circle cx="-2.3" cy="-5.6" r="1.9"/><circle cx="2.9" cy="-5.6" r="1.9"/></g>
+<path data-r="ed" d="M-4.4 -4.4 Q-2.3 -7.8 -0.2 -4.4 M0.8 -4.4 Q2.9 -7.8 5 -4.4" fill="none" stroke="var(--vy-blue-100, #dae2f3)" stroke-width="1.5" stroke-linecap="round" display="none"/>
+<path data-r="ex" d="M-4.6 -6.6 L-1.4 -3.4 M-1.4 -6.6 L-4.6 -3.4 M1.4 -6.6 L4.6 -3.4 M4.6 -6.6 L1.4 -3.4" fill="none" stroke="var(--vy-blue-100, #dae2f3)" stroke-width="1.5" stroke-linecap="round" display="none"/>
+</g>
+</svg>

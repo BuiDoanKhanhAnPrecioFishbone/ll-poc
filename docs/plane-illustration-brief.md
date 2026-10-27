@@ -3,6 +3,14 @@
 Bản này **đứng độc lập**: ai nhận nó mà không có repo vẫn vẽ được. Mọi con số
 đều đo trong bản dựng thật, không ước lượng.
 
+> **Đã có bản vẽ — đọc `docs/rocket-journey-review.md` trước.** Bản giao là một
+> *hành trình tên lửa*, không phải một hình tàu bay đơn lẻ, nên hai con số dưới
+> đây không còn chi phối: khung boot screen là **240–320px bề ngang** chứ không
+> phải 96 × 96, và ngưỡng "64px mới đọc được" áp cho **nhân vật**, không phải
+> cho khung — ở khung 240 nhân vật chỉ cao 59px và mắt 2.7px. Mọi ràng buộc còn
+> lại của bản brief này (màu cấm, token chuyển động, SVG nội tuyến, trợ năng,
+> câu hỏi D2) vẫn nguyên giá trị.
+
 Sản phẩm: **Voyager IQ** — hệ ERP cho Linh Long Engineering, người dùng là nhân
 viên báo giá và kỹ sư, dùng cả ngày trên máy tính để bàn. Giao diện là
 KendoReact trên nền token màu riêng. Chữ: **Inter**.
