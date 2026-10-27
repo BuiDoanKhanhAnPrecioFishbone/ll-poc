@@ -872,11 +872,16 @@
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: var(--vy-space-7);
 }
-.vy-boot-mark {
-  inline-size: var(--vy-space-14); block-size: var(--vy-space-14);
-  display: grid; place-items: center; border-radius: var(--vy-radius-md);
-  background: var(--vy-brand); color: var(--vy-brand-on);
-  font-size: var(--vy-text-xl); font-weight: var(--vy-weight-bold);
+/* THE FLOOR IS 288, NOT 240 — 27 Oct, and it is the illustration's own
+   smallest part that sets it. The journey is 144 viewBox units wide and the
+   rocket is 0.42 of that; measured on screen, a 240px frame puts the craft at
+   59px and its EYES at 2.7px, which at DPR 1 is about three device pixels for
+   the detail the whole drawing is built around, with a blink nobody can see.
+   At 288 the eyes are 3.2px and at 320 they are 3.5px. The frame was never the
+   problem — the subject inside it was. */
+.vy-rocket-journey {
+  inline-size: clamp(288px, 20vw, 320px);
+  block-size: auto;
 }
 
 /* The loader inside a button: it replaces the icon, so it takes the icon's

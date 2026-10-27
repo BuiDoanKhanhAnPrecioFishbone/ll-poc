@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { Loader as KendoLoader } from '@progress/kendo-react-indicators';
+import { RocketJourney } from './RocketJourney';
 
 /**
  * The loading indicator — KendoReact's, not ours.
@@ -90,15 +91,24 @@ export function BusyOverlay({ busy, label, children, blocking = false }: {
  * booting after sign-in, when it is fetching the navigation tree and the
  * permission set and therefore does not yet know what to draw a skeleton OF.
  *
- * The mark is here rather than a bare spinner because this is the first screen
- * after a password, and a blank page with a spinner on it is indistinguishable
- * from a page that has failed.
+ * It carries the rocket rather than a bare spinner because this is the first
+ * screen after a password, and a blank page with a spinner on it is
+ * indistinguishable from a page that has failed.
  */
 export function BootScreen({ label = 'Loading Voyager IQ' }: { label?: string }) {
   return (
-    <div className="vy-boot" role="status" aria-live="polite">
-      <div className="vy-boot-mark" aria-hidden>V</div>
-      <Loader type="converging-spinner" size="large" label={label} />
+    <div className="vy-boot" role="status" aria-live="polite" aria-busy="true">
+      {/* ONE INDICATOR, NOT TWO. The `V` tile and the Kendo Loader both used to
+          stand here; the rocket replaces both. The tile was the mark, and the
+          illustration carries the brand better at this size than a 40px square
+          of it does — and a spinner beside an animating illustration is two
+          things saying the same thing, which is how a loading screen starts
+          looking busy rather than working.
+
+          Kendo's Loader keeps every other wait in the product. This is the one
+          screen with nothing else on it, which is the only place an
+          illustration earns its room. */}
+      <RocketJourney />
       <p className="vy-busy-label">{label}</p>
     </div>
   );
