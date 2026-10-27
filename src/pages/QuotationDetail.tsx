@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { RecordSkeleton } from '../ui/RecordSkeleton';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Dialog, Tabs } from '../ui/Overlays';
 import { ValidationPanel } from '../components/quotation/ValidationPanel';
@@ -93,6 +94,30 @@ export function QuotationDetail() {
      early, so on that render the hook was never reached, and navigating from a
      missing RFQ to a real one changed the hook order between renders. */
   const [confirmDiscard, setConfirmDiscard] = useState(false);
+
+  /**
+   * How long the first paint shows the record skeleton.
+   *
+   * Same convention, and the same reason, as `useListScreen`: this record is
+   * already in memory, so without the delay the loading state — a real,
+   * designed state with its own skeleton — can never be seen, on the pattern
+   * that carries more fields than any other screen. 700ms there, 700ms here;
+   * on the live system it ends when the record arrives.
+   */
+  const [loading, setLoading] = useState(true);
+  useEffect(() => { const t = setTimeout(() => setLoading(false), 700); return () => clearTimeout(t); }, [id]);
+
+  /* BEFORE the not-found branch, because "no RFQ with that reference" is an
+     answer and we do not have one yet. Showing it for 700ms and then the
+     record would be telling the user their link was broken and taking it
+     back. */
+  if (loading) {
+    return (
+      <div className="vy-page vy-page--record">
+        <RecordSkeleton groups={HEADER_GROUPS} />
+      </div>
+    );
+  }
 
   if (!q || !base) {
     return (

@@ -834,7 +834,12 @@
    document and not demonstrated. Skeleton rows keep the grid's shape so the
    page does not jump when data lands. */
 .vy-skeleton-row { display: flex; gap: var(--vy-space-6); padding: var(--vy-space-4) var(--vy-space-6); border-bottom: 1px solid var(--vy-border-faint); }
-.vy-skeleton-cell { height: var(--vy-space-5); border-radius: var(--vy-radius-sm); background: linear-gradient(90deg, var(--vy-surface-sunken) 25%, var(--vy-surface-app) 50%, var(--vy-surface-sunken) 75%); background-size: 200% 100%; animation: vy-shimmer 1.4s ease-in-out infinite; }
+/* `display: block`, and it is load-bearing rather than tidy. Every skeleton
+   cell was a `<span>`, which worked only because the grid's were flex items
+   and got blockified by their parent. Standing alone in the record header the
+   same span measured **0px tall**, so two rows collapsed and the field groups
+   sat 80px too high — a skeleton that moves the page is worse than none. */
+.vy-skeleton-cell { display: block; height: var(--vy-space-5); border-radius: var(--vy-radius-sm); background: linear-gradient(90deg, var(--vy-surface-sunken) 25%, var(--vy-surface-app) 50%, var(--vy-surface-sunken) 75%); background-size: 200% 100%; animation: vy-shimmer 1.4s ease-in-out infinite; }
 @keyframes vy-shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
 
 /* --- Busy over content that stays ------------------------------------------
@@ -968,6 +973,53 @@
 .vy-skeleton-cell[data-role="date"]   { flex: 0 0 11%; }
 .vy-skeleton-cell[data-role="status"] { flex: 0 0 9%; }
 .vy-skeleton-cell[data-role="rating"] { flex: 0 0 9%; }
+
+/* --- Record skeleton ---------------------------------------------------------
+   The list pattern had a loading state since September; the record pattern had
+   none, so opening an RFQ went from nothing to everything with no state in
+   between. 27 Oct.
+
+   REUSES `.vy-skeleton-cell` — the same shimmer, the same two surfaces, one
+   definition. What differs is the width, and that comes from the field's KIND
+   rather than its column role: a flag is a chip, a note is two lines, a date
+   is a date's worth. See RecordSkeleton.
+
+   The labels are NOT skeletons here, so they take the record field's own
+   label styling and nothing more. */
+/* Only the placeholders are declared here. The LAYOUT comes from
+   `.vy-rfq-head` and the rows inside it, which the skeleton borrows wholesale
+   — see RecordSkeleton. Heights are measured off the real controls: back link
+   24, action buttons 34, record bar 23, title 35. */
+.vy-rec-sk-back  { block-size: var(--vy-space-10); inline-size: 11rem; }
+.vy-rec-sk-btn   { block-size: var(--vy-control-md); inline-size: 6rem; border-radius: var(--vy-shape-full); }
+.vy-rec-sk-title { block-size: var(--vy-control-md); inline-size: 22rem; }
+/* The identifier strip stands at the height of the line of text it replaces,
+   not of the bar it sits in — measured at 23, and 24 is the rung above it. */
+.vy-record-bar .vy-skeleton-cell { block-size: var(--vy-space-10); }
+.vy-rec-sk-label {
+  font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle);
+  text-transform: uppercase; letter-spacing: .04em;
+}
+.vy-rec-sk-value { margin: 0; display: flex; flex-direction: column; gap: var(--vy-space-2); }
+/* A value bar stands at the height of the text it replaces, not of the control
+   that will hold it: the record reads before it edits, and a 34px bar would
+   promise a row of inputs that read mode never shows. */
+.vy-rec-sk-value .vy-skeleton-cell { block-size: var(--vy-space-5); }
+
+.vy-skeleton-cell[data-sk="ident"]    { inline-size: 11rem; block-size: var(--vy-space-9); }
+.vy-skeleton-cell[data-sk="chip"]     { inline-size: 4.5rem; block-size: var(--vy-space-8); border-radius: var(--vy-shape-full); }
+.vy-skeleton-cell[data-sk="lookup"]   { inline-size: 12rem; }
+.vy-skeleton-cell[data-sk="combo"]    { inline-size: 12rem; }
+.vy-skeleton-cell[data-sk="select"]   { inline-size: 9rem; }
+.vy-skeleton-cell[data-sk="radio"]    { inline-size: 9rem; }
+.vy-skeleton-cell[data-sk="number"]   { inline-size: 4rem; }
+.vy-skeleton-cell[data-sk="date"]     { inline-size: 6rem; }
+.vy-skeleton-cell[data-sk="datetime"] { inline-size: 9.5rem; }
+.vy-skeleton-cell[data-sk="priority"] { inline-size: 5rem; }
+.vy-skeleton-cell[data-sk="flag"]     { inline-size: 3rem; }
+.vy-skeleton-cell[data-sk="people"]   { inline-size: 14rem; }
+.vy-skeleton-cell[data-sk="notes"]    { inline-size: 100%; }
+.vy-skeleton-cell[data-sk="notes-2"]  { inline-size: 62%; }
 
 /* Visible to screen readers only. */
 
