@@ -1,4 +1,5 @@
 import { ROLE_WIDTH } from '../components/column-model';
+import { RocketJourney } from '../ui/RocketJourney';
 import { StatusBadge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 
@@ -157,6 +158,36 @@ export function DesignSystemPage() {
               <span>{n}</span>
             </div>
           ))}
+        </div>
+      </Section>
+
+      {/* MOTION, which this page did not have until the boot screen needed
+          somewhere to be looked at. The illustration lives in a Suspense
+          fallback that is gone in milliseconds on a local server, so the only
+          way to see it was to pause a network request — which is no way to
+          show anyone anything. It is the real component, not a picture of one:
+          the same hover, flame and blink, and it answers reduce-motion here
+          exactly as it does on the boot screen. */}
+      <Section title="Motion"
+        note="Four easings and three durations, and nothing else — a loop length is not among them, because the one loop in the product is JavaScript and a custom property nothing reads is a token that rots. Turn on Reduce Motion in the OS and the rocket below settles into its pose and stops.">
+        <div className="vy-ds-motion">
+          <div className="vy-ds-motion-art">
+            <RocketJourney />
+            <p className="vy-busy-label">Loading your workspace</p>
+          </div>
+          <dl className="vy-ds-motion-list">
+            {[['--vy-ease-standard', 'cubic-bezier(.2, 0, 0, 1)', 'The default. Everything uses this unless it has a reason.'],
+              ['--vy-ease-decelerate', 'cubic-bezier(0, 0, 0, 1)', 'Entering the screen.'],
+              ['--vy-ease-accelerate', 'cubic-bezier(.3, 0, 1, 1)', 'Leaving it.'],
+              ['--vy-dur-short', '100ms', 'State: hover, focus.'],
+              ['--vy-dur-medium', '200ms', 'A small component appearing.'],
+              ['--vy-dur-long', '300ms', 'Dialogs and drawers.']].map(([tok, val, use]) => (
+                <div className="vy-ds-motion-row" key={tok}>
+                  <dt><code>{tok}</code></dt>
+                  <dd><code>{val}</code> <span>{use}</span></dd>
+                </div>
+              ))}
+          </dl>
         </div>
       </Section>
 

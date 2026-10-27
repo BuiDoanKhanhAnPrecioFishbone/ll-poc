@@ -884,6 +884,29 @@
   block-size: auto;
 }
 
+/* The design system's motion section. The illustration sits beside its tokens
+   rather than above them: on this page it is a specimen, and a specimen is
+   read next to its label. */
+.vy-ds-motion { display: flex; flex-wrap: wrap; gap: var(--vy-space-12); align-items: center; }
+.vy-ds-motion-art {
+  /* `flex: none`, for the third time in this stylesheet and the same reason
+     every time: `inline-size` on a flex item is its BASIS, and the default
+     `flex-shrink: 1` spends it on whatever sits beside it. Measured here at
+     68px against a clamp whose floor is 288. */
+  flex: none;
+  display: flex; flex-direction: column; align-items: center; gap: var(--vy-space-7);
+  padding: var(--vy-space-9); border: 1px solid var(--vy-border);
+  border-radius: var(--vy-radius-md); background: var(--vy-surface);
+}
+.vy-ds-motion-list { margin: 0; flex: 1 1 22rem; min-inline-size: 0; }
+.vy-ds-motion-row {
+  display: flex; flex-wrap: wrap; gap: var(--vy-space-4);
+  padding-block: var(--vy-space-3); border-block-end: 1px solid var(--vy-border-faint);
+}
+.vy-ds-motion-row dt { flex: 0 0 13rem; }
+.vy-ds-motion-row dd { margin: 0; display: flex; flex-wrap: wrap; gap: var(--vy-space-4); align-items: baseline; }
+.vy-ds-motion-row dd span { color: var(--vy-on-surface-subtle); }
+
 /* The loader inside a button: it replaces the icon, so it takes the icon's
    box and nothing in the row moves when the action starts. */
 .vy-btn-busy { display: inline-flex; align-items: center; }
