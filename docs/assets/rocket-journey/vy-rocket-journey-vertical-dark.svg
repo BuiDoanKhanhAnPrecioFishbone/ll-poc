@@ -12,7 +12,7 @@
 <path data-r="seg4" d="M48 57 L48 50" fill="none" stroke="var(--vy-blue-100, #dae2f3)" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="0.1 6.9" opacity="0"/>
 <path data-r="seg5" d="M48 50 L48 36" fill="none" stroke="var(--vy-blue-100, #dae2f3)" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="0.1 6.9" opacity="0"/>
 <g data-r="ship" transform="translate(48 71) rotate(0) scale(0.42)">
-<g data-r="fl" transform="translate(0 22) scale(1 1) translate(0 -22)"><path d="M-5.5 22 C-8 33 -3 42 0 53 C3 42 8 33 5.5 22 Z" fill="var(--vy-blue-300, #7f9ce1)"/><path d="M-3.4 22 C-4 29 -1.5 36 0 42 C1.5 36 4 29 3.4 22 Z" fill="var(--vy-blue-100, #dae2f3)"/><path d="M-1.6 22 C-1.6 26 0 31 0 31 C0 31 1.6 26 1.6 22 Z" fill="var(--vy-surface, #ffffff)"/></g>
+<g data-r="fl" transform="translate(0 22) scale(1 1) translate(0 -22)"><path d="M-5.5 22 C-8 33 -3 42 0 53 C3 42 8 33 5.5 22 Z" fill="var(--vy-blue-300, #7f9ce1)"/><path d="M-3.4 22 C-4 29 -1.5 36 0 42 C1.5 36 4 29 3.4 22 Z" fill="var(--vy-blue-100, #dae2f3)"/><path d="M-1.6 22 C-1.6 26 0 31 0 31 C0 31 1.6 26 1.6 22 Z" fill="var(--vy-grey-0, #ffffff)"/></g>
 <g data-r="pf" fill="var(--vy-blue-200, #b0c2ea)" opacity="0"><circle cx="0" cy="34" r="4.4"/><circle cx="0" cy="45" r="3" opacity=".6"/></g>
 <path d="M-12 6 C-19 10 -24 18 -23 27 C-23 28.5 -21.5 28.5 -20.5 27.5 L-11 20 Z M12 6 C19 10 24 18 23 27 C23 28.5 21.5 28.5 20.5 27.5 L11 20 Z M-6.5 19 H6.5 L5 24.5 H-5 Z" fill="var(--vy-blue-300, #7f9ce1)"/>
 <path d="M0 -31 C13 -23 15 -4 14 10 C14 16.5 11 20.5 0 20.5 C-11 20.5 -14 16.5 -14 10 C-15 -4 -13 -23 0 -31 Z" fill="var(--vy-blue-100, #dae2f3)"/>
