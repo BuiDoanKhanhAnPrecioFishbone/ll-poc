@@ -27,8 +27,26 @@ và tải được như prototype chị gửi.
 | **Review 8/10 + họp 13/10** | bỏ mono, trả lại cột con mắt, định dạng đọc/sửa |
 | **Activity Log** | dựng lại theo bản chị đã làm trên Voyager |
 | **Run Quotation** | step 1 dùng hết màn hình · step 2–3 gọn lại · điều hướng wizard trên trái, stepper trên phải · thẻ *Quote Run · Version N* + *Prices From* ở step 4 · Cost Estimation 2×2 · *Continue from Drafts* |
-| **Quoting BoM (16/10)** | đủ 8 trên 8 mục: Quote Setup tách khỏi kết quả · AML thành dòng con ở step 2 và 3 · Preferred Suppliers theo nhóm ưu tiên · chọn MPN chính thức từ Nexar · Consigned trừ trước khi mua · giá trị mang từ RFQ tô xanh kèm tooltip |
+| **Quoting BoM (16/10)** | Quote Setup tách khỏi kết quả · AML thành dòng con ở step 2 và 3 · Preferred Suppliers theo nhóm ưu tiên · chọn MPN chính thức từ Nexar · Consigned trừ trước khi mua · giá trị mang từ RFQ tô xanh kèm tooltip · step 1 dựng lại theo mockup kèm attachment xem/tải. **Còn thiếu — xem mục dưới** |
 | **25/10** | nút icon trong hàng về **26px** đúng standard — lấy đúng bậc `xs` của Kendo chứ không tự đặt số, nên 26 nằm cùng một phép tính với 32 và 34 |
+
+### Còn thiếu so với prototype 16/10 — bản trước nói "đủ 8/8", không đúng
+
+Mình mở lại đúng file chị gửi và chạy nó để đối chiếu. Prototype của chị dựng
+**step 1, step 2 và một màn xem kết quả riêng** (nút *Quote result (view mode)*);
+bấm Next sang step 3 và 4 thì nội dung vẫn là lưới Review BoM.
+
+| | | |
+|---|---|---|
+| 1 | **Màn xem kết quả theo từng phiên bản** — bấm một dòng trong bảng Result của mình hiện thông báo "chưa dựng" | **đang làm** |
+| 2 | **Export to PDF** — mình mới có Excel | nhỏ |
+| 3 | **Import** trên thanh công cụ của lưới kết quả | nhỏ |
+| 4 | **Pricing Detail** — nút cạnh *Add Package*. Trong prototype của chị bấm vào **chưa làm gì**, nên mình chưa biết nó mở ra gì — xin chị cho biết | **cần chị trả lời** |
+| 5 | **Attachment to Process\*** — trường bắt buộc chọn *file đính kèm nào là BoM*. Mình có Template nhưng thiếu trường này | vừa |
+| 6 | **Import Completed Quote** — lựa chọn thứ ba của Select Action, *"Migration only"*. Mình mới có hai | nhỏ |
+
+Hai điểm nhỏ khác: cột tiền chị đặt **EXT. PRICE**, mình đang để **Amount** —
+mình đổi theo chị; và mockup có 6 attachment, bản mình có 3.
 
 **Một điểm mình làm khác:** mockup có bộ chọn phiên bản sau khi Submit; mình giữ
 **bảng Result** — mỗi phiên bản một dòng, kèm ngày chạy, người chạy, tổng tiền.
