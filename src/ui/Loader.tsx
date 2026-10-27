@@ -95,9 +95,16 @@ export function BusyOverlay({ busy, label, children, blocking = false }: {
  * screen after a password, and a blank page with a spinner on it is
  * indistinguishable from a page that has failed.
  */
-export function BootScreen({ label = 'Loading Voyager IQ' }: { label?: string }) {
+export function BootScreen({ step = 0, label = 'Loading Voyager IQ' }: {
+  /** How many boot stages are done — lights that much of the route. */
+  step?: number;
+  label?: string;
+}) {
   return (
     <div className="vy-boot" role="status" aria-live="polite" aria-busy="true">
+      {/* `key` on the label, so a stage change replaces the node rather than
+          editing its text. A live region announces replaced content reliably;
+          a mutated text node is where screen readers disagree. */}
       {/* ONE INDICATOR, NOT TWO. The `V` tile and the Kendo Loader both used to
           stand here; the rocket replaces both. The tile was the mark, and the
           illustration carries the brand better at this size than a 40px square
@@ -108,8 +115,8 @@ export function BootScreen({ label = 'Loading Voyager IQ' }: { label?: string })
           Kendo's Loader keeps every other wait in the product. This is the one
           screen with nothing else on it, which is the only place an
           illustration earns its room. */}
-      <RocketJourney />
-      <p className="vy-busy-label">{label}</p>
+      <RocketJourney step={step} />
+      <p className="vy-busy-label" key={label}>{label}</p>
     </div>
   );
 }

@@ -1,5 +1,7 @@
 import { ROLE_WIDTH } from '../components/column-model';
+import { useEffect, useState } from 'react';
 import { RocketJourney } from '../ui/RocketJourney';
+import { BOOT_STAGES } from '../ui/bootStages';
 import { StatusBadge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 
@@ -171,10 +173,7 @@ export function DesignSystemPage() {
       <Section title="Motion"
         note="Four easings and three durations, and nothing else — a loop length is not among them, because the one loop in the product is JavaScript and a custom property nothing reads is a token that rots. Turn on Reduce Motion in the OS and the rocket below settles into its pose and stops.">
         <div className="vy-ds-motion">
-          <div className="vy-ds-motion-art">
-            <RocketJourney />
-            <p className="vy-busy-label">Loading your workspace</p>
-          </div>
+          <BootSpecimen />
           <dl className="vy-ds-motion-list">
             {[['--vy-ease-standard', 'cubic-bezier(.2, 0, 0, 1)', 'The default. Everything uses this unless it has a reason.'],
               ['--vy-ease-decelerate', 'cubic-bezier(0, 0, 0, 1)', 'Entering the screen.'],
@@ -201,6 +200,40 @@ export function DesignSystemPage() {
           ))}
         </div>
       </Section>
+    </div>
+  );
+}
+
+/**
+ * The boot journey, stepping through its five stations so a person can watch it.
+ *
+ * THE LOOP LIVES HERE, NOT IN THE COMPONENT. `RocketJourney` takes a `step` and
+ * draws it; what the step means is the caller's business. In the product that
+ * is a real boot stage finishing, and on this page it is a specimen advancing
+ * on a timer — which is a legitimate thing for a specimen to do and an
+ * illegitimate thing for a product to do, so the timer is on this side of the
+ * line and labelled as one.
+ *
+ * It exists because the boot screen cannot be watched where it actually runs:
+ * four of the five stages resolve instantly in this build, so the real one is
+ * gone before the eye catches it.
+ */
+function BootSpecimen() {
+  const [step, setStep] = useState(0);
+  useEffect(() => {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const t = setInterval(() => setStep(s => (s + 1) % (BOOT_STAGES.length + 1)), 1100);
+    return () => clearInterval(t);
+  }, []);
+  const stage = BOOT_STAGES[Math.min(step, BOOT_STAGES.length - 1)];
+  return (
+    <div className="vy-ds-motion-art">
+      <RocketJourney step={step} />
+      <p className="vy-busy-label">{stage.label}</p>
+      <p className="vy-ds-specimen-note">
+        Specimen — stepping on a timer. In the product each station waits on{' '}
+        <code>{stage.liveSignal}</code>.
+      </p>
     </div>
   );
 }

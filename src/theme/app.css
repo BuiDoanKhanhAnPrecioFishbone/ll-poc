@@ -898,6 +898,10 @@
   padding: var(--vy-space-9); border: 1px solid var(--vy-border);
   border-radius: var(--vy-radius-md); background: var(--vy-surface);
 }
+.vy-ds-specimen-note {
+  margin: 0; max-inline-size: 26rem; text-align: center;
+  font-size: var(--vy-text-sm); font-style: italic; color: var(--vy-on-surface-subtle);
+}
 .vy-ds-motion-list { margin: 0; flex: 1 1 22rem; min-inline-size: 0; }
 .vy-ds-motion-row {
   display: flex; flex-wrap: wrap; gap: var(--vy-space-4);

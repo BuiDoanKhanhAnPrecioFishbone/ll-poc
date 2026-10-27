@@ -12,6 +12,7 @@ import { QuotationDetail } from './pages/QuotationDetail';
 import { SitemapPage } from './pages/Sitemap';
 import { DesignSystemPage } from './pages/DesignSystem';
 import { BootScreen } from './ui/Loader';
+import { BootGate } from './ui/BootGate';
 import { AuditPage } from './pages/Audit';
 import { Placeholder } from './pages/Placeholder';
 import { Login } from './pages/Login';
@@ -43,7 +44,11 @@ export default function App() {
             screen you reach before you have signed in. */}
         <Route path="/login" element={<Login />} />
 
-        <Route element={<AppShell />}>
+        {/* THE BOOT GATE WRAPS THE AUTHENTICATED ROUTES ONLY. Booting before
+            a password would be loading a workspace for nobody, and `/login`
+            above renders outside it for the same reason it renders outside the
+            shell. */}
+        <Route element={<BootGate><AppShell /></BootGate>}>
           {/* Every route mirrors the production URL exactly, so this mockup and
               the live system can be opened side by side and compared at the same
               address. The proposed-IA paths from the earlier restructure are kept

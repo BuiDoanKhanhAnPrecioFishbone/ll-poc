@@ -34,6 +34,20 @@ rules out anything with fine lines or text inside it.
   destructive actions. A red mark would spend that meaning.
 - **Typeface is Inter** (D5). A wordmark drawn from Inter needs no licence.
 - **Rocket EMS colours are out** (D2) — Voyager IQ is its own identity.
+  **Ngoại lệ có chủ ý, chốt 27/10/2026.** Hình minh hoạ màn chờ là một **tên
+  lửa**, không phải tàu bay. Khi rà soát bản vẽ, điểm này đã được nêu đúng như
+  một rủi ro với D2 — một con tên lửa làm linh vật dễ kéo bản sắc của công ty
+  mẹ trở lại — và quyết định là **giữ tên lửa**.
+
+  Vì sao nó không phá D2: D2 nói về **màu**, và hình này không mượn màu nào của
+  Rocket EMS. Nó dùng đúng thang xanh của Voyager IQ — `--vy-brand #1a419e` và
+  dải blue-100→blue-800 — đã đối chiếu từng token trong
+  `docs/assets/rocket-journey/README.md`, không có một mã màu viết thẳng nào.
+  Và *"Voyager"* tự nó là một từ về hành trình, nên con tàu là hình của Voyager
+  IQ trước khi nó là hình của bất kỳ ai khác.
+
+  Ranh giới: **không dùng đỏ** — đó là màu phá huỷ của hệ thống **và** là màu
+  trong logo live. Một con tên lửa đỏ sẽ phá D2 thật sự.
 
 ## 3. The five tests every idea has to pass
 
