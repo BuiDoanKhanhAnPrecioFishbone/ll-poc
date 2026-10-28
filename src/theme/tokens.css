@@ -493,8 +493,11 @@
      browser-default 170px and the row wrapped to 123px, which is a row of the
      BoM spent on air around three two-digit numbers. */
   --vy-quote-qty-w:        92px; /* Build Qty / Attrition Set / Markup */
-  --vy-quote-pick-w:      156px; /* fits "Material Package Type" at 152 */
-  --vy-quote-pick-wide-w: 186px; /* Quote Focus — "Production - Competitive cost" */
+  /* ONE COLUMN WIDTH FOR THE WHOLE SETUP STRIP. Wide enough for its longest
+     value, "Production-Competitive Cost", so the field that needs the most
+     room sets the measure and every other field matches it. The strip is
+     `auto-fit`, so a wider panel takes more columns rather than wider ones. */
+  --vy-quote-fact-w:      190px;
   --vy-quote-sup-w:       158px; /* "Preferred Suppliers" plus its summary */
   --vy-sup-group-w:       118px; /* the Group 1 / Group 2 picker in the dialog */
   --vy-mpn-menu-w:        320px; /* an MPN and a full manufacturer name */

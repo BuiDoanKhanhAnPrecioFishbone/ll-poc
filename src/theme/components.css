@@ -1361,21 +1361,39 @@
 .vy-quote-context-head span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* 12px between fields rather than 16: ten settings on this strip, so the gaps
    alone were 144px — a column of the grid below, spent on air. */
+/* A GRID, NOT A WRAPPED ROW — 28 Oct, and the customer asked for it in those
+   words: the fields in this strip are not the same width as each other, and
+   the ones that wrap onto a second line sit under nothing in particular.
+
+   Both faults are the same fault. Flex gave every field the width of its own
+   longest value, so nine settings came out nine widths, and a wrapped row
+   starts wherever the row above happened to end. `auto-fit` columns of one
+   fixed minimum fix both at once: every box is identical, and row two lands on
+   the same columns as row one. A wider panel takes MORE columns rather than
+   wider ones, so the strip reflows from 6 columns in the wizard to 4 beside
+   the cost card without either of them looking different. */
 .vy-quote-context-fields {
-  display: flex; flex-wrap: wrap; align-items: center;
-  gap: var(--vy-space-4) var(--vy-space-6);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--vy-quote-fact-w), 1fr));
+  gap: var(--vy-space-4) var(--vy-space-5);
+  align-items: start;
 }
 /* Label above value, and MEASURED BOTH WAYS on 6 Oct: beside it, the two wide
    facts pushed the strip from one row to two and it grew to 93px. Stacked it is
    76px, and with the padding below, 60px. */
 .vy-quote-fact { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+/* Two columns, not "whatever is left": a wide fact is still on the grid. */
+.vy-quote-context-fields .vy-quote-fact[data-wide] { grid-column: span 2; }
 .vy-quote-fact[data-wide] { flex: 1 1 var(--vy-quote-fact-wide); }
 /* THE 92px CAP IS THE STRIP'S, not the field's. On the Quote Setup strip it
    is what keeps nine settings on one row; in step 1's Assembly Details the
    same component carries "BUILD QUANTITY" and "ATTRITION SET", and 92px
    truncated both labels to "BUILD QUAN…". A width that exists to fit a row
    belongs to the row. */
-.vy-quote-context-fields .vy-quote-fact--input { inline-size: var(--vy-quote-qty-w); }
+/* The 92px quantity box is gone from this strip. It was the right width for
+   "1" and the wrong one for a row that is meant to read as one set of
+   settings; `--vy-quote-qty-w` still sizes the same control on step 1, where
+   it stands among fields of its own size. */
 .vy-quote-fact--input { min-width: 0; }
 .vy-quote-fact-label {
   font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .05em;
@@ -1397,6 +1415,13 @@
   min-height: var(--vy-control-sm);
   padding-block: var(--vy-space-2);
 }
+/* In the strip the column sets the width, so the floor comes off and a long
+   value ends in an ellipsis rather than stretching its own box. The whole
+   value is on the field's `title` — see Fact in QuoteContext.tsx. */
+.vy-quote-context-fields .vy-read-value { min-width: 0; }
+.vy-quote-context-fields .vy-read-value-text {
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
 .vy-quote-fact[data-wide] .vy-read-value { min-width: 0; }
 
 /* ---- The setup strip on step 3 ------------------------------------------
@@ -1409,8 +1434,9 @@
    strip wrapped to two rows again. These widths fit the longest label —
    "Material Package Type" needs 152 — and the label degrades to an ellipsis
    rather than colliding with its neighbour if a translation outgrows it. */
-.vy-quote-fact--pick { inline-size: var(--vy-quote-pick-w); flex: 0 0 auto; }
-.vy-quote-fact--pick[data-wide] { inline-size: var(--vy-quote-pick-wide-w); }
+/* The pickers take their cell. The fixed widths that used to be here, and the
+   six hand-measured ones in QuoteContext.tsx, are what made the strip uneven. */
+.vy-quote-fact--pick { min-inline-size: 0; }
 .vy-quote-fact--pick .vy-select,
 .vy-quote-fact--pick .k-combobox { width: 100%; min-width: 0; }
 .vy-quote-fact-label { overflow: hidden; text-overflow: ellipsis; }

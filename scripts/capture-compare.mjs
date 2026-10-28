@@ -167,6 +167,16 @@ const JOBS = [
     ]`,
   },
   {
+    /* Step 3's strip is the editable one — nine pickers rather than twelve
+       read-only facts — so it is the other half of any argument about how
+       that strip is laid out. */
+    name: 'ours-step3', route: REC, prep: OPEN_WIZARD + FILL_STEP1 + `
+      __byText('button', /^Next$/).click();
+      await __wait(() => __byText('button', /Get Prices/));
+      await new Promise(r => setTimeout(r, 500));`,
+    marks: `[[6, document.querySelector('.vy-quote-context')]]`,
+  },
+  {
     name: 'ours-result', route: REC,
     prep: `
       /* Kendo's TabStrip is a list of .k-link spans, not buttons. */
@@ -238,7 +248,9 @@ async function main() {
     await run(`__wait(() => document.querySelector('.card, .vy-app, main, #root > *'))`);
     await run(STOP_MOTION);
     if (job.prep) await run(`(async () => { ${job.prep} })()`);
-    const missing = await run(`__mark(${job.marks})`);
+    /* NO_MARKS=1 takes the same figure without the callouts — for showing a
+       screen as it is, rather than arguing about parts of it. */
+    const missing = process.env.NO_MARKS ? [] : await run(`__mark(${job.marks})`);
     if (missing?.length) { console.warn(`  ${job.name}: no element for mark(s) ${missing}`); bad++; }
 
     const shot = await send('Page.captureScreenshot', { format: 'jpeg', quality: 86 });

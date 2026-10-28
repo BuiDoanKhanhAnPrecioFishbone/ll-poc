@@ -122,7 +122,6 @@ export function QuoteContextBar({
           <QtyField label="Attrition Set" value={s.attritionSet} changed={changed('attritionSet')}
                     title={was('attritionSet')} onChange={n => onPending!({ attritionSet: n })} />
           <PickField label="Quote Focus" value={s.quoteFocus} options={[...QUOTE_FOCUS]}
-                     width={172}
                      changed={changed('quoteFocus')} title={was('quoteFocus')}
                      onChange={v => onPending!({ quoteFocus: v })} />
           <QtyField label="Markup %" value={s.markup} min={0} changed={changed('markup')}
@@ -131,7 +130,7 @@ export function QuoteContextBar({
               mockup labels it that way, and on a strip of ten settings the
               dropped word is 30px that the grid gets instead. The full name
               survives on the read-only strips, where there is room. */}
-          <PickField label="Package Type" value={s.materialPackageType} width={130}
+          <PickField label="Package Type" value={s.materialPackageType}
                      options={[...MATERIAL_PACKAGE_TYPE]} changed={changed('materialPackageType')}
                      title={was('materialPackageType')}
                      onChange={v => onPending!({ materialPackageType: v })} />
@@ -139,7 +138,7 @@ export function QuoteContextBar({
               on this strip: a 5,000-piece reel against a 500-piece build is
               where excess comes from, and this is the setting that says whether
               to accept it. */}
-          <PickField label="Excess and MOQ" value={s.excessMoq} width={132}
+          <PickField label="Excess and MOQ" value={s.excessMoq}
                      options={[...EXCESS_AND_MOQ]} changed={changed('excessMoq')}
                      title={was('excessMoq')}
                      onChange={v => onPending!({ excessMoq: v })} />
@@ -147,18 +146,18 @@ export function QuoteContextBar({
               August and changed nothing until today: a quote that said "the
               customer supplies 2,000 of these" priced all of them anyway. They
               come off the quantity before a supplier is asked. */}
-          <PickField label="Net Consigned" value={s.netConsigned} width={136}
+          <PickField label="Net Consigned" value={s.netConsigned}
                      options={[...NET_CONSIGNED_INVENTORY]} changed={changed('netConsigned')}
                      title={was('netConsigned')}
                      onChange={v => onPending!({ netConsigned: v })} />
-          <PickField label="Rocket Consigned" value={s.rocketConsigned} width={152}
+          <PickField label="Rocket Consigned" value={s.rocketConsigned}
                      options={[...ROCKET_CONSIGNED_INVENTORY]} changed={changed('rocketConsigned')}
                      title={was('rocketConsigned')}
                      onChange={v => onPending!({ rocketConsigned: v })} />
           {/* THE PROVIDER MOVES HERE from the grid toolbar. It is setup, not an
               action: it decides where the next price request goes, and leaving
               it beside Get Prices implied it took effect on its own. */}
-          <PickField label="Primary Provider" value={s.provider} width={134}
+          <PickField label="Primary Provider" value={s.provider}
                      options={[...PRIMARY_PROVIDERS]}
                      changed={changed('provider')} title={was('provider')}
                      onChange={v => onPending!({ provider: v as PrimaryProvider })} />
@@ -188,7 +187,10 @@ function Fact({ label, value, locked = false, wide }: {
   label: string; value: string; locked?: boolean; wide?: boolean;
 }) {
   return (
-    <div className="vy-quote-fact" data-wide={wide || undefined}>
+    /* `title` because a uniform column can clip a long value — "Production-
+       Competitive Cost" is 26 characters in a column sized for "27%" — and a
+       value a reader cannot finish reading is worse than one they can hover. */
+    <div className="vy-quote-fact" data-wide={wide || undefined} title={value}>
       <span className="vy-quote-fact-label">{label}</span>
       <ReadValue lock={locked}>{value}</ReadValue>
     </div>
@@ -220,17 +222,20 @@ export function QtyField({ label, value, onChange, min = 1, changed, title }: {
   );
 }
 
-function PickField({ label, value, options, onChange, changed, title, wide, width }: {
+/**
+ * NO PER-FIELD WIDTH ANY MORE. Each of these carried its own number — 172 for
+ * Quote Focus, 130 for Package Type, 132, 136, 152, 134 — each measured
+ * against its own longest option, which is exactly what the customer objected
+ * to on 28 Oct: nine boxes, nine widths, and a second row whose fields line up
+ * with nothing above them. The strip is a grid now and the column decides.
+ */
+function PickField({ label, value, options, onChange, changed, title, wide }: {
   label: string; value: string; options: string[]; onChange: (v: string) => void;
   changed?: boolean; title?: string; wide?: boolean;
-  /** Narrower than the default where the label allows it — the strip is one
-   *  row and every pixel spent here comes off the grid below. */
-  width?: number;
 }) {
   return (
     <div className="vy-quote-fact vy-quote-fact--pick" data-changed={changed || undefined}
-         data-wide={wide || undefined} title={title}
-         style={width ? { inlineSize: width } : undefined}>
+         data-wide={wide || undefined} title={title}>
       <span className="vy-quote-fact-label">{label}</span>
       <Select label={label} size="small" value={value} options={options} onChange={onChange} />
     </div>
