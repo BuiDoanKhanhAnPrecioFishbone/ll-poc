@@ -404,6 +404,26 @@
     <li>
       <span class="n" data-mute>•</span>
       <div>
+        <div class="find-h"><strong>Cách gom hàng của một dòng BoM</strong><span class="tag diff">Làm khác — nhìn giống hệt</span></div>
+        <div class="sides">
+          <div class="side"><em>Của chị</em>Ô cha <b>merge thật</b> bằng <code>rowspan</code>, bảy ô một lần.</div>
+          <div class="side"><em>Của em</em>Ô cha để trống, nhưng <b>bỏ đường kẻ giữa các dòng cùng một record</b> — nhìn ra đúng một ô liền.</div>
+        </div>
+        <p class="why">
+          <b>Lý do không dùng <code>rowspan</code>:</b> lưới này có <b>7 cột đóng băng</b>,
+          mà Kendo vẽ phần đóng băng và phần cuộn thành <b>hai bảng riêng</b> — một ô
+          <code>rowspan</code> ở bên này không có gì bắt bên kia phải cao bằng, nên chỉ cần
+          một dòng lệch là hai nửa lưới trượt khỏi nhau. Bỏ đường kẻ cho ra đúng hình ảnh đó
+          mà không phải giữ hai bảng bằng nhau từng pixel.
+          <b>Hôm nay sửa thêm một chỗ:</b> sọc zebra trước đây tô <i>theo dòng</i>, nên một
+          part có ba nhà sản xuất ra trắng–xám–trắng và cái ô "merge" bị kẻ sọc ngang giữa
+          thân. Giờ tô <b>theo record</b>: một part là một mảng màu.
+        </p>
+      </div>
+    </li>
+    <li>
+      <span class="n" data-mute>•</span>
+      <div>
         <div class="find-h"><strong>Cột</strong><span class="tag ask">Cần chị quyết</span></div>
         <p class="why" style="border-color: var(--ink-faint)">
           Bản em có thêm <b>LEVEL</b> và <b>TOTAL QTY</b> (theo guideline), bản chị không có.

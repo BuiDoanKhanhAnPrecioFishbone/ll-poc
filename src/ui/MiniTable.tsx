@@ -125,6 +125,31 @@ export function MiniTable<T extends { id: string | number }>({
     return { data: kept.flatMap(h => groups.get(rowGroup.key(h))!) as object[], total: data.length };
   }, [data, sort, filter, rowGroup]);
 
+  /**
+   * WHICH RECORD EACH ROW BELONGS TO, counted in display order.
+   *
+   * THE STRIPE WAS FIGHTING THE GROUPING. The rules between the rows of one
+   * record are already suppressed so the line's own cells read as one merged
+   * block — but Kendo stripes by ROW, so a three-manufacturer part came out
+   * white / grey / white and the "merged" cell was banded down the middle. An
+   * asked whether these should betruly merged cells like the customer's mockup;
+   * the honest answer is that the merge was already there and the zebra was
+   * undoing it.
+   *
+   * Striping by RECORD does both jobs: the eye still tracks a wide row across
+   * the table, and one record is one tint.
+   */
+  const parity = useMemo(() => {
+    if (!rowGroup) return null;
+    const m = new Map<string, number>();
+    let i = 0;
+    for (const row of view.data as T[]) {
+      const k = rowGroup.key(row);
+      if (!m.has(k)) m.set(k, i++);
+    }
+    return m;
+  }, [view, rowGroup]);
+
   /* A filter row over three rows costs a row of chrome to search three things,
      and this component backs both a 23-line BoM and a 1-line Where-Used. The
      threshold is my judgement, not the guideline's — the guideline asks for
@@ -156,15 +181,27 @@ export function MiniTable<T extends { id: string | number }>({
         /* v16 replaced `rowRender` with a `rows` settings object of components.
            This puts our row state back on the row Kendo renders. */
         rows={{
-          data: ({ dataItem, trProps, children }: GridCustomRowProps) => (
-            <tr {...kendoDomProps(trProps)} data-tone={rowTone?.(dataItem as T)}
-                /* The rule goes under the LAST row of a record, so the rows of
-                   one BoM line read as one block rather than as three lines
-                   that happen to share a part number. */
-                data-group-end={rowGroup ? (rowGroup.end(dataItem as T) || undefined) : undefined}>
-              {children}
-            </tr>
-          ),
+          data: ({ dataItem, trProps, children }: GridCustomRowProps) => {
+            const props = kendoDomProps(trProps) as Record<string, unknown>;
+            /* Kendo's own class, moved rather than restyled: the tint stays
+               exactly the one the theme ships, and only what counts as "every
+               other" changes — every other RECORD instead of every other row. */
+            if (rowGroup && parity) {
+              const even = (parity.get(rowGroup.key(dataItem as T)) ?? 0) % 2 === 0;
+              const cls = String(props.className ?? '').replace(/\bk-table-alt-row\b/g, '')
+                .replace(/\s+/g, ' ').trim();
+              props.className = even ? cls : `${cls} k-table-alt-row`;
+            }
+            return (
+              <tr {...props} data-tone={rowTone?.(dataItem as T)}
+                  /* The rule goes under the LAST row of a record, so the rows of
+                     one BoM line read as one block rather than as three lines
+                     that happen to share a part number. */
+                  data-group-end={rowGroup ? (rowGroup.end(dataItem as T) || undefined) : undefined}>
+                {children}
+              </tr>
+            );
+          },
         }}
       >
         {columns.map((c, i) => (

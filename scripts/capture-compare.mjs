@@ -188,6 +188,12 @@ const JOBS = [
     ]`,
   },
   {
+    /* One part with three manufacturers, close up: the question is whether
+       the line's own cells read as one merged block across the group. */
+    name: 'ours-step2-group', route: REC, prep: OPEN_WIZARD + FILL_STEP1,
+    marks: `[]`, clip: '.vy-minitable-k',
+  },
+  {
     /* Step 3's strip is the editable one — nine pickers rather than twelve
        read-only facts — so it is the other half of any argument about how
        that strip is laid out. */
