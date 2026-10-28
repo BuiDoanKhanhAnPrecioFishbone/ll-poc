@@ -1,9 +1,10 @@
+import { useState } from 'react';
 import { Button } from '../../ui/Button';
 import { fmtMoney } from '../../ui/regional';
 import { MiniTable } from '../../ui/MiniTable';
 import { fmtDateTime } from '../../ui/renderCell';
-import { useToast } from '../../ui/Toast';
 import { useExcelExport } from '../../ui/useExcelExport';
+import { QuoteResultDialog } from './QuoteResultDialog';
 import type { ColumnSpec } from '../column-model';
 import type { Quotation, QuoteResult } from '../../data/quotations';
 import { pageActionsProps } from '../../ui/pageActions';
@@ -68,8 +69,8 @@ function resultColumns(onOpen: (r: QuoteResult) => void): ColumnSpec<QuoteResult
  *    what to do about it.
  */
 export function ResultTab({ q, onRun }: { q: Quotation; onRun: () => void }) {
-  const toast = useToast();
   const { exportRows, excel, busy: exporting } = useExcelExport<QuoteResult>();
+  const [open, setOpen] = useState<QuoteResult | null>(null);
 
   if (q.results.length === 0) {
     return (
@@ -122,9 +123,14 @@ export function ResultTab({ q, onRun }: { q: Quotation; onRun: () => void }) {
 
       <MiniTable
         data={q.results}
-        columns={resultColumns(r =>
-          toast.notImplemented(`open the quotation detail for ${r.partNumber} run ${r.lastRunVersion}`))}
+        /* "Each quotation result line allows the user to open and view the
+           corresponding quotation detail." It raised a not-implemented toast
+           for weeks — the table listed versions and could not answer the one
+           question a reader of it has. */
+        columns={resultColumns(setOpen)}
       />
+
+      {open && <QuoteResultDialog q={q} result={open} onClose={() => setOpen(null)} />}
     </>
   );
 }

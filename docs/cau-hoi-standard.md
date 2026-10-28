@@ -38,15 +38,22 @@ bấm Next sang step 3 và 4 thì nội dung vẫn là lưới Review BoM.
 
 | | | |
 |---|---|---|
-| 1 | **Màn xem kết quả theo từng phiên bản** — bấm một dòng trong bảng Result của mình hiện thông báo "chưa dựng" | **đang làm** |
-| 2 | **Export to PDF** — mình mới có Excel | nhỏ |
-| 3 | **Import** trên thanh công cụ của lưới kết quả | nhỏ |
+| 1 | **Màn xem kết quả theo từng phiên bản** — bấm một dòng trong bảng Result giờ mở ra đúng màn của chị: thiết lập đã dùng, Cost Estimation, và toàn bộ dòng đã định giá (14 cột, kèm **Ext. Price** theo tên của chị) | **xong** |
+| 2 | **Export to PDF** — nút đã có trên màn kết quả, bấm vào báo "chưa dựng". Xin chị cho biết bản PDF cần trông ra sao (mẫu có sẵn chưa?) | **cần chị trả lời** |
+| 3 | **Import** trên thanh công cụ lưới kết quả — nút đã có, và nó thuộc luồng *Import Completed Quote* ở mục 6 | theo mục 6 |
 | 4 | **Pricing Detail** — nút cạnh *Add Package*. Trong prototype của chị bấm vào **chưa làm gì**, nên mình chưa biết nó mở ra gì — xin chị cho biết | **cần chị trả lời** |
 | 5 | **Attachment to Process\*** — trường bắt buộc chọn *file đính kèm nào là BoM*. Mình có Template nhưng thiếu trường này | vừa |
 | 6 | **Import Completed Quote** — lựa chọn thứ ba của Select Action, *"Migration only"*. Mình mới có hai | nhỏ |
 
-Hai điểm nhỏ khác: cột tiền chị đặt **EXT. PRICE**, mình đang để **Amount** —
-mình đổi theo chị; và mockup có 6 attachment, bản mình có 3.
+Thêm một câu: mockup của chị có nút **Add Package** ngay cạnh *Pricing Detail*
+trên màn xem kết quả. Mình **chưa đặt nó ở đó** — thêm một linh kiện đóng gói
+làm đổi giá, mà đây là phiên bản **đã gửi đi rồi**, nên nút đó sẽ là thứ duy
+nhất trên một màn chỉ-đọc lại đi sửa lịch sử. Nút Add Package của mình nằm ở
+step 4, nơi báo giá còn mở. Nếu ý chị là *"thêm package rồi chạy lại thành
+phiên bản mới"* thì đó là một nút khác với một cái tên khác — xin chị xác nhận.
+
+Một điểm nhỏ: mockup có 6 attachment, bản mình có 3. Cột tiền mình đã đổi theo
+chị thành **Ext. Price**.
 
 **Một điểm mình làm khác:** mockup có bộ chọn phiên bản sau khi Submit; mình giữ
 **bảng Result** — mỗi phiên bản một dòng, kèm ngày chạy, người chạy, tổng tiền.

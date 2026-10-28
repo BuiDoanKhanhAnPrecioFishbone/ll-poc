@@ -9,9 +9,10 @@
  *
  * WHAT IS HONEST ABOUT THIS PROTOTYPE, said plainly. Four of the five resolve
  * instantly here, because there is no server: the session is not exchanged,
- * permissions are not fetched, preferences are already in localStorage. So the
- * boot screen flashes rather than tells a story, and that is the correct
- * behaviour for a boot this fast — a progress indicator that lingers when the
+ * permissions are not fetched, preferences are already in localStorage. The
+ * fifth, `navigation`, awaits a module the main bundle already contains — so
+ * all five resolve at once. The boot screen flashes rather than tells a story,
+ * and that is the correct behaviour for a boot this fast — a progress indicator that lingers when the
  * work does not is a progress indicator that lies.
  *
  * The journey is therefore watched on `/design-system`, where it steps through
@@ -44,9 +45,19 @@ export const BOOT_STAGES: BootStage[] = [
   {
     key: 'navigation', label: 'Loading your menu',
     liveSignal: 'navigation (set on LOGIN_SUCCESS)',
-    /* THE ONE STAGE WITH REAL WORK IN IT. The sidebar is built from this
-       module, and loading it as a chunk is what production does too — the menu
-       a user may open is not knowable until their navigation tree arrives. */
+    /* THE AWAIT IS REAL; THE WAIT IS NOT, and the bundler says so out loud:
+       "INEFFECTIVE_DYNAMIC_IMPORT — src/data/sitemap.ts is dynamically
+       imported by src/ui/bootStages.ts but also statically imported by
+       AppShell, CommandPalette, GlobalHeader, Home, Placeholder". The module
+       is in the main bundle because the shell itself needs it, so this
+       resolves from cache on the next microtask.
+
+       It stays anyway, and not out of stubbornness: this is the line
+       production replaces with the request for the user's navigation tree, and
+       a stage that already awaits something is a one-word edit where an empty
+       one is a design decision made again. What it is NOT is a wait — the
+       claim that this stage had real work in it was wrong, and the build
+       warning is the correction. */
     run: () => import('../data/sitemap'),
   },
   {

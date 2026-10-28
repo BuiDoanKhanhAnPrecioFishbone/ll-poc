@@ -161,6 +161,18 @@ export type QuoteResult = {
   lastRunDate: Date;
   lastRunVersion: string;
   bomFile: string;
+  /**
+   * The markup this run used, kept rather than recovered.
+   *
+   * It can be read back out of `totalWithMarkup / totalAmount`, and that is
+   * how the cost matrix would have had to get it — but the arithmetic returns
+   * 11.97 where the run used 12, because both totals are rounded to the cent
+   * before they are stored. A figure printed in a column heading as "With
+   * Markup (12%)" should be the number the user chose, not a reconstruction of
+   * it. Storing it costs no draw from the generator's random stream, which is
+   * the thing that must not move.
+   */
+  markupPct: number;
 };
 
 export type Comment = {
@@ -561,6 +573,7 @@ export function generateQuotations(count = 330): Quotation[] {
               lastRunBy: pick(OWNERS),
               lastRunDate: new Date(created.getTime() + 86400000 * (2 + j)),
               lastRunVersion: `v${1 + j}`,
+              markupPct: markup,
               /* Blank when the run used the BoM already on the RFQ: "the BOM
                  File field is blank when the quotation is run from an existing
                  BOM". Roughly a third of runs, since re-runs against the
