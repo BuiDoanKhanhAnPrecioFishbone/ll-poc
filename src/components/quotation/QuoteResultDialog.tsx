@@ -69,25 +69,45 @@ export function QuoteResultDialog({ q, result, onClose }: {
       title="Quotation Result"
       subtitle={`${result.partNumber} · Rev ${result.partRev} · ${result.description}`}
       onClose={onClose}
-      actions={<>
-        {/* HER TWO HEADER ACTIONS, in her order. Excel is the one that works:
-            it goes through the same hook every other export here uses, so it
-            inherits the busy state and the frame that gets it painted before
-            the workbook blocks the thread. PDF is hers and not built — said
-            plainly rather than wired to a silent no-op. */}
-        <Button busy={exporting}
-                onClick={() => exportRows(shown, columns, `QuotationResult-RFQ${q.no}-${result.lastRunVersion}.xlsx`)}>
-          {exporting ? 'Building the file…' : 'Export to Excel'}
-        </Button>
-        <Button onClick={() => toast.notImplemented('export this quotation as PDF')}>
-          Export to PDF
-        </Button>
-        <Button variant="filled" onClick={onClose}>Done</Button>
-      </>}
     >
       {excel}
 
       <div className="vy-run-step">
+        {/* TOP LEFT, NOT A FOOTER — the same row the wizard uses, and for the
+            same reason the standard gives: "Top-left toolbar = page navigation
+            only". This screen is a RECORD, not a step: nothing here commits
+            anything, so there is no sequence for the eye to finish at the
+            bottom of, and the actions apply to the whole version at any
+            moment. In a footer they also sat below a 23-row grid, which is a
+            long way from the thing they act on. Her own prototype puts Export
+            to Excel and Export to PDF at the top left.
+
+            DONE FIRST, because the way out goes on the left wherever the bar
+            sits (modal-patterns, rule 3) — and none of the three is `filled`:
+            a primary button promises a commit, and a saved version cannot be
+            changed from here. */}
+        <div className="vy-run-nav">
+          <div className="vy-run-nav-actions">
+            <Button onClick={onClose}>Done</Button>
+            <Button busy={exporting}
+                    onClick={() => exportRows(shown, columns, `QuotationResult-RFQ${q.no}-${result.lastRunVersion}.xlsx`)}>
+              {exporting ? 'Building the file…' : 'Export to Excel'}
+            </Button>
+            {/* Hers, and not built — said plainly rather than wired to a
+                silent no-op. */}
+            <Button onClick={() => toast.notImplemented('export this quotation as PDF')}>
+              Export to PDF
+            </Button>
+          </div>
+        </div>
+
+        {/* THE COST BESIDE THE SETUP, as her mockup has it. Stacked, the cost
+            card took a full-width band to show a 340px table — the right two
+            thirds were empty, and the band cost the grid a row and a half of
+            the only thing anyone opens this screen to read. Side by side it
+            costs nothing: the setup strip has width to spare and simply wraps
+            onto one more line. */}
+        <div className="vy-result-head">
         <QuoteContextBar
           heading={`Quote Run · Version ${result.lastRunVersion.replace(/^v/, '')}`}
           assembly={`${result.partNumber} - ${result.partRev}`}
@@ -114,7 +134,7 @@ export function QuoteResultDialog({ q, result, onClose }: {
           ]}
         />
 
-        <section className="vy-cost-card vy-cost-card--wide">
+        <section className="vy-cost-card vy-cost-card--side">
           <h3 className="vy-cost-title">Cost estimation</h3>
           {/* THE STORED TOTALS, NOT RECOMPUTED ONES. The lines below are priced
               by the same engine the run used, but a saved version's totals are
@@ -167,6 +187,7 @@ export function QuoteResultDialog({ q, result, onClose }: {
             </Button>
           </div>
         </section>
+        </div>
 
         <QuoteToolbar
           search={search} onSearch={setSearch}

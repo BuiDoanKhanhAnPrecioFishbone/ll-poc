@@ -182,12 +182,22 @@ const JOBS = [
 ];
 
 async function main() {
-  if (!fs.existsSync(PROTO)) {
+  const wantsHers = (process.argv.slice(2).length
+    ? process.argv.slice(2).some(n => n.startsWith('her-'))
+    : true);
+  if (wantsHers && !fs.existsSync(PROTO)) {
     console.error(`Missing ${PROTO}.\n`
       + 'Copy the customer\'s "Quoting BoM 16 Oct 1.html" there first; it is not tracked.');
     process.exit(1);
   }
   fs.mkdirSync(OUT, { recursive: true });
+
+  /* `node scripts/capture-compare.mjs ours-result` re-shoots one figure when
+     one screen changed, instead of all seven — and, more to the point, without
+     needing her prototype on disk for the jobs it is not taking. */
+  const only = process.argv.slice(2);
+  const jobs = only.length ? JOBS.filter(j => only.includes(j.name)) : JOBS;
+  if (!jobs.length) { console.error(`no job named ${only.join(', ')}`); process.exit(1); }
 
   const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'vy-cmp-'));
   const chrome = spawn(CHROME, ['--headless=new', '--disable-gpu', '--hide-scrollbars',
@@ -219,7 +229,7 @@ async function main() {
     { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
 
   let bad = 0;
-  for (const job of JOBS) {
+  for (const job of jobs) {
     await send('Page.navigate', { url: BASE + job.route });
     await sleep(1400);
     await run(HELPERS);

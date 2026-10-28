@@ -1748,6 +1748,26 @@
    Two measures down, with and without markup across — see StepSummary.tsx for
    why this is a table and not the list of five it replaced. */
 .vy-cost-card--wide { display: flex; flex-direction: column; align-items: flex-start; gap: var(--vy-space-6); }
+
+/* ---- Quotation Result: the cost sits BESIDE the setup, not under it -------
+   Stacked, the card spent a full-width band on a 340px table and left the
+   right two thirds empty — a band the grid paid for. Side by side, the strip
+   wraps onto one more line and the band is gone.
+
+   `flex: 1 1 var(--vy-result-setup-min)` on the strip and `flex: 0 0 auto` on
+   the card, so the card keeps the width its table needs and the strip takes
+   the rest; under that basis the row wraps and they stack again, which is the
+   right failure on a narrow window. `min-inline-size: 0` because a flex item
+   defaults to `min-width: auto` and the strip's widest field would otherwise
+   stop it shrinking. */
+.vy-result-head {
+  display: flex; flex-wrap: wrap; align-items: flex-start; gap: var(--vy-space-5);
+}
+.vy-result-head > .vy-quote-context { flex: 1 1 var(--vy-result-setup-min); min-inline-size: 0; }
+.vy-result-head > .vy-cost-card     { flex: 0 0 auto; }
+.vy-cost-card--side { padding: var(--vy-space-5) var(--vy-space-6); }
+.vy-cost-card--side .vy-cost-title  { margin-block-end: var(--vy-space-4); }
+.vy-cost-card--side .vy-cost-actions { margin-block-start: var(--vy-space-5); }
 .vy-cost-table { border-collapse: collapse; min-inline-size: var(--vy-cost-table-min); }
 .vy-cost-table th[scope="col"] {
   font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .05em;
