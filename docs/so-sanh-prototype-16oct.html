@@ -629,8 +629,9 @@
         Đây là màn thật, đúng kích cỡ: nền trắng, hình ở giữa, một dòng chữ bên dưới.
         <b>Năm trạm là năm mốc khởi động thật</b> — phiên đăng nhập, menu, quyền,
         thiết lập cá nhân, rồi mở workspace — chứ không phải năm cái chấm cho vui.
-        Mỗi trạm sáng lên khi mốc đó xong, và khi xong hết thì <b>tên lửa đáp xuống
-        hành tinh và tắt động cơ</b>.
+        Mỗi trạm sáng lên khi mốc đó xong, và khi xong hết thì <b>tên lửa quay đầu,
+        đáp bằng đuôi xuống hành tinh và tắt động cơ</b> — đúng cách một tên lửa hạ
+        cánh, và cũng là lúc khuôn mặt nhìn ngược lại chặng đường vừa bay.
       </p>
       <p class="boot-note">
         Máy nào bật <i>Reduce Motion</i> thì nó đứng yên ở tư thế đó, không chạy.
@@ -720,16 +721,25 @@
     var badge = svg.querySelector('[data-r="bc"]');
     if (!ship) { btn.style.display = 'none'; return; }
 
-    /* The component's own stations, and its landing: the sixth stop is where
-       the route ends and the planet's ring begins. */
-    var STOPS = [38, 59, 73, 87, 94, 108];
+    /* The component's own stations, and its landing. The sixth stop is 106
+       rather than the route's end at 108 because the ship turns round to land:
+       its nozzle then sits 9 units to the right of its origin, and the
+       planet's disc begins at 115. */
+    var STOPS = [38, 59, 73, 87, 94, 106];
     var LABELS = ['Signing you in', 'Loading your menu', 'Checking your permissions',
                   'Restoring your settings', 'Opening your workspace'];
     var REST = 'Loading Voyager IQ';
     var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var running = false;
 
-    function place(x) { ship.setAttribute('transform', 'translate(' + x + ' 48) rotate(90) scale(0.42)'); }
+    /* Landing is a TURN: the rocket swings round so the engine faces the
+       planet and settles on its tail, which is also why the face ends up
+       looking back down the route. The component draws that pose; here the
+       last hop rotates into it. */
+    function place(x, rot) {
+      ship.setAttribute('transform',
+        'translate(' + x + ' 48) rotate(' + (rot === undefined ? 90 : rot) + ') scale(0.42)');
+    }
     function land(on) {
       if (dest) dest.setAttribute('transform',
         'translate(122 48) scale(' + (on ? 1.1 : 1) + ') translate(-122 -48)');
@@ -743,14 +753,14 @@
       if (fl) fl.setAttribute('transform', 'translate(0 22) scale(1 ' + (on ? 1 : 0) + ') translate(0 -22)');
     }
 
-    function tween(from, to, ms, then) {
-      if (still) { place(to); setTimeout(then, 420); return; }
+    function tween(from, to, ms, then, turn) {
+      if (still) { place(to, turn ? -90 : 90); setTimeout(then, 420); return; }
       var t0 = performance.now();
       (function frame(now) {
         var k = Math.min(1, (now - t0) / ms);
         /* Ease in and out, so each hop leaves and arrives rather than jerking. */
         var e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
-        place(from + (to - from) * e);
+        place(from + (to - from) * e, turn ? 90 - 180 * e : 90);
         if (k < 1) requestAnimationFrame(frame); else then();
       })(t0);
     }
@@ -761,7 +771,7 @@
       btn.disabled = true;
       land(false);
       engine(true);
-      place(STOPS[0]);
+      place(STOPS[0], 90);
       say(0);
       var i = 0;
       (function hop() {
@@ -778,7 +788,10 @@
         i += 1;
         /* The sixth hop is the landing, which has no stage name of its own. */
         if (i < LABELS.length) say(i);
-        tween(from, STOPS[i], 620, function () { setTimeout(hop, 260); });
+        var last = i === STOPS.length - 1;
+        /* The landing takes longer than a hop: it is a turn as well as a move,
+           and a flip at hop speed reads as a glitch. */
+        tween(from, STOPS[i], last ? 900 : 620, function () { setTimeout(hop, 260); }, last);
       })();
     }
 

@@ -121,6 +121,16 @@ const OPEN_WIZARD = `
    jobs skip the readiness wait and photograph the page while it is still
    coming up — `wait` is the whole exposure. */
 const LOADING_JOBS = [
+  {
+    /* The landing, which only exists for one beat of the specimen's loop. */
+    name: 'load-landing', route: '/design-system', prep: `
+      const art = await __wait(() => document.querySelector('.vy-ds-motion-art'));
+      const ship = art.querySelector('svg g[transform*="scale(0.42)"]');
+      await __wait(() => /rotate\\(-90\\)/.test(ship.getAttribute('transform')), 20000);
+      art.scrollIntoView({ block: 'center' });
+      await new Promise(r => setTimeout(r, 120));`,
+    marks: `[]`,
+  },
   { name: 'load-record', route: REC, wait: 260, raw: true },
   { name: 'load-grid', route: '/sales-management/quotation', wait: 260, raw: true },
 ];

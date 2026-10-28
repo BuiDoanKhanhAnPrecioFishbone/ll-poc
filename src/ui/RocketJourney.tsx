@@ -75,6 +75,27 @@ function flameFit(x: number) {
   return Math.max(0, Math.min(1, room / (FLAME_TIP - NOZZLE)));
 }
 
+/**
+ * TOUCHING DOWN IS A TURN, NOT A STOP — An, 28 Oct: "đáp là quay ngược lại".
+ *
+ * A rocket does not arrive nose-first. It swings round so the engine faces
+ * what it is landing on and settles on its tail, which is also why the face
+ * ends up looking back down the route it has just flown. The first version
+ * parked it still pointing at the planet, engine out, which reads as a rocket
+ * that stopped rather than one that arrived.
+ *
+ * THE LANDING X IS THE TAIL'S, NOT THE SHIP'S. Turned, the nozzle sits at
+ * local y=22, which is 22 × 0.42 = 9.2 units to the RIGHT of the ship's
+ * origin; the planet's disc begins at 115 (centre 122, radius 7). So the
+ * origin goes at 115 − 9.2 ≈ 106 and the tail stands on the surface. Parking
+ * it at the route's end, 108, would have buried the tail two units into the
+ * planet.
+ */
+const LANDING_X = 106;
+const pose = (s: number) => s >= LANDED
+  ? `translate(${LANDING_X} 48) rotate(-90) scale(${SHIP_SCALE})`
+  : `translate(${at(s)} 48) rotate(90) scale(${SHIP_SCALE})`;
+
 export function RocketJourney({ step = 0, state = 'loading' }: {
   /**
    * How many boot stages have finished — lights that many route segments.
@@ -166,8 +187,7 @@ export function RocketJourney({ step = 0, state = 'loading' }: {
        landing, engine out, eyes open. Nothing is scheduled, for the same
        reason reduce-motion schedules nothing. */
     if (step >= LANDED) {
-      ship.current?.setAttribute(
-        'transform', `translate(${STATIONS[LANDED]} 48) rotate(90) scale(${SHIP_SCALE})`);
+      ship.current?.setAttribute('transform', pose(step));
       flame.current?.setAttribute('transform', 'translate(0 22) scale(1 0) translate(0 -22)');
       eyes.current?.setAttribute('transform', 'translate(0 -5.6) scale(1 1) translate(0 5.6)');
       return;
@@ -223,7 +243,7 @@ export function RocketJourney({ step = 0, state = 'loading' }: {
       <path d="M94 48 L108 48" {...seg} opacity={step >= 5 ? 1 : 0} />
 
       <g ref={ship}
-         transform={`translate(${at(step)} 48) rotate(90) scale(${SHIP_SCALE})`}>
+         transform={pose(step)}>
         {/* The resting pose carries the cap too. Left at `scale(1 1)` the flame
             painted at full length for one frame before the first animation
             tick trimmed it — a flicker through the planet on every mount. */}
