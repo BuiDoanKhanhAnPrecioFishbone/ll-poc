@@ -189,9 +189,21 @@ export function QuoteResultDialog({ q, result, onClose }: {
         <MiniTable data={shown} columns={columns} freeze={2} rowTone={rowTone}
                    filterable={false} empty={<NoRecords />} />
 
+        {/* THREE TONES, BECAUSE THE GRID PAINTS THREE. This legend shipped
+            with two entries, and neither of them worked: `data-tone` on the
+            `li` itself drew no swatch — the colour belongs to `.vy-tone-key`,
+            as step 3's legend has it — and "warn"/"bad" are not tone names
+            this app uses, so even a correct element would have been
+            transparent. Measured in the dialog: rows carry `covered`, `short`
+            and `no-supplier`; the legend carried nothing at all and was silent
+            about the green that covers most of the grid. */}
         <ul className="vy-tone-legend">
-          <li data-tone="warn">Out of stock quantity</li>
-          <li data-tone="bad">No bid — not included in total cost</li>
+          <li><span className="vy-tone-key" data-tone="known" aria-hidden />
+            Fully covered by the selected supplier</li>
+          <li><span className="vy-tone-key" data-tone="short" aria-hidden />
+            Out of stock quantity — the supplier cannot cover the full amount</li>
+          <li><span className="vy-tone-key" data-tone="missing" aria-hidden />
+            No bid — no supplier covered this line, so it is not in the total</li>
         </ul>
       </div>
     </Dialog>

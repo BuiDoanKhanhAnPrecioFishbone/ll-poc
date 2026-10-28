@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prototype 16/10 và bản mình dựng</title>
+<style>
+  :root {
+    --ink: #1b2330;
+    --ink-soft: #4b5667;
+    --ink-faint: #6b7788;
+    --line: #dfe4ec;
+    --paper: #ffffff;
+    --wash: #f5f7fa;
+    --accent: #e0552a;
+    --accent-soft: #fdeee8;
+    --ok: #1f7a4d;
+    --ok-soft: #e6f5ed;
+    --ask: #8a5a00;
+    --ask-soft: #fdf3e0;
+    --diff: #2f4b8f;
+    --diff-soft: #eaf0fd;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ink: #e8ecf3; --ink-soft: #b3bdcc; --ink-faint: #8b97a8;
+      --line: #2b3344; --paper: #161b24; --wash: #11151d;
+      --accent: #ff7a4d; --accent-soft: #33200f;
+      --ok: #5fd39b; --ok-soft: #102c20;
+      --ask: #f0c268; --ask-soft: #33280f;
+      --diff: #9db7ff; --diff-soft: #182440;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--wash); color: var(--ink);
+    font: 16px/1.6 var(--sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  .page { max-width: 1180px; margin: 0 auto; padding: 0 16px 96px; }
+
+  /* ---- header ---------------------------------------------------------- */
+  header.top {
+    display: flex; gap: 28px; align-items: center; flex-wrap: wrap;
+    padding: 36px 0 28px;
+  }
+  header.top .rocket { inline-size: 196px; flex: none; }
+  header.top .rocket svg { width: 100%; height: auto; display: block; }
+  h1 { font-size: 30px; line-height: 1.2; margin: 0 0 6px; letter-spacing: -0.01em; text-wrap: balance; }
+  .sub { color: var(--ink-soft); margin: 0; max-width: 62ch; }
+  .meta { color: var(--ink-faint); font-size: 13px; margin: 10px 0 0; }
+
+  /* ---- blocks ---------------------------------------------------------- */
+  .card {
+    background: var(--paper); border: 1px solid var(--line);
+    border-radius: 14px; padding: 22px 24px; margin: 0 0 28px;
+  }
+  .card h2 { font-size: 20px; margin: 0 0 4px; letter-spacing: -0.01em; }
+  .card h3 { font-size: 15px; margin: 26px 0 10px; color: var(--ink-soft);
+             text-transform: uppercase; letter-spacing: .07em; }
+  .lead { color: var(--ink-soft); margin: 0 0 18px; max-width: 78ch; }
+  p { max-width: 80ch; }
+  code { font-family: var(--mono); font-size: 0.88em; background: var(--wash);
+         border: 1px solid var(--line); border-radius: 5px; padding: 1px 5px; }
+
+  /* ---- figure pair ----------------------------------------------------- */
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 6px 0 4px; }
+  @media (max-width: 900px) { .pair { grid-template-columns: 1fr; } }
+  figure { margin: 0; }
+  figure img {
+    width: 100%; height: auto; display: block; cursor: zoom-in;
+    border: 1px solid var(--line); border-radius: 10px; background: var(--paper);
+  }
+  /* CLICK TO SEE IT PROPERLY. Two 1440px screens side by side on one page are
+     about 520px each, which is enough to compare shapes and not enough to read
+     a field label — and the labels are half of what this document is arguing
+     about. No library: one overlay, one image, Escape or a click to close. */
+  #zoom {
+    position: fixed; inset: 0; z-index: 99; display: none;
+    background: rgba(12, 16, 24, .88); padding: 24px; cursor: zoom-out;
+    overflow: auto; text-align: center;
+  }
+  #zoom[open] { display: block; }
+  #zoom img { max-width: 100%; border-radius: 8px; box-shadow: 0 18px 60px rgba(0,0,0,.5); }
+  #zoom p { color: #fff; font-size: 13px; margin: 10px auto 0; max-width: 60ch; opacity: .8; }
+  figcaption {
+    font-size: 13px; color: var(--ink-faint); margin-top: 8px;
+    display: flex; gap: 8px; align-items: baseline;
+  }
+  figcaption b { color: var(--ink); font-weight: 650; }
+  .stack figure + figure { margin-top: 14px; }
+
+  /* ---- numbered findings ------------------------------------------------ */
+  ol.finds { list-style: none; counter-reset: none; padding: 0; margin: 18px 0 0; }
+  ol.finds > li {
+    display: grid; grid-template-columns: 34px 1fr; gap: 14px;
+    padding: 16px 0; border-top: 1px solid var(--line);
+  }
+  .n {
+    inline-size: 28px; block-size: 28px; border-radius: 50%;
+    background: var(--accent); color: #fff; text-align: center;
+    font: 700 15px/28px var(--sans); margin-top: 2px;
+  }
+  .n[data-mute] { background: var(--ink-faint); }
+  .find-h { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; margin-bottom: 4px; }
+  .find-h strong { font-size: 16px; }
+  .tag {
+    font-size: 11.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+    border-radius: 999px; padding: 3px 9px; white-space: nowrap;
+  }
+  .tag.ok   { background: var(--ok-soft);   color: var(--ok); }
+  .tag.ask  { background: var(--ask-soft);  color: var(--ask); }
+  .tag.diff { background: var(--diff-soft); color: var(--diff); }
+  .sides { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 18px; margin: 8px 0 0; }
+  @media (max-width: 760px) { .sides { grid-template-columns: 1fr; } }
+  .side { font-size: 14.5px; }
+  .side em { font-style: normal; color: var(--ink-faint); font-size: 12px;
+             text-transform: uppercase; letter-spacing: .06em; display: block; margin-bottom: 2px; }
+  .why { margin: 10px 0 0; font-size: 14.5px; color: var(--ink-soft);
+         border-left: 3px solid var(--accent); padding-left: 12px; max-width: 86ch; }
+  .why b { color: var(--ink); }
+
+  /* ---- question table --------------------------------------------------- */
+  table { width: 100%; border-collapse: collapse; font-size: 14.5px; margin-top: 8px; }
+  th, td { text-align: left; vertical-align: top; padding: 11px 12px; border-top: 1px solid var(--line); }
+  th { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-faint); border-top: 0; }
+  tbody tr:nth-child(odd) { background: var(--wash); }
+
+  .note { background: var(--accent-soft); border: 1px solid var(--line);
+          border-radius: 12px; padding: 18px 20px; margin: 0 0 28px; }
+  .note h2 { font-size: 17px; margin: 0 0 8px; }
+  .note p { margin: 0 0 8px; font-size: 15px; }
+  .note p:last-child { margin-bottom: 0; }
+  footer { color: var(--ink-faint); font-size: 13px; padding-top: 10px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="top">
+  <div class="rocket">{{ROCKET}}</div>
+  <div>
+    <h1>Prototype 16/10 và bản mình dựng</h1>
+    <p class="sub">
+      Từng màn một, ảnh chụp cùng kích thước 1440×900. Khoanh cam là chỗ hai bên
+      khác nhau — mỗi chỗ có lý do, và chỗ nào cần chị quyết thì ghi rõ.
+    </p>
+    <p class="meta">28/10/2026 · ảnh chụp tự động bằng <code>scripts/capture-compare.mjs</code>, khung khoanh lấy từ toạ độ thật của phần tử</p>
+  </div>
+</header>
+
+<div class="note">
+  <h2>Hình tên lửa trong tài liệu — lấy ở đâu</h2>
+  <p>
+    Bốn file nằm ở <code>docs/assets/rocket-journey/</code>: ngang/dọc × nền sáng/tối.
+    Đều là <b>SVG</b>, nên phóng to bao nhiêu cũng nét.
+  </p>
+  <p>
+    <b>Tài liệu HTML như trang này:</b> dán thẳng nội dung file <code>.svg</code> vào chỗ cần —
+    hình tên lửa phía trên chính là cách đó, không có file ảnh rời nào cả, gửi một file là xong.
+    <b>Markdown:</b> <code>![](assets/rocket-journey/vy-rocket-journey-horizontal-light.svg)</code>,
+    nhưng khi gửi file <code>.md</code> đi một mình thì ảnh sẽ mất — phải gửi kèm thư mục.
+    <b>Word / PowerPoint:</b> mở file SVG bằng trình duyệt rồi xuất PNG, hoặc chèn thẳng SVG (Office hỗ trợ).
+  </p>
+</div>
+
+<!-- ======================= STEP 1 ======================= -->
+<section class="card">
+  <h2>1 · Step 1 — Config BoM</h2>
+  <p class="lead">
+    Bản của chị vừa đúng một màn hình. Bản mình cao hơn nên phải cuộn — hai ảnh
+    bên phải là phần trên và phần dưới của cùng một màn.
+  </p>
+
+  <div class="pair">
+    <figure>
+      <img src="{{IMG:her-step1}}" alt="Step 1 trong prototype 16/10">
+      <figcaption><b>Prototype 16/10</b> — vừa một màn</figcaption>
+    </figure>
+    <div class="stack">
+      <figure>
+        <img src="{{IMG:ours-step1-top}}" alt="Step 1 bản mình, phần trên">
+        <figcaption><b>Bản mình</b> — phần trên</figcaption>
+      </figure>
+      <figure>
+        <img src="{{IMG:ours-step1-bottom}}" alt="Step 1 bản mình, phần dưới">
+        <figcaption><b>Bản mình</b> — cuộn xuống</figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <ol class="finds">
+    <li>
+      <span class="n">1</span>
+      <div>
+        <div class="find-h"><strong>Select Action</strong><span class="tag diff">Làm khác</span></div>
+        <div class="sides">
+          <div class="side"><em>Của chị</em>Ba thẻ nằm ngang một hàng, mỗi thẻ một câu mô tả.</div>
+          <div class="side"><em>Của mình</em>Ba dòng radio xếp dọc, mỗi dòng một câu mô tả.</div>
+        </div>
+        <p class="why">
+          <b>Lý do:</b> lựa chọn thứ ba <i>Import Completed Quote</i> bị khoá, mà một
+          câu giải thích đặt dưới cả nhóm thì chỉ mô tả được cái đang chọn —
+          không bao giờ nói được cho cái không ai chọn được. Nên câu mô tả phải
+          đi theo từng lựa chọn, đúng như prototype của chị làm.
+          <b>Cái giá:</b> xếp dọc làm panel cao thêm, đẩy <i>Continue from Drafts</i> xuống dưới màn.
+          Nếu chị thích ba thẻ ngang như bản của chị thì mình đổi — <b>xin chị cho ý</b>.
+        </p>
+      </div>
+    </li>
+    <li>
+      <span class="n">2</span>
+      <div>
+        <div class="find-h"><strong>Template</strong><span class="tag ask">Cần chị quyết</span></div>
+        <div class="sides">
+          <div class="side"><em>Của chị</em><code>Template *</code> — bắt buộc, điền sẵn <i>Quoting - New Customer</i>.</div>
+          <div class="side"><em>Của mình</em>Không bắt buộc. Để trống = dùng template mặc định cấu hình trong Inventory Management.</div>
+        </div>
+        <p class="why">
+          Hai cách đều chạy được, nhưng chỉ một cách đúng: <b>để trống có được không?</b>
+          Nếu bắt buộc thì mình thêm dấu <code>*</code> và chặn Next; nếu không thì
+          giữ nguyên và bỏ chữ “hoặc bạn không thể tiếp tục” trong câu gợi ý.
+        </p>
+      </div>
+    </li>
+    <li>
+      <span class="n">3</span>
+      <div>
+        <div class="find-h"><strong>Continue from Drafts</strong><span class="tag ok">Đã giống</span></div>
+        <div class="sides">
+          <div class="side"><em>Của chị</em>Luôn hiện, 2 dòng mẫu. Bảy cột, có <i>Quote Focus</i>.</div>
+          <div class="side"><em>Của mình</em>Luôn hiện (sửa 28/10), đúng bảy cột đó. Chưa có draft thì bảng nói draft sinh ra từ đâu.</div>
+        </div>
+        <p class="why">
+          Mình <b>không</b> gieo draft mẫu: draft là dấu vết công việc ai đó vừa làm
+          trong phiên này; dòng giả sẽ cho bấm Continue vào một BoM chưa từng được cấu hình.
+        </p>
+      </div>
+    </li>
+    <li>
+      <span class="n">4</span>
+      <div>
+        <div class="find-h"><strong>Attachments</strong><span class="tag diff">Làm khác</span></div>
+        <div class="sides">
+          <div class="side"><em>Của chị</em>6 file, mỗi dòng một nút tải.</div>
+          <div class="side"><em>Của mình</em>3 file, mỗi dòng <b>xem</b> và <b>tải</b>; file không phải .xlsx ghi rõ <i>not .xlsx</i>.</div>
+        </div>
+        <p class="why">
+          Nút “xem” là theo yêu cầu 22/10 của chị. Câu hỏi còn lại chỉ là số lượng
+          file mẫu — <b>không ảnh hưởng chức năng</b>.
+        </p>
+      </div>
+    </li>
+    <li>
+      <span class="n">5</span>
+      <div>
+        <div class="find-h"><strong>Select Column Detection</strong><span class="tag ask">Cần chị quyết</span></div>
+        <div class="sides">
+          <div class="side"><em>Của chị</em>Không có.</div>
+          <div class="side"><em>Của mình</em>Có — lấy từ Testing Guideline.</div>
+        </div>
+        <p class="why">
+          Trường này quyết định cột nào nhận dạng một dòng BoM là duy nhất; chọn sai
+          thì hai dòng khác nhau bị gộp làm một. <b>Giữ hay bỏ?</b> Guideline có, mockup không.
+        </p>
+      </div>
+    </li>
+    <li>
+      <span class="n" data-mute>•</span>
+      <div>
+        <div class="find-h"><strong>Ba điểm nhỏ</strong><span class="tag ask">Cần chị quyết</span></div>
+        <p class="why" style="border-color: var(--ink-faint)">
+          <b>Build Qty</b> và <b>Attrition Set</b> bên chị có dấu <code>*</code> bắt buộc, bên mình
+          mặc định 1 và không đánh dấu. · <b>Revision</b> bên chị là số (<code>1</code>),
+          bên mình là chữ (<code>A</code>) — cái nào đúng với hệ thống thật?
+          · Bên chị ô <b>Description</b> ở Assembly Details điền sẵn trùng mã assembly.
+        </p>
+      </div>
+    </li>
+  </ol>
+</section>
+
+<!-- ======================= STEP 2 ======================= -->
+<section class="card">
+  <h2>2 · Step 2 — Review BoM</h2>
+  <p class="lead">Lưới gần như giống hệt. Khác nhau ở thanh Quote Setup phía trên và một cảnh báo.</p>
+
+  <div class="pair">
+    <figure>
+      <img src="{{IMG:her-step2}}" alt="Step 2 trong prototype 16/10">
+      <figcaption><b>Prototype 16/10</b></figcaption>
+    </figure>
+    <figure>
+      <img src="{{IMG:ours-step2}}" alt="Step 2 bản mình">
+      <figcaption><b>Bản mình</b></figcaption>
+    </figure>
+  </div>
+
+  <ol class="finds">
+    <li>
+      <span class="n">6</span>
+      <div>
+        <div class="find-h"><strong>Thanh Quote Setup</strong><span class="tag diff">Làm khác — theo lời chị</span></div>
+        <div class="sides">
+          <div class="side"><em>Của chị</em>Chín ô <b>sửa được</b> ngay tại step 2, đều có dấu <code>*</code>.</div>
+          <div class="side"><em>Của mình</em>Chín ô <b>chỉ đọc</b>, có ổ khoá.</div>
+        </div>
+        <p class="why">
+          Đây là chỗ prototype 16/10 và lời chị dặn ngày 22/10 ngược nhau:
+          <i>“Các trường là chốt rùi, và chỉ đc sửa ở step 3.”</i>
+          Mình theo lời dặn 22/10 vì nó đến sau. <b>Nếu chị muốn theo prototype thì mình mở lại.</b>
+        </p>
+      </div>
+    </li>
+    <li>
+      <span class="n">7</span>
+      <div>
+        <div class="find-h"><strong>Cảnh báo “5 parts are not in Part Master”</strong><span class="tag ok">Mình thêm</span></div>
+        <p class="why">
+          Lưới hai bên đều tô đỏ những dòng chưa có trong hệ thống, nhưng chỉ tô màu thì
+          người đọc phải tự đếm. Câu này nói luôn số lượng và hậu quả: chưa tạo thì
+          không confirm được Project Requirement.
+        </p>
+      </div>
+    </li>
+    <li>
+      <span class="n" data-mute>•</span>
+      <div>
+        <div class="find-h"><strong>Cột</strong><span class="tag ask">Cần chị quyết</span></div>
+        <p class="why" style="border-color: var(--ink-faint)">
+          Bản mình có thêm <b>LEVEL</b> và <b>TOTAL QTY</b> (theo guideline), bản chị không có.
+          · Vài tiêu đề bị cắt (<i>NUM…</i>, <i>REVISI…</i>, <i>QUANTI…</i>): cột đo theo
+          <b>nội dung</b> chứ không theo tên cột, để cả lưới vừa màn mà không phải cuộn ngang —
+          nới tiêu đề ra thì cụm <b>MFG | MPN</b>, thứ mà bước này sinh ra để kiểm, bị bóp lại.
+          Nếu chị thấy khó đọc thì mình đổi.
+        </p>
+      </div>
+    </li>
+  </ol>
+</section>
+
+<!-- ======================= RESULT ======================= -->
+<section class="card">
+  <h2>3 · Quote result (view mode)</h2>
+  <p class="lead">
+    Màn này mình mới dựng hôm 28/10. Lưới 14 cột, tên và thứ tự lấy đúng của chị,
+    kể cả <i>Ext. Price</i>. Khác nhau nằm ở các nút quanh lưới.
+  </p>
+
+  <div class="pair">
+    <figure>
+      <img src="{{IMG:her-result}}" alt="Quote result view mode trong prototype 16/10">
+      <figcaption><b>Prototype 16/10</b></figcaption>
+    </figure>
+    <figure>
+      <img src="{{IMG:ours-result}}" alt="Quotation Result bản mình">
+      <figcaption><b>Bản mình</b></figcaption>
+    </figure>
+  </div>
+
+  <ol class="finds">
+    <li>
+      <span class="n">8</span>
+      <div>
+        <div class="find-h"><strong>Bộ chọn Quotation Version</strong><span class="tag ask">Cần chị quyết</span></div>
+        <div class="sides">
+          <div class="side"><em>Của chị</em>Dropdown ngay trên màn: <i>Version 3 · 10/12/2026 · Qty 100 · $1,722.45</i>.</div>
+          <div class="side"><em>Của mình</em>Không có. Mỗi phiên bản là một dòng trong <b>bảng Result</b>, bấm vào mở ra màn này.</div>
+        </div>
+        <p class="why">
+          Một bảng cho thấy đủ các phiên bản cạnh nhau, so sánh được và xuất Excel được.
+          Nhưng <b>bộ chọn của chị giải quyết việc khác</b>: đổi phiên bản mà không phải đóng màn.
+          Hai thứ không loại trừ nhau — <b>chị muốn thêm bộ chọn vào màn này không?</b>
+        </p>
+      </div>
+    </li>
+    <li>
+      <span class="n">9</span>
+      <div>
+        <div class="find-h"><strong>Add Package</strong><span class="tag ask">Cần chị quyết</span></div>
+        <div class="sides">
+          <div class="side"><em>Của chị</em>Nằm cạnh <i>Pricing Detail</i>, ngay trên màn xem kết quả.</div>
+          <div class="side"><em>Của mình</em>Không đặt ở đây. Nút Add Package của mình ở <b>step 4</b>, nơi báo giá còn mở.</div>
+        </div>
+        <p class="why">
+          Thêm một linh kiện đóng gói <b>làm đổi giá</b>, mà đây là phiên bản đã gửi đi rồi —
+          nút đó sẽ là thứ duy nhất trên một màn chỉ-đọc lại đi sửa lịch sử.
+          Nếu ý chị là <i>“thêm package rồi chạy lại thành phiên bản mới”</i> thì đó là
+          một nút khác với một cái tên khác. <b>Xin chị xác nhận.</b>
+        </p>
+      </div>
+    </li>
+    <li>
+      <span class="n">10</span>
+      <div>
+        <div class="find-h"><strong>Pricing Detail</strong><span class="tag ask">Cần chị quyết</span></div>
+        <p class="why">
+          Hai bên đều có nút. Trong prototype của chị bấm vào <b>chưa làm gì</b>, nên mình
+          chưa biết nó mở ra cái gì — bản mình báo “chưa dựng” thay vì im lặng.
+          <b>Xin chị mô tả nội dung màn Pricing Detail.</b>
+        </p>
+      </div>
+    </li>
+    <li>
+      <span class="n">11</span>
+      <div>
+        <div class="find-h"><strong>Import / Export trên thanh công cụ</strong><span class="tag ask">Cần chị quyết</span></div>
+        <div class="sides">
+          <div class="side"><em>Của chị</em><b>Import</b> và <b>Export</b> cạnh nhau trên thanh lưới; <i>Export to Excel / PDF</i> ở góc trên.</div>
+          <div class="side"><em>Của mình</em><b>Import</b> trên thanh lưới; <i>Export to Excel / PDF</i> ở chân màn, cạnh nút Done.</div>
+        </div>
+        <p class="why">
+          <b>Export to Excel</b> bên mình chạy thật. <b>Export to PDF</b> và <b>Import</b> thì chưa —
+          Import thuộc luồng <i>Import Completed Quote</i>, và cả hai đang chờ cùng một câu trả lời:
+          <b>một báo giá đã hoàn tất bên Voyager sang đây dưới dạng gì, và bản PDF cần trông ra sao?</b>
+        </p>
+      </div>
+    </li>
+    <li>
+      <span class="n" data-mute>•</span>
+      <div>
+        <div class="find-h"><strong>Hai điểm nữa</strong><span class="tag diff">Làm khác</span></div>
+        <p class="why" style="border-color: var(--ink-faint)">
+          <b>Thanh thiết lập ở chế độ xem:</b> bên chị các ô vẫn trông như sửa được (viền trắng, dấu <code>*</code>);
+          bên mình để chỉ-đọc, vì một phiên bản đã lưu là chuyện đã xảy ra.
+          · <b>Chú giải màu:</b> lưới dùng ba màu, bản mình hôm nay sửa lại cho đủ ba dòng chú giải
+          (xanh = supplier cung đủ, vàng = thiếu hàng, hồng = không có nhà cung cấp nào).
+        </p>
+      </div>
+    </li>
+  </ol>
+</section>
+
+<!-- ======================= STEP 3, 4 ======================= -->
+<section class="card">
+  <h2>4 · Step 3 và step 4 — không so sánh được</h2>
+  <p>
+    Mình mở prototype của chị và bấm Next qua step 3 rồi step 4: nội dung vẫn là
+    lưới Review BoM của step 2. Tức là prototype dựng <b>step 1, step 2 và màn xem kết quả</b>,
+    còn hai bước giữa thì chưa.
+  </p>
+  <p>
+    Bản mình có đủ: <b>step 3 Quoting</b> (Get Prices, chọn nhà cung cấp, AML dòng con,
+    Preferred Suppliers, Consigned trừ trước khi mua) và <b>step 4 Summary</b>
+    (Cost Estimation 2×2, Add Package, Generate Quotation). Hai bước này dựng theo
+    Testing Guideline chứ không theo mockup — <b>khi nào chị rảnh, xin chị xem lại giúp.</b>
+  </p>
+</section>
+
+<!-- ======================= QUESTIONS ======================= -->
+<section class="card">
+  <h2>5 · Gom lại — những câu cần chị trả lời</h2>
+  <table>
+    <thead><tr><th style="width:34px">#</th><th>Câu hỏi</th><th style="width:150px">Ở đâu</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td><b>Template</b> có bắt buộc chọn không, hay để trống thì dùng template mặc định?</td><td>Step 1 · điểm 2</td></tr>
+      <tr><td>2</td><td><b>Select Column Detection</b> — giữ (theo guideline) hay bỏ (theo mockup)?</td><td>Step 1 · điểm 5</td></tr>
+      <tr><td>3</td><td><b>Build Qty / Attrition Set</b> có bắt buộc không? <b>Revision</b> là số hay chữ?</td><td>Step 1</td></tr>
+      <tr><td>4</td><td>Thanh <b>Quote Setup ở step 2</b>: sửa được (như mockup) hay chỉ đọc (như chị dặn 22/10)?</td><td>Step 2 · điểm 6</td></tr>
+      <tr><td>5</td><td>Thêm <b>bộ chọn phiên bản</b> vào màn xem kết quả không?</td><td>Result · điểm 8</td></tr>
+      <tr><td>6</td><td><b>Add Package</b> trên màn chỉ-đọc — ý chị là sửa phiên bản cũ, hay chạy ra phiên bản mới?</td><td>Result · điểm 9</td></tr>
+      <tr><td>7</td><td><b>Pricing Detail</b> mở ra cái gì?</td><td>Result · điểm 10</td></tr>
+      <tr><td>8</td><td><b>Export to PDF</b> cần trông ra sao — đã có mẫu chưa?</td><td>Result · điểm 11</td></tr>
+      <tr><td>9</td><td><b>Import Completed Quote</b> — một báo giá đã hoàn tất bên Voyager sang đây dưới dạng gì?</td><td>Step 1 · Result</td></tr>
+      <tr><td>10</td><td>Ba thẻ <b>Select Action</b> nằm ngang như mockup, hay xếp dọc kèm câu giải thích như bản mình?</td><td>Step 1 · điểm 1</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<footer>
+  Ảnh chụp ngày 28/10/2026, cùng khung 1440×900 cho cả hai bên.
+  Khung khoanh cam được vẽ từ toạ độ thật của từng phần tử trong trang, không vẽ tay.
+</footer>
+
+</div>
+
+<div id="zoom" role="dialog" aria-label="Ảnh phóng to"><img alt=""><p></p></div>
+<script>
+  (function () {
+    var box = document.getElementById('zoom');
+    var img = box.querySelector('img');
+    var cap = box.querySelector('p');
+    document.addEventListener('click', function (e) {
+      var t = e.target;
+      if (t.tagName === 'IMG' && t.closest('figure')) {
+        img.src = t.src;
+        img.alt = t.alt;
+        cap.textContent = t.closest('figure').querySelector('figcaption').textContent.trim()
+          + ' — bấm bất kỳ đâu để đóng';
+        box.setAttribute('open', '');
+      } else if (box.hasAttribute('open')) {
+        box.removeAttribute('open');
+      }
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') box.removeAttribute('open');
+    });
+  })();
+</script>
+</body>
+</html>
