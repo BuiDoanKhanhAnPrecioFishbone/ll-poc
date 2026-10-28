@@ -292,11 +292,19 @@ export function StepConfigBom({ q, cfg, set, invalid = [], onResume }: {
                 </span>
               </Field>
 
-              <Field label="File Name">
-                {/* Read-only and auto-filled, per r23-r25. */}
-                <ReadValue>{cfg.attachment}</ReadValue>
-              </Field>
+              {/* NO `File Name` HERE ANY MORE. The guideline has one (r23-r25),
+                  read-only and auto-filled — and what it filled with was the
+                  file the picker above it had just been set to, so the panel
+                  printed one string twice in adjacent cells. Renaming the
+                  picker to her `Attachment to Process` put the two side by side
+                  and made it obvious.
 
+                  A read-only box is worth its space when it shows something
+                  you could not otherwise see: the Load Existing flow keeps its
+                  File name field for exactly that reason, because there the
+                  file arrives through an upload dialog and the field is the
+                  only record of which one. Here the picker IS the file name.
+                  Her own prototype has no such field in BoM Options. */}
               <Field label="Select template">
                 {/* PREVIEW AND DOWNLOAD BESIDE THE PICKER, as her prototype has
                     them. A template is a column map, and the question somebody
