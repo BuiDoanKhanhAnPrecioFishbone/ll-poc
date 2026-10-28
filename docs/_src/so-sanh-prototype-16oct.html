@@ -410,11 +410,11 @@
           <div class="side"><em>Của em</em>Ô cha để trống, nhưng <b>bỏ đường kẻ giữa các dòng cùng một record</b> — nhìn ra đúng một ô liền.</div>
         </div>
         <p class="why">
-          <b>Lý do không dùng <code>rowspan</code>:</b> lưới này có <b>7 cột đóng băng</b>,
-          mà Kendo vẽ phần đóng băng và phần cuộn thành <b>hai bảng riêng</b> — một ô
-          <code>rowspan</code> ở bên này không có gì bắt bên kia phải cao bằng, nên chỉ cần
-          một dòng lệch là hai nửa lưới trượt khỏi nhau. Bỏ đường kẻ cho ra đúng hình ảnh đó
-          mà không phải giữ hai bảng bằng nhau từng pixel.
+          <b>Lý do không dùng <code>rowspan</code>:</b> lưới của Kendo <b>tự dựng bộ ô</b> —
+          mỗi dòng một ô cho mỗi cột — còn phần mình viết chỉ là <i>nội dung</i> bên trong ô.
+          Muốn merge thì các dòng con phải <b>bớt ô đi</b>, mà bề rộng cột và vị trí dính
+          (sticky) của 7 cột đóng băng lại tính từ chính bộ ô của từng dòng. Bỏ đường kẻ cho
+          ra đúng hình ảnh đó mà không phải giành quyền dựng ô với lưới.
           <b>Hôm nay sửa thêm một chỗ:</b> sọc zebra trước đây tô <i>theo dòng</i>, nên một
           part có ba nhà sản xuất ra trắng–xám–trắng và cái ô "merge" bị kẻ sọc ngang giữa
           thân. Giờ tô <b>theo record</b>: một part là một mảng màu.

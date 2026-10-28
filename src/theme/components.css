@@ -2122,8 +2122,21 @@
    make that read as ONE record rather than as three rows that happen to share
    a part number: no rule between the rows of a group, one rule under the last
    of them. The blank cells then look merged, which is what the standard asks
-   for — "parent cells merged" — without a `rowSpan` the grid could not keep in
-   step with its own frozen columns. */
+   for — "parent cells merged" — without a `rowSpan`.
+
+   WHY NOT A REAL `rowSpan`, corrected 28 Oct. The first version of this note
+   said Kendo renders the frozen and scrolling halves as two tables that a
+   rowspan could not hold level. Measured: it does not. KendoReact 16 locks
+   columns with STICKY CELLS in one table — `k-grid-content-sticky`,
+   `position: sticky`, `left: 0 / 52px / 124px` — so there are no two halves to
+   keep in step.
+
+   The real obstacle is that the Grid owns the cell set: it renders one `<td>`
+   per column per row, and our `cells` render supplies the CONTENTS of those
+   cells, not the cells. A rowspan needs the continuation rows to have fewer
+   cells, and the sticky offsets and column widths are computed from the cells
+   each row has. Suppressing the rule gets the same picture without taking that
+   over. */
 .vy-minitable-k[data-grouped] .k-grid tbody td { border-block-end-color: transparent; }
 .vy-minitable-k[data-grouped] .k-grid tbody tr[data-group-end] > td {
   border-block-end-color: var(--vy-border);
