@@ -233,7 +233,7 @@ export function StepConfigBom({ q, cfg, set, invalid = [], onResume }: {
             replaces the cast: `completed` is not one of the wizard's two flows,
             and telling the compiler to accept it anyway is how the result
             dialog ended up with two fields of the wrong type last week. */}
-        <RadioGroup label="Action" value={cfg.action}
+        <RadioGroup label="Action" value={cfg.action} tiles
                     options={ACTIONS}
                     onChange={v => {
                       if (v === 'import-new' || v === 'load-existing') set({ action: v });

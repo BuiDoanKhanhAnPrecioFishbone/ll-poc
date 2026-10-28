@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Prototype 16/10 và bản mình dựng</title>
+<title>Prototype 16/10 và bản em dựng</title>
 <style>
   :root {
     --ink: #1b2330;
@@ -48,7 +48,21 @@
     display: flex; gap: 28px; align-items: center; flex-wrap: wrap;
     padding: 36px 0 28px;
   }
-  header.top .rocket { inline-size: 196px; flex: none; }
+  .rocket-player { inline-size: 196px; flex: none; }
+  header.top .rocket { inline-size: 196px; }
+  .rocket-play {
+    display: block; inline-size: 100%; margin-block-start: 6px;
+    font: 600 13px/1 var(--sans); color: var(--ink);
+    background: var(--paper); border: 1px solid var(--line);
+    border-radius: 999px; padding: 8px 10px; cursor: pointer;
+  }
+  .rocket-play:hover { border-color: var(--accent); color: var(--accent); }
+  .rocket-play:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .rocket-stage {
+    margin: 6px 0 0; font-size: 11.5px; line-height: 1.35; text-align: center;
+    color: var(--ink-faint); min-block-size: 2.7em;
+  }
+  .rocket-stage b { color: var(--ink); font-weight: 600; }
   header.top .rocket svg { width: 100%; height: auto; display: block; }
   h1 { font-size: 30px; line-height: 1.2; margin: 0 0 6px; letter-spacing: -0.01em; text-wrap: balance; }
   .sub { color: var(--ink-soft); margin: 0; max-width: 62ch; }
@@ -183,7 +197,7 @@
     .card, .note { padding: 14px 16px; }
     .card h2 { break-after: avoid; }
     figure img { box-shadow: none; }
-    #zoom { display: none !important; }
+    #zoom, .rocket-play { display: none !important; }
     /* Backgrounds carry meaning here — the orange callouts, the status tags
        and the striped rows are the document's own legend. */
     * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -195,9 +209,13 @@
 <div class="page">
 
 <header class="top">
-  <div class="rocket">{{ROCKET}}</div>
+  <div class="rocket-player">
+    <div class="rocket">{{ROCKET}}</div>
+    <button type="button" class="rocket-play" id="rocket-play">▶&nbsp; Chạy thử</button>
+    <p class="rocket-stage" id="rocket-stage" aria-live="polite">Năm trạm, mỗi trạm là một mốc khởi động thật</p>
+  </div>
   <div>
-    <h1>Prototype 16/10 và bản mình dựng</h1>
+    <h1>Prototype 16/10 và bản em dựng</h1>
     <p class="sub">
       Từng màn một, ảnh chụp cùng kích thước 1440×900. Khoanh cam là chỗ hai bên
       khác nhau — mỗi chỗ có lý do, và chỗ nào cần chị quyết thì ghi rõ.
@@ -211,12 +229,14 @@
   <p>
     Bốn file nằm ở <code>docs/assets/rocket-journey/</code>: ngang/dọc × nền sáng/tối.
     Đều là <b>SVG</b>, nên phóng to bao nhiêu cũng nét.
+    Bấm <b>Chạy thử</b> ở góc trên bên trái để xem nó đi hết hành trình —
+    <b>năm trạm là năm mốc khởi động thật</b> của hệ thống, không phải năm cái chấm cho vui.
   </p>
   <p>
     <b>Tài liệu HTML như trang này:</b> dán thẳng nội dung file <code>.svg</code> vào chỗ cần —
     hình tên lửa phía trên chính là cách đó, không có file ảnh rời nào cả, gửi một file là xong.
     <b>Markdown:</b> <code>![](assets/rocket-journey/vy-rocket-journey-horizontal-light.svg)</code>,
-    nhưng khi gửi file <code>.md</code> đi một mình thì ảnh sẽ mất — phải gửi kèm thư mục.
+    nhưng khi gửi file <code>.md</code> đi một em thì ảnh sẽ mất — phải gửi kèm thư mục.
     <b>Word / PowerPoint:</b> mở file SVG bằng trình duyệt rồi xuất PNG, hoặc chèn thẳng SVG (Office hỗ trợ).
   </p>
 </div>
@@ -225,7 +245,7 @@
 <section class="card">
   <h2>1 · Step 1 — Config BoM</h2>
   <p class="lead">
-    Bản của chị vừa đúng một màn hình. Bản mình cao hơn nên phải cuộn — hai ảnh
+    Bản của chị vừa đúng một màn hình. Bản em cao hơn nên phải cuộn — hai ảnh
     bên phải là phần trên và phần dưới của cùng một màn.
   </p>
 
@@ -236,12 +256,12 @@
     </figure>
     <div class="stack">
       <figure>
-        <img src="{{IMG:ours-step1-top}}" alt="Step 1 bản mình, phần trên">
-        <figcaption><b>Bản mình</b> — phần trên</figcaption>
+        <img src="{{IMG:ours-step1-top}}" alt="Step 1 bản em, phần trên">
+        <figcaption><b>Bản em</b> — phần trên</figcaption>
       </figure>
       <figure>
-        <img src="{{IMG:ours-step1-bottom}}" alt="Step 1 bản mình, phần dưới">
-        <figcaption><b>Bản mình</b> — cuộn xuống</figcaption>
+        <img src="{{IMG:ours-step1-bottom}}" alt="Step 1 bản em, phần dưới">
+        <figcaption><b>Bản em</b> — cuộn xuống</figcaption>
       </figure>
     </div>
   </div>
@@ -250,18 +270,18 @@
     <li>
       <span class="n">1</span>
       <div>
-        <div class="find-h"><strong>Select Action</strong><span class="tag diff">Làm khác</span></div>
+        <div class="find-h"><strong>Select Action</strong><span class="tag ok">Đã giống</span></div>
         <div class="sides">
           <div class="side"><em>Của chị</em>Ba thẻ nằm ngang một hàng, mỗi thẻ một câu mô tả.</div>
-          <div class="side"><em>Của mình</em>Ba dòng radio xếp dọc, mỗi dòng một câu mô tả.</div>
+          <div class="side"><em>Của em</em>Ba thẻ nằm ngang một hàng, mỗi thẻ một câu mô tả. Thẻ đang chọn tô xanh, thẻ khoá mờ đi.</div>
         </div>
         <p class="why">
-          <b>Lý do:</b> lựa chọn thứ ba <i>Import Completed Quote</i> bị khoá, mà một
-          câu giải thích đặt dưới cả nhóm thì chỉ mô tả được cái đang chọn —
-          không bao giờ nói được cho cái không ai chọn được. Nên câu mô tả phải
-          đi theo từng lựa chọn, đúng như prototype của chị làm.
-          <b>Cái giá:</b> xếp dọc làm panel cao thêm, đẩy <i>Continue from Drafts</i> xuống dưới màn.
-          Nếu chị thích ba thẻ ngang như bản của chị thì mình đổi — <b>xin chị cho ý</b>.
+          Câu mô tả <b>đi theo từng thẻ</b> chứ không đặt chung dưới nhóm — vì lựa
+          chọn thứ ba <i>Import Completed Quote</i> bị khoá, mà một câu dùng chung
+          thì chỉ mô tả được cái đang chọn, không bao giờ nói được cho cái không ai
+          chọn được. Đúng như prototype của chị làm.
+          <b>Xếp ngang cũng gọn hơn:</b> khối Action cao 151px thay vì 230px, kéo
+          <i>Continue from Drafts</i> lên gần vừa trong một màn.
         </p>
       </div>
     </li>
@@ -271,11 +291,11 @@
         <div class="find-h"><strong>Template</strong><span class="tag ask">Cần chị quyết</span></div>
         <div class="sides">
           <div class="side"><em>Của chị</em><code>Template *</code> — bắt buộc, điền sẵn <i>Quoting - New Customer</i>.</div>
-          <div class="side"><em>Của mình</em>Không bắt buộc. Để trống = dùng template mặc định cấu hình trong Inventory Management.</div>
+          <div class="side"><em>Của em</em>Không bắt buộc. Để trống = dùng template mặc định cấu hình trong Inventory Management.</div>
         </div>
         <p class="why">
           Hai cách đều chạy được, nhưng chỉ một cách đúng: <b>để trống có được không?</b>
-          Nếu bắt buộc thì mình thêm dấu <code>*</code> và chặn Next; nếu không thì
+          Nếu bắt buộc thì em thêm dấu <code>*</code> và chặn Next; nếu không thì
           giữ nguyên và bỏ chữ “hoặc bạn không thể tiếp tục” trong câu gợi ý.
         </p>
       </div>
@@ -286,10 +306,10 @@
         <div class="find-h"><strong>Continue from Drafts</strong><span class="tag ok">Đã giống</span></div>
         <div class="sides">
           <div class="side"><em>Của chị</em>Luôn hiện, 2 dòng mẫu. Bảy cột, có <i>Quote Focus</i>.</div>
-          <div class="side"><em>Của mình</em>Luôn hiện (sửa 28/10), đúng bảy cột đó. Chưa có draft thì bảng nói draft sinh ra từ đâu.</div>
+          <div class="side"><em>Của em</em>Luôn hiện (sửa 28/10), đúng bảy cột đó. Chưa có draft thì bảng nói draft sinh ra từ đâu.</div>
         </div>
         <p class="why">
-          Mình <b>không</b> gieo draft mẫu: draft là dấu vết công việc ai đó vừa làm
+          Em <b>không</b> gieo draft mẫu: draft là dấu vết công việc ai đó vừa làm
           trong phiên này; dòng giả sẽ cho bấm Continue vào một BoM chưa từng được cấu hình.
         </p>
       </div>
@@ -300,7 +320,7 @@
         <div class="find-h"><strong>Attachments</strong><span class="tag diff">Làm khác</span></div>
         <div class="sides">
           <div class="side"><em>Của chị</em>6 file, mỗi dòng một nút tải.</div>
-          <div class="side"><em>Của mình</em>3 file, mỗi dòng <b>xem</b> và <b>tải</b>; file không phải .xlsx ghi rõ <i>not .xlsx</i>.</div>
+          <div class="side"><em>Của em</em>3 file, mỗi dòng <b>xem</b> và <b>tải</b>; file không phải .xlsx ghi rõ <i>not .xlsx</i>.</div>
         </div>
         <p class="why">
           Nút “xem” là theo yêu cầu 22/10 của chị. Câu hỏi còn lại chỉ là số lượng
@@ -314,7 +334,7 @@
         <div class="find-h"><strong>Select Column Detection</strong><span class="tag ask">Cần chị quyết</span></div>
         <div class="sides">
           <div class="side"><em>Của chị</em>Không có.</div>
-          <div class="side"><em>Của mình</em>Có — lấy từ Testing Guideline.</div>
+          <div class="side"><em>Của em</em>Có — lấy từ Testing Guideline.</div>
         </div>
         <p class="why">
           Trường này quyết định cột nào nhận dạng một dòng BoM là duy nhất; chọn sai
@@ -327,9 +347,9 @@
       <div>
         <div class="find-h"><strong>Ba điểm nhỏ</strong><span class="tag ask">Cần chị quyết</span></div>
         <p class="why" style="border-color: var(--ink-faint)">
-          <b>Build Qty</b> và <b>Attrition Set</b> bên chị có dấu <code>*</code> bắt buộc, bên mình
+          <b>Build Qty</b> và <b>Attrition Set</b> bên chị có dấu <code>*</code> bắt buộc, bên em
           mặc định 1 và không đánh dấu. · <b>Revision</b> bên chị là số (<code>1</code>),
-          bên mình là chữ (<code>A</code>) — cái nào đúng với hệ thống thật?
+          bên em là chữ (<code>A</code>) — cái nào đúng với hệ thống thật?
           · Bên chị ô <b>Description</b> ở Assembly Details điền sẵn trùng mã assembly.
         </p>
       </div>
@@ -348,8 +368,8 @@
       <figcaption><b>Prototype 16/10</b></figcaption>
     </figure>
     <figure>
-      <img src="{{IMG:ours-step2}}" alt="Step 2 bản mình">
-      <figcaption><b>Bản mình</b></figcaption>
+      <img src="{{IMG:ours-step2}}" alt="Step 2 bản em">
+      <figcaption><b>Bản em</b></figcaption>
     </figure>
   </div>
 
@@ -360,12 +380,12 @@
         <div class="find-h"><strong>Thanh Quote Setup</strong><span class="tag diff">Làm khác — theo lời chị</span></div>
         <div class="sides">
           <div class="side"><em>Của chị</em>Chín ô <b>sửa được</b> ngay tại step 2, đều có dấu <code>*</code>.</div>
-          <div class="side"><em>Của mình</em>Chín ô <b>chỉ đọc</b>, có ổ khoá.</div>
+          <div class="side"><em>Của em</em>Chín ô <b>chỉ đọc</b>, có ổ khoá.</div>
         </div>
         <p class="why">
           Đây là chỗ prototype 16/10 và lời chị dặn ngày 22/10 ngược nhau:
           <i>“Các trường là chốt rùi, và chỉ đc sửa ở step 3.”</i>
-          Mình theo lời dặn 22/10 vì nó đến sau. <b>Nếu chị muốn theo prototype thì mình mở lại.</b>
+          Em theo lời dặn 22/10 vì nó đến sau. <b>Nếu chị muốn theo prototype thì em mở lại.</b>
         </p>
       </div>
     </li>
@@ -374,7 +394,7 @@
       <div>
         <div class="find-h"><strong>Tên nhóm và icon</strong><span class="tag ok">Đã giống</span></div>
         <p class="why">
-          Thẻ của chị có tiêu đề <i>Quote Setup</i> kèm icon. Bản mình trước đây
+          Thẻ của chị có tiêu đề <i>Quote Setup</i> kèm icon. Bản em trước đây
           chỉ mở đầu bằng mã assembly — <b>không có tên nhóm</b> — ở cả step 2, 3, 4
           và màn kết quả; step 1 thì có. Sửa 28/10: cùng một thanh tiêu đề,
           cùng kiểu icon, đúng tên của chị. Màn kết quả vẫn giữ tên riêng
@@ -385,7 +405,7 @@
     <li>
       <span class="n">7</span>
       <div>
-        <div class="find-h"><strong>Cảnh báo “5 parts are not in Part Master”</strong><span class="tag ok">Mình thêm</span></div>
+        <div class="find-h"><strong>Cảnh báo “5 parts are not in Part Master”</strong><span class="tag ok">Em thêm</span></div>
         <p class="why">
           Lưới hai bên đều tô đỏ những dòng chưa có trong hệ thống, nhưng chỉ tô màu thì
           người đọc phải tự đếm. Câu này nói luôn số lượng và hậu quả: chưa tạo thì
@@ -398,11 +418,11 @@
       <div>
         <div class="find-h"><strong>Cột</strong><span class="tag ask">Cần chị quyết</span></div>
         <p class="why" style="border-color: var(--ink-faint)">
-          Bản mình có thêm <b>LEVEL</b> và <b>TOTAL QTY</b> (theo guideline), bản chị không có.
+          Bản em có thêm <b>LEVEL</b> và <b>TOTAL QTY</b> (theo guideline), bản chị không có.
           · Vài tiêu đề bị cắt (<i>NUM…</i>, <i>REVISI…</i>, <i>QUANTI…</i>): cột đo theo
           <b>nội dung</b> chứ không theo tên cột, để cả lưới vừa màn mà không phải cuộn ngang —
           nới tiêu đề ra thì cụm <b>MFG | MPN</b>, thứ mà bước này sinh ra để kiểm, bị bóp lại.
-          Nếu chị thấy khó đọc thì mình đổi.
+          Nếu chị thấy khó đọc thì em đổi.
         </p>
       </div>
     </li>
@@ -413,7 +433,7 @@
 <section class="card">
   <h2>3 · Quote result (view mode)</h2>
   <p class="lead">
-    Màn này mình mới dựng hôm 28/10. Lưới 14 cột, tên và thứ tự lấy đúng của chị,
+    Màn này em mới dựng hôm 28/10. Lưới 14 cột, tên và thứ tự lấy đúng của chị,
     kể cả <i>Ext. Price</i>. Bố cục đầu màn cũng đã theo mockup: thẻ Cost Estimation
     nằm cạnh thanh thiết lập, nút đặt ở góc trên bên trái. Khác nhau còn lại nằm ở
     các nút quanh lưới.
@@ -425,8 +445,8 @@
       <figcaption><b>Prototype 16/10</b></figcaption>
     </figure>
     <figure>
-      <img src="{{IMG:ours-result}}" alt="Quotation Result bản mình">
-      <figcaption><b>Bản mình</b></figcaption>
+      <img src="{{IMG:ours-result}}" alt="Quotation Result bản em">
+      <figcaption><b>Bản em</b></figcaption>
     </figure>
   </div>
 
@@ -437,7 +457,7 @@
         <div class="find-h"><strong>Bộ chọn Quotation Version</strong><span class="tag ask">Cần chị quyết</span></div>
         <div class="sides">
           <div class="side"><em>Của chị</em>Dropdown ngay trên màn: <i>Version 3 · 10/12/2026 · Qty 100 · $1,722.45</i>.</div>
-          <div class="side"><em>Của mình</em>Không có. Mỗi phiên bản là một dòng trong <b>bảng Result</b>, bấm vào mở ra màn này.</div>
+          <div class="side"><em>Của em</em>Không có. Mỗi phiên bản là một dòng trong <b>bảng Result</b>, bấm vào mở ra màn này.</div>
         </div>
         <p class="why">
           Một bảng cho thấy đủ các phiên bản cạnh nhau, so sánh được và xuất Excel được.
@@ -452,7 +472,7 @@
         <div class="find-h"><strong>Add Package</strong><span class="tag ask">Cần chị quyết</span></div>
         <div class="sides">
           <div class="side"><em>Của chị</em>Nằm cạnh <i>Pricing Detail</i>, ngay trên màn xem kết quả.</div>
-          <div class="side"><em>Của mình</em>Không đặt ở đây. Nút Add Package của mình ở <b>step 4</b>, nơi báo giá còn mở.</div>
+          <div class="side"><em>Của em</em>Không đặt ở đây. Nút Add Package của em ở <b>step 4</b>, nơi báo giá còn mở.</div>
         </div>
         <p class="why">
           Thêm một linh kiện đóng gói <b>làm đổi giá</b>, mà đây là phiên bản đã gửi đi rồi —
@@ -467,8 +487,8 @@
       <div>
         <div class="find-h"><strong>Pricing Detail</strong><span class="tag ask">Cần chị quyết</span></div>
         <p class="why">
-          Hai bên đều có nút. Trong prototype của chị bấm vào <b>chưa làm gì</b>, nên mình
-          chưa biết nó mở ra cái gì — bản mình báo “chưa dựng” thay vì im lặng.
+          Hai bên đều có nút. Trong prototype của chị bấm vào <b>chưa làm gì</b>, nên em
+          chưa biết nó mở ra cái gì — bản em báo “chưa dựng” thay vì im lặng.
           <b>Xin chị mô tả nội dung màn Pricing Detail.</b>
         </p>
       </div>
@@ -479,10 +499,10 @@
         <div class="find-h"><strong>Import / Export trên thanh công cụ</strong><span class="tag ask">Cần chị quyết</span></div>
         <div class="sides">
           <div class="side"><em>Của chị</em><b>Import</b> và <b>Export</b> cạnh nhau trên thanh lưới; <i>Export to Excel / PDF</i> ở góc trên.</div>
-          <div class="side"><em>Của mình</em><b>Import</b> trên thanh lưới; <i>Done · Export to Excel · Export to PDF</i> ở <b>góc trên bên trái</b> — sửa 28/10, trước đó nằm ở chân modal.</div>
+          <div class="side"><em>Của em</em><b>Import</b> trên thanh lưới; <i>Done · Export to Excel · Export to PDF</i> ở <b>góc trên bên trái</b> — sửa 28/10, trước đó nằm ở chân modal.</div>
         </div>
         <p class="why">
-          <b>Export to Excel</b> bên mình chạy thật. <b>Export to PDF</b> và <b>Import</b> thì chưa —
+          <b>Export to Excel</b> bên em chạy thật. <b>Export to PDF</b> và <b>Import</b> thì chưa —
           Import thuộc luồng <i>Import Completed Quote</i>, và cả hai đang chờ cùng một câu trả lời:
           <b>một báo giá đã hoàn tất bên Voyager sang đây dưới dạng gì, và bản PDF cần trông ra sao?</b>
         </p>
@@ -494,8 +514,8 @@
         <div class="find-h"><strong>Hai điểm nữa</strong><span class="tag diff">Làm khác</span></div>
         <p class="why" style="border-color: var(--ink-faint)">
           <b>Thanh thiết lập ở chế độ xem:</b> bên chị các ô vẫn trông như sửa được (viền trắng, dấu <code>*</code>);
-          bên mình để chỉ-đọc, vì một phiên bản đã lưu là chuyện đã xảy ra.
-          · <b>Chú giải màu:</b> lưới dùng ba màu, bản mình hôm nay sửa lại cho đủ ba dòng chú giải
+          bên em để chỉ-đọc, vì một phiên bản đã lưu là chuyện đã xảy ra.
+          · <b>Chú giải màu:</b> lưới dùng ba màu, bản em hôm nay sửa lại cho đủ ba dòng chú giải
           (xanh = supplier cung đủ, vàng = thiếu hàng, hồng = không có nhà cung cấp nào).
           · <b>Thẻ Cost Estimation</b> giờ có tiêu đề nhóm kèm icon như thẻ của chị, và nằm
           <b>cạnh</b> thanh thiết lập, đúng như mockup của chị —
@@ -515,12 +535,12 @@
 <section class="card">
   <h2>4 · Step 3 và step 4 — không so sánh được</h2>
   <p>
-    Mình mở prototype của chị và bấm Next qua step 3 rồi step 4: nội dung vẫn là
+    Em mở prototype của chị và bấm Next qua step 3 rồi step 4: nội dung vẫn là
     lưới Review BoM của step 2. Tức là prototype dựng <b>step 1, step 2 và màn xem kết quả</b>,
     còn hai bước giữa thì chưa.
   </p>
   <p>
-    Bản mình có đủ: <b>step 3 Quoting</b> (Get Prices, chọn nhà cung cấp, AML dòng con,
+    Bản em có đủ: <b>step 3 Quoting</b> (Get Prices, chọn nhà cung cấp, AML dòng con,
     Preferred Suppliers, Consigned trừ trước khi mua) và <b>step 4 Summary</b>
     (Cost Estimation 2×2, Add Package, Generate Quotation). Hai bước này dựng theo
     Testing Guideline chứ không theo mockup — <b>khi nào chị rảnh, xin chị xem lại giúp.</b>
@@ -542,7 +562,6 @@
       <tr><td>7</td><td><b>Pricing Detail</b> mở ra cái gì?</td><td>Result · điểm 10</td></tr>
       <tr><td>8</td><td><b>Export to PDF</b> cần trông ra sao — đã có mẫu chưa?</td><td>Result · điểm 11</td></tr>
       <tr><td>9</td><td><b>Import Completed Quote</b> — một báo giá đã hoàn tất bên Voyager sang đây dưới dạng gì?</td><td>Step 1 · Result</td></tr>
-      <tr><td>10</td><td>Ba thẻ <b>Select Action</b> nằm ngang như mockup, hay xếp dọc kèm câu giải thích như bản mình?</td><td>Step 1 · điểm 1</td></tr>
     </tbody>
   </table>
 </section>
@@ -556,6 +575,80 @@
 
 <div id="zoom" role="dialog" aria-label="Ảnh phóng to"><img alt=""><p></p></div>
 <script>
+  /* The boot rocket, running. The five stops are the five boot stages the app
+     actually waits on — session, menu, permissions, preferences, workspace —
+     and their x positions are the ones the component uses. Nothing here
+     reaches into the drawing beyond the ship's own transform and the planet it
+     is heading for, so the illustration cannot be bent out of shape by it. */
+  (function () {
+    var svg = document.querySelector('.rocket svg');
+    var btn = document.getElementById('rocket-play');
+    var out = document.getElementById('rocket-stage');
+    if (!svg || !btn || !out) return;
+    var ship = svg.querySelector('[data-r="ship"]');
+    var dest = svg.querySelector('[data-r="nd"]');
+    var badge = svg.querySelector('[data-r="bc"]');
+    if (!ship) { btn.style.display = 'none'; return; }
+
+    var STOPS = [38, 59, 73, 87, 94];
+    var LABELS = ['Signing you in', 'Loading your menu', 'Checking your permissions',
+                  'Restoring your settings', 'Opening your workspace'];
+    var REST = 'Năm trạm, mỗi trạm là một mốc khởi động thật';
+    var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var running = false;
+
+    function place(x) { ship.setAttribute('transform', 'translate(' + x + ' 48) rotate(90) scale(0.42)'); }
+    function land(on) {
+      if (dest) dest.setAttribute('transform',
+        'translate(122 48) scale(' + (on ? 1.1 : 1) + ') translate(-122 -48)');
+      if (badge) badge.setAttribute('opacity', on ? '1' : '0');
+    }
+    function say(i, done) {
+      out.innerHTML = done
+        ? '<b>' + LABELS[LABELS.length - 1] + '</b><br>Xong — vào thẳng màn làm việc'
+        : '<b>' + LABELS[i] + '</b><br>Trạm ' + (i + 1) + ' trên 5';
+    }
+
+    function tween(from, to, ms, then) {
+      if (still) { place(to); setTimeout(then, 420); return; }
+      var t0 = performance.now();
+      (function frame(now) {
+        var k = Math.min(1, (now - t0) / ms);
+        /* Ease in and out, so each hop leaves and arrives rather than jerking. */
+        var e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+        place(from + (to - from) * e);
+        if (k < 1) requestAnimationFrame(frame); else then();
+      })(t0);
+    }
+
+    function run() {
+      if (running) return;
+      running = true;
+      btn.disabled = true;
+      land(false);
+      place(STOPS[0]);
+      say(0);
+      var i = 0;
+      (function hop() {
+        if (i >= STOPS.length - 1) {
+          land(true);
+          say(0, true);
+          btn.disabled = false;
+          btn.innerHTML = '↻&nbsp; Chạy lại';
+          running = false;
+          return;
+        }
+        var from = STOPS[i];
+        i += 1;
+        say(i);
+        tween(from, STOPS[i], 620, function () { setTimeout(hop, 260); });
+      })();
+    }
+
+    btn.addEventListener('click', run);
+    out.textContent = REST;
+  })();
+
   (function () {
     var box = document.getElementById('zoom');
     var img = box.querySelector('img');

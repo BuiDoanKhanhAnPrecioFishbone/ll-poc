@@ -187,6 +187,32 @@
    The hint is indented to the LABEL'S TEXT, not to the box: a sentence that
    starts under the circle reads as a sentence about the group. */
 .vy-radio-row { min-width: 0; }
+
+/* ---- Three cards across, for a group that is the screen's first question --
+   Her 16 Oct prototype lays Select Action out this way and An asked for it:
+   `auto-fit` so a narrow dialog returns them to a column rather than squeezing
+   three sentences into 150px each. The selected card takes the brand tint the
+   rest of this app uses for "this is the one", and `data-checked` comes from
+   React rather than `:has()`, which nothing else here relies on yet. */
+.vy-radios--tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--vy-radio-tile-min), 1fr));
+  gap: var(--vy-space-5);
+}
+.vy-radios--tiles .vy-radio-row {
+  padding: var(--vy-space-5);
+  background: var(--vy-surface);
+  border: 1px solid var(--vy-border);
+  border-radius: var(--vy-shape-md);
+  cursor: pointer;
+}
+.vy-radios--tiles .vy-radio-row[data-checked] {
+  background: var(--vy-brand-subtle);
+  border-color: var(--vy-brand-boundary-strong);
+}
+/* Not selectable, so not a target: the cursor says so before the click does. */
+.vy-radios--tiles .vy-radio-row[data-disabled] { cursor: not-allowed; }
+.vy-radios--tiles .vy-radio-hint { max-width: none; }
 .vy-radio-hint {
   font-size: var(--vy-text-xs); font-style: italic; color: var(--vy-on-surface-subtle);
   margin: var(--vy-space-1) 0 0 calc(var(--vy-space-4) + 1.25rem); max-width: 56ch;

@@ -505,6 +505,9 @@
   /* The same field in the narrow reference panel, where two of them share the
      width: enough for "MATERIAL PACKAGE TYPE", the longest label there. */
   --vy-quote-ref-field-min: 150px;
+  /* One Action card: its label on one line and its sentence on no more than
+     three. Below this the three drop to a column, which is the old layout. */
+  --vy-radio-tile-min:    230px;
   --vy-cost-col-min:      170px; /* one figure in the cost summary */
   --vy-cost-table-min:    340px; /* two money columns and their headings */
   /* How much the Quotation Result's setup strip wants before the cost card

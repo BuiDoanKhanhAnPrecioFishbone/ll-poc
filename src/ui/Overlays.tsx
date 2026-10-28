@@ -334,19 +334,37 @@ export type RadioOption = {
   disabled?: boolean;
 };
 
-export function RadioGroup({ options, value, onChange, label }: {
+export function RadioGroup({ options, value, onChange, label, tiles }: {
   options: readonly RadioOption[]; value: string;
   onChange: (v: string) => void; label: string;
+  /**
+   * One card per option, side by side, instead of a list down the page.
+   *
+   * FOR A GROUP THAT IS THE SCREEN'S FIRST QUESTION. Run Quotation's Action
+   * decides what everything below it means, there are three of them, and each
+   * carries a sentence — which is a lot of page to spend on a list. The
+   * customer's 16 Oct prototype lays it out as three cards across and An asked
+   * for the same. Everywhere else a radio list is still a list.
+   */
+  tiles?: boolean;
 }) {
   const name = useId();
   return (
-    <div role="radiogroup" aria-label={label} className="vy-radios">
+    <div role="radiogroup" aria-label={label}
+         className={tiles ? 'vy-radios vy-radios--tiles' : 'vy-radios'}>
       {options.map(o => (
         /* THE HINT IS A SIBLING OF THE LABEL, NOT INSIDE IT. Inside, it joins
            the radio's accessible NAME, and a screen reader announces the whole
            paragraph as the name of the option; `aria-describedby` is what a
            description is for, and it is read after the name rather than as it. */
-        <div className="vy-radio-row" key={o.value}>
+        <div className="vy-radio-row" key={o.value}
+             data-checked={tiles && value === o.value || undefined}
+             data-disabled={tiles && o.disabled || undefined}
+             /* The whole card answers the click, as a card should. The radio
+                inside still carries the keyboard and the accessible name, so
+                this adds a target rather than replacing one; selecting the
+                already-selected value is a no-op. */
+             onClick={tiles && !o.disabled ? () => onChange(o.value) : undefined}>
           <label className="vy-radio" data-disabled={o.disabled || undefined}>
             <input type="radio" className="k-radio k-radio-lg"
                    name={name} value={o.value} disabled={o.disabled}
