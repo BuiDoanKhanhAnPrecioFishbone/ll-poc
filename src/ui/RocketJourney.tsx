@@ -32,8 +32,20 @@ import { useEffect, useId, useRef } from 'react';
  * ---------------------------------------------------------------------------
  */
 
-/** The flight axis, in viewBox units: the five stations, then the landing. */
-const STATIONS = [38, 59, 73, 87, 94] as const;
+/**
+ * The flight axis, in viewBox units: the five stations, then the landing.
+ *
+ * THE LANDING WAS MISSING UNTIL 28 OCT, and this comment named it the whole
+ * time. The ship's position was `STATIONS[min(step, 4)]`, so at step 5 — every
+ * stage done — it stayed at the last station while the final leg of the route
+ * lit up behind it and the planet it was pointing at never got nearer. An saw
+ * it on the specimen: "hình như tên lửa thiếu đáp hả?". 108 is where the route
+ * ends and the planet's ring begins.
+ */
+const STATIONS = [38, 59, 73, 87, 94, 108] as const;
+/** Every stage done: the ship is at the planet, not between stations. */
+const LANDED = STATIONS.length - 1;
+const at = (s: number) => STATIONS[Math.min(Math.max(s, 0), LANDED)];
 
 /* The rocket's own geometry, read off the art rather than guessed, because the
    flame length below is computed from it. The ship group is drawn at scale
@@ -123,7 +135,7 @@ export function RocketJourney({ step = 0, state = 'loading' }: {
       /* One loop length for all three, so they never drift apart on screen. */
       const loop = 1400;
       const hover = 2 * (0.5 - 0.5 * Math.cos((2 * Math.PI * (t % loop)) / loop));
-      const x = STATIONS[Math.min(step, 4)] + hover;
+      const x = at(step) + hover;
       ship.current?.setAttribute(
         'transform', `translate(${x.toFixed(2)} 48) rotate(90) scale(${SHIP_SCALE})`);
 
@@ -148,13 +160,26 @@ export function RocketJourney({ step = 0, state = 'loading' }: {
        is no CSS animation here to cap. */
     if (reduce.matches) { draw(0); return; }
 
+    /* ARRIVED IS A POSE, NOT A LOOP. Hovering at the planet would say the ship
+       is still flying, and the flame would say the engine is still burning —
+       both after the thing being waited for has finished. It parks: at the
+       landing, engine out, eyes open. Nothing is scheduled, for the same
+       reason reduce-motion schedules nothing. */
+    if (step >= LANDED) {
+      ship.current?.setAttribute(
+        'transform', `translate(${STATIONS[LANDED]} 48) rotate(90) scale(${SHIP_SCALE})`);
+      flame.current?.setAttribute('transform', 'translate(0 22) scale(1 0) translate(0 -22)');
+      eyes.current?.setAttribute('transform', 'translate(0 -5.6) scale(1 1) translate(0 5.6)');
+      return;
+    }
+
     const tick = (t: number) => { draw(t); frame = requestAnimationFrame(tick); };
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
   }, [step, state]);
 
   /* The error pose does not hover, so one value covers it. */
-  const errFit = flameFit(STATIONS[Math.min(step, 4)]);
+  const errFit = flameFit(at(step));
   const star = 'M0 -3.2 Q0 0 3.2 0 Q0 0 0 3.2 Q0 0 -3.2 0 Q0 0 0 -3.2Z';
   const dot = { fill: 'none', strokeWidth: 2.4, strokeLinecap: 'round' as const,
                 strokeDasharray: '0.1 6.9' };
@@ -198,12 +223,12 @@ export function RocketJourney({ step = 0, state = 'loading' }: {
       <path d="M94 48 L108 48" {...seg} opacity={step >= 5 ? 1 : 0} />
 
       <g ref={ship}
-         transform={`translate(${STATIONS[Math.min(step, 4)]} 48) rotate(90) scale(${SHIP_SCALE})`}>
+         transform={`translate(${at(step)} 48) rotate(90) scale(${SHIP_SCALE})`}>
         {/* The resting pose carries the cap too. Left at `scale(1 1)` the flame
             painted at full length for one frame before the first animation
             tick trimmed it — a flicker through the planet on every mount. */}
         <g ref={flame} opacity={state === 'error' ? 0 : 1}
-           transform={`translate(0 22) scale(1 ${flameFit(STATIONS[Math.min(step, 4)]).toFixed(3)}) translate(0 -22)`}>
+           transform={`translate(0 22) scale(1 ${(step >= LANDED ? 0 : flameFit(at(step))).toFixed(3)}) translate(0 -22)`}>
           <path d="M-5.5 22 C-8 33 -3 42 0 53 C3 42 8 33 5.5 22 Z" fill="var(--vy-blue-300, #7f9ce1)" />
           <path d="M-3.4 22 C-4 29 -1.5 36 0 42 C1.5 36 4 29 3.4 22 Z" fill="var(--vy-blue-100, #dae2f3)" />
           {/* White because it is the hottest part of a flame, not because it is

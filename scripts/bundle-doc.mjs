@@ -29,10 +29,19 @@ const ROCKET = process.env.ROCKET
 let html = fs.readFileSync(src, 'utf8');
 const missing = [];
 
-html = html.replace(/\{\{ROCKET\}\}/g, () => {
+/* `{{ROCKET}}` once, `{{ROCKET:name}}` for a second copy on the same page —
+   with its ids suffixed, because two copies of one drawing means two elements
+   claiming `id="vy-rocket-clip-h-light"` and a clip that silently resolves to
+   whichever came first. */
+html = html.replace(/\{\{ROCKET(?::([\w-]+))?\}\}/g, (_, suffix) => {
   if (!fs.existsSync(ROCKET)) { missing.push(ROCKET); return ''; }
   /* The XML declaration, if one is ever added, cannot sit inside a body. */
-  return fs.readFileSync(ROCKET, 'utf8').replace(/^<\?xml[^>]*\?>\s*/, '').trim();
+  let svg = fs.readFileSync(ROCKET, 'utf8').replace(/^<\?xml[^>]*\?>\s*/, '').trim();
+  if (suffix) {
+    svg = svg.replace(/id="([^"]+)"/g, (_m, id) => `id="${id}-${suffix}"`)
+             .replace(/url\(#([^)]+)\)/g, (_m, id) => `url(#${id}-${suffix})`);
+  }
+  return svg;
 });
 
 html = html.replace(/\{\{IMG:([\w-]+)\}\}/g, (_, name) => {

@@ -116,6 +116,15 @@ const OPEN_WIZARD = `
   await new Promise(r => setTimeout(r, 600));
 `;
 
+/* The loading screens, for the "what you see while you wait" section of the
+   document. Three of them live for well under a second by design, so these
+   jobs skip the readiness wait and photograph the page while it is still
+   coming up — `wait` is the whole exposure. */
+const LOADING_JOBS = [
+  { name: 'load-record', route: REC, wait: 260, raw: true },
+  { name: 'load-grid', route: '/sales-management/quotation', wait: 260, raw: true },
+];
+
 const JOBS = [
   {
     name: 'her-step1', route: HER,
@@ -177,6 +186,29 @@ const JOBS = [
     marks: `[[6, document.querySelector('.vy-quote-context')]]`,
   },
   {
+    /* The busy overlay, caught during the one wait in this build that is real:
+       Get Prices runs a timer that stands in for a marketplace request. */
+    name: 'load-busy', route: REC, prep: OPEN_WIZARD + FILL_STEP1 + `
+      __byText('button', /^Next$/).click();
+      await __wait(() => __byText('button', /Get Prices/));
+      await new Promise(r => setTimeout(r, 400));
+      __byText('button', /Get Prices/).click();
+      await new Promise(r => setTimeout(r, 700));`,
+    marks: `[]`,
+  },
+  {
+    /* The error state, by breaking a panel on purpose — the design system
+       carries a specimen that throws during render, and the boundary that
+       wraps every route catches it. */
+    name: 'load-error', route: '/design-system', prep: `
+      (await __wait(() => __byText('button', /^Break this panel$/))).click();
+      await __wait(() => __byText('h2, h3, strong, p', /went wrong|try again|Reload/i));
+      await new Promise(r => setTimeout(r, 500));
+      document.querySelector('.vy-ds-errorstate').scrollIntoView({ block: 'center' });
+      await new Promise(r => setTimeout(r, 300));`,
+    marks: `[]`,
+  },
+  {
     name: 'ours-result', route: REC,
     prep: `
       /* Kendo's TabStrip is a list of .k-link spans, not buttons. */
@@ -206,7 +238,8 @@ async function main() {
      one screen changed, instead of all seven — and, more to the point, without
      needing her prototype on disk for the jobs it is not taking. */
   const only = process.argv.slice(2);
-  const jobs = only.length ? JOBS.filter(j => only.includes(j.name)) : JOBS;
+  const all = [...JOBS, ...LOADING_JOBS];
+  const jobs = only.length ? all.filter(j => only.includes(j.name)) : JOBS;
   if (!jobs.length) { console.error(`no job named ${only.join(', ')}`); process.exit(1); }
 
   const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'vy-cmp-'));
@@ -241,6 +274,16 @@ async function main() {
   let bad = 0;
   for (const job of jobs) {
     await send('Page.navigate', { url: BASE + job.route });
+    /* A raw job is photographing the page BEFORE it is ready, which is the
+       whole point of it: the record skeleton lives 700ms. */
+    if (job.raw) {
+      await sleep(job.wait ?? 300);
+      const shot0 = await send('Page.captureScreenshot', { format: 'jpeg', quality: 86 });
+      const file0 = path.join(OUT, `${job.name}.jpg`);
+      fs.writeFileSync(file0, Buffer.from(shot0.result.data, 'base64'));
+      console.log(`  ${job.name} -> ${file0} (${(fs.statSync(file0).size / 1024).toFixed(0)} KB)`);
+      continue;
+    }
     await sleep(1400);
     await run(HELPERS);
     /* Vite's first transform of a cold route outruns a fixed sleep, and a shot

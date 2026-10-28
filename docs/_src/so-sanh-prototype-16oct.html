@@ -48,21 +48,33 @@
     display: flex; gap: 28px; align-items: center; flex-wrap: wrap;
     padding: 36px 0 28px;
   }
-  .rocket-player { inline-size: 196px; flex: none; }
-  header.top .rocket { inline-size: 196px; }
+  header.top .rocket { inline-size: 196px; flex: none; }
+
+  /* ---- the boot screen, at the size it really is ------------------------- */
+  .boot-demo { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+               gap: 22px; align-items: center; margin: 4px 0 8px; }
+  @media (max-width: 860px) { .boot-demo { grid-template-columns: 1fr; } }
+  .boot-screen {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 20px; min-block-size: 320px; padding: 24px;
+    background: #fff; border: 1px solid var(--line); border-radius: 12px;
+  }
+  /* 288px is the floor the app itself sets for this drawing: below it the
+     rocket's eyes fall under three device pixels. */
+  .boot-art { inline-size: 300px; flex: none; }
+  .boot-art svg { width: 100%; height: auto; display: block; }
+  .boot-label { margin: 0; font-size: 13px; color: #5b6676; min-block-size: 1.4em; }
+  .boot-side { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+  .boot-note { margin: 0; font-size: 14px; color: var(--ink-soft); max-width: 48ch; }
+  .boot-note b { color: var(--ink); }
   .rocket-play {
-    display: block; inline-size: 100%; margin-block-start: 6px;
-    font: 600 13px/1 var(--sans); color: var(--ink);
+    font: 600 14px/1 var(--sans); color: var(--ink);
     background: var(--paper); border: 1px solid var(--line);
     border-radius: 999px; padding: 8px 10px; cursor: pointer;
   }
   .rocket-play:hover { border-color: var(--accent); color: var(--accent); }
   .rocket-play:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .rocket-stage {
-    margin: 6px 0 0; font-size: 11.5px; line-height: 1.35; text-align: center;
-    color: var(--ink-faint); min-block-size: 2.7em;
-  }
-  .rocket-stage b { color: var(--ink); font-weight: 600; }
+
   header.top .rocket svg { width: 100%; height: auto; display: block; }
   h1 { font-size: 30px; line-height: 1.2; margin: 0 0 6px; letter-spacing: -0.01em; text-wrap: balance; }
   .sub { color: var(--ink-soft); margin: 0; max-width: 62ch; }
@@ -209,11 +221,7 @@
 <div class="page">
 
 <header class="top">
-  <div class="rocket-player">
-    <div class="rocket">{{ROCKET}}</div>
-    <button type="button" class="rocket-play" id="rocket-play">▶&nbsp; Chạy thử</button>
-    <p class="rocket-stage" id="rocket-stage" aria-live="polite">Năm trạm, mỗi trạm là một mốc khởi động thật</p>
-  </div>
+  <div class="rocket">{{ROCKET}}</div>
   <div>
     <h1>Prototype 16/10 và bản em dựng</h1>
     <p class="sub">
@@ -548,8 +556,78 @@
 </section>
 
 <!-- ======================= QUESTIONS ======================= -->
+<!-- ======================= LOADING ======================= -->
 <section class="card">
-  <h2>5 · Gom lại — những câu cần chị trả lời</h2>
+  <h2>5 · Những màn chờ — khởi động, skeleton và lỗi</h2>
+  <p class="lead">
+    Phần này <b>không phải so sánh</b>: prototype 16/10 không dựng trạng thái chờ,
+    nên đây là phần bản em thêm. Nguyên tắc: <b>ba trạng thái</b> — đang tải,
+    trống, và lỗi — chứ không phải hai.
+  </p>
+
+  <h3>Màn khởi động — bấm Chạy thử</h3>
+  <div class="boot-demo">
+    <div class="boot-screen">
+      <div class="boot-art">{{ROCKET:boot}}</div>
+      <p class="boot-label" id="boot-label">Loading Voyager IQ</p>
+    </div>
+    <div class="boot-side">
+      <button type="button" class="rocket-play" id="boot-play">▶&nbsp; Chạy thử</button>
+      <p class="boot-note">
+        Đây là màn thật, đúng kích cỡ: nền trắng, hình ở giữa, một dòng chữ bên dưới.
+        <b>Năm trạm là năm mốc khởi động thật</b> — phiên đăng nhập, menu, quyền,
+        thiết lập cá nhân, rồi mở workspace — chứ không phải năm cái chấm cho vui.
+        Mỗi trạm sáng lên khi mốc đó xong, và khi xong hết thì <b>tên lửa đáp xuống
+        hành tinh và tắt động cơ</b>.
+      </p>
+      <p class="boot-note">
+        Máy nào bật <i>Reduce Motion</i> thì nó đứng yên ở tư thế đó, không chạy.
+        Bản PDF in ra tất nhiên chỉ có một khung hình.
+      </p>
+    </div>
+  </div>
+
+  <h3>Skeleton — chỗ nào chờ thì nói là đang chờ</h3>
+  <div class="pair">
+    <figure>
+      <img src="{{IMG:load-record}}" alt="Skeleton của màn hồ sơ">
+      <figcaption><b>Màn hồ sơ</b> — nhãn thật, chỉ giá trị là thanh xám</figcaption>
+    </figure>
+    <figure>
+      <img src="{{IMG:load-grid}}" alt="Skeleton của lưới">
+      <figcaption><b>Màn danh sách</b> — đúng số cột và bề rộng cột thật</figcaption>
+    </figure>
+  </div>
+  <p class="why">
+    Skeleton của em <b>không tô xám tất cả</b>. Nhãn, nhóm và thứ tự đã nằm sẵn trong
+    máy — chỉ tên khách hàng và ngày tháng là còn đang về. Tô xám cả nhãn là giấu đi
+    thứ mình đang có, và cướp mất điều duy nhất làm cho việc chờ dễ chịu: biết sắp
+    thấy cái gì. Nó cũng có nghĩa là <b>không có gì nhảy</b> khi dữ liệu về — nhãn đã
+    đứng đúng chỗ cuối cùng của nó rồi.
+  </p>
+
+  <h3>Đang chạy, và khi hỏng</h3>
+  <div class="pair">
+    <figure>
+      <img src="{{IMG:load-busy}}" alt="Lưới đang chờ giá">
+      <figcaption><b>Đang hỏi giá</b> — lưới mờ đi, nút khoá lại</figcaption>
+    </figure>
+    <figure>
+      <img src="{{IMG:load-error}}" alt="Trạng thái lỗi">
+      <figcaption><b>Lỗi</b> — trạng thái thứ ba</figcaption>
+    </figure>
+  </div>
+  <p class="why">
+    Nút <i>Get Prices</i> khoá lại trong lúc chạy và nói rõ <b>đang hỏi ai, bao nhiêu
+    dòng</b> — một lần bấm thứ hai là một lần tốn tiền thật với nhà cung cấp.
+    · Màn lỗi nói <b>cái gì còn nguyên</b> ("Nothing you entered has been lost") chứ
+    không in ra mã lỗi: người đọc cần biết mình có mất việc đang làm hay không, chứ
+    không cần biết tên cái exception.
+  </p>
+</section>
+
+<section class="card">
+  <h2>6 · Gom lại — những câu cần chị trả lời</h2>
   <table>
     <thead><tr><th style="width:34px">#</th><th>Câu hỏi</th><th style="width:150px">Ở đâu</th></tr></thead>
     <tbody>
@@ -581,19 +659,21 @@
      reaches into the drawing beyond the ship's own transform and the planet it
      is heading for, so the illustration cannot be bent out of shape by it. */
   (function () {
-    var svg = document.querySelector('.rocket svg');
-    var btn = document.getElementById('rocket-play');
-    var out = document.getElementById('rocket-stage');
+    var svg = document.querySelector('.boot-art svg');
+    var btn = document.getElementById('boot-play');
+    var out = document.getElementById('boot-label');
     if (!svg || !btn || !out) return;
     var ship = svg.querySelector('[data-r="ship"]');
     var dest = svg.querySelector('[data-r="nd"]');
     var badge = svg.querySelector('[data-r="bc"]');
     if (!ship) { btn.style.display = 'none'; return; }
 
-    var STOPS = [38, 59, 73, 87, 94];
+    /* The component's own stations, and its landing: the sixth stop is where
+       the route ends and the planet's ring begins. */
+    var STOPS = [38, 59, 73, 87, 94, 108];
     var LABELS = ['Signing you in', 'Loading your menu', 'Checking your permissions',
                   'Restoring your settings', 'Opening your workspace'];
-    var REST = 'Năm trạm, mỗi trạm là một mốc khởi động thật';
+    var REST = 'Loading Voyager IQ';
     var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var running = false;
 
@@ -603,10 +683,12 @@
         'translate(122 48) scale(' + (on ? 1.1 : 1) + ') translate(-122 -48)');
       if (badge) badge.setAttribute('opacity', on ? '1' : '0');
     }
-    function say(i, done) {
-      out.innerHTML = done
-        ? '<b>' + LABELS[LABELS.length - 1] + '</b><br>Xong — vào thẳng màn làm việc'
-        : '<b>' + LABELS[i] + '</b><br>Trạm ' + (i + 1) + ' trên 5';
+    /* The label is the app's own: one line, the stage being waited on. */
+    function say(i, done) { out.textContent = done ? 'Welcome back' : LABELS[i]; }
+    /* Landed: engine out, as the component parks it. */
+    function engine(on) {
+      var fl = svg.querySelector('[data-r="fl"]');
+      if (fl) fl.setAttribute('transform', 'translate(0 22) scale(1 ' + (on ? 1 : 0) + ') translate(0 -22)');
     }
 
     function tween(from, to, ms, then) {
@@ -626,12 +708,14 @@
       running = true;
       btn.disabled = true;
       land(false);
+      engine(true);
       place(STOPS[0]);
       say(0);
       var i = 0;
       (function hop() {
         if (i >= STOPS.length - 1) {
           land(true);
+          engine(false);
           say(0, true);
           btn.disabled = false;
           btn.innerHTML = '↻&nbsp; Chạy lại';
@@ -640,13 +724,15 @@
         }
         var from = STOPS[i];
         i += 1;
-        say(i);
+        /* The sixth hop is the landing, which has no stage name of its own. */
+        if (i < LABELS.length) say(i);
         tween(from, STOPS[i], 620, function () { setTimeout(hop, 260); });
       })();
     }
 
     btn.addEventListener('click', run);
     out.textContent = REST;
+    engine(true);
   })();
 
   (function () {
