@@ -67,6 +67,8 @@
   .boot-side { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
   .boot-note { margin: 0; font-size: 14px; color: var(--ink-soft); max-width: 48ch; }
   .boot-note b { color: var(--ink); }
+  .landing-fig { margin: 18px 0 4px; max-width: 560px; }
+  .landing-fig img { border-radius: 10px; }
   .rocket-play {
     font: 600 14px/1 var(--sans); color: var(--ink);
     background: var(--paper); border: 1px solid var(--line);
@@ -588,6 +590,15 @@
     </div>
   </div>
 
+  <figure class="landing-fig">
+    <img src="{{IMG:load-landing}}" alt="Khoảnh khắc tên lửa đáp xuống hành tinh">
+    <figcaption>
+      <b>Khoảnh khắc đáp</b> — chụp đúng lúc vòng xung đang lan ra: tên lửa quay đầu,
+      nhỏ lại vì giờ nó đứng trên một nơi ở xa, động cơ vừa tắt, hành tinh nảy một
+      nhịp, và khuôn mặt đổi thành <b>mặt cười</b>.
+    </figcaption>
+  </figure>
+
   <h3>Skeleton — chỗ nào chờ thì nói là đang chờ</h3>
   <div class="pair">
     <figure>
@@ -654,62 +665,110 @@
 
 <div id="zoom" role="dialog" aria-label="Ảnh phóng to"><img alt=""><p></p></div>
 <script>
-  /* The boot rocket, running. The five stops are the five boot stages the app
-     actually waits on — session, menu, permissions, preferences, workspace —
-     and their x positions are the ones the component uses. Nothing here
-     reaches into the drawing beyond the ship's own transform and the planet it
-     is heading for, so the illustration cannot be bent out of shape by it. */
+  /* The boot rocket, running — the same arrival the component draws, to the
+     same numbers: the five stops are the five real boot stages, and the sixth
+     is the landing. Lands at x 108 turned to 270° and scaled 0.3, the engine
+     flares and cuts, the planet bounces and rings, and the face smiles a
+     second after touchdown. */
   (function () {
     var svg = document.querySelector('.boot-art svg');
     var btn = document.getElementById('boot-play');
     var out = document.getElementById('boot-label');
     if (!svg || !btn || !out) return;
-    var ship = svg.querySelector('[data-r="ship"]');
-    var dest = svg.querySelector('[data-r="nd"]');
-    var badge = svg.querySelector('[data-r="bc"]');
+    var part = function (n) { return svg.querySelector('[data-r="' + n + '"]'); };
+    var ship = part('ship'), flame = part('fl'), origin = part('no'), dest = part('nd');
+    var ring = part('bc'), eyes = part('el'), smile = part('ed');
     if (!ship) { btn.style.display = 'none'; return; }
 
-    /* The component's own stations, and its landing. The sixth stop is 106
-       rather than the route's end at 108 because the ship turns round to land:
-       its nozzle then sits 9 units to the right of its origin, and the
-       planet's disc begins at 115. */
-    var STOPS = [38, 59, 73, 87, 94, 106];
+    var STOPS = [38, 59, 73, 87, 94, 108];
     var LABELS = ['Signing you in', 'Loading your menu', 'Checking your permissions',
                   'Restoring your settings', 'Opening your workspace'];
     var REST = 'Loading Voyager IQ';
+    var LAND_MS = 1100, ARRIVE_AT = 1000, PULSE_MS = 800, BOUNCE_MS = 500;
     var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var running = false;
 
-    /* Landing is a TURN: the rocket swings round so the engine faces the
-       planet and settles on its tail, which is also why the face ends up
-       looking back down the route. The component draws that pose; here the
-       last hop rotates into it. */
-    function place(x, rot) {
+    function bezier(x1, y1, x2, y2) {
+      var cx = 3 * x1, bx = 3 * (x2 - x1) - cx, ax = 1 - cx - bx;
+      var cy = 3 * y1, by = 3 * (y2 - y1) - cy, ay = 1 - cy - by;
+      return function (k) {
+        var lo = 0, hi = 1, t = k, i, x;
+        for (i = 0; i < 24; i++) {
+          x = ((ax * t + bx) * t + cx) * t;
+          if (Math.abs(x - k) < 1e-5) break;
+          if (x < k) lo = t; else hi = t;
+          t = (lo + hi) / 2;
+        }
+        return ((ay * t + by) * t + cy) * t;
+      };
+    }
+    var easeStandard = bezier(0.2, 0, 0, 1), easeDecel = bezier(0, 0, 0, 1);
+    function frames(k, keys) {
+      for (var i = 1; i < keys.length; i++) {
+        if (k <= keys[i][0]) {
+          var a = keys[i - 1], b = keys[i], f = (k - a[0]) / (b[0] - a[0]), o = [];
+          for (var j = 1; j < a.length; j++) o.push(a[j] + (b[j] - a[j]) * f);
+          return o;
+        }
+      }
+      return keys[keys.length - 1].slice(1);
+    }
+    function about(x, y, k) {
+      return 'translate(' + x + ' ' + y + ') scale(' + k.toFixed(3) + ') translate(' + (-x) + ' ' + (-y) + ')';
+    }
+    function craft(x, rot, sc) {
       ship.setAttribute('transform',
-        'translate(' + x + ' 48) rotate(' + (rot === undefined ? 90 : rot) + ') scale(0.42)');
+        'translate(' + x.toFixed(2) + ' 48) rotate(' + rot.toFixed(1) + ') scale(' + sc.toFixed(3) + ')');
     }
-    function land(on) {
-      if (dest) dest.setAttribute('transform',
-        'translate(122 48) scale(' + (on ? 1.1 : 1) + ') translate(-122 -48)');
-      if (badge) badge.setAttribute('opacity', on ? '1' : '0');
+    function planets(n, bounce, ringScale, ringOpacity) {
+      if (origin) origin.setAttribute('transform', about(14, 48, 1 - 0.05 * n));
+      if (dest) dest.setAttribute('transform', about(122, 48, (1 + 0.05 * n) * (bounce || 1)));
+      if (ring) {
+        ring.setAttribute('transform', about(122, 48, ringScale || 1));
+        ring.setAttribute('opacity', String(ringOpacity || 0));
+      }
     }
-    /* The label is the app's own: one line, the stage being waited on. */
+    function face(landed) {
+      if (eyes) eyes.setAttribute('display', landed ? 'none' : 'inline');
+      if (smile) { smile.setAttribute('display', landed ? 'inline' : 'none');
+                   smile.setAttribute('opacity', '0'); }
+    }
     function say(i, done) { out.textContent = done ? 'Welcome back' : LABELS[i]; }
-    /* Landed: engine out, as the component parks it. */
-    function engine(on) {
-      var fl = svg.querySelector('[data-r="fl"]');
-      if (fl) fl.setAttribute('transform', 'translate(0 22) scale(1 ' + (on ? 1 : 0) + ') translate(0 -22)');
-    }
 
-    function tween(from, to, ms, then, turn) {
-      if (still) { place(to, turn ? -90 : 90); setTimeout(then, 420); return; }
+    function hop(from, to, n, then) {
+      if (still) { craft(to, 90, 0.42); planets(n); setTimeout(then, 420); return; }
       var t0 = performance.now();
       (function frame(now) {
-        var k = Math.min(1, (now - t0) / ms);
-        /* Ease in and out, so each hop leaves and arrives rather than jerking. */
+        var k = Math.min(1, (now - t0) / 620);
         var e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
-        place(from + (to - from) * e, turn ? 90 - 180 * e : 90);
+        craft(from + (to - from) * e, 90, 0.42);
+        planets(n - 1 + e);
         if (k < 1) requestAnimationFrame(frame); else then();
+      })(t0);
+    }
+
+    function land(from, then) {
+      face(true);
+      if (still) {
+        craft(108, 270, 0.3); planets(5); flame.setAttribute('opacity', '0');
+        if (smile) smile.setAttribute('opacity', '1');
+        then(); return;
+      }
+      var t0 = performance.now();
+      (function frame(now) {
+        var k = now - t0, u = Math.min(1, k / LAND_MS), e = easeDecel(u);
+        craft(from + (108 - from) * e, 90 + 180 * e, 0.42 + (0.3 - 0.42) * e);
+        var f = frames(u, [[0, 1, 1], [0.55, 1.2, 1.7], [0.85, 1, 0.5], [1, 0.6, 0]]);
+        flame.setAttribute('transform',
+          'translate(0 22) scale(' + f[0].toFixed(3) + ' ' + f[1].toFixed(3) + ') translate(0 -22)');
+        flame.setAttribute('opacity', String(u < 0.85 ? 1 : u >= 1 ? 0 : 1 - (u - 0.85) / 0.15));
+        var b = (k - ARRIVE_AT) / BOUNCE_MS, r = (k - ARRIVE_AT) / PULSE_MS;
+        planets(5,
+          b >= 0 && b <= 1 ? 1 + 0.14 * Math.sin(Math.PI * b) : 1,
+          r >= 0 && r <= 1 ? 1 + 1.2 * easeStandard(r) : 1,
+          r >= 0 && r <= 1 ? 0.9 * (1 - r) : 0);
+        if (smile && k >= ARRIVE_AT) smile.setAttribute('opacity', '1');
+        if (k < 2000) requestAnimationFrame(frame); else then();
       })(t0);
     }
 
@@ -717,35 +776,34 @@
       if (running) return;
       running = true;
       btn.disabled = true;
-      land(false);
-      engine(true);
-      place(STOPS[0], 90);
+      face(false);
+      flame.setAttribute('opacity', '1');
+      flame.setAttribute('transform', 'translate(0 22) scale(1 1) translate(0 -22)');
+      craft(STOPS[0], 90, 0.42);
+      planets(0);
       say(0);
       var i = 0;
-      (function hop() {
-        if (i >= STOPS.length - 1) {
-          land(true);
-          engine(false);
-          say(0, true);
-          btn.disabled = false;
-          btn.innerHTML = '↻&nbsp; Chạy lại';
-          running = false;
+      (function next() {
+        if (i === STOPS.length - 2) {
+          i += 1;
+          land(STOPS[i - 1], function () {
+            say(0, true);
+            btn.disabled = false;
+            btn.innerHTML = '↻&nbsp; Chạy lại';
+            running = false;
+          });
           return;
         }
-        var from = STOPS[i];
         i += 1;
-        /* The sixth hop is the landing, which has no stage name of its own. */
-        if (i < LABELS.length) say(i);
-        var last = i === STOPS.length - 1;
-        /* The landing takes longer than a hop: it is a turn as well as a move,
-           and a flip at hop speed reads as a glitch. */
-        tween(from, STOPS[i], last ? 900 : 620, function () { setTimeout(hop, 260); }, last);
+        say(i);
+        hop(STOPS[i - 1], STOPS[i], i, function () { setTimeout(next, 260); });
       })();
     }
 
     btn.addEventListener('click', run);
     out.textContent = REST;
-    engine(true);
+    face(false);
+    planets(0);
   })();
 
   (function () {

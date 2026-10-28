@@ -123,12 +123,14 @@ const OPEN_WIZARD = `
 const LOADING_JOBS = [
   {
     /* The landing, which only exists for one beat of the specimen's loop. */
+    /* Caught mid-pulse on purpose: the ring is only on screen for 800ms and
+       it is half the point of the arrival. */
     name: 'load-landing', route: '/design-system', prep: `
       const art = await __wait(() => document.querySelector('.vy-ds-motion-art'));
-      const ship = art.querySelector('svg g[transform*="scale(0.42)"]');
-      await __wait(() => /rotate\\(-90\\)/.test(ship.getAttribute('transform')), 20000);
-      art.scrollIntoView({ block: 'center' });
-      await new Promise(r => setTimeout(r, 120));`,
+      const ring = art.querySelector('svg circle[fill="none"]');
+      await __wait(() => parseFloat(ring.getAttribute('opacity') || '0') > 0.45, 30000);
+      art.scrollIntoView({ block: 'center' });`,
+    clip: '.vy-ds-motion-art',
     marks: `[]`,
   },
   { name: 'load-record', route: REC, wait: 260, raw: true },
@@ -306,7 +308,17 @@ async function main() {
     const missing = process.env.NO_MARKS ? [] : await run(`__mark(${job.marks})`);
     if (missing?.length) { console.warn(`  ${job.name}: no element for mark(s) ${missing}`); bad++; }
 
-    const shot = await send('Page.captureScreenshot', { format: 'jpeg', quality: 86 });
+    /* `clip` photographs one element rather than the viewport, at 3x, for the
+       figures that are about a 300px drawing rather than about a screen. */
+    let clip;
+    if (job.clip) {
+      clip = await run(`(() => { const e = document.querySelector(${JSON.stringify(job.clip)});
+        if (!e) return null; const r = e.getBoundingClientRect();
+        return { x: r.left, y: r.top, width: r.width, height: r.height, scale: 3 }; })()`);
+      if (!clip) console.warn(`  ${job.name}: nothing matched ${job.clip}`);
+    }
+    const shot = await send('Page.captureScreenshot',
+      { format: 'jpeg', quality: 90, ...(clip ? { clip } : {}) });
     const data = shot.result?.data;
     if (!data) { console.error(`  ${job.name}: no image`); bad++; continue; }
     const file = path.join(OUT, `${job.name}.jpg`);

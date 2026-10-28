@@ -234,11 +234,18 @@ export function DesignSystemPage() {
  */
 function BootSpecimen() {
   const [step, setStep] = useState(0);
+  /* THE LAST STATION IS NOT A STATION. A flat 1100ms interval gave the
+     arrival 1100ms, and the arrival needs 2000: the craft lands over 1100,
+     then the planet bounces, the ring pulses and the face smiles — all of
+     which start a second after touchdown. The specimen was cutting the end
+     off the thing it exists to show. */
   useEffect(() => {
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const t = setInterval(() => setStep(s => (s + 1) % (BOOT_STAGES.length + 1)), 1100);
-    return () => clearInterval(t);
-  }, []);
+    const last = BOOT_STAGES.length;
+    const t = setTimeout(() => setStep(s => (s + 1) % (last + 1)),
+                         step === last ? 3200 : 1100);
+    return () => clearTimeout(t);
+  }, [step]);
   const stage = BOOT_STAGES[Math.min(step, BOOT_STAGES.length - 1)];
   return (
     <div className="vy-ds-motion-art">

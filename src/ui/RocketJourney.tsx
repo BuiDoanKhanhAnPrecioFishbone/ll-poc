@@ -91,9 +91,74 @@ function flameFit(x: number) {
  * it at the route's end, 108, would have buried the tail two units into the
  * planet.
  */
-const LANDING_X = 106;
+/**
+ * ARRIVING, to the numbers the illustration was delivered with.
+ *
+ * The first attempt at this parked the ship nose-first at the last station;
+ * the second turned it round. Both were guesses, and the delivered demo had
+ * the answer all along — `rocket-journey-demo.html`, the file the 27 Oct
+ * review was written from. Its `done` state is four things at once:
+ *
+ *   the craft lands — x 108, `rotate(270)`, scale 0.3, over 1100ms on the
+ *     decelerate curve, which is a backflip onto its tail and a step BACK in
+ *     size, because it is now standing on something far away;
+ *   the engine flares and cuts — the retro-burn: the flame stretches to
+ *     1.2 x 1.7 at 55% of the landing, drops to 1 x 0.5, then goes out;
+ *   the planet takes the weight — a 14% bounce 500ms after touchdown, and a
+ *     ring that expands to 2.2x while fading from 0.9, which is the pulse;
+ *   and the face smiles — `ed`, two arcs replacing the two dots, one second
+ *     after it lands.
+ *
+ * Ours had the first of those four and none of the rest. An knew: "mặt cười,
+ * có pulse ở hành tinh".
+ */
+const LANDING_X = 108, LANDED_ROT = 270, LANDED_SCALE = 0.3;
+/** Timings, in ms, all measured from the moment the last stage finished. */
+const LAND_MS = 1100, ARRIVE_AT = 1000, PULSE_MS = 800, BOUNCE_MS = 500, DONE_MS = 2000;
+
+/**
+ * The two easings the art is built on — the same curves `tokens.css` names
+ * `--vy-ease-standard` and `--vy-ease-decelerate`. Solved by bisection rather
+ * than approximated, because a landing that eases differently from the CSS
+ * around it is a landing that looks borrowed.
+ */
+function bezier(x1: number, y1: number, x2: number, y2: number) {
+  const cx = 3 * x1, bx = 3 * (x2 - x1) - cx, ax = 1 - cx - bx;
+  const cy = 3 * y1, by = 3 * (y2 - y1) - cy, ay = 1 - cy - by;
+  const fx = (t: number) => ((ax * t + bx) * t + cx) * t;
+  const fy = (t: number) => ((ay * t + by) * t + cy) * t;
+  return (k: number) => {
+    let lo = 0, hi = 1, t = k;
+    for (let i = 0; i < 24; i++) {
+      const x = fx(t);
+      if (Math.abs(x - k) < 1e-5) break;
+      if (x < k) lo = t; else hi = t;
+      t = (lo + hi) / 2;
+    }
+    return fy(t);
+  };
+}
+const easeStandard = bezier(0.2, 0, 0, 1);
+const easeDecelerate = bezier(0, 0, 0, 1);
+
+/** Linear interpolation across keyframes `[at, ...values]`. */
+function frames(k: number, keys: readonly (readonly number[])[]): number[] {
+  for (let i = 1; i < keys.length; i++) {
+    if (k <= keys[i][0]) {
+      const a = keys[i - 1], b = keys[i];
+      const f = (k - a[0]) / (b[0] - a[0]);
+      return a.slice(1).map((v, j) => v + (b[j + 1] - v) * f);
+    }
+  }
+  return keys[keys.length - 1].slice(1);
+}
+
+/** `scale` about a point, which is how the art moves both planets. */
+const about = (x: number, y: number, k: number) =>
+  `translate(${x} ${y}) scale(${k.toFixed(3)}) translate(${-x} ${-y})`;
+
 const pose = (s: number) => s >= LANDED
-  ? `translate(${LANDING_X} 48) rotate(-90) scale(${SHIP_SCALE})`
+  ? `translate(${LANDING_X} 48) rotate(${LANDED_ROT}) scale(${LANDED_SCALE})`
   : `translate(${at(s)} 48) rotate(90) scale(${SHIP_SCALE})`;
 
 export function RocketJourney({ step = 0, state = 'loading' }: {
@@ -132,6 +197,13 @@ export function RocketJourney({ step = 0, state = 'loading' }: {
   const ship = useRef<SVGGElement>(null);
   const flame = useRef<SVGGElement>(null);
   const eyes = useRef<SVGGElement>(null);
+  /* The two planets and the ring that pulses out of the destination — the
+     parts the arrival moves, and the parts this component used to draw as
+     scenery that never changed. */
+  const origin = useRef<SVGGElement>(null);
+  const dest = useRef<SVGGElement>(null);
+  const pulse = useRef<SVGCircleElement>(null);
+  const smile = useRef<SVGPathElement>(null);
 
   /**
    * Hover, flame and blink — the three things that say "still working" when
@@ -152,7 +224,68 @@ export function RocketJourney({ step = 0, state = 'loading' }: {
     const reduce = matchMedia('(prefers-reduced-motion: reduce)');
     let frame = 0;
 
+    /* THE PLANETS ARE NOT SCENERY. A shrinks 5% a station and B grows 5% a
+       station, which is the drawing's way of saying the distance is closing —
+       and it is the one piece of progress a reader takes in without reading
+       anything. This component drew both at a fixed size for a week. */
+    const planets = (n: number, bounce = 1, ring = 1, ringOpacity = 0) => {
+      origin.current?.setAttribute('transform', about(14, 48, 1 - 0.05 * n));
+      dest.current?.setAttribute('transform', about(122, 48, (1 + 0.05 * n) * bounce));
+      pulse.current?.setAttribute('transform', about(122, 48, ring));
+      pulse.current?.setAttribute('opacity', ringOpacity.toFixed(3));
+    };
+
+    /* ---- Arrived ------------------------------------------------------- */
+    if (step >= LANDED) {
+      const land = (k: number) => {
+        /* The flip and the step back in size, on one curve. */
+        const e = easeDecelerate(Math.min(1, k / LAND_MS));
+        const x = at(LANDED - 1) + (LANDING_X - at(LANDED - 1)) * e;
+        ship.current?.setAttribute('transform',
+          `translate(${x.toFixed(2)} 48) rotate(${(90 + (LANDED_ROT - 90) * e).toFixed(1)})`
+          + ` scale(${(SHIP_SCALE + (LANDED_SCALE - SHIP_SCALE) * e).toFixed(3)})`);
+
+        /* The retro-burn: it flares to slow the craft, then goes out. */
+        const u = Math.min(1, k / LAND_MS);
+        const [fx, fy] = frames(u, [[0, 1, 1], [0.55, 1.2, 1.7], [0.85, 1, 0.5], [1, 0.6, 0]]);
+        flame.current?.setAttribute('transform',
+          `translate(0 22) scale(${fx.toFixed(3)} ${fy.toFixed(3)}) translate(0 -22)`);
+        flame.current?.setAttribute('opacity',
+          (u < 0.85 ? 1 : u >= 1 ? 0 : 1 - (u - 0.85) / 0.15).toFixed(3));
+
+        /* The planet takes the weight, and the ring goes out from it. */
+        const b = (k - ARRIVE_AT) / BOUNCE_MS;
+        const r = (k - ARRIVE_AT) / PULSE_MS;
+        planets(LANDED,
+          b >= 0 && b <= 1 ? 1 + 0.14 * Math.sin(Math.PI * b) : 1,
+          r >= 0 && r <= 1 ? 1 + 1.2 * easeStandard(r) : 1,
+          r >= 0 && r <= 1 ? 0.9 * (1 - r) : 0);
+
+        /* And it smiles, once it is down. */
+        smile.current?.setAttribute('opacity', k >= ARRIVE_AT ? '1' : '0');
+      };
+
+      if (reduce.matches) {
+        ship.current?.setAttribute('transform', pose(step));
+        flame.current?.setAttribute('opacity', '0');
+        smile.current?.setAttribute('opacity', '1');
+        planets(LANDED);
+        return;
+      }
+      const t0 = performance.now();
+      const tick = (t: number) => {
+        const k = t - t0;
+        land(k);
+        /* Stops when the arrival is over. Nothing about a landed rocket
+           changes after that, so nothing should be scheduled for it. */
+        if (k < DONE_MS) frame = requestAnimationFrame(tick);
+      };
+      frame = requestAnimationFrame(tick);
+      return () => cancelAnimationFrame(frame);
+    }
+
     const draw = (t: number) => {
+      planets(step);
       /* One loop length for all three, so they never drift apart on screen. */
       const loop = 1400;
       const hover = 2 * (0.5 - 0.5 * Math.cos((2 * Math.PI * (t % loop)) / loop));
@@ -180,18 +313,6 @@ export function RocketJourney({ step = 0, state = 'loading' }: {
        stylesheet cannot cover this one: its rule caps CSS animation, and there
        is no CSS animation here to cap. */
     if (reduce.matches) { draw(0); return; }
-
-    /* ARRIVED IS A POSE, NOT A LOOP. Hovering at the planet would say the ship
-       is still flying, and the flame would say the engine is still burning —
-       both after the thing being waited for has finished. It parks: at the
-       landing, engine out, eyes open. Nothing is scheduled, for the same
-       reason reduce-motion schedules nothing. */
-    if (step >= LANDED) {
-      ship.current?.setAttribute('transform', pose(step));
-      flame.current?.setAttribute('transform', 'translate(0 22) scale(1 0) translate(0 -22)');
-      eyes.current?.setAttribute('transform', 'translate(0 -5.6) scale(1 1) translate(0 5.6)');
-      return;
-    }
 
     const tick = (t: number) => { draw(t); frame = requestAnimationFrame(tick); };
     frame = requestAnimationFrame(tick);
@@ -221,18 +342,27 @@ export function RocketJourney({ step = 0, state = 'loading' }: {
       <path d={star} transform="translate(100 80) scale(1)" fill="var(--vy-blue-200, #b0c2ea)" />
 
       <clipPath id={clip}><circle cx="14" cy="48" r="10" /></clipPath>
-      <g>
+      {/* Planet A, shrinking a station at a time — see `planets` above. */}
+      <g ref={origin} transform={about(14, 48, 1 - 0.05 * Math.min(step, LANDED))}>
         <circle cx="14" cy="48" r="10" fill="var(--vy-blue-200, #b0c2ea)" />
         <circle cx="17.5" cy="45" r="10" fill="var(--vy-blue-100, #dae2f3)"
                 clipPath={`url(#${clip})`} />
       </g>
 
-      <g transform="rotate(-14 122 48)" opacity={state === 'error' ? 0.5 : 1}>
-        <path d="M109 48 A13 4 0 0 1 135 48" fill="none"
-              stroke="var(--vy-blue-200, #b0c2ea)" strokeWidth="2.4" strokeLinecap="round" />
-        <circle cx="122" cy="48" r="7" fill="var(--vy-blue-300, #7f9ce1)" />
-        <path d="M109 48 A13 4 0 0 0 135 48" fill="none"
-              stroke="var(--vy-blue-200, #b0c2ea)" strokeWidth="2.4" strokeLinecap="round" />
+      <g ref={dest} transform={about(122, 48, 1 + 0.05 * Math.min(step, LANDED))}
+         opacity={state === 'error' ? 0.5 : 1}>
+        {/* THE PULSE. A ring the size of the planet, invisible until the
+            craft is down, then out to 2.2× as it fades — the drawing's way of
+            saying the planet felt it. */}
+        <circle ref={pulse} cx="122" cy="48" r="7" fill="none" opacity="0"
+                stroke="var(--vy-blue-300, #7f9ce1)" strokeWidth="1.5" />
+        <g transform="rotate(-14 122 48)">
+          <path d="M109 48 A13 4 0 0 1 135 48" fill="none"
+                stroke="var(--vy-blue-200, #b0c2ea)" strokeWidth="2.4" strokeLinecap="round" />
+          <circle cx="122" cy="48" r="7" fill="var(--vy-blue-300, #7f9ce1)" />
+          <path d="M109 48 A13 4 0 0 0 135 48" fill="none"
+                stroke="var(--vy-blue-200, #b0c2ea)" strokeWidth="2.4" strokeLinecap="round" />
+        </g>
       </g>
 
       <path d="M38 48 L108 48" {...dot} stroke="var(--vy-blue-200, #b0c2ea)" />
@@ -283,10 +413,22 @@ export function RocketJourney({ step = 0, state = 'loading' }: {
         <rect x="-14.4" y="11" width="28.8" height="3.4" fill="var(--vy-blue-100, #dae2f3)" />
         <circle cx="0" cy="-4" r="9.4" fill="var(--vy-blue-100, #dae2f3)" />
         <circle cx="0" cy="-4" r="7" fill="var(--vy-blue-800, #112960)" />
+        {/* THREE FACES, NOT TWO — the art ships `el`, `ed` and `ex`, and this
+            component carried only two of them. Open eyes on the way, crosses
+            when it fails, and two arcs when it arrives: the smile is the
+            whole point of the last second, and it was missing. */}
         {state === 'error' ? (
           <path d="M-4.6 -6.6 L-1.4 -3.4 M-1.4 -6.6 L-4.6 -3.4 M1.4 -6.6 L4.6 -3.4 M4.6 -6.6 L1.4 -3.4"
                 fill="none" stroke="var(--vy-blue-100, #dae2f3)"
                 strokeWidth="1.5" strokeLinecap="round" />
+        ) : step >= LANDED ? (
+          /* Faded in rather than switched on, a second after touchdown: a
+             smile that appears the instant the craft stops reads as a sprite
+             swap, not as a reaction. */
+          <path ref={smile} d="M-4.4 -4.4 Q-2.3 -7.8 -0.2 -4.4 M0.8 -4.4 Q2.9 -7.8 5 -4.4"
+                fill="none" stroke="var(--vy-blue-100, #dae2f3)"
+                strokeWidth="1.5" strokeLinecap="round" opacity="0"
+                style={{ transition: 'opacity 250ms ease-out' }} />
         ) : (
           <g ref={eyes} fill="var(--vy-blue-100, #dae2f3)"
              transform="translate(0 -5.6) scale(1 1) translate(0 5.6)">
