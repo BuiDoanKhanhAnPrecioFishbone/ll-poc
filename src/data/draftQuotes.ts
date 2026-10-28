@@ -22,12 +22,25 @@ export type DraftQuote = {
   rfqId: string;
   /** Scoped per the guideline's precondition: "available for the selected customer". */
   customer: string;
-  /** The seven read-only columns the drafts table shows. */
+  /** What the drafts table reads, flattened out of `cfg` for it. */
   assemblyName: string;
+  /**
+   * NOT A COLUMN ANY MORE — her 16 Oct table drops it for Quote Focus — but
+   * still carried, and not out of habit: it is half the key that decides
+   * whether Save draft replaces an earlier draft or adds a row, and the
+   * record's Resume menu prints "Rev A" beside each one.
+   */
   revision: string;
   description: string;
   buildQty: number;
   attritionSet: number;
+  /**
+   * DENORMALISED LIKE THE SIX ABOVE IT, and for the same reason: these fields
+   * exist to be the drafts table's columns. It is also in `cfg`, where the
+   * wizard reads it — the copy here is the table's, so a column cannot reach
+   * into a config object to find what to print.
+   */
+  quoteFocus: string;
   createdDate: Date;
   /** Everything needed to put the user back where they left off. */
   cfg: RunConfig;

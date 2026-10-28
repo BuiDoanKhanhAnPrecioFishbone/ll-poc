@@ -366,6 +366,7 @@ export function RunQuotationDialog({ q, onClose, resume }: {
       description: cfg.partDesc || q.projectName,
       buildQty: cfg.buildQty,
       attritionSet: cfg.attritionSet,
+      quoteFocus: cfg.quoteFocus,
       createdDate: new Date(),
       cfg, lines, hasRun, runVersion, runDate,
     });

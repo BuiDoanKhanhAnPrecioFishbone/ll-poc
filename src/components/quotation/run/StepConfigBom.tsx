@@ -515,11 +515,26 @@ export function StepConfigBom({ q, cfg, set, invalid = [], onResume }: {
           open the user has already answered "new or saved", and if the answer
           was "saved" they have to close it and find a control they did not know
           was a menu. A draft is picked up where a quote is set up. */}
-      {drafts.length > 0 && onResume && (
+      {/* SHOWN WITH NOTHING IN IT TOO, from 28 Oct. The section used to appear
+          only once a draft existed, and drafts live in this browser session —
+          so anyone opening the prototype met a screen with no sign that
+          resuming is a thing the wizard does, and the empty state written for
+          exactly that moment was the one thing they could not see.
+
+          Her mockup keeps the card on screen the whole time. The alternative
+          was seeding demo drafts to fill it, which was declined: a draft is a
+          record of work somebody did in this session, and three fake ones
+          would open a BoM that no previous sitting ever configured. An empty
+          table that says where drafts come from is the honest version of the
+          same card. */}
+      {onResume && (
         <section className="vy-run-section vy-run-draft-list">
           <h3 className="vy-field-group-title">
             <SmartIcon name="quote" />Continue from Drafts
-            <span className="vy-pill">{drafts.length} saved</span>
+            {/* No badge at nothing — a count pill reading "0 saved" dresses an
+                absence up as a quantity, and the table below says it in
+                words. */}
+            {drafts.length > 0 && <span className="vy-pill">{drafts.length} saved</span>}
           </h3>
           <DraftsTable drafts={drafts} customer={q.customer} onContinue={onResume} />
         </section>

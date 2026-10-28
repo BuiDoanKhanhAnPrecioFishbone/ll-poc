@@ -29,7 +29,7 @@ và tải được như prototype chị gửi.
 | **Run Quotation** | step 1 dùng hết màn hình · step 2–3 gọn lại · điều hướng wizard trên trái, stepper trên phải · thẻ *Quote Run · Version N* + *Prices From* ở step 4 · Cost Estimation 2×2 · *Continue from Drafts* |
 | **Quoting BoM (16/10)** | Quote Setup tách khỏi kết quả · AML thành dòng con ở step 2 và 3 · Preferred Suppliers theo nhóm ưu tiên · chọn MPN chính thức từ Nexar · Consigned trừ trước khi mua · giá trị mang từ RFQ tô xanh kèm tooltip · step 1 dựng lại theo mockup kèm attachment xem/tải. **Còn thiếu — xem mục dưới** |
 | **25/10** | nút icon trong hàng về **26px** đúng standard — lấy đúng bậc `xs` của Kendo chứ không tự đặt số, nên 26 nằm cùng một phép tính với 32 và 34 |
-| **28/10** | màn xem kết quả theo phiên bản (mục 1) · **Attachment to Process\*** và **Import Completed Quote** (mục 5, 6) · mỗi lựa chọn trong nhóm radio có câu giải thích của riêng nó, như mockup của chị |
+| **28/10** | màn xem kết quả theo phiên bản (mục 1) · **Attachment to Process\*** và **Import Completed Quote** (mục 5, 6) · mỗi lựa chọn trong nhóm radio có câu giải thích của riêng nó, như mockup của chị · bỏ ô **File Name** vì nó in lại đúng tên file vừa chọn ngay trên nó · **Continue from Drafts** luôn hiện, kể cả khi chưa có draft nào, và lấy đúng bảy cột của chị (có **Quote Focus**, bỏ Revision) |
 
 ### Còn thiếu so với prototype 16/10 — bản trước nói "đủ 8/8", không đúng
 
@@ -53,11 +53,20 @@ nhất trên một màn chỉ-đọc lại đi sửa lịch sử. Nút Add Packa
 step 4, nơi báo giá còn mở. Nếu ý chị là *"thêm package rồi chạy lại thành
 phiên bản mới"* thì đó là một nút khác với một cái tên khác — xin chị xác nhận.
 
-Một câu nữa, thấy được chính nhờ đổi nhãn ở mục 5: ngay dưới *Attachment to
-Process* mình còn một ô **File Name** chỉ-đọc, và nó in lại đúng tên file vừa
-chọn ở trên — hai ô cạnh nhau, một chuỗi. Ô này là của guideline (r23–r25), còn
-prototype của chị **không có nó**. Mình đề nghị **bỏ**, nhưng vì nó nằm trong
-guideline nên xin chị quyết.
+Ô **File Name** dưới *Attachment to Process* đã **bỏ**: nó in lại đúng tên file
+vừa chọn ngay phía trên, hai ô cạnh nhau một chuỗi. Ô này là của guideline
+(r23–r25), prototype của chị không có nó. Nhánh *Existing Assembly* vẫn giữ ô
+File name, vì ở đó file đến từ hộp thoại upload nên ô đó là chỗ duy nhất biết
+đã chọn file nào.
+
+**Continue from Drafts giờ luôn hiện.** Trước đây mục này chỉ xuất hiện khi đã
+có draft, mà draft chỉ sống trong một phiên trình duyệt — nên mở prototype lên
+là không thấy gì, cả một luồng đã dựng xong trông như chưa có. Giờ mục luôn ở
+đó; khi chưa có draft nào thì bảng nói rõ draft sinh ra từ đâu. Mình **không**
+gieo draft mẫu: một draft là dấu vết công việc ai đó vừa làm, ba dòng giả sẽ mở
+ra một BoM chưa từng được cấu hình. Bảng lấy đúng bảy cột của chị — có **Quote
+Focus**, bỏ Revision (Revision vẫn nằm trên thanh đầu mỗi bước và trong menu
+Resume ở record).
 
 Một điểm nhỏ: mockup có 6 attachment, bản mình có 3. Cột tiền mình đã đổi theo
 chị thành **Ext. Price**.
