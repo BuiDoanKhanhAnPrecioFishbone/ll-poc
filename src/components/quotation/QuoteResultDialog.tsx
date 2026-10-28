@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react';
 import { Dialog } from '../../ui/Overlays';
 import { Button } from '../../ui/Button';
 import { MiniTable } from '../../ui/MiniTable';
+import { useColumnChoice } from '../../ui/useColumnChoice';
+import { ColumnChooser } from '../../ui/ColumnChooser';
 import { useToast } from '../../ui/Toast';
 import { useExcelExport } from '../../ui/useExcelExport';
 import { fmtDateTime } from '../../ui/regional';
@@ -63,6 +65,11 @@ export function QuoteResultDialog({ q, result, onClose }: {
   }, [lines, search, noBid, notEnough, excess]);
 
   const columns = resultColumns(setup.buildQty, setup.attritionSet);
+  /* COLUMNS, WHICH HER OWN RESULT VIEW HAS and this one did not. Fourteen
+     columns, two of them frozen; the standard's rule is "every list or grid
+     with 3+ columns". Locked = frozen, as on every other grid here. */
+  const { shown: shownColumns, chooser } =
+    useColumnChoice(columns, { locked: 2, storageKey: 'vy.cols.quoteResult' });
 
   return (
     <Dialog
@@ -208,9 +215,13 @@ export function QuoteResultDialog({ q, result, onClose }: {
               Import
             </Button>
           }
+          trailing={<ColumnChooser {...chooser} />}
         />
 
-        <MiniTable data={shown} columns={columns} freeze={2} rowTone={rowTone}
+        {/* The grid shows what the chooser leaves; the EXPORT keeps all
+            fourteen. Putting a column away to read the screen should not
+            quietly drop it from the file somebody quotes from. */}
+        <MiniTable data={shown} columns={shownColumns} freeze={2} rowTone={rowTone}
                    filterable={false} empty={<NoRecords />} />
 
         {/* THREE TONES, BECAUSE THE GRID PAINTS THREE. This legend shipped

@@ -158,11 +158,6 @@
   th { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-faint); border-top: 0; }
   tbody tr:nth-child(odd) { background: var(--wash); }
 
-  .note { background: var(--accent-soft); border: 1px solid var(--line);
-          border-radius: 12px; padding: 18px 20px; margin: 0 0 28px; }
-  .note h2 { font-size: 17px; margin: 0 0 8px; }
-  .note p { margin: 0 0 8px; font-size: 15px; }
-  .note p:last-child { margin-bottom: 0; }
   footer { color: var(--ink-faint); font-size: 13px; padding-top: 10px; }
 
   /* ---- print / PDF ------------------------------------------------------
@@ -180,7 +175,7 @@
     html, body { background: #fff; }
     body { font-size: 11.5px; }
     .page { max-width: none; padding: 0 0 8mm; }
-    .card, .note { break-inside: auto; border-radius: 8px; }
+    .card { break-inside: auto; border-radius: 8px; }
     /* NO FORCED BREAK BEFORE A SECTION, and the first attempt is why. Forcing
        one, then asking the figure pair not to split, gave Chrome a block it
        would not fit under the heading — so page after page opened with a title
@@ -208,7 +203,7 @@
     .pair  { grid-template-columns: 1fr 1fr; }
     .sides { grid-template-columns: 1fr 1fr; }
     .pair img { max-block-size: 62mm; inline-size: auto; max-inline-size: 100%; margin-inline: auto; }
-    .card, .note { padding: 14px 16px; }
+    .card { padding: 14px 16px; }
     .card h2 { break-after: avoid; }
     figure img { box-shadow: none; }
     #zoom, .rocket-play { display: none !important; }
@@ -233,23 +228,6 @@
     <p class="meta">28/10/2026 · ảnh chụp tự động bằng <code>scripts/capture-compare.mjs</code>, khung khoanh lấy từ toạ độ thật của phần tử</p>
   </div>
 </header>
-
-<div class="note">
-  <h2>Hình tên lửa trong tài liệu — lấy ở đâu</h2>
-  <p>
-    Bốn file nằm ở <code>docs/assets/rocket-journey/</code>: ngang/dọc × nền sáng/tối.
-    Đều là <b>SVG</b>, nên phóng to bao nhiêu cũng nét.
-    Bấm <b>Chạy thử</b> ở góc trên bên trái để xem nó đi hết hành trình —
-    <b>năm trạm là năm mốc khởi động thật</b> của hệ thống, không phải năm cái chấm cho vui.
-  </p>
-  <p>
-    <b>Tài liệu HTML như trang này:</b> dán thẳng nội dung file <code>.svg</code> vào chỗ cần —
-    hình tên lửa phía trên chính là cách đó, không có file ảnh rời nào cả, gửi một file là xong.
-    <b>Markdown:</b> <code>![](assets/rocket-journey/vy-rocket-journey-horizontal-light.svg)</code>,
-    nhưng khi gửi file <code>.md</code> đi một em thì ảnh sẽ mất — phải gửi kèm thư mục.
-    <b>Word / PowerPoint:</b> mở file SVG bằng trình duyệt rồi xuất PNG, hoặc chèn thẳng SVG (Office hỗ trợ).
-  </p>
-</div>
 
 <!-- ======================= STEP 1 ======================= -->
 <section class="card">
@@ -532,6 +510,9 @@
           trước đó nó chiếm một băng ngang nguyên chiều rộng để hiện một bảng rộng 340px,
           hai phần ba bên phải bỏ trống. Đo trên cùng khung 1440×900: lưới hiện <b>15 dòng</b>
           thay vì 9, dòng đầu tiên lên cao hơn 134px.
+          · <b>Nút Columns</b> trên thanh lưới: thanh của chị có, bản em thiếu — và thiếu
+          ở cả step 4 nữa, trong khi step 2 và step 3 thì có. Đo lại cả bốn lưới hôm
+          nay: giờ đủ cả bốn.
           · <b>Các ô trong thanh thiết lập</b> giờ bằng nhau và thẳng cột: trước đây 12 ô
           có <b>10 bề rộng khác nhau</b>, dòng hai nằm dưới không cái gì cả. Giờ là một
           lưới, mọi ô 211px, hàng dưới rơi đúng cột của hàng trên.

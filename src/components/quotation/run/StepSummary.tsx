@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
 import { MiniTable } from '../../../ui/MiniTable';
+import { useColumnChoice } from '../../../ui/useColumnChoice';
+import { ColumnChooser } from '../../../ui/ColumnChooser';
 import { Button } from '../../../ui/Button';
 import { Select } from '../../../ui/Overlays';
 import type { ColumnSpec } from '../../column-model';
@@ -53,6 +55,9 @@ export function StepSummary({ cfg, lines, run, onAddPackage, setLines }: {
 
   const columns = summaryColumns(cfg, (id, status) =>
     setLines(ls => ls.map(l => (l.id === id ? { ...l, status } : l))));
+  /* Locked = the frozen block, so the two cannot disagree — see useColumnChoice. */
+  const { shown: shownColumns, chooser } =
+    useColumnChoice(columns, { locked: 3, storageKey: 'vy.cols.summary' });
 
   return (
     <div className="vy-run-step">
@@ -129,6 +134,12 @@ export function StepSummary({ cfg, lines, run, onAddPackage, setLines }: {
         </Button>
       </section>
 
+      {/* COLUMNS, LIKE THE OTHER THREE GRIDS — 28 Oct. The standard asks for
+          the chooser on "every list or grid with 3+ columns"; steps 2 and 3
+          had it, this one and the saved-result view did not, with no note
+          saying why. An asked whether this grid needs it; it has twenty-one
+          columns and a frozen block of three, which is precisely the case the
+          rule was written for. Locked = frozen, as everywhere else. */}
       <QuoteToolbar
         search={search} onSearch={setSearch}
         placeholder="Search by Part / Description / MPN / MFG / Supplier"
@@ -137,6 +148,7 @@ export function StepSummary({ cfg, lines, run, onAddPackage, setLines }: {
           { key: 'qty', label: 'Not Enough Qty', on: notEnough, onToggle: setNotEnough },
           { key: 'excess', label: 'Excess Qty', on: excess, onToggle: setExcess },
         ]}
+        trailing={<ColumnChooser {...chooser} />}
       />
 
       {/* NO PER-COLUMN FILTER ROW. The step already carries a search box and
@@ -151,7 +163,7 @@ export function StepSummary({ cfg, lines, run, onAddPackage, setLines }: {
           forbids was rendered, and the note itself was printed on screen as a
           paragraph of source code. Found by opening step 4 on a draft — it is
           three clicks deep, and no check we run walks that far. */}
-      <MiniTable data={shown} columns={columns} freeze={3} rowTone={rowTone}
+      <MiniTable data={shown} columns={shownColumns} freeze={3} rowTone={rowTone}
                  filterable={false} empty={<NoRecords />} />
     </div>
   );
