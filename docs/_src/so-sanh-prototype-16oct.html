@@ -67,6 +67,9 @@
   .boot-side { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
   .boot-note { margin: 0; font-size: 14px; color: var(--ink-soft); max-width: 48ch; }
   .boot-note b { color: var(--ink); }
+  table.mini { margin: 12px 0 4px; font-size: 13.5px; }
+  table.mini th:first-child, table.mini td:first-child { width: 150px; }
+  table.mini th { padding-bottom: 8px; }
   .landing-fig { margin: 18px 0 4px; max-width: 560px; }
   .landing-fig img { border-radius: 10px; }
   .rocket-play {
@@ -406,18 +409,57 @@
       <div>
         <div class="find-h"><strong>Cách gom hàng của một dòng BoM</strong><span class="tag diff">Làm khác — nhìn giống hệt</span></div>
         <div class="sides">
-          <div class="side"><em>Của chị</em>Ô cha <b>merge thật</b> bằng <code>rowspan</code>, bảy ô một lần.</div>
-          <div class="side"><em>Của em</em>Ô cha để trống, nhưng <b>bỏ đường kẻ giữa các dòng cùng một record</b> — nhìn ra đúng một ô liền.</div>
+          <div class="side"><em>Của chị</em>Ô cha <b>merge thật</b> bằng <code>rowspan</code> — một ô duy nhất trải qua nhiều dòng, đúng kiểu ô gộp của Excel / Google Sheets, và căn giữa theo chiều dọc.</div>
+          <div class="side"><em>Của em</em>Ô cha để trống, nhưng <b>bỏ đường kẻ giữa các dòng cùng một record</b> và <b>tô sọc theo record</b> — nhìn ra đúng một ô liền.</div>
         </div>
         <p class="why">
-          <b>Lý do không dùng <code>rowspan</code>:</b> lưới của Kendo <b>tự dựng bộ ô</b> —
-          mỗi dòng một ô cho mỗi cột — còn phần mình viết chỉ là <i>nội dung</i> bên trong ô.
-          Muốn merge thì các dòng con phải <b>bớt ô đi</b>, mà bề rộng cột và vị trí dính
-          (sticky) của 7 cột đóng băng lại tính từ chính bộ ô của từng dòng. Bỏ đường kẻ cho
-          ra đúng hình ảnh đó mà không phải giành quyền dựng ô với lưới.
-          <b>Hôm nay sửa thêm một chỗ:</b> sọc zebra trước đây tô <i>theo dòng</i>, nên một
-          part có ba nhà sản xuất ra trắng–xám–trắng và cái ô "merge" bị kẻ sọc ngang giữa
-          thân. Giờ tô <b>theo record</b>: một part là một mảng màu.
+          Hai cách cho ra <b>gần như cùng một bức hình</b>. Khác nhau nằm ở chỗ ô gộp là
+          <i>một ô thật</i> hay <i>mấy ô rỗng trông như một</i> — và cái đó quyết định những
+          thứ bên dưới.
+        </p>
+        <table class="mini">
+          <thead><tr><th></th><th>Merge thật (Excel / Sheets · bản của chị)</th><th>Bỏ đường kẻ (bản em)</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><b>Ô trống nghĩa là gì</b></td>
+              <td>Không có ô trống nào cả — chỉ có một ô. Không thể hiểu nhầm.</td>
+              <td>Có ô trống. Người đọc hiểu "giống dòng trên" <b>nhờ mắt</b>, không nhờ cấu trúc.</td>
+            </tr>
+            <tr>
+              <td><b>Sắp xếp và lọc</b></td>
+              <td>Phải <b>tính lại độ trải</b> sau mỗi lần sắp xếp hay lọc; lọc mất một dòng con là ô cha sai. Excel thì chặn thẳng: không sort được bảng có ô gộp.</td>
+              <td><b>Không ảnh hưởng gì</b> — mỗi dòng vẫn là một dòng. Lưới sắp theo dòng đầu của record rồi kéo các dòng con theo sau.</td>
+            </tr>
+            <tr>
+              <td><b>Đóng băng cột, bàn phím</b></td>
+              <td>Lưới cần <b>ma trận ô đều nhau</b>: bề rộng cột và vị trí dính của 7 cột đóng băng tính từ bộ ô của từng dòng.</td>
+              <td>Ma trận giữ nguyên, nên 7 cột đóng băng và điều hướng bằng phím chạy như mọi lưới khác.</td>
+            </tr>
+            <tr>
+              <td><b>Trình đọc màn hình</b></td>
+              <td><b>Tốt hơn</b>: đứng ở dòng con nào cũng nghe lại được mã part của ô cha.</td>
+              <td>Dòng con đọc ra là <b>ô trống</b>. Đây là điểm yếu thật của cách này.</td>
+            </tr>
+            <tr>
+              <td><b>Căn giữa theo nhóm</b></td>
+              <td>Làm được, và chị đang làm.</td>
+              <td>Không, trừ khi dời giá trị xuống dòng giữa — mà thế thì record <b>mở đầu bằng một dòng không có mã part</b>.</td>
+            </tr>
+            <tr>
+              <td><b>Rủi ro</b></td>
+              <td>Ô gộp hỏng khi dữ liệu đổi mà quên tính lại.</td>
+              <td>Bất cứ thứ gì tô <b>theo dòng</b> đều phá được ảo giác. Sọc zebra đã làm đúng thế, và hôm nay mới sửa.</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="why">
+          <b>Em chọn cách thứ hai</b>, vì lưới này có 21 cột, 7 cột đóng băng, và sắp xếp
+          lẫn lọc đều dùng thật — ba thứ mà ô gộp phải trả giá. Lưới của chị không đóng băng
+          cột nào nên chị không gặp cái giá đó.
+          <b>Nhưng hai điểm chị hơn thì em ghi nhận:</b> ô gộp không bao giờ bị hiểu nhầm, và
+          nó đọc tốt hơn với trình đọc màn hình. Nếu chị thấy hai điểm đó quan trọng hơn,
+          em làm merge thật được — chỉ là phải giành quyền dựng ô với lưới, và tính lại
+          độ trải sau mỗi lần sắp xếp.
         </p>
       </div>
     </li>
