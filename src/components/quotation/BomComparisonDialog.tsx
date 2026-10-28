@@ -4,6 +4,7 @@ import { Dialog, RadioGroup, Select } from '../../ui/Overlays';
 import { useExcelExport } from '../../ui/useExcelExport';
 import type { ColumnSpec } from '../column-model';
 import { FileDrop } from '../../ui/FileDrop';
+import { SmartIcon } from './SmartButtons';
 
 /**
  * BoM Comparison.
@@ -155,8 +156,12 @@ export function BomComparisonDialog({ onClose }: { onClose: () => void }) {
         />
       ) : (
         <div className="vy-bom-compare">
-          <section>
-            <h3 className="vy-field-group-title">Select Action</h3>
+          {/* `vy-run-section`, the same card step 1 uses for its own Action
+              group — 28 Oct. This was a bare section with a caption on it,
+              which made the first thing on the screen the one block in the
+              flow that did not look like a group. */}
+          <section className="vy-run-section">
+            <h3 className="vy-field-group-title"><SmartIcon name="task" />Select Action</h3>
             <RadioGroup label="Select Action" options={ACTIONS} value={action} onChange={setAction} />
           </section>
 
@@ -184,7 +189,7 @@ function BomPane({ title, upload }: { title: string; upload: boolean }) {
   const [assembly, setAssembly] = useState('');
   return (
     <section className="vy-bom-pane">
-      <h3 className="vy-field-group-title">{title}</h3>
+      <h3 className="vy-field-group-title"><SmartIcon name="bom" />{title}</h3>
       {upload ? (
         <>
           <div className="vy-dropzone">
@@ -246,7 +251,17 @@ function ComparisonResult({ rows, expanded, onToggle, allOpen, onToggleAll }: {
   return (
     <div className="vy-bom-result">
       <div className="vy-bom-result-head">
-        <h3 className="vy-field-group-title">BOM Comparison Summary</h3>
+        {/* NO TINTED BAR ON THIS ONE, and the rule is the distinction rather
+            than an exception: a group that is a CARD wears the bar bled to its
+            edge; a heading that titles a stretch of the page wears the icon
+            and the caption. This names the counts and the part list under it,
+            and neither is boxed.
+
+            "BoM", not "BOM" — the live export sheet shouts it, and every other
+            screen in this build spells it the way the standard does. */}
+        <h3 className="vy-field-group-title">
+          <SmartIcon name="insight" />BoM Comparison Summary
+        </h3>
         <Button size="sm" variant="tonal" onClick={onToggleAll}>
           {allOpen ? 'Collapse all' : 'Expand all'}
         </Button>

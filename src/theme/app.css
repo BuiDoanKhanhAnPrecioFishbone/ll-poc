@@ -523,7 +523,7 @@
    ========================================================================== */
 .vy-bom-compare { display: flex; flex-direction: column; gap: var(--vy-space-9); }
 .vy-bom-panes { display: grid; grid-template-columns: 1fr 1fr; gap: var(--vy-space-9); }
-.vy-bom-pane { border: 1px solid var(--vy-border); border-radius: var(--vy-radius-md); padding: var(--vy-space-7); }
+.vy-bom-pane { --vy-card-pad: var(--vy-space-7); border: 1px solid var(--vy-border); border-radius: var(--vy-radius-md); padding: var(--vy-card-pad); }
 .vy-dropzone { border: 1px dashed var(--vy-border-strong); border-radius: var(--vy-radius-md); background: var(--vy-surface-subtle); padding: var(--vy-space-9); text-align: center; display: flex; flex-direction: column; align-items: center; gap: var(--vy-space-3); }
 .vy-dropzone strong { color: var(--vy-on-surface); font-size: var(--vy-text-md); }
 .vy-dropzone span { color: var(--vy-on-surface-subtle); font-size: var(--vy-text-sm); }
@@ -1082,18 +1082,28 @@
    border is two boundaries doing one job. That is also where the height for
    the title bars comes from — the separator was costing 41px a join. */
 .vy-run-section {
-  padding: var(--vy-space-6);
+  --vy-card-pad: var(--vy-space-6);
+  padding: var(--vy-card-pad);
   background: var(--vy-surface);
   border: 1px solid var(--vy-border);
   border-radius: var(--vy-radius-md);
   min-width: 0;
 }
-/* The title bleeds to the card's edges, so the bar is the full width of the
-   region rather than a stripe inset from it. */
-.vy-run-section > .vy-field-group-title {
-  margin: calc(var(--vy-space-6) * -1) calc(var(--vy-space-6) * -1) var(--vy-space-6);
-  padding: var(--vy-space-4) var(--vy-space-6);
-  display: flex; align-items: center; gap: var(--vy-space-3);
+/* THE CARD HEADER, in one rule for every card that has one.
+   The title bleeds to the card's edges, so the bar is the full width of the
+   region rather than a stripe inset from it — and each card declares its own
+   `--vy-card-pad`, because CSS cannot read a parent's padding and these three
+   do not pad alike.
+
+   A group that is a CARD wears this bar. A heading that titles a stretch of
+   the page — BoM Comparison Summary, say — wears the icon and the caption
+   above instead; there is nothing for a bar to bleed into. */
+.vy-run-section > .vy-field-group-title,
+.vy-cost-card    > .vy-field-group-title,
+.vy-bom-pane     > .vy-field-group-title {
+  align-self: stretch;
+  margin: calc(var(--vy-card-pad) * -1) calc(var(--vy-card-pad) * -1) var(--vy-card-pad);
+  padding: var(--vy-space-4) var(--vy-card-pad);
   background: var(--vy-brand-subtle);
   border-bottom: 1px solid var(--vy-border);
   border-radius: 0;
@@ -1101,7 +1111,6 @@
   letter-spacing: 0; text-transform: none;
   color: var(--vy-on-surface);
 }
-.vy-run-section > .vy-field-group-title svg { color: var(--vy-brand-text); flex: none; }
 /* The separator is for sections that FOLLOW one another down the page. Side by
    side they are not a sequence, and the rule was pushing Assembly Details 41px
    below BoM Options and drawing a rule across the top of it. */
@@ -1134,18 +1143,10 @@
    `align-self: stretch` because the wide card is a column flex with
    `align-items: flex-start`, which would otherwise shrink the bar to the
    width of the words in it. */
+/* The cost card is the one with a larger radius, so its bar follows it. */
 .vy-cost-card > .vy-field-group-title {
-  align-self: stretch;
-  margin: calc(var(--vy-card-pad) * -1) calc(var(--vy-card-pad) * -1) var(--vy-card-pad);
-  padding: var(--vy-space-3) var(--vy-card-pad);
-  display: flex; align-items: center; gap: var(--vy-space-3);
-  background: var(--vy-brand-subtle);
-  border-bottom: 1px solid var(--vy-border);
   border-radius: var(--vy-radius-lg) var(--vy-radius-lg) 0 0;
-  font-size: var(--vy-text-sm); font-weight: var(--vy-weight-semibold);
-  letter-spacing: 0; text-transform: none; color: var(--vy-on-surface);
 }
-.vy-cost-card > .vy-field-group-title svg { color: var(--vy-brand-text); flex: none; }
 /* The cost-summary ROWS lived here until 21 Oct: five figures as a definition
    list, the money in a mono face. Both went with the matrix — see the cost
    table in components.css, and the 8 Oct review on mono. */
