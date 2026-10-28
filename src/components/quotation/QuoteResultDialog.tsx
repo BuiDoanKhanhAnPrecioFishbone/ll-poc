@@ -12,6 +12,7 @@ import { resultSetup, resultLines } from '../../data/quoteRun';
 import { masterSuppliers } from '../../data/suppliers';
 import { totalQtyOf, money, money3, type BomLine } from '../../data/bom';
 import type { Quotation, QuoteResult } from '../../data/quotations';
+import { SmartIcon } from './SmartButtons';
 
 /**
  * One saved quotation version, read-only — the customer's "Quote result
@@ -135,7 +136,9 @@ export function QuoteResultDialog({ q, result, onClose }: {
         />
 
         <section className="vy-cost-card vy-cost-card--side">
-          <h3 className="vy-cost-title">Cost estimation</h3>
+          <h3 className="vy-field-group-title">
+            <SmartIcon name="finance" />Cost Estimation
+          </h3>
           {/* THE STORED TOTALS, NOT RECOMPUTED ONES. The lines below are priced
               by the same engine the run used, but a saved version's totals are
               what was quoted to the customer — if the two ever disagree, the

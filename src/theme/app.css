@@ -1123,8 +1123,29 @@
 .vy-empty-state--inline { padding: var(--vy-space-10) var(--vy-space-8); margin: var(--vy-space-6) 0 0; }
 
 /* ---- Step 4: Cost Estimation -------------------------------------------- */
-.vy-cost-card { padding: var(--vy-space-8); background: var(--vy-surface-app); border: 1px solid var(--vy-border); border-radius: var(--vy-radius-lg); }
-.vy-cost-title { margin: 0 0 var(--vy-space-6); font-size: var(--vy-text-sm); font-weight: var(--vy-weight-semibold); color: var(--vy-on-surface-muted); text-transform: uppercase; letter-spacing: .04em; }
+.vy-cost-card { --vy-card-pad: var(--vy-space-8); padding: var(--vy-card-pad); background: var(--vy-surface-app); border: 1px solid var(--vy-border); border-radius: var(--vy-radius-lg); }
+/* THE SAME GROUP HEADER STEP 1 USES. The card had a small uppercase caption
+   and no icon, which made it the one block on these screens that announced
+   itself differently from every other — the thing An's note is about.
+
+   `--vy-card-pad` exists so one rule can bleed the bar to the card's edge in
+   both variants: the wide card on step 4 and the narrower one beside the
+   result grid pad differently, and CSS cannot read a parent's padding.
+   `align-self: stretch` because the wide card is a column flex with
+   `align-items: flex-start`, which would otherwise shrink the bar to the
+   width of the words in it. */
+.vy-cost-card > .vy-field-group-title {
+  align-self: stretch;
+  margin: calc(var(--vy-card-pad) * -1) calc(var(--vy-card-pad) * -1) var(--vy-card-pad);
+  padding: var(--vy-space-3) var(--vy-card-pad);
+  display: flex; align-items: center; gap: var(--vy-space-3);
+  background: var(--vy-brand-subtle);
+  border-bottom: 1px solid var(--vy-border);
+  border-radius: var(--vy-radius-lg) var(--vy-radius-lg) 0 0;
+  font-size: var(--vy-text-sm); font-weight: var(--vy-weight-semibold);
+  letter-spacing: 0; text-transform: none; color: var(--vy-on-surface);
+}
+.vy-cost-card > .vy-field-group-title svg { color: var(--vy-brand-text); flex: none; }
 /* The cost-summary ROWS lived here until 21 Oct: five figures as a definition
    list, the money in a mono face. Both went with the matrix — see the cost
    table in components.css, and the 8 Oct review on mono. */

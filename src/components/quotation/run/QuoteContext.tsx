@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Checkbox, Select } from '../../../ui/Overlays';
 import { SearchField, TextField } from '../../../ui/Field';
 import { ReadValue } from '../../../ui/FieldRow';
+import { SmartIcon } from '../SmartButtons';
 import {
   EXCESS_AND_MOQ, MATERIAL_PACKAGE_TYPE, NET_CONSIGNED_INVENTORY,
   QUOTE_FOCUS, ROCKET_CONSIGNED_INVENTORY,
@@ -33,12 +34,23 @@ import type { QuoteSetup } from './state';
  * press it.
  */
 export function QuoteContextBar({
-  heading, assembly, description, applied, pending, onPending, onSuppliers, rfq, extra,
+  heading = 'Quote Setup', assembly, description, applied, pending, onPending,
+  onSuppliers, rfq, extra,
 }: {
   /**
-   * What this strip IS, where it is not simply the setup — step 4 names the
-   * run it is describing, "Quote Run · Version 3", because by then the setup
-   * is history rather than a control.
+   * What this strip IS.
+   *
+   * NAMED ON EVERY STEP FROM 28 OCT, with a default rather than nothing. Step
+   * 1 gives each of its four regions a titled header with an icon — the
+   * pattern the standard asks for — and steps 2, 3 and 4 opened with an
+   * unlabelled box whose first words were a part number. An's note: "một group
+   * nên có tên group, và icon… step 1 đã áp dụng rồi nhưng các step còn lại
+   * chưa". It is the customer's own name for it: her 16 Oct prototype titles
+   * this card `Quote Setup`.
+   *
+   * The result view overrides it with the run it is describing — "Quote Run ·
+   * Version 3", hers too — because by then the setup is history rather than a
+   * control.
    */
   heading?: string;
   assembly: string; description: string;
@@ -89,7 +101,12 @@ export function QuoteContextBar({
           is 76. It is also not a setting — nothing about it can be changed
           here — so a row of settings is the wrong company for it. */}
       <p className="vy-quote-context-head">
-        {heading && <span className="vy-quote-context-heading">{heading}</span>}
+        {/* THE ICON IS THE OTHER HALF OF THE PATTERN. `.vy-run-section`'s header
+            carries one in brand colour; this bar now reads the same way, so a
+            user moving from step 1 to step 3 meets one kind of group heading
+            rather than two. */}
+        <SmartIcon name="settings" />
+        <span className="vy-quote-context-heading">{heading}</span>
         <strong>{assembly}</strong>
         {description && <span>{description}</span>}
         {/* THE SUPPLIER LIST IS A SETTING TOO, and the one that changes the

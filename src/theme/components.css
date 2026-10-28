@@ -1340,11 +1340,30 @@
 }
 /* The assembly, as a heading above the settings rather than as two more boxes
    in the row — see QuoteContext.tsx. */
+/* A GROUP HEADER, the same one step 1 uses — 28 Oct. It was an unlabelled
+   line whose first words were a part number, so three of the four steps
+   opened with a box that did not say what it was. Now it carries the icon and
+   the name in the brand tint, bleeding to the card's edges exactly as
+   `.vy-run-section > .vy-field-group-title` does, and the assembly follows
+   behind the separator it already had. No extra row: the line was there, it
+   just had nothing to say. */
 .vy-quote-context-head {
-  display: flex; align-items: baseline; gap: var(--vy-space-5);
-  margin: 0 0 var(--vy-space-3); min-width: 0;
+  display: flex; align-items: center; gap: var(--vy-space-3) var(--vy-space-5);
+  margin: calc(var(--vy-space-4) * -1) calc(var(--vy-space-6) * -1) var(--vy-space-4);
+  padding: var(--vy-space-3) var(--vy-space-6);
+  min-width: 0;
+  background: var(--vy-brand-subtle);
+  border-bottom: 1px solid var(--vy-border);
+  border-radius: var(--vy-shape-md) var(--vy-shape-md) 0 0;
   font-size: var(--vy-text-sm); color: var(--vy-on-surface-muted);
 }
+/* `flex: none`, because an icon that is a flex item is an icon that shrinks —
+   three times now in this build. */
+.vy-quote-context-head > svg { color: var(--vy-brand-text); flex: none; }
+/* The changed mark is a brand tint, and the bar it now sits on is the same
+   tint: on this one button the fill would vanish. The border and the text
+   carry it instead. */
+.vy-quote-context-head .vy-sup-btn[data-changed] { background: var(--vy-surface); }
 /* NOT MONO. The standard asks for mono on part numbers and the 8 Oct review
    ruled it out — "do not use monotext, hard to read" — and that contradiction
    is question 1 in the customer document. Until it is answered this reads like
@@ -1774,6 +1793,9 @@
    Two measures down, with and without markup across — see StepSummary.tsx for
    why this is a table and not the list of five it replaced. */
 .vy-cost-card--wide { display: flex; flex-direction: column; align-items: flex-start; gap: var(--vy-space-6); }
+/* The column's own `gap` does the spacing under the header here, so the
+   header's margin would be counted twice. */
+.vy-cost-card--wide > .vy-field-group-title { margin-block-end: 0; }
 
 /* ---- Quotation Result: the cost sits BESIDE the setup, not under it -------
    Stacked, the card spent a full-width band on a 340px table and left the
@@ -1791,8 +1813,7 @@
 }
 .vy-result-head > .vy-quote-context { flex: 1 1 var(--vy-result-setup-min); min-inline-size: 0; }
 .vy-result-head > .vy-cost-card     { flex: 0 0 auto; }
-.vy-cost-card--side { padding: var(--vy-space-5) var(--vy-space-6); }
-.vy-cost-card--side .vy-cost-title  { margin-block-end: var(--vy-space-4); }
+.vy-cost-card--side { --vy-card-pad: var(--vy-space-6); }
 .vy-cost-card--side .vy-cost-actions { margin-block-start: var(--vy-space-5); }
 .vy-cost-table { border-collapse: collapse; min-inline-size: var(--vy-cost-table-min); }
 .vy-cost-table th[scope="col"] {

@@ -10,6 +10,7 @@ import {
   type BomLine, type LineStatus,
 } from '../../../data/bom';
 import { setupOf, type RunConfig } from './state';
+import { SmartIcon } from '../SmartButtons';
 
 const STATUSES: LineStatus[] = ['COVER', 'NO', 'N/A', 'NO BID'];
 
@@ -87,7 +88,9 @@ export function StepSummary({ cfg, lines, run, onAddPackage, setLines }: {
           third way of measuring the same material — it is money spent on
           material the build does not consume. */}
       <section className="vy-cost-card vy-cost-card--wide">
-        <h3 className="vy-cost-title">Cost estimation</h3>
+        <h3 className="vy-field-group-title">
+            <SmartIcon name="finance" />Cost Estimation
+          </h3>
         <table className="vy-cost-table">
           <thead>
             <tr>
