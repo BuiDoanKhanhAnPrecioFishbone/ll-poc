@@ -502,6 +502,9 @@
   --vy-sup-group-w:       118px; /* the Group 1 / Group 2 picker in the dialog */
   --vy-mpn-menu-w:        320px; /* an MPN and a full manufacturer name */
   --vy-quote-field-min:   240px; /* one field on the Config BoM grid */
+  /* The same field in the narrow reference panel, where two of them share the
+     width: enough for "MATERIAL PACKAGE TYPE", the longest label there. */
+  --vy-quote-ref-field-min: 150px;
   --vy-cost-col-min:      170px; /* one figure in the cost summary */
   --vy-cost-table-min:    340px; /* two money columns and their headings */
   /* How much the Quotation Result's setup strip wants before the cost card

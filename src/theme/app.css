@@ -562,7 +562,18 @@
    work on the right: what you are doing, then the two halves of doing it. */
 .vy-run-step--config {
   display: grid;
-  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+  /* WIDER, SO THE REFERENCE PANEL CAN PAIR ITS FIELDS — 28 Oct. Her step 1
+     puts Customer beside Qty to Quote, Quote Focus beside Markup, and so on
+     down the panel; at 320px there was no room for a second track, so ours
+     stacked eight fields into a column twice as tall as it needed to be.
+
+     470px, MEASURED RATHER THAN CHOSEN: the widest value here is the customer,
+     "00912 - Halden Marine AS", which wants 162px of text, and a read-only box
+     spends another 52 on its padding and its lock. Two of those and the gap
+     come to 470 — which lands on the third of the dialog her own mockup gives
+     this panel. At 420 the customer's name wrapped onto a second line and took
+     the whole first row with it. */
+  grid-template-columns: minmax(320px, 470px) minmax(0, 1fr);
   gap: var(--vy-space-8);
   align-items: stretch;
   min-height: 0;
@@ -590,9 +601,16 @@
   gap: var(--vy-space-8);
   align-items: start;
 }
-/* The reference column is narrow, so its fields stack rather than fighting for
-   a second track they cannot fill. */
-.vy-run-ref .vy-quote-config-grid { grid-template-columns: minmax(0, 1fr); }
+/* TWO FIELDS TO A ROW, as her mockup pairs them — and `auto-fit` rather than
+   a flat `1fr 1fr`, so the panel drops back to one column when the window is
+   too narrow for the second to hold a label. The pairs fall out of the field
+   order on their own: Customer | Qty to Quote, Quote Focus | Mark up, Excess
+   and MOQ | Material Package Type, Net Consigned | Rocket Consigned — which
+   is hers, field for field. The dividers and the two Notes already span the
+   full width. */
+.vy-run-ref .vy-quote-config-grid {
+  grid-template-columns: repeat(auto-fit, minmax(var(--vy-quote-ref-field-min), 1fr));
+}
 /* The reference rail keeps its grey ground — that is what says "carried from
    the RFQ, not the work" — and takes the same border and title bar as its
    siblings so the four regions read as four of a kind. */
