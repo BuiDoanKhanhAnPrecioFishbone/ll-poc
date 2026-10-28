@@ -41,8 +41,28 @@ export const ACTIONS = [
      It overrides their own sheets, which say `Select Action = "Import New BoM"`
      and `"Load Exisiting Assembly"` — later instruction, same author, about
      these exact words. */
-  { value: 'import-new', label: 'Quick Quote from BoM File' },
-  { value: 'load-existing', label: 'Existing Assembly' },
+  { value: 'import-new', label: 'Quick Quote from BoM File',
+    hint: 'Quote a BoM file attached to this Project Requirement, against an assembly you name.' },
+  { value: 'load-existing', label: 'Existing Assembly',
+    hint: 'Quote an assembly already approved and loaded in the system through the ECO process.' },
+  /* HER THIRD ACTION, 16 Oct — and disabled, as it is in her own prototype:
+     `{ v: "completed", label: "Import Completed Quote", help: "Migration only.
+     Store a quote finished in Voyager.", disabled: true }`.
+
+     IT IS NOT A QUOTE RUN AT ALL, which is why it can sit here switched off
+     without being a hole in the wizard: nothing downstream of this screen would
+     run. It stores a quote that was finished in the old system, so the three
+     steps after this one — parse, price, submit — have already happened
+     elsewhere. Leaving it out would have answered the wrong question: a reader
+     migrating from Voyager would conclude the new system cannot take their
+     finished quotes, where the truth is that this screen is not where it
+     happens.
+
+     THE `Import` BUTTON ON THE RESULT GRID IS THE OTHER END OF THIS, and also
+     unbuilt — both are waiting on the same answer about what a completed
+     Voyager quote arrives as. */
+  { value: 'completed', label: 'Import Completed Quote', disabled: true,
+    hint: 'Migration only — stores a quote that was finished in Voyager. Not part of quoting, so it is switched off here.' },
   /* RESUME DRAFT QUOTE IS NOT HERE ANY MORE. It was, as a third option, and it
      was the wrong shape: the other two answer "what am I quoting", while
      resuming answers "where was I" — and choosing it replaced both sections
@@ -82,6 +102,18 @@ const ATTACHMENTS = [
 ];
 
 /**
+ * The ones this screen can process, in the order they are attached.
+ *
+ * EXPORTED SO THE WIZARD'S DEFAULT COMES FROM HERE. `RunQuotationDialog` opened
+ * with `attachment: 'BOM_RevC_2026-08-12.xlsx'` typed out a second time — the
+ * same file name in two files, which is fine until this list changes and the
+ * dialog opens with a file that is no longer attached. It also made the new
+ * required rule unreachable: a field that is never empty cannot fail, and the
+ * one case the rule exists for is the RFQ with no .xlsx on it.
+ */
+export const RFQ_XLSX = ATTACHMENTS.filter(a => a.ok).map(a => a.name);
+
+/**
  * Step 1 — Config BoM.
  *
  * Three parts: the quoting information carried from the Project Requirement,
@@ -98,7 +130,7 @@ export function StepConfigBom({ q, cfg, set, invalid = [], onResume }: {
   const toast = useToast();
   const [importOpen, setImportOpen] = useState(false);
   const customer = findCustomer(q.customer);
-  const xlsx = ATTACHMENTS.filter(a => a.ok);
+  const xlsx = RFQ_XLSX;
   const assemblies = assembliesFor(q.customer);
   const drafts = draftQuotesFor(q.customer);
 
@@ -194,21 +226,29 @@ export function StepConfigBom({ q, cfg, set, invalid = [], onResume }: {
       <div className="vy-run-work">
       <section className="vy-run-section">
         <h3 className="vy-field-group-title"><SmartIcon name="task" />Action</h3>
+        {/* THE SENTENCES MOVED ONTO THE OPTIONS, and the `as RunConfig['action']`
+            cast went with them. One hint under the group could only ever
+            describe the current selection, which left the third Action — the
+            one nobody can select — with nothing to say for itself. The guard
+            replaces the cast: `completed` is not one of the wizard's two flows,
+            and telling the compiler to accept it anyway is how the result
+            dialog ended up with two fields of the wrong type last week. */}
         <RadioGroup label="Action" value={cfg.action}
                     options={ACTIONS}
-                    onChange={v => set({ action: v as RunConfig['action'] })} />
-        <p className="vy-hint">
-          {cfg.action === 'import-new'
-            ? 'Quote a BoM file attached to this Project Requirement, against an assembly you name.'
-            : 'Quote an assembly already approved and loaded in the system through the ECO process.'}
-        </p>
+                    onChange={v => {
+                      if (v === 'import-new' || v === 'load-existing') set({ action: v });
+                    }} />
         {/* "Precondition: Only show this option when user attach at least 1 file
             in this corresponding project requirements." Saying why beats the
             option quietly not being there. */}
         {cfg.action === 'import-new' && xlsx.length === 0 && (
           <div className="vy-run-banner" data-tone="warn">
-            <strong>Import New BoM needs an attachment.</strong> It reads .xlsx files from this
-            Project Requirement, and there are none.
+            {/* THE ACTION'S OWN NAME, found by finally being able to see this
+                banner. It said "Import New BoM", the label this radio stopped
+                using on 16 Oct, so the one message a user meets when the
+                screen cannot proceed named a control that is not on it. */}
+            <strong>Quick Quote from BoM File needs an attachment.</strong> It reads .xlsx files
+            from this Project Requirement, and there are none.
           </div>
         )}
       </section>
@@ -229,12 +269,25 @@ export function StepConfigBom({ q, cfg, set, invalid = [], onResume }: {
               another below.
             </p>
             <div className="vy-quote-config-grid">
-              <Field label="Please select an attachment you would like to process" wide>
-                <Select label="Attachment" value={cfg.attachment}
-                        options={xlsx.map(a => a.name)}
+              {/* HER LABEL AND HER ASTERISK, 16 Oct: `<Field id="att"
+                  label="Attachment to Process" req>`. Ours read "Please select
+                  an attachment you would like to process" — the guideline's
+                  whole sentence used as a label, which made the one field on
+                  this panel with a decision in it the widest thing on the
+                  screen and still did not say the file had to be chosen. The
+                  sentence is not lost: it is the hint, which is where an
+                  instruction belongs.
+
+                  REQUIRED, AND NOW ENFORCED. The asterisk was the easy half —
+                  `missingStep1` holds the other, so Next stops here with the
+                  field marked instead of parsing a run with no file. */}
+              <Field label="Attachment to Process" required wide
+                     error={invalid.includes('attachment')}>
+                <Select label="Attachment to Process" value={cfg.attachment}
+                        options={xlsx} required invalid={invalid.includes('attachment')}
                         onChange={v => set({ attachment: v })} />
                 <span className="vy-field-hint">
-                  Only .xlsx files from this RFQ's attachments.
+                  Which attached file holds the BoM. Only .xlsx files from this RFQ's attachments.
                   {xlsx.length === 1 && ' There is one, so it is selected for you.'}
                 </span>
               </Field>

@@ -177,6 +177,25 @@
    ship. The 24 lines that used to draw a radio by hand are gone with it, along
    with the bug they carried: see RadioGroup in Overlays.tsx. */
 .vy-radios { display: flex; flex-direction: column; gap: var(--vy-space-4); }
+/* AN OPTION AND ITS OWN SENTENCE, in a plain block so the group goes on laying
+   out one row per option. Measured against the version without the wrapper, on
+   the record form's three radio fields: identical geometry, to the pixel —
+   `.vy-field--radio` below re-declares `flex-wrap: wrap` but not the direction,
+   so those options have been stacking in a column all along and the wrapper
+   changes nothing there either.
+
+   The hint is indented to the LABEL'S TEXT, not to the box: a sentence that
+   starts under the circle reads as a sentence about the group. */
+.vy-radio-row { min-width: 0; }
+.vy-radio-hint {
+  font-size: var(--vy-text-xs); font-style: italic; color: var(--vy-on-surface-subtle);
+  margin: var(--vy-space-1) 0 0 calc(var(--vy-space-4) + 1.25rem); max-width: 56ch;
+}
+/* A DISABLED OPTION IS THE ONE OPTION WHOSE WHOLE JOB IS TO BE READ, so its
+   label is muted rather than faded — the `opacity` treatment belongs on the
+   box, which `kendo-bridge.css` applies, and would take the explanation down
+   with it if it were applied here. */
+.vy-radio[data-disabled] { cursor: not-allowed; color: var(--vy-on-surface-muted); }
 
 
 /* --- Dialog ---------------------------------------------------------------- */

@@ -13,7 +13,7 @@ import {
   buildBomLines, runQuote, totalQtyOf, money,
   type BomLine, type LineStatus, type QuoteRules,
 } from '../../data/bom';
-import { StepConfigBom } from './run/StepConfigBom';
+import { StepConfigBom, RFQ_XLSX } from './run/StepConfigBom';
 import { StepReviewBom } from './run/StepReviewBom';
 import { StepQuoting } from './run/StepQuoting';
 import { StepSummary } from './run/StepSummary';
@@ -88,7 +88,12 @@ export function RunQuotationDialog({ q, onClose, resume }: {
   const [cfg, setCfg] = useState<RunConfig>(() => resume ? resume.cfg : ({
     action: 'import-new',
     bomOption: 'current',
-    attachment: 'BOM_RevC_2026-08-12.xlsx',
+    /* THE FIRST .xlsx ON THE RECORD, not a file name typed again. It was
+       spelled out here, which is the same fact in two files and would open the
+       dialog on a file that is no longer attached the moment that list changes.
+       Empty when the RFQ has no .xlsx — which is the case the new required rule
+       on step 1 exists for, and the case the banner there already explains. */
+    attachment: RFQ_XLSX[0] ?? '',
     template: '',
     detection: 'part number',
     uploadedFile: '',

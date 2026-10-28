@@ -308,21 +308,57 @@ export function Checkbox({ checked, onCheckedChange, label }: {
  * `useId` names the group: radios are exclusive by shared `name`, and two
  * groups on one screen sharing a name would make them one group.
  */
+/** One choice in a `RadioGroup`. */
+export type RadioOption = {
+  value: string;
+  label: string;
+  /**
+   * The sentence under THIS option, rather than one sentence under the group.
+   *
+   * THE SHAPE OF THE GROUP ASKED FOR IT, not taste. Run Quotation step 1 offers
+   * an Action that cannot be chosen, and a hint that follows the selection can
+   * never explain the one option nobody can select. The customer's own 16 Oct
+   * mockup writes a `help` string on each of her three Actions for the same
+   * reason.
+   */
+  hint?: string;
+  /**
+   * Shown, and not selectable — a flow the system has but this moment does not.
+   *
+   * It stays on screen because leaving it out answers a different question:
+   * absence reads as "the system cannot do this", where a disabled option with
+   * its reason beside it reads as "not from here". The reason is not optional
+   * for one of these — a control that refuses without saying why is the thing
+   * being avoided.
+   */
+  disabled?: boolean;
+};
+
 export function RadioGroup({ options, value, onChange, label }: {
-  options: { value: string; label: string }[]; value: string;
+  options: readonly RadioOption[]; value: string;
   onChange: (v: string) => void; label: string;
 }) {
   const name = useId();
   return (
     <div role="radiogroup" aria-label={label} className="vy-radios">
       {options.map(o => (
-        <label className="vy-radio" key={o.value}>
-          <input type="radio" className="k-radio k-radio-lg"
-                 name={name} value={o.value}
-                 checked={value === o.value}
-                 onChange={() => onChange(o.value)} />
-          <span>{o.label}</span>
-        </label>
+        /* THE HINT IS A SIBLING OF THE LABEL, NOT INSIDE IT. Inside, it joins
+           the radio's accessible NAME, and a screen reader announces the whole
+           paragraph as the name of the option; `aria-describedby` is what a
+           description is for, and it is read after the name rather than as it. */
+        <div className="vy-radio-row" key={o.value}>
+          <label className="vy-radio" data-disabled={o.disabled || undefined}>
+            <input type="radio" className="k-radio k-radio-lg"
+                   name={name} value={o.value} disabled={o.disabled}
+                   aria-describedby={o.hint ? `${name}${o.value}-hint` : undefined}
+                   checked={value === o.value}
+                   onChange={() => onChange(o.value)} />
+            <span>{o.label}</span>
+          </label>
+          {o.hint && (
+            <p className="vy-radio-hint" id={`${name}${o.value}-hint`}>{o.hint}</p>
+          )}
+        </div>
       ))}
     </div>
   );

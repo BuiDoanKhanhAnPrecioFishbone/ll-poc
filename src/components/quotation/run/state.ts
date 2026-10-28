@@ -96,6 +96,16 @@ export type RunConfig = {
  * it; the screen says Assembly Part Number.
  */
 export const STEP1_REQUIRED = [
+  /* THE ATTACHMENT IS HERS, NOT THE SHEET'S — `Attachment to Process` carries a
+     red asterisk on her 16 Oct mockup and carried none here, so Next would
+     walk a run with no file on to step 2 and parse whatever the config happened
+     to hold. It is first because it is first on the screen, which is also the
+     order the message names them in.
+
+     The live message quoted above names three fields, not four; it is the
+     string the live system shows, and this build now stops on one more thing
+     than that system does. */
+  { field: 'attachment', label: 'Attachment to Process' },
   { field: 'assemblyPartNumber', label: 'Assembly Part Number' },
   { field: 'partRev', label: 'Revision' },
   { field: 'partDesc', label: 'Description' },

@@ -29,6 +29,7 @@ và tải được như prototype chị gửi.
 | **Run Quotation** | step 1 dùng hết màn hình · step 2–3 gọn lại · điều hướng wizard trên trái, stepper trên phải · thẻ *Quote Run · Version N* + *Prices From* ở step 4 · Cost Estimation 2×2 · *Continue from Drafts* |
 | **Quoting BoM (16/10)** | Quote Setup tách khỏi kết quả · AML thành dòng con ở step 2 và 3 · Preferred Suppliers theo nhóm ưu tiên · chọn MPN chính thức từ Nexar · Consigned trừ trước khi mua · giá trị mang từ RFQ tô xanh kèm tooltip · step 1 dựng lại theo mockup kèm attachment xem/tải. **Còn thiếu — xem mục dưới** |
 | **25/10** | nút icon trong hàng về **26px** đúng standard — lấy đúng bậc `xs` của Kendo chứ không tự đặt số, nên 26 nằm cùng một phép tính với 32 và 34 |
+| **28/10** | màn xem kết quả theo phiên bản (mục 1) · **Attachment to Process\*** và **Import Completed Quote** (mục 5, 6) · mỗi lựa chọn trong nhóm radio có câu giải thích của riêng nó, như mockup của chị |
 
 ### Còn thiếu so với prototype 16/10 — bản trước nói "đủ 8/8", không đúng
 
@@ -40,10 +41,10 @@ bấm Next sang step 3 và 4 thì nội dung vẫn là lưới Review BoM.
 |---|---|---|
 | 1 | **Màn xem kết quả theo từng phiên bản** — bấm một dòng trong bảng Result giờ mở ra đúng màn của chị: thiết lập đã dùng, Cost Estimation, và toàn bộ dòng đã định giá (14 cột, kèm **Ext. Price** theo tên của chị) | **xong** |
 | 2 | **Export to PDF** — nút đã có trên màn kết quả, bấm vào báo "chưa dựng". Xin chị cho biết bản PDF cần trông ra sao (mẫu có sẵn chưa?) | **cần chị trả lời** |
-| 3 | **Import** trên thanh công cụ lưới kết quả — nút đã có, và nó thuộc luồng *Import Completed Quote* ở mục 6 | theo mục 6 |
+| 3 | **Import** trên thanh công cụ lưới kết quả — nút đã có, và nó là đầu kia của mục 6. Cả hai cùng chờ một câu trả lời: *một báo giá đã hoàn tất bên Voyager sang đây dưới dạng gì* | **cần chị trả lời** |
 | 4 | **Pricing Detail** — nút cạnh *Add Package*. Trong prototype của chị bấm vào **chưa làm gì**, nên mình chưa biết nó mở ra gì — xin chị cho biết | **cần chị trả lời** |
-| 5 | **Attachment to Process\*** — trường bắt buộc chọn *file đính kèm nào là BoM*. Mình có Template nhưng thiếu trường này | vừa |
-| 6 | **Import Completed Quote** — lựa chọn thứ ba của Select Action, *"Migration only"*. Mình mới có hai | nhỏ |
+| 5 | **Attachment to Process\*** — trường chọn *file đính kèm nào là BoM*. Mục này **ghi sai ở bản trước**: trường vẫn có, chỉ là nó lấy nguyên câu hướng dẫn làm nhãn, không có dấu `*`, và Next vẫn cho đi tiếp khi chưa chọn file. Giờ đúng nhãn của chị, có dấu `*`, và Next dừng lại | **xong** |
+| 6 | **Import Completed Quote** — lựa chọn thứ ba của Select Action. Dựng đúng như prototype của chị: **có mặt nhưng không chọn được**, kèm câu *"Migration only"* ngay dưới | **xong** |
 
 Thêm một câu: mockup của chị có nút **Add Package** ngay cạnh *Pricing Detail*
 trên màn xem kết quả. Mình **chưa đặt nó ở đó** — thêm một linh kiện đóng gói
@@ -51,6 +52,12 @@ làm đổi giá, mà đây là phiên bản **đã gửi đi rồi**, nên nút
 nhất trên một màn chỉ-đọc lại đi sửa lịch sử. Nút Add Package của mình nằm ở
 step 4, nơi báo giá còn mở. Nếu ý chị là *"thêm package rồi chạy lại thành
 phiên bản mới"* thì đó là một nút khác với một cái tên khác — xin chị xác nhận.
+
+Một câu nữa, thấy được chính nhờ đổi nhãn ở mục 5: ngay dưới *Attachment to
+Process* mình còn một ô **File Name** chỉ-đọc, và nó in lại đúng tên file vừa
+chọn ở trên — hai ô cạnh nhau, một chuỗi. Ô này là của guideline (r23–r25), còn
+prototype của chị **không có nó**. Mình đề nghị **bỏ**, nhưng vì nó nằm trong
+guideline nên xin chị quyết.
 
 Một điểm nhỏ: mockup có 6 attachment, bản mình có 3. Cột tiền mình đã đổi theo
 chị thành **Ext. Price**.

@@ -285,7 +285,13 @@ html[data-kendo-bridged] .k-picker {
    exactly the control whose whole job was to show "this column is always
    shown". Opacity keeps the tick legible and matches `--vy-state-disabled`, the
    one disabled treatment the rest of the app already uses. */
-html[data-kendo-bridged] .k-checkbox:disabled {
+/* THE RADIO HAS THE SAME FAULT, and it took a radio that had to be disabled to
+   find it: the Action group on Run Quotation step 1 offers "Import Completed
+   Quote" unselectable, and without this line that option rendered as an
+   ordinary choice that silently refused the click. Same measurement, same
+   cause, so it joins the rule rather than getting one of its own. */
+html[data-kendo-bridged] .k-checkbox:disabled,
+html[data-kendo-bridged] .k-radio:disabled {
   opacity: var(--vy-state-disabled);
   cursor: not-allowed;
 }
