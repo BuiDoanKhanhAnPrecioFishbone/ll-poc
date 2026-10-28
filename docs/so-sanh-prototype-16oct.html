@@ -23,7 +23,9 @@
     --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
     --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   }
-  @media (prefers-color-scheme: dark) {
+  /* SCREEN ONLY. A reader whose machine is in dark mode would otherwise print
+     white text onto paper the printer leaves white. */
+  @media screen and (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       --ink: #e8ecf3; --ink-soft: #b3bdcc; --ink-faint: #8b97a8;
       --line: #2b3344; --paper: #161b24; --wash: #11151d;
@@ -134,6 +136,59 @@
   .note p { margin: 0 0 8px; font-size: 15px; }
   .note p:last-child { margin-bottom: 0; }
   footer { color: var(--ink-faint); font-size: 13px; padding-top: 10px; }
+
+  /* ---- print / PDF ------------------------------------------------------
+     A4 LANDSCAPE, because the whole document is a pair of screens read against
+     each other. Portrait would force the two apart onto separate pages, and a
+     comparison the reader has to hold in their head is not a comparison.
+     Landscape leaves each figure about 130mm wide — small on paper, fine on a
+     screen, which is where a PDF is actually read.
+
+     Nothing may be split: a finding cut between its figure and its reason, or
+     a numbered badge landing on the page after the sentence it belongs to,
+     costs the reader the one thing the numbering was for. */
+  @page { size: A4 landscape; margin: 12mm 12mm 14mm; }
+  @media print {
+    html, body { background: #fff; }
+    body { font-size: 11.5px; }
+    .page { max-width: none; padding: 0 0 8mm; }
+    .card, .note { break-inside: auto; border-radius: 8px; }
+    /* NO FORCED BREAK BEFORE A SECTION, and the first attempt is why. Forcing
+       one, then asking the figure pair not to split, gave Chrome a block it
+       would not fit under the heading — so page after page opened with a title
+       and three lines and then stopped, 184mm of paper spent on 20mm of words.
+       Measured: the opener needs 171mm of a 184mm page and Chrome still moved
+       it. Letting the content flow fills the pages instead; a heading landing
+       mid-page is what a report looks like, a blank half-page is not. */
+    section.card { break-before: auto; }
+    figure, .pair, ol.finds > li, table tr { break-inside: avoid; }
+    /* HEIGHT-CAPPED ON PAPER, and that is what makes the page breaks behave.
+       A landscape A4 leaves about 185mm of content; step 1's pair is two
+       stacked screens, which at full width came to roughly 195mm — so the
+       whole block refused to share a page with its own heading and left the
+       heading alone on a nearly blank one. Capped, the heading and its figures
+       travel together, which is the entire point of a figure.
+
+       62mm, not 68: at 68 the step-1 block came to about 186mm against 184mm
+       of page, and missing by 2mm costs a whole sheet exactly as dearly as
+       missing by 50. Measured by counting pages, which went 19 → 14. */
+    /* THE SIDE-BY-SIDE IS THE DOCUMENT, so it is stated here rather than left
+       to the width query above. Chrome lays print out at a width of its own
+       choosing — narrower than the page box, as the first PDF showed: the
+       `max-width: 900px` rule fired, the pair collapsed into one column, and a
+       comparison document printed its two sides one under the other. */
+    .pair  { grid-template-columns: 1fr 1fr; }
+    .sides { grid-template-columns: 1fr 1fr; }
+    .pair img { max-block-size: 62mm; inline-size: auto; max-inline-size: 100%; margin-inline: auto; }
+    .card, .note { padding: 14px 16px; }
+    .card h2 { break-after: avoid; }
+    figure img { box-shadow: none; }
+    #zoom { display: none !important; }
+    /* Backgrounds carry meaning here — the orange callouts, the status tags
+       and the striped rows are the document's own legend. */
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    a { color: inherit; text-decoration: none; }
+  }
 </style>
 </head>
 <body>
