@@ -40,18 +40,22 @@ bấm Next sang step 3 và 4 thì nội dung vẫn là lưới Review BoM.
 | | | |
 |---|---|---|
 | 1 | **Màn xem kết quả theo từng phiên bản** — bấm một dòng trong bảng Result giờ mở ra đúng màn của chị: thiết lập đã dùng, Cost Estimation, và toàn bộ dòng đã định giá (14 cột, kèm **Ext. Price** theo tên của chị) | **xong** |
-| 2 | **Export to PDF** — nút đã có trên màn kết quả, bấm vào báo "chưa dựng". Xin chị cho biết bản PDF cần trông ra sao (mẫu có sẵn chưa?) | **cần chị trả lời** |
-| 3 | **Import** trên thanh công cụ lưới kết quả — nút đã có, và nó là đầu kia của mục 6. Cả hai cùng chờ một câu trả lời: *một báo giá đã hoàn tất bên Voyager sang đây dưới dạng gì* | **cần chị trả lời** |
-| 4 | **Pricing Detail** — nút cạnh *Add Package*. Trong prototype của chị bấm vào **chưa làm gì**, nên mình chưa biết nó mở ra gì — xin chị cho biết | **cần chị trả lời** |
+| 2 | **Export to PDF** — chị trả lời 29/10: **tạm gác**, khách đang xuất Excel rồi nhập thủ công theo template riêng của từng PM | **gác lại** |
+| 3 | **Import Completed Quote** — chị trả lời 29/10: **tạm gác** | **gác lại** |
+| 4 | **Pricing Detail** — chị trả lời 29/10: màn **Other Quoted Cost**. Run quote chỉ cho giá vật tư; PM còn cần so với **giá lịch sử** và thêm **chi phí nhân công, tư vấn…** Gồm REFERENCE COST theo đơn vị (standard / target / highest / lowest / last PO), bảng dòng *Sale type · Unit price · Qty · Amount · Amount with markup*, rồi Subtotal · Markup · Total Quoted | **việc lớn nhất còn lại** |
 | 5 | **Attachment to Process\*** — trường chọn *file đính kèm nào là BoM*. Mục này **ghi sai ở bản trước**: trường vẫn có, chỉ là nó lấy nguyên câu hướng dẫn làm nhãn, không có dấu `*`, và Next vẫn cho đi tiếp khi chưa chọn file. Giờ đúng nhãn của chị, có dấu `*`, và Next dừng lại | **xong** |
 | 6 | **Import Completed Quote** — lựa chọn thứ ba của Select Action. Dựng đúng như prototype của chị: **có mặt nhưng không chọn được**, kèm câu *"Migration only"* ngay dưới | **xong** |
 
-Thêm một câu: mockup của chị có nút **Add Package** ngay cạnh *Pricing Detail*
-trên màn xem kết quả. Mình **chưa đặt nó ở đó** — thêm một linh kiện đóng gói
-làm đổi giá, mà đây là phiên bản **đã gửi đi rồi**, nên nút đó sẽ là thứ duy
-nhất trên một màn chỉ-đọc lại đi sửa lịch sử. Nút Add Package của mình nằm ở
-step 4, nơi báo giá còn mở. Nếu ý chị là *"thêm package rồi chạy lại thành
-phiên bản mới"* thì đó là một nút khác với một cái tên khác — xin chị xác nhận.
+**Add Package — chị đã trả lời 29/10, và em đoán sai.** Em không đặt nút này
+trên màn xem kết quả vì nghĩ một phiên bản đã gửi đi là lịch sử, không nên sửa.
+Chị trả lời: **nó không phải lịch sử** — package là thứ bên mình bán thêm khi
+khách yêu cầu, thêm vào là **tính lại giá ngay cho chính phiếu báo giá đang
+xem**. Vậy nút về đúng chỗ chị đặt, và nó ghi vào phiên bản.
+
+**Bảng Result gom nhiều lần chạy vào một dòng.** Ví dụ chị gửi: một part chạy
+**6 lần** nhưng bảng chỉ có **một dòng**, cột *Last Run Version* ghi 6. Bản em
+đang mỗi lần chạy một dòng — phải sửa, và thêm **dropdown chọn version** ngay
+trong màn xem để đổi phiên bản mà không phải đóng màn.
 
 Ô **File Name** dưới *Attachment to Process* đã **bỏ**: nó in lại đúng tên file
 vừa chọn ngay phía trên, hai ô cạnh nhau một chuỗi. Ô này là của guideline
@@ -75,6 +79,24 @@ chị thành **Ext. Price**.
 **bảng Result** — mỗi phiên bản một dòng, kèm ngày chạy, người chạy, tổng tiền.
 Một bảng cho thấy đủ các phiên bản cạnh nhau, so sánh được và xuất Excel được.
 Nếu chị vẫn muốn bộ chọn thì mình thêm.
+
+## Chị trả lời 29/10 — chín câu của tài liệu so sánh
+
+| | Chị trả lời | Việc sinh ra |
+|---|---|---|
+| **Template bắt buộc?** | **Có** — không có template thì không load được BoM. Trường có `*` đỏ là bắt buộc | Thêm `*`, chặn Next |
+| **Select Column Detection** | **Bỏ** — yêu cầu mới từ khách | Gỡ khỏi step 1 |
+| **Build Qty / Attrition Set** | **Bắt buộc**. Revision **số và chữ đều được** | Thêm `*`, chặn Next |
+| **Quote Setup ở step 2** | **Chỉ đọc**, chỉ sửa ở step 3 | Không phải làm gì — đang đúng |
+| **Bộ chọn phiên bản** | **Có**, và bảng Result **gom nhiều lần chạy vào một dòng** | Hai việc: gom dòng + dropdown trong màn xem |
+| **Add Package** | Sửa **trên chính phiên bản đang xem**, tính lại giá ngay | Đưa lên màn kết quả, ghi vào phiên bản |
+| **Pricing Detail** | Màn **Other Quoted Cost** — xem mục 4 bảng trên | Một màn mới |
+| **Export to PDF** | **Tạm gác** | Giữ nút, vẫn báo chưa dựng |
+| **Import Completed Quote** | **Tạm gác** | Giữ như đang có |
+
+Chị bổ sung hai điều, và cả hai **xác nhận bản em đang đúng**: step 3 lúc mới mở
+chưa có dữ liệu nhà cung cấp hay order qty, và **phải bấm Get Prices** mới lấy
+giá từ sàn về.
 
 ## Cần chị quyết — 10 câu
 

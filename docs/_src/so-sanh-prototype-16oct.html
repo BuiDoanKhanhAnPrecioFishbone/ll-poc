@@ -682,25 +682,58 @@
 </section>
 
 <section class="card">
-  <h2>6 · Gom lại — những câu cần chị trả lời</h2>
+  <h2>6 · Chín câu — chị đã trả lời hết, 29/10</h2>
+  <p class="lead">
+    Bảng dưới là <b>câu trả lời của chị</b>, kèm việc nó sinh ra. Bảy câu đổi thành
+    việc phải làm, hai câu chị cho tạm gác.
+  </p>
   <table>
-    <thead><tr><th style="width:34px">#</th><th>Câu hỏi</th><th style="width:150px">Ở đâu</th></tr></thead>
+    <thead><tr><th style="width:30px">#</th><th style="width:27%">Câu hỏi</th><th>Chị trả lời</th><th style="width:26%">Việc sinh ra</th></tr></thead>
     <tbody>
-      <tr><td>1</td><td><b>Template</b> có bắt buộc chọn không, hay để trống thì dùng template mặc định?</td><td>Step 1 · điểm 2</td></tr>
-      <tr><td>2</td><td><b>Select Column Detection</b> — giữ (theo guideline) hay bỏ (theo mockup)?</td><td>Step 1 · điểm 5</td></tr>
-      <tr><td>3</td><td><b>Build Qty / Attrition Set</b> có bắt buộc không? <b>Revision</b> là số hay chữ?</td><td>Step 1</td></tr>
-      <tr><td>4</td><td>Thanh <b>Quote Setup ở step 2</b>: sửa được (như mockup) hay chỉ đọc (như chị dặn 22/10)?</td><td>Step 2 · điểm 6</td></tr>
-      <tr><td>5</td><td>Thêm <b>bộ chọn phiên bản</b> vào màn xem kết quả không?</td><td>Result · điểm 8</td></tr>
-      <tr><td>6</td><td><b>Add Package</b> trên màn chỉ-đọc — ý chị là sửa phiên bản cũ, hay chạy ra phiên bản mới?</td><td>Result · điểm 9</td></tr>
-      <tr><td>7</td><td><b>Pricing Detail</b> mở ra cái gì?</td><td>Result · điểm 10</td></tr>
-      <tr><td>8</td><td><b>Export to PDF</b> cần trông ra sao — đã có mẫu chưa?</td><td>Result · điểm 11</td></tr>
-      <tr><td>9</td><td><b>Import Completed Quote</b> — một báo giá đã hoàn tất bên Voyager sang đây dưới dạng gì?</td><td>Step 1 · Result</td></tr>
+      <tr><td>1</td><td><b>Template</b> có bắt buộc?</td>
+          <td><b>Có.</b> Không có template thì hệ thống không load được BoM. Trường nào chị để dấu <code>*</code> đỏ là bắt buộc.</td>
+          <td>Thêm <code>*</code> vào Template và chặn Next khi chưa chọn. Bỏ câu "dùng template mặc định" — nó không đúng.</td></tr>
+      <tr><td>2</td><td><b>Select Column Detection</b> giữ hay bỏ?</td>
+          <td><b>Bỏ</b> — yêu cầu mới từ khách.</td>
+          <td>Gỡ khỏi step 1. Trường này của Testing Guideline, giờ guideline và khách ngược nhau, lấy theo khách.</td></tr>
+      <tr><td>3</td><td><b>Build Qty / Attrition Set</b> bắt buộc? <b>Revision</b> số hay chữ?</td>
+          <td><b>Bắt buộc cả hai.</b> Revision <b>số và chữ đều được</b>.</td>
+          <td>Thêm <code>*</code> và chặn Next. Revision giữ nguyên ô chữ tự do — đang đúng.</td></tr>
+      <tr><td>4</td><td><b>Quote Setup ở step 2</b> sửa được hay chỉ đọc?</td>
+          <td><b>Chỉ đọc. Chỉ sửa ở step 3.</b></td>
+          <td><b>Không phải làm gì</b> — bản em đang đúng. Chốt lại chỗ prototype 16/10 cho sửa ở step 2.</td></tr>
+      <tr><td>5</td><td>Thêm <b>bộ chọn phiên bản</b> vào màn xem kết quả?</td>
+          <td><b>Có, giữ cả hai.</b> Và quan trọng hơn: <b>nhiều lần chạy trên cùng một file gom vào MỘT dòng</b> ở bảng Result — ví dụ của chị có 6 version nhưng chỉ một dòng, cột <i>Last Run Version</i> ghi 6. Dropdown trong màn xem để đổi version mà không phải đóng màn.</td>
+          <td><b>Hai việc.</b> Bảng Result phải gom theo part + BoM version, không phải mỗi lần chạy một dòng. Và thêm dropdown chọn version vào màn xem.</td></tr>
+      <tr><td>6</td><td><b>Add Package</b> trên màn chỉ-đọc?</td>
+          <td><b>Sửa trên chính phiên bản đang xem.</b> Package là thứ bên mình bán thêm khi khách yêu cầu, thêm vào là <b>tính lại giá ngay cho phiếu báo giá này</b>.</td>
+          <td>Đưa Add Package lên màn kết quả và cho nó <b>ghi vào phiên bản</b>. Em từng không đặt nút này ở đây vì nghĩ phiên bản đã gửi là lịch sử — chị trả lời rồi, nó không phải lịch sử.</td></tr>
+      <tr><td>7</td><td><b>Pricing Detail</b> mở ra gì?</td>
+          <td><b>Chi tiết giá.</b> Run quote chỉ cho giá <b>vật tư</b>; PM còn cần so với <b>giá lịch sử</b> và thêm các loại chi phí khác — nhân công, tư vấn… Màn <i>Other Quoted Cost</i>: REFERENCE COST theo đơn vị (standard / target / highest / lowest / last PO), rồi bảng dòng <i>Sale type · Unit price · Qty · Amount · Amount with markup</i>, cuối cùng Subtotal · Markup · Total Quoted.</td>
+          <td><b>Một màn mới.</b> Đây là việc lớn nhất trong chín câu.</td></tr>
+      <tr><td>8</td><td><b>Export to PDF</b> trông ra sao?</td>
+          <td><b>Tạm gác.</b> Hiện khách xuất Excel rồi nhập báo giá thủ công theo template riêng của từng PM.</td>
+          <td>Giữ nút, vẫn báo "chưa dựng". Chờ yêu cầu mới.</td></tr>
+      <tr><td>9</td><td><b>Import Completed Quote</b> nhận dạng gì?</td>
+          <td><b>Tạm gác.</b></td>
+          <td>Giữ lựa chọn khoá và nút Import như đang có.</td></tr>
     </tbody>
   </table>
+
+  <h3>Chị bổ sung — và hai điều này xác nhận bản em đang đúng</h3>
+  <p class="why">
+    <b>Step 3 lúc mới mở chưa có dữ liệu nhà cung cấp, order qty…</b> và
+    <b>phải bấm Get Prices mới lấy giá từ sàn về.</b> Bản em đang làm đúng như vậy:
+    mở step 3 ra thì cột Supplier, Order Qty, Stock, LT, Pkg., MOQ, Unit Price đều trống,
+    thanh công cụ ghi <i>"No prices yet"</i>, và <i>Update Results</i> bị khoá cho tới khi
+    có giá. Sau khi chạy, nút đổi thành <b>Refresh Prices</b> kèm giờ cập nhật — và
+    nó là nút duy nhất trong luồng <b>hỏi lại trước khi chạy</b>, vì mỗi lần hỏi sàn
+    là một lần tốn tiền thật.
+  </p>
 </section>
 
 <footer>
-  Ảnh chụp ngày 28/10/2026, cùng khung 1440×900 cho cả hai bên.
+  Ảnh chụp ngày 28/10/2026, cùng khung 1440×900 cho cả hai bên. Câu trả lời của chị cập nhật 29/10.
   Khung khoanh cam được vẽ từ toạ độ thật của từng phần tử trong trang, không vẽ tay.
 </footer>
 
