@@ -969,7 +969,7 @@
   margin: 0; max-inline-size: 60ch; color: var(--vy-on-surface-subtle);
   font-size: var(--vy-text-base);
 }
-.vy-errorstate-actions { display: flex; flex-wrap: wrap; gap: var(--vy-space-5); justify-content: center; }
+.vy-errorstate-actions { display: flex; flex-wrap: wrap; gap: var(--vy-space-4); justify-content: center; }
 
 /* The design system's specimen of it. A fixed height so the section does not
    jump when the panel fails — the point is to compare the two states, and a
@@ -2597,5 +2597,5 @@
    the app uses — a second green would make one screen disagree with the rest. */
 .vy-task-status[data-status="Completed"] { background: var(--vy-status-done-bg); color: var(--vy-status-done-fg); }
 
-.vy-task-actions { display: inline-flex; align-items: center; gap: var(--vy-space-3); }
+.vy-task-actions { display: inline-flex; align-items: center; gap: var(--vy-space-4); }
 

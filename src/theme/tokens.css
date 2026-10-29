@@ -398,6 +398,33 @@
   --vy-space-12: 32px;
   --vy-space-14: 40px;
 
+  /* WHICH GAP GOES BETWEEN TWO CONTROLS — 29 Oct.
+     --------------------------------------------------------------------
+     The customer reads a screen for tidiness before they read it for
+     content, and three accidental values turned up in one dialog: two
+     buttons at 0, a picker 2px shorter than the row it stood in, and a
+     column of figures that did not line up. The numbers below are not new;
+     they are what the app already does, written down so the next one is
+     chosen rather than invented.
+
+       2px   buttons in a cluster that READS AS ONE control — the dialog
+             titlebar's Restore/Close, the pager's arrows.
+       4px   icon buttons attached to the control they act on:
+             `.vy-with-actions` — a Select with Preview and Download on it.
+       8px   TWO ADJACENT ACTIONS. This is the default and the common case:
+             `.vy-page-actions`, `.vy-grid-actions`, `.vy-run-actions`,
+             `.vy-run-nav-actions`, `.vy-vs-actions`, `.vy-cost-actions`,
+             `.vy-task-actions`, `.vy-errorstate-actions`.
+      12px   between items that each hold a control AND a label, where 8 is
+             already spent INSIDE the item: `.vy-quote-filters`, whose
+             checkboxes sit 8px from their own words. Tighter inside than
+             between, or the label joins the wrong box.
+      16px   between GROUPS on one row — the toolbar's filters, search and
+             Columns; the nav row's buttons and the version picker.
+
+     So two buttons side by side are 8px apart everywhere, and a bigger gap
+     means a real boundary rather than a different author. */
+
   /* The floor for anything a finger has to hit. Not on the spacing scale on
      purpose — it is an accessibility minimum, not a rhythm step, and a control
      that needs it should say so rather than reach for whichever space token
