@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Icon } from '../../ui/icons';
 import { Button } from '../../ui/Button';
 import { fmtMoney } from '../../ui/regional';
 import { MiniTable } from '../../ui/MiniTable';
@@ -22,16 +23,26 @@ const money = (n: number) => fmtMoney(n);
  * customer's; only the rendering is ours.
  */
 function resultColumns(onOpen: (r: QuoteResult) => void): ColumnSpec<QuoteResult>[] { return [
-  /* "Each quotation result line allows the user to open and view the
-     corresponding quotation detail." The IDENTIFIER carries that, not the whole
-     row — a row-wide click target breaks text selection, and these cells hold
-     part numbers people copy out into email. */
-  { field: 'partNumber', title: 'Part Number', role: 'ident',
+  /* THE EYE OPENS IT, in a column of its own — guideline 2.1 §4: "Click the
+     eye icon on the assembly to open quote result", and her Quotation Result
+     screenshot of 29 Oct shows exactly that, an eye button ahead of PART
+     NUMBER. It used to be a link on the part number itself, which was our
+     reading of "each quotation result line allows the user to open and view
+     the corresponding quotation detail" — a reasonable reading, and not the
+     one the live system shipped. A link also costs the cell its text
+     selection, and these are part numbers people copy into email. */
+  { field: 'id', id: 'open', title: '', role: 'code', width: 56, sortable: false,
+    widthNote: 'One icon button, 26px, with the cell padding around it.',
     render: r => (
-      <button type="button" className="vy-cell-link" onClick={() => onOpen(r)}>
-        {r.partNumber}
+      <button type="button" className="vy-icon-btn"
+              title={`Open quotation ${r.lastRunVersion} for ${r.partNumber}`}
+              aria-label={`Open quotation ${r.lastRunVersion} for ${r.partNumber}`}
+              onClick={() => onOpen(r)}>
+        <Icon name="eye" size={15} />
       </button>
     ) },
+  { field: 'partNumber', title: 'Part Number', role: 'ident',
+    render: r => r.partNumber },
   { field: 'partRev', title: 'Part Rev', role: 'code', render: r => <span className="vy-code">{r.partRev}</span> },
   { field: 'description', title: 'Description', role: 'text' },
   { field: 'buildQty', title: 'Build Qty', role: 'number', render: r => r.buildQty.toLocaleString() },

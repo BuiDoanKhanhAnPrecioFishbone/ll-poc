@@ -237,7 +237,8 @@ const JOBS = [
     prep: `
       /* Kendo's TabStrip is a list of .k-link spans, not buttons. */
       (await __wait(() => __byText('.k-link', /Quotation Result/))).click();
-      (await __wait(() => document.querySelector('.vy-cell-link'))).click();
+      /* The eye, since 29 Oct — guideline 2.1 §4 opens a result that way. */
+      (await __wait(() => document.querySelector('.vy-tabpanel .vy-icon-btn'))).click();
       await __wait(() => __byText('button', /^Pricing Detail$/));
       await new Promise(r => setTimeout(r, 600));`,
     marks: `[

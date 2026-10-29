@@ -438,7 +438,11 @@ export function RunQuotationDialog({ q, onClose, resume }: {
         <Button variant="filled" busy={submitting}
                 onClick={() => {
                   setSubmitting(true);
-                  toast.success('Add Quotation Result');
+                  /* The live system's own words, from guideline 2.1 §3.4:
+                     "The message 'Add Quotation Successfully' appears and
+                     system auto close the form." Ours said "Add Quotation
+                     Result", which is the name of the tab it lands in. */
+                  toast.success('Add Quotation Successfully');
                   onClose();
                 }}>
           Submit
