@@ -1808,7 +1808,16 @@
 /* Actions sit with the provider on the left; the filters and the search are
    pushed to the trailing edge as one group. */
 .vy-quote-toolbar > .vy-run-actions { margin-block: 0; }
-.vy-quote-toolbar > .vy-quote-filters { margin-left: auto; }
+.vy-quote-toolbar > /* The number beside a filter: how many rows it would leave. Tabular, so a
+   column of them does not jiggle, and quiet enough that the label still reads
+   as the control's name. */
+.vy-filter-count {
+  margin-inline-start: var(--vy-space-3);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--vy-text-xs); font-weight: var(--vy-weight-semibold);
+  color: var(--vy-on-surface-subtle);
+}
+.vy-quote-filters { margin-left: auto; }
 .vy-quote-toolbar > .vy-inline-field { margin-top: 0; flex: none; }
 .vy-quote-filters { display: flex; flex-wrap: wrap; gap: var(--vy-space-6); }
 

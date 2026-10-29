@@ -130,5 +130,7 @@ giá từ sàn về.
 | 9 | **Attachments** — ngoài phạm vi v1.0 nhưng mình đã ship (xem / tải). Giữ ở v1.0 hay đóng băng tới v1.1? |
 | 10 | **"Status not counted"** — xin danh sách đủ các field audit không được tính |
 
-*Nút cuối wizard: mình vẫn đề nghị **Generate Quotation** thay cho "Submit",
-theo đúng quy tắc "nút gọi tên kết quả" của chính standard.*
+*Nút cuối wizard: **rút đề nghị này** (29/10). User manual của chị gọi nút cuối
+là **Submit** và nút ở step 3 là **Next** — và chị đúng: nút ở step 3 không
+sinh ra báo giá nào cả, nó chỉ đánh NO BID rồi sang step 4. Thứ thật sự tạo
+bản ghi là Submit. Bản em đã đổi theo.*

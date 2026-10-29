@@ -417,13 +417,21 @@ export function RunQuotationDialog({ q, onClose, resume }: {
       </Button>
       {step === 0 && <Button variant="filled" onClick={leaveStep1}>Next</Button>}
       {step === 1 && <Button variant="filled" onClick={leaveStep2}>Next</Button>}
+      {/* `Next`, NOT `Generate Quotation` — 29 Oct, and the file beside this
+          one had already made the case: "THE PRESS THAT ACTUALLY WRITES IS
+          THIS ONE, not Generate Quotation. Step 3's button sets NO BID on the
+          supplier-less lines and moves to step 4." A button that generates
+          nothing should not be named after generating something; the standard's
+          own rule is that a button names its result, and the result here is
+          step 4. Her user manual calls it Next on both steps, and the quotation
+          is created by Submit — which is what ours already calls it. */}
       {step === 2 && (
         <Button variant={hasRun ? 'filled' : undefined}
                 title={canLeaveStep3
                   ? undefined
                   : 'Get prices first, or continue with a quote that has none'}
                 onClick={generateQuotation}>
-          Generate Quotation
+          Next
         </Button>
       )}
       {step === 3 && (

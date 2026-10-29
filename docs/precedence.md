@@ -89,3 +89,24 @@ one record.** The Testing Guideline would have told me the rule outright.
 
 None of these were judgement calls. Each had a verifiable answer that I did not
 go and look up first.
+
+---
+
+## 29/10/2026 — Hai popup của user manual, cố ý không làm
+
+`Quoting BoM — User Manual` (29/10) mô tả hai hộp thoại xác nhận mà bản này
+**không có**. An chốt ngày 29/10: **giữ cách của bản mình**, và ghi lại để sau
+này còn so sánh.
+
+| | Manual của chị | Bản mình | Vì sao |
+|---|---|---|---|
+| **Step 2 → Next** | Mở popup **Review Excluded Parts**: liệt kê part bị loại, bỏ tick để quote lại, rồi *Confirm & Continue* / *Go Back* | Không popup. Việc loại/nhận part làm **ngay trên lưới step 2**, và bộ lọc **Excluded Only** (giờ có cả số đếm) mở ra đúng danh sách đó bất cứ lúc nào | Popup chồng lên modal wizard, mà nội dung của nó là **một danh sách màn hình phía sau đang hiện**. Thao tác sửa cũng nằm ở lưới, nên popup chỉ thêm một lần bấm giữa người dùng và chỗ sửa |
+| **Step 3 → Next** | Mở popup **Confirm Importing BoM**: liệt kê part không có supplier (sẽ thành *No bid*) và part dư, kèm **Total Excess Amount**, rồi *Accept & Continue* / *Back to Rework* | Không popup. Ba con số đó in thẳng trên thanh cạnh nút Next: *"N dòng · $X · M dòng không có nhà cung cấp → NO BID"* | Một modal hỏi "bạn chắc chưa" về ba con số là một modal lẽ ra chỉ cần **in ba con số đó ra**. Nút vẫn ở đó, người dùng vẫn đọc được hậu quả trước khi bấm, nhưng không mất một nhịp |
+
+**Điều kiện để đổi ý:** nếu người dùng thật bấm Next mà **không đọc** dòng số
+đó — tức là có người submit một báo giá có NO BID mà không biết — thì lập luận
+trên sai và popup phải quay lại. Cần theo dõi ở buổi demo với người dùng thật.
+
+**Đã làm theo manual, không giữ cách cũ:** số đếm cạnh mỗi bộ lọc (standard
+14/10 ghi *"filters (no counts)"*, manual 29/10 ghi ngược lại — lấy bản mới
+hơn), và nút step 3 đổi từ *Generate Quotation* về **Next**.

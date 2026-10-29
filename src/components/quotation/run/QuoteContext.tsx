@@ -274,7 +274,11 @@ function PickField({ label, value, options, onChange, changed, title, wide }: {
  */
 export function QuoteToolbar({ search, onSearch, placeholder, filters, leading, actions, trailing }: {
   search: string; onSearch: (v: string) => void; placeholder: string;
-  filters: { key: string; label: string; on: boolean; onToggle: (v: boolean) => void }[];
+  filters: {
+    key: string; label: string; on: boolean; onToggle: (v: boolean) => void;
+    /** How many rows this filter would leave — see the note in the body. */
+    count?: number;
+  }[];
   /**
    * Controls that configure the run, before the search — step 3's Primary
    * Provider. ONE BAND INSTEAD OF TWO, asked for on 15 Oct: the provider and
@@ -293,18 +297,24 @@ export function QuoteToolbar({ search, onSearch, placeholder, filters, leading, 
      ran provider, search, filters, actions — the actions, which are the point
      of the row, finished last on the right while the search led.
 
-     NO COUNTS on the filters, also theirs, and it is the one rule in this
-     component we would rather argue than obey: a count tells you whether a
-     filter is worth clicking before you click it. Followed here because the
-     standard says it twice and says it plainly; raised in the review instead
-     of quietly kept. */
+     COUNTS ON THE FILTERS, after all — 29 Oct. The standard of 14 Oct says
+     "filters (no counts)", twice and plainly, so this component obeyed it and
+     the argument against went into the review instead: a count tells you
+     whether a filter is worth clicking BEFORE you click it. Her own user
+     manual of 29 Oct answers it — "The number next to each filter is how many
+     parts match" — and it is the later document. So the count is in, and the
+     callers pass it from the same predicate that does the filtering, never a
+     second copy of the rule. */
   return (
     <div className="vy-quote-toolbar">
       {leading}
       {actions}
       <div className="vy-quote-filters">
         {filters.map(f => (
-          <Checkbox key={f.key} checked={f.on} onCheckedChange={f.onToggle} label={f.label} />
+          <Checkbox key={f.key} checked={f.on} onCheckedChange={f.onToggle}
+                    label={f.count === undefined ? f.label : (
+                      <>{f.label}<span className="vy-filter-count">{f.count}</span></>
+                    )} />
         ))}
       </div>
       <SearchField placeholder={placeholder} aria-label={placeholder}

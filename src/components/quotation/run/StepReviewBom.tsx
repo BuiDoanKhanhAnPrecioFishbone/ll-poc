@@ -55,6 +55,13 @@ export function StepReviewBom({ cfg, lines, setLines }: {
     });
   }, [lines, search, isExclude, missingMfg]);
 
+  /* THE COUNTS BESIDE THE FILTERS, from the same predicates the filter uses —
+     `l.excluded` and `unverifiedMfg`, read once each here rather than written
+     a second time. A count that disagrees with its own filter is worse than
+     no count. */
+  const nExcluded = lines.filter(l => l.excluded).length;
+  const nUnverified = lines.filter(unverifiedMfg).length;
+
   const selectable = lines;
   const allOn = selectable.length > 0 && selectable.every(l => !l.excluded);
 
@@ -199,8 +206,10 @@ export function StepReviewBom({ cfg, lines, setLines }: {
         search={search} onSearch={setSearch}
         placeholder="Search by Part / Description / MPN / MFG"
         filters={[
-          { key: 'exclude', label: 'Excluded Only', on: isExclude, onToggle: setIsExclude },
-          { key: 'mfg', label: 'Manufacturer Not Verified', on: missingMfg, onToggle: setMissingMfg },
+          { key: 'exclude', label: 'Excluded Only', on: isExclude, onToggle: setIsExclude,
+            count: nExcluded },
+          { key: 'mfg', label: 'Manufacturer Not Verified', on: missingMfg, onToggle: setMissingMfg,
+            count: nUnverified },
         ]}
       />
 

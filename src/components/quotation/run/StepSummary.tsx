@@ -144,9 +144,12 @@ export function StepSummary({ cfg, lines, run, onAddPackage, setLines }: {
         search={search} onSearch={setSearch}
         placeholder="Search by Part / Description / MPN / MFG / Supplier"
         filters={[
-          { key: 'nobid', label: 'No Bid', on: noBid, onToggle: setNoBid },
-          { key: 'qty', label: 'Not Enough Qty', on: notEnough, onToggle: setNotEnough },
-          { key: 'excess', label: 'Excess Qty', on: excess, onToggle: setExcess },
+          { key: 'nobid', label: 'No Bid', on: noBid, onToggle: setNoBid,
+            count: lines.filter(l => l.supplier === '').length },
+          { key: 'qty', label: 'Not Enough Qty', on: notEnough, onToggle: setNotEnough,
+            count: lines.filter(l => l.status === 'NO').length },
+          { key: 'excess', label: 'Excess Qty', on: excess, onToggle: setExcess,
+            count: lines.filter(l => l.excessAmt > 0).length },
         ]}
         trailing={<ColumnChooser {...chooser} />}
       />

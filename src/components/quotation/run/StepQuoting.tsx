@@ -246,10 +246,15 @@ export function StepQuoting({
         )}
         search={search} onSearch={setSearch}
         placeholder="Search by Part / Description / MPN / MFG / Supplier"
+        /* The counts come from the same three tests the filter runs, a few
+           lines up — not a second copy of the rule. */
         filters={[
-          { key: 'sup', label: 'Unselected Supplier', on: noSupplier, onToggle: setNoSupplier },
-          { key: 'qty', label: 'Not Enough Qty', on: notEnough, onToggle: setNotEnough },
-          { key: 'att', label: 'Missing Attrition', on: missingAttr, onToggle: setMissingAttr },
+          { key: 'sup', label: 'Unselected Supplier', on: noSupplier, onToggle: setNoSupplier,
+            count: quoted.filter(l => !l.excluded && l.supplier === '').length },
+          { key: 'qty', label: 'Not Enough Qty', on: notEnough, onToggle: setNotEnough,
+            count: quoted.filter(l => l.status === 'NO').length },
+          { key: 'att', label: 'Missing Attrition', on: missingAttr, onToggle: setMissingAttr,
+            count: quoted.filter(l => !l.excluded && !(l.attrition > 0)).length },
         ]}
       />
 
