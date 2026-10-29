@@ -95,7 +95,8 @@ export function RunQuotationDialog({ q, onClose, resume }: {
        on step 1 exists for, and the case the banner there already explains. */
     attachment: RFQ_XLSX[0] ?? '',
     template: '',
-    detection: 'part number',
+    /* Her default, and the one listed first. */
+    amlFormat: 'Horizontal',
     uploadedFile: '',
     assemblyPartNumber: '',
     partRev: '',

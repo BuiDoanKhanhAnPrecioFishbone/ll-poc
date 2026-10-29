@@ -224,13 +224,19 @@ function Fact({ label, value, locked = false, wide }: {
  * back to 1 the moment you clear it cannot be retyped. Markup takes 0, which is
  * a real answer.
  */
-export function QtyField({ label, value, onChange, min = 1, changed, title }: {
+export function QtyField({ label, value, onChange, min = 1, changed, title, required }: {
   label: string; value: number; onChange: (n: number) => void;
   min?: number; changed?: boolean; title?: string;
+  /** Step 1 marks these — chị, 29 Oct: Build Qty and Attrition Set are
+   *  required. They cannot be empty (below `min` reverts to it), so the mark
+   *  is the whole of it: there is no state for Next to catch. */
+  required?: boolean;
 }) {
   return (
     <label className="vy-quote-fact vy-quote-fact--input" data-changed={changed || undefined} title={title}>
-      <span className="vy-quote-fact-label">{label}</span>
+      <span className="vy-quote-fact-label">
+        {label}{required && <span className="vy-required" aria-hidden>*</span>}
+      </span>
       <TextField type="number" min={min} value={String(value)}
                  aria-label={label}
                  onChange={e => onChange(Number(e.target.value))}

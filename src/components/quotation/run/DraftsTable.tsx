@@ -69,9 +69,8 @@ export function DraftsTable({ drafts, customer, onContinue }: {
          the Action dropped on 16 Oct, exactly like the step-1 banner did. */
       empty={
         <div className="vy-empty-inline">
-          <strong>No saved drafts for {customer}.</strong> A draft is created when you press
-          Save draft during quoting — on the Quoting or Summary step, in either Action.
-          Drafts are held in this browser session only.
+          <strong>No saved drafts for {customer}.</strong> Save draft during
+          quoting puts one here, for this browser session.
         </div>
       }
     />

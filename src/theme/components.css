@@ -1682,6 +1682,20 @@
 .vy-quote-config-field > .vy-btn { align-self: flex-start; }
 .vy-quote-config-field[data-wide] { grid-column: 1 / -1; }
 
+/* ---- Assembly Details, two tracks ----------------------------------------
+   Her 27 Oct layout pairs part number with revision and the two quantities
+   with each other, and gives the description the width. The panel is ~420px,
+   so the shared `--vy-quote-field-min` of 240 could only ever make one track;
+   these fields are short enough for 170. BoM Options keeps the default and
+   stays a single column, which is right — each of its three fields is a
+   decision on its own. */
+.vy-assy-grid {
+  grid-template-columns: repeat(auto-fit, minmax(var(--vy-assy-field-min), 1fr));
+}
+/* The AVL radio is two words and a dot; her prototype puts the pair on one
+   row at any width, so the tiles take their own, much smaller, floor. */
+.vy-avl-format .vy-radios--tiles { --vy-radio-tile-min: 110px; }
+
 /* A value the step did not ask for — carried from the RFQ, or filled by the
    system — sitting among controls that ARE live. That is the same state as a
    locked field row above, so it is the same box: disabled fill, grey border,

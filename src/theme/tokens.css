@@ -505,6 +505,8 @@
   /* The same field in the narrow reference panel, where two of them share the
      width: enough for "MATERIAL PACKAGE TYPE", the longest label there. */
   --vy-quote-ref-field-min: 150px;
+  /* Assembly Details: "Assembly Part Number" is the longest label in it. */
+  --vy-assy-field-min:    170px;
   /* One Action card: its label on one line and its sentence on no more than
      three. Below this the three drop to a column, which is the old layout. */
   --vy-radio-tile-min:    230px;

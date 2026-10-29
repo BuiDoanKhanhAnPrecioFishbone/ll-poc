@@ -42,7 +42,18 @@ export type RunConfig = {
   /* ---- BoM Options ------------------------------------------------------ */
   attachment: string;
   template: string;
-  detection: string;
+  /**
+   * How the alternates are laid out in the BoM file — her 27 Oct prototype,
+   * and her user manual: "how the AVLs are laid out in the file. Used to check
+   * duplicate part numbers in Step 2."
+   *
+   *   Horizontal  the default: AVLs in columns on one row
+   *   Vertical    one AVL per row
+   *
+   * It is a PARSE instruction, not a display one. The grid always shows one
+   * row per AVL whichever way the file was written — see amlRows.
+   */
+  amlFormat: 'Horizontal' | 'Vertical';
   /** The file chosen through "Import File from Voyager", for `new-version`. */
   uploadedFile: string;
 
@@ -96,6 +107,10 @@ export type RunConfig = {
  * it; the screen says Assembly Part Number.
  */
 export const STEP1_REQUIRED = [
+  /* TEMPLATE IS REQUIRED — chị, 29 Oct: "Có, vì không có template hệ thống
+     không load được BoM lên." Which also retires the line this screen used to
+     carry, that an empty template meant the Inventory Management default. */
+  { field: 'template', label: 'Template' },
   /* THE ATTACHMENT IS HERS, NOT THE SHEET'S — `Attachment to Process` carries a
      red asterisk on her 16 Oct mockup and carried none here, so Next would
      walk a run with no file on to step 2 and parse whatever the config happened

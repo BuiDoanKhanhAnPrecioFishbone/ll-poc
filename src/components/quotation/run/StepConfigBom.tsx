@@ -10,7 +10,7 @@ import { QtyField } from './QuoteContext';
 import { DraftsTable } from './DraftsTable';
 import { draftQuotesFor, type DraftQuote } from '../../../data/draftQuotes';
 import { ImportFileDialog } from './dialogs';
-import { BOM_TEMPLATES, COLUMN_DETECTION, assembliesFor } from '../../../data/bom';
+import { BOM_TEMPLATES, assembliesFor } from '../../../data/bom';
 import { findCustomer, type Quotation } from '../../../data/quotations';
 import type { RunConfig } from './state';
 
@@ -79,14 +79,32 @@ export const ACTIONS = [
  * version nobody asked for — is not visible at the point of choosing.
  */
 export const BOM_OPTIONS = [
-  { value: 'current', label: 'User current BoM (no changes)' },
-  { value: 'new-version', label: 'Upload BoM and create a new version' },
+  /* THE GUIDANCE MOVED ONTO THE OPTIONS, 29 Oct. It was a paragraph under the
+     group, which is the shape chị asked us to stop using; one line per option
+     is the shape she uses herself on Select Action. It keeps the warning where
+     the choice is made — the second option creates a BoM version nobody asked
+     for, and that consequence is invisible at the moment of choosing. */
+  { value: 'current', label: 'User current BoM (no changes)',
+    hint: 'The BoM in the system is already correct.' },
+  { value: 'new-version', label: 'Upload BoM and create a new version',
+    hint: 'Uploading a file here creates a new BoM version.' },
 ];
 
-const BOM_OPTION_HINT: Record<string, string> = {
-  current: 'Use when the existing BoM in the system is already correct and no update is needed.',
-  'new-version': 'Use when the BoM needs updating by uploading a new file, which creates a new version.',
-};
+/**
+ * How the alternates are written in the file — her 27 Oct prototype.
+ *
+ * NO SENTENCE UNDER EITHER, on purpose. Her own prototype carries the
+ * explanation in the data (`AVLs in columns on one row` / `One AVL per row`)
+ * and does not render it, which is the same instruction she gave on 29 Oct:
+ * name the field well and drop the help text. "Horizontal" and "Vertical" are
+ * the words her users already use for the two file shapes.
+ */
+export const AVL_FORMATS = [
+  { value: 'Horizontal', label: 'Horizontal' },
+  { value: 'Vertical', label: 'Vertical' },
+];
+
+
 
 /**
  * Attachments on the Project Requirement.
@@ -153,9 +171,11 @@ export function StepConfigBom({ q, cfg, set, invalid = [], onResume }: {
             14 Oct 2026 a value you cannot edit carries a lock, so naming the
             three editable ones in prose was the same fact twice, in the one
             panel short of vertical room. */}
-        <p className="vy-hint">
-          Carried from the Project Requirement. Change them in Quoting, step 3.
-        </p>
+        {/* THE SENTENCE UNDER THE TITLE IS GONE — chị, 29/10: the screen reads
+            as clutter, so a label that is right should not need a line of prose
+            under it. Every field here carries a lock, which says read-only
+            better than a sentence can, and the user manual is where "change
+            them in step 3" belongs. Eleven of these came off step 1 today. */}
 
         <div className="vy-quote-config-grid">
           {/* THE PROJECT REQUIREMENT'S OWN NUMBER IS GONE, 22 Oct — the
@@ -264,10 +284,6 @@ export function StepConfigBom({ q, cfg, set, invalid = [], onResume }: {
 
         {cfg.action === 'import-new' ? (
           <>
-            <p className="vy-hint">
-              Uses the default template configured in Inventory Management unless you choose
-              another below.
-            </p>
             <div className="vy-quote-config-grid">
               {/* HER LABEL AND HER ASTERISK, 16 Oct: `<Field id="att"
                   label="Attachment to Process" req>`. Ours read "Please select
@@ -286,10 +302,16 @@ export function StepConfigBom({ q, cfg, set, invalid = [], onResume }: {
                 <Select label="Attachment to Process" value={cfg.attachment}
                         options={xlsx} required invalid={invalid.includes('attachment')}
                         onChange={v => set({ attachment: v })} />
-                <span className="vy-field-hint">
-                  Which attached file holds the BoM. Only .xlsx files from this RFQ's attachments.
-                  {xlsx.length === 1 && ' There is one, so it is selected for you.'}
-                </span>
+              </Field>
+
+              {/* HER NEW FIELD, 27 Oct — and it is a parse instruction, not a
+                  display one: "how the AVLs are laid out in the file. Used to
+                  check duplicate part numbers in Step 2." The grid still shows
+                  one row per AVL whichever shape the file arrived in. */}
+              <Field label="AVL Format" required wide className="vy-avl-format">
+                <RadioGroup label="AVL Format" tiles value={cfg.amlFormat}
+                            options={AVL_FORMATS}
+                            onChange={v => set({ amlFormat: v as RunConfig['amlFormat'] })} />
               </Field>
 
               {/* NO `File Name` HERE ANY MORE. The guideline has one (r23-r25),
@@ -305,15 +327,16 @@ export function StepConfigBom({ q, cfg, set, invalid = [], onResume }: {
                   file arrives through an upload dialog and the field is the
                   only record of which one. Here the picker IS the file name.
                   Her own prototype has no such field in BoM Options. */}
-              <Field label="Select template">
+              <Field label="Template" required error={invalid.includes('template')}>
                 {/* PREVIEW AND DOWNLOAD BESIDE THE PICKER, as her prototype has
                     them. A template is a column map, and the question somebody
                     has before choosing one is "what does this map" — which a
                     name cannot answer and a preview can. Disabled until one is
                     chosen, because there is nothing to look at before that. */}
                 <div className="vy-with-actions">
-                  <Select label="Select template" value={cfg.template}
+                  <Select label="Template" value={cfg.template}
                           options={[...BOM_TEMPLATES]}
+                          required invalid={invalid.includes('template')}
                           onChange={v => set({ template: v })} />
                   <button type="button" className="vy-icon-btn" disabled={!cfg.template}
                           title="Preview Template" aria-label="Preview Template"
@@ -326,20 +349,14 @@ export function StepConfigBom({ q, cfg, set, invalid = [], onResume }: {
                     <Icon name="download" size={15} />
                   </button>
                 </div>
-                <span className="vy-field-hint">
-                  Maps and validates the file. It must find Qty, MFG and MPN, or you cannot continue.
-                </span>
               </Field>
 
-              <Field label="Select Column Detection">
-                <Select label="Select Column Detection" value={cfg.detection}
-                        options={[...COLUMN_DETECTION]}
-                        onChange={v => set({ detection: v })} />
-                <span className="vy-field-hint">
-                  Which column identifies a line uniquely. If the column you pick is empty in the
-                  file, separate lines can be merged into one.
-                </span>
-              </Field>
+              {/* SELECT COLUMN DETECTION IS GONE — chị, 29/10: "BỎ (new
+                  requirement từ khách)". It came from the Testing Guideline,
+                  which asks for it; the customer has since decided against it,
+                  and her 27 Oct prototype and her user manual both describe
+                  this panel without it. Later instruction, same author, about
+                  this exact field. */}
             </div>
 
             {/* "The option should be enabled when no Select Template value has
@@ -361,7 +378,6 @@ export function StepConfigBom({ q, cfg, set, invalid = [], onResume }: {
             <RadioGroup label="BoM Options" value={cfg.bomOption}
                         options={BOM_OPTIONS}
                         onChange={v => set({ bomOption: v as RunConfig['bomOption'] })} />
-            <p className="vy-hint">{BOM_OPTION_HINT[cfg.bomOption]}</p>
 
             {cfg.bomOption === 'current' ? (
               /* "Uses the default template configured in Inventory Management.
@@ -369,20 +385,15 @@ export function StepConfigBom({ q, cfg, set, invalid = [], onResume }: {
                  incorrect template selection.)" The control is hidden; WHICH
                  template is not a secret, and naming it answers the obvious
                  question at no cost. */
-              <p className="vy-hint">
-                Parsed with <strong>{BOM_TEMPLATES[0]}</strong>, the default configured in
-                Inventory Management. The template is not offered here, so it cannot be set
-                wrongly.
-              </p>
+              /* "No changes" is the whole of it: nothing to configure,
+                 nothing to explain. */
+              <></>
             ) : (
               <div className="vy-quote-config-grid">
                 <Field label="Select template">
                   <Select label="Select template" value={cfg.template || BOM_TEMPLATES[0]}
                           options={[...BOM_TEMPLATES]}
                           onChange={v => set({ template: v })} />
-                  <span className="vy-field-hint">
-                    Defaults to the template configured in Inventory Management.
-                  </span>
                 </Field>
 
                 {/* ONE ROW: the file name and the control that fills it.
@@ -400,7 +411,6 @@ export function StepConfigBom({ q, cfg, set, invalid = [], onResume }: {
                       Upload file
                     </Button>
                   </div>
-                  <span className="vy-field-hint">Filled in when you upload.</span>
                 </Field>
               </div>
             )}
@@ -413,10 +423,17 @@ export function StepConfigBom({ q, cfg, set, invalid = [], onResume }: {
         <h3 className="vy-field-group-title"><SmartIcon name="factory" />Assembly Details</h3>
 
         {cfg.action === 'import-new' ? (
-          <div className="vy-quote-config-grid">
+          /* TWO TRACKS HERE, ONE IN BoM OPTIONS — her 27 Oct layout: part
+             number beside revision, description across both, then the two
+             quantities side by side. BoM Options stays a single column; its
+             three fields are each a decision on their own. */
+          <div className="vy-quote-config-grid vy-assy-grid">
             <Field label="Assembly Part Number" required error={invalid.includes('assemblyPartNumber')}>
               <TextField aria-label="Assembly Part Number" value={cfg.assemblyPartNumber}
-                         placeholder="3032606"
+                         /* THE PLACEHOLDER TEACHES THE PREFIX, so the line
+                            under the field does not have to — hers does the
+                            same with "0455-ASSEMBLY-TEST". */
+                         placeholder="0912-3032606"
                          onChange={e => set({ assemblyPartNumber: e.target.value })}
                          /* "After the user enters a value and clicks outside the
                             field, the system automatically prefixes the entered
@@ -433,9 +450,6 @@ export function StepConfigBom({ q, cfg, set, invalid = [], onResume }: {
                            const prefix = `0${code.replace(/^0+/, '')}-`;
                            if (!raw.startsWith(prefix)) set({ assemblyPartNumber: prefix + raw });
                          }} />
-              <span className="vy-field-hint">
-                Prefixed with the customer code when you leave the field.
-              </span>
             </Field>
 
             <Field label="Revision" required error={invalid.includes('partRev')}>
@@ -448,13 +462,13 @@ export function StepConfigBom({ q, cfg, set, invalid = [], onResume }: {
                         onChange={e => set({ partDesc: e.target.value })} />
             </Field>
 
-            <QtyField label="Build Quantity" value={cfg.buildQty}
+            <QtyField label="Build Qty" required value={cfg.buildQty}
                       onChange={n => set({ buildQty: n })} />
-            <QtyField label="Attrition Set" value={cfg.attritionSet}
+            <QtyField label="Attrition Set" required value={cfg.attritionSet}
                       onChange={n => set({ attritionSet: n })} />
           </div>
         ) : (
-          <div className="vy-quote-config-grid">
+          <div className="vy-quote-config-grid vy-assy-grid">
             <Field label="Please select assembly" required wide error={invalid.includes('assembly')}>
               <div className="vy-assembly-pick">
                 <Select label="Please select assembly" value={cfg.assembly}
@@ -483,11 +497,15 @@ export function StepConfigBom({ q, cfg, set, invalid = [], onResume }: {
                   </Button>
                 )}
               </div>
-              <span className="vy-field-hint">
-                {assemblies.length
-                  ? `${assemblies.length} on file for ${q.customer}. Format: Customer Code - Part Number - Rev - Version.`
-                  : `No assemblies are loaded for ${q.customer}. Use Import New BoM instead.`}
-              </span>
+              {/* THE COUNT AND THE FORMAT ARE GONE; the dead end stays. A
+                  list that is there explains itself when you open it — but a
+                  list that is EMPTY leaves the user pressing a control that
+                  can never work, and that still needs a sentence. */}
+              {assemblies.length === 0 && (
+                <span className="vy-field-hint">
+                  No assemblies are loaded for {q.customer}. Use Quick Quote from BoM File instead.
+                </span>
+              )}
             </Field>
 
             <Field label="Description" wide>
@@ -495,12 +513,11 @@ export function StepConfigBom({ q, cfg, set, invalid = [], onResume }: {
                   more adjusted", and it belongs to the assembly rather than to
                   this quote run. */}
               <ReadValue>{cfg.partDesc}</ReadValue>
-              <span className="vy-field-hint">Comes from the assembly and cannot be changed here.</span>
             </Field>
 
-            <QtyField label="Build Quantity" value={cfg.buildQty}
+            <QtyField label="Build Qty" required value={cfg.buildQty}
                       onChange={n => set({ buildQty: n })} />
-            <QtyField label="Attrition Set" value={cfg.attritionSet}
+            <QtyField label="Attrition Set" required value={cfg.attritionSet}
                       onChange={n => set({ attritionSet: n })} />
           </div>
         )}
@@ -556,8 +573,9 @@ function Divider({ children }: { children: React.ReactNode }) {
   return <p className="vy-config-divider">{children}</p>;
 }
 
-function Field({ label, required, wide, error, rfq, value, children }: {
+function Field({ label, required, wide, error, rfq, value, className, children }: {
   label: string; required?: boolean; wide?: boolean; error?: boolean;
+  className?: string;
   /**
    * What the Project Requirement holds for this field.
    *
@@ -580,7 +598,8 @@ function Field({ label, required, wide, error, rfq, value, children }: {
     /* `data-invalid` is what the step's Next scrolls to and focuses, and what
        paints the field. The error is on the FIELD because that is where the fix
        is; the toast keeps the customer's own sentence. */
-    <div className="vy-quote-config-field" data-wide={wide || undefined}
+    <div className={className ? `vy-quote-config-field ${className}` : 'vy-quote-config-field'}
+         data-wide={wide || undefined}
          data-invalid={error || undefined} data-changed={changed || undefined}
          title={changed ? `RFQ value: ${rfq}` : undefined}>
       <span className="vy-quote-fact-label">
