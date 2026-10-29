@@ -1,6 +1,6 @@
 # Time log — Voyager IQ UX revamp
 
-**Kỳ này: 27/09 → 29/10/2026** · 98 commit · **≈ 17 giờ 00 phút đo được**
+**Kỳ này: 27/09 → 29/10/2026** · 101 commit · **≈ 16 giờ 22 phút đo được**
 
 Nối tiếp đúng chỗ `Voyager-UIUX-Timesheet-Aug2026.xlsx` dừng lại (26/09).
 
@@ -9,7 +9,8 @@ Nối tiếp đúng chỗ `Voyager-UIUX-Timesheet-Aug2026.xlsx` dừng lại (26
 ## Con số này được tính thế nào
 
 Lấy từ **dấu thời gian commit**, không bấm giờ. Một *phiên* là chuỗi commit cách
-nhau dưới 2 tiếng; thời lượng phiên = từ commit **đầu** đến commit **cuối**.
+nhau dưới 2 tiếng; thời lượng phiên = từ commit **đầu** đến commit **cuối**, làm
+tròn **lên** phút.
 
 **Nó thấp hơn thực tế, và thấp một cách có hệ thống.** Phần việc sinh ra commit
 *đầu tiên* của mỗi phiên không nằm trong khoảng nào: đọc bundle hệ thống live,
@@ -27,8 +28,8 @@ tính khác nhau. Bảng dưới là **đo**, không phải **ước**.
 | Ngày | Phiên | Đo được | Việc chính | Thành phẩm |
 |---|---|---|---|---|
 | **27/09** | 11:45 | — | Chốt time log tới 26/09 · nghiên cứu logo, dựng hướng đầu tiên | `docs/logo-ideas.md` (126 dòng, kèm ngoại lệ D2) · timesheet cập nhật |
-| **06/10** | 21:26–21:56 | 0:30 | Run Quotation dùng hết màn hình; step 1 thôi giấu các trường nó bắt buộc · `npm install` tự kích hoạt licence Kendo để bản demo không bị dán badge · badge đếm thôi đè lên góc dialog | Wizard step 1 dựng lại · script `activate-kendo-licence.mjs` |
-| **07/10** | 06:25–06:32 | 0:07 | Thêm dòng hiển thị trên màn · **câu hỏi chặn B5** gửi chị: *"Upload Quote from Voyager"* là BoM hay là quote? | Câu hỏi B5 vào `open-questions.md` |
+| **06/10** | 21:26–21:56 | 0:31 | Run Quotation dùng hết màn hình; step 1 thôi giấu các trường nó bắt buộc · `npm install` tự kích hoạt licence Kendo để bản demo không bị dán badge · badge đếm thôi đè lên góc dialog | Wizard step 1 dựng lại · script `activate-kendo-licence.mjs` |
+| **07/10** | 06:25–06:32 | 0:08 | Thêm dòng hiển thị trên màn · **câu hỏi chặn B5** gửi chị: *"Upload Quote from Voyager"* là BoM hay là quote? | Câu hỏi B5 vào `open-questions.md` |
 | **13/10** | 21:33 | — | Ghi lại **review 08/10** và **cuộc họp 13/10** | `docs/design-review-08oct.md` |
 | **14/10** | 06:30–07:05 | 0:35 | Trả lại **cột con mắt**, mã hồ sơ thôi làm link · **hai nền, không phải ba**: trắng = gõ được | Quy ước đọc/sửa cho toàn bộ form |
 | **15/10** | 05:59–06:45 | 0:46 | **Activity Log** dựng lại theo đúng bản chị đã làm trên Voyager · Checklists: nút trong hàng đang nằm ngoài mép lưới · step 2: **AML thành cặp** thay cho 12 cột rỗng | Activity Log · Checklists · bản AML đầu tiên |
@@ -43,12 +44,11 @@ tính khác nhau. Bảng dưới là **đo**, không phải **ước**.
 | **25/10** | 16:45–16:56 | 0:11 | Nút icon trong hàng về **26px** — lấy đúng bậc `xs` của Kendo chứ không tự đặt số · **audit Kendo: 33 luật, 0 chỗ chưa ghi chép** | `docs/kendo-control-scale-18oct.md` |
 | **25/10** | 20:57–21:28 | 0:31 | **Viết tài liệu motion & loading lần đầu** · loader mà sản phẩm vốn đã có, giờ mới render · chỗ nào hình minh hoạ đáng tiền, chỗ nào không | `docs/motion-loading.md` (10 mục) · `docs/plane-illustration-brief.md` — brief cho người vẽ |
 | **27/10** | 19:39–21:29 | **1:50** | **Rà soát bản tên lửa bằng cách chạy thật**: đo tương phản 1.52 → 3.81:1, C2PA 12.209 → 4.435 bytes · dựng bản dọc-sáng còn thiếu · **5 trạm gắn vào 5 mốc boot thật** · **busy cho 3 nút bấm hai lần là mất tiền** · **trạng thái lỗi** (trạng thái thứ ba) · export Excel thật · **skeleton màn hồ sơ**, đo tới khi hết nhảy (92px → 1px) | `docs/rocket-journey-review.md` · 4 file SVG + README · BootScreen · ErrorBoundary · RecordSkeleton |
-| **28/10** | 06:53–07:01 | 0:08 | Sửa tài liệu: **bỏ câu "đủ 8/8"** vì không đúng · dựng **màn xem kết quả theo từng phiên bản** | Bảng 6 mục còn thiếu · `QuoteResultDialog` |
-| **28/10** | 19:53–22:53 | **3:00** | 19 commit — xem bảng dưới | **Tài liệu so sánh HTML + PDF 16 trang** |
+| **28/10** | 06:53–07:01 | 0:09 | Sửa tài liệu: **bỏ câu "đủ 8/8"** vì không đúng · dựng **màn xem kết quả theo từng phiên bản** | Bảng 6 mục còn thiếu · `QuoteResultDialog` |
+| **28/10** | 19:53–22:53 | **3:01** | 19 commit — xem bảng dưới | **Tài liệu so sánh HTML + PDF 16 trang** |
 | **29/10** | 06:50 | — | Time log tháng, 27/9 → 28/10 | `docs/time-log.md` |
-| **29/10** | 20:31–21:04 | 0:33 | **Chín câu trả lời của chị, ghi lại rồi dựng**: bỏ Column Detection · Template, Build Qty, Attrition bắt buộc · step 1 theo prototype 27/10 và **helptext 12 khối → 1** · giữ cách của mình ở hai popup, ghi lý do riêng · soát step 2–4 với **guideline 2.1** (đọc PDF bằng bộ giải mã ToUnicode theo từng font) · **Export to Excel ba sheet** đúng §5, kiểm bằng cách tải file về đọc `workbook.xml` | `precedence.md` · `guideline-2.1-soat-step234.md` · `quoteReport.ts` |
-| **29/10** | 21:20–22:4x | **1:10** | **Ba việc cuối của chín câu**: bộ chọn phiên bản + bảng Result gom một dòng · Add Package trên màn kết quả · **Other Quoted Cost** sau nút Pricing Detail. Gom dòng làm lộ một **con số sai** — tổng báo giá đang cộng cả ba lần chạy của cùng một assembly | `resultVersions.ts` · `otherCost.ts` · `PricingDetailDialog.tsx` |
-| | | **≈ 17:00** | **98 commit** | |
+| **29/10** | 20:31–21:31 | **1:01** | **Chín câu trả lời của chị — ghi lại rồi dựng hết**: bỏ Column Detection · Template / Build Qty / Attrition bắt buộc · step 1 theo prototype 27/10, **helptext 12 khối → 1** · hai popup giữ cách của mình, lý do ghi riêng · soát step 2–4 với **guideline 2.1** (đọc PDF bằng bộ giải mã ToUnicode theo từng font) · **Export to Excel ba sheet** · **bộ chọn phiên bản** + bảng Result gom một dòng · **Add Package** trên màn kết quả · **Other Quoted Cost**. Gom dòng làm lộ một **con số sai**: tổng báo giá đang cộng cả ba lần chạy của cùng một assembly | `precedence.md` · `guideline-2.1-soat-step234.md` · `quoteReport.ts` · `resultVersions.ts` · `otherCost.ts` · `PricingDetailDialog.tsx` |
+| | | **≈ 16:22** | **101 commit** | |
 
 ---
 
@@ -82,14 +82,14 @@ tính khác nhau. Bảng dưới là **đo**, không phải **ước**.
 | | |
 |---|---|
 | **Tài liệu so sánh** | `so-sanh-prototype-16oct.html` / `.pdf` — 16 trang, **một file tự chứa**: ảnh và tên lửa nằm sẵn bên trong, bấm được nút Chạy thử, gửi đi đâu cũng mở được |
-| **Tài liệu câu hỏi** | `cau-hoi-standard.md` — còn **9 câu** chờ chị trả lời |
+| **Tài liệu câu hỏi** | `cau-hoi-standard.md` — chín câu của đợt trước **chị đã trả lời hết 29/10**; còn **11 câu** về standard và một câu mới từ màn Other Quoted Cost |
 | **Tài liệu kỹ thuật** | motion & loading · brief hình tên lửa · rà soát bản tên lửa · audit thang kích thước Kendo · modal patterns |
 | **Công cụ dựng lại được** | `capture-compare.mjs` (chụp cả hai bên, khoanh theo toạ độ thật) · `bundle-doc.mjs` · `print-pdf.mjs` — tài liệu dựng lại bằng 3 lệnh |
-| **Trong sản phẩm** | Run Quotation 4 bước đúng mockup · màn xem kết quả theo phiên bản · BootScreen + tên lửa 5 trạm · skeleton lưới và hồ sơ · trạng thái lỗi · BoM Comparison |
+| **Trong sản phẩm** | Run Quotation 4 bước đúng mockup · màn xem kết quả **có bộ chọn phiên bản**, Add Package và Other Quoted Cost · **Export to Excel ba sheet** · BootScreen + tên lửa 5 trạm · skeleton lưới và hồ sơ · trạng thái lỗi · BoM Comparison |
 
 ## Còn chờ chị
 
-Chị đã trả lời cả chín câu hôm 29/10 và **chín việc đã dựng xong**. Còn chờ:
+Chín câu chị trả lời hôm 29/10 đã xong hết: **bảy dựng**, **hai chị chốt tạm gác**. Còn chờ:
 
 - **Export to PDF** và **Import Completed Quote** — chị chốt **tạm gác**.
 - **Danh sách Sale type** của màn Other Quoted Cost — bản em đang để tám giá trị
