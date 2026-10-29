@@ -1939,8 +1939,9 @@ a.vy-btn, a.vy-btn:hover { text-decoration: none; }
    Result row, how many packages were added to a quote. Smaller than a status
    pill because it is a footnote to the number it follows.
 
-   The modifier was in use on step 4's Package tag with nothing behind it since
-   15 Oct — one of those uses is why it is defined now. */
+   The modifier had been in the markup since 28 Aug — step 4's Package tag —
+   with no rule behind it, so it rendered as a full-size pill for two months.
+   Found by needing it for a third use. */
 .vy-pill--sm {
   font-size: var(--vy-text-2xs); padding: 0 var(--vy-space-3);
   letter-spacing: .01em;
