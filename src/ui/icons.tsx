@@ -76,6 +76,11 @@ export const ICONS: Record<string, string> = {
      already on the server, and a cloud would be describing where it is not. */
   download: 'M10 3v9M6.5 8.5 10 12l3.5-3.5M4 14.5V16a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-1.5',
   clip: 'M14 8.5 9 13.5a2.8 2.8 0 0 1-4-4l5.5-5.5a1.9 1.9 0 0 1 2.7 2.7L7.7 12.2a1 1 0 0 1-1.4-1.4L11 6',
+  /* Remove a row the user added — a saved view's column, a quoted cost line.
+     Drawn here rather than inside the two screens that need it: this glyph
+     already existed twice as a local `TrashIcon`, and a set whose members live
+     in different files is how two of them end up different. */
+  trash: 'M3.5 5.5h13M8 5.5V4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v1.5M5.5 5.5 6 16a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l.5-10.5M8.5 8.5v5M11.5 8.5v5',
 };
 
 /**

@@ -1895,6 +1895,87 @@
    different kind of number from the four above it. */
 .vy-cost-table td[data-tone="excess"] { color: var(--vy-danger-text-deep); }
 
+/* ---- Quotation Result: the version picker --------------------------------
+   Guideline 2.1 §4.3's Select Quotation Version, at the end of the navigation
+   row. It does not describe this run — it chooses which run the screen is
+   about — so it sits with the screen's controls rather than inside the strip
+   of values it changes. `.vy-run-nav-actions` takes the free space, so this
+   lands at the end of the row and drops to its own line when the row wraps. */
+.vy-version-pick { display: flex; align-items: center; gap: var(--vy-space-4); flex: 0 0 auto; }
+.vy-version-pick-label {
+  font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .05em;
+  font-weight: var(--vy-weight-medium); color: var(--vy-on-surface-subtle);
+}
+/* Wide enough for the longest option — "v3 · existing BoM · 500 boards ·
+   $123,456.00" — because a picker that ellipsises the total is hiding the
+   column it was added to compare. */
+.vy-version-pick .vy-select { inline-size: 19rem; }
+
+/* A value with a tag after it — a part number and its Package badge, a version
+   and how many runs stand behind it. Inline-flex for the GAP: both call sites
+   rendered `{value}{pill}` inside a plain span, so the pill touched the last
+   character. */
+.vy-tagged { display: inline-flex; align-items: center; gap: var(--vy-space-3); }
+
+/* A count beside a value, not a status: how many runs stand behind a folded
+   Result row, how many packages were added to a quote. Smaller than a status
+   pill because it is a footnote to the number it follows.
+
+   The modifier was in use on step 4's Package tag with nothing behind it since
+   15 Oct — one of those uses is why it is defined now. */
+.vy-pill--sm {
+  font-size: var(--vy-text-2xs); padding: 0 var(--vy-space-3);
+  letter-spacing: .01em;
+}
+
+/* ---- Other Quoted Cost — what Pricing Detail opens -----------------------
+   Two tables, one above the other: what this assembly has cost before, and
+   what is being quoted beside material. See PricingDetailDialog.tsx. */
+.vy-pricing-detail { display: flex; flex-direction: column; gap: var(--vy-space-8); }
+/* The note above a table is about the table, and with no space between them it
+   reads as part of the header row. */
+.vy-pricing-detail .vy-field-hint { display: block; margin-block: 0 var(--vy-space-5); }
+.vy-pricing-detail .vy-field-hint:last-child { margin-block: var(--vy-space-5) 0; }
+.vy-ref-cost, .vy-cost-lines { width: 100%; border-collapse: collapse; }
+.vy-ref-cost th[scope="col"], .vy-cost-lines th[scope="col"] {
+  font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .05em;
+  font-weight: var(--vy-weight-medium); color: var(--vy-on-surface-subtle);
+  text-align: end; padding: 0 0 var(--vy-space-3) var(--vy-space-6);
+  border-block-end: 1px solid var(--vy-border);
+}
+.vy-ref-cost th[scope="col"]:first-child,
+.vy-cost-lines th[scope="col"]:first-child { text-align: start; padding-inline-start: 0; }
+.vy-ref-cost th[scope="row"], .vy-cost-lines th[scope="row"] {
+  text-align: start; font-weight: var(--vy-weight-regular);
+  color: var(--vy-on-surface-muted); padding: var(--vy-space-3) 0;
+}
+.vy-ref-cost td, .vy-cost-lines td {
+  text-align: end; padding: var(--vy-space-3) 0 var(--vy-space-3) var(--vy-space-6);
+  font-variant-numeric: tabular-nums; color: var(--vy-on-surface-strong);
+}
+/* The sale type is a name, and the first column of both tables reads left. */
+.vy-cost-lines td:first-child { text-align: start; padding-inline-start: 0; }
+.vy-ref-cost td[data-tone="excess"] { color: var(--vy-danger-text-deep); }
+/* Row height follows the control in it, so an editable row is taller than a
+   read-only one and the two tables do not pretend to share a rhythm. */
+.vy-cost-lines .vy-field-control { margin: 0; }
+.vy-cost-lines .vy-select { inline-size: 11rem; }
+.vy-num-cell { inline-size: 7rem; }
+.vy-num-cell .vy-input { text-align: end; font-variant-numeric: tabular-nums; }
+/* The line the quote run priced: locked, and saying so with the same padlock
+   the read-only fields use. */
+.vy-locked-cell {
+  display: inline-flex; align-items: center; gap: var(--vy-space-3);
+  color: var(--vy-on-surface-muted);
+}
+.vy-cost-lines tfoot th, .vy-cost-lines tfoot td {
+  border-block-start: 1px solid var(--vy-border); padding-block-start: var(--vy-space-4);
+}
+.vy-cost-lines tfoot tr:last-child th { color: var(--vy-on-surface-strong); }
+.vy-cost-lines tfoot td[data-emphasis] {
+  font-size: var(--vy-text-lg); font-weight: var(--vy-weight-semibold);
+}
+
 /* ---- View Setting: the filter preview ------------------------------------
    Two screens on this app say "filter". The toolbar over the grid is where you
    filter; the Filter tab of View Setting decides what that toolbar contains.

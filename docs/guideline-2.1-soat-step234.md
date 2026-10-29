@@ -33,6 +33,7 @@ với cặp *Import New BoM* / *Quick Quote from BoM File*).
 |---|---|---|---|
 | **Mở kết quả** | §4: *"Click the **eye icon** on the assembly to open quote result"* — và ảnh chụp 29/10 của chị cũng là nút con mắt ở cột đầu | Bấm vào **mã part** (link) | **Nút con mắt** ở cột riêng, trước Part Number. Mã part trả về chữ thường — cell lấy lại khả năng bôi đen để copy |
 | **Thông báo sau Submit** | §3.4: *"The message **'Add Quotation Successfully'** appears"* | *"Add Quotation Result"* | Đúng câu của hệ thống |
+| **Bộ chọn phiên bản** | §4.3: *"Select Quotation Version"* — mỗi dòng hiện **Assembly - Rev - Part Rev - BoM Version - Qty - Total amount** | Mỗi lần chạy một dòng trong bảng Result, không có cách đổi phiên bản trong màn xem | Ô **VERSION** ở thanh điều hướng màn kết quả, và bảng Result **gom các lần chạy của một assembly vào một dòng** (*Last Run Version* kèm thẻ đếm). Assembly/Rev không lặp trong từng dòng của dropdown — màn đã mở từ assembly đó |
 | **Export to Excel** | §5: **Sheet 1 Summary** (tổng theo board và toàn bộ, có/không markup; bốn nhóm cần chú ý: **Excess** · **No Stock** *(có tính tiền)* · **No Bid** *(không tính)* · **EOL/NRND/Obsolete** *(không tính)*) · **Sheet 2 Detail** (mọi dòng, dòng No Bid tô đỏ) · **Sheet 3 Supporting** (mọi chào giá sàn trả về — để kiểm vì sao chọn nhà cung cấp đó) | Một sheet, đúng lưới đang xem | **Ba sheet.** Mỗi tiêu đề nhóm tự ghi số dòng và *(có tính tiền)* / *(KHÔNG tính tiền)* — tổng bỏ dòng nào thì phải nói ra dòng nào. Nhóm EOL/NRND **ghi thẳng là chưa mô phỏng** chứ không để bảng rỗng: bảng rỗng đọc thành "không có hàng EOL", mà điều đó chưa ai kiểm. Xuất **toàn bộ** dòng, không theo filter đang xem |
 
 ## C · Còn thiếu — xin chị / anh xếp thứ tự
@@ -40,7 +41,6 @@ với cặp *Import New BoM* / *Quick Quote from BoM File*).
 | | 2.1 nói | Bản em | Cỡ |
 |---|---|---|---|
 | **Load more suppliers** | §3.3.1: danh sách thả xuống chỉ hiện nhà cung cấp **ưu tiên**; nút *"Load more suppliers"* dưới đáy mở thêm nhà cung cấp ngoài danh sách và broker | Danh sách thả xuống không có nút này | Vừa |
-| **Bộ chọn phiên bản** | §4.3: *"Select Quotation Version"* — mỗi dòng hiện **Assembly - Rev - Part Rev - BoM Version - Qty - Total amount** | Chưa có (chị đã chốt 29/10 là **có**) | Vừa — và 2.1 cho sẵn nội dung từng dòng |
 | **Gộp dòng trùng** | §3.2: cùng *Part Number + Part Rev* ở nhiều sub-assembly thì **cộng số lượng vào một dòng**, báo giá một lần cho tổng | Dữ liệu mẫu không có ca này | Nhỏ (dữ liệu) |
 | **Mã part tạm** | §3.2: file không có mã part thì hệ thống tự sinh **tiền tố khách + số** (ví dụ `S_01`, `S_02`) | Chưa mô phỏng | Nhỏ (dữ liệu) |
 | **Trạng thái sau Submit** | §4: Project Requirement về chế độ xem với trạng thái **Quoted** | Đóng dialog, không đổi trạng thái bản ghi | Nhỏ |

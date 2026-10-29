@@ -188,7 +188,7 @@ function summaryColumns(cfg: RunConfig,
     { field: 'part', title: 'Part', role: 'ident', width: 180,
       widthNote: 'Frozen; part numbers must not truncate.',
       render: l => (
-        <span className="vy-ident">
+        <span className="vy-ident vy-tagged">
           {l.part}{l.isPackage && <span className="vy-pill vy-pill--sm">Package</span>}
         </span>
       ) },

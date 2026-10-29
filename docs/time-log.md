@@ -1,6 +1,6 @@
 # Time log — Voyager IQ UX revamp
 
-**Kỳ này: 27/09 → 28/10/2026** · 92 commit · **≈ 15 giờ 17 phút đo được**
+**Kỳ này: 27/09 → 29/10/2026** · 98 commit · **≈ 17 giờ 00 phút đo được**
 
 Nối tiếp đúng chỗ `Voyager-UIUX-Timesheet-Aug2026.xlsx` dừng lại (26/09).
 
@@ -45,7 +45,10 @@ tính khác nhau. Bảng dưới là **đo**, không phải **ước**.
 | **27/10** | 19:39–21:29 | **1:50** | **Rà soát bản tên lửa bằng cách chạy thật**: đo tương phản 1.52 → 3.81:1, C2PA 12.209 → 4.435 bytes · dựng bản dọc-sáng còn thiếu · **5 trạm gắn vào 5 mốc boot thật** · **busy cho 3 nút bấm hai lần là mất tiền** · **trạng thái lỗi** (trạng thái thứ ba) · export Excel thật · **skeleton màn hồ sơ**, đo tới khi hết nhảy (92px → 1px) | `docs/rocket-journey-review.md` · 4 file SVG + README · BootScreen · ErrorBoundary · RecordSkeleton |
 | **28/10** | 06:53–07:01 | 0:08 | Sửa tài liệu: **bỏ câu "đủ 8/8"** vì không đúng · dựng **màn xem kết quả theo từng phiên bản** | Bảng 6 mục còn thiếu · `QuoteResultDialog` |
 | **28/10** | 19:53–22:53 | **3:00** | 19 commit — xem bảng dưới | **Tài liệu so sánh HTML + PDF 16 trang** |
-| | | **≈ 15:17** | **92 commit** | |
+| **29/10** | 06:50 | — | Time log tháng, 27/9 → 28/10 | `docs/time-log.md` |
+| **29/10** | 20:31–21:04 | 0:33 | **Chín câu trả lời của chị, ghi lại rồi dựng**: bỏ Column Detection · Template, Build Qty, Attrition bắt buộc · step 1 theo prototype 27/10 và **helptext 12 khối → 1** · giữ cách của mình ở hai popup, ghi lý do riêng · soát step 2–4 với **guideline 2.1** (đọc PDF bằng bộ giải mã ToUnicode theo từng font) · **Export to Excel ba sheet** đúng §5, kiểm bằng cách tải file về đọc `workbook.xml` | `precedence.md` · `guideline-2.1-soat-step234.md` · `quoteReport.ts` |
+| **29/10** | 21:20–22:4x | **1:10** | **Ba việc cuối của chín câu**: bộ chọn phiên bản + bảng Result gom một dòng · Add Package trên màn kết quả · **Other Quoted Cost** sau nút Pricing Detail. Gom dòng làm lộ một **con số sai** — tổng báo giá đang cộng cả ba lần chạy của cùng một assembly | `resultVersions.ts` · `otherCost.ts` · `PricingDetailDialog.tsx` |
+| | | **≈ 17:00** | **98 commit** | |
 
 ---
 
@@ -86,6 +89,10 @@ tính khác nhau. Bảng dưới là **đo**, không phải **ước**.
 
 ## Còn chờ chị
 
-Ba mục trong bảng thiếu vẫn **chờ chị trả lời chứ không chờ việc**: Export to PDF
-(cần mẫu), Pricing Detail (trong prototype của chị bấm vào cũng chưa làm gì), và
-Import Completed Quote (một báo giá hoàn tất bên Voyager sang đây dưới dạng gì).
+Chị đã trả lời cả chín câu hôm 29/10 và **chín việc đã dựng xong**. Còn chờ:
+
+- **Export to PDF** và **Import Completed Quote** — chị chốt **tạm gác**.
+- **Danh sách Sale type** của màn Other Quoted Cost — bản em đang để tám giá trị
+  đoán theo nghề; nếu bên mình có bảng metadata thì xin chị gửi danh sách đúng.
+- Bốn mục nhỏ từ guideline 2.1: *Load more suppliers*, gộp dòng trùng giữa các
+  sub-assembly, mã part tạm, và trạng thái **Quoted** sau Submit.

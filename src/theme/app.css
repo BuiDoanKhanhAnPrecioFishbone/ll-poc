@@ -412,6 +412,10 @@
 
 .vy-fact-label { font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .05em; color: var(--vy-on-surface-subtle); margin-bottom: var(--vy-space-1); }
 .vy-fact-value { font-size: var(--vy-text-md); color: var(--vy-on-surface-strong); display: flex; align-items: baseline; gap: var(--vy-space-3); flex-wrap: wrap; }
+/* A second, smaller fact in the same line — "2 · 5 runs". The assemblies count
+   and the runs behind them are one statement, and two facts side by side would
+   claim they are independent numbers. */
+.vy-fact-note { font-size: var(--vy-text-sm); color: var(--vy-on-surface-muted); }
 
 .vy-tabs { background: transparent; }
 /* An unset field says so once, quietly. The production screen renders an empty

@@ -845,6 +845,48 @@ export function assembliesFor(customerLabel: string): Assembly[] {
   return out;
 }
 
+/**
+ * A packaging part, as it enters a BoM.
+ *
+ * SHARED BY THE TWO SCREENS THAT ADD ONE — step 4 of the wizard and the saved
+ * result view, which the customer confirmed on 29 Oct also carries Add Package.
+ * It was twenty lines of `BomLine` construction inside the wizard; copied, the
+ * two screens would have agreed about packaging until the first time one of
+ * them was edited.
+ */
+export type PackageEntry = {
+  part: string; description: string; mfg: string; mpn: string;
+  /** Per board, like every other `qty` in this model. */
+  qty: number;
+  unitPrice: number;
+  notes: string;
+};
+
+export function packageBomLine(p: PackageEntry, buildQty: number, existing: BomLine[]): BomLine {
+  return {
+    id: Math.max(0, ...existing.map(l => l.id)) + 1,
+    number: existing.length + 1,
+    part: p.part, revision: '—', description: p.description,
+    /* `qty` is PER BOARD everywhere in this model, so the package's total comes
+       out of the same formula as every other line rather than being stored
+       separately. */
+    partSource: 'PACKAGING', qty: p.qty, level: 1,
+    /* Priced by hand, so it has no marketplace offers. */
+    offers: [],
+    mfg: p.mfg, mpn: p.mpn,
+    /* A packaging line is bought as specified; there is no second source to
+       offer, so it carries no alternates and nothing to look up. */
+    alternates: [],
+    nexar: [null],
+    attrition: 0, supplier: '—',
+    orderQty: p.qty * buildQty, stock: 0, outStock: 0, lt: 0, pkg: '', moq: 0,
+    excessQty: 0, unitPrice: p.unitPrice,
+    amount: p.unitPrice * p.qty * buildQty,
+    excessAmt: 0, status: 'COVER', notes: p.notes,
+    excluded: false, isPackage: true,
+  };
+}
+
 export const money = (n: number) =>
   fmtMoney(n);
 export const money3 = (n: number) =>

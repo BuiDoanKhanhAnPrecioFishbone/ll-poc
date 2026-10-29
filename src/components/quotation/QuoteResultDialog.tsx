@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Dialog } from '../../ui/Overlays';
+import { Dialog, Select } from '../../ui/Overlays';
 import { Button } from '../../ui/Button';
 import { MiniTable } from '../../ui/MiniTable';
 import { useColumnChoice } from '../../ui/useColumnChoice';
@@ -13,8 +13,11 @@ import { rowTone } from './run/StepQuoting';
 import { resultSetup, resultLines } from '../../data/quoteRun';
 import { quoteReportWorkbook } from '../../data/quoteReport';
 import { masterSuppliers } from '../../data/suppliers';
-import { totalQtyOf, money, money3, type BomLine } from '../../data/bom';
+import { totalQtyOf, money, money3, packageBomLine, type BomLine } from '../../data/bom';
+import { bomVersionOf, type AssemblyRuns } from '../../data/resultVersions';
 import type { Quotation, QuoteResult } from '../../data/quotations';
+import { AddPackageDialog } from './run/dialogs';
+import { PricingDetailDialog } from './PricingDetailDialog';
 import { SmartIcon } from './SmartButtons';
 
 /**
@@ -38,9 +41,10 @@ import { SmartIcon } from './SmartButtons';
  * saved version is a historical fact. Nothing here edits anything, so nothing
  * here is a control that looks like it might.
  */
-export function QuoteResultDialog({ q, result, onClose }: {
+export function QuoteResultDialog({ q, group, onClose }: {
   q: Quotation;
-  result: QuoteResult;
+  /** The assembly and every run of it — the picker's list. */
+  group: AssemblyRuns;
   onClose: () => void;
 }) {
   const toast = useToast();
@@ -48,10 +52,30 @@ export function QuoteResultDialog({ q, result, onClose }: {
   const [noBid, setNoBid] = useState(false);
   const [notEnough, setNotEnough] = useState(false);
   const [excess, setExcess] = useState(false);
+  /* Opens on the run that ran last, which is what the row reported. */
+  const [picked, setPicked] = useState(group.latest.id);
+  const [packageOpen, setPackageOpen] = useState(false);
+  const [pricingOpen, setPricingOpen] = useState(false);
+  /**
+   * What this session has added to the version on screen.
+   *
+   * THE CUSTOMER'S ANSWER OF 29 OCT settled a question this screen had been
+   * carrying a comment about: a saved version is NOT history. A package is
+   * something Rocket sells when the customer asks for it, and adding one
+   * re-prices the quote in front of you. So both controls write — and neither
+   * persists, because the prototype has no store; the cost card says so where
+   * the changed total appears rather than letting it look saved.
+   */
+  const [added, setAdded] = useState<BomLine[]>([]);
+  const [otherCost, setOtherCost] = useState(0);
 
+  const result = group.runs.find(r => r.id === picked) ?? group.latest;
   const setup = useMemo(() => resultSetup(result), [result]);
-  const lines = useMemo(() => resultLines(result), [result]);
+  const priced = useMemo(() => resultLines(result), [result]);
+  const lines = useMemo(() => [...priced, ...added], [priced, added]);
   const { exportWorkbook, excel, busy: exporting } = useExcelExport<BomLine>();
+  const packagesAmount = added.reduce((n, l) => n + l.amount, 0);
+  const adjusted = packagesAmount > 0 || otherCost > 0;
 
   const shown = useMemo(() => {
     const k = search.trim().toLowerCase();
@@ -118,6 +142,49 @@ export function QuoteResultDialog({ q, result, onClose }: {
               Export to PDF
             </Button>
           </div>
+
+          {/* SELECT QUOTATION VERSION — guideline 2.1 §4.3, and the customer's
+              answer of 29 Oct: yes, there is a picker, and the Result tab folds
+              the runs of one assembly into a single row. Without it the
+              earlier versions were unreachable from the screen built to read
+              one, and comparing two meant closing this dialog to open the
+              other.
+
+              ON THE RIGHT OF THE NAVIGATION ROW, not inside the setup strip.
+              It does not describe this run, it CHOOSES which run the whole
+              screen is about, and `.vy-run-nav-actions` is `flex: 1 1 auto`,
+              so a sibling after it lands at the end of the row the way the
+              wizard's stepper does.
+
+              ONE ASSEMBLY, NOT THE RFQ. §4.3 lists Assembly and Rev in each
+              option because the live picker spans everything the RFQ quoted;
+              this one is opened from an assembly's row and the strip below
+              names it, so the option text carries what actually differs
+              between the runs. */}
+          {group.runs.length > 1 && (
+            <div className="vy-version-pick">
+              {/* A VISIBLE CAPTION, because `Select`'s `label` is its
+                  aria-label and nothing else. Without one the row ends in a
+                  dropdown reading "v3 · BoM v3 · 250 boards · $41,655.00",
+                  which is a value with no name on it. */}
+              <span className="vy-version-pick-label">Version</span>
+              <Select
+                label="Quotation version" size="small" value={picked}
+                options={group.runs.map(r => ({
+                  value: r.id,
+                  label: versionOption(r),
+                }))}
+                onChange={id => {
+                  setPicked(id);
+                  /* The adjustments belong to the version they were made on —
+                     carrying a package added to v3 over to v1 would show a
+                     total no run ever produced. */
+                  setAdded([]);
+                  setOtherCost(0);
+                }}
+              />
+            </div>
+          )}
         </div>
 
         {/* THE COST BESIDE THE SETUP, as her mockup has it. Stacked, the cost
@@ -188,22 +255,66 @@ export function QuoteResultDialog({ q, result, onClose }: {
                 <td />
                 <td>{money(lines.reduce((n, l) => n + l.excessAmt, 0))}</td>
               </tr>
+              {/* ONLY ONCE SOMETHING HAS BEEN ADDED. Three rows reading $0.00
+                  would describe a quote nobody has touched as one that has
+                  been adjusted to nothing. */}
+              {adjusted && <>
+                {packagesAmount > 0 && (
+                  <tr>
+                    <th scope="row">
+                      Packages added
+                      <span className="vy-pill vy-pill--sm">{added.length}</span>
+                    </th>
+                    <td />
+                    <td>{money(packagesAmount)}</td>
+                  </tr>
+                )}
+                {otherCost > 0 && (
+                  <tr>
+                    <th scope="row">Other quoted cost</th>
+                    <td />
+                    <td>{money(otherCost)}</td>
+                  </tr>
+                )}
+                <tr>
+                  <th scope="row">Total Quoted</th>
+                  <td />
+                  <td data-emphasis>
+                    {money(result.totalWithMarkup
+                           + (packagesAmount + otherCost) * (1 + result.markupPct / 100))}
+                  </td>
+                </tr>
+              </>}
             </tfoot>
           </table>
-          {/* NO `Add Package` HERE, though her prototype puts one beside
-              Pricing Detail. Adding a packaging part changes what a quote
-              costs, and this is a version that was already sent — the button
-              would be the one control on a read-only screen that edits
-              history. It belongs on step 4, where the quote is still open, and
-              that is where ours is. Flagged for her rather than assumed: if
-              she means "add a package and re-run as a new version", that is a
-              different button with a different name. */}
+          {/* A PROTOTYPE CANNOT SAVE THIS, so it says which number is which
+              rather than letting a changed total look like a stored one. */}
+          {adjusted && (
+            <p className="vy-field-hint">
+              Added in this session. The run's own totals above are what was
+              quoted; nothing here is saved.
+            </p>
+          )}
+          {/* BOTH BUTTONS ARE HERS, and both were a comment here until 29 Oct.
+
+              ADD PACKAGE was left off on the reasoning that a saved version is
+              history and a read-only screen should carry no control that edits
+              it. The customer answered that directly: a package is what Rocket
+              sells when the customer asks for it, and adding one re-prices the
+              quotation being looked at. The reasoning was sound and the premise
+              was wrong, which is why it was asked rather than assumed.
+
+              PRICING DETAIL opened nothing in her prototype either, so what it
+              led to was a question. It leads to Other Quoted Cost: the
+              reference costs this assembly has been bought at, and the labour
+              and consulting that go on top of material. */}
           <div className="vy-cost-actions">
-            {/* HERS, AND UNBUILT ON BOTH SIDES. Pressing Pricing Detail in her
-                own prototype does nothing, so what it opens is a question for
-                her rather than something to invent — question 4 on the
-                customer page. */}
-            <Button onClick={() => toast.notImplemented('open the pricing detail')}>
+            <Button onClick={() => setPackageOpen(true)}
+                    title="Add a packaging part and re-price this quotation">
+              Add Package
+            </Button>
+            <Button onClick={() => setPricingOpen(true)}
+                    title="Reference costs, and the cost quoted beside material">
               Pricing Detail
             </Button>
           </div>
@@ -255,8 +366,53 @@ export function QuoteResultDialog({ q, result, onClose }: {
             No bid — no supplier covered this line, so it is not in the total</li>
         </ul>
       </div>
+
+      {/* THE WIZARD'S OWN DIALOG, not a second one that looks like it. Step 4
+          adds packages through this same form, and the line it produces is
+          built in one place — see packageBomLine. */}
+      <AddPackageDialog
+        open={packageOpen}
+        buildQty={setup.buildQty}
+        onClose={() => setPackageOpen(false)}
+        onAdd={pkg => setAdded(ls => [...ls, packageBomLine(pkg, setup.buildQty, lines)])}
+      />
+
+      {/* KEYED ON THE RUN. Its cost lines are seeded from the result ONCE, in
+          a `useState` initialiser, so without this the screen kept the lines
+          of whichever version was open first: switch from v3 to v1, press
+          Pricing Detail, and the material line still read v3's 100 boards.
+          Caught by the arithmetic — the applied total did not match the
+          subtotal the dialog had just shown. */}
+      <PricingDetailDialog
+        key={result.id}
+        result={result} open={pricingOpen}
+        onClose={() => setPricingOpen(false)}
+        onApply={cost => {
+          setOtherCost(cost);
+          toast.success(`Other quoted cost applied — ${money(cost)} on top of material.`);
+        }}
+      />
     </Dialog>
   );
+}
+
+/**
+ * One line of the version picker.
+ *
+ * §4.3 asks for Assembly - Rev - Part Rev - BoM Version - Qty - Total amount.
+ * The first three are the same on every option here, so they are not repeated
+ * nine times in a dropdown — the strip under it names the assembly. What is
+ * left is what tells two runs apart: which BoM they priced, at what volume, for
+ * how much.
+ */
+function versionOption(r: QuoteResult): string {
+  const bom = bomVersionOf(r);
+  return [
+    r.lastRunVersion,
+    bom ? `BoM ${bom}` : 'existing BoM',
+    `${r.buildQty.toLocaleString()} boards`,
+    money(r.totalWithMarkup),
+  ].join(' · ');
 }
 
 /**

@@ -9,6 +9,7 @@ import { StatusBadge } from '../ui/Badge';
 import { generateQuotations, daysUntil, findCustomer, contactsFor, taskStatus, type Quotation } from '../data/quotations';
 import { ChecklistsTab } from '../components/quotation/ChecklistsTab';
 import { ResultTab } from '../components/quotation/ResultTab';
+import { assemblyRuns } from '../data/resultVersions';
 import { ConversationsTab } from '../components/quotation/ConversationsTab';
 import { ActivityTab } from '../components/quotation/ActivityTab';
 import { BomComparisonDialog } from '../components/quotation/BomComparisonDialog';
@@ -598,7 +599,10 @@ export function QuotationDetail() {
                 : undefined}
             />
           ) },
-          { value: 'result',       label: 'Quotation Result', count: q.results.length,     content: <ResultTab q={q} onRun={() => setRunOpen(true)} /> },
+          /* ASSEMBLIES, NOT RUNS — the tab badge counts the rows behind it, and
+             since 29 Oct the grid folds every run of an assembly into one.
+             `q.results.length` counted three where the tab shows one. */
+          { value: 'result',       label: 'Quotation Result', count: assemblyRuns(q.results).length, content: <ResultTab q={q} onRun={() => setRunOpen(true)} /> },
           { value: 'conversations',label: 'Conversations',count: q.comments.length,    content: <ConversationsTab q={q} /> },
           { value: 'activity',     label: 'Activity Logs', count: q.activity.length, content: <ActivityTab q={q} /> },
         ]}

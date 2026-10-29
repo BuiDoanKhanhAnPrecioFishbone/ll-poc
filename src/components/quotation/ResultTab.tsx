@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Icon } from '../../ui/icons';
 import { Button } from '../../ui/Button';
 import { fmtMoney } from '../../ui/regional';
@@ -7,6 +7,7 @@ import { fmtDateTime } from '../../ui/renderCell';
 import { useExcelExport } from '../../ui/useExcelExport';
 import { QuoteResultDialog } from './QuoteResultDialog';
 import type { ColumnSpec } from '../column-model';
+import { assemblyRuns, type AssemblyRuns } from '../../data/resultVersions';
 import type { Quotation, QuoteResult } from '../../data/quotations';
 import { pageActionsProps } from '../../ui/pageActions';
 
@@ -22,7 +23,8 @@ const money = (n: number) => fmtMoney(n);
  * "Run By" — and the last four were in the wrong order. Names and order are the
  * customer's; only the rendering is ours.
  */
-function resultColumns(onOpen: (r: QuoteResult) => void): ColumnSpec<QuoteResult>[] { return [
+function resultColumns(onOpen: (r: QuoteResult) => void,
+                       runCount: (r: QuoteResult) => number): ColumnSpec<QuoteResult>[] { return [
   /* THE EYE OPENS IT, in a column of its own — guideline 2.1 §4: "Click the
      eye icon on the assembly to open quote result", and her Quotation Result
      screenshot of 29 Oct shows exactly that, an eye button ahead of PART
@@ -55,9 +57,29 @@ function resultColumns(onOpen: (r: QuoteResult) => void): ColumnSpec<QuoteResult
   { field: 'lastRunDate', title: 'Last Run Date', role: 'date', render: r => fmtDateTime(r.lastRunDate) },
   /* "Last Run Version displays the corresponding assembly run number", and
      re-running against the same BoM increments it — so it is a counter, not a
-     label, and reads better right-aligned with the other numbers. */
-  { field: 'lastRunVersion', title: 'Last Run Version', role: 'code',
-    render: r => <span className="vy-code">{r.lastRunVersion}</span> },
+     label, and reads better right-aligned with the other numbers.
+
+     IT IS ALSO HOW DEEP THE ROW IS, since 29 Oct: one row now stands for every
+     run of its assembly, and the customer's own example is a part quoted six
+     times showing as a single row. The count is what tells you there is
+     something behind the eye besides this run — without it, a folded row and a
+     one-run row look the same. */
+  { field: 'lastRunVersion', title: 'Last Run Version', role: 'code', width: 150,
+    widthNote: 'Measured: the heading alone wants 103px of text plus 24px of '
+             + 'cell padding, and the role gives 96 — so it read "Last Run …" '
+             + 'before the count was ever added. 150 fits the heading, the '
+             + 'sort arrow and "v3 · 3 runs".',
+    render: r => {
+      const n = runCount(r);
+      return (
+        <span className="vy-tagged">
+          <span className="vy-code">{r.lastRunVersion}</span>
+          {n > 1 && <span className="vy-pill vy-pill--sm" title={`${n} runs of this assembly`}>
+            {n} runs
+          </span>}
+        </span>
+      );
+    } },
   /* "The BOM File field is blank when the quotation is run from an existing
      BOM." An empty cell here is a fact about how the quote was run, not missing
      data, so it says so rather than showing a dash. */
@@ -81,7 +103,22 @@ function resultColumns(onOpen: (r: QuoteResult) => void): ColumnSpec<QuoteResult
  */
 export function ResultTab({ q, onRun }: { q: Quotation; onRun: () => void }) {
   const { exportRows, excel, busy: exporting } = useExcelExport<QuoteResult>();
-  const [open, setOpen] = useState<QuoteResult | null>(null);
+  const [open, setOpen] = useState<AssemblyRuns | null>(null);
+  /**
+   * ONE ROW PER ASSEMBLY, NOT PER RUN — the customer's answer of 29 Oct. Her
+   * example: a part quoted six times is one row whose Last Run Version reads 6.
+   * Ours listed every run, which filled three rows with two columns of
+   * difference and nine of repetition, and left no screen able to compare them.
+   *
+   * The row IS the latest run, so every column below keeps working on a
+   * `QuoteResult` and nothing about sorting or the export changes. What the
+   * grouping adds is the eye opening a version picker rather than a single
+   * version — see resultVersions.ts.
+   */
+  const groups = useMemo(() => assemblyRuns(q.results), [q.results]);
+  const rows = useMemo(() => groups.map(g => g.latest), [groups]);
+  const groupOf = useMemo(
+    () => new Map(groups.map(g => [g.latest.id, g] as const)), [groups]);
 
   if (q.results.length === 0) {
     return (
@@ -96,8 +133,13 @@ export function ResultTab({ q, onRun }: { q: Quotation; onRun: () => void }) {
     );
   }
 
-  const total = q.results.reduce((a, r) => a + r.totalWithMarkup, 0);
-  const latest = q.results.reduce((a, r) => (r.lastRunDate > a.lastRunDate ? r : a), q.results[0]);
+  /* THE LATEST RUN OF EACH ASSEMBLY, which is what the quote comes to. Summing
+     every result double-counted the moment runs were folded into versions: an
+     assembly re-quoted three times contributed all three totals to one
+     number. It was right while every row was its own assembly, and wrong the
+     moment that stopped being true. */
+  const total = rows.reduce((a, r) => a + r.totalWithMarkup, 0);
+  const latest = rows.reduce((a, r) => (r.lastRunDate > a.lastRunDate ? r : a), rows[0]);
 
   return (
     <>
@@ -109,7 +151,13 @@ export function ResultTab({ q, onRun }: { q: Quotation; onRun: () => void }) {
         </div>
         <div className="vy-fact">
           <div className="vy-fact-label">Assemblies</div>
-          <div className="vy-fact-value">{q.results.length}</div>
+          <div className="vy-fact-value">
+            {groups.length}
+            {/* The runs behind them, when there are more than one apiece —
+                otherwise the two numbers are the same number twice. */}
+            {q.results.length > groups.length &&
+              <span className="vy-fact-note"> · {q.results.length} runs</span>}
+          </div>
         </div>
         <div className="vy-fact">
           <div className="vy-fact-label">Last run</div>
@@ -120,8 +168,8 @@ export function ResultTab({ q, onRun }: { q: Quotation; onRun: () => void }) {
               numbers with a currency format, so the totals are summable rather
               than a column of text. */}
           <Button busy={exporting} onClick={() => exportRows(
-            q.results,
-            resultColumns(() => {}),
+            rows,
+            resultColumns(() => {}, r => groupOf.get(r.id)?.runs.length ?? 1),
             `QuotationResult-RFQ${q.no}.xlsx`,
           )}>
             {exporting ? 'Building the file…' : 'Export'}
@@ -133,15 +181,18 @@ export function ResultTab({ q, onRun }: { q: Quotation; onRun: () => void }) {
       {excel}
 
       <MiniTable
-        data={q.results}
+        data={rows}
         /* "Each quotation result line allows the user to open and view the
            corresponding quotation detail." It raised a not-implemented toast
            for weeks — the table listed versions and could not answer the one
            question a reader of it has. */
-        columns={resultColumns(setOpen)}
+        columns={resultColumns(
+          r => setOpen(groupOf.get(r.id) ?? null),
+          r => groupOf.get(r.id)?.runs.length ?? 1,
+        )}
       />
 
-      {open && <QuoteResultDialog q={q} result={open} onClose={() => setOpen(null)} />}
+      {open && <QuoteResultDialog q={q} group={open} onClose={() => setOpen(null)} />}
     </>
   );
 }

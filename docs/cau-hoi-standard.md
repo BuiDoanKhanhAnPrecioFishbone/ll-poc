@@ -42,7 +42,7 @@ bấm Next sang step 3 và 4 thì nội dung vẫn là lưới Review BoM.
 | 1 | **Màn xem kết quả theo từng phiên bản** — bấm một dòng trong bảng Result giờ mở ra đúng màn của chị: thiết lập đã dùng, Cost Estimation, và toàn bộ dòng đã định giá (14 cột, kèm **Ext. Price** theo tên của chị) | **xong** |
 | 2 | **Export to PDF** — chị trả lời 29/10: **tạm gác**, khách đang xuất Excel rồi nhập thủ công theo template riêng của từng PM | **gác lại** |
 | 3 | **Import Completed Quote** — chị trả lời 29/10: **tạm gác** | **gác lại** |
-| 4 | **Pricing Detail** — chị trả lời 29/10: màn **Other Quoted Cost**. Run quote chỉ cho giá vật tư; PM còn cần so với **giá lịch sử** và thêm **chi phí nhân công, tư vấn…** Gồm REFERENCE COST theo đơn vị (standard / target / highest / lowest / last PO), bảng dòng *Sale type · Unit price · Qty · Amount · Amount with markup*, rồi Subtotal · Markup · Total Quoted | **việc lớn nhất còn lại** |
+| 4 | **Pricing Detail** — chị trả lời 29/10: màn **Other Quoted Cost**. Run quote chỉ cho giá vật tư; PM còn cần so với **giá lịch sử** và thêm **chi phí nhân công, tư vấn…** Gồm REFERENCE COST theo đơn vị (standard / target / highest / lowest / last PO), bảng dòng *Sale type · Unit price · Qty · Amount · Amount with markup*, rồi Subtotal · Markup · Total Quoted | **xong 29/10** — xem ghi chú dưới bảng |
 | 5 | **Attachment to Process\*** — trường chọn *file đính kèm nào là BoM*. Mục này **ghi sai ở bản trước**: trường vẫn có, chỉ là nó lấy nguyên câu hướng dẫn làm nhãn, không có dấu `*`, và Next vẫn cho đi tiếp khi chưa chọn file. Giờ đúng nhãn của chị, có dấu `*`, và Next dừng lại | **xong** |
 | 6 | **Import Completed Quote** — lựa chọn thứ ba của Select Action. Dựng đúng như prototype của chị: **có mặt nhưng không chọn được**, kèm câu *"Migration only"* ngay dưới | **xong** |
 
@@ -62,6 +62,25 @@ vừa chọn ngay phía trên, hai ô cạnh nhau một chuỗi. Ô này là c�
 (r23–r25), prototype của chị không có nó. Nhánh *Existing Assembly* vẫn giữ ô
 File name, vì ở đó file đến từ hộp thoại upload nên ô đó là chỗ duy nhất biết
 đã chọn file nào.
+
+### Ba việc cuối của chín câu — dựng xong 29/10
+
+| | Chị nói | Bản em giờ |
+|---|---|---|
+| **Bộ chọn phiên bản** | §4.3 *Select Quotation Version*, mỗi dòng có Assembly - Rev - Part Rev - BoM Version - Qty - Total amount | Ô **VERSION** ở góc phải thanh điều hướng màn kết quả. Mỗi dòng: `v3 · BoM v3 · 100 boards · $11,830.68`. Assembly và Rev **không lặp lại** trong từng dòng: màn này mở từ một assembly và thanh ngay dưới đã ghi tên nó — dòng chỉ chở thứ **khác nhau** giữa các lần chạy. Đổi version là cả màn đổi theo: thiết lập, Cost Estimation, toàn bộ dòng đã định giá |
+| **Bảng Result gom một dòng** | Một part chạy 6 lần → **một dòng**, *Last Run Version* ghi 6 | Một dòng cho mỗi assembly, cột *Last Run Version* ghi `v3` kèm thẻ **3 runs**. Ô *Assemblies* trên đầu đọc `1 · 3 runs`, badge của tab đếm assembly chứ không đếm lần chạy. **Và nó sửa một con số sai**: *Quoted total with markup* trước đây cộng cả ba lần chạy của cùng một assembly — đúng khi mỗi dòng là một assembly, sai ngay khi không còn vậy |
+| **Add Package** | Sửa **trên chính phiên bản đang xem**, tính lại giá ngay | Nút nằm cạnh *Pricing Detail*, dùng lại đúng hộp thoại của step 4. Dòng package vào thẳng lưới, Cost Estimation mọc thêm hàng **Packages added** và **Total Quoted** |
+| **Pricing Detail** | Màn **Other Quoted Cost** | Hộp thoại 2 bảng: **Reference cost** (standard / target / highest / lowest / last PO, kèm cột *vs this run*) và **Quoted cost lines** (Sale type · Unit price · Qty · Amount · With markup), rồi Subtotal · Markup · Total Quoted. Dòng **Material khoá** — nó là kết quả của lần chạy, không gõ lại được; các dòng khác sửa và thêm bớt được. *Apply to quote* cộng phần ngoài vật tư vào Total Quoted ở màn kết quả |
+
+**Hai điều em nói thẳng trên màn, không để người đọc tự đoán:**
+
+- **Reference cost là số suy ra, không phải lịch sử mua hàng.** Bản demo không
+  có dữ liệu PO; năm con số được suy từ chính lần chạy để màn hình đọc được và
+  so sánh được. Câu đó in ngay trên bảng. Một con số suy ra mà trình bày như
+  *last PO price* là thứ PM sẽ mang đi báo giá.
+- **Add Package và Apply không được lưu.** Prototype không có kho dữ liệu đằng
+  sau. Cost Estimation ghi *"Added in this session"* ngay dưới Total Quoted,
+  thay vì để một con số đã đổi trông như đã lưu.
 
 **Continue from Drafts giờ luôn hiện.** Trước đây mục này chỉ xuất hiện khi đã
 có draft, mà draft chỉ sống trong một phiên trình duyệt — nên mở prototype lên
@@ -98,7 +117,7 @@ Chị bổ sung hai điều, và cả hai **xác nhận bản em đang đúng**:
 chưa có dữ liệu nhà cung cấp hay order qty, và **phải bấm Get Prices** mới lấy
 giá từ sàn về.
 
-## Cần chị quyết — 10 câu
+## Cần chị quyết — 11 câu
 
 **Đang ngược nhau trong tài liệu**
 
@@ -112,6 +131,12 @@ giá từ sàn về.
 |---|---|---|
 | 2 | 44px cho form hồ sơ (chỉ còn form RFQ) | 44px là sàn cho **cảm ứng**, 34–36px cho chuột. Form 27 trường cao thêm ~270px. WCAG 2.5.5 nói về vùng chạm, không nói ô nhập phải cao 44 |
 | 3 | Sáu hay bảy nhóm trạng thái | Giữ **bảy**: RFQ mới và bản nháp không phải một thứ. Kèm pill vàng `open` |
+
+**Từ màn Other Quoted Cost vừa dựng**
+
+| | |
+|---|---|
+| 11 | **Danh sách Sale type** lấy ở đâu? Chị mới nói hai cái — *nhân công* và *tư vấn*. Bản em tạm để tám: Material · Labour · Consulting · Tooling / Fixture · Test & Programming · Packaging · Freight · Other. Đây là **em đoán theo nghề**, không phải đọc từ hệ thống — nếu bên mình có bảng metadata cho nó thì xin chị cho em danh sách đúng |
 
 **Ba câu từ chính file 16/10**
 

@@ -4,35 +4,19 @@ import {
 } from './bom';
 import { masterSuppliers } from './suppliers';
 import type { QuoteResult } from './quotations';
+import { hash, pickBy } from './idHash';
 
 /**
  * The setup and the priced lines behind a saved quote result.
  *
- * WHY THIS IS NOT IN THE GENERATOR. `generateQuotations` draws every value
- * from one seeded stream, and adding a draw to it re-rolls everything after —
- * the canary is the Customer RFQs count on a record, which moves if the stream
- * does. A saved result needs nine more facts than it stores (which focus, what
- * package type, which provider…), and asking the generator for them would have
- * cost nine draws and shifted the whole dataset.
- *
- * So they are derived HERE, from the result's own id, through a local hash
- * that touches no shared stream. Same id, same answer, every reload — and the
- * generator's numbers do not move by a digit.
+ * WHY THIS IS NOT IN THE GENERATOR. A saved result needs nine more facts than
+ * it stores (which focus, what package type, which provider…), and asking the
+ * generator for them would have cost nine draws from its one seeded stream and
+ * shifted the whole dataset. They are derived from the result's own id
+ * instead — see `idHash.ts`, which explains the rule and holds the hash.
  */
 
-/** FNV-1a over the id. Small, stable, and not the generator's `rnd`. */
-function hash(s: string): number {
-  let h = 0x811c9dc5;
-  for (let i = 0; i < s.length; i++) {
-    h ^= s.charCodeAt(i);
-    h = Math.imul(h, 0x01000193);
-  }
-  return h >>> 0;
-}
-
-/** Deterministic pick: the nth value, chosen by the id and a salt. */
-const pick = <T,>(id: string, salt: string, xs: readonly T[]): T =>
-  xs[hash(id + salt) % xs.length];
+const pick = pickBy;
 
 const QUOTE_FOCUS = ['Stock - High cost', 'Lead time - Low cost', 'OTHER'] as const;
 const EXCESS_MOQ = ['Low', 'High'] as const;

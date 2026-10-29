@@ -16,6 +16,7 @@
 
 import type { ColumnSpec } from '../components/column-model';
 import { createdQuotations } from './createdQuotations';
+import { foldRuns } from './resultVersions';
 import * as META from './metadata';
 
 export type QuotationStatus = 'New' | 'In-Progress' | 'Quoted' | 'Completed' | 'Cancelled';
@@ -555,9 +556,16 @@ export function generateQuotations(count = 330): Quotation[] {
             approved,
           };
         }),
-      /* Only quoted/completed RFQs have results — a New one has never been run. */
+      /* Only quoted/completed RFQs have results — a New one has never been run.
+
+         FOLDED INTO ASSEMBLIES AFTERWARDS, not while drawing. Each run below
+         draws its own part number, so an RFQ's three runs were three unrelated
+         assemblies; the live system re-runs ONE assembly as the BoM changes,
+         and the customer's Result tab shows that as a single row. `foldRuns`
+         rewrites the identity of runs already drawn and asks `rnd()` for
+         nothing, so the fix moves no other record — see resultVersions.ts. */
       results: (status === 'Quoted' || status === 'Completed')
-        ? Array.from({ length: 1 + Math.floor(rnd() * 3) }, (_, j) => {
+        ? foldRuns(Array.from({ length: 1 + Math.floor(rnd() * 3) }, (_, j) => {
             const qty = pick([25, 50, 100, 250, 500]);
             const cpb = Math.round(rnd() * 18000) / 100 + 12;
             const markup = 10 + Math.floor(rnd() * 20);
@@ -580,7 +588,7 @@ export function generateQuotations(count = 330): Quotation[] {
                  current BoM are the common case. */
               bomFile: rnd() > 0.35 ? `BOM-${cust.slice(0, 5)}-v${1 + j}.xlsx` : '',
             };
-          })
+          }), `rfq-${i}`)
         : [],
       comments: Array.from({ length: Math.floor(rnd() * 3) }, (_, j) => {
         const who = pick(OWNERS);

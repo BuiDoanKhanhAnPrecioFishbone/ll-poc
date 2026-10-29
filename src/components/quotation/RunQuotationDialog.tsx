@@ -10,7 +10,7 @@ import { useToast } from '../../ui/Toast';
 import type { Quotation } from '../../data/quotations';
 import { ME } from '../../data/queues';
 import {
-  buildBomLines, runQuote, totalQtyOf, money,
+  buildBomLines, runQuote, totalQtyOf, money, packageBomLine,
   type BomLine, type LineStatus, type QuoteRules,
 } from '../../data/bom';
 import { StepConfigBom, RFQ_XLSX } from './run/StepConfigBom';
@@ -562,28 +562,9 @@ export function RunQuotationDialog({ q, onClose, resume }: {
         open={packageOpen}
         buildQty={cfg.buildQty}
         onClose={() => setPackageOpen(false)}
-        onAdd={p => setLines(ls => [...ls, {
-          id: Math.max(0, ...ls.map(l => l.id)) + 1,
-          number: ls.length + 1,
-          part: p.part, revision: '—', description: p.description,
-          /* `qty` is PER BOARD everywhere in this model, so the package's total
-             comes out of the same formula as every other line rather than
-             being stored separately. */
-          partSource: 'PACKAGING', qty: p.qty, level: 1,
-          /* Priced by hand on step 4, so it has no marketplace offers. */
-          offers: [],
-          mfg: p.mfg, mpn: p.mpn,
-          /* A packaging line is bought as specified; there is no second source
-             to offer, so it carries no alternates and nothing to look up. */
-          alternates: [],
-          nexar: [null],
-          attrition: 0, supplier: '—',
-          orderQty: p.qty * cfg.buildQty, stock: 0, outStock: 0, lt: 0, pkg: '', moq: 0,
-          excessQty: 0, unitPrice: p.unitPrice,
-          amount: p.unitPrice * p.qty * cfg.buildQty,
-          excessAmt: 0, status: 'COVER', notes: p.notes,
-          excluded: false, isPackage: true,
-        }])}
+        /* The line itself is built in `bom.ts`, because the saved result view
+           adds packages too — see packageBomLine. */
+        onAdd={p => setLines(ls => [...ls, packageBomLine(p, cfg.buildQty, ls)])}
       />
     </>
   );

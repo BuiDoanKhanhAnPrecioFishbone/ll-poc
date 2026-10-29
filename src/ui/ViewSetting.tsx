@@ -4,6 +4,7 @@ import { Select } from './Overlays';
 import { DialogDismiss } from './dismiss';
 import { FilterToolbar } from './FilterToolbar';
 import { TextField } from './Field';
+import { Icon } from './icons';
 import type { ColumnSpec } from '../components/column-model';
 import { activeCount, type SavedView, type ViewField, type ViewSort } from './views';
 
@@ -372,11 +373,6 @@ function AddRow({ label, options, onAdd }: {
   );
 }
 
-function TrashIcon() {
-  return (
-    <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor"
-         strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <path d="M3.5 5.5h13M8 5.5V4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v1.5M5.5 5.5 6 16a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l.5-10.5M8.5 8.5v5M11.5 8.5v5" />
-    </svg>
-  );
-}
+/* The shared glyph, since 29 Oct — it was drawn here and again in the quoted
+   cost table. One `trash` in `icons.tsx` now, at this file's own 14px. */
+function TrashIcon() { return <Icon name="trash" size={14} />; }
