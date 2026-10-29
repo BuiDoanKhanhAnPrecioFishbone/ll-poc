@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Voyager IQ loading screen – launch redesign</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  --page:#FFFFFF; --frame:#FFFFFF; --surface:#FFFFFF; --border:#DDE2E9;
+  --text:#131820; --text-2:#4D5766; --text-3:#626D7E;
+  --brand:#1A419E; --brand-d:#112960; --b500:#2754BC; --b300:#7F9CE1; --b200:#B0C2EA; --b100:#DAE2F3;
+  --planet:#DAE2F3; --planet-sh:#C3D1EE; --crater:#B0C2EA; --window:#DAE2F3; --flame-in:#FFFFFF;
+  --shell-bar:#131820; --smoke:#B7BFCC; --crack:#DAE2F3; --sheet:#F4F7FD;
+  color-scheme:light;
+}
+/* Always light: the loader screen is specified on a white background. */
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--text);font:14px/1.5 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+main{max-width:880px;margin:0 auto;padding:28px 20px 40px}
+h1{font-size:18px;font-weight:600;margin:0 0 4px}
+.sub{color:var(--text-2);margin:0 0 18px}
+
+/* the loader frame = the app's content area */
+.frame{position:relative;height:420px;background:var(--frame);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.loader,.shell{position:absolute;inset:0;transition:opacity .2s ease}
+.loader{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:20px}
+.hidden{opacity:0;pointer-events:none}
+.scene{width:280px;max-width:80%;height:auto;display:block;overflow:visible}
+
+.label{margin:6px 0 0;font-size:14px;font-weight:500;color:var(--text);min-height:21px;text-align:center}
+.slow{margin:0;font-size:12.5px;color:var(--text-3);min-height:19px;text-align:center;opacity:0;transition:opacity .3s}
+.slow.on{opacity:1}
+.bar{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;width:160px;margin:4px 0 2px}
+.bar span{height:4px;border-radius:2px;background:var(--b100);position:relative;overflow:hidden}
+.bar span.done{background:var(--b500)}
+.bar span.now::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,var(--b300),transparent);transform:translateX(-100%);animation:shim 1.1s linear infinite}
+@keyframes shim{to{transform:translateX(100%)}}
+
+/* error */
+.err,.dev{display:none;text-align:center;max-width:420px}
+.dev{max-width:none}
+@media (min-width:640px){.dev p{white-space:nowrap}}
+.err h2,.dev h2{font-size:18px;font-weight:600;margin:10px 0 6px}
+.err p,.dev p{margin:0 0 14px;color:var(--text-2);font-size:13.5px}
+.loader.is-dev .dev{display:block}
+.err p.help{margin:12px 0 0;font-size:13px;color:var(--text-2)}
+.err p.sent{color:var(--text)}
+.okc{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;background:#1A6B34;color:#fff;font-size:10px;margin-right:6px;vertical-align:-2px}
+.help b{font-weight:600}
+/* support ticket dialog */
+.tk-bg{position:absolute;inset:0;z-index:5;background:rgba(19,24,32,.35);display:grid;place-items:center;padding:12px}
+.tk-bg[hidden]{display:none}
+.tk{width:min(460px,100%);background:var(--surface);border-radius:8px;overflow:hidden;box-shadow:0 20px 50px rgba(19,24,32,.3)}
+.tk-h{display:flex;justify-content:space-between;align-items:center;background:var(--shell-bar);color:#fff;padding:8px 10px 8px 14px;font-weight:600;font-size:13.5px}
+.tk-x{background:none;border:0;color:#fff;cursor:pointer;width:26px;height:26px;border-radius:4px;font-size:13px}
+.tk-x:focus-visible{outline:2px solid #fff}
+.tk-b{padding:12px 14px;display:grid;gap:4px}
+.fl{font-size:11px;color:var(--text-2);margin-top:6px}
+.fl:first-child{margin-top:0}
+.req{color:#9B2226;margin-left:2px}
+.tk .inp{height:32px;border:1px solid #8A94A6;border-radius:4px;padding:0 8px;font:inherit;font-size:13px;width:100%;background:var(--surface);color:var(--text)}
+.tk textarea.inp{height:auto;padding:6px 8px;resize:vertical;line-height:1.4}
+.tk .inp:focus-visible{outline:2px solid var(--b500);outline-offset:0}
+.tk-auto{margin-top:8px;background:var(--frame);border:1px solid var(--border);border-radius:6px;padding:8px 10px}
+.tk-auto .fl{margin:0 0 4px}
+.tk-auto dl{display:grid;grid-template-columns:72px 1fr;gap:2px 10px;margin:0;font-size:12.5px}
+.tk-auto dt{color:var(--text-3)}
+.tk-auto dd{margin:0;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tk-f{display:flex;justify-content:flex-end;gap:8px;padding:10px 14px;border-top:1px solid var(--border)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.err .acts{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.err p.eid{margin:14px 0 0;font-size:12px;color:var(--text-3)}
+.eid b{font-weight:500;color:var(--text-2);font-variant-numeric:tabular-nums;margin-left:4px}
+.lnk{background:none;border:0;padding:2px 6px;margin-left:4px;border-radius:4px;color:var(--brand);font:inherit;font-weight:500;cursor:pointer}
+.lnk:hover{text-decoration:underline}
+.lnk:focus-visible{outline:2px solid var(--b500);outline-offset:1px}
+.loader.is-dev .label,.loader.is-dev .slow,.loader.is-dev .bar,.loader.is-dev #rocketPos{display:none}
+/* under development: rocket in the scaffold, nose cone on the crane */
+#build{display:none}
+.loader.is-dev #build{display:inline}
+/* option B: arm welds at two points along the seam; sparks only while holding; the plan ticks off */
+.ra-sh{transform-box:view-box;transform-origin:166px 128px;animation:rsh 4s ease-in-out infinite}
+.ra-el{transform-box:view-box;transform-origin:158px 98px;animation:rel 4s ease-in-out infinite}
+@keyframes rsh{0%,15%{transform:rotate(0)}45%,60%{transform:rotate(-4deg)}90%,100%{transform:rotate(0)}}
+@keyframes rel{0%,15%{transform:rotate(0)}45%,60%{transform:rotate(9deg)}90%,100%{transform:rotate(0)}}
+.ra-sp{opacity:0;animation:rsp 4s linear infinite}
+@keyframes rsp{0%{opacity:1}3%{opacity:.35}6%{opacity:1}9%{opacity:.45}12%{opacity:1}14%,46%{opacity:0}47%{opacity:1}50%{opacity:.35}53%{opacity:1}56%{opacity:.45}59%{opacity:1}61%,100%{opacity:0}}
+.ck{opacity:0;animation:6s linear infinite}
+.ck1{animation-name:ck1}.ck2{animation-name:ck2}.ck3{animation-name:ck3}
+@keyframes ck1{0%,12%{opacity:0}15%,92%{opacity:1}96%,100%{opacity:0}}
+@keyframes ck2{0%,37%{opacity:0}40%,92%{opacity:1}96%,100%{opacity:0}}
+@keyframes ck3{0%,62%{opacity:0}65%,92%{opacity:1}96%,100%{opacity:0}}
+.rm .ra-sh,.rm .ra-el,.rm .ra-sp,.rm .ck{animation:none!important}
+.rm .ra-sp,.rm .ck1,.rm .ck2{opacity:1}
+.loader.is-error .err{display:block}
+.loader.is-error .label,.loader.is-error .slow,.loader.is-error .bar{display:none}
+/* broken rocket: only in the error state */
+#wreck{display:none}
+.loader.is-error #wreck{display:inline}
+.loader.is-error #rocketPos{display:none}
+.puff{fill:var(--smoke);transform-box:fill-box;transform-origin:center;opacity:0;animation:puff 2.4s ease-out infinite}
+@keyframes puff{0%{transform:translate(0,0) scale(.4);opacity:0}20%{opacity:.9}100%{transform:translate(10px,-30px) scale(1.6);opacity:0}}
+.rm .puff{animation:none;opacity:.6}
+.btn{height:34px;padding:0 14px;border-radius:4px;border:1px solid var(--brand);background:var(--brand);color:#fff;font:inherit;font-size:13px;font-weight:500;cursor:pointer}
+.btn.sec{background:var(--surface);color:var(--text);border-color:var(--border)}
+.btn:focus-visible,.chip:focus-visible{outline:2px solid var(--b500);outline-offset:2px}
+
+/* scene parts */
+#rocketPos{transition:transform .7s cubic-bezier(.2,.7,.2,1)}
+#planet{transition:transform .6s cubic-bezier(.3,.6,.2,1)}
+.bob{animation:none}
+.flying .bob{animation:bob 1.6s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-2px)}}
+#flame{transform-box:fill-box;transform-origin:50% 0;opacity:0;transition:opacity .2s}
+.flying #flame,.exit #flame{opacity:1}
+.flying #flame{animation:flick .18s ease-in-out infinite alternate}
+.exit #flame{transform:scaleY(1.5)}
+@keyframes flick{from{transform:scaleY(.86)}to{transform:scaleY(1.06)}}
+.exit #rocketPos{transition:transform .4s cubic-bezier(.55,0,.9,.4)}
+#streaks{opacity:0;transition:opacity .3s}
+.flying #streaks,.exit #streaks{opacity:1}
+#streaks line{stroke:var(--b200);stroke-width:1.6;stroke-linecap:round;animation:fall 1s linear infinite}
+@keyframes fall{from{transform:translateY(-40px)}to{transform:translateY(200px)}}
+
+/* reduced motion: no travel, no flicker, no streaks; state still shown */
+.rm #rocketPos,.rm #planet,.rm.exit #rocketPos{transition:none}
+.snap #rocketPos,.snap #planet{transition:none!important}
+.rm .bob,.rm #flame,.rm #streaks line,.rm .bar span.now::after{animation:none!important}
+.rm #streaks{display:none}
+
+/* fake app shell shown once loading is done */
+.shell{display:grid;grid-template-rows:38px 1fr;background:var(--frame)}
+.shell-top{background:var(--shell-bar);display:flex;align-items:center;padding:0 14px;color:#fff;font-size:13px;font-weight:600;gap:10px}
+.shell-main{display:grid;grid-template-columns:180px 1fr;gap:14px;padding:14px}
+.blk{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;display:grid;gap:10px;align-content:start}
+.ln{height:9px;border-radius:5px;background:var(--b100)}
+.toast{position:absolute;right:14px;bottom:14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:12.5px;color:var(--text-2)}
+
+/* demo controls */
+.ctrl{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:14px 0 6px}
+.chip{height:32px;padding:0 12px;border-radius:16px;border:1px solid var(--border);background:var(--surface);color:var(--text);font:inherit;font-size:13px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:#fff}
+.rmck{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-2)}
+.rmck input{accent-color:var(--brand)}
+.meter{font-size:12.5px;color:var(--text-3);min-height:19px;margin:0 0 18px}
+.notes{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px}
+.notes h3{font-size:14px;font-weight:600;margin:0 0 6px}
+.notes ul{margin:0;padding-left:18px;color:var(--text-2)}
+.notes li{margin:3px 0}
+@media (max-width:560px){.frame{height:380px}.shell-main{grid-template-columns:1fr}.shell-main .blk:first-child{display:none}.rmck{margin-left:0}}
+</style>
+</head>
+<body>
+<main>
+  <h1>Loading screen – launch redesign</h1>
+  <p class="sub">The rocket lifts off and climbs while Voyager IQ loads. Progress comes from the five real start-up steps.</p>
+
+  <div class="frame" id="frame">
+    <div class="loader hidden" id="loader">
+      <svg class="scene" id="scene" viewBox="0 0 240 180" aria-hidden="true" focusable="false">
+        <defs>
+          <clipPath id="lowerClip"><rect x="-30" y="-12.5" width="60" height="50"/></clipPath>
+          <linearGradient id="fadeG" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+            <stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".12" stop-color="#fff"/>
+            <stop offset=".72" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+          </linearGradient>
+          <mask id="fade" maskUnits="userSpaceOnUse" x="-40" y="0" width="320" height="180">
+            <rect x="-40" y="0" width="320" height="180" fill="url(#fadeG)"/>
+          </mask>
+        </defs>
+        <!-- stars -->
+        <g fill="var(--b200)">
+          <path d="M0-4Q0 0 4 0Q0 0 0 4Q0 0-4 0Q0 0 0-4Z" transform="translate(42 34) scale(1.1)"/>
+          <path d="M0-4Q0 0 4 0Q0 0 0 4Q0 0-4 0Q0 0 0-4Z" transform="translate(196 26) scale(.8)"/>
+          <path d="M0-4Q0 0 4 0Q0 0 0 4Q0 0-4 0Q0 0 0-4Z" transform="translate(186 98) scale(.9)"/>
+          <path d="M0-4Q0 0 4 0Q0 0 0 4Q0 0-4 0Q0 0 0-4Z" transform="translate(58 112) scale(.7)"/>
+          <circle cx="160" cy="58" r="1.2"/><circle cx="78" cy="68" r="1"/><circle cx="214" cy="140" r="1"/><circle cx="24" cy="150" r="1.2"/>
+        </g>
+        <!-- speed streaks: the world moves down, so the rocket reads as moving up -->
+        <g mask="url(#fade)"><g id="streaks">
+          <line x1="70" y1="0" x2="70" y2="12" style="animation-duration:1.05s"/>
+          <line x1="92" y1="0" x2="92" y2="18" style="animation-duration:.8s;animation-delay:-.4s"/>
+          <line x1="150" y1="0" x2="150" y2="14" style="animation-duration:.95s;animation-delay:-.2s"/>
+          <line x1="172" y1="0" x2="172" y2="10" style="animation-duration:1.2s;animation-delay:-.7s"/>
+          <line x1="48" y1="0" x2="48" y2="10" style="animation-duration:1.3s;animation-delay:-.9s"/>
+          <line x1="196" y1="0" x2="196" y2="16" style="animation-duration:.9s;animation-delay:-.5s"/>
+        </g></g>
+        <!-- planet surface + pad; sinks as the rocket climbs -->
+        <g mask="url(#fade)"><g id="planet">
+          <circle cx="120" cy="330" r="190" fill="var(--planet)"/>
+          <path d="M-70 330a190 190 0 0 1 380 0a190 175 0 0 0-380 0z" fill="var(--planet-sh)"/>
+          <ellipse cx="70" cy="152" rx="9" ry="2.6" fill="var(--crater)"/>
+          <ellipse cx="176" cy="156" rx="6" ry="2" fill="var(--crater)"/>
+          <ellipse cx="150" cy="168" rx="11" ry="3" fill="var(--crater)"/>
+          <rect x="106" y="137.5" width="28" height="3" rx="1.5" fill="var(--b300)"/>
+        </g></g>
+        <!-- rocket, nose up -->
+        <g id="rocketPos" style="transform:translate(120px,112px)">
+          <g class="bob">
+            <g transform="scale(.9)">
+              <g id="flame">
+                <path d="M-5.5 22C-8 33-3 42 0 53C3 42 8 33 5.5 22Z" fill="var(--b300)"/>
+                <path d="M-3.4 22C-4 29-1.5 36 0 42C1.5 36 4 29 3.4 22Z" fill="var(--b100)"/>
+                <path d="M-1.6 22C-1.6 26 0 31 0 31C0 31 1.6 26 1.6 22Z" fill="var(--flame-in)"/>
+              </g>
+              <path d="M-12 6C-19 10-24 18-23 27C-23 28.5-21.5 28.5-20.5 27.5L-11 20ZM12 6C19 10 24 18 23 27C23 28.5 21.5 28.5 20.5 27.5L11 20ZM-6.5 19H6.5L5 24.5H-5Z" fill="var(--brand-d)"/>
+              <path d="M0-31C13-23 15-4 14 10C14 16.5 11 20.5 0 20.5C-11 20.5-14 16.5-14 10C-15-4-13-23 0-31Z" fill="var(--brand)"/>
+              <path d="M0-31C13-23 15-4 14 10C14 16.5 11 20.5 0 20.5Z" fill="var(--brand-d)" opacity=".45"/>
+              <path d="M0-31C5-27.5 9-23 11-17.5H-11C-9-23-5-27.5 0-31Z" fill="var(--brand-d)"/>
+              <rect x="-14.4" y="11" width="28.8" height="3.4" fill="var(--b100)"/>
+              <circle cx="0" cy="-4" r="8" fill="var(--b100)"/>
+              <circle cx="0" cy="-4" r="5.6" fill="var(--window)" opacity=".55"/>
+              <path d="M-3-6.5a4 4 0 0 1 3.5-1.6" stroke="#fff" stroke-width="1.4" stroke-linecap="round" fill="none" opacity=".9"/>
+            </g>
+          </g>
+        </g>
+        <!-- under development: robot arm + design doc, drawn by script -->
+        <g id="build"></g>
+        <!-- error: rocket back on the pad, tilted, one fin off, cracked, smoking -->
+        <g id="wreck">
+          <g transform="translate(152 139.5) rotate(96) scale(.9) translate(-17 -17)">
+            <path d="M12 6C19 10 24 18 23 27C23 28.5 21.5 28.5 20.5 27.5L11 20Z" fill="var(--brand-d)"/>
+          </g>
+          <g transform="translate(121 138) rotate(11) translate(0 -25) scale(.9)">
+            <path d="M-12 6C-19 10-24 18-23 27C-23 28.5-21.5 28.5-20.5 27.5L-11 20ZM-6.5 19H6.5L5 24.5H-5Z" fill="var(--brand-d)"/>
+            <path d="M11 9L13 12L11 14L13.5 17" stroke="var(--brand-d)" stroke-width="1.2" fill="none" stroke-linejoin="round"/>
+            <path d="M0-31C13-23 15-4 14 10C14 16.5 11 20.5 0 20.5C-11 20.5-14 16.5-14 10C-15-4-13-23 0-31Z" fill="var(--brand)"/>
+            <path d="M0-31C13-23 15-4 14 10C14 16.5 11 20.5 0 20.5Z" fill="var(--brand-d)" opacity=".45"/>
+            <path d="M0-31C5-27.5 9-23 11-17.5H-11C-9-23-5-27.5 0-31Z" fill="var(--brand-d)"/>
+            <rect x="-14.4" y="11" width="28.8" height="3.4" fill="var(--b100)"/>
+            <circle cx="0" cy="-4" r="8" fill="var(--b100)"/>
+            <circle cx="0" cy="-4" r="5.6" fill="var(--window)" opacity=".55"/>
+            <path d="M-4.2-7.6L-1.4-4.6L-2.6-2.8L1.2 0.4" stroke="var(--brand-d)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <path d="M7 2L4 5.5L6.5 7.5L3.5 10.5" stroke="var(--crack)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <!-- smoke leaks from the crack -->
+            <circle class="puff" cx="8" cy="3" r="5"/>
+            <circle class="puff" cx="9" cy="4" r="4" style="animation-delay:-.8s"/>
+            <circle class="puff" cx="7" cy="4" r="4.5" style="animation-delay:-1.6s"/>
+          </g>
+        </g>
+      </svg>
+
+      <p class="label" id="label" role="status" aria-live="polite"></p>
+      <div class="bar" id="bar" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+      <p class="slow" id="slow"></p>
+
+      <div class="err" role="alert">
+        <h2>This screen stopped loading</h2>
+        <p>Nothing you entered was lost. Reload to try again.</p>
+        <div class="acts">
+          <button class="btn" type="button" id="reload">Reload this screen</button>
+          <button class="btn sec" type="button" id="home2">Back to Home</button>
+        </div>
+        <p class="help" id="help">Still not working?<button class="lnk" type="button" id="ticket">Send a support ticket</button></p>
+        <p class="help sent" id="sent" hidden><span class="okc" aria-hidden="true">✓</span>Ticket <b id="tno"></b> sent. You’ll get updates by email.</p>
+        <p class="eid">Error ID <b id="eid">VIQ-7F3A2C</b><button class="lnk" type="button" id="copy">Copy</button></p>
+      </div>
+
+      <div class="dev" role="status">
+        <h2>Still on the launch pad</h2>
+        <p>Our crew is assembling this module. It lifts off in an upcoming release.</p>
+        <button class="btn" type="button" id="home">Back to Home</button>
+      </div>
+    </div>
+
+    <div class="tk-bg" id="tk" hidden>
+      <div class="tk" role="dialog" aria-modal="true" aria-labelledby="tk-t">
+        <div class="tk-h"><span id="tk-t">Send a Support Ticket</span><button class="tk-x" type="button" id="tk-x" aria-label="Close">✕</button></div>
+        <div class="tk-b">
+          <label class="fl" for="tk-sub">Subject<span class="req">*</span></label>
+          <input class="inp" id="tk-sub" value="Screen stopped loading: Quoting BoM">
+          <label class="fl" for="tk-desc">What were you doing?</label>
+          <textarea class="inp" id="tk-desc" rows="3" placeholder="For example: opened a quote from Project Requirement RFQ0000000329"></textarea>
+          <div class="tk-auto">
+            <div class="fl">Added for you</div>
+            <dl>
+              <dt>Error ID</dt><dd id="tk-eid"></dd>
+              <dt>Screen</dt><dd>Quoting BoM</dd>
+              <dt>Time</dt><dd id="tk-time"></dd>
+              <dt>Browser</dt><dd id="tk-br"></dd>
+            </dl>
+          </div>
+        </div>
+        <div class="tk-f">
+          <button class="btn sec" type="button" id="tk-cancel">Cancel</button>
+          <button class="btn" type="button" id="tk-send">Send Ticket</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="shell hidden" id="shell" aria-hidden="true">
+      <div class="shell-top">Voyager IQ</div>
+      <div class="shell-main">
+        <div class="blk"><div class="ln" style="width:70%"></div><div class="ln" style="width:85%"></div><div class="ln" style="width:60%"></div><div class="ln" style="width:75%"></div></div>
+        <div class="blk"><div class="ln" style="width:40%;height:12px"></div><div class="ln"></div><div class="ln" style="width:92%"></div><div class="ln" style="width:80%"></div><div class="ln" style="width:88%"></div></div>
+      </div>
+      <div class="toast" id="toast">Workspace ready</div>
+    </div>
+  </div>
+
+  <div class="ctrl" role="group" aria-label="Scenario">
+    <button class="chip" type="button" data-s="normal" aria-pressed="false">Normal load</button>
+    <button class="chip" type="button" data-s="slow" aria-pressed="false">Slow load</button>
+    <button class="chip" type="button" data-s="fast" aria-pressed="false">Fast load</button>
+    <button class="chip" type="button" data-s="error" aria-pressed="false">Screen error</button>
+    <button class="chip" type="button" data-s="dev" aria-pressed="false">Under development</button>
+    <label class="rmck"><input type="checkbox" id="rm"> Reduce motion</label>
+  </div>
+  <p class="meter" id="meter" aria-live="polite"></p>
+
+  <section class="notes">
+    <h3>Rules</h3>
+    <ul>
+      <li>Launches straight up. The planet sinks and streaks fall past, so the climb reads as progress.</li>
+      <li>Driven by the five real start-up steps. The animation never holds the user back.</li>
+      <li>Shown only if loading takes longer than 0.4 s. Exit takes 0.4 s, then the workspace opens.</li>
+      <li>Text: one line, “Launching your mission…”. It changes only when slow (“Still climbing…” after 5 s) or done (“Welcome aboard”).</li>
+      <li>Error: the rocket is back on the pad, tilted, cracked, one fin off, smoking. Text says what to do: reload first, and if it still fails, send a support ticket. The ticket gets the error ID, screen, time and browser added automatically. Back to Home lets the user carry on elsewhere.</li>
+      <li>Under development: the rocket stands whole on the pad while a robot arm welds it, next to a design doc whose checklist ticks off. Nothing is broken, so there’s no Reload.</li>
+      <li>Reduce Motion: no travel, flicker, streaks or moving smoke. The step bar still updates.</li>
+    </ul>
+  </section>
+</main>
+
+<script>
+(function () {
+  var STAGES = ['Signing you in', 'Loading your menu', 'Checking your permissions', 'Restoring your settings', 'Opening your workspace'];
+  var PLAN = {
+    normal: [500, 700, 600, 400, 600],
+    slow:   [500, 700, 7600, 400, 600],
+    fast:   [60, 60, 60, 60, 60]
+  };
+  var SHOW_AFTER = 400, SLOW_AFTER = 5000, EXIT_MS = 400;
+  var PAD_Y = 112, CRUISE_Y = 70;
+
+  var $ = function (id) { return document.getElementById(id); };
+  var loader = $('loader'), shell = $('shell'), scene = $('scene'), label = $('label'), slow = $('slow'), meter = $('meter');
+  var rocket = $('rocketPos'), planet = $('planet'), bars = $('bar').children, rmBox = $('rm');
+  var chips = document.querySelectorAll('.chip');
+  var token = 0, current = 'normal';
+
+  var sysRM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
+  if (sysRM && sysRM.matches) rmBox.checked = true;
+  function applyRM() {
+    document.querySelectorAll('svg.scene, svg.mini').forEach(function (s) { s.classList.toggle('rm', rmBox.checked); });
+    $('bar').classList.toggle('rm', rmBox.checked);
+  }
+
+  function wait(ms, t) { return new Promise(function (res, rej) { setTimeout(function () { t === token ? res() : rej('cancel'); }, ms); }); }
+  function rocketAt(y) { rocket.style.transform = 'translate(120px,' + y + 'px)'; }
+  function planetDown(px) { planet.style.transform = 'translateY(' + px + 'px)'; }
+  function setBar(done, now) {
+    for (var i = 0; i < bars.length; i++) {
+      bars[i].className = i < done ? 'done' : (i === now ? 'now' : '');
+    }
+  }
+  function sec(ms) { return (ms / 1000).toFixed(1) + ' s'; }
+
+  function reset() {
+    scene.classList.remove('flying', 'exit');
+    scene.classList.add('snap');
+    loader.classList.remove('is-error', 'is-dev');
+    $('tk').hidden = true; $('help').hidden = false; $('sent').hidden = true;
+    loader.classList.add('hidden'); shell.classList.add('hidden');
+    slow.classList.remove('on');
+    rocketAt(PAD_Y); planetDown(0); setBar(0, -1);
+    label.textContent = ''; meter.textContent = '';
+    scene.getBoundingClientRect(); scene.classList.remove('snap');
+  }
+
+  async function run(name) {
+    var t = ++token; current = name;
+    chips.forEach(function (c) { c.setAttribute('aria-pressed', String(c.dataset.s === name)); });
+    applyRM(); reset();
+
+    if (name === 'error') {
+      // Screen error: rocket rests on the pad, engine off. Message is in the text.
+      loader.classList.add('is-error'); loader.classList.remove('hidden');
+      meter.textContent = 'Error. Rocket broken on the pad, Reload offered.';
+      return;
+    }
+    if (name === 'dev') {
+      // Planned screen, not a failure: rocket still being built, no retry.
+      loader.classList.add('is-dev'); loader.classList.remove('hidden');
+      meter.textContent = 'Under development. Nothing broken, no Reload.';
+      return;
+    }
+
+    var t0 = performance.now(), shown = false;
+    var showTimer = setTimeout(function () {
+      if (t !== token) return;
+      shown = true; loader.classList.remove('hidden');
+      scene.classList.add('flying'); rocketAt(CRUISE_Y);   // lift-off
+    }, SHOW_AFTER);
+
+    try {
+      for (var i = 0; i < STAGES.length; i++) {
+        // One line for the whole load. The bar shows the real step; text only changes when slow or done.
+        label.textContent = 'Launching your mission…'; setBar(i, i);
+        var slowTimer = setTimeout(function () { if (t === token) label.textContent = 'Still climbing…'; }, SLOW_AFTER);
+        await wait(PLAN[name][i], t);
+        clearTimeout(slowTimer); slow.classList.remove('on');
+        planetDown(14 + (i + 1) * 13);                    // climb: the planet falls away
+      }
+      clearTimeout(showTimer);
+      setBar(5, -1);
+      var total = performance.now() - t0;
+
+      if (!shown) {                                      // fast: never show the loader
+        shell.classList.remove('hidden');
+        meter.textContent = 'Loaded in ' + sec(total) + '. Under 0.4 s, so the loader was skipped.';
+        return;
+      }
+      label.textContent = 'Welcome aboard';
+      scene.classList.remove('flying'); scene.classList.add('exit');
+      rocketAt(-60);                                     // leaves the top of the frame
+      await wait(rmBox.checked ? 150 : EXIT_MS, t);
+      loader.classList.add('hidden'); shell.classList.remove('hidden');
+      meter.textContent = 'Loaded in ' + sec(total) + ' + ' + sec(EXIT_MS) + ' exit. Loader appeared after ' + sec(SHOW_AFTER) + '.';
+    } catch (e) { clearTimeout(showTimer); }
+  }
+
+  /* ---- Under development: whole rocket, robot arm welding, design doc ticking off ---- */
+  var BODY = 'M0-31C13-23 15-4 14 10C14 16.5 11 20.5 0 20.5C-11 20.5-14 16.5-14 10C-15-4-13-23 0-31Z';
+  var FINS = 'M-12 6C-19 10-24 18-23 27C-23 28.5-21.5 28.5-20.5 27.5L-11 20ZM12 6C19 10 24 18 23 27C23 28.5 21.5 28.5 20.5 27.5L11 20ZM-6.5 19H6.5L5 24.5H-5Z';
+  var ROCKET = '<g transform="translate(120 112) scale(.9)">' +
+    '<path d="' + FINS + '" fill="var(--brand-d)"/><path d="' + BODY + '" fill="var(--brand)"/>' +
+    '<path d="M0-31C13-23 15-4 14 10C14 16.5 11 20.5 0 20.5Z" fill="var(--brand-d)" opacity=".45"/>' +
+    '<path d="M0-31C5-27.5 9-23 11-17.5H-11C-9-23-5-27.5 0-31Z" fill="var(--brand-d)"/>' +
+    '<rect x="-14.4" y="11" width="28.8" height="3.4" fill="var(--b100)"/>' +
+    '<circle cx="0" cy="-4" r="8" fill="var(--b100)"/><circle cx="0" cy="-4" r="5.6" fill="var(--window)" opacity=".55"/>' +
+    '<path d="M-3-6.5a4 4 0 0 1 3.5-1.6" stroke="#fff" stroke-width="1.4" stroke-linecap="round" fill="none" opacity=".9"/></g>';
+  var DEV = {
+    B: { svg: function (u) {
+      var rows = [81, 90, 99].map(function (y, i) {
+        return '<rect x="77" y="' + (y - 2.5) + '" width="5" height="5" rx="1" fill="var(--surface)" stroke="var(--b300)" stroke-width=".9"/>' +
+          '<rect x="84" y="' + (y - 1) + '" width="' + [8, 6, 7][i] + '" height="2" rx="1" fill="var(--b100)"/>' +
+          '<path class="ck ck' + (i + 1) + '" d="M78.1 ' + y + 'l1.3 1.4 2.5-2.7" stroke="var(--b500)" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>';
+      }).join('');
+      // design doc on an easel: schematic of the rocket + checklist
+      var doc = '<defs><pattern id="dgrid-' + u + '" width="4" height="4" patternUnits="userSpaceOnUse"><path d="M4 0H0V4" fill="none" stroke="var(--b100)" stroke-width=".5"/></pattern></defs>' +
+        '<path d="M55 121L53 151.6M89 121L91 142.6" stroke="var(--b300)" stroke-width="2" stroke-linecap="round"/>' +
+        '<rect x="48" y="70" width="48" height="52" rx="3" fill="var(--surface)" stroke="var(--b200)"/>' +
+        '<rect x="66" y="67" width="12" height="5" rx="1.5" fill="var(--brand-d)"/>' +
+        '<rect x="52" y="76" width="20" height="40" rx="1.5" fill="var(--sheet)"/><rect x="52" y="76" width="20" height="40" rx="1.5" fill="url(#dgrid-' + u + ')" stroke="var(--b100)" stroke-width=".6"/>' +
+        '<path d="M62 79V113" stroke="var(--b300)" stroke-width=".5" stroke-dasharray="2 1.5"/>' +
+        '<g transform="translate(62 97.5) scale(.38)" fill="none" stroke="var(--b500)" stroke-width="2.6" stroke-linejoin="round"><path d="' + BODY + '"/><path d="' + FINS + '"/><circle cx="0" cy="-4" r="7"/></g>' +
+        '<path d="M74.5 76V116" stroke="var(--b100)" stroke-width=".8"/>' + rows +
+        '<rect x="77" y="106" width="15" height="2" rx="1" fill="var(--b100)"/><rect x="77" y="110.5" width="10" height="2" rx="1" fill="var(--b100)"/>';
+      // industrial arm: base, turret, shoulder, elbow, wrist, welding tool
+      var arm = '<path d="M154 146.4L178 146.4L175 141L157 141Z" fill="var(--brand-d)"/>' +
+        '<rect x="159" y="129" width="14" height="13" rx="2.5" fill="var(--b500)"/><rect x="161" y="131" width="2.6" height="9" rx="1" fill="var(--b300)" opacity=".7"/>' +
+        '<g class="ra-sh">' +
+          '<path d="M166 128L158 98" stroke="var(--b300)" stroke-width="7" stroke-linecap="round"/><path d="M164.4 126.4L157.2 99.4" stroke="var(--b200)" stroke-width="1.4" stroke-linecap="round"/>' +
+          '<circle cx="166" cy="128" r="5" fill="var(--brand-d)"/><circle cx="166" cy="128" r="1.9" fill="var(--b200)"/>' +
+          '<g class="ra-el">' +
+            '<path d="M158 98L141 103" stroke="var(--b300)" stroke-width="5" stroke-linecap="round"/><path d="M156.6 96.9L142 101.2" stroke="var(--b200)" stroke-width="1.2" stroke-linecap="round"/>' +
+            '<path d="M141.5 101.6L136 103.5L136 104.4L141.8 105.2Z" fill="var(--brand-d)"/><circle cx="141" cy="103" r="3" fill="var(--brand-d)"/>' +
+            '<g class="ra-sp"><circle cx="134.4" cy="104" r="3.2" fill="var(--b200)" opacity=".55"/>' +
+              '<path d="M134.4 104l-2.8-3M134.4 104l-3.8 .4M134.4 104l-2.4 3.2M134.4 104l.4-3.6" stroke="#fff" stroke-width="1" stroke-linecap="round"/><circle cx="134.4" cy="104" r="1.3" fill="#fff"/></g>' +
+            '<circle cx="158" cy="98" r="4.2" fill="var(--brand-d)"/><circle cx="158" cy="98" r="1.6" fill="var(--b200)"/>' +
+          '</g>' +
+        '</g>';
+      return doc + ROCKET + arm;
+    } },
+  };
+  $('build').innerHTML = DEV.B.svg('main');
+
+  chips.forEach(function (c) { c.addEventListener('click', function () { run(c.dataset.s); }); });
+  rmBox.addEventListener('change', function () { run(current); });
+  $('home').addEventListener('click', function () { run('normal'); });
+  $('home2').addEventListener('click', function () { run('normal'); });
+
+  // Support ticket: subject prefilled, error details attached automatically
+  var tk = $('tk'), tkSub = $('tk-sub'), tkSend = $('tk-send');
+  function openTicket() {
+    $('tk-eid').textContent = $('eid').textContent;
+    $('tk-time').textContent = new Date().toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    var ua = navigator.userAgent, br = /Edg\//.test(ua) ? 'Edge' : /Chrome\//.test(ua) ? 'Chrome' : /Firefox\//.test(ua) ? 'Firefox' : /Safari\//.test(ua) ? 'Safari' : 'Other';
+    $('tk-br').textContent = br;
+    tk.hidden = false; $('tk-desc').focus();
+  }
+  function closeTicket() { tk.hidden = true; $('ticket').focus(); }
+  $('ticket').addEventListener('click', openTicket);
+  $('tk-x').addEventListener('click', closeTicket);
+  $('tk-cancel').addEventListener('click', closeTicket);
+  tk.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeTicket(); });
+  tkSub.addEventListener('input', function () { tkSend.disabled = !tkSub.value.trim(); });
+  tkSend.addEventListener('click', function () {
+    tk.hidden = true;
+    $('tno').textContent = 'HD-' + (1040 + Math.floor(Math.random() * 60));
+    $('help').hidden = true; $('sent').hidden = false;
+    $('reload').focus();
+  });
+  $('copy').addEventListener('click', function () {
+    var b = this, id = $('eid').textContent;
+    var done = function () { b.textContent = 'Copied'; setTimeout(function () { b.textContent = 'Copy'; }, 1500); };
+    try { navigator.clipboard.writeText(id).then(done, done); } catch (e) { done(); }
+  });
+  $('reload').addEventListener('click', function () { run('normal'); });
+  run('normal');
+})();
+</script>
+</body>
+</html>
