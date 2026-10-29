@@ -11,6 +11,7 @@ import type { ColumnSpec } from '../column-model';
 import { QuoteContextBar, QuoteToolbar, NoRecords } from './run/QuoteContext';
 import { rowTone } from './run/StepQuoting';
 import { resultSetup, resultLines } from '../../data/quoteRun';
+import { quoteReportWorkbook } from '../../data/quoteReport';
 import { masterSuppliers } from '../../data/suppliers';
 import { totalQtyOf, money, money3, type BomLine } from '../../data/bom';
 import type { Quotation, QuoteResult } from '../../data/quotations';
@@ -50,7 +51,7 @@ export function QuoteResultDialog({ q, result, onClose }: {
 
   const setup = useMemo(() => resultSetup(result), [result]);
   const lines = useMemo(() => resultLines(result), [result]);
-  const { exportRows, excel, busy: exporting } = useExcelExport<BomLine>();
+  const { exportWorkbook, excel, busy: exporting } = useExcelExport<BomLine>();
 
   const shown = useMemo(() => {
     const k = search.trim().toLowerCase();
@@ -97,8 +98,18 @@ export function QuoteResultDialog({ q, result, onClose }: {
         <div className="vy-run-nav">
           <div className="vy-run-nav-actions">
             <Button onClick={onClose}>Done</Button>
+            {/* THREE SHEETS, NOT THE GRID — guideline 2.1 §5 specifies the
+                quoting report as Summary, Detail and Supporting, and this is
+                the button it describes. It exports EVERY line, not the
+                filtered set: a filter is how someone reads the screen, and
+                the file goes to a customer. */}
             <Button busy={exporting}
-                    onClick={() => exportRows(shown, columns, `QuotationResult-RFQ${q.no}-${result.lastRunVersion}.xlsx`)}>
+                    onClick={() => exportWorkbook(
+                      quoteReportWorkbook({
+                        rfqNo: q.no, assembly: `${result.partNumber} · Rev ${result.partRev}`,
+                        result, setup, lines,
+                      }),
+                      `QuotingReport-RFQ${q.no}-${result.lastRunVersion}.xlsx`)}>
               {exporting ? 'Building the file…' : 'Export to Excel'}
             </Button>
             {/* Hers, and not built — said plainly rather than wired to a

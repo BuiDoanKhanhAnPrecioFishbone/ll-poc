@@ -54,9 +54,22 @@ export function useExcelExport<T>() {
      moment and is a lie to React: the next render puts the old name back. */
   const [fileName, setFileName] = useState('export.xlsx');
   const pending = useRef<{ rows: object[]; cols: ExcelExportColumnProps[] } | null>(null);
+  const pendingBook = useRef<object | null>(null);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
+    if (pendingBook.current) {
+      const book = pendingBook.current;
+      pendingBook.current = null;
+      requestAnimationFrame(() => setTimeout(() => {
+        /* Kendo types `save` for (data, columns); the workbook overload is in
+           the component and not in the .d.ts, so the cast is the API, not a
+           way around the types. */
+        try { (ref.current as unknown as { save(w: object): void } | null)?.save(book); }
+        finally { setBusy(false); }
+      }, 0));
+      return;
+    }
     if (!pending.current) return;
     const { rows, cols } = pending.current;
     pending.current = null;
@@ -98,6 +111,22 @@ export function useExcelExport<T>() {
      to own the workbook and trigger the download. */
   const excel = <ExcelExport ref={ref} fileName={fileName.trim()} />;
 
+  /**
+   * A workbook we built ourselves, for the reports that are not one grid.
+   *
+   * Guideline 2.1 §5 specifies the quoting report as THREE sheets — Summary,
+   * Detail, Supporting — which `exportRows` cannot express: it maps one screen
+   * to one sheet, which is right for every other export in this app and wrong
+   * for this one. Kendo's `save()` takes a workbook object as happily as it
+   * takes rows and columns, so the caller builds the sheets and this keeps the
+   * busy state and the paint hop that make the indicator true.
+   */
+  function exportWorkbook(workbook: object, name: string) {
+    setBusy(true);
+    pendingBook.current = workbook;
+    setFileName(f => (f === name ? `${name} ` : name));
+  }
+
   /** True from the press until the workbook has been handed to the browser. */
-  return { exportRows, excel, busy };
+  return { exportRows, exportWorkbook, excel, busy };
 }
