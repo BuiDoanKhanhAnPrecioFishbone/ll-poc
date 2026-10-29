@@ -1,6 +1,6 @@
 import { ROLE_WIDTH } from '../components/column-model';
 import { useEffect, useState } from 'react';
-import { RocketJourney } from '../ui/RocketJourney';
+import { RocketLaunch } from '../ui/RocketLaunch';
 import { BOOT_STAGES } from '../ui/bootStages';
 import { ErrorBoundary } from '../ui/ErrorBoundary';
 import { StatusBadge } from '../ui/Badge';
@@ -169,10 +169,10 @@ export function DesignSystemPage() {
           fallback that is gone in milliseconds on a local server, so the only
           way to see it was to pause a network request — which is no way to
           show anyone anything. It is the real component, not a picture of one:
-          the same hover, flame and blink, and it answers reduce-motion here
+          the same climb, flame and streaks, and it answers reduce-motion here
           exactly as it does on the boot screen. */}
       <Section title="Motion"
-        note="Four easings and three durations, and nothing else — a loop length is not among them, because the one loop in the product is JavaScript and a custom property nothing reads is a token that rots. Turn on Reduce Motion in the OS and the rocket below settles into its pose and stops.">
+        note="Four easings and three durations, and nothing else — a loop length is not among them, because a custom property nothing reads is a token that rots. Turn on Reduce Motion in the OS and the rocket below holds its pose: no climb, no flicker, no streaks, and the step bar still fills.">
         <div className="vy-ds-motion">
           <BootSpecimen />
           <dl className="vy-ds-motion-list">
@@ -219,9 +219,9 @@ export function DesignSystemPage() {
 }
 
 /**
- * The boot journey, stepping through its five stations so a person can watch it.
+ * The launch, stepping through its five stages so a person can watch it.
  *
- * THE LOOP LIVES HERE, NOT IN THE COMPONENT. `RocketJourney` takes a `step` and
+ * THE LOOP LIVES HERE, NOT IN THE COMPONENT. `RocketLaunch` takes a `step` and
  * draws it; what the step means is the caller's business. In the product that
  * is a real boot stage finishing, and on this page it is a specimen advancing
  * on a timer — which is a legitimate thing for a specimen to do and an
@@ -229,31 +229,32 @@ export function DesignSystemPage() {
  * line and labelled as one.
  *
  * It exists because the boot screen cannot be watched where it actually runs:
- * four of the five stages resolve instantly in this build, so the real one is
- * gone before the eye catches it.
+ * four of the five stages resolve instantly in this build, and since 29 Oct a
+ * boot that fast does not draw the screen at all.
+ *
+ * THE LABEL IS THE STAGE NAME HERE AND ONE SENTENCE IN THE PRODUCT, on
+ * purpose. The product stopped naming stages because five names in under a
+ * second is five things nobody reads; a specimen is read at leisure, and the
+ * name is what maps the picture to the signal under it.
  */
 function BootSpecimen() {
   const [step, setStep] = useState(0);
-  /* THE LAST STATION IS NOT A STATION. A flat 1100ms interval gave the
-     arrival 1100ms, and the arrival needs 2000: the craft lands over 1100,
-     then the planet bounces, the ring pulses and the face smiles — all of
-     which start a second after touchdown. The specimen was cutting the end
-     off the thing it exists to show. */
   useEffect(() => {
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const last = BOOT_STAGES.length;
     const t = setTimeout(() => setStep(s => (s + 1) % (last + 1)),
-                         step === last ? 3200 : 1100);
+                         step === last ? 2000 : 1100);
     return () => clearTimeout(t);
   }, [step]);
   const stage = BOOT_STAGES[Math.min(step, BOOT_STAGES.length - 1)];
   return (
     <div className="vy-ds-motion-art">
-      <RocketJourney step={step} />
+      <RocketLaunch step={step} />
       <p className="vy-busy-label">{stage.label}</p>
       <p className="vy-ds-specimen-note">
-        Specimen — stepping on a timer. In the product each station waits on{' '}
-        <code>{stage.liveSignal}</code>.
+        Specimen — stepping on a timer. In the product each stage waits on{' '}
+        <code>{stage.liveSignal}</code>, and the screen itself appears only if
+        the boot takes longer than 0.4&nbsp;s.
       </p>
     </div>
   );

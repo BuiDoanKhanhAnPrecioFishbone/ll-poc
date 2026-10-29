@@ -360,6 +360,35 @@
 .vy-stub-hint { font-size: var(--vy-text-lg); color: var(--vy-on-surface); margin: 0 0 var(--vy-space-5); }
 .vy-stub-note { color: var(--vy-on-surface-subtle); font-size: var(--vy-text-base); margin: 0; }
 
+/* ---- Still on the launch pad --------------------------------------------
+   The unbuilt screen, which used to be a dashed box of prose. Centred in the
+   page rather than boxed: it IS the page, and a border around the whole of it
+   draws a frame nobody needs.
+
+   The note at the bottom is the old stub's text, kept and demoted. A reviewer
+   who wants to know why the screen is empty is owed the answer; everyone else
+   has already read the heading and moved on, so it is small, quiet and last. */
+.vy-launchpad {
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  gap: var(--vy-space-6); padding: var(--vy-space-12) var(--vy-space-9);
+}
+.vy-launchpad-title {
+  margin: 0; font-size: var(--vy-text-xl); font-weight: var(--vy-weight-bold);
+  color: var(--vy-on-surface-strong); text-wrap: balance;
+}
+.vy-launchpad-body {
+  margin: 0; max-inline-size: 48ch; font-size: var(--vy-text-base);
+  color: var(--vy-on-surface-subtle);
+}
+.vy-launchpad-hint {
+  margin: 0; max-inline-size: 60ch; font-size: var(--vy-text-sm);
+  color: var(--vy-on-surface-muted); font-style: italic;
+}
+.vy-launchpad-note {
+  margin: var(--vy-space-6) 0 0; max-inline-size: 64ch;
+  font-size: var(--vy-text-sm); color: var(--vy-on-surface-faint);
+}
+
 /* The review pages document the revamp; they are visually separated from the
    product navigation so nobody mistakes them for part of the proposed IA. */
 
@@ -899,16 +928,127 @@
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: var(--vy-space-7);
 }
-/* THE FLOOR IS 288, NOT 240 — 27 Oct, and it is the illustration's own
-   smallest part that sets it. The journey is 144 viewBox units wide and the
-   rocket is 0.42 of that; measured on screen, a 240px frame puts the craft at
-   59px and its EYES at 2.7px, which at DPR 1 is about three device pixels for
-   the detail the whole drawing is built around, with a blink nobody can see.
-   At 288 the eyes are 3.2px and at 320 they are 3.5px. The frame was never the
-   problem — the subject inside it was. */
-.vy-rocket-journey {
-  inline-size: clamp(288px, 20vw, 320px);
+
+/* THE EXIT. The craft leaves the top of the frame and the workspace is already
+   behind it. A CSS `transform` beats the `transform` attribute the component
+   sets, which is why this can be done from here at all — and why the component
+   sets no CSS transform of its own. */
+.vy-boot[data-exiting] .vy-rl-ship {
+  transform: translate(120px, -60px);
+  transition: transform .4s cubic-bezier(.55, 0, .9, .4);
+}
+.vy-boot[data-exiting] .vy-rl-flame { transform: scaleY(1.5); }
+
+/* Five segments, one per boot stage: what the sentence above it stopped
+   saying when the five stage names became one line. The one in flight carries
+   a sheen travelling across it, so a stage that takes a while still looks like
+   something rather than like a stuck bar. */
+.vy-boot-bar {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--vy-space-2);
+  inline-size: 160px;
+}
+.vy-boot-bar span {
+  block-size: 4px; border-radius: 2px; background: var(--vy-rocket-trim);
+  position: relative; overflow: hidden;
+}
+.vy-boot-bar span[data-done] { background: var(--vy-rocket-accent); }
+.vy-boot-bar span[data-now]::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, var(--vy-rocket-soft), transparent);
+  transform: translateX(-100%);
+  animation: vy-boot-sheen 1.1s linear infinite;
+}
+@keyframes vy-boot-sheen { to { transform: translateX(100%); } }
+@media (prefers-reduced-motion: reduce) {
+  .vy-boot-bar span[data-now]::after { animation: none; }
+  .vy-boot[data-exiting] .vy-rl-ship { transition: none; }
+}
+/* ---- The rocket, in its three states -------------------------------------
+   The customer's launch redesign of 29 Oct, which replaced the horizontal
+   journey. The motion is hers: the craft holds still in the middle of the
+   frame and the WORLD moves — the planet sinks a notch per boot stage, the
+   streaks run down past it — so the climb reads as progress without a number
+   on it.
+
+   280 units wide against the journey's 144, and the subject is bigger inside
+   it, so the 288px floor that drawing needed does not apply here. */
+.vy-rocket-launch {
+  inline-size: clamp(240px, 18vw, 280px);
   block-size: auto;
+  overflow: visible;
+}
+
+/* Lift-off and the climb. Both are a change of `transform` on a group, eased
+   rather than animated: the position comes from a boot stage finishing, and a
+   keyframe cannot know when that happens. */
+.vy-rl-ship   { transition: transform .7s cubic-bezier(.2, .7, .2, 1); }
+.vy-rl-planet { transition: transform .6s cubic-bezier(.3, .6, .2, 1); }
+.vy-rl-planet, .vy-rl-streaks line, .vy-rl-shoulder, .vy-rl-elbow {
+  /* An SVG element's transform resolves against its own bounding box unless
+     told otherwise, and every coordinate in this drawing is a viewBox unit. */
+  transform-box: view-box;
+}
+
+[data-state="launching"] .vy-rl-bob { animation: vy-rl-bob 1.6s ease-in-out infinite; }
+@keyframes vy-rl-bob { 50% { transform: translateY(-2px); } }
+
+.vy-rl-flame { transform-box: fill-box; transform-origin: 50% 0; opacity: 0; transition: opacity .2s; }
+[data-state="launching"] .vy-rl-flame {
+  opacity: 1; animation: vy-rl-flicker .18s ease-in-out infinite alternate;
+}
+@keyframes vy-rl-flicker { from { transform: scaleY(.86); } to { transform: scaleY(1.06); } }
+
+.vy-rl-streaks { opacity: 0; transition: opacity .3s; }
+[data-state="launching"] .vy-rl-streaks { opacity: 1; }
+.vy-rl-streaks line {
+  stroke: var(--vy-rocket-detail); stroke-width: 1.6; stroke-linecap: round;
+  animation: vy-rl-fall 1s linear infinite;
+}
+@keyframes vy-rl-fall { from { transform: translateY(-40px); } to { transform: translateY(200px); } }
+
+/* Error: smoke out of the crack. */
+.vy-rl-puff {
+  fill: var(--vy-rocket-smoke); transform-box: fill-box; transform-origin: center;
+  opacity: 0; animation: vy-rl-puff 2.4s ease-out infinite;
+}
+@keyframes vy-rl-puff {
+  0%   { transform: translate(0, 0) scale(.4); opacity: 0; }
+  20%  { opacity: .9; }
+  100% { transform: translate(10px, -30px) scale(1.6); opacity: 0; }
+}
+
+/* Under development: the arm holds against the seam at two points along it,
+   sparks only while it is holding, and the plan ticks off behind it. */
+.vy-rl-shoulder { transform-origin: 166px 128px; animation: vy-rl-shoulder 4s ease-in-out infinite; }
+.vy-rl-elbow    { transform-origin: 158px 98px;  animation: vy-rl-elbow 4s ease-in-out infinite; }
+@keyframes vy-rl-shoulder { 0%, 15% { transform: rotate(0); } 45%, 60% { transform: rotate(-4deg); } 90%, 100% { transform: rotate(0); } }
+@keyframes vy-rl-elbow    { 0%, 15% { transform: rotate(0); } 45%, 60% { transform: rotate(9deg); }  90%, 100% { transform: rotate(0); } }
+.vy-rl-spark { opacity: 0; animation: vy-rl-spark 4s linear infinite; }
+@keyframes vy-rl-spark {
+  0% { opacity: 1; } 3% { opacity: .35; } 6% { opacity: 1; } 9% { opacity: .45; }
+  12% { opacity: 1; } 14%, 46% { opacity: 0; }
+  47% { opacity: 1; } 50% { opacity: .35; } 53% { opacity: 1; } 56% { opacity: .45; }
+  59% { opacity: 1; } 61%, 100% { opacity: 0; }
+}
+.vy-rl-tick { opacity: 0; animation: 6s linear infinite; }
+.vy-rl-tick-1 { animation-name: vy-rl-tick-1; }
+.vy-rl-tick-2 { animation-name: vy-rl-tick-2; }
+.vy-rl-tick-3 { animation-name: vy-rl-tick-3; }
+@keyframes vy-rl-tick-1 { 0%, 12% { opacity: 0; } 15%, 92% { opacity: 1; } 96%, 100% { opacity: 0; } }
+@keyframes vy-rl-tick-2 { 0%, 37% { opacity: 0; } 40%, 92% { opacity: 1; } 96%, 100% { opacity: 0; } }
+@keyframes vy-rl-tick-3 { 0%, 62% { opacity: 0; } 65%, 92% { opacity: 1; } 96%, 100% { opacity: 0; } }
+
+/* REDUCED MOTION KEEPS THE PICTURE, not just the absence of movement. A
+   welding arm with the animation switched off is an arm with no sparks and an
+   empty checklist, which says something different from what the state means —
+   so the things that fade IN are left on. */
+@media (prefers-reduced-motion: reduce) {
+  .vy-rl-ship, .vy-rl-planet { transition: none; }
+  .vy-rl-bob, .vy-rl-flame, .vy-rl-streaks line, .vy-rl-puff,
+  .vy-rl-shoulder, .vy-rl-elbow, .vy-rl-spark, .vy-rl-tick { animation: none !important; }
+  .vy-rl-streaks { display: none; }
+  .vy-rl-puff { opacity: .6; }
+  .vy-rl-spark, .vy-rl-tick-1, .vy-rl-tick-2 { opacity: 1; }
 }
 
 /* The design system's motion section. The illustration sits beside its tokens
@@ -970,6 +1110,52 @@
   font-size: var(--vy-text-base);
 }
 .vy-errorstate-actions { display: flex; flex-wrap: wrap; gap: var(--vy-space-4); justify-content: center; }
+
+/* ---- The way out when Reload has already failed -------------------------
+   Two lines under the buttons, in the order a person reaches them: the offer
+   of a ticket, then the id they will be asked for either way. Tighter than
+   the gap above them, because they are a footnote to the actions rather than
+   a third action. */
+.vy-errorstate-support {
+  display: flex; flex-direction: column; align-items: center; gap: var(--vy-space-2);
+  margin-block-start: calc(var(--vy-space-5) - var(--vy-space-7));
+}
+.vy-errorstate-help, .vy-errorstate-sent, .vy-errorstate-eid {
+  margin: 0; display: flex; align-items: center; gap: var(--vy-space-3);
+  font-size: var(--vy-text-sm); color: var(--vy-on-surface-subtle);
+}
+.vy-errorstate-sent { color: var(--vy-on-surface); }
+.vy-errorstate-eid strong { font-weight: var(--vy-weight-medium); color: var(--vy-on-surface-muted); }
+/* The tick is on a filled dot rather than loose in the line: a green glyph on
+   white reads as decoration, and this one is a receipt. */
+.vy-ok-dot {
+  display: inline-grid; place-items: center; inline-size: 16px; block-size: 16px;
+  border-radius: 50%; background: var(--vy-status-done-fg); color: var(--vy-grey-0);
+  flex: none;
+}
+
+/* ---- Send a Support Ticket ----------------------------------------------
+   A short form and a receipt of what goes with it. */
+.vy-ticket { display: flex; flex-direction: column; gap: var(--vy-space-5); }
+.vy-ticket-auto {
+  background: var(--vy-surface-subtle); border: 1px solid var(--vy-border);
+  border-radius: var(--vy-radius-md); padding: var(--vy-space-5) var(--vy-space-6);
+}
+.vy-ticket-auto h3 {
+  margin: 0 0 var(--vy-space-3); font-size: var(--vy-text-xs); font-weight: var(--vy-weight-medium);
+  text-transform: uppercase; letter-spacing: .05em; color: var(--vy-on-surface-subtle);
+}
+/* A fixed first column, so the four values line up as a list of facts rather
+   than as four sentences of different lengths. */
+.vy-ticket-auto dl {
+  display: grid; grid-template-columns: 5.5rem 1fr; gap: var(--vy-space-2) var(--vy-space-6);
+  margin: 0; font-size: var(--vy-text-sm);
+}
+.vy-ticket-auto dt { color: var(--vy-on-surface-subtle); }
+.vy-ticket-auto dd {
+  margin: 0; color: var(--vy-on-surface-strong);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
 
 /* The design system's specimen of it. A fixed height so the section does not
    jump when the panel fails — the point is to compare the two states, and a

@@ -81,6 +81,9 @@ export const ICONS: Record<string, string> = {
      already existed twice as a local `TrashIcon`, and a set whose members live
      in different files is how two of them end up different. */
   trash: 'M3.5 5.5h13M8 5.5V4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v1.5M5.5 5.5 6 16a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l.5-10.5M8.5 8.5v5M11.5 8.5v5',
+  /* A plain tick. Drawn on the ramp the other glyphs use — 20×20, stroked, no
+     fill — so it sits on a confirmation line at the same weight as the rest. */
+  check: 'M4.5 10.5 8 14 15.5 6',
 };
 
 /**

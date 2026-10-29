@@ -15,7 +15,15 @@
   transition: background-color var(--vy-dur-short) var(--vy-ease-standard),
               border-color var(--vy-dur-short) var(--vy-ease-standard),
               box-shadow var(--vy-dur-short) var(--vy-ease-standard);
-}
+}/* AN ANCHOR WEARING A BUTTON'S CLOTHES WEARS NO UNDERLINE. `Button asChild`
+   puts these classes on its child, so a <Link> inside one IS the button — and
+   the browser still underlines it, which drew a line through the middle of a
+   filled pill on the error state and the launch-pad screen. Found by probing
+   the rendered element after a first guess at `a.k-button` changed nothing:
+   `asChild` does not go through Kendo's Button at all. */
+a.vy-btn, a.vy-btn:hover { text-decoration: none; }
+
+
 /* min-height carries this to the 24px minimum target size (WCAG 2.2, 2.5.8).
    Padding alone left the pager's « ‹ › » at 23px — one pixel short, which is the
    least useful way to fail a threshold: invisible to review, and a real miss for

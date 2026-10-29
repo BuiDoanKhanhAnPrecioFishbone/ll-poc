@@ -1,4 +1,6 @@
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import { Button } from '../ui/Button';
+import { RocketLaunch } from '../ui/RocketLaunch';
 import { legacyNav, liveNav, proposedNav, settingsNav } from '../data/sitemap';
 
 /**
@@ -21,19 +23,33 @@ export function Placeholder() {
           <p className="vy-page-sub">{group}</p>
         </div>
       </div>
-      <div className="vy-stub">
-        <span className="vy-stub-tag">Not yet mocked</span>
-        {hint && <p className="vy-stub-hint">{hint}</p>}
-        <p className="vy-stub-note">
-          Quotations is the module built out in this prototype. This screen exists
-          in the navigation because it exists in the live menu — it has not been
-          checked against the real one, so nothing is shown here rather than
-          something that looks checked and is not.
+      {/* HER SCREEN, 29 Oct — the fourth state, and the one that was a page of
+          prose. The rocket stands whole on the pad with an arm welding it and
+          the plan ticking off beside it: work in progress, not wreckage, and
+          the difference is visible before the heading is read. There is no
+          Reload, because nothing is broken.
+
+          IT IS THE HIGHEST-LEVERAGE OF THE THREE she sent. Twenty-one routes
+          are built against ninety-one in the sitemap, so this is most of what
+          a reviewer clicks. */}
+      <div className="vy-launchpad" role="status">
+        <RocketLaunch state="building" />
+        <h2 className="vy-launchpad-title">Still on the launch pad</h2>
+        <p className="vy-launchpad-body">
+          Our crew is assembling this module. It lifts off in an upcoming release.
         </p>
-        <p className="vy-stub-note">
-          When it is built it will use the same list pattern as Part Master: same
-          toolbar order, same column roles, same status vocabulary. That is the
-          point of standardising — a new screen costs a column spec, not a design.
+        {/* The one fact the illustration cannot carry: WHICH screen, in the
+            words the live menu uses for it. Kept from the page this replaces —
+            a reviewer who typed the URL is owed the name. */}
+        {hint && <p className="vy-launchpad-hint">{hint}</p>}
+        <Button variant="filled" asChild><Link to="/">Back to Home</Link></Button>
+        <p className="vy-launchpad-note">
+          Quotations is the module built out in this prototype. This screen is in
+          the navigation because it is in the live menu; it has not been checked
+          against the real one, so nothing is shown rather than something that
+          looks checked and is not. When it is built it will use the same list
+          pattern as Part Master — same toolbar order, same column roles, same
+          status vocabulary.
         </p>
       </div>
     </div>

@@ -104,14 +104,27 @@ Ngược với thứ tự trong file của chị, và lý do là số màn ở c
 | **Luật 0,4 giây + thoát 0,4 giây + "Welcome aboard"** | Nhỏ |
 | **Đổi hẳn sang phóng thẳng đứng** | Lớn — và là **câu hỏi**, không phải việc: xem dưới |
 
-## F · Hai điều cần chị quyết
+## F · Hai điều đã chốt — và đã dựng xong 29/10
 
-1. **Hành trình ngang còn dùng nữa không?** Bản phóng thẳng của chị và bản bay
-   ngang 5 trạm của em là hai phép ẩn dụ khác nhau cho cùng một lúc chờ. Em
-   không định giữ cả hai — hai hình cho một trạng thái là hai thứ người dùng
-   phải học. Nếu chị chốt bản phóng thẳng thì em thay, và bản ngang lui về làm
-   hình minh hoạ trong tài liệu.
-2. **Support ticket gửi đi đâu?** Hộp thoại trong file dừng ở màn xác nhận với
-   số `HD-1056`. Bên mình có hệ thống helpdesk nào đang chạy (số `HD-` là của
-   hệ nào), hay đây là thứ cần dựng mới? Trả lời cái này rồi em mới dựng được
-   phần sau nút Send.
+1. **Bỏ hành trình ngang.** An chốt: không giữ hai hình cho một trạng thái.
+   `RocketJourney.tsx` đã xoá; `RocketLaunch.tsx` thay vào, một component ba
+   trạng thái — *launching · error · building*. Bốn file SVG tĩnh trong
+   `docs/assets/rocket-journey/` **giữ nguyên**: chúng là hình trong tài liệu
+   so sánh, không phải code.
+2. **Support ticket: giả.** An chốt tạm thời tạo và gửi giả. Hộp thoại dựng
+   đủ, số ticket bốc ngay trong trình duyệt, **không có request nào rời máy**.
+   Phần còn thiếu để nó thật là một lời gọi POST và câu trả lời "gửi đi đâu" —
+   câu 12 trong trang câu hỏi.
+
+### Đã dựng — 29/10
+
+| | |
+|---|---|
+| **Still on the launch pad** | Thay `Placeholder`. Tên lửa nguyên vẹn + cánh tay máy hàn + bảng vẽ tick dần. Nút **Back to Home**, không có Reload. ~70 màn đổi theo |
+| **Màn lỗi** | Thêm **Back to Home** · **Error ID** kèm **Copy** · *"Still not working? Send a support ticket"* · hộp thoại ticket tự đính kèm Error ID / Screen / Time / Browser · dòng xác nhận *"Ticket HD-1056 sent"*. Tên lửa đổi sang **nằm nghiêng trên bệ, nứt, rụng cánh, bốc khói** |
+| **Màn chờ** | Phóng thẳng đứng · **thanh 5 đoạn** · một dòng chữ *"Launching your mission…"* → *"Still climbing…"* sau 5 giây → *"Welcome aboard"* · **chỉ hiện sau 0,4 giây** · thoát 0,4 giây bay khỏi mép trên |
+| **Dark mode** | Chị chỉ ra màn sáng; bản dark là của em, theo đúng luật file dark chị đã gửi trước đây: **cùng dải màu xanh, lấy bậc cao hơn** |
+
+**Error ID sinh lúc BẮT được lỗi, không phải lúc vẽ.** Sinh lúc vẽ thì mỗi lần
+render lại — bấm Copy, mở hộp thoại — người dùng nhận một số khác cho cùng một
+lỗi, và số họ vừa đọc cho đồng nghiệp thôi khớp.

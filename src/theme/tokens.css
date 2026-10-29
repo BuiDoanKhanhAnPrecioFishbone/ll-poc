@@ -460,6 +460,29 @@
   --vy-swatch-label-bg:       rgba(255, 255, 255, .85);
   --vy-overlay-scrim:         rgba(19, 24, 32, .45);
 
+  /* ---- The rocket -----------------------------------------------------
+     Ten roles rather than ten hex values, because the drawing has to survive
+     dark mode and the delivered art already showed how: the designer's dark
+     file is the SAME blue ramp picked further up it — 100/200/300 where the
+     light one uses 500/600/800 — so the craft goes pale on a dark ground
+     instead of disappearing into it.
+
+     She specified the launch screen on white ("Always light"), so the light
+     column is hers and the dark column is ours, built by the rule her own
+     horizontal dark file set. Two values are off the ramp and say so:
+     `ground-sh`, the planet's unlit half, and `smoke`, which is the one grey
+     in the picture because smoke is not blue. */
+  --vy-rocket-hull:      var(--vy-blue-600);   /* the body */
+  --vy-rocket-shade:     var(--vy-blue-800);   /* its unlit side, fins, nose */
+  --vy-rocket-accent:    var(--vy-blue-500);   /* turret, ticks, the schematic */
+  --vy-rocket-soft:      var(--vy-blue-300);   /* arm, pad, the flame's edge */
+  --vy-rocket-detail:    var(--vy-blue-200);   /* stars, craters, streaks */
+  --vy-rocket-trim:      var(--vy-blue-100);   /* stripe, window, the crack */
+  --vy-rocket-ground:    var(--vy-blue-100);   /* the planet's lit half */
+  --vy-rocket-ground-sh: #c3d1ee;
+  --vy-rocket-paper:     var(--vy-blue-50);    /* the design doc's sheet */
+  --vy-rocket-smoke:     var(--vy-grey-400);
+
   /* Semantic accents. `caution` is the brighter amber used for borders and
      rules; `warning` is darkened so it still clears 4.5:1 as text on white. */
   --vy-accent-positive: #047857;
@@ -781,6 +804,16 @@
   --vy-accent-neutral: #aab4c3;
   --vy-swatch-label-bg: rgba(16, 21, 28, .85);
   --vy-shadow-tint: #000000;
+  --vy-rocket-hull:      var(--vy-blue-300);
+  --vy-rocket-shade:     var(--vy-blue-500);
+  --vy-rocket-accent:    var(--vy-blue-300);
+  --vy-rocket-soft:      var(--vy-blue-400);
+  --vy-rocket-detail:    var(--vy-blue-500);
+  --vy-rocket-trim:      var(--vy-blue-100);
+  --vy-rocket-ground:    var(--vy-blue-800);
+  --vy-rocket-ground-sh: #0d1e44;
+  --vy-rocket-paper:     #1b2436;
+  --vy-rocket-smoke:     var(--vy-grey-500);
   --vy-shadow-key: #000000;
   --vy-overlay-scrim: rgba(0, 0, 0, .62);
   color-scheme: dark;
@@ -861,6 +894,16 @@
     --vy-accent-neutral: #aab4c3;
     --vy-swatch-label-bg: rgba(16, 21, 28, .85);
     --vy-shadow-tint: #000000;
+  --vy-rocket-hull:      var(--vy-blue-300);
+    --vy-rocket-shade:     var(--vy-blue-500);
+    --vy-rocket-accent:    var(--vy-blue-300);
+    --vy-rocket-soft:      var(--vy-blue-400);
+    --vy-rocket-detail:    var(--vy-blue-500);
+    --vy-rocket-trim:      var(--vy-blue-100);
+    --vy-rocket-ground:    var(--vy-blue-800);
+    --vy-rocket-ground-sh: #0d1e44;
+    --vy-rocket-paper:     #1b2436;
+    --vy-rocket-smoke:     var(--vy-grey-500);
     --vy-shadow-key: #000000;
     --vy-overlay-scrim: rgba(0, 0, 0, .62);
     color-scheme: dark;
