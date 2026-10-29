@@ -114,8 +114,11 @@ export function PricingDetailDialog({ result, open, onClose, onApply }: {
             <thead>
               <tr>
                 <th scope="col">Sale type</th>
-                <th scope="col">Unit price</th>
-                <th scope="col">Qty</th>
+                {/* `data-typed` = a column whose cells hold an input, so the
+                    heading takes the input's own text inset and sits flush
+                    with the figures under it. */}
+                <th scope="col" data-typed>Unit price</th>
+                <th scope="col" data-typed>Qty</th>
                 <th scope="col">Amount</th>
                 <th scope="col">With markup</th>
                 <th scope="col"><span className="vy-sr-only">Remove</span></th>
@@ -133,14 +136,24 @@ export function PricingDetailDialog({ result, open, onClose, onApply }: {
                           it. */}
                       {l.locked
                         ? <span className="vy-locked-cell">
-                            <Icon name="lock" size={13} />{l.saleType}
+                            {l.saleType}
+                            {/* The padlock goes LAST, like `ReadValue`'s. Ahead
+                                of the word it pushed "Material" 10px right of
+                                every sale type under it, and a column of names
+                                that do not start in the same place is the
+                                first thing the eye catches. */}
+                            <Icon name="lock" size={13} />
+                            <span className="vy-sr-only"> read-only</span>
                           </span>
                         : <Select label="Sale type" size="small" value={l.saleType}
                                   options={SALE_TYPES.filter(t => t !== 'Material')}
                                   onChange={v => patch(l.id, { saleType: v as OtherCostLine['saleType'] })} />}
                     </td>
+                    {/* The locked value wears the input's own text inset, so
+                        the digits line up down the column rather than the
+                        boxes — see the stylesheet. */}
                     <td>
-                      {l.locked ? money3(l.unitPrice) : (
+                      {l.locked ? <span className="vy-typed-static">{money3(l.unitPrice)}</span> : (
                         <TextField type="number" min={0} step="0.01" className="vy-num-cell"
                                    aria-label={`${l.saleType} unit price`}
                                    value={String(l.unitPrice)}
@@ -149,7 +162,7 @@ export function PricingDetailDialog({ result, open, onClose, onApply }: {
                       )}
                     </td>
                     <td>
-                      {l.locked ? l.qty.toLocaleString() : (
+                      {l.locked ? <span className="vy-typed-static">{l.qty.toLocaleString()}</span> : (
                         <TextField type="number" min={1} className="vy-num-cell"
                                    aria-label={`${l.saleType} quantity`}
                                    value={String(l.qty)}

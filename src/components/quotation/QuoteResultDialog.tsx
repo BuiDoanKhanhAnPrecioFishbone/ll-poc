@@ -168,8 +168,11 @@ export function QuoteResultDialog({ q, group, onClose }: {
                   dropdown reading "v3 · BoM v3 · 250 boards · $41,655.00",
                   which is a value with no name on it. */}
               <span className="vy-version-pick-label">Version</span>
+              {/* MEDIUM, NOT SMALL — it stands in a row of 34px buttons, and
+                  at `small` it was 32px: two control heights on one line, which
+                  is the first thing an eye notices on a toolbar. */}
               <Select
-                label="Quotation version" size="small" value={picked}
+                label="Quotation version" value={picked}
                 options={group.runs.map(r => ({
                   value: r.id,
                   label: versionOption(r),

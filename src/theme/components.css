@@ -1870,6 +1870,13 @@
 .vy-result-head > .vy-cost-card     { flex: 0 0 auto; }
 .vy-cost-card--side { --vy-card-pad: var(--vy-space-6); }
 .vy-cost-card--side .vy-cost-actions { margin-block-start: var(--vy-space-5); }
+/* TWO BUTTONS NOW, AND THEY WERE TOUCHING. This held one button until 29 Oct,
+   so a plain block was enough and nothing said otherwise; Add Package and
+   Pricing Detail then rendered edge to edge at 0px while the row above them
+   used 8. 8px is this app's gap between adjacent actions — `.vy-page-actions`,
+   `.vy-grid-actions`, `.vy-run-actions`, `.vy-vs-actions` and
+   `.vy-run-nav-actions` all use it. */
+.vy-cost-actions { display: flex; flex-wrap: wrap; gap: var(--vy-space-4); }
 .vy-cost-table { border-collapse: collapse; min-inline-size: var(--vy-cost-table-min); }
 .vy-cost-table th[scope="col"] {
   font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .05em;
@@ -1956,18 +1963,54 @@
 /* The sale type is a name, and the first column of both tables reads left. */
 .vy-cost-lines td:first-child { text-align: start; padding-inline-start: 0; }
 .vy-ref-cost td[data-tone="excess"] { color: var(--vy-danger-text-deep); }
-/* Row height follows the control in it, so an editable row is taller than a
-   read-only one and the two tables do not pretend to share a rhythm. */
-.vy-cost-lines .vy-field-control { margin: 0; }
+/* ONE COLUMN, ONE RIGHT EDGE. The typed numbers sit under the priced ones and
+   two things pushed them out of line:
+
+     · the control is a `label`, which is a BLOCK, and `text-align: end` on the
+       cell does not move a block — the input sat at the left of a 165px cell,
+       52px adrift of the figure above it. `margin-inline-start: auto` ends it
+       at the cell's edge instead.
+     · an input's text is inset by its own border and padding; plain text is
+       not. So the read-only cells in these two columns wear the same inset,
+       and the digits line up rather than the boxes.
+
+   Row height still follows the control in it — an editable row is taller than
+   a read-only one, and the two tables do not pretend to share a rhythm. */
+.vy-cost-lines .vy-field-control { margin: 0 0 0 auto; }
 .vy-cost-lines .vy-select { inline-size: 11rem; }
 .vy-num-cell { inline-size: 7rem; }
 .vy-num-cell .vy-input { text-align: end; font-variant-numeric: tabular-nums; }
+/* The inset belongs to the VALUE, not to the cell: put it on the cell and the
+   input is inset too, which moves both and fixes neither. */
+.vy-typed-static { padding-inline-end: calc(var(--vy-space-5) + 1px); }
 /* The line the quote run priced: locked, and saying so with the same padlock
-   the read-only fields use. */
+   the read-only fields use.
+
+   IT OCCUPIES THE SELECT'S SLOT. Measured against Kendo's own box, a
+   ComboBox's text starts 9px inside it — 1px of border and 8 of padding — so
+   the locked name takes the same 9px and the column's names all begin at the
+   same x. The padlock follows the word rather than leading it, so it cannot
+   shift the thing it describes. */
 .vy-locked-cell {
-  display: inline-flex; align-items: center; gap: var(--vy-space-3);
+  display: inline-flex; align-items: center; gap: var(--vy-space-4);
+  padding-inline-start: calc(var(--vy-space-4) + 1px);
   color: var(--vy-on-surface-muted);
 }
+/* BESIDE THE WORD, not at the end of the Select's slot. Given that width the
+   padlock sat 90px adrift in empty cell, reading as a stray glyph rather than
+   as a note about the word it belongs to. */
+.vy-locked-cell > svg { flex: none; }
+/* ONE RULE FOR THIS TABLE: a column's heading and its summary line are flush
+   with the VALUES, not with the boxes around them.
+
+   The usual convention in this app is the other way — a field's label sits at
+   its box's edge, as the setup strip has it — and it does not survive a column
+   that mixes a typed value with a priced one. The reader of this table compares
+   $33.820 with the number typed under it; whichever edge the boxes happen to
+   have is not what they are reading. */
+.vy-cost-lines th[data-typed] { padding-inline-end: calc(var(--vy-space-5) + 1px); }
+.vy-cost-lines th[scope="col"]:first-child,
+.vy-cost-lines tfoot th[scope="row"] { padding-inline-start: calc(var(--vy-space-4) + 1px); }
 .vy-cost-lines tfoot th, .vy-cost-lines tfoot td {
   border-block-start: 1px solid var(--vy-border); padding-block-start: var(--vy-space-4);
 }
