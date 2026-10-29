@@ -105,7 +105,13 @@ const FILL_STEP1 = `
   __setVal(await __wait(() => document.querySelector('input[aria-label="Assembly Part Number"]')), '9001234');
   __setVal(document.querySelector('input[aria-label="Revision"]'), 'A');
   __setVal(document.querySelector('textarea[aria-label="Description"]'), 'Sensor interface PCBA');
-  await new Promise(r => setTimeout(r, 200));
+  /* TEMPLATE IS REQUIRED SINCE 29 OCT, and this script found out the way a
+     user would: Next stopped working. A ComboBox cannot be filled by setting
+     its input, so it is opened and the first option is clicked. */
+  const tplField = __byText('.vy-quote-config-field', /^Template/);
+  tplField.querySelector('.k-input-button, .k-select').click();
+  (await __wait(() => document.querySelector('.k-animation-container li.k-list-item'))).click();
+  await new Promise(r => setTimeout(r, 300));
   __byText('button', /^Next$/).click();
   await new Promise(r => setTimeout(r, 900));
 `;
