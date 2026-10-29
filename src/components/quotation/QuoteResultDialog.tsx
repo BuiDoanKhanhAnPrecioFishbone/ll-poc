@@ -196,7 +196,7 @@ export function QuoteResultDialog({ q, group, onClose }: {
             the only thing anyone opens this screen to read. Side by side it
             costs nothing: the setup strip has width to spare and simply wraps
             onto one more line. */}
-        <div className="vy-result-head">
+        <div className="vy-run-head">
         <QuoteContextBar
           heading={`Quote Run · Version ${result.lastRunVersion.replace(/^v/, '')}`}
           assembly={`${result.partNumber} - ${result.partRev}`}

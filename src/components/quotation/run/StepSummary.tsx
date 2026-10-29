@@ -66,6 +66,12 @@ export function StepSummary({ cfg, lines, run, onAddPackage, setLines }: {
           version is the thing a reader needs first — a quotation is sent,
           revised and sent again, and "which one am I looking at" has to be
           answerable from the top of the screen. */}
+      {/* THE COST BESIDE THE SETUP, as the saved result view has it since
+          28 Oct — and as this step did not until An asked why the two screens
+          differ. Stacked, the card spent a full-width band on a 340px table
+          and the grid below paid for it. Same wrapper, same card modifier,
+          same breakpoint: the two screens are now one layout. */}
+      <div className="vy-run-head">
       <QuoteContextBar
         heading={`Quote Run · Version ${run.version || 1}`}
         assembly={`${cfg.assemblyPartNumber} - ${cfg.partRev}`}
@@ -92,7 +98,7 @@ export function StepSummary({ cfg, lines, run, onAddPackage, setLines }: {
           Excess Amount keeps its own row under the rule, because it is not a
           third way of measuring the same material — it is money spent on
           material the build does not consume. */}
-      <section className="vy-cost-card vy-cost-card--wide">
+      <section className="vy-cost-card vy-cost-card--side">
         <h3 className="vy-field-group-title">
             <SmartIcon name="finance" />Cost Estimation
           </h3>
@@ -128,11 +134,16 @@ export function StepSummary({ cfg, lines, run, onAddPackage, setLines }: {
             </tr>
           </tfoot>
         </table>
-        {/* "The Add Package button is displayed below the cost summary section." */}
-        <Button onClick={onAddPackage} title="Add a packaging part to this quotation">
-          Add Package
-        </Button>
+        {/* "The Add Package button is displayed below the cost summary section."
+            In `.vy-cost-actions`, which is where the result view's two buttons
+            live — one row of actions under one card, at one gap. */}
+        <div className="vy-cost-actions">
+          <Button onClick={onAddPackage} title="Add a packaging part to this quotation">
+            Add Package
+          </Button>
+        </div>
       </section>
+      </div>
 
       {/* COLUMNS, LIKE THE OTHER THREE GRIDS — 28 Oct. The standard asks for
           the chooser on "every list or grid with 3+ columns"; steps 2 and 3

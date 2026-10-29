@@ -1855,28 +1855,31 @@ a.vy-btn, a.vy-btn:hover { text-decoration: none; }
 /* ---- Step 4 cost estimation ----------------------------------------------
    Two measures down, with and without markup across — see StepSummary.tsx for
    why this is a table and not the list of five it replaced. */
-.vy-cost-card--wide { display: flex; flex-direction: column; align-items: flex-start; gap: var(--vy-space-6); }
-/* The column's own `gap` does the spacing under the header here, so the
-   header's margin would be counted twice. */
-.vy-cost-card--wide > .vy-field-group-title { margin-block-end: 0; }
-
-/* ---- Quotation Result: the cost sits BESIDE the setup, not under it -------
+/* ---- The cost sits BESIDE the setup, not under it ------------------------
    Stacked, the card spent a full-width band on a 340px table and left the
    right two thirds empty — a band the grid paid for. Side by side, the strip
    wraps onto one more line and the band is gone.
 
-   `flex: 1 1 var(--vy-result-setup-min)` on the strip and `flex: 0 0 auto` on
-   the card, so the card keeps the width its table needs and the strip takes
-   the rest; under that basis the row wraps and they stack again, which is the
+   BOTH SCREENS, since 29 Oct. This was built for the saved result view and
+   named after it, which left step 4 of the wizard — the same strip, the same
+   card, the same five figures — still spending the band. An asked why the two
+   differ, and there was no reason beyond the order they were worked on.
+
+   `flex: 1 1 var(--vy-run-setup-min)` on the strip and `flex: 0 0 auto` on the
+   card, so the card keeps the width its table needs and the strip takes the
+   rest; under that basis the row wraps and they stack again, which is the
    right failure on a narrow window. `min-inline-size: 0` because a flex item
    defaults to `min-width: auto` and the strip's widest field would otherwise
    stop it shrinking. */
-.vy-result-head {
+.vy-run-head {
   display: flex; flex-wrap: wrap; align-items: flex-start; gap: var(--vy-space-5);
 }
-.vy-result-head > .vy-quote-context { flex: 1 1 var(--vy-result-setup-min); min-inline-size: 0; }
-.vy-result-head > .vy-cost-card     { flex: 0 0 auto; }
+.vy-run-head > .vy-quote-context { flex: 1 1 var(--vy-run-setup-min); min-inline-size: 0; }
+.vy-run-head > .vy-cost-card     { flex: 0 0 auto; }
 .vy-cost-card--side { --vy-card-pad: var(--vy-space-6); }
+/* The column's own `gap` does the spacing under the header, so the header's
+   margin would be counted twice. */
+.vy-cost-card--side > .vy-field-group-title { margin-block-end: 0; }
 .vy-cost-card--side .vy-cost-actions { margin-block-start: var(--vy-space-5); }
 /* TWO BUTTONS NOW, AND THEY WERE TOUCHING. This held one button until 29 Oct,
    so a plain block was enough and nothing said otherwise; Add Package and

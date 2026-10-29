@@ -562,9 +562,10 @@
   --vy-radio-tile-min:    230px;
   --vy-cost-col-min:      170px; /* one figure in the cost summary */
   --vy-cost-table-min:    340px; /* two money columns and their headings */
-  /* How much the Quotation Result's setup strip wants before the cost card
-     stops sitting beside it: nine settings and three run facts, two rows. */
-  --vy-result-setup-min:  560px;
+  /* How much a run's setup strip wants before the cost card stops sitting
+     beside it: nine settings and three run facts, two rows. Step 4 and the
+     saved result view share the strip, so they share the number. */
+  --vy-run-setup-min:     560px;
   /* ONE reading measure, and it caps TEXT — never a container.
      Panels, cards and dialogs take their width from the layout they sit in; only
      the prose inside them is capped, because line length is a property of text.
