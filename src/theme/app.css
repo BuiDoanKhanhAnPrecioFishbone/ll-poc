@@ -439,7 +439,7 @@
 
 .vy-record-title { font-size: var(--vy-text-2xl); font-weight: var(--vy-weight-bold); margin: var(--vy-space-4) 0 0; color: var(--vy-on-surface-strong); letter-spacing: -.01em; }
 
-.vy-fact-label { font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .05em; color: var(--vy-on-surface-subtle); margin-bottom: var(--vy-space-1); }
+.vy-fact-label { font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle); margin-bottom: var(--vy-space-1); }
 .vy-fact-value { font-size: var(--vy-text-md); color: var(--vy-on-surface-strong); display: flex; align-items: baseline; gap: var(--vy-space-3); flex-wrap: wrap; }
 /* A second, smaller fact in the same line — "2 · 5 runs". The assemblies count
    and the runs behind them are one statement, and two facts side by side would
@@ -637,7 +637,7 @@
 /* TWO FIELDS TO A ROW, as her mockup pairs them — and `auto-fit` rather than
    a flat `1fr 1fr`, so the panel drops back to one column when the window is
    too narrow for the second to hold a label. The pairs fall out of the field
-   order on their own: Customer | Qty to Quote, Quote Focus | Mark up, Excess
+   order on their own: Customer | Qty to Quote, Quote Focus | Markup, Excess
    and MOQ | Material Package Type, Net Consigned | Rocket Consigned — which
    is hers, field for field. The dividers and the two Notes already span the
    full width. */
@@ -800,7 +800,7 @@
 }
 .vy-split-more:hover { background: var(--vy-brand-hover); }
 .vy-draft-menu { padding: var(--vy-space-5); max-width: 22rem; }
-.vy-popover-title { margin: 0 0 var(--vy-space-3); font-size: var(--vy-text-sm); font-weight: var(--vy-weight-bold); text-transform: uppercase; letter-spacing: .04em; color: var(--vy-on-surface-muted); }
+.vy-popover-title { margin: 0 0 var(--vy-space-3); font-size: var(--vy-text-sm); font-weight: var(--vy-weight-bold); color: var(--vy-on-surface-muted); }
 .vy-draft-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--vy-space-2); }
 .vy-draft-list button {
   display: flex; flex-direction: column; gap: 2px; width: 100%; text-align: start;
@@ -1142,8 +1142,8 @@
   border-radius: var(--vy-radius-md); padding: var(--vy-space-5) var(--vy-space-6);
 }
 .vy-ticket-auto h3 {
-  margin: 0 0 var(--vy-space-3); font-size: var(--vy-text-xs); font-weight: var(--vy-weight-medium);
-  text-transform: uppercase; letter-spacing: .05em; color: var(--vy-on-surface-subtle);
+ margin: 0 0 var(--vy-space-3); font-size: var(--vy-text-xs); font-weight: var(--vy-weight-medium);
+ color: var(--vy-on-surface-subtle);
 }
 /* A fixed first column, so the four values line up as a list of facts rather
    than as four sentences of different lengths. */
@@ -1205,9 +1205,8 @@
    not of the bar it sits in — measured at 23, and 24 is the rung above it. */
 .vy-record-bar .vy-skeleton-cell { block-size: var(--vy-space-10); }
 .vy-rec-sk-label {
-  font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle);
-  text-transform: uppercase; letter-spacing: .04em;
-}
+ font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle);
+ }
 .vy-rec-sk-value { margin: 0; display: flex; flex-direction: column; gap: var(--vy-space-2); }
 /* A value bar stands at the height of the text it replaces, not of the control
    that will hold it: the record reads before it edits, and a 34px bar would
@@ -1316,7 +1315,6 @@
   border-bottom: 1px solid var(--vy-border);
   border-radius: 0;
   font-size: var(--vy-text-sm); font-weight: var(--vy-weight-semibold);
-  letter-spacing: 0; text-transform: none;
   color: var(--vy-on-surface);
 }
 /* The separator is for sections that FOLLOW one another down the page. Side by
@@ -1388,7 +1386,7 @@
 .vy-bom-status[data-status="Changed"] { background: var(--vy-status-open-bg);      color: var(--vy-status-open-fg); }
 
 .vy-bom-diff { width: 100%; border-collapse: collapse; border-top: 1px solid var(--vy-border); font-size: var(--vy-text-sm); }
-.vy-bom-diff th { text-align: left; padding: var(--vy-space-4) var(--vy-space-6); background: var(--vy-surface-subtle); color: var(--vy-on-surface-muted); font-weight: var(--vy-weight-semibold); font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .03em; }
+.vy-bom-diff th { text-align: left; padding: var(--vy-space-4) var(--vy-space-6); background: var(--vy-surface-subtle); color: var(--vy-on-surface-muted); font-weight: var(--vy-weight-semibold); font-size: var(--vy-text-xs); }
 .vy-bom-diff td { padding: var(--vy-space-4) var(--vy-space-6); border-top: 1px solid var(--vy-border-faint); color: var(--vy-on-surface); vertical-align: top; }
 .vy-bom-diff td:last-child { font-family: var(--vy-font-mono); font-size: var(--vy-text-xs); color: var(--vy-on-surface-soft); }
 
@@ -2017,10 +2015,9 @@
   border-radius: var(--vy-radius-md);
 }
 .vy-status-flow-title {
-  margin: 0 0 var(--vy-space-6);
-  font-size: var(--vy-text-xs); font-weight: var(--vy-weight-semibold);
-  letter-spacing: .08em; text-transform: uppercase;
-  color: var(--vy-on-surface-muted);
+ margin: 0 0 var(--vy-space-6);
+ font-size: var(--vy-text-xs); font-weight: var(--vy-weight-semibold);
+ color: var(--vy-on-surface-muted);
 }
 .vy-status-flow-track {
   list-style: none; margin: 0; padding: 0 0 var(--vy-space-3);
@@ -2160,10 +2157,9 @@
   font-variant-numeric: tabular-nums; white-space: nowrap;
 }
 .vy-activity-detail-title {
-  margin: var(--vy-space-7) 0 var(--vy-space-4);
-  font-size: var(--vy-text-xs); font-weight: var(--vy-weight-semibold);
-  letter-spacing: .08em; text-transform: uppercase;
-  color: var(--vy-on-surface-muted);
+ margin: var(--vy-space-7) 0 var(--vy-space-4);
+ font-size: var(--vy-text-xs); font-weight: var(--vy-weight-semibold);
+ color: var(--vy-on-surface-muted);
 }
 .vy-activity-detail-summary { margin: var(--vy-space-7) 0 0; color: var(--vy-on-surface-soft); }
 
@@ -2331,7 +2327,7 @@
 .vy-vs-tab:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
 
 .vy-vs-body { flex: 1; overflow-y: auto; padding: var(--vy-space-7); }
-.vy-vs-heading { margin: 0 0 var(--vy-space-2); font-size: var(--vy-text-sm); font-weight: var(--vy-weight-semibold); color: var(--vy-on-surface); text-transform: uppercase; letter-spacing: .04em; }
+.vy-vs-heading { margin: 0 0 var(--vy-space-2); font-size: var(--vy-text-sm); font-weight: var(--vy-weight-semibold); color: var(--vy-on-surface); }
 .vy-vs-hint { margin: 0 0 var(--vy-space-6); font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle); line-height: 1.45; }
 .vy-vs-colhead { display: grid; grid-template-columns: minmax(0, 1fr) var(--vy-vs-width-col) var(--vy-vs-action-col); gap: var(--vy-space-4); padding: 0 var(--vy-space-4) var(--vy-space-3) var(--vy-space-9); font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle); }
 

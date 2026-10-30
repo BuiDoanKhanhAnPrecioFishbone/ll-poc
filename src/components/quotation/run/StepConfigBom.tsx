@@ -209,7 +209,14 @@ export function StepConfigBom({ q, cfg, set, invalid = [], onResume }: {
             <ReadValue>{cfg.quoteFocus}</ReadValue>
           </Field>
 
-          <Field label="Mark up">
+          {/* `Markup`, the live system's own word and the one the record form
+              uses — this panel said "Mark up", which was invisible while the
+              label was rendered in capitals and reads as a typo now that it is
+              not. The same sweep found two fields with two names: this panel's
+              "Customer Special Need" and "Internal Notes" against the record's
+              `Customer specific needs` and `Internal notes`. One field, one
+              name, and the live system's is the one. */}
+          <Field label="Markup">
             <ReadValue>{`${cfg.markup}%`}</ReadValue>
           </Field>
 
@@ -231,11 +238,11 @@ export function StepConfigBom({ q, cfg, set, invalid = [], onResume }: {
 
           <Divider>Notes</Divider>
 
-          <Field label="Customer Special Need" wide>
+          <Field label="Customer specific needs" wide>
             <ReadValue>{q.customerNotes}</ReadValue>
           </Field>
 
-          <Field label="Internal Notes" wide>
+          <Field label="Internal notes" wide>
             <ReadValue>{q.internalNotes}</ReadValue>
           </Field>
         </div>

@@ -501,7 +501,24 @@ a.vy-btn, a.vy-btn:hover { text-decoration: none; }
    used to live only under `.vy-run-section`, so every heading outside the
    wizard had to go without one. A heading with no icon renders identically to
    before: one text child in a flex box is one text child. */
-.vy-field-group-title { display: flex; align-items: center; gap: var(--vy-space-3); font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .06em; color: var(--vy-on-surface-subtle); font-weight: var(--vy-weight-heavy); margin: 0 0 var(--vy-space-4); padding-bottom: var(--vy-space-2); border-bottom: 1px solid var(--vy-border); }
+/* TITLE CASE, NOT UPPERCASE — 30 Oct, and the rule is the customer's own.
+   The UI Standard of 14 Oct lists what takes Title Case: "Buttons, links,
+   tabs, form and dialog titles, section and card titles, FIELD LABELS, column
+   headers, filter labels, menu items, status pills" — with a worked example
+   for a field label, `Due Date`, against the wrong `Due date`. Nothing in it
+   asks for uppercase anywhere.
+
+   WHERE OURS CAME FROM: nowhere. These rules were written on 20-23 Aug, before
+   the standard existed, and uppercase was my own habit — the live system
+   writes its field labels `Due Date` and `Assigned To` too, so it was not
+   copied from there either. My own review of the standard caught it on 16 Oct
+   (item B5, ranked "cheap, visible, no decisions needed") and then it sat.
+
+   WHAT MADE IT VISIBLE: the card-header bar of 21 Oct sets its own size and
+   case, so a group inside a card read as Title Case while the divider two
+   lines under it read as UPPERCASE — one screen, one kind of thing, two
+   cases. An asked where that came from; this is the answer and the fix. */
+.vy-field-group-title { display: flex; align-items: center; gap: var(--vy-space-3); font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle); font-weight: var(--vy-weight-heavy); margin: 0 0 var(--vy-space-4); padding-bottom: var(--vy-space-2); border-bottom: 1px solid var(--vy-border); }
 .vy-field-group-title svg { color: var(--vy-brand-text); flex: none; }
 .vy-field-list { margin: 0; }
 /* ---- Label ABOVE the value, everywhere -----------------------------------
@@ -1455,9 +1472,8 @@ a.vy-btn, a.vy-btn:hover { text-decoration: none; }
    it stands among fields of its own size. */
 .vy-quote-fact--input { min-width: 0; }
 .vy-quote-fact-label {
-  font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .05em;
-  color: var(--vy-on-surface-subtle); font-weight: var(--vy-weight-semibold);
-  white-space: nowrap;
+ font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle); font-weight: var(--vy-weight-semibold);
+ white-space: nowrap;
 }
 /* The facts are `ReadValue` boxes now, not bare text — see QuoteContext.tsx.
    They sit in a strip whose other members are real inputs, so they take a
@@ -1545,10 +1561,10 @@ a.vy-btn, a.vy-btn:hover { text-decoration: none; }
 .vy-mpn-menu { padding: 0; min-inline-size: var(--vy-mpn-menu-w); }
 .vy-mpn-table { border-collapse: collapse; inline-size: 100%; font-size: var(--vy-text-sm); }
 .vy-mpn-table th {
-  text-align: start; font-size: var(--vy-text-xs); text-transform: uppercase;
-  letter-spacing: .05em; color: var(--vy-on-surface-subtle);
-  padding: var(--vy-space-4) var(--vy-space-5) var(--vy-space-2);
-  border-bottom: 1px solid var(--vy-border);
+ text-align: start; font-size: var(--vy-text-xs); 
+ color: var(--vy-on-surface-subtle);
+ padding: var(--vy-space-4) var(--vy-space-5) var(--vy-space-2);
+ border-bottom: 1px solid var(--vy-border);
 }
 .vy-mpn-table td { padding: 0 var(--vy-space-5); border-bottom: 1px solid var(--vy-border-faint); }
 .vy-mpn-table td:last-child { color: var(--vy-on-surface-muted); white-space: nowrap; }
@@ -1578,10 +1594,10 @@ a.vy-btn, a.vy-btn:hover { text-decoration: none; }
    one panel holding the strategy, the notes and the attachments reads as three
    things when it is ruled and as a long list when it is not. */
 .vy-config-divider {
-  grid-column: 1 / -1; margin: var(--vy-space-5) 0 0;
-  display: flex; align-items: center; gap: var(--vy-space-4);
-  font-size: var(--vy-text-xs); font-weight: var(--vy-weight-semibold);
-  text-transform: uppercase; letter-spacing: .05em; color: var(--vy-on-surface-subtle);
+ grid-column: 1 / -1; margin: var(--vy-space-5) 0 0;
+ display: flex; align-items: center; gap: var(--vy-space-4);
+ font-size: var(--vy-text-xs); font-weight: var(--vy-weight-semibold);
+ color: var(--vy-on-surface-subtle);
 }
 .vy-config-divider::after {
   content: ''; flex: 1; border-top: 1px solid var(--vy-border);
@@ -1890,9 +1906,8 @@ a.vy-btn, a.vy-btn:hover { text-decoration: none; }
 .vy-cost-actions { display: flex; flex-wrap: wrap; gap: var(--vy-space-4); }
 .vy-cost-table { border-collapse: collapse; min-inline-size: var(--vy-cost-table-min); }
 .vy-cost-table th[scope="col"] {
-  font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .05em;
-  font-weight: var(--vy-weight-medium); color: var(--vy-on-surface-subtle);
-  text-align: end; padding: 0 0 var(--vy-space-3) var(--vy-space-9);
+ font-size: var(--vy-text-xs); font-weight: var(--vy-weight-medium); color: var(--vy-on-surface-subtle);
+ text-align: end; padding: 0 0 var(--vy-space-3) var(--vy-space-9);
 }
 .vy-cost-table th[scope="row"] {
   text-align: start; font-weight: var(--vy-weight-regular);
@@ -1921,8 +1936,7 @@ a.vy-btn, a.vy-btn:hover { text-decoration: none; }
    lands at the end of the row and drops to its own line when the row wraps. */
 .vy-version-pick { display: flex; align-items: center; gap: var(--vy-space-4); flex: 0 0 auto; }
 .vy-version-pick-label {
-  font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .05em;
-  font-weight: var(--vy-weight-medium); color: var(--vy-on-surface-subtle);
+ font-size: var(--vy-text-xs); font-weight: var(--vy-weight-medium); color: var(--vy-on-surface-subtle);
 }
 /* Wide enough for the longest option — "v3 · existing BoM · 500 boards ·
    $123,456.00" — because a picker that ellipsises the total is hiding the
@@ -1957,10 +1971,9 @@ a.vy-btn, a.vy-btn:hover { text-decoration: none; }
 .vy-pricing-detail .vy-field-hint:last-child { margin-block: var(--vy-space-5) 0; }
 .vy-ref-cost, .vy-cost-lines { width: 100%; border-collapse: collapse; }
 .vy-ref-cost th[scope="col"], .vy-cost-lines th[scope="col"] {
-  font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .05em;
-  font-weight: var(--vy-weight-medium); color: var(--vy-on-surface-subtle);
-  text-align: end; padding: 0 0 var(--vy-space-3) var(--vy-space-6);
-  border-block-end: 1px solid var(--vy-border);
+ font-size: var(--vy-text-xs); font-weight: var(--vy-weight-medium); color: var(--vy-on-surface-subtle);
+ text-align: end; padding: 0 0 var(--vy-space-3) var(--vy-space-6);
+ border-block-end: 1px solid var(--vy-border);
 }
 .vy-ref-cost th[scope="col"]:first-child,
 .vy-cost-lines th[scope="col"]:first-child { text-align: start; padding-inline-start: 0; }

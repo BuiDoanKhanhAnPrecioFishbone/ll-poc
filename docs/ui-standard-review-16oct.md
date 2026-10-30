@@ -53,6 +53,15 @@ already done.
    Ours says Cancel (`QuotationDetail.tsx:277`). The reasoning is sound — rename.
 5. **Title Case for labels, sentence case for prose.** Much of ours is sentence
    case ("Save draft", "Keep editing"). A sweep, but a clear rule.
+
+   > **30/10 — nửa đầu đã làm.** Lúc viết mục này em chỉ thấy *sentence case
+   > vs Title Case* trong chữ của nút; em bỏ sót nửa còn lại, **nhãn trường
+   > viết HOA TOÀN BỘ**. UPPERCASE không phải Title Case theo bất kỳ cách đọc
+   > nào, nên nửa đó đã sửa: 15 rule bỏ `text-transform: uppercase` — nhãn
+   > trường, tiêu đề cột, tiêu đề card và divider. Còn lại là nửa khó: đổi
+   > **chữ** của từng nhãn sang Title Case, và nó **chọi với chính prototype
+   > của chị** (file của chị viết *"Reload this screen"*, *"Accept &
+   > continue"*). Cần chị chốt trước khi sửa chữ.
 6. **Short filter labels.** The document cites our own
    `Is Exclude? (Include in quotation = FALSE)` as the thing not to do. Correct —
    we copied it verbatim from the live screen. Shorten it.
