@@ -393,6 +393,11 @@ export function RunQuotationDialog({ q, onClose, resume }: {
   const quotable = lines.filter(l => !l.excluded);
   const noSupplier = quotable.filter(l => !l.supplier).length;
   const quotedTotal = quotable.reduce((sum, l) => sum + (l.amount ?? 0), 0);
+  /* THE FOURTH NUMBER HER POPUP CARRIES. Confirm Importing BoM shows a Total
+     Excess Amount beside the no-supplier list, and the line beside Next —
+     which exists to make that popup unnecessary — was printing three of its
+     four facts. Found on 30 Oct by holding the two side by side. */
+  const excessTotal = quotable.reduce((sum, l) => sum + (l.excessAmt ?? 0), 0);
   const canLeaveStep3 = hasRun;
 
   /**
@@ -461,6 +466,10 @@ export function RunQuotationDialog({ q, onClose, resume }: {
           <strong>{quotable.length}</strong> {quotable.length === 1 ? 'line' : 'lines'}
           {' · '}{money(quotedTotal)}
           {noSupplier > 0 && <> · <strong>{noSupplier}</strong> without a supplier → NO BID</>}
+          {/* Only when there IS excess, for the reason step 4's cost card
+              gives: $0.00 called out reads as a problem that has been found,
+              and finding none is the good outcome. */}
+          {excessTotal > 0 && <> · <strong>{money(excessTotal)}</strong> excess</>}
         </span>
       )}
     </>
