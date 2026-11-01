@@ -891,3 +891,8 @@ export const money = (n: number) =>
   fmtMoney(n);
 export const money3 = (n: number) =>
   fmtMoney(n, { decimals: 3 });
+/* SIX, because the live Quotation Result and the Other Quoted Cost window both
+   print six — `$683.929200`, `$6,839.292000`. A unit price on a 20,000-piece
+   line is a number where the sixth decimal is still money. */
+export const money6 = (n: number) =>
+  fmtMoney(n, { decimals: 6 });

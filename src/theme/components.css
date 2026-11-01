@@ -1971,13 +1971,93 @@ a.vy-btn, a.vy-btn:hover { text-decoration: none; }
 }
 
 /* ---- Other Quoted Cost — what Pricing Detail opens -----------------------
-   Two tables, one above the other: what this assembly has cost before, and
-   what is being quoted beside material. See PricingDetailDialog.tsx. */
+   The live window, 1 Nov: a mode button, then the form and the reference
+   block SIDE BY SIDE, then the lines with their totals across the foot.
+   See PricingDetailDialog.tsx and docs/_ref/live-other-quoted-cost-29oct.png.
+
+   The first version stacked everything, which is what you build when you have
+   been told about a screen instead of shown one. */
+.vy-oqc { display: flex; flex-direction: column; gap: var(--vy-space-7); }
+.vy-oqc-mode { display: flex; }
+/* The form takes the slack and the reference block keeps the width its five
+   figures need; under that basis the row wraps and they stack, which is the
+   right failure on a narrow window. */
+.vy-oqc-head { display: flex; flex-wrap: wrap; align-items: flex-start; gap: var(--vy-space-7); }
+.vy-oqc-form {
+  flex: 1 1 22rem; min-inline-size: 0;
+  display: grid; grid-template-columns: 1fr 1fr; gap: var(--vy-space-5);
+  padding: var(--vy-space-7); border: 1px solid var(--vy-border);
+  border-radius: var(--vy-radius-md); background: var(--vy-surface);
+}
+/* Notes runs under both columns: it is a paragraph, and half a dialog is not
+   a width to write one in. */
+.vy-oqc-notes { grid-column: 1 / -1; }
+.vy-oqc-ref {
+  flex: 0 1 20rem; min-inline-size: 0;
+  padding: var(--vy-space-7); border: 1px solid var(--vy-border);
+  border-radius: var(--vy-radius-md); background: var(--vy-surface);
+}
+.vy-oqc-ref-title {
+  display: flex; align-items: center; gap: var(--vy-space-3);
+  margin: 0 0 var(--vy-space-3);
+  font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .06em;
+  font-weight: var(--vy-weight-heavy); color: var(--vy-on-surface-subtle);
+}
+/* "(Per unit)" is a qualifier on the heading, not part of its name, so it
+   keeps its own case and weight inside it. */
+.vy-oqc-ref-title span {
+  text-transform: none; letter-spacing: 0;
+  font-weight: var(--vy-weight-regular); color: var(--vy-on-surface-faint);
+}
+.vy-oqc-ref-title svg { color: var(--vy-brand-text); flex: none; }
+.vy-oqc-ref-list { margin: 0; display: flex; flex-direction: column; gap: var(--vy-space-4); }
+/* Name, figure, and how it sits against this run — three columns, so the
+   figures line up down the block and the arrows line up beside them. */
+.vy-oqc-ref-list > div {
+  display: grid; grid-template-columns: 1fr auto auto;
+  align-items: baseline; gap: var(--vy-space-5);
+}
+.vy-oqc-ref-list dt { color: var(--vy-on-surface-muted); font-size: var(--vy-text-sm); }
+.vy-oqc-ref-list dd {
+  margin: 0; font-variant-numeric: tabular-nums;
+  color: var(--vy-on-surface-strong); font-weight: var(--vy-weight-semibold);
+}
+.vy-oqc-delta { font-weight: var(--vy-weight-regular); min-inline-size: 5.5rem; text-align: end; }
+.vy-oqc-delta[data-dir="down"] { color: var(--vy-status-done-fg); }
+.vy-oqc-delta[data-dir="up"]   { color: var(--vy-danger-text-deep); }
+.vy-oqc-delta[data-dir="flat"] { color: var(--vy-on-surface-faint); }
+
+.vy-oqc-lines { display: flex; flex-direction: column; gap: var(--vy-space-5); }
+.vy-oqc-lines-bar { display: flex; align-items: center; gap: var(--vy-space-4); }
+/* The row number is a position, not a quantity: narrow, and left where the
+   eye starts the row. */
+.vy-cost-lines .vy-oqc-no { inline-size: 3rem; text-align: start; padding-inline-start: 0; }
+
+/* The three figures read left to right — this much, plus this much, comes to
+   this. Down the page they read as three more rows of the table above. */
+.vy-oqc-totals {
+  margin: 0; display: flex; flex-wrap: wrap; justify-content: flex-end;
+  gap: var(--vy-space-5) var(--vy-space-11);
+}
+.vy-oqc-totals > div { display: flex; flex-direction: column; gap: var(--vy-space-1); text-align: end; }
+.vy-oqc-totals dt {
+  font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .05em;
+  color: var(--vy-on-surface-subtle);
+}
+.vy-oqc-totals dd {
+  margin: 0; font-variant-numeric: tabular-nums;
+  font-size: var(--vy-text-md); color: var(--vy-on-surface-strong);
+}
+.vy-oqc-totals dd[data-add] { color: var(--vy-brand-text); }
+.vy-oqc-totals dd[data-emphasis] {
+  font-size: var(--vy-text-xl); font-weight: var(--vy-weight-bold);
+}
+
 .vy-pricing-detail { display: flex; flex-direction: column; gap: var(--vy-space-8); }
 /* The note above a table is about the table, and with no space between them it
    reads as part of the header row. */
-.vy-pricing-detail .vy-field-hint { display: block; margin-block: 0 var(--vy-space-5); }
-.vy-pricing-detail .vy-field-hint:last-child { margin-block: var(--vy-space-5) 0; }
+.vy-pricing-detail .vy-field-hint, .vy-oqc .vy-field-hint { display: block; margin-block: 0 var(--vy-space-5); }
+.vy-pricing-detail .vy-field-hint:last-child, .vy-oqc .vy-field-hint:last-child { margin-block: var(--vy-space-5) 0; }
 .vy-ref-cost, .vy-cost-lines { width: 100%; border-collapse: collapse; }
 .vy-ref-cost th[scope="col"], .vy-cost-lines th[scope="col"] {
  font-size: var(--vy-text-xs); font-weight: var(--vy-weight-medium); color: var(--vy-on-surface-subtle);
@@ -1994,8 +2074,13 @@ a.vy-btn, a.vy-btn:hover { text-decoration: none; }
   text-align: end; padding: var(--vy-space-3) 0 var(--vy-space-3) var(--vy-space-6);
   font-variant-numeric: tabular-nums; color: var(--vy-on-surface-strong);
 }
-/* The sale type is a name, and the first column of both tables reads left. */
-.vy-cost-lines td:first-child { text-align: start; padding-inline-start: 0; }
+/* A name reads left; a figure reads right. Which column holds the name moved
+   when the live window turned out to number its lines, so this names the
+   columns rather than counting from the edge. */
+.vy-cost-lines td:first-child,
+.vy-cost-lines td.vy-oqc-sale { text-align: start; padding-inline-start: 0; }
+.vy-cost-lines th[scope="col"].vy-oqc-sale { text-align: start; }
+.vy-cost-lines td.vy-oqc-sale { padding-inline-start: calc(var(--vy-space-4) + 1px); }
 .vy-ref-cost td[data-tone="excess"] { color: var(--vy-danger-text-deep); }
 /* ONE COLUMN, ONE RIGHT EDGE. The typed numbers sit under the priced ones and
    two things pushed them out of line:

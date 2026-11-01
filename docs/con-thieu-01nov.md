@@ -30,7 +30,11 @@ chị kể, nên khác khá nhiều. Tám điểm:
 Và tiền hiện **6 chữ số thập phân** (`$6,839.290000`) — khớp định dạng trong
 guideline 2.1, bản em đang để 2.
 
-**→ Việc: dựng lại màn này theo ảnh.** Vừa, không khó, chỉ là phải làm lại.
+**→ Đã dựng lại xong 01/11**, theo ảnh chứ không theo mô tả. Cả tám điểm.
+Thêm hai điều ảnh không nói mà màn cần: nút **Edit** đổi thành **Discard
+Changes** khi đang sửa (chữ của chính standard chị: *"Discard Changes, not
+Cancel, in edit mode"*), và **Quantity ở đầu màn điều khiển dòng Materials** —
+một số lượng cho cả báo giá, không phải mỗi dòng một số tình cờ bằng nhau.
 
 ## B · Bảng **Quotation Result** — thiếu một cột
 
