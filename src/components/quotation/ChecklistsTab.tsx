@@ -256,7 +256,7 @@ export function ChecklistsTab({ q, people: controlled, onPeopleChange, touched, 
 
         {uploadOpen && (
           <Dialog open onClose={() => setUploadOpen(false)} title="Upload a document"
-                  subtitle="Attach a document to this Project Requirement's checklist"
+                  subtitle="Attach a document to this Project Requirement’s checklist"
                   actions={<Button variant="filled" onClick={() => setUploadOpen(false)}>Done</Button>}>
             <FileDrop multiple accept=".xlsx,.pdf,.png,.jpg,.doc,.docx"
                       hint="Drawings, reports and signed checklists."

@@ -205,7 +205,7 @@ export function PricingDetailDialog({ result, open, onClose, onApply }: {
                               <span className="vy-sr-only"> read-only</span>
                             </>}
                           </span>
-                        : <Select label="Sale type" size="small" value={l.saleType}
+                        : <Select label="Sale Type" size="small" value={l.saleType}
                                   options={SALE_TYPES.filter(t => t !== 'Materials')}
                                   onChange={v => patch(l.id, { saleType: v as OtherCostLine['saleType'] })} />}
                     </td>

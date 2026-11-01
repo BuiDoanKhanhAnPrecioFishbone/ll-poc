@@ -378,7 +378,7 @@ export function StepConfigBom({ q, cfg, set, invalid = [], onResume }: {
                 been chosen. The option should be disabled after the user has
                 selected a template." */}
             <div className="vy-run-drafts">
-              <span>Don't see your template?</span>
+              <span>Don’t see your template?</span>
               <Button size="sm" variant="tonal" disabled={Boolean(cfg.template)}
                       title={cfg.template
                         ? 'A template is already selected — clear it to create a new one'

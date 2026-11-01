@@ -274,7 +274,7 @@ export function QuoteResultDialog({ q, group, onClose }: {
                 )}
                 {otherCost > 0 && (
                   <tr>
-                    <th scope="row">Other quoted cost</th>
+                    <th scope="row">Other Quoted Cost</th>
                     <td />
                     <td>{money(otherCost)}</td>
                   </tr>
@@ -392,7 +392,7 @@ export function QuoteResultDialog({ q, group, onClose }: {
         onClose={() => setPricingOpen(false)}
         onApply={cost => {
           setOtherCost(cost);
-          toast.success(`Other quoted cost applied — ${money(cost)} on top of material.`);
+          toast.success(`Other Quoted Cost applied — ${money(cost)} on top of material.`);
         }}
       />
     </Dialog>

@@ -145,7 +145,10 @@ export function ResultTab({ q, onRun }: { q: Quotation; onRun: () => void }) {
           Running a quotation uploads a BoM, matches each line to a manufacturer and returns a
           cost per board. Results appear here, one row per assembly and version.
         </p>
-        <Button variant="filled" onClick={onRun}>Run quotation</Button>
+        {/* `Run Quotation` — the button's name, and the same two words the
+            record's own primary button and the dialog's title use. This tab
+            had it in sentence case in both places. */}
+        <Button variant="filled" onClick={onRun}>Run Quotation</Button>
       </div>
     );
   }
@@ -191,7 +194,7 @@ export function ResultTab({ q, onRun }: { q: Quotation; onRun: () => void }) {
           )}>
             {exporting ? 'Building the file…' : 'Export'}
           </Button>
-          <Button variant="filled" onClick={onRun}>Re-run quotation</Button>
+          <Button variant="filled" onClick={onRun}>Re-run Quotation</Button>
         </div>
       </div>
 
