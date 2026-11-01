@@ -49,7 +49,10 @@ một số lượng cho cả báo giá, không phải mỗi dòng một số tì
 - **LAST RUN VERSION ghi `6`** — số trần, không có chữ `v`. Bản em ghi `v3`
   kèm thẻ *3 runs*. Đúng như chị nói hôm 29/10 ("cột Last Run Version ghi 6").
 
-**→ Việc: thêm cột BOM VERSION, bỏ tiền tố `v`.** Nhỏ.
+**→ Xong 01/11.** Cột **BoM Version** nằm đúng chỗ của nó (giữa Part Rev và
+Description), và Last Run Version giờ là **số trần**. Chỗ nào cần chữ thì ghi
+*"Version 3"*; chỉ tên file export còn giữ `v`, vì ở đó nó là quy ước đặt tên
+file chứ không phải nhãn.
 
 ## C · Bản 27/10, bước 3 — đã khớp, em đối chiếu lại cho chắc
 
@@ -72,8 +75,11 @@ record** thay vì gộp ô — đã giải thích đủ lợi hại trong tài l
 | Tiêu đề panel trái | **RFQ & Quote Strategy** kèm số `RFQ0000000329` | *Quote Strategy*, không có số RFQ |
 | Link dưới Template | **Create Custom Template** | *Create a new template* |
 
-Cả ba đều nhỏ. Mục đầu là **hai nguồn của chị chọi nhau** (prototype vs
-standard) nên em không tự đổi.
+**Hai mục sau đã làm 01/11** — tiêu đề panel giờ là *RFQ & Quote Strategy*
+kèm số RFQ, và link là *Create Custom Template*. **Mục đầu em không tự đổi**:
+đó là **hai nguồn của chị chọi nhau** — prototype 27/10 để *Existing Assembly*
+trước, còn UI Standard 14/10 viết thẳng thứ tự *"Quick Quote from BoM File ·
+Existing Assembly"*. Xin chị chốt.
 
 ## E · Vẫn đang chờ chị — không phải chờ việc
 
@@ -87,7 +93,14 @@ standard) nên em không tự đổi.
 6. **`Customer Special Need` hay `Customer specific needs`** — panel của chị
    một đằng, hệ thống live một nẻo. Một trường, hai tên.
 
-## F · Còn nợ từ guideline 2.1
+## F · Guideline 2.1 — **đã làm nốt cả bốn, 01/11**
 
-*Load more suppliers* dưới dropdown · gộp số lượng một part dùng ở nhiều
-sub-assembly · mã part tạm (`S_01`) · trạng thái **Quoted** sau Submit.
+| | |
+|---|---|
+| **Load more suppliers** | Dropdown chỉ liệt kê nhà cung cấp **ưu tiên**; nút ghim dưới danh sách mở phần còn lại và broker. **Theo từng dòng**, không phải cả màn — cần broker là quyết định của một part |
+| **Gộp số lượng** | `CONN-USB-C-16P` giờ có mặt ở bo chính (6) và sub-assembly RF (4), gộp thành **một dòng qty 10**. Phải gộp thật chứ không phải gộp hiển thị: mua tách 6 và 4 là mất bậc giá ở 10 và có thể rơi vào hai nhà cung cấp — đúng cái luật này sinh ra để chặn. Attrition lấy **max**, không cộng |
+| **Mã part tạm** | Dòng không có mã part nhận `00912_01` — tiền tố là **mã khách**, lấy từ chính record |
+| **Trạng thái sau Submit** | Submit → **Quoted**. Và nó lòi ra hai cái nữa: hộp thoại *Confirm RFQ* tự nói *"moves from New to In-Progress"*, *Cancel* nói *"closed as Cancelled"*, mà cả hai kết thúc bằng toast *"not in this prototype"*. Cả ba giờ đổi trạng thái thật và ghi vào **Activity Log** |
+
+Hai cái cuối hiện ngay trên dòng — thẻ **2 sub-assemblies** và **Temporary** —
+vì nhìn vào con số không thể biết được, giống hệt thẻ *Package* ở step 4.
