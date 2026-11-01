@@ -424,7 +424,7 @@ function quotingColumns(cfg: RunConfig, hasRun: boolean,
   return [
     { field: 'id', id: 'part', title: 'Part', role: 'ident', width: 180,
       widthNote: 'Frozen, so it pays for itself; part numbers must not truncate.',
-      render: r => p(r, () => r.line.part) },
+      render: r => p(r, () => <PartCell line={r.line} />) },
     { field: 'id', id: 'revision', title: 'Revision', role: 'code', width: 80,
       widthNote: 'A revision is one or two characters; the live column is 80.',
       render: r => p(r, () => r.line.revision) },
@@ -583,4 +583,31 @@ function quotingColumns(cfg: RunConfig, hasRun: boolean,
                    value={r.line.notes}
                    onChange={e => edit(r.line.id, { notes: e.target.value })} />)) },
   ];
+}
+
+/**
+ * The two things a Part cell has to admit about itself.
+ *
+ * A folded line was several lines in the file, and a temporary part number was
+ * not in the file at all. Both change what the number means, and neither is
+ * visible from the number — so the cell says it, the way the Package tag on
+ * step 4 does.
+ */
+export function PartCell({ line }: { line: BomLine }) {
+  return (
+    <span className="vy-tagged">
+      {line.part}
+      {line.isTemporary && (
+        <span className="vy-pill vy-pill--sm" title="Generated: this line had no part number in the file">
+          Temporary
+        </span>
+      )}
+      {line.mergedFrom && line.mergedFrom > 1 && (
+        <span className="vy-pill vy-pill--sm"
+              title={`Quantities from ${line.mergedFrom} sub-assemblies, quoted once for the total`}>
+          {line.mergedFrom} sub-assemblies
+        </span>
+      )}
+    </span>
+  );
 }

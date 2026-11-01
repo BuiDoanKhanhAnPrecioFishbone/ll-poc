@@ -134,7 +134,10 @@ export function RunQuotationDialog({ q, onClose, onSubmitted, resume }: {
     setPendingState(p => ({ ...p, ...setupPatch(patch) }));
   };
 
-  const [lines, setLinesState] = useState<BomLine[]>(() => resume ? resume.lines : buildBomLines());
+  /* The customer's code is the prefix a generated part number takes — §3.2.
+     `00912 - Halden Marine AS` gives `00912_01`. */
+  const [lines, setLinesState] = useState<BomLine[]>(
+    () => (resume ? resume.lines : buildBomLines(q.customer.split(' - ')[0].trim())));
   const setLines = (fn: (l: BomLine[]) => BomLine[]) => setLinesState(fn);
 
   /* THE PENDING SETUP — see `state.ts`. `cfg` is what the grid's numbers were

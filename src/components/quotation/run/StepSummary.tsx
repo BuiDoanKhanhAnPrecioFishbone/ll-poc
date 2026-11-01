@@ -6,7 +6,7 @@ import { Button } from '../../../ui/Button';
 import { Select } from '../../../ui/Overlays';
 import type { ColumnSpec } from '../../column-model';
 import { QuoteContextBar, QuoteToolbar, NoRecords } from './QuoteContext';
-import { rowTone } from './StepQuoting';
+import { rowTone, PartCell } from './StepQuoting';
 import {
   costSummary, totalQtyOf, money, money3,
   type BomLine, type LineStatus,
@@ -200,7 +200,8 @@ function summaryColumns(cfg: RunConfig,
       widthNote: 'Frozen; part numbers must not truncate.',
       render: l => (
         <span className="vy-ident vy-tagged">
-          {l.part}{l.isPackage && <span className="vy-pill vy-pill--sm">Package</span>}
+          <PartCell line={l} />
+          {l.isPackage && <span className="vy-pill vy-pill--sm">Package</span>}
         </span>
       ) },
     { field: 'revision', title: 'Revision', role: 'code', width: 96 },

@@ -79,5 +79,7 @@ export function resultLines(r: QuoteResult): BomLine[] {
        switched off would have stored them, and none of ours did. */
     suppliers: masterSuppliers(),
   };
-  return runQuote(buildBomLines(), rules);
+  /* The saved result carries its assembly number, which opens with the
+     customer's code — the same prefix a generated part number takes. */
+  return runQuote(buildBomLines(r.partNumber.split('-')[0]), rules);
 }

@@ -179,6 +179,13 @@ export type BomLine = {
    * a lock.
    */
   excluded: boolean;
+  /**
+   * How many BoM lines were folded into this one — §3.2's quantity merge.
+   * Absent means one, which is every line that was not repeated.
+   */
+  mergedFrom?: number;
+  /** The part number was generated because the file carried none — §3.2. */
+  isTemporary?: boolean;
   /** True when this line was added on step 4 through Add Package. */
   isPackage?: boolean;
 };
@@ -347,6 +354,18 @@ const SEEDS: Seed[] = [
   /* Zero quantity — auto-excluded. */
   { part: 'TP-DNI-01', revision: 'A', description: 'Test point — do not install', partSource: 'BUY', qty: 0, level: 1, mfg: '', mpn: '', supplier: '', unitPrice: 0, moq: 0, pkg: '', lt: 0, stock: 0, attrition: 0 },
   { part: 'STK-THERM-PAD', revision: 'A', description: 'Thermal pad 20x20mm', partSource: 'FLRSTK', qty: 1, level: 1, mfg: '', mpn: 'TP-2020-1MM', supplier: 'Digi-Key', unitPrice: 0.65, moq: 500, pkg: 'Bag', lt: 9, stock: 4300, attrition: 0 },
+  /* THE SAME PART IN TWO SUB-ASSEMBLIES — guideline 2.1 §3.2: "the system
+     combines the quantities into one line and quotes once for the total". The
+     BoM had no such case, so the rule had nothing to act on and could not be
+     seen to work. These two are one part, 6 on the main board and 4 on the RF
+     sub-assembly; `buildBomLines` folds them into a line of 10. */
+  { part: 'CONN-USB-C-16P', revision: 'A', description: 'USB-C receptacle 16P', partSource: 'BUY', qty: 6, level: 1, mfg: 'Amphenol', mpn: '12401610E4-2A', supplier: 'Mouser', unitPrice: 0.74, moq: 500, pkg: 'Reel', lt: 11, stock: 18000, attrition: 2 },
+  { part: 'CONN-USB-C-16P', revision: 'A', description: 'USB-C receptacle 16P', partSource: 'BUY', qty: 4, level: 2, mfg: 'Amphenol', mpn: '12401610E4-2A', supplier: 'Mouser', unitPrice: 0.74, moq: 500, pkg: 'Reel', lt: 11, stock: 18000, attrition: 1 },
+  /* NO PART NUMBER IN THE FILE — §3.2 again: "the system generates a temporary
+     part number from the customer prefix and a sequence". A BoM arrives from a
+     customer who numbers nothing, and the quote still has to refer to the line
+     by something. */
+  { part: '', revision: 'A', description: 'Shield can 18x18x3mm', partSource: 'BUY', qty: 1, level: 1, mfg: 'Laird', mpn: 'BMI-S-203-F', supplier: 'Digi-Key', unitPrice: 0.42, moq: 250, pkg: 'Tray', lt: 8, stock: 6400, attrition: 0 },
 ];
 
 /**
@@ -467,8 +486,8 @@ function nexarFor(s: Seed, i: number): (NexarLookup | null)[] {
   });
 }
 
-export function buildBomLines(): BomLine[] {
-  return SEEDS.map((s, i) => ({
+export function buildBomLines(tempPrefix = 'S'): BomLine[] {
+  const rows = SEEDS.map((s, i) => ({
     offers: offersFor(s, i),
     id: i + 1,
     number: i + 1,
@@ -501,6 +520,66 @@ export function buildBomLines(): BomLine[] {
     notes: '',
     excluded: autoExcluded(s),
   }));
+  return numberLines(mergeRepeats(nameTheUnnamed(rows, tempPrefix)));
+}
+
+/**
+ * A line the file gave no part number.
+ *
+ * §3.2: "the system generates a temporary part number from the customer prefix
+ * and a sequence" — `S_01`, `S_02`. The prefix is the CUSTOMER's, so the caller
+ * supplies it: the wizard passes the customer's code, and a saved result
+ * passes the one in front of its assembly number. `S` is the default, which is
+ * the guideline's own example and the honest answer when nobody said.
+ *
+ * `isTemporary` rather than a naming convention, because a part number that
+ * looks generated and a part number that IS generated are not the same claim,
+ * and only the second one may be shown as provisional.
+ */
+function nameTheUnnamed(rows: BomLine[], prefix: string): BomLine[] {
+  let n = 0;
+  return rows.map(l => (l.part
+    ? l
+    : { ...l, part: `${prefix}_${String(++n).padStart(2, '0')}`, isTemporary: true }));
+}
+
+/**
+ * One part used in several sub-assemblies is ONE line.
+ *
+ * §3.2: same Part Number and Part Rev across sub-assemblies, "the system
+ * combines the quantities into one line and quotes once for the total". It has
+ * to be a fold rather than a display trick: two lines of 6 and 4 bought
+ * separately miss the price break at 10 and can be answered by two different
+ * suppliers, which is the mistake the rule exists to prevent.
+ *
+ * ATTRITION TAKES THE LARGEST, not the sum — it is a percentage-shaped
+ * allowance per part, and the guideline already resolves the same clash
+ * between a part's own attrition and its AMLs' by taking the maximum.
+ */
+function mergeRepeats(rows: BomLine[]): BomLine[] {
+  const out: BomLine[] = [];
+  const at = new Map<string, number>();
+  for (const l of rows) {
+    const key = `${l.part}\u0000${l.revision}`;
+    const seen = at.get(key);
+    if (seen === undefined) {
+      at.set(key, out.length);
+      out.push({ ...l });
+      continue;
+    }
+    const into = out[seen];
+    into.qty += l.qty;
+    into.attrition = Math.max(into.attrition, l.attrition);
+    into.netConsigned = (into.netConsigned ?? 0) + (l.netConsigned ?? 0) || undefined;
+    into.rocketConsigned = (into.rocketConsigned ?? 0) + (l.rocketConsigned ?? 0) || undefined;
+    into.mergedFrom = (into.mergedFrom ?? 1) + 1;
+  }
+  return out;
+}
+
+/** `number` is the row's position, so it is assigned after the folding. */
+function numberLines(rows: BomLine[]): BomLine[] {
+  return rows.map((l, i) => ({ ...l, id: i + 1, number: i + 1 }));
 }
 
 /**
