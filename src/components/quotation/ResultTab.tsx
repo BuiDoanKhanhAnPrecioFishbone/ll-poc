@@ -7,7 +7,7 @@ import { fmtDateTime } from '../../ui/renderCell';
 import { useExcelExport } from '../../ui/useExcelExport';
 import { QuoteResultDialog } from './QuoteResultDialog';
 import type { ColumnSpec } from '../column-model';
-import { assemblyRuns, type AssemblyRuns } from '../../data/resultVersions';
+import { assemblyRuns, bomVersionOf, type AssemblyRuns } from '../../data/resultVersions';
 import type { Quotation, QuoteResult } from '../../data/quotations';
 import { pageActionsProps } from '../../ui/pageActions';
 
@@ -37,8 +37,8 @@ function resultColumns(onOpen: (r: QuoteResult) => void,
     widthNote: 'One icon button, 26px, with the cell padding around it.',
     render: r => (
       <button type="button" className="vy-icon-btn"
-              title={`Open quotation ${r.lastRunVersion} for ${r.partNumber}`}
-              aria-label={`Open quotation ${r.lastRunVersion} for ${r.partNumber}`}
+              title={`Open quotation version ${r.lastRunVersion} for ${r.partNumber}`}
+              aria-label={`Open quotation version ${r.lastRunVersion} for ${r.partNumber}`}
               onClick={() => onOpen(r)}>
         <Icon name="eye" size={15} />
       </button>
@@ -46,6 +46,23 @@ function resultColumns(onOpen: (r: QuoteResult) => void,
   { field: 'partNumber', title: 'Part Number', role: 'ident',
     render: r => r.partNumber },
   { field: 'partRev', title: 'Part Rev', role: 'code', render: r => <span className="vy-code">{r.partRev}</span> },
+  /* BOM VERSION, from her screenshot of the live tab — it sits here, between
+     Part Rev and Description, and we did not have it at all. The Testing
+     Guideline's column list does not mention it and names `BoM File` instead;
+     the live screen has both, so this app has both.
+
+     OURS READS `v3` WHERE HERS READS `0.1`, and that is a difference in the
+     DATA rather than in the column: a BoM version in the live system is its
+     own numbering, and all we hold is the token in the file name. Showing
+     `0.1` would be inventing a number. Blank means the run used the BoM
+     already on the record, which is the same fact `BoM File` states. */
+  { field: 'bomFile', id: 'bomVersion', title: 'BoM Version', role: 'code', width: 130,
+    widthNote: 'A short token, with room for the "Current" case.',
+    render: r => {
+      const v = bomVersionOf(r);
+      return v ? <span className="vy-code">{v}</span>
+               : <span className="vy-empty" title="Run from the BoM already on the record">Current</span>;
+    } },
   { field: 'description', title: 'Description', role: 'text' },
   { field: 'buildQty', title: 'Build Qty', role: 'number', render: r => r.buildQty.toLocaleString() },
   { field: 'costPerBoard', title: 'Cost/Board', role: 'money', render: r => money(r.costPerBoard) },

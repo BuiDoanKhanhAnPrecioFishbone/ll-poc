@@ -408,7 +408,7 @@ export function RadioGroup({ options, value, onChange, label, tiles }: {
 /** An option may be a bare string, or a value distinct from what is shown. */
 export type SelectOption = string | { value: string; label: string };
 
-export function Select({ options, value, onChange, label, id, required, invalid, size = 'medium' }: {
+export function Select({ options, value, onChange, label, id, required, invalid, footer, size = 'medium' }: {
   /**
    * Strings where the text IS the value — which is most of this app — or
    * `{ value, label }` where it is not.
@@ -432,6 +432,15 @@ export function Select({ options, value, onChange, label, id, required, invalid,
    */
   size?: 'small' | 'medium';
   label?: string; id?: string; required?: boolean; invalid?: boolean;
+  /**
+   * Pinned under the option list, inside the popup.
+   *
+   * FOR A LIST THAT IS DELIBERATELY SHORT. Guideline 2.1 §3.3.1 has the
+   * Supplier dropdown show preferred suppliers only, with "Load more
+   * suppliers" at the bottom to reach the rest and the brokers — a control
+   * that belongs to the list, not to the cell the list opens from.
+   */
+  footer?: ReactNode;
   /** Accepted and ignored: every list filters now. Kept so call sites compile. */
   filterable?: boolean;
 }) {
@@ -489,6 +498,30 @@ export function Select({ options, value, onChange, label, id, required, invalid,
                      which is the only place that distinction can be drawn.
        list CLOSED → take it on the way DOWN, so Kendo's swallow never happens,
                      and hand it to the dialog. */
+  /**
+   * TWO EMPTIES, NOT ONE. A list can be empty because the filter matched
+   * nothing, or because there was nothing to begin with — and until the
+   * supplier dropdown started holding its non-preferred offers back, the
+   * second case could not happen here, so it rendered as `No option matches
+   * “”.` A line whose only offer comes from an approved-but-not-preferred
+   * supplier opens exactly that way, with Load more suppliers underneath as
+   * the way out.
+   */
+  const emptyList = () => (
+    <div className="vy-menu-empty">
+      {filter.trim()
+        ? <>No option matches “{filter}”.</>
+        : 'Nothing to choose from here.'}
+    </div>
+  );
+
+  /* Kendo takes a NODE here, not a render function — its PropTypes say
+     `ReactNodeLike`. Built above the JSX because an element inside an object
+     inside an attribute spread is where the TSX parser gives up. */
+  const footerProp = footer
+    ? { footer: <div className="vy-select-footer">{footer}</div> }
+    : {};
+
   const [listOpen, setListOpen] = useState(false);
   /* Read in the bubble handler, and it must be a ref: `listOpen` there is the
      value from the render that attached the handler, and Kendo may have closed
@@ -577,9 +610,8 @@ export function Select({ options, value, onChange, label, id, required, invalid,
         itemProps.dataItem.value === ''
           ? cloneElement(li, li.props, <span className="vy-empty">—</span>)
           : li}
-      listNoDataRender={() => (
-        <div className="vy-menu-empty">No option matches “{filter}”.</div>
-      )}
+      listNoDataRender={emptyList}
+      {...footerProp}
     />
     </span>
   );

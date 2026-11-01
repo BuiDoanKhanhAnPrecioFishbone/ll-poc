@@ -520,6 +520,15 @@ a.vy-btn, a.vy-btn:hover { text-decoration: none; }
    cases. An asked where that came from; this is the answer and the fix. */
 .vy-field-group-title { display: flex; align-items: center; gap: var(--vy-space-3); font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .06em; color: var(--vy-on-surface-subtle); font-weight: var(--vy-weight-heavy); margin: 0 0 var(--vy-space-4); padding-bottom: var(--vy-space-2); border-bottom: 1px solid var(--vy-border); }
 .vy-field-group-title svg { color: var(--vy-brand-text); flex: none; }
+/* A record number beside a panel's name — her 27 Oct prototype puts the RFQ
+   there. Pushed to the end so the name keeps the left edge every other
+   heading on the screen starts at, and set in the panel's own quiet colour
+   because it identifies the panel rather than titling it. */
+.vy-group-title-aside {
+  margin-inline-start: auto; text-transform: none; letter-spacing: 0;
+  font-weight: var(--vy-weight-regular); color: var(--vy-on-surface-faint);
+  font-variant-numeric: tabular-nums;
+}
 .vy-field-list { margin: 0; }
 /* ---- Label ABOVE the value, everywhere -----------------------------------
    Asked for on 13 October: "same structure, same layout for label and input
@@ -2159,6 +2168,16 @@ a.vy-btn, a.vy-btn:hover { text-decoration: none; }
 /* Select plus its Clear, on one line. The guideline asks for both — "User can
    clear and chose another value again in this field" — and a clear that wrapped
    below the select would read as an action on the whole section. */
+/* Pinned under a dropdown's options, inside its popup — "Load more
+   suppliers". Separated by a rule because it is not one of the options: it
+   changes what the options ARE. */
+.vy-select-footer {
+  padding: var(--vy-space-3) var(--vy-space-5);
+  border-block-start: 1px solid var(--vy-border);
+  background: var(--vy-surface);
+}
+.vy-select-footer .vy-link { min-height: var(--vy-space-9); font-size: var(--vy-text-sm); }
+
 .vy-assembly-pick { display: flex; align-items: center; gap: var(--vy-space-4); }
 .vy-assembly-pick .vy-select { flex: 1; min-width: 0; }
 

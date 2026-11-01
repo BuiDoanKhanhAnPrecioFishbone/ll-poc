@@ -72,7 +72,7 @@ export function quoteReportWorkbook(
               { width: 110 }, { width: 110 }, { width: 110 }],
     rows: [
       { cells: [{ value: `Quoting report · RFQ${rfqNo}`, bold: true, colSpan: 4 }] },
-      { cells: [{ value: assembly }, { value: `${result.lastRunVersion} · ${result.lastRunBy}` }] },
+      { cells: [{ value: assembly }, { value: `Version ${result.lastRunVersion} · ${result.lastRunBy}` }] },
       { cells: [{ value: 'Quote Focus' }, { value: setup.quoteFocus },
                 { value: 'Build Qty' }, { value: setup.buildQty, format: INT }] },
       { cells: [{ value: 'Package Type' }, { value: setup.packageType },

@@ -56,7 +56,7 @@ export function foldRuns(runs: QuoteResult[], rfqId: string): QuoteResult[] {
       partNumber: identity.partNumber,
       partRev: identity.partRev,
       description: identity.description,
-      lastRunVersion: `v${n}`,
+      lastRunVersion: String(n),
     };
   });
 }

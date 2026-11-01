@@ -164,7 +164,15 @@ export function StepConfigBom({ q, cfg, set, invalid = [], onResume }: {
         {/* "Quote Strategy", her own name for it — 22 Oct. It was "Quoting
             information", which named the panel after the fact that it contains
             facts. */}
-        <h3 className="vy-field-group-title"><SmartIcon name="quote" />Quote Strategy</h3>
+        {/* HER TITLE, 27 Oct: "RFQ & Quote Strategy", with the RFQ number
+            beside it. The number is the one fact a reader of a reference
+            panel checks first — which record am I looking at — and this panel
+            is reached from inside a dialog that names it once, in a title bar
+            that scrolls away. */}
+        <h3 className="vy-field-group-title">
+          <SmartIcon name="quote" />RFQ &amp; Quote Strategy
+          <span className="vy-group-title-aside">RFQ{q.no}</span>
+        </h3>
         {/* The sentence that used to follow — "Quote Focus, Material Package
             Type and Markup may be changed for this run; the rest is shown for
             reference" — is gone because the fields now say it themselves: from
@@ -375,8 +383,11 @@ export function StepConfigBom({ q, cfg, set, invalid = [], onResume }: {
                       title={cfg.template
                         ? 'A template is already selected — clear it to create a new one'
                         : `Create a BoM template for ${q.customer}`}
-                      onClick={() => toast.notImplemented(`create a new BoM template for ${q.customer}`)}>
-                Create a new template
+                      onClick={() => toast.notImplemented(`create a custom BoM template for ${q.customer}`)}>
+                {/* Her words, from the 27 Oct prototype: "Don't see your
+                    template? Create Custom Template". Ours read "Create a new
+                    template", which is the same offer in a different voice. */}
+                Create Custom Template
               </Button>
             </div>
           </>

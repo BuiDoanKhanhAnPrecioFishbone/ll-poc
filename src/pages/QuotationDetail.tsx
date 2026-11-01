@@ -10,6 +10,7 @@ import { generateQuotations, daysUntil, findCustomer, contactsFor, taskStatus, t
 import { ChecklistsTab } from '../components/quotation/ChecklistsTab';
 import { ResultTab } from '../components/quotation/ResultTab';
 import { assemblyRuns } from '../data/resultVersions';
+import { ME } from '../data/queues';
 import { ConversationsTab } from '../components/quotation/ConversationsTab';
 import { ActivityTab } from '../components/quotation/ActivityTab';
 import { BomComparisonDialog } from '../components/quotation/BomComparisonDialog';
@@ -89,6 +90,45 @@ export function QuotationDetail() {
   }, []);
   const base = useMemo(() => all.find(x => x.id === id), [all, id]);
   const q = saved ?? base;
+
+  /**
+   * Move the record to another status, and say so in the Activity Log.
+   *
+   * THE THREE TRANSITIONS WERE PROMISED AND NOT PERFORMED. Confirm RFQ's own
+   * dialog said "RFQ0000000292 moves from New to In-Progress", Cancel's said
+   * "will be closed as Cancelled", and both ended at a toast reading "not in
+   * this prototype". A dialog that states what will happen and then does not
+   * do it is worse than one that says nothing: the reader has been told.
+   * Submit is the third, and the one guideline 2.1 §4 asks for by name — the
+   * record is in the Quoted state once a quotation has been run against it.
+   *
+   * It writes an Activity entry because the live log has a `Status` action
+   * with a from/to pair, which exists for exactly this and was only ever
+   * written by the seed.
+   */
+  const moveTo = (next: Quotation['status'], by = ME) => {
+    setSaved(prev => {
+      /* `q` is `saved ?? base`, and `base` is undefined on a bad :id — this
+         helper is declared above the not-found return, with the other hooks,
+         so it has to say so rather than assume a record. */
+      const on = prev ?? q;
+      if (!on || on.status === next) return prev;
+      return {
+        ...on,
+        status: next,
+        lastUpdated: new Date(),
+        activity: [{
+          id: `ac-${on.id}-${Date.now().toString(36)}`,
+          author: by,
+          initials: by.split(' ').map(w => w[0]).join('').slice(0, 2),
+          at: new Date(),
+          action: 'Status' as const,
+          summary: `Status changed to ${next}`,
+          changes: [{ field: 'Status', from: on.status, to: next }],
+        }, ...on.activity],
+      };
+    });
+  };
 
   /* Declared with the other hooks, ABOVE the not-found return. It began life
      beside cancelEdit, which reads better and is wrong: a bad :id returns
@@ -682,7 +722,7 @@ export function QuotationDetail() {
           body={`RFQ${q.no} will be closed as Cancelled. Any quotation already run against it stays on the record, and it stops appearing in the open work queues.`}
           confirmLabel="Cancel RFQ"
           tone="danger"
-          onConfirm={() => { setCancelOpen(false); toast.notImplemented('cancel this RFQ'); }}
+          onConfirm={() => { setCancelOpen(false); moveTo('Cancelled'); toast.success(`RFQ${q.no} cancelled.`); }}
           onClose={() => setCancelOpen(false)}
         />
       )}
@@ -691,7 +731,7 @@ export function QuotationDetail() {
           title="Confirm this RFQ?"
           body={`RFQ${q.no} moves from New to In-Progress and becomes work in hand — it leaves the New queue and shows as being worked on.`}
           confirmLabel="Confirm RFQ"
-          onConfirm={() => { setConfirmOpen(false); toast.notImplemented('confirm this RFQ'); }}
+          onConfirm={() => { setConfirmOpen(false); moveTo('In-Progress'); toast.success(`RFQ${q.no} confirmed — now In-Progress.`); }}
           onClose={() => setConfirmOpen(false)}
         />
       )}
@@ -699,6 +739,10 @@ export function QuotationDetail() {
       {bomOpen && <BomComparisonDialog onClose={() => setBomOpen(false)} />}
       {runOpen && (
         <RunQuotationDialog q={q} resume={resumeDraft}
+                            /* "Project Requirement … with status Quoted" —
+                               guideline 2.1 §4. Submitting a run is what puts
+                               the record in that state. */
+                            onSubmitted={() => moveTo('Quoted')}
                             onClose={() => { setRunOpen(false); setResumeDraft(undefined); }} />
       )}
     </div>

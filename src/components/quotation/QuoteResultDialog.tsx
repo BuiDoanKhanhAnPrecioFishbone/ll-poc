@@ -133,7 +133,7 @@ export function QuoteResultDialog({ q, group, onClose }: {
                         rfqNo: q.no, assembly: `${result.partNumber} · Rev ${result.partRev}`,
                         result, setup, lines,
                       }),
-                      `QuotingReport-RFQ${q.no}-${result.lastRunVersion}.xlsx`)}>
+                      `QuotingReport-RFQ${q.no}-v${result.lastRunVersion}.xlsx`)}>
               {exporting ? 'Building the file…' : 'Export to Excel'}
             </Button>
             {/* Hers, and not built — said plainly rather than wired to a
@@ -198,7 +198,7 @@ export function QuoteResultDialog({ q, group, onClose }: {
             onto one more line. */}
         <div className="vy-run-head">
         <QuoteContextBar
-          heading={`Quote Run · Version ${result.lastRunVersion.replace(/^v/, '')}`}
+          heading={`Quote Run · Version ${result.lastRunVersion}`}
           assembly={`${result.partNumber} - ${result.partRev}`}
           description={result.description}
           applied={{
@@ -411,8 +411,8 @@ export function QuoteResultDialog({ q, group, onClose }: {
 function versionOption(r: QuoteResult): string {
   const bom = bomVersionOf(r);
   return [
-    r.lastRunVersion,
-    bom ? `BoM ${bom}` : 'existing BoM',
+    `Version ${r.lastRunVersion}`,
+    bom ? `BoM ${bom}` : 'current BoM',
     `${r.buildQty.toLocaleString()} boards`,
     money(r.totalWithMarkup),
   ].join(' · ');

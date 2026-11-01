@@ -69,8 +69,10 @@ const STEPS = [
   { label: 'Summary',    text: 'Cost estimation and submission' },
 ];
 
-export function RunQuotationDialog({ q, onClose, resume }: {
+export function RunQuotationDialog({ q, onClose, onSubmitted, resume }: {
   q: Quotation; onClose: () => void;
+  /** Submit puts the record in the Quoted state — guideline 2.1 §4. */
+  onSubmitted?: () => void;
   /**
    * A draft to open on, chosen on the record rather than in here.
    *
@@ -448,6 +450,7 @@ export function RunQuotationDialog({ q, onClose, resume }: {
                      system auto close the form." Ours said "Add Quotation
                      Result", which is the name of the tab it lands in. */
                   toast.success('Add Quotation Successfully');
+                  onSubmitted?.();
                   onClose();
                 }}>
           Submit

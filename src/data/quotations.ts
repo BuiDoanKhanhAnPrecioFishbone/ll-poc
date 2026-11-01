@@ -580,7 +580,10 @@ export function generateQuotations(count = 330): Quotation[] {
               totalWithMarkup: Math.round(cpb * qty * (1 + markup / 100) * 100) / 100,
               lastRunBy: pick(OWNERS),
               lastRunDate: new Date(created.getTime() + 86400000 * (2 + j)),
-              lastRunVersion: `v${1 + j}`,
+              /* A BARE NUMBER, as the live grid prints it: its Last Run
+                 Version column reads `6`, not `v6`. Screens that need the
+                 word say "Version 3"; only a filename keeps the `v`. */
+              lastRunVersion: String(1 + j),
               markupPct: markup,
               /* Blank when the run used the BoM already on the RFQ: "the BOM
                  File field is blank when the quotation is run from an existing

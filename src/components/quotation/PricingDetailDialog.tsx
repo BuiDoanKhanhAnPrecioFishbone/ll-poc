@@ -73,7 +73,7 @@ export function PricingDetailDialog({ result, open, onClose, onApply }: {
     <Dialog
       open={open} onClose={onClose} size="lg" startMaximised={false}
       title="Other Quoted Cost"
-      subtitle={`${result.partNumber} · Rev ${result.partRev} · ${result.lastRunVersion}`}
+      subtitle={`${result.partNumber} · Rev ${result.partRev} · Version ${result.lastRunVersion}`}
       actions={<>
         <Button onClick={onClose}>Close</Button>
         <Button variant="filled" onClick={() => { onApply(added); onClose(); }}

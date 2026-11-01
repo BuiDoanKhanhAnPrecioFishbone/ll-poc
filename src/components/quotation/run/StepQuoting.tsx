@@ -76,6 +76,14 @@ export function StepQuoting({
   const [noSupplier, setNoSupplier] = useState(false);
   const [notEnough, setNotEnough] = useState(false);
   const [missingAttr, setMissingAttr] = useState(false);
+  /**
+   * Lines whose Supplier dropdown has been opened out to the full list.
+   *
+   * PER LINE, NOT PER SCREEN. "Load more suppliers" is a decision about one
+   * part — this one needs a broker — and a screen-wide switch would answer it
+   * for the other two hundred lines at the same time.
+   */
+  const [showAll, setShowAll] = useState<Set<number>>(new Set());
   /* Quote Focus = Other: the run computes but does not choose. See runQuote. */
   const manual = cfg.quoteFocus === 'OTHER';
 
@@ -133,7 +141,8 @@ export function StepQuoting({
       nexar: l.nexar.map((n, i) => (i === aml && n ? { ...n, picked: candidate } : n)),
     })));
 
-  const columns = quotingColumns(cfg, hasRun, edit, editAml, pickSupplierFor, pickMpn);
+  const columns = quotingColumns(cfg, hasRun, edit, editAml, pickSupplierFor, pickMpn,
+                                 showAll, setShowAll);
   const rows = useMemo(() => amlRows(shown), [shown]);
 
   /* The Columns chooser, and the frozen block as its locked set — see
@@ -358,6 +367,10 @@ function quotingColumns(cfg: RunConfig, hasRun: boolean,
                         editAml: (line: BomLine, index: number, mpn: string) => void,
                         onPickSupplier: (line: BomLine, supplier: string) => void,
                         onPickMpn: (line: BomLine, aml: number, candidate: number) => void,
+                        /* Which lines have asked for the full supplier list,
+                           and how to ask — see `showAll` in the component. */
+                        showAll: Set<number>,
+                        setShowAll: (fn: (s: Set<number>) => Set<number>) => void,
                         ): ColumnSpec<AmlRow>[] {
   /** The catalogue entry in force for a row: the user's pick, else the
    *  system's match, else nothing. */
@@ -368,17 +381,31 @@ function quotingColumns(cfg: RunConfig, hasRun: boolean,
   /* One option per offer: the supplier's priority group, its stock and its
      price, in that order — the group says whether the system would have chosen
      it, the other two say what choosing it does to the line. */
-  const supplierOptions = (l: BomLine) => {
+  const sortedOffers = (l: BomLine) => {
     const rank = (id: string) => cfg.suppliers[id]?.group ?? 9;
-    return [...l.offers]
-      .sort((a, b) => rank(a.supplier) - rank(b.supplier)
-        || SUPPLIER_NAMES[a.supplier].localeCompare(SUPPLIER_NAMES[b.supplier]))
-      .map(o => ({
-        value: SUPPLIER_NAMES[o.supplier],
-        label: `${cfg.suppliers[o.supplier] ? `G${cfg.suppliers[o.supplier].group} ` : ''}`
-          + `${SUPPLIER_NAMES[o.supplier]} · ${o.stock.toLocaleString()} in stock · ${money3(o.unitPrice)}`,
-      }));
+    return [...l.offers].sort((a, b) => rank(a.supplier) - rank(b.supplier)
+      || SUPPLIER_NAMES[a.supplier].localeCompare(SUPPLIER_NAMES[b.supplier]));
   };
+  /** A supplier this quote has in its priority list. The rest are approved. */
+  const preferred = (id: string) => Boolean(cfg.suppliers[id]);
+  const supplierOptions = (l: BomLine) => {
+    const offers = sortedOffers(l);
+    /* PREFERRED ONLY, UNTIL ASKED — guideline 2.1 §3.3.1: the dropdown "shows
+       the preferred suppliers", and `Load more suppliers` at the bottom of it
+       opens the ones outside the list and the brokers. The distinction was
+       already in the data and in the sort order; what was missing is that the
+       list stopped at it. A quoter scanning for the cheapest franchised
+       source should not have to read past a broker to find one. */
+    const shown = showAll.has(l.id) ? offers : offers.filter(o => preferred(o.supplier));
+    return shown.map(o => ({
+      value: SUPPLIER_NAMES[o.supplier],
+      label: `${cfg.suppliers[o.supplier] ? `G${cfg.suppliers[o.supplier].group} ` : ''}`
+        + `${SUPPLIER_NAMES[o.supplier]} · ${o.stock.toLocaleString()} in stock · ${money3(o.unitPrice)}`,
+    }));
+  };
+  /** How many offers the short list is holding back. */
+  const hiddenOffers = (l: BomLine) =>
+    showAll.has(l.id) ? 0 : sortedOffers(l).filter(o => !preferred(o.supplier)).length;
   /* An excluded line "displays only the following information: Part, Revision,
      Source, Description, MFG, MPN, Qty, Total Qty" — everything else is blank
      on those rows rather than showing a zero that could be read as a price. */
@@ -503,6 +530,13 @@ function quotingColumns(cfg: RunConfig, hasRun: boolean,
           : r.line.offers.length
             ? <Select label={`Supplier for ${r.line.part}`} value={r.line.supplier}
                       options={supplierOptions(r.line)}
+                      footer={hiddenOffers(r.line) > 0 ? (
+                        <button type="button" className="vy-link"
+                                onMouseDown={e => e.preventDefault()}
+                                onClick={() => setShowAll(s => new Set(s).add(r.line.id))}>
+                          Load more suppliers ({hiddenOffers(r.line)})
+                        </button>
+                      ) : undefined}
                       onChange={v => onPickSupplier(r.line, v)} />
             : <span className="vy-empty">No bid</span>)),
     },
