@@ -238,11 +238,11 @@ export function StepConfigBom({ q, cfg, set, invalid = [], onResume }: {
 
           <Divider>Notes</Divider>
 
-          <Field label="Customer specific needs" wide>
+          <Field label="Customer Special Need" wide>
             <ReadValue>{q.customerNotes}</ReadValue>
           </Field>
 
-          <Field label="Internal notes" wide>
+          <Field label="Internal Notes" wide>
             <ReadValue>{q.internalNotes}</ReadValue>
           </Field>
         </div>

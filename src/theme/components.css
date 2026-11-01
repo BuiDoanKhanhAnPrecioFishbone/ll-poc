@@ -518,7 +518,7 @@ a.vy-btn, a.vy-btn:hover { text-decoration: none; }
    case, so a group inside a card read as Title Case while the divider two
    lines under it read as UPPERCASE — one screen, one kind of thing, two
    cases. An asked where that came from; this is the answer and the fix. */
-.vy-field-group-title { display: flex; align-items: center; gap: var(--vy-space-3); font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle); font-weight: var(--vy-weight-heavy); margin: 0 0 var(--vy-space-4); padding-bottom: var(--vy-space-2); border-bottom: 1px solid var(--vy-border); }
+.vy-field-group-title { display: flex; align-items: center; gap: var(--vy-space-3); font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .06em; color: var(--vy-on-surface-subtle); font-weight: var(--vy-weight-heavy); margin: 0 0 var(--vy-space-4); padding-bottom: var(--vy-space-2); border-bottom: 1px solid var(--vy-border); }
 .vy-field-group-title svg { color: var(--vy-brand-text); flex: none; }
 .vy-field-list { margin: 0; }
 /* ---- Label ABOVE the value, everywhere -----------------------------------
@@ -1593,11 +1593,20 @@ a.vy-btn, a.vy-btn:hover { text-decoration: none; }
 /* A labelled rule inside step 1's reference panel. The customer's own device:
    one panel holding the strategy, the notes and the attachments reads as three
    things when it is ruled and as a long list when it is not. */
+/* UPPERCASE, AND THAT IS A CORRECTION OF YESTERDAY'S CORRECTION. The 30 Oct
+   sweep took capitals off every small label at once, this one included. Her
+   prototypes settle it: the 27 Oct file writes FIELD LABELS in Title Case —
+   `Customer`, `Quote Focus`, `Markup (%)` — and the dividers INSIDE a card in
+   capitals: `QUOTE STRATEGY`, `NOTES`, `ATTACHMENTS (6)`, `BOM OPTIONS`,
+   `ASSEMBLY DETAILS`. The live system names its sections the same way. Three
+   levels, three treatments: card header Title Case at 13px, divider CAPITALS
+   at 12px, field label Title Case at 13px. */
 .vy-config-divider {
- grid-column: 1 / -1; margin: var(--vy-space-5) 0 0;
- display: flex; align-items: center; gap: var(--vy-space-4);
- font-size: var(--vy-text-xs); font-weight: var(--vy-weight-semibold);
- color: var(--vy-on-surface-subtle);
+  grid-column: 1 / -1; margin: var(--vy-space-5) 0 0;
+  display: flex; align-items: center; gap: var(--vy-space-4);
+  font-size: var(--vy-text-xs); font-weight: var(--vy-weight-semibold);
+  text-transform: uppercase; letter-spacing: .05em;
+  color: var(--vy-on-surface-subtle);
 }
 .vy-config-divider::after {
   content: ''; flex: 1; border-top: 1px solid var(--vy-border);

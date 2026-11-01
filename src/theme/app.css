@@ -1315,6 +1315,9 @@
   border-bottom: 1px solid var(--vy-border);
   border-radius: 0;
   font-size: var(--vy-text-sm); font-weight: var(--vy-weight-semibold);
+  /* A card HEADER is Title Case; the divider inside it is not. Her prototypes
+     draw all three levels, and this rule is the top one. */
+  letter-spacing: 0; text-transform: none;
   color: var(--vy-on-surface);
 }
 /* The separator is for sections that FOLLOW one another down the page. Side by
