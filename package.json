@@ -19,6 +19,10 @@
     "mobile:check": "node scripts/mobile-check.mjs",
     "focus:check": "node scripts/focus-check.mjs",
     "hover:check": "node scripts/hover-check.mjs",
+    "doc:ds": "node scripts/md-doc.mjs docs/design-system.md docs/design-system.html",
+    "doc:ds-vi": "DOC_LANG=vi DOC_TOC_LABEL=\"Mục lục\" node scripts/md-doc.mjs docs/design-system-vi.md docs/design-system-vi.html",
+    "doc:ds-pdf": "node scripts/with-server.mjs doc:ds-print",
+    "doc:ds-print": "node scripts/print-pdf.mjs docs/design-system.html docs/design-system.pdf && node scripts/print-pdf.mjs docs/design-system-vi.html docs/design-system-vi.pdf",
     "postinstall": "node scripts/activate-kendo-licence.mjs",
     "prepare": "git rev-parse --git-dir >/dev/null 2>&1 && git config core.hooksPath .githooks || true"
   },
