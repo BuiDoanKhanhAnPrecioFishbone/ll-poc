@@ -51,9 +51,8 @@ rõ.
 [F1 Bản đồ file](#f1--bản-đồ-file) ·
 [F2 Muốn sửa một thứ thì làm gì](#f2--muốn-sửa-một-thứ-thì-làm-gì) ·
 [F3 Quản trị](#f3--quản-trị) ·
-[F4 Còn thiếu gì](#f4--còn-thiếu-gì) ·
-[F5 Một bộ bàn giao cần có gì](#f5--một-bộ-bàn-giao-cần-có-gì) ·
-[F6 Chỉ mục nguồn](#f6--chỉ-mục-nguồn)
+[F4 Một bộ bàn giao cần có gì](#f4--một-bộ-bàn-giao-cần-có-gì) ·
+[F5 Chỉ mục nguồn](#f5--chỉ-mục-nguồn)
 
 ---
 ---
@@ -90,9 +89,9 @@ trắng**, không theme nào dời được. Viết `var(--vy-surface)` là đó
 
 1. **Có token cho thứ này chưa?** Có thì dùng. Chưa thì thêm — và ghi trong
    code vì sao thang hiện tại không có nó.
-2. **Hệ thống live đã trả lời chưa?** Tên trường, danh sách lựa chọn và hành
-   vi lấy từ hệ thống live, trừ khi một yêu cầu của khách ghi đè. Thứ tự ưu
-   tiên nằm ở [`precedence.md`](precedence.md).
+2. **Không bịa nội dung.** Tên trường, danh sách lựa chọn, từ ngữ status và
+   hành vi là **sự thật về nghiệp vụ**, không phải quyết định thiết kế. Tra
+   cho ra trước khi vẽ.
 3. **Cả hai theme, cả hai mật độ, và 820px.** Một màn chỉ mới được xem ở chế
    độ sáng trên màn 1920px là một màn mới được xem **một lần**.
 4. **Số ma thuật phải có ghi chú.** Một bề rộng lệch khỏi role của nó cần
@@ -340,14 +339,21 @@ dark sẽ nói khác nhau:
 > tự chọn dark trong menu nhận viền grey-400 và một chấm priority gần trắng
 > trên nền gần đen. **Thêm một token màu nghĩa là sửa ba chỗ.**
 
+Vẫn hai khối đó ở theme tối. Mỗi vai trò **giữ nguyên nhiệm vụ** và đổi giá
+trị — và các cặp status vẫn đọc được chứ không bị đảo một cách máy móc:
+
+![Lớp ngữ nghĩa ở chế độ tối](assets/design-system/semantic-layer-dark.png)
+
+![Bộ từ vựng status ở chế độ tối](assets/design-system/status-vocabulary-dark.png)
+
 ---
 
 ## B2 · Chữ
 
 Hai bộ chữ. **Inter Variable** cho mọi thứ; **JetBrains Mono** cho mã định
 danh phải đọc thành lời hoặc so từng ký tự — part number, MPN, mã lỗi. Chữ
-thân bài **không bao giờ** dùng mono: chỉ đạo của khách ngày 13/10 —
-*"do not use monotext, hard to read"*.
+thân bài **không bao giờ** dùng mono — ở 13px nó khó đọc hơn, và không có gì
+trong một câu văn cần bề rộng ký tự cố định.
 
 ![Thang chữ](assets/design-system/type-scale.png)
 
@@ -382,11 +388,10 @@ xuống hàng.
 
 ### Viết hoa — ba cấp, vẽ khác nhau có chủ đích
 
-UI Standard của khách ngày 14/10: nút, link, tab, tiêu đề form và hộp thoại,
-tiêu đề section và card, **nhãn trường**, tiêu đề cột, nhãn bộ lọc, mục menu
-và status pill đều dùng **Title Case**, với giới từ (for, to, of, by, as, in,
-on, at, from, with, via, per, into) viết thường trừ khi đứng đầu. Văn xuôi thì
-sentence case.
+Nút, link, tab, tiêu đề form và hộp thoại, tiêu đề section và card, **nhãn
+trường**, tiêu đề cột, nhãn bộ lọc, mục menu và status pill đều dùng **Title
+Case**, với giới từ (for, to, of, by, as, in, on, at, from, with, via, per,
+into) viết thường trừ khi đứng đầu. Văn xuôi thì sentence case.
 
 | Cấp | Kiểu chữ | Cỡ / độ đậm | Ví dụ |
 |---|---|---|---|
@@ -616,6 +621,16 @@ Hệ thống chạy trên terminal ngoài xưởng, thường 1366×768 hoặc h
 khoảng 1100px thì một sidebar 248px thôi làm nhiệm vụ định hướng và bắt đầu
 làm vật cản — **đo ở 543px thì nó chiếm 46% khung nhìn**.
 
+Cùng một màn ở ba bề rộng đáng quan tâm. Thanh đầy đủ, thanh icon, và không
+còn thanh nào với một nút menu trên top bar — và ở cả ba, **lưới giữ nguyên
+cột** chứ không bóp chúng lại:
+
+![1500px — sidebar đầy đủ](assets/design-system/responsive-1500.png)
+
+![1100px — sidebar thu thành thanh icon](assets/design-system/responsive-1100.png)
+
+![760px — sidebar nằm sau một nút menu](assets/design-system/responsive-760.png)
+
 ---
 ---
 
@@ -743,7 +758,7 @@ thêm vào đó chỉ làm chậm cả hai.
 | | |
 |---|---|
 | Nguồn sống | `src/ui/RocketLaunch.tsx` |
-| SVG tĩnh | `docs/assets/rocket-journey/*.svg` — bộ **bay ngang đã nghỉ hưu**, giữ lại vì tài liệu so sánh 16/10 đang dùng. Không còn trong sản phẩm |
+| SVG tĩnh | `docs/assets/rocket-journey/*.svg` — bộ **bay ngang đã nghỉ hưu**, giữ lại vì một tài liệu cũ vẫn in chúng. Không còn trong sản phẩm |
 | Hình trong tài liệu này | Chụp từ app đang chạy ở 2×; script nằm trong `scripts/` |
 
 > **Nếu cần đem hình ra khỏi codebase** — cho slide, cho PDF — hãy xuất SVG
@@ -763,7 +778,11 @@ nên trông thế nào" mà là "Kendo đã làm được gì, và mình phải 
 
 ## D1 · Nút
 
-![Nút](assets/design-system/buttons.png)
+![Các biến thể nút, kèm trạng thái disabled](assets/design-system/states-buttons.png)
+
+Hình trên là trang mẫu sống với bàn phím đang đặt trên đó: `Text` mang **vòng
+focus** mà mọi control trong hệ thống đều dùng — 2px `--vy-brand-boundary`,
+lệch ra 2px, **không bao giờ gỡ outline**.
 
 | Biến thể | Khi nào |
 |---|---|
@@ -784,23 +803,66 @@ khoá nút** mới là thứ chặn cú bấm thứ hai tiêu thêm một lượ
 
 ## D2 · Trường nhập
 
-![Các trạng thái của trường](assets/design-system/fields.png)
+### Hai chế độ, ba cách thể hiện
 
-**Hai nền, không phải ba** — chỉ đạo ngày 14/10: *nền trắng nghĩa là gõ được.*
-Một giá trị chỉ đọc là một hộp có nền lõm, viền 1px và ổ khoá — nên chế độ
-đọc và chế độ sửa **cùng một hình dạng**, và bố cục không nhảy khi chuyển
-giữa hai chế độ.
+Một hồ sơ có **hai chế độ** — xem và sửa. Bên trong chế độ sửa, một trường
+thuộc **một trong hai loại**, và ổ khoá sinh ra để đánh dấu điều đó. **Ổ khoá
+không phải trạng thái thứ ba của một trường**; nó là dấu phân biệt hai loại,
+và nó chỉ xuất hiện ở nơi sự phân biệt đó còn ý nghĩa.
+
+| | Trường sửa được | Trường không sửa được |
+|---|---|---|
+| **Chế độ xem** | Hộp nền lõm, **không** ổ khoá | Hộp nền lõm, **không** ổ khoá |
+| **Chế độ sửa** | Ô **trắng**, viền `--vy-border-control` | Hộp **nền lõm**, **có ổ khoá**, kèm một lý do ngắn |
+
+**Ở chế độ xem thì không gì sửa được, nên sự phân biệt chẳng có gì để nói** —
+gắn ổ khoá lên cả hai mươi bảy trường là không đánh dấu trường nào cả. Các
+hộp giống hệt nhau, và mắt đọc **giá trị** chứ không đọc cái khung.
+
+**Ở chế độ sửa, màu trắng nói cho biết chỗ nào gõ được.** Thứ gì còn nằm
+trong hộp xám là giá trị màn này không sở hữu, và sau ổ khoá là **lý do, viết
+bằng hai ba chữ** — vì ổ khoá nói được *rằng* trường bị khoá nhưng không nói
+được *vì sao*.
+
+**Chế độ xem — một kiểu hộp cho mọi giá trị:**
+
+![Hồ sơ ở chế độ xem](assets/design-system/states-field-view.png)
+
+**Chế độ sửa — trắng ở chỗ gõ được; xám, có khoá và có lý do ở chỗ không gõ
+được.** `Created Date` ghi *set by the system*; `ITAR` ghi *follows Customer*:
+
+![Cùng hồ sơ đó ở chế độ sửa](assets/design-system/states-field-edit.png)
+
+> **Một ngoại lệ, và nó vẫn là cùng một luật.** Một panel mà **không gì** sửa
+> được thì giữ hộp xám và **bỏ ổ khoá** — ví dụ thanh thiết lập ở bước cuối
+> của Run Quotation, khi lần chạy đã xong. Gắn ổ khoá lên cả bảy giá trị chỉ
+> lặp lại điều mà cả panel đã nói.
+
+### Phần còn lại của một trường
 
 | Thành phần | Luật |
 |---|---|
-| Nhãn | **Trên** giá trị, không bao giờ nằm cạnh (13/10). Title Case, 12px, 600 |
+| Nhãn | **Trên** giá trị, không bao giờ nằm cạnh. Title Case, 12px, 600 |
 | Bắt buộc | **Dấu sao đỏ** ngay sau nhãn, ở **cả** chế độ xem lẫn chế độ sửa |
 | Không bắt buộc | Không đánh dấu gì. Không bao giờ viết "(optional)" |
-| Helper | Dưới trường, in nghiêng, cỡ ≤ cỡ nhãn (22/10) |
+| Helper | Dưới trường, in nghiêng, cỡ bằng hoặc nhỏ hơn nhãn |
 | Lỗi | Chữ đỏ dưới trường, **khi rời ô** — không phải mỗi lần gõ |
+| Lỗi *hoặc* hint | **Không bao giờ cả hai**: hai dòng cùng tự nhận là đang chỉ việc tiếp theo |
 | Hint | Là **anh em** của nhãn, không nằm trong nhãn, nếu không nó nhập vào tên của control |
 
 ## D3 · Lưới
+
+Lưới là nơi hệ thống này làm phần lớn công việc, và **tone dòng** là cách nó
+nói. Tone là **trạng thái của dòng trong báo giá**, không phải mức nghiêm
+trọng: xanh là đã có nhà cung cấp phủ đủ, vàng là thiếu số lượng, đỏ là không
+ai chào giá, xám là bị loại khỏi báo giá.
+
+![Một BoM đã định giá, đủ bốn tone dòng](assets/design-system/states-row-tones.png)
+
+**Mọi tone đều được gọi tên ngay dưới lưới mà nó tô.** Một màu mà chỉ người
+vẽ giải mã được là một màu không có nghĩa:
+
+![Chú giải tone](assets/design-system/states-tone-legend.png)
 
 | Luật | |
 |---|---|
@@ -817,9 +879,10 @@ Kích thước ở [B5.4](#b54-hộp-thoại-và-khung-ứng-dụng). Thêm ba l
 
 1. **Hành động nằm góc trên trái** với một mặt bàn làm việc, nằm ở chân với
    một câu hỏi. Lối thoát luôn nằm bên trái, dù thanh nằm ở đâu.
-2. **`lg` và `xl` mở ra full màn** — yêu cầu tại buổi review 13/10. `md` thì
-   không bao giờ: một hộp xác nhận chiếm hết màn 27 inch là câu trả lời tệ
-   hơn cái nó thay thế.
+2. **`lg` và `xl` mở ra full màn**; `md` thì không bao giờ. Hai cỡ đó là mặt
+   bàn làm việc, và một lưới 21 cột trong khung 1180px là đang tiêu đúng chỗ
+   màn hình được cấp — trong khi một hộp xác nhận chiếm hết màn 27 inch là câu
+   trả lời tệ hơn cái nó thay thế.
 3. **Escape đóng thứ trong cùng**, điều mà Select phải được dạy bằng tay —
    cách xử lý của Kendo đóng luôn cả hộp thoại khi dropdown đang mở.
 
@@ -962,9 +1025,9 @@ Hai hành vi của Kendo nên biết trước khi ngồi debug một component:
 
 | | |
 |---|---|
-| Ai giữ | Bản làm việc của đợt UX revamp, `ll-poc` |
-| Quyết định ghi ở đâu | Trong commit message, và một ghi chú có ngày trong `docs/` cho bất cứ điều gì người đọc sau này sẽ phải tự suy lại |
-| Khi hai nguồn nói khác nhau | [`precedence.md`](precedence.md) — yêu cầu của khách, rồi hệ thống live, rồi phán đoán của mình; và phán đoán thì **phải dán nhãn là phán đoán** |
+| Nguồn chuẩn | `src/theme/` và các component trong `src/ui`. File này **mô tả** chúng, không **định nghĩa** chúng |
+| Quyết định ghi ở đâu | Trong code, ngay tại luật mà nó chi phối — và trong một ghi chú có ngày dưới `docs/` khi người đọc sau này sẽ phải tự suy lại |
+| Phán đoán | Được phép ở chỗ không có nguồn nào trả lời, và **phải dán nhãn là phán đoán** ngay tại chỗ dùng |
 | Đánh phiên bản | `v1.0` là bản bàn giao này. Sửa một token hay một luật là minor; sửa tới mức phải dựng lại màn hình là major |
 
 **Ba luật giữ cho tài liệu này còn đúng:**
@@ -975,21 +1038,7 @@ Hai hành vi của Kendo nên biết trước khi ngồi debug một component:
 3. **Trang sống thắng tài liệu.** `/design-system` render hàng thật; nếu hai
    bên nói khác nhau thì **trang đúng, file này cũ**.
 
-## F4 · Còn thiếu gì
-
-Danh sách thật thà, vì một bộ bàn giao tự nhận là đầy đủ là bộ không ai kiểm.
-
-| | Tình trạng |
-|---|---|
-| **Viết hoa chữ trong nhãn** (`Reload this screen` → `Reload This Screen`) | Xong một nửa. Chữ VIẾT HOA TOÀN BỘ đã bỏ khỏi nhãn; đổi **chữ** thì chọi với chính prototype của khách, vốn dùng sentence case. Đang chờ trả lời |
-| **Danh sách Sale Type** ở màn Other Quoted Cost | Tám giá trị: hai của khách, sáu của mình. Đang chờ bảng metadata |
-| **Ticket hỗ trợ gửi đi đâu** | Hộp thoại đã xong; phần gửi là giả. Còn cách một lời gọi POST |
-| **Gộp ô ở bước 3** | Prototype của khách gộp ô; bản mình tô sọc theo record. Lợi hại đã ghi, đang chờ quyết |
-| **Thứ tự Select Action** | Prototype của khách và UI Standard của khách nói khác nhau |
-| **`Customer Special Need`** hay `Customer specific needs` | Prototype của khách và hệ thống live nói khác nhau |
-| **`--vy-ease-emphasised`** | Giống hệt `standard`. Hoặc cho nó đường cong riêng, hoặc bỏ |
-
-## F5 · Một bộ bàn giao cần có gì
+## F4 · Một bộ bàn giao cần có gì
 
 Bố cục của tài liệu này được **đối chiếu với thực hành hiện hành** chứ không
 tự nghĩ ra. Danh sách lặp đi lặp lại trong các checklist đã công bố là:
@@ -1014,20 +1063,17 @@ Tham khảo ngày 3/11/2026:
 Đây là blog của nhà cung cấp và checklist cộng đồng, **không phải tiêu
 chuẩn**; chúng thống nhất ở phần lõi và khác nhau ở độ sâu.
 
-## F6 · Chỉ mục nguồn
+## F5 · Chỉ mục nguồn
 
 | Tài liệu | Chốt điều gì |
 |---|---|
-| [`precedence.md`](precedence.md) | Nguồn nào thắng khi hai nguồn nói khác nhau |
 | [`contrast-sweep.md`](contrast-sweep.md) | Mọi tỉ số tương phản đã đo, và phương pháp |
 | [`focus-order.md`](focus-order.md) | Thứ tự bàn phím và vòng focus |
 | [`modal-patterns.md`](modal-patterns.md) | Cỡ hộp thoại, vị trí nút, cách đóng |
 | [`table-patterns.md`](table-patterns.md) | Hành vi lưới, role cột, mật độ |
 | [`motion-loading.md`](motion-loading.md) | Mọi quyết định về màn chờ và chuyển cảnh |
 | [`kendo-control-scale-18oct.md`](kendo-control-scale-18oct.md) | Bản audit 33 luật về thang kích thước Kendo |
-| [`ui-standard-review-16oct.md`](ui-standard-review-16oct.md) | Bản soát UI Standard của khách |
 | [`working-agreement.md`](working-agreement.md) | Luật kỹ thuật, gồm cả các ngoại lệ của luật số ma thuật |
-| [`con-thieu-01nov.md`](con-thieu-01nov.md) | Còn nợ gì so với chính tài liệu khách gửi |
 
 ---
 

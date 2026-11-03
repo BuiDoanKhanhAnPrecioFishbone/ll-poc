@@ -16,11 +16,12 @@
  * code, bold and italic. Anything outside that subset is passed through as a
  * paragraph rather than silently swallowed.
  *
- * IMAGES ARE DOWNSCALED ON THE WAY IN. The captures are 2× — about 2300px
- * wide — which is right for reading a swatch on a retina screen and wrong for
- * a file somebody has to receive. `sips` resamples them to 1300px, which took
- * the set from 6.6MB to 3.3MB; PNG rather than JPEG because half of these
- * pictures ARE colour swatches, and JPEG puts artefacts around flat fills.
+ * IMAGES ARE DOWNSCALED ON THE WAY IN. The captures are 2× — up to 5600px
+ * wide for a full grid — which is right for reading a swatch on a retina
+ * screen and wrong for a file somebody has to receive. `sips` resamples them
+ * to 1100px, which holds the document at about 4MB with 26 pictures in it.
+ * PNG rather than JPEG because half of these pictures ARE colour swatches,
+ * and JPEG puts artefacts around flat fills. Override with `MAX_PX`.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -33,7 +34,7 @@ if (!src || !out) {
   process.exit(1);
 }
 
-const MAX_PX = Number(process.env.MAX_PX || 1300);
+const MAX_PX = Number(process.env.MAX_PX || 1100);
 const baseDir = path.dirname(src);
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'vy-mddoc-'));
 

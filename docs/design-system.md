@@ -47,9 +47,8 @@ screen rather than from a rule, it says so.
 [F1 File map](#f1--file-map) ·
 [F2 How to change something](#f2--how-to-change-something) ·
 [F3 Governance](#f3--governance) ·
-[F4 Known gaps](#f4--known-gaps) ·
-[F5 What a handover should contain](#f5--what-a-handover-should-contain) ·
-[F6 Source index](#f6--source-index)
+[F4 What a handover should contain](#f4--what-a-handover-should-contain) ·
+[F5 Source index](#f5--source-index)
 
 ---
 ---
@@ -87,9 +86,9 @@ component.**
 
 1. **Is there a token?** If yes, use it. If no, add one — and say in the code
    why the scale did not already have it.
-2. **Does the live system already answer this?** Field names, option lists and
-   behaviour come from the live system unless a customer requirement overrides
-   it. The order of precedence is written down in [`precedence.md`](precedence.md).
+2. **Do not invent content.** Field names, option lists, status words and
+   behaviour are facts about the business, not design decisions. Look them up
+   before drawing them.
 3. **Both themes, both densities, 820px.** A screen that has only been seen in
    light mode on a 1920px monitor has been seen once.
 4. **A magic number carries a note.** A width that deviates from its role
@@ -338,14 +337,22 @@ choosing dark disagree:
 > priority dot on a near-black ground. **Adding a colour token means editing
 > three places.**
 
+The same two blocks in the dark theme. Every role keeps its job and changes
+its value — and the status pairs stay legible rather than being inverted
+mechanically:
+
+![The semantic layer in dark](assets/design-system/semantic-layer-dark.png)
+
+![The status vocabulary in dark](assets/design-system/status-vocabulary-dark.png)
+
 ---
 
 ## B2 · Typography
 
 Two families. **Inter Variable** for everything; **JetBrains Mono** for
 identifiers that get read aloud or compared character by character — part
-numbers, MPNs, error ids. Body text is never mono: the customer's instruction
-of 13 October, *"do not use monotext, hard to read"*.
+numbers, MPNs, error ids. Body text is never mono — at 13px it is
+harder to read, and nothing about a sentence needs a fixed advance width.
 
 ![Type scale](assets/design-system/type-scale.png)
 
@@ -380,11 +387,10 @@ and costs a wrap.
 
 ### Casing — three levels, drawn differently on purpose
 
-The customer's UI Standard of 14 October: buttons, links, tabs, form and
-dialog titles, section and card titles, **field labels**, column headers,
-filter labels, menu items and status pills take **Title Case**, with
-prepositions (for, to, of, by, as, in, on, at, from, with, via, per, into)
-lowercase unless they lead. Prose is sentence case.
+Buttons, links, tabs, form and dialog titles, section and card titles,
+**field labels**, column headers, filter labels, menu items and status pills
+take **Title Case**, with prepositions (for, to, of, by, as, in, on, at, from,
+with, via, per, into) lowercase unless they lead. Prose is sentence case.
 
 | Level | Case | Size / weight | Example |
 |---|---|---|---|
@@ -614,6 +620,16 @@ Below about 1100px a 248px sidebar stops being orientation and starts being
 the thing in the way — measured at 543px it was taking **46% of the
 viewport**.
 
+The same screen at the three widths that matter. Full rail, icon rail, and no
+rail at all with a menu button in the top bar — and in all three the grid
+keeps its columns rather than shrinking them:
+
+![1500px — the full sidebar](assets/design-system/responsive-1500.png)
+
+![1100px — the sidebar is an icon rail](assets/design-system/responsive-1100.png)
+
+![760px — the sidebar is behind a menu button](assets/design-system/responsive-760.png)
+
 ---
 ---
 
@@ -742,7 +758,7 @@ picture there delays both.
 | | |
 |---|---|
 | Live source | `src/ui/RocketLaunch.tsx` |
-| Static SVGs | `docs/assets/rocket-journey/*.svg` — the **retired** horizontal set, kept because the 16 Oct comparison document uses them. Not in the product |
+| Static SVGs | `docs/assets/rocket-journey/*.svg` — the **retired** horizontal set, kept because an earlier document still prints them. Not in the product |
 | These images | Captured from the running app at 2×; the scripts are in `scripts/` |
 
 > **If an illustration needs to leave the codebase** — for a slide, a PDF —
@@ -763,7 +779,11 @@ already do, and what must we add".**
 
 ## D1 · Buttons
 
-![Buttons](assets/design-system/buttons.png)
+![Button variants, including disabled](assets/design-system/states-buttons.png)
+
+The picture above is the live specimen with the keyboard on it: `Text` carries
+the focus ring every control in the system uses — 2px of `--vy-brand-boundary`
+offset by 2px, never a removed outline.
 
 | Variant | When |
 |---|---|
@@ -785,23 +805,67 @@ request.
 
 ## D2 · Fields
 
-![Field states](assets/design-system/fields.png)
+### Two modes, three presentations
 
-**Two backgrounds, not three** — the 14 October instruction: *white means you
-can type in it.* A read-only value is a box with a sunken fill, a 1px border
-and a padlock, so read and edit modes are the same shape and the layout does
-not move between them.
+A record has **two modes** — view and edit. Inside edit mode a field is one of
+**two kinds**, and that is what the padlock is for. It is not a third state of
+a field; it is the mark that separates the two kinds, and it exists only where
+the distinction is live.
+
+| | Field the user can change | Field the user cannot |
+|---|---|---|
+| **View mode** | Sunken box, no padlock | Sunken box, no padlock |
+| **Edit mode** | **White** input, `--vy-border-control` | **Sunken** box, **padlock**, and a short reason |
+
+**In view mode nothing is editable, so the distinction has nothing to say** —
+a padlock on all twenty-seven fields marks none of them. The boxes are
+identical and the eye reads the values, not the chrome.
+
+**In edit mode the white tells you where you may type.** Everything still in a
+grey box is a value this screen does not own, and the padlock is followed by
+the reason in two or three words, because a padlock says *that* a field is
+locked and cannot say *why*.
+
+**View mode — one box for every value:**
+
+![A record in view mode](assets/design-system/states-field-view.png)
+
+**Edit mode — white where you may type; grey, padlocked and explained where
+you may not.** `Created Date` reads *set by the system*; `ITAR` reads *follows
+Customer*:
+
+![The same record in edit mode](assets/design-system/states-field-edit.png)
+
+> **One exception, and it is the same rule.** A panel where *nothing* is
+> editable keeps the grey box and drops the padlock — Run Quotation's setup
+> strip on the last step, where the run is finished. A padlock on each of
+> seven values says only what the panel already says.
+
+### The rest of a field
 
 | Part | Rule |
 |---|---|
-| Label | **Above** the value, never beside it (13 Oct). Title Case, 12px, 600 |
+| Label | **Above** the value, never beside it. Title Case, 12px, 600 |
 | Required | A **red asterisk** right after the label, in view **and** edit mode |
 | Optional | No mark. Never the word "(optional)" |
-| Helper | Below the field, italic, ≤ the label's size (22 Oct) |
+| Helper | Below the field, italic, at or below the label's size |
 | Error | Red text below the field, **on blur** — not on every keystroke |
+| Error *or* hint | Never both: two lines, each claiming to say what to do next |
 | Hint | A **sibling** of the label, never inside it, or it joins the accessible name |
 
 ## D3 · Grids
+
+A grid is where this system does most of its work, and the **row tone** is how
+it talks. A tone is a row's state in the quote, not a severity: green is
+covered by the chosen supplier, amber is short of the quantity, red is no bid,
+grey is excluded from the quote entirely.
+
+![A priced BoM, showing all four row tones](assets/design-system/states-row-tones.png)
+
+**Every tone is named under the grid it paints.** A colour that only the
+author can decode is a colour that means nothing:
+
+![The tone legend](assets/design-system/states-tone-legend.png)
 
 | Rule | |
 |---|---|
@@ -818,9 +882,10 @@ Sizes are in [B5.4](#b54-dialogs-and-shell). Three further rules:
 
 1. **Actions top-left** on a work surface, in a footer on a question. The way
    out goes on the left wherever the bar sits.
-2. **`lg` and `xl` open maximised** — asked for at the 13 October review. `md`
-   never does: a confirmation filling a 27-inch screen is a worse answer than
-   the one it replaced.
+2. **`lg` and `xl` open maximised**; `md` never does. Those two are the work
+   surfaces, and a 21-column grid in a 1180px window spends the screen it was
+   given — while a confirmation filling a 27-inch screen is a worse answer
+   than the one it replaced.
 3. **Escape dismisses the innermost thing**, which the Select had to be taught
    by hand — Kendo's own handling closed the dialog from an open dropdown.
 
@@ -964,9 +1029,9 @@ Two Kendo behaviours worth knowing before debugging a component:
 
 | | |
 |---|---|
-| Owner | The UX revamp working copy, `ll-poc` |
-| Where decisions are recorded | A commit message, and a dated note in `docs/` for anything a reader would otherwise have to re-derive |
-| Precedence when two sources disagree | [`precedence.md`](precedence.md) — customer requirement, then the live system, then judgement, and judgement must be labelled |
+| Source of truth | `src/theme/` and the components in `src/ui`. This file describes them; it does not define them |
+| Where a decision is recorded | In the code, at the rule it governs — and in a dated note under `docs/` when a reader would otherwise have to re-derive it |
+| Judgement | Allowed where nothing else answers, and **labelled as judgement** where it is used |
 | Versioning | `v1.0` is this handover. A token or rule change is a minor version; a change that requires screens to be rebuilt is a major one |
 
 **Three rules that keep this document true:**
@@ -978,22 +1043,7 @@ Two Kendo behaviours worth knowing before debugging a component:
 3. **The living page beats the document.** `/design-system` renders the real
    components; if the two disagree, the page is right and this file is stale.
 
-## F4 · Known gaps
-
-An honest list, because a handover claiming completeness is one nobody
-checks.
-
-| | Status |
-|---|---|
-| **Label text casing** (`Reload this screen` → `Reload This Screen`) | Half done. Uppercase is gone from labels; rewriting the **words** collides with the customer's own prototypes, which use sentence case. Awaiting her answer |
-| **Sale Type list** on Other Quoted Cost | Eight values: two hers, six ours. Awaiting the metadata list |
-| **Support ticket destination** | The dialog is complete; the send is faked. One POST away |
-| **Row merging on step 3** | Her prototype merges cells; ours bands by record. Trade-off documented, awaiting a decision |
-| **Select Action order** | Her prototype and her UI Standard disagree |
-| **`Customer Special Need`** vs `Customer specific needs` | Her prototype and the live system disagree |
-| **`--vy-ease-emphasised`** | Identical to `standard`. Either give it its own curve or retire it |
-
-## F5 · What a handover should contain
+## F4 · What a handover should contain
 
 The shape of this document was checked against current practice rather than
 invented. The recurring list across published checklists is: **design tokens**
@@ -1018,20 +1068,17 @@ Consulted 3 November 2026:
 These are vendor blogs and community checklists, not a standard; they agree
 on the core set and differ on depth.
 
-## F6 · Source index
+## F5 · Source index
 
 | Document | What it settles |
 |---|---|
-| [`precedence.md`](precedence.md) | Which source wins when two disagree |
 | [`contrast-sweep.md`](contrast-sweep.md) | Every measured contrast ratio, and the method |
 | [`focus-order.md`](focus-order.md) | Keyboard order and the focus ring |
 | [`modal-patterns.md`](modal-patterns.md) | Dialog sizes, action placement, dismissal |
 | [`table-patterns.md`](table-patterns.md) | Grid behaviour, column roles, density |
 | [`motion-loading.md`](motion-loading.md) | Every loading and transition decision |
 | [`kendo-control-scale-18oct.md`](kendo-control-scale-18oct.md) | The 33-rule Kendo size audit |
-| [`ui-standard-review-16oct.md`](ui-standard-review-16oct.md) | Our review of the customer's UI Standard |
 | [`working-agreement.md`](working-agreement.md) | Engineering rules, including the magic-number exceptions |
-| [`con-thieu-01nov.md`](con-thieu-01nov.md) | What is still outstanding against the customer's own material |
 
 ---
 
