@@ -47,7 +47,16 @@ export const MEASURES: Measure[] = [
   },
   {
     key: 'waiting-doc', label: 'Waiting on a document', tone: 'waiting',
-    meaning: 'A checklist task is started but its document has not arrived',
+    /* THE SENTENCE WAS STILL DESCRIBING THE OLD PREDICATE — 9 Nov. It read
+       "a checklist task is STARTED but its document has not arrived", which is
+       the `status === 'In progress' && !documentName` test the note below
+       calls a contradiction and replaced. The test moved; its sentence did
+       not, so the tile explained itself with a rule it no longer applies —
+       and that sentence travels: the Quotations list prints it in the banner
+       when you arrive from here. A count is only as good as the words beside
+       it, which is the whole argument for keeping the predicate in one
+       place. */
+    meaning: 'A checklist task with no document attached yet',
     /* A checklist task that applies and has no file attached.
        
        This used to read `status === 'In progress' && !documentName`, which is

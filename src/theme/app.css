@@ -80,14 +80,24 @@
 .vy-search {
   margin-left: auto; display: flex; align-items: center; gap: var(--vy-space-4);
   width: min(var(--vy-search-w), 38vw); padding: var(--vy-space-3) var(--vy-space-5); cursor: pointer;
-  background: var(--vy-surface-app); border: 1px solid var(--vy-border);
+  /* `border-control`: this is a button drawn to look like a search field, and
+     it is the only thing in the top bar with an edge — 1.4.11's 3:1 is what
+     tells the eye there is a control there. It was `--vy-border` at 1.30
+     against the page it sits on. Changed 8 Nov with the rest of the sweep. */
+  background: var(--vy-surface-app); border: 1px solid var(--vy-border-control);
   border-radius: var(--vy-radius-md); color: var(--vy-on-surface-subtle);
   font-size: var(--vy-text-base); font-family: inherit; text-align: left;
 }
-.vy-search:hover { border-color: var(--vy-border-strong); background: var(--vy-surface); }
+/* The background carries the hover, and the border does not move: it was going
+   to `border-strong` at 1.64:1 — fainter than the resting `border-control` this
+   rule had just been corrected to, which undid the fix for anyone with a
+   pointer on it. 8 Nov. */
+.vy-search:hover { background: var(--vy-surface); }
 .vy-search span { flex: 1; }
 .vy-search kbd, .vy-palette-foot kbd {
-  font-family: var(--vy-font-mono); font-size: var(--vy-text-2xs); color: var(--vy-on-surface-subtle);
+  /* Medium rather than mono: the border and the raised bottom edge are what
+     say "key", and the face no longer has to. */
+  font-weight: var(--vy-weight-medium); font-size: var(--vy-text-2xs); color: var(--vy-on-surface-subtle);
   border: 1px solid var(--vy-border-strong); border-bottom-width: var(--vy-space-1);
   border-radius: var(--vy-radius-sm); padding: 1px var(--vy-space-2); background: var(--vy-surface);
 }
@@ -139,7 +149,13 @@
 .vy-content { flex: 1; overflow: auto; min-height: 0; position: relative; }
 
 /* ---- Page ----------------------------------------------------------------- */
-.vy-page { padding: var(--vy-space-9) var(--vy-space-10); }
+/* CAPPED BY DEFAULT, and the list shape opts out — 9 Nov. See the derivation
+   beside `--vy-page-max` in tokens.css. Left-aligned rather than centred: the
+   page title has to start at the same x as every list screen's, and a list
+   screen is full-bleed, so centring this one would make the heading jump
+   right when you navigate from a grid to the dashboard. */
+.vy-page { padding: var(--vy-space-9) var(--vy-space-10); max-width: var(--vy-page-max); }
+.vy-page--grid { max-width: none; }
 .vy-page--doc { max-width: var(--vy-doc-max-w); }
 .vy-page-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--vy-space-8); margin-bottom: var(--vy-space-7); }
 .vy-page-title { font-size: var(--vy-text-2xl); font-weight: var(--vy-weight-bold); margin: 0; color: var(--vy-on-surface-strong); letter-spacing: -.01em; }
@@ -244,10 +260,24 @@
 .vy-palette-list { list-style: none; margin: 0; padding: var(--vy-space-3); max-height: 46vh; overflow-y: auto; }
 .vy-palette-list li { padding: var(--vy-space-4) var(--vy-space-5); border-radius: var(--vy-radius-md); cursor: pointer; }
 .vy-palette-list li.is-sel { background: var(--vy-brand-subtle); }
-.vy-palette-row { display: flex; align-items: baseline; gap: var(--vy-space-4); }
-.vy-palette-group { font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .06em; color: var(--vy-on-surface-subtle); min-width: var(--vy-palette-group-w); }
-.vy-palette-title { font-size: var(--vy-text-md); color: var(--vy-on-surface-strong); font-weight: var(--vy-weight-medium); }
-.vy-palette-was { font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle); margin-left: var(--vy-palette-indent); }
+/* THE NAME FIRST, AND EVERY NAME AT THE SAME LEFT EDGE — 9 Nov.
+   The group led the row, in a column set to `--vy-palette-group-w: 66px` as a
+   MINIMUM, which is a column that aligns nothing: measured, the eight live
+   group labels run from 88px ("PRODUCTION") to 199px ("PROCUREMENT
+   MANAGEMENT"), so the eight visible titles started at five different x
+   positions and Home — a leaf group, with no title at all — started at a
+   sixth. A list you scan by name has one job for the eye, which is to run
+   down a single left edge.
+
+   Widening the column to fit 199px was the other way out, and it spends a
+   third of a 620px palette on a qualifier that matters for the eight rows
+   where a label repeats: "Configuration" appears 5 times in this menu and
+   "Reporting" 3. So the group moves to the end of the row and right-aligns —
+   still there when two titles collide, never in the way of reading them. */
+.vy-palette-row { display: flex; align-items: baseline; gap: var(--vy-space-6); }
+.vy-palette-group { font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .06em; color: var(--vy-on-surface-subtle); margin-left: auto; flex: 0 0 auto; }
+.vy-palette-title { font-size: var(--vy-text-md); color: var(--vy-on-surface-strong); font-weight: var(--vy-weight-medium); flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vy-palette-was { font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle); }
 .vy-palette-empty { color: var(--vy-on-surface-subtle); padding: var(--vy-space-7) var(--vy-space-5); cursor: default; }
 .vy-palette-foot { border-top: 1px solid var(--vy-border); padding: var(--vy-space-4) var(--vy-space-7); font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle); display: flex; gap: var(--vy-space-2); align-items: center; }
 
@@ -295,7 +325,7 @@
 .vy-tree-purpose { font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle); font-weight: var(--vy-weight-regular); }
 .vy-tree-item { padding: var(--vy-space-2) 0 var(--vy-space-2) var(--vy-space-7); border-left: 1px solid var(--vy-border); margin-left: var(--vy-space-2); }
 .vy-tree-item-row { display: flex; align-items: baseline; justify-content: space-between; gap: var(--vy-space-5); font-size: var(--vy-text-base); color: var(--vy-on-surface-soft); }
-.vy-tree-group code, .vy-tree-item code { font-family: var(--vy-font-mono); font-size: var(--vy-text-2xs); color: var(--vy-on-surface-subtle); white-space: nowrap; }
+.vy-tree-group code, .vy-tree-item code { font-size: var(--vy-text-2xs); color: var(--vy-on-surface-subtle); white-space: nowrap; }
 .vy-issue { font-size: var(--vy-text-xs); color: var(--vy-danger-text-deep); background: var(--vy-danger-subtle); border-radius: var(--vy-radius-sm); padding: var(--vy-space-2) var(--vy-space-4); margin: var(--vy-space-2) 0; }
 .vy-was { font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle); }
 
@@ -315,20 +345,50 @@
 .vy-ramp-name { font-size: var(--vy-text-sm); font-weight: var(--vy-weight-semibold); color: var(--vy-on-surface-muted); margin-bottom: var(--vy-space-3); }
 .vy-ramp-row { display: flex; flex-wrap: wrap; gap: var(--vy-space-2); }
 .vy-swatch { width: var(--vy-swatch-w); height: var(--vy-swatch-h); border-radius: var(--vy-radius-sm); border: 1px solid var(--vy-border); display: flex; align-items: flex-end; padding: var(--vy-space-2); }
-.vy-swatch span { font-size: var(--vy-text-2xs); font-family: var(--vy-font-mono); background: var(--vy-swatch-label-bg); border-radius: var(--vy-radius-sm); padding: 0 var(--vy-space-2); color: var(--vy-on-surface-soft); }
+.vy-swatch span { font-size: var(--vy-text-2xs); background: var(--vy-swatch-label-bg); border-radius: var(--vy-radius-sm); padding: 0 var(--vy-space-2); color: var(--vy-on-surface-soft); }
 .vy-badge-row { display: flex; flex-wrap: wrap; gap: var(--vy-space-4); align-items: center; }
+
+/* THE VARIANT x STATE MATRIX, which is a specimen rather than a layout.
+   ONLY THE STATES THAT HOLD STILL. The first build of this had six columns,
+   with hover, focus and press drawn by putting Kendo's own `.k-hover`,
+   `.k-focus` and `.k-active` classes on the button. Measured against a real
+   pointer before it shipped: Kendo never adds those classes — its hover is a
+   `::before` layer driven by `:hover` — and `.k-hover` flipped a tonal button
+   from its tint to solid primary, a thing no user can ever see. A specimen
+   that photographs a state the product cannot reach is worse than no
+   specimen. Three columns now, all of them real; the other three are written
+   down in the component page with the token that drives them. */
+.vy-btn-matrix { display: grid; grid-template-columns: auto repeat(3, minmax(0, 14rem)); gap: var(--vy-space-5) var(--vy-space-6); align-items: center; justify-content: start; }
+.vy-btn-matrix > .h { font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .05em; color: var(--vy-on-surface-subtle); }
+.vy-btn-matrix > .r { font-size: var(--vy-text-base); color: var(--vy-on-surface-muted); white-space: nowrap; padding-right: var(--vy-space-5); }
+
+/* Anatomy: one button at rest with its parts numbered beneath it. The numbers
+   are in reading order — container, icon slot, label — which for a control
+   this small says more than a callout line would. */
+.vy-anatomy { display: flex; flex-wrap: wrap; gap: var(--vy-space-10); align-items: flex-start; }
+.vy-anatomy-parts { display: grid; gap: var(--vy-space-4); margin: 0; font-size: var(--vy-text-base); }
+.vy-anatomy-parts div { display: flex; gap: var(--vy-space-4); align-items: baseline; }
+.vy-anatomy-parts b { flex: none; width: var(--vy-space-9); height: var(--vy-space-9); border-radius: var(--vy-radius-pill); background: var(--vy-brand-subtle); color: var(--vy-brand-text-deep); font-size: var(--vy-text-xs); font-weight: var(--vy-weight-semibold); display: inline-flex; align-items: center; justify-content: center; font-variant-numeric: tabular-nums; }
+.vy-anatomy-parts code { color: var(--vy-on-surface-subtle); }
 .vy-spec-table { width: 100%; border-collapse: collapse; font-size: var(--vy-text-base); }
 .vy-spec-table th { text-align: left; font-size: var(--vy-text-xs); text-transform: uppercase; letter-spacing: .05em; color: var(--vy-on-surface-subtle); border-bottom: 1px solid var(--vy-border-strong); padding: var(--vy-space-3) var(--vy-space-5) var(--vy-space-3) 0; }
 .vy-spec-table td { padding: var(--vy-space-4) var(--vy-space-5) var(--vy-space-4) 0; border-bottom: 1px solid var(--vy-border-faint); vertical-align: top; color: var(--vy-on-surface-soft); }
 .vy-spec-table td:nth-child(2) { white-space: nowrap; color: var(--vy-on-surface-strong); }
 .vy-type-scale { display: flex; flex-direction: column; gap: var(--vy-space-4); }
 .vy-type-row { display: flex; align-items: baseline; justify-content: space-between; border-bottom: 1px solid var(--vy-border-faint); padding-bottom: var(--vy-space-3); }
-.vy-type-row code { font-family: var(--vy-font-mono); font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle); }
+.vy-type-row code { font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle); font-variant-numeric: tabular-nums; }
 
 /* ---- Audit ---------------------------------------------------------------- */
 .vy-filter-row { display: flex; gap: var(--vy-space-3); flex-wrap: wrap; margin-bottom: var(--vy-space-8); }
-.vy-audit-chip { background: var(--vy-surface); border: 1px solid var(--vy-border); border-radius: var(--vy-radius-pill); padding: var(--vy-space-2) var(--vy-space-6); font-size: var(--vy-text-base); color: var(--vy-on-surface-muted); cursor: pointer; font-family: inherit; }
-.vy-audit-chip:hover { border-color: var(--vy-border-strong); }
+/* Same shape as `.vy-chip` and the same correction on 8 Nov: a chip is a
+   control, so its edge is `border-control`, not the structure token. */
+.vy-audit-chip { background: var(--vy-surface); border: 1px solid var(--vy-border-control); border-radius: var(--vy-radius-pill); padding: var(--vy-space-2) var(--vy-space-6); font-size: var(--vy-text-base); color: var(--vy-on-surface-muted); cursor: pointer; font-family: inherit; }
+/* `border-control-hover`, not `on-surface-subtle`. A text tier was drawing a
+   control's edge: it happened to clear 3:1 in both themes (5.89 and 6.01 on a
+   panel), so this is not a fix but a correction of which token owns the job —
+   and the next change to the subtle TEXT tier would otherwise have moved a
+   chip's boundary with it. 9 Nov. */
+.vy-audit-chip:hover { border-color: var(--vy-border-control-hover); }
 .vy-audit-chip.is-on { background: var(--vy-brand); border-color: var(--vy-brand); color: var(--vy-brand-on); }
 .vy-audit-chip span { opacity: .7; margin-left: var(--vy-space-2); }
 .vy-findings { display: flex; flex-direction: column; gap: var(--vy-space-6); }
@@ -339,7 +399,7 @@
    invisible; in dark, `on-surface-invert` flips to near-black and this chip
    measured 1.44:1 — dark text on a dark chip. Chrome does not invert, so the
    text on it must not either. */
-.vy-finding-id { font-family: var(--vy-font-mono); font-size: var(--vy-text-xs); color: var(--vy-on-dark-fg); background: var(--vy-surface-chrome-soft); border-radius: var(--vy-radius-sm); padding: var(--vy-space-1) var(--vy-space-3); }
+.vy-finding-id { font-size: var(--vy-text-xs); font-variant-numeric: tabular-nums; color: var(--vy-on-dark-fg); background: var(--vy-surface-chrome-soft); border-radius: var(--vy-radius-sm); padding: var(--vy-space-1) var(--vy-space-3); }
 .vy-finding h2 { margin: 0; font-size: var(--vy-text-md); font-weight: var(--vy-weight-bold); color: var(--vy-on-surface-strong); flex: 1; min-width: var(--vy-finding-title-w); }
 .vy-finding-tags { display: flex; gap: var(--vy-space-3); }
 .vy-tag { font-size: var(--vy-text-xs); border-radius: var(--vy-radius-pill); padding: var(--vy-space-1) var(--vy-space-4); font-weight: var(--vy-weight-semibold); }
@@ -1391,7 +1451,9 @@
 .vy-bom-diff { width: 100%; border-collapse: collapse; border-top: 1px solid var(--vy-border); font-size: var(--vy-text-sm); }
 .vy-bom-diff th { text-align: left; padding: var(--vy-space-4) var(--vy-space-6); background: var(--vy-surface-subtle); color: var(--vy-on-surface-muted); font-weight: var(--vy-weight-semibold); font-size: var(--vy-text-xs); }
 .vy-bom-diff td { padding: var(--vy-space-4) var(--vy-space-6); border-top: 1px solid var(--vy-border-faint); color: var(--vy-on-surface); vertical-align: top; }
-.vy-bom-diff td:last-child { font-family: var(--vy-font-mono); font-size: var(--vy-text-xs); color: var(--vy-on-surface-soft); }
+/* `tabular-nums` rather than a second family. This column is read down, one
+   value against the one above it, which is the alignment mono was here for. */
+.vy-bom-diff td:last-child { font-size: var(--vy-text-xs); font-variant-numeric: tabular-nums; color: var(--vy-on-surface-soft); }
 
 /* The queue filter's plain-language gloss, next to the chip that names it. The
    chip says WHICH queue; this says what that queue means, so nobody has to
@@ -1414,7 +1476,19 @@
 .vy-chart { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--vy-space-3); align-items: end; height: var(--vy-chart-h); }
 .vy-chart-col { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; min-width: 0; }
 .vy-chart-stack { display: flex; flex-direction: column-reverse; justify-content: flex-start; width: 100%; max-width: var(--vy-chart-bar-w); flex: 1; }
-.vy-chart-seg { display: block; width: 100%; height: var(--seg-h); min-height: 2px; }
+.vy-chart-seg { display: block; width: 100%; height: var(--seg-h); min-height: 3px; }
+/* A SEPARATOR BETWEEN SEGMENTS, because two fills are not a boundary — 9 Nov.
+   Contrast is a luminance measure, and these five series separate by HUE: on
+   the light card draft/open/done sit within 1.08:1 of each other, and in dark
+   within 1.54:1. A greyscale print, or a reader with no colour vision, sees
+   one block where the legend names three states. And because a month with no
+   In-Progress work makes New touch Quoted, it is not enough to check the four
+   neighbouring pairs — any of the ten can end up adjacent, which is why the
+   boundary is DRAWN rather than inferred from the two fills either side.
+   The stack is column-reverse, so a segment's own bottom edge is the line
+   between it and the one below. min-height is 3px so a single-record month
+   still shows 2px of fill under its separator. */
+.vy-chart-seg + .vy-chart-seg { box-shadow: inset 0 -1px 0 var(--vy-surface); }
 .vy-chart-stack > .vy-chart-seg:last-child { border-radius: var(--vy-radius-sm) var(--vy-radius-sm) 0 0; }
 .vy-chart-n { margin-top: var(--vy-space-3); font-size: var(--vy-text-xs); font-weight: var(--vy-weight-semibold); color: var(--vy-on-surface-soft); font-variant-numeric: tabular-nums; }
 /* A zero is de-emphasised by dropping the weight, not by fading to grey-300 —
@@ -1426,14 +1500,27 @@
 /* A CHART SEGMENT IS NOT A BADGE, and this block was treating them as the same
    thing. The status tokens come in pairs — `-fg` is the text on a chip, `-bg`
    is the chip — and for four of the five states the saturated half happens to
-   be `-fg`, so reading `-fg` looked right. For `progress` it is not: the chip
-   is solid green and its `-fg` is literally `#ffffff`, so the In-Progress
+   be `-fg`, so reading `-fg` looked right. For `progress` it was not: the chip
+   was solid green and its `-fg` was literally `#ffffff`, so the In-Progress
    series was drawn WHITE ON A WHITE CARD. Thirty-nine records, on the
    dashboard, invisible — and the legend key beside it blank.
 
-   `progress` therefore takes the saturated half of its own pair. */
+   THEN THE FIX OUTLIVED THE BUG — 9 Nov. The status pairs were later
+   restructured to the convention the rest of this file now states: `-fg` is
+   ink, `-bg` is a pale chip. `--vy-status-progress-fg` has been `#155e75`
+   since, which is the saturated half like its four siblings — but the `-bg`
+   exception was never revisited. Measured on the running card, the series it
+   rescued was invisible again for the opposite reason:
+
+     progress segment on the chart card    1.12:1 light   1.37:1 dark
+
+   `#cffafe` is a chip background: pale by design, because text sits on it. On
+   dark it is `#1e3838`, which is a near-black shape on a near-black card. Same
+   invisibility, different cause, and it survived because nothing measures a
+   fill that carries no text. Every series now reads its own `-fg`, so there is
+   no exception left to go stale. */
 .vy-chart-seg[data-status="draft"],     .vy-chart-key[data-status="draft"]     { background: var(--vy-status-draft-fg); }
-.vy-chart-seg[data-status="progress"],  .vy-chart-key[data-status="progress"]  { background: var(--vy-status-progress-bg); }
+.vy-chart-seg[data-status="progress"],  .vy-chart-key[data-status="progress"]  { background: var(--vy-status-progress-fg); }
 .vy-chart-seg[data-status="open"],      .vy-chart-key[data-status="open"]      { background: var(--vy-status-open-fg); }
 .vy-chart-seg[data-status="done"],      .vy-chart-key[data-status="done"]      { background: var(--vy-status-done-fg); }
 /* Cancelled gets its own neutral HERE, and only here. As badges, New and
@@ -1693,12 +1780,17 @@
   display: inline-flex; align-items: center; gap: var(--vy-space-3);
   padding: var(--vy-space-3) var(--vy-space-5);
   min-height: var(--vy-control-md);
-  background: var(--vy-surface); border: 1px solid var(--vy-brand-boundary-light);
+  /* blue-400, not blue-300. The edge is the whole shape of this button — it
+     has no fill at rest — and blue-300 measured 2.71 against the panel, short
+     of 1.4.11's 3. blue-400 is 4.48 and needs no new token, the same step the
+     chip's selected border already uses. Hover moves on to blue-500 so the
+     two states still differ. Changed 8 Nov with the control sweep. */
+  background: var(--vy-surface); border: 1px solid var(--vy-brand-boundary);
   border-radius: var(--vy-radius-md);
   font: inherit; font-size: var(--vy-text-base); color: var(--vy-brand-text);
   cursor: pointer; white-space: nowrap;
 }
-.vy-smart-btn:hover { background: var(--vy-brand-subtle); border-color: var(--vy-brand-boundary); color: var(--vy-brand-text-hover); }
+.vy-smart-btn:hover { background: var(--vy-brand-subtle); border-color: var(--vy-brand-boundary-strong); color: var(--vy-brand-text-hover); }
 .vy-smart-btn:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
 .vy-smart-btn svg { flex: 0 0 auto; }
 /* The count follows the name, in brackets — `Customer RFQs (43)`, which is the
@@ -1768,7 +1860,7 @@
    GLOBAL HEADER WIDGETS
    ========================================================================== */
 .vy-clock { display: flex; align-items: baseline; gap: var(--vy-space-3); white-space: nowrap; }
-.vy-clock-time { font-family: var(--vy-font-mono); font-size: var(--vy-text-md); color: var(--vy-on-surface-strong); font-variant-numeric: tabular-nums; }
+.vy-clock-time { font-size: var(--vy-text-md); color: var(--vy-on-surface-strong); font-variant-numeric: tabular-nums; }
 .vy-clock-zone { font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle); }
 
 /* Native selects here on purpose: they are shell chrome, used rarely, and a
@@ -1779,7 +1871,10 @@
   border: 1px solid transparent; border-radius: var(--vy-radius-sm);
   padding: var(--vy-space-2) var(--vy-space-4); cursor: pointer; max-width: var(--vy-tz-w);
 }
-.vy-header-select select:hover { background: var(--vy-surface-app); border-color: var(--vy-border); }
+/* Transparent at rest, so this is the same case as `.vy-cell-input`: the hover
+   edge is what reveals a control, and `--vy-border` is the page-rule token at
+   1.30:1. 8 Nov. */
+.vy-header-select select:hover { background: var(--vy-surface-app); border-color: var(--vy-border-control); }
 .vy-header-select select:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
 .vy-header-select--short select { max-width: none; font-weight: var(--vy-weight-semibold); }
 .vy-topbar-sep { width: 1px; height: var(--vy-space-9); background: var(--vy-surface-strong); }
@@ -1855,7 +1950,13 @@
   font: inherit; cursor: pointer;
 }
 .vy-density-choice:hover { background: var(--vy-surface-app); }
-.vy-density-choice[aria-checked="true"] { background: var(--vy-brand-subtle); border-color: var(--vy-brand-boundary-soft); }
+/* `brand-boundary`, not `brand-boundary-soft`. THIS CONTROL IS TRANSPARENT AT
+   REST, so the checked border is its only boundary — and `boundary-soft` is
+   the decorative tier: 1.37 in light, 1.89 in dark. The fill does not rescue
+   it, because `brand-subtle` on a panel is 1.14 in dark. `boundary` clears
+   both themes (3.44 and 4.76). Same case as `.vy-people-add` on 8 Nov: a
+   state that replaces a control's edge with a fainter one. 9 Nov. */
+.vy-density-choice[aria-checked="true"] { background: var(--vy-brand-subtle); border-color: var(--vy-brand-boundary); }
 .vy-density-label { font-size: var(--vy-text-base); color: var(--vy-on-surface-strong); }
 .vy-density-choice[aria-checked="true"] .vy-density-label { font-weight: var(--vy-weight-semibold); color: var(--vy-brand-text-deep); }
 .vy-density-note { font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle); }
@@ -1970,9 +2071,13 @@
 }
 .vy-pager-count { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .vy-pager-size { display: flex; align-items: center; gap: var(--vy-space-3); white-space: nowrap; }
+/* `border-control`: a real `<select>`, which is the first thing B1.4 lists
+   this token for. It was on the structure token at 1.27 against the pager
+   strip — the second native select found by the 8 Nov sweep, after the one
+   in the rich-text toolbar. */
 .vy-pager-size select {
   font: inherit; font-size: var(--vy-text-sm); color: var(--vy-on-surface);
-  background: var(--vy-surface); border: 1px solid var(--vy-border);
+  background: var(--vy-surface); border: 1px solid var(--vy-border-control);
   border-radius: var(--vy-radius-sm); padding: var(--vy-space-1) var(--vy-space-3); cursor: pointer;
   min-height: var(--vy-space-10);   /* 24px minimum target, as above */
 }
@@ -2358,11 +2463,17 @@
 .vy-vs-remove:hover { background: var(--vy-danger-subtle); color: var(--vy-danger-text-deep); }
 .vy-vs-remove:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
 .vy-vs-dir {
-  background: var(--vy-surface-app); border: 1px solid var(--vy-border); border-radius: var(--vy-radius-pill);
+  /* `border-control`, not `border`. The page-rule token at 1.30:1 was drawing
+     an operable pill — the same mis-pick the 8 Nov sweep found seven times.
+     This one sits inside the View Setting dialog, which `border:check` does
+     not open, so it was never swept. 9 Nov. */
+  background: var(--vy-surface-app); border: 1px solid var(--vy-border-control); border-radius: var(--vy-radius-pill);
   padding: var(--vy-space-1) var(--vy-space-5); font: inherit; font-size: var(--vy-text-xs);
   color: var(--vy-on-surface-soft); cursor: pointer; white-space: nowrap;
 }
-.vy-vs-dir[aria-pressed="true"] { background: var(--vy-brand-subtle); border-color: var(--vy-brand-boundary-light); color: var(--vy-brand-text-hover); }
+/* `boundary-light` is 2.08 in light — pressing the pill was making its edge
+   fainter than the resting one it just replaced. 9 Nov. */
+.vy-vs-dir[aria-pressed="true"] { background: var(--vy-brand-subtle); border-color: var(--vy-brand-boundary); color: var(--vy-brand-text-hover); }
 /* Separated from the list above it, not merely spaced.
    The rows sit 4px apart and this sat 12px below them, which is a difference
    the eye reads as "another row, slightly loose" rather than "the control that
@@ -2714,11 +2825,22 @@
 
 .vy-people-add {
   min-height: var(--vy-space-10); padding: var(--vy-space-2) var(--vy-space-5);
-  background: var(--vy-surface); border: 1px dashed var(--vy-border-strong);
+  /* `border-control`, not `border-strong`. A dashed edge and one muted word are
+     the whole of this control, so its boundary is squarely the category WCAG
+     1.4.11 covers — and `border-strong` is the structure token, 1.64:1 against
+     the surface it sits on. Same correction as `.vy-chip` and `.vy-search`;
+     missed on 8 Nov because `border:check` walks resting controls on the swept
+     routes and this one only renders once a record is in edit mode. Found by
+     hand while documenting the component, 8 Nov. */
+  background: var(--vy-surface); border: 1px dashed var(--vy-border-control);
   border-radius: var(--vy-radius-sm); cursor: pointer;
   font-size: var(--vy-text-base); color: var(--vy-on-surface-muted);
 }
-.vy-people-add:hover { border-color: var(--vy-border-mid); color: var(--vy-on-surface-strong); }
+/* HOVER NO LONGER TOUCHES THE BORDER. It moved to `border-mid` at 2.58:1 —
+   a hover that makes the control's only boundary FAINTER, and below the
+   threshold the resting state had just met. The ink change carries the state;
+   the edge stays where it is measured. */
+.vy-people-add:hover { color: var(--vy-on-surface-strong); }
 .vy-people-add:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
 .vy-people-clear { min-height: var(--vy-space-10); background: none; border: 0; padding: 0 var(--vy-space-3); cursor: pointer; font-size: var(--vy-text-sm); color: var(--vy-on-surface-muted); }
 .vy-people-clear:hover { color: var(--vy-danger-text-deep); }

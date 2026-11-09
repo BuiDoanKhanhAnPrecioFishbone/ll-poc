@@ -1,13 +1,36 @@
 # Voyager IQ — Hệ thống thiết kế
 
-> **Phiên bản 1.0 · 3/11/2026**
+> **Phiên bản 1.2 · 8/11/2026**
 > Linh Long Engineering / Rocket EMS · repository `ll-poc`
 > **Nguồn chuẩn:** `src/theme/` · **Trang mẫu sống:** `/design-system`
 
 Mọi thứ trong tài liệu này đều đọc ra từ một bản build đang chạy. Mọi con số
-lấy từ source; mọi hình chụp từ ứng dụng thật ở 2× ngày 3/11/2026. Chỗ nào
-con số đến từ việc **đo màn hình** chứ không phải từ một quy tắc, tài liệu nói
-rõ.
+lấy từ source; mọi hình chụp từ ứng dụng thật ở 2×. Chỗ nào con số đến từ việc
+**đo màn hình** chứ không phải từ một quy tắc, tài liệu nói rõ.
+
+> **1.2 đổi những gì.** Bốn chỗ trong bản 1.1 kiểm chứng được và không đứng
+> vững. Số route ở [C2.3](#c23-building--còn-trên-bệ-phóng) giờ ghi rõ nguồn.
+> [B7](#b7--responsive) ghi ba breakpoint trong khi stylesheet có mười một.
+> Dòng tương phản ở [E1](#e1--khả-năng-tiếp-cận) dựa trên một bản quét duy
+> nhất ngày 5/9; `contrast:check` giờ đo lại 114 cặp token mỗi lần push, và
+> bắt được một lỗ hổng trong light theme ngay hôm đó — `subtle` giờ là một
+> giá trị đo được, xem [B1.3](#b13-màu-chữ--sáu-bậc). Và `progress` là status
+> duy nhất chưa ai làm tối, nên một lưới dark hiện đúng một chip cyan sáng
+> giữa bảy chip tối ([B1.6](#b16-bộ-từ-vựng-status)).
+>
+> Bản 1.2 cũng nói rõ file này **chưa** bao gồm những gì.
+> [A1](#a1--tài-liệu-này-là-gì) ghi phạm vi — nền móng đã đủ, component mới
+> đủ 29 trang component tính đến 8/11 — và [F4](#f4--một-bộ-bàn-giao-cần-có-gì) liệt kê những chỗ
+> thiếu so với các hệ thống đã công bố, đối chiếu lại trực tiếp trên trang
+> của họ thay vì qua blog viết về họ.
+>
+> **1.1 đổi những gì.** Thang chữ in trong bản 1.0 là khối
+> `@media (pointer: coarse)` chứ không phải giá trị mặc định — sáu giá trị,
+> đều ở [B2](#b2--chữ), in lớn hơn thực tế hai bậc. Đã sửa theo `tokens.css`.
+> B2 cũng vẫn mô tả bộ chữ thứ hai; mono đã bỏ cho mã định danh từ 13/10 theo
+> yêu cầu khách, xong hẳn 22/10, và token cùng webfont gỡ ngày 7/11. Bậc duy
+> nhất còn dưới sàn 12px là `--vy-text-2xs` (10px) đã được nâng. Ngoài ra không
+> gì đổi: 156 giá trị token còn lại vốn đã khớp chính xác.
 
 > Đây là bản tiếng Việt của `design-system.md`. Tên token, đường dẫn file, tên
 > component và **chữ hiển thị trên giao diện** giữ nguyên tiếng Anh — vì đó là
@@ -29,7 +52,8 @@ rõ.
 [B4 Hình khối và độ nổi](#b4--hình-khối-và-độ-nổi) ·
 [B5 Kích thước](#b5--kích-thước) ·
 [B6 Chuyển động](#b6--chuyển-động) ·
-[B7 Responsive](#b7--responsive)
+[B7 Responsive](#b7--responsive) ·
+[B8 Lưới layout](#b8--lưới-layout)
 
 **Phần C — Tài nguyên**
 [C1 Icon](#c1--icon) ·
@@ -68,6 +92,22 @@ nhìn có vẻ đúng**.
 Nó không phải style guide cho công cụ vẽ. Nó mô tả một hệ thống **đang chạy**:
 token là CSS custom property, component là React, và trang mẫu render đúng
 hàng thật.
+
+> **Nói rõ hiện tại nó đi được tới đâu, thay vì để người đọc tự đoán.** Phần
+> nền móng — [Phần B](#phần-b--nền-tảng) — đã đầy đủ: mọi token trong
+> `src/theme/` đều có mặt ở đây kèm giá trị đo được, và sáu phép kiểm chứng
+> minh lại chúng mỗi lần push. **Phần component thì chưa.**
+> [Phần D](#phần-d--component-và-mẫu-dựng) mô tả bốn họ — button, field, grid,
+> dialog — trên tổng số **29 component trong `src/ui`**, và mô tả bằng văn
+> xuôi chứ chưa theo dạng spec mà một hệ thống tra cứu dành cho từng
+> component: dùng khi nào, **không** dùng khi nào, cấu tạo, ma trận biến thể ×
+> trạng thái, và một cặp nên/không nên. Chỉ một component — Button — có trang
+> mẫu sống.
+>
+> Tức là: file này đủ để lấy đúng màu, chữ, khoảng cách, mật độ và hành vi
+> cho một màn mới, và đủ để review một màn. Nó **chưa** đủ để chọn đúng
+> control mà không cần đọc `src/ui`. Thiếu gì và nên lấp theo thứ tự nào thì
+> ở [F4](#f4--một-bộ-bàn-giao-cần-có-gì).
 
 ## A2 · Ba lớp
 
@@ -172,9 +212,20 @@ dưới mặt trang · `chrome` là phần khung tối **cố ý giữ tối ở
 `on-surface` là chữ thân bài; `strong` nằm trên nó, cho tiêu đề và mã định
 danh.
 
+**Một bậc được đặt theo nền xấu nhất của nó, không phải theo panel.** `subtle`
+là giá trị thứ hai trong hệ thống được chọn bằng **đo đạc** thay vì lấy từ
+ramp — sau [`--vy-border-control`](#b14-đường-kẻ), và vì cùng một lý do: không
+bậc nào đạt. grey-500 `#626d7e` đạt 4.5 trên nền trắng, nền page và panel chìm
+nhưng chỉ tới **4.02** trên `surface-strong`; grey-600 thì vọt lên 5.62, tới
+mức không phân biệt được với `muted` nữa và bậc này thôi còn là một bậc.
+`#5b6575` nằm trên đúng hue và saturation của grey-500, tối hơn một nấc, và
+đạt trên mọi nền — chặt nhất là `surface-strong` ở 4.53.
+
 > ⚠️ **`on-surface-faint` đo được 2.58:1 trên nền trắng.** Chỉ hợp lệ trên nền
 > tối, hoặc khi chữ chỉ mang tính trang trí — **không bao giờ** dùng cho thứ
-> người dùng phải đọc. Xem [E1](#e1--khả-năng-tiếp-cận).
+> người dùng phải đọc. Đây là **ngoại lệ duy nhất được khai báo** trong
+> [`contrast:check`](#e1--khả-năng-tiếp-cận); mọi cặp còn lại trong bảng đều
+> được kiểm mỗi lần push.
 
 
 
@@ -184,7 +235,7 @@ danh.
 | `--vy-on-surface` | `var(--vy-grey-800)` | `#232a34` | `#e9edf3` |
 | `--vy-on-surface-soft` | `var(--vy-grey-700)` | `#363e4b` | `#d3dae4` |
 | `--vy-on-surface-muted` | `var(--vy-grey-600)` | `#4d5766` | `#aab4c3` |
-| `--vy-on-surface-subtle` | `var(--vy-grey-500)` | `#626d7e` | `#8f9aaa` |
+| `--vy-on-surface-subtle` | `#5b6575` | — | `#8f9aaa` |
 | `--vy-on-surface-faint` | `var(--vy-grey-400)` | `#97a2b2` | `#67727f` |
 | `--vy-on-surface-invert` | `var(--vy-grey-0)` | `#ffffff` | `#0f131a` |
 | `--vy-on-chrome-muted` | `var(--vy-grey-300)` | `#c3cbd6` | `#c3cbd6` |
@@ -202,18 +253,73 @@ danh.
 quản. `border-control` là viền của thứ người dùng **thao tác được**, và nó thì
 WCAG có quản.
 
-Đây là giá trị duy nhất trong hệ thống được chọn bằng **đo đạc** chứ không
-lấy từ ramp. Bản quét ngày 5/9 cho biết lý do: thang xám **không có bậc nào
-đạt**. grey-400 `#97a2b2` được 2.58:1 trên trắng, **thiếu 0.42**; bậc kế tiếp
-lại vọt lên 5.24. `--vy-border-control` `#8a94a6` được thêm vào giữa hai bậc —
-**3.06:1**, giá trị nhạt nhất mà vẫn đạt. Nó chỉ quản viền: input, textarea,
-combobox, checkbox, radio.
+Đây là một trong **hai** giá trị trong hệ thống được chọn bằng **đo đạc** chứ
+không lấy từ ramp — cái kia là
+[`on-surface-subtle`](#b13-màu-chữ--sáu-bậc). Bản quét ngày 5/9 cho biết lý
+do: thang xám **không có bậc nào đạt**. grey-400 `#97a2b2` được 2.58:1 trên
+trắng, **thiếu 0.42**; bậc kế tiếp lại vọt lên 5.24, tới mức không phân biệt
+được với chữ nằm cạnh nó. Một giá trị được thêm vào giữa hai bậc. Nó chỉ quản
+viền: input, textarea, combobox, checkbox, radio, và bất cứ thứ gì mà **cái
+viền chính là hình dạng của nó** — chip, nút outlined, ô chọn màu.
+
+> **"Giá trị nhạt nhất mà vẫn đạt" chỉ đạt trên đúng một nền, và tới 8/11 mới
+> phát hiện.** Giá trị hồi tháng 9, `#8a94a6`, được đo trên nền trắng. Nhưng
+> một control còn nằm trên nền page, trên dải chìm, trên nền hover, trên dòng
+> đang chọn. Quét qua mọi nền ngày 8/11 thì nó đạt **đúng một cái**:
+>
+> | surface | subtle | app | hover | selected | sunken | strong |
+> |---|---|---|---|---|---|---|
+> | 3.06 | 2.98 | 2.85 | 2.85 | 2.78 | 2.65 | 2.35 |
+>
+> Đó là lý do một checkbox đo ra **2.85** trong bản quét control trong khi
+> kendo-bridge đã trỏ đúng token từ lâu: **token đúng, giá trị thiếu**. Một
+> cái viền phải được đặt theo **nền xấu nhất của nó**, cùng luật với một bậc
+> chữ. `#758096` là giá trị nhạt nhất trên cùng đường hue và saturation mà
+> đạt 3 trên tất cả, chặt nhất là **3.05** trên `surface-strong`.
+> `contrast:check` giờ đo mọi đường biên trên **mọi nền** thay vì chỉ trên
+> panel, nên chuyện này không quay lại được.
+
+> **Rồi đúng lỗi đó, dịch sang một trạng thái — 9/11.** 1.4.11 nói về viền
+> control **và các trạng thái của nó**, mà cả hai phép kiểm đều chỉ đo lúc
+> nghỉ: một cái đọc bảng màu, một cái quét trang không ai trỏ chuột vào.
+> `.vy-input:hover` và `.vy-sup-btn:hover` vẽ viền bằng `--vy-border-heavy`,
+> và chú thích cạnh rule tự giải thích — chỉ đúng ở light: *"grey-500, chứ
+> không phải grey-400; viền lúc nghỉ giờ đậm hơn grey-400, nên hover cũ lại
+> nhạt hơn chính cái trạng thái nó muốn nhấn."* Đúng trên nền trắng. Trong
+> dark, viền lúc nghỉ là `#707c8d` và grey-500 **đậm hơn** nó, nên cùng một
+> dòng khai báo vừa làm hover mờ hơn lúc nghỉ, vừa tụt dưới ngưỡng: đo trên
+> bản đang chạy là **2.68** trên panel, 2.41 trên panel nổi, **2.02** trên
+> `surface-strong`.
+>
+> **Một giá trị không làm được cả hai việc**, y như lý lẽ
+> [B1.5](#b15-brand-và-danger) đã ghi về nền và chữ: *dễ thấy hơn* nghĩa là
+> đậm hơn trên trắng và nhạt hơn trên gần đen. Nên viền hover là một role
+> riêng. Light lấy grey-500 từ ramp — 5.24 trên panel so với 3.97 lúc nghỉ,
+> nên **light không đổi gì**. Dark thì không có bậc nào dùng được: grey-500 và
+> `border-mid` đậm hơn viền lúc nghỉ, còn grey-400 lại nhạt hơn
+> `on-surface-subtle`, tức là viền hover sẽ sáng hơn chữ mờ nhất trên trang.
+> `#858f9e` lên một nốt trên đúng đường hue và saturation của
+> `border-control` — **5.23** trên panel, **3.95** trên `surface-strong`,
+> lệch 0.07 so với con số light nhận được. Hai theme giờ cùng cho biên hover
+> khoảng 4:1 trên nền xấu nhất của mình.
+>
+> Đo trên `.vy-input`, hai theme, đã tắt transition:
+>
+> | | nghỉ | hover, trước | hover, sau | focus, trước | focus, sau |
+> |---|---|---|---|---|---|
+> | light | 3.97 | 5.24 | 5.24 | 4.48 | **6.82** |
+> | dark | 4.04 | **2.68** | **5.23** | 3.82 | **9.58** |
+>
+> `border:check` giờ quét **ba trạng thái**, nên lần sau không phải tìm bằng
+> tay. Danh sách đầy đủ, cùng ba trạng thái mang bởi thuộc tính mà nó vẫn
+> không với tới, nằm trong [`vien-state-09nov.md`](vien-state-09nov.md).
 
 
 
 | Token | Giá trị | Phân giải ra | Dark |
 |---|---|---|---|
-| `--vy-border-control` | `#8a94a6` | — | `#6d7889` |
+| `--vy-border-control` | `#758096` | — | `#707c8d` |
+| `--vy-border-control-hover` | `var(--vy-grey-500)` | `#626d7e` | `#858f9e` |
 | `--vy-border-faint` | `var(--vy-grey-100)` | `#eceff3` | `#212936` |
 | `--vy-border` | `var(--vy-grey-200)` | `#dde2e9` | `#2a323f` |
 | `--vy-border-strong` | `var(--vy-grey-300)` | `#c3cbd6` | `#3b4553` |
@@ -227,6 +333,19 @@ combobox, checkbox, radio.
 Màu nền và màu chữ là **hai vai trò tách biệt**, vì ở theme tối chúng kéo
 ngược chiều nhau: nền phải đủ tối để chữ trên nó đọc được, còn chữ brand phải
 đủ sáng để đọc trên trang. Theme tối **đảo cặp** chứ không dịch chuyển nó.
+
+**Các đường biên cũng vậy, và một cái bị bỏ sót.** `boundary-strong` nghĩa là
+nhấn hơn `boundary` một bậc — đậm hơn ở light, nhạt hơn ở dark. Nó là **viền**
+focus của mọi ô gõ chữ, của khung rich text và của mọi ô bảng sửa được. Khi
+**vòng** focus rời blue-400 ngày 8/11 vì đo ra 2.88 trên `surface-strong`, cái
+viền vẫn giữ nguyên blue-400: trong dark, "strong" đậm hơn `boundary` thường,
+nên yếu hơn nó. Hai token được đo trong cùng một lượt và chỉ một cái được
+sửa. blue-200 trả lại quan hệ đúng — chặt nhất **7.22** — ngày 9/11.
+
+`boundary-soft` và `boundary-light` vẫn dưới 3:1, và là có chủ ý: chúng vẽ
+viền banner, khung verdict và một đường kẻ ngang, thứ 1.4.11 không nói tới.
+Dù vậy vẫn có hai control đang trỏ sai vào chúng, và lượt quét trạng thái tìm
+ra cả hai.
 
 
 
@@ -243,10 +362,10 @@ ngược chiều nhau: nền phải đủ tối để chữ trên nó đọc đ�
 | `--vy-brand-subtle-strong` | `var(--vy-blue-100)` | `#dae2f3` | `#223357` |
 | `--vy-brand-light` | `var(--vy-blue-400)` | `#4973d4` | `#7f9ce1` |
 | `--vy-brand-soft` | `var(--vy-blue-500)` | `#2754bc` | `#4973d4` |
-| `--vy-brand-boundary` | `var(--vy-blue-400)` | `#4973d4` | `#4973d4` |
+| `--vy-brand-boundary` | `var(--vy-blue-400)` | `#4973d4` | `#7f9ce1` |
 | `--vy-brand-boundary-soft` | `var(--vy-blue-200)` | `#b0c2ea` | `#2754bc` |
 | `--vy-brand-boundary-light` | `var(--vy-blue-300)` | `#7f9ce1` | `#7f9ce1` |
-| `--vy-brand-boundary-strong` | `var(--vy-blue-500)` | `#2754bc` | `#4973d4` |
+| `--vy-brand-boundary-strong` | `var(--vy-blue-500)` | `#2754bc` | `#b0c2ea` |
 
 
 
@@ -265,6 +384,17 @@ ngược chiều nhau: nền phải đủ tối để chữ trên nó đọc đ�
 
 Tám status, mỗi cái là một cặp chữ/nền.
 
+Các cặp dark được **dựng** chứ không chọn tay: chữ chạy giữa `96` và `ee`,
+nền giữa `1e` và `38`, kênh màu ở giữa mang hue. Mọi cặp rơi vào khoảng
+6.16:1 đến 9.30:1.
+
+> **`progress` mới nhập hội ngày 8/11.** Bảy status đã đảo cho dark, riêng nó
+> giữ nguyên cặp sáng, nên một lưới dark hiện đúng một chip cyan sáng trưng
+> giữa bảy chip tối. Đáng nhớ vì đây vẫn là cặp gần nhau nhất trong bộ từ
+> vựng: `progress` và `review` cách nhau 1.5° hue ở light và 6° ở dark, và thứ
+> tách chúng ra là **chữ**. Nếu sau này hai cái bị nhầm trên màn hình thì lời
+> giải là đổi hue cho một trong hai, không phải làm cyan tối thêm.
+
 > **Status là một chữ kèm một màu, không bao giờ là màu không thôi.** Chính
 > cặp đó mới làm nó đọc được với người không phân biệt được sắc độ.
 
@@ -278,8 +408,8 @@ Tám status, mỗi cái là một cặp chữ/nền.
 | `--vy-status-draft-bg` | `var(--vy-grey-100)` | `#eceff3` | `#2a323f` |
 | `--vy-status-open-fg` | `#92400e` | — | `#eeb796` |
 | `--vy-status-open-bg` | `#fef3c7` | — | `#38281e` |
-| `--vy-status-progress-fg` | `#155e75` | — | *(same)* |
-| `--vy-status-progress-bg` | `#cffafe` | — | *(same)* |
+| `--vy-status-progress-fg` | `#155e75` | — | `#96e4ee` |
+| `--vy-status-progress-bg` | `#cffafe` | — | `#1e3838` |
 | `--vy-status-done-fg` | `#065f46` | — | `#96eed5` |
 | `--vy-status-done-bg` | `#d1fae5` | — | `#1e3831` |
 | `--vy-status-waiting-fg` | `#5b21b6` | — | `#b896ee` |
@@ -290,13 +420,53 @@ Tám status, mỗi cái là một cặp chữ/nền.
 | `--vy-status-blocked-bg` | `var(--vy-red-50)` | `#fdeceb` | `#38201e` |
 | `--vy-status-cancelled-fg` | `var(--vy-grey-500)` | `#626d7e` | `#aab4c3` |
 | `--vy-status-cancelled-bg` | `var(--vy-grey-100)` | `#eceff3` | `#2a323f` |
+| `--vy-chart-cancelled` | `var(--vy-grey-700)` | `#363e4b` | `#5d6878` |
 | `--vy-status-slot-w` | `104px` | — | *(same)* |
+
+> **Một mảng màu không mang chữ thì lấy nửa `-fg`, không phải nửa `-bg`.**
+> Biểu đồ ở Home vẽ từng series bằng chính bộ từ vựng này, mà một mảng biểu đồ
+> không phải một chip: `-bg` nhạt là có chủ đích, vì chữ nằm lên nó. Đo ngày
+> 9/11, series In-Progress đang đọc `--vy-status-progress-bg` và ra **1.12:1**
+> trên card light, **1.37:1** trên card dark. Năm mảng màu của biểu đồ giờ nằm
+> trong `contrast:check` đúng vì lý do đó — trước nay chưa phép đo nào chạm tới
+> một hình khối không có chữ.
+>
+> `--vy-chart-cancelled` là giá trị duy nhất chỉ dùng cho biểu đồ. Ở dạng
+> badge, New và Cancelled nằm hai dòng khác nhau nên xám gần giống nhau không
+> tốn gì; trong một cột xếp chồng thì chúng chạm nhau, mà hai màu xám badge chỉ
+> cách nhau 1.35:1 ở light và **giống hệt** ở dark. Bộ token badge là đặc tả
+> của khách, giữ nguyên. Xem [Dashboard](patterns/dashboard.md).
 
 
 ### B1.7 Tone dòng và màu nhấn
 
 Tone là **trạng thái của một dòng trong báo giá**, không phải mức độ nghiêm
 trọng. Ba tone tô phần lớn lưới BoM, và chú giải dưới lưới gọi tên đủ cả ba.
+
+**Màu hổ phách làm ba việc, và được phép nhờ hai luật.** Cùng một `#fef3c7`
+vừa là status `open`, vừa là tone dòng `short`, vừa là tone `known-mfg`. Phản
+đối thì tự nó hiện ra — *vàng phải có nghĩa cảnh báo, không gì khác* — nên
+đây là câu trả lời **đo được**, không phải khẳng định suông:
+
+1. **Chúng không bao giờ gặp nhau.** `short` tô lưới Quoting và Quote Result,
+   `known-mfg` tô Review BoM, và **không lưới nào trong số đó có cột status**
+   — đã kiểm chứ không đoán: zero cột `role: 'status'` ở cả hai. Một pill hổ
+   phách và một dòng hổ phách không thể cùng xuất hiện trên một màn.
+2. **Mọi lưới hổ phách đều có chú giải** gọi tên nghĩa của nó, trên chính màn
+   đó. Một màu chỉ tác giả giải mã được là một màu không có nghĩa gì; một màu
+   có chú giải bên cạnh là một màu có đúng một nghĩa.
+
+Thứ mà cả ba cùng mang là **cần để ý, chưa có gì hỏng** — đó là lý do
+`blocked` và `missing` dùng đỏ chứ không phải một sắc hổ phách đậm hơn.
+
+**Chọn sắc hổ phách nào.** `--vy-accent-warning` `#b45309` là mặc định, có
+mười hai chỗ dùng; `--vy-accent-caution` `#d97706` có **một**, là viền
+composer ở chế độ email. Hai màu cách nhau 17.9 ΔE nên phân biệt được thật —
+đây không phải một cặp trùng lặp — nhưng hệ thống chưa bao giờ nói nên lấy
+cái nào, và đã hai lần một comment trong code phải quyết hộ. Giờ ghi rõ:
+**`warning` cho mọi thứ người dùng cần xử lý, `caution` chỉ khi hai mức hổ
+phách xuất hiện cùng nhau và mức thấp hơn cần lùi lại.** Hôm nay đúng một chỗ
+như vậy. Một token có một chỗ dùng và không có luật là cách một bảng màu trôi.
 
 
 
@@ -350,10 +520,20 @@ trị — và các cặp status vẫn đọc được chứ không bị đảo m
 
 ## B2 · Chữ
 
-Hai bộ chữ. **Inter Variable** cho mọi thứ; **JetBrains Mono** cho mã định
-danh phải đọc thành lời hoặc so từng ký tự — part number, MPN, mã lỗi. Chữ
-thân bài **không bao giờ** dùng mono — ở 13px nó khó đọc hơn, và không có gì
-trong một câu văn cần bề rộng ký tự cố định.
+**Một bộ chữ duy nhất.** Inter Variable, ở mọi nơi, tự host — không gọi sang
+Google và không nháy chữ dự phòng.
+
+Từng có bộ thứ hai. **JetBrains Mono** dùng cho mã định danh: part number,
+MPN, số RFQ và số assembly. Buổi review **13/10** kết thúc việc đó — *"do not
+use monotext, hard to read"* — `.vy-ident` được viết lại ngay hôm đó, và chỗ
+sót cuối cùng là các lưới MiniTable trong Run Quotation thì xong ngày
+**22/10**. Cũng ngày 22/10 khách nói rõ mono vốn để **làm gì**: một giá trị
+duy nhất thì không nên trông giống một trường bình thường. Vậy yêu cầu thật là
+**sự nổi bật, không phải một bộ chữ** — và nổi bật thì rẻ hơn một font thứ
+hai. Mã định danh giờ dùng semibold, mực đậm, kèm `tabular-nums` — thứ vẫn
+luôn là cái giữ các chữ số thẳng cột. Người thuộc catalogue đọc part number
+như một **từ**; ở 12–13px trong lưới dày, chính mặt chữ mono mới là thứ làm họ
+chậm lại. Token và webfont được gỡ ngày **7/11**.
 
 ![Thang chữ](assets/design-system/type-scale.png)
 
@@ -362,13 +542,12 @@ trong một câu văn cần bề rộng ký tự cố định.
 | Token | Giá trị |
 |---|---|
 | `--vy-font-sans` | `"Inter Variable", "Inter", system-ui, -apple-system, "Segoe UI", Arial, sans-serif` |
-| `--vy-font-mono` | `"JetBrains Mono", ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace` |
 | `--vy-text-2xs` | `12px` |
-| `--vy-text-xs` | `13px` |
-| `--vy-text-sm` | `14px` |
-| `--vy-text-base` | `15px` |
-| `--vy-text-md` | `16px` |
-| `--vy-text-lg` | `18px` |
+| `--vy-text-xs` | `12px` |
+| `--vy-text-sm` | `12px` |
+| `--vy-text-base` | `13px` |
+| `--vy-text-md` | `14px` |
+| `--vy-text-lg` | `16px` |
 | `--vy-text-xl` | `20px` |
 | `--vy-text-2xl` | `24px` |
 | `--vy-text-3xl` | `28px` |
@@ -379,12 +558,43 @@ trong một câu văn cần bề rộng ký tự cố định.
 | `--vy-weight-heavy` | `700` |
 
 
-**Thang chữ dịch lên trên thiết bị cảm ứng.** Dưới `@media (pointer: coarse)`,
-dải chữ thân bài tăng đều **+2px** — thành 12, 13, 14, 15, 16, 18 thay vì 10,
-11, 12, 13, 14, 16 — giữ nguyên mọi tương quan và nâng bậc nhỏ nhất lên mức
-đọc được là 12. Các cỡ tiêu đề (`xl` trở lên) **không đổi**: chúng vốn đã thoải
-mái, và phóng to tiêu đề trên màn 375px không được gì mà còn tốn một dòng
-xuống hàng.
+**Năm độ đậm, và ba cái trên cùng cách nhau rất sát — có chủ đích, và đã đo.**
+"650 với 700 quá gần 600" là phản đối hiển nhiên, nên nó được **đo** chứ
+không tranh luận: cùng một chuỗi chữ ở 13px, Inter Variable, đo bề rộng và
+lượng mực.
+
+| | 400 | 500 | 600 | 650 | 700 |
+|---|---|---|---|---|---|
+| bề rộng | 234.30 | 237.03 | 239.76 | 241.12 | 242.48 |
+| mực | 111k | 128k | 146k | 154k | 162k |
+| bước | — | +15.7% | +13.4% | **+5.6%** | **+5.5%** |
+
+Cả năm đều khác nhau thật — Inter Variable chạy 100–900, không có bậc nào bị
+làm tròn về bậc khác — nhưng hai bước trên cùng chỉ bằng **khoảng một phần
+ba** các bước dưới. Nên luật trung thực không phải "năm độ đậm thay nhau":
+
+| Độ đậm | Việc | Số chỗ dùng |
+|---|---|---|
+| `regular` 400 | Chữ thân bài | 22 |
+| `medium` 500 | Nhãn, nút, link cần giữ dòng | 59 |
+| `semibold` 600 | **Mức nhấn mặc định.** Mã định danh, tiêu đề nhóm, tổng | 112 |
+| `bold` 650 | Tiêu đề trang hoặc tiêu đề record, khi 600 đã dùng ngay cạnh | 42 |
+| `heavy` 700 | Con số **là** lý do tồn tại của ô đó — KPI, số đếm hàng chờ | 12 |
+
+Mặc định lấy 600. Chỉ dùng 650 và 700 khi có thứ ở 600 nằm **ngay cạnh** và
+phải lùi lại; ở bước 5% chúng không tự mình đọc ra là nhấn mạnh.
+
+
+**12px là sàn**, thống nhất với khách ngày 22/10. Trước đó là 11px; small-text
+check của mình vốn đã cảnh báo mọi thứ dưới 12 từ lâu. Cái sàn này làm **đáy
+thang bị gộp** — `2xs`, `xs` và `sm` cùng nằm trên nó, ba cái tên mang một cỡ.
+Giữ cả ba tên vì chúng mang nghĩa khác nhau: badge, nhãn, và chữ phụ.
+
+**Ngón tay làm đáy thang tách ra lại.** Dưới `@media (pointer: coarse)`, ba bậc
+đáy tách thành 12, 13, 14, và mọi bậc trên đó tăng +2 — thành 15, 16, 18. Các
+cỡ tiêu đề (`xl` trở lên) **không đổi**: chúng vốn đã thoải mái, và phóng to
+tiêu đề trên màn 375px không được gì mà còn tốn một dòng xuống hàng. Sàn 12px
+không bị vượt qua theo chiều nào.
 
 ### Viết hoa — ba cấp, vẽ khác nhau có chủ đích
 
@@ -610,12 +820,32 @@ tức là nó nói một điều khác với ý nghĩa của trạng thái. Nên
 Breakpoint viết bằng pixel thô vì `@media` không đọc được custom property —
 một ngoại lệ có ghi chép của luật "không dùng số ma thuật".
 
+**Ba cái là của shell**, nằm trong `responsive.css`, và là ba cái đáng thuộc:
+
 | Bề rộng | Đổi gì |
 |---|---|
 | ≤ **1180px** | Sidebar 248px thu thành thanh icon 56px |
 | ≤ **980px** | Các vùng hai cột xếp chồng |
 | ≤ **820px** | Sidebar rời khỏi dòng chảy; một nút menu gọi nó ra |
-| `pointer: coarse` | Thang chữ +2px ở dải thân bài; sàn vùng chạm 44px |
+| `pointer: coarse` | Đáy thang chữ giãn ra lại; sàn vùng chạm 44px |
+
+**Tám cái còn lại là breakpoint của component** — con số thật là **mười
+một**, không phải ba. Component nào cần thì tự đo và mang theo số đo của nó —
+luật 4 của [A3](#a3--năm-luật-trước-khi-dựng) — thay vì bị bẻ cho vừa một bề
+rộng shell mà nó không liên quan:
+
+| Bề rộng | Ở đâu | Trả lời cho việc gì |
+|---|---|---|
+| ≤ **1100px** | top bar, dải tab | Bỏ bộ chọn múi giờ; đồng hồ vẫn ghi rõ múi |
+| ≤ **900px** | top bar, tóm tắt chi phí, thanh submit | Bỏ đồng hồ; khối tiền 2fr/1fr xếp chồng trước khi các con số thôi thẳng cột |
+| ≤ **860px** | header record | |
+| ≤ **840px** | stepper wizard | Bốn bước có nhãn cần ~760px; dưới ngưỡng đó nhãn bị cắt, mà một tên bước bị cắt còn tệ hơn không có |
+| ≤ **720px** | thân trang | Điện thoại thật, hoặc một cửa sổ thấp thật |
+| ≤ **700px** | stepper, cột link | Chỉ bước hiện tại giữ nhãn; các bước khác còn lại cái marker, vẫn thấy vị trí và vẫn bấm được |
+| ≤ **620px** | header record | |
+| ≤ **560px** | dải filter | Một dải neo phải ở bề rộng này sẽ đọc ra như bị cắt mất |
+
+Hai cái — 860 và 620 — chưa có ghi chú, mà luật 4 nói là phải có.
 
 Hệ thống chạy trên terminal ngoài xưởng, thường 1366×768 hoặc hẹp hơn. Dưới
 khoảng 1100px thì một sidebar 248px thôi làm nhiệm vụ định hướng và bắt đầu
@@ -630,6 +860,172 @@ cột** chứ không bóp chúng lại:
 ![1100px — sidebar thu thành thanh icon](assets/design-system/responsive-1100.png)
 
 ![760px — sidebar nằm sau một nút menu](assets/design-system/responsive-760.png)
+
+
+---
+
+## B8 · Lưới layout
+
+Một trang trong app này, theo chiều ngang, là ba thứ: sidebar, hai máng, và
+hộp nội dung. [B7](#b7--responsive) nói sidebar đổi cỡ lúc nào; mục này nói
+hộp nội dung làm gì với điều đó, và nó được phép to tới đâu.
+
+Viết ngày **9/11/2026**, và đây là mục cấu trúc cuối cùng hệ thống còn thiếu.
+Mọi thứ dưới đây là **đo**, không phải chọn: `grid:check` quét **6 route × 12
+bề rộng** và các con số trong mục này là kết quả của nó.
+
+### B8.1 Cái gì ăn bề rộng trước khi tới nội dung
+
+Đo dưới dạng một đẳng thức chứ không phải một công thức, để dời breakpoint
+cũng không làm mục này sai:
+
+> **rail + máng + nội dung = viewport.** Không thứ gì khác được lấy phần.
+
+| Viewport | Rail | Máng | Nội dung |
+|---|---|---|---|
+| ≤ 820px | 0 — sidebar là `fixed`, nằm ngoài màn hình | 2 × 14 | vw − 28 |
+| 821–1180px | 56 — rail chỉ còn icon | 2 × 14 | vw − 84 |
+| ≥ 1181px | 248 — có nhãn | 2 × 24 | vw − 296, tới trần |
+
+Hộp nội dung, đo trên từng dạng trang:
+
+| vw | 375 | 600 | 768 | 820 | 900 | 980 | 1100 | 1180 | 1280 | 1366 | 1440 | 1920 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| **danh sách** | 347 | 572 | 740 | 792 | 816 | 896 | 1016 | 1096 | 984 | 1070 | 1144 | **1624** |
+| **mọi dạng khác** | 347 | 572 | 740 | 792 | 816 | 896 | 1016 | 1096 | 984 | 1070 | 1132 | **1132** |
+
+### B8.2 Bậc ở 1180 là một bậc **âm**, và nó là bậc duy nhất
+
+Đọc lại hàng trên ở hai bề rộng kẹp quanh nó.
+
+> Ở **1180px** hộp nội dung rộng **1096px**. Ở **1280px** nó còn **984px**.
+> Cửa sổ rộng thêm 100px và trang **mất 112px**.
+
+Vượt 1180 đi lên, rail từ 56 → 248 và máng từ 14 → 24: **lấy đi 212px, cho
+lại 100px**. Hệ quả không phải lý thuyết — một laptop 1366, loại máy sản phẩm
+này chạy trên đó nhiều nhất, hiển thị **1070px** nội dung, trong khi một
+terminal 1180 được **1096px**.
+
+**Đây là một đánh đổi, không phải một lỗi.** Rail có nhãn chính là phần định
+hướng mà quyết định D1 mua, và là thứ buổi review 25/8 yêu cầu; phương án
+ngược lại là mọi laptop trong công ty chỉ còn rail icon. Và người dùng có một
+lối thoát đáng **192px** — nút thu gọn, chỉ xuất hiện trên 1180 vì dưới mức đó
+rail vốn đã thu gọn sẵn.
+
+Breakpoint xoá hẳn được bậc này là **1392px**, không phải 1180: trên breakpoint
+nội dung là `vw − 296`, nên cửa sổ phải tới 1392 thì rail mở mới "trả đủ tiền"
+cho chỗ nó chiếm. Dời tới đó nghĩa là mọi màn 1366 mất rail có nhãn — tức là
+chọn nhầm nửa của đánh đổi.
+
+Thay vào đó hệ thống **khai báo** bậc này, và `grid:check` sẽ đỏ nếu xuất hiện
+một bậc thứ hai ở bất kỳ đâu.
+
+### B8.3 Bốn dạng trang, và tới 9/11 mới chỉ hai dạng có bề rộng
+
+| Dạng | Dùng ở | Trần |
+|---|---|---|
+| `.vy-page--grid` | Mọi màn danh sách | **không có, cố ý** |
+| `.vy-page--record` | Bản ghi RFQ | `--vy-record-max-w` |
+| `.vy-page--doc` | Design system, Audit, Sitemap | `--vy-doc-max-w` |
+| `.vy-page` | Home, My Queues, Placeholder | **trước là không có — giờ là `--vy-page-max`** |
+
+Cả ba trần đều là **1180px**, và hai token có tên giờ trỏ về `--vy-page-max`,
+nên chỉ còn một giá trị chứ không phải ba giá trị tình cờ bằng nhau.
+
+**Dạng danh sách không có trần, và điều đó phải giữ nguyên tư cách một quyết
+định.** Lưới rộng nhất trong sản phẩm này là **1806px** ở view mặc định —
+Project Requirements, 12 cột theo bề rộng role của
+[B5.3](#b53-role-cột--bề-rộng-chọn-một-lần-theo-vai-trò) — và **2106px** khi bật hết
+cột, là Part Master với 16 cột. Bất kỳ trần nào thấp hơn hai con số đó đều tạo
+ra cuộn ngang trên một cửa sổ vốn đủ rộng để không phải cuộn. Bản thân bề rộng
+role thì đúng ở mọi width: đo ở 2560px, bảng vẫn là 1806px và mỗi cột vẫn đúng
+bề rộng đã khai, nên màn 2560 hiện trọn lưới và phần khung còn lại để trống.
+
+**Mọi dạng khác đều có trần, và luật gốc là chỗ mang nó** — nên một trang
+không khai báo gì giờ nhận bề rộng dè dặt thay vì bề rộng vô hạn. Chính phép
+đảo đó mới là điểm chính: trước đây mặc định là vô hạn.
+
+Cái giá của việc không có trần thì đo được, trên hai màn dashboard:
+
+| Ở viewport 1920 | Không trần | Có trần |
+|---|---|---|
+| Cột biểu đồ | 127px, chứa một thanh 28px — **99px khoảng không giữa hai thanh** | 85px, cách nhau 57px |
+| Ô hàng đợi | **397px** cho một con số một chữ và hai dòng ngắn | 274px |
+
+Một trang không có lưới để lấp thì không có gì để tiêu bề rộng, và mười hai
+thanh rải trên 1600px thôi đọc ra thành một chuỗi.
+
+![Trần nội dung ở 1920](assets/components/layout-cap.png)
+
+**Canh trái, không canh giữa.** Màn danh sách tràn hết bề ngang, nên nếu canh
+giữa dashboard thì tiêu đề trang sẽ nhảy sang phải mỗi khi đi từ một lưới về
+Home. Tiêu đề bắt đầu ở cùng một toạ độ x trên mọi màn; phần bề rộng không
+dùng thì cứ để đó.
+
+### B8.4 Cột — một lối viết, mười sáu giá trị tối thiểu
+
+Ở đây **không có lưới 12 cột**, và đó là chủ đích. Một số cột cố định giả định
+hộp nội dung có bề rộng ổn định; hộp này đổi 640px trong dải trên, mất 112px ở
+một bậc, và bị chặn trần ở bốn trên năm dạng. **Mười sáu lưới layout, tất cả
+cùng một lối viết:**
+
+```css
+grid-template-columns: repeat(auto-fit, minmax(var(--some-min), 1fr));
+```
+
+Các track bằng nhau, chúng lấp kín hàng ở mọi số lượng và mọi bề rộng, và cái
+sàn mới là thứ quyết định khi nào hàng xuống dòng. Nên con số duy nhất mà một
+lưới layout phải chọn là **bề rộng mà dưới đó nội dung của nó thôi đọc được** —
+và đó là tính chất của **nội dung**, không phải của lưới. Một ô đếm và một
+nhóm trường form không cùng ngưỡng không-đọc-được, nên chúng không dùng chung
+một con số.
+
+| Lưới | Token tối thiểu | Tối thiểu | Máng cột | Nó chứa gì |
+|---|---|---|---|---|
+| `.vy-kpi-row` | `--vy-kpi-min-w` | 140px | 8px | Ô đếm trên một danh sách |
+| `.vy-bom-summary` | `--vy-stat-min-w` | 150px | 10px | Số liệu trên một BoM |
+| `.vy-run-ref .vy-quote-config-grid` | `--vy-quote-ref-field-min` | 150px | kế thừa | Trường tham chiếu, khung hẹp |
+| `.vy-stat-row` | `--vy-stat-min-w` | 150px | 10px | Số liệu trong dải tóm tắt |
+| `.vy-assy-grid` | `--vy-assy-field-min` | 170px | kế thừa | Trường của assembly |
+| `.vy-contact-fields` | `--vy-contact-field-min` | 180px | 10px | Trường liên hệ |
+| `.vy-filter-fields` | `--vy-filter-field-min` | 190px | 12px | Trường lọc |
+| `.vy-quote-context-fields` | `--vy-quote-fact-w` | 190px | 10px | Thông tin ngữ cảnh báo giá |
+| `.vy-record-fields` | `--vy-header-field-min` | 190px | 16px | Thông tin ở đầu bản ghi |
+| `.vy-assignees` | `--vy-card-min-w` | 200px | kế thừa | Thẻ người phụ trách, khi xếp dọc |
+| `.vy-queue-row` | `--vy-card-min-w` | 200px | 12px | Thẻ hàng đợi |
+| `.vy-radios--tiles` | `--vy-radio-tile-min` | 230px | 10px | Ô radio dạng tile |
+| `.vy-quote-config-grid` | `--vy-quote-field-min` | 240px | 16px | Trường cấu hình báo giá |
+| `.vy-header-groups` | `--vy-header-group-min` | 260px | 12px | Nhóm ở đầu bản ghi |
+| `.vy-field-groups` | `--vy-field-group-min` | 280px | 20px | Nhóm trường trong form |
+| `.vy-notes-edit` | `--vy-note-min-w` | 320px | 16px | Hai ô soạn ghi chú cạnh nhau |
+
+Mười một giá trị tối thiểu khác nhau và sáu máng cột khác nhau, và hệ thống
+**không** ép chúng về một thang. Nó công bố danh mục: một lưới mới chọn một
+dòng trong đó, hoặc tự đo và ghi lại lý do —
+[A3](#a3--năm-luật-trước-khi-dựng) luật 4, đúng luật mà
+[B7](#b7--responsive) áp cho breakpoint. Thứ `grid:check` bắt buộc là giá trị
+tối thiểu phải là một **token**, để một giá trị thứ mười bảy không thể lọt vào
+dưới dạng số trần trong một rule.
+
+### B8.5 `grid:check` đo cái gì
+
+`node scripts/with-server.mjs grid:check` · **72 lượt đo**, 6 route × 12 bề
+rộng, nằm trong `check:visual` mỗi lần push.
+
+| | |
+|---|---|
+| **Đẳng thức** | rail + máng + nội dung = viewport, ở mọi bề rộng. Không thứ gì khác được lấy phần |
+| **Trần** | Một dạng có trần không bao giờ vượt `--vy-page-max` |
+| **Quyền không có trần** | Dạng danh sách vẫn không bị chặn ở bề rộng lớn nhất quét được — để quyết định ở B8.3 không thoái hoá thành một chỗ bỏ sót |
+| **Một bậc** | Bề rộng nội dung không bao giờ giảm khi viewport tăng, trừ khoảng 1180 → 1280 |
+| **Token** | Mọi giá trị tối thiểu của `auto-fit` là một `var()`, không bao giờ là số trần |
+
+Mỗi lần chạy có hai lỗi gài sẵn — một cái trần ép lên dạng danh sách, và một
+giá trị tối thiểu viết trần — và lượt chạy sẽ hỏng nếu bỏ sót bất kỳ cái nào.
+
+> Thứ nó **cố ý không** kiểm là tràn ngang của trang. `mobile:check` giữ việc
+> đó, cùng 198 phát hiện tablet còn mở; nhân đôi chúng ở đây chỉ làm phép kiểm
+> này đỏ vì một lý do chẳng liên quan gì tới lưới.
 
 ---
 ---
@@ -720,7 +1116,7 @@ khác biệt đó phải thấy được trước khi đọc tiêu đề.
 
 | | |
 |---|---|
-| Ở đâu | `Placeholder`, trả lời cho mọi route chưa dựng (~70 trên 91) |
+| Ở đâu | `Placeholder`, trả lời cho mọi route chưa dựng — **71 trên 82 đích đến** của menu live (`src/data/sitemap.ts`: 91 mục `path`, 82 đích phân biệt; `App.tsx` khai báo 21 route thật và một catch-all) |
 | Chuyển động | Cánh tay 4s · tia lửa chỉ khi tay đang tì vào mối hàn · checklist 6s |
 | Khi giảm chuyển động | Tia lửa và hai tick đầu **giữ bật**, để bức hình vẫn nói "đang được dựng" |
 
@@ -776,7 +1172,83 @@ Mỗi lớp bọc đều có lý do, và luật sinh ra chúng lúc nào cũng g
 **hệ thống live đã có sẵn KendoReact, nên câu hỏi không bao giờ là "cái này
 nên trông thế nào" mà là "Kendo đã làm được gì, và mình phải thêm gì".**
 
+### Trang component
+
+Mỗi trang là một spec đầy đủ — dùng khi nào và **không** dùng khi nào, cấu
+tạo, biến thể và trạng thái, chữ nghĩa, hành vi, khả năng tiếp cận, API, và
+nhật ký thay đổi riêng. **Đủ cả 29.** [`button.md`](components/button.md)
+là trang mẫu; phần D bên dưới là bản văn xuôi cũ và mỏng hơn mà nó thay thế.
+
+| Trang | Trạng thái | Viết ra thì tìm thấy gì |
+|---|---|---|
+| [Button](components/button.md) | stable | Chỉ báo busy đo được 1.19:1 trên `filled`, đã sửa |
+| [Status badge](components/badge.md) | stable | `review` có màu nhưng không có đường nào render; comment trong file ghi sáu token, thực tế bảy |
+| [Chip](components/chip.md) | **trial** | Viền lúc nghỉ 1.64:1 và thiếu `aria-pressed`, đều ở trạng thái unselected — đã sửa |
+| [Filter toolbar](components/filter-toolbar.md) | stable | Hai thứ nó **cố ý không làm**, giờ đã ghi ra: không có toán tử, không có luồng thêm điều kiện |
+| [Column chooser](components/column-chooser.md) | stable | 6 trên 11 cột là bắt buộc — một bộ chọn mà quá nửa hàng không đổi được thì gần với danh mục hơn |
+| [View picker](components/view-picker.md) | stable | Khoá theo `id` chứ không theo `name`: hai view có thể trùng tên, và bản migration suýt làm hỏng điều đó |
+| [Pager](components/pager.md) | stable | Thay cuộn vô hạn trên 21.941 bản ghi — đánh đổi được ghi ra, gồm cả cái giá phải trả |
+| [Priority](components/priority.md) | stable | Mã hoá bằng độ đậm và hình dạng, không bằng sắc màu: ba mức vẫn tự xếp hạng khi mất màu |
+| [More menu](components/more-menu.md) | stable | Khách yêu cầu 8/10 **và** mình đo được độc lập — Cancel RFQ cách Run Quotation 69px |
+| [Field](components/field.md) | stable | 91 chỗ dùng, nhiều nhất sản phẩm — kèm luật hint/error để hai dòng không cùng giành một việc |
+| [Select](components/select.md) | stable | Cố ý **từ chối** giá trị ngoài danh sách: Customer là một lookup |
+| [Dialog](components/dialog.md) | stable | Ba lớp chồng nhau trước đây đúng chỉ nhờ thứ tự mount — và Minimize cố ý không làm |
+| [Tabs](components/tabs.md) | stable | Khoá theo value, không theo index: đảo thứ tự mảng không thể âm thầm đổi tab nào mở |
+| [Data grid](components/data-grid.md) | stable | Select-all nghĩa là **trang này** — trên 2.000 dòng, một chữ "all" sẽ xuất cả bản ghi chưa ai nhìn |
+| [MiniTable](components/mini-table.md) | stable | Ô lọc từng cột — khoảng hở thật duy nhất so với hệ thống live — tới dưới dạng một prop |
+| [Field row](components/field-row.md) | stable | Cùng một khối 14 dòng đã bị viết lại 14 lần, mà không chỗ nào trông hỏng |
+| [Radio group](components/radio-group.md) | stable | Mỗi lựa chọn một câu gợi ý, vì có một lựa chọn không bao giờ chọn được và gợi ý chung không giải thích nổi |
+| [View setting](components/view-setting.md) | stable | Hai lỗi chữ trong bản live, sửa chứ không chép — chỗ duy nhất cố ý **không** theo live |
+| [Toast](components/toast.md) | stable | Bốn động từ có tên thay vì một `push`, vì "loại" là một quyết định chứ không phải một kiểu dáng |
+| [Checkbox](components/checkbox.md) | stable | Dùng class của Kendo chứ không phải component — `indeterminate` không có prop, và lưới đặt tên cho từng ô |
+| [Loader](components/loader.md) | stable | `pulsing` bên trong control để nó không trông như đang quay; nhãn nói **cái gì** đang tải |
+| [File drop](components/file-drop.md) | **trial** | Tắt `autoUpload`, cố tình không có `saveUrl` — và dòng hint nói thẳng điều đó, lần nào cũng vậy |
+| [Stepper](components/stepper.md) | stable | Mỗi bước là một nút, giới hạn bởi `furthest`: quay lại tự do, không nhảy vào bước chưa có dữ liệu đầu vào |
+| [Error state](components/error-state.md) | stable | Một khối chú thích khai báo trạng thái này suốt nhiều tuần mà bên dưới không có rule nào — nói mà chưa vẽ |
+| [Grid skeleton](components/grid-skeleton.md) | stable | Thanh giả chia theo role của cột; bản live ghi "No records available" khi spinner của chính nó còn chạy |
+| [Record skeleton](components/record-skeleton.md) | stable | Nhãn là thật, chỉ giá trị là thanh giả — và nó mượn đúng class của record, sau khi đo ra 92px nhảy |
+| [People picker](components/people-picker.md) | stable | Email không phải để trang trí: danh bạ live có "Linh 4 Tran", "Linh Tran 5" và "Linh Tran 1" |
+| [Rich text](components/rich-text.md) | **trial** | Dấu "?" trên bản live không phải nút trợ giúp — đó là avatar không có initials, và ta cố tình không làm |
+| [Support ticket](components/support-ticket.md) | **trial** | Bốn thông tin tự đính kèm, dưới một tiêu đề nói rõ điều đó thay vì giấu đi |
+
+> Mỗi trang đều viết dựa trên bản build đang chạy, và **mỗi trang đều tìm ra
+> một thứ** — một tỉ lệ tương phản sai, một thuộc tính ARIA thiếu, một chú
+> thích mô tả cái rule không tồn tại. Đó là lý do viết đủ cả 29, và đúng tới
+> trang cuối: `people-picker.md` lộ ra một viền nét đứt 1.64:1 mà
+> `border:check` không với tới, vì control đó chỉ hiện khi record vào chế độ
+> sửa.
+>
+> Hôm sau, viết dòng hover cho [`field.md`](components/field.md) lộ ra nửa còn
+> lại: những **trạng thái** không phép quét nào đang nhìn, trong đó có viền
+> hover của chính ô input đó — 2.02:1 ở dark — và viền focus của mọi ô gõ chữ
+> trong sản phẩm. Giờ cả hai phép kiểm đều đo trạng thái, và đó mới là phần
+> đáng giữ — xem [`vien-state-09nov.md`](vien-state-09nov.md).
+
+### Trang pattern
+
+Pattern là nhiều component ghép thành một hình dạng lặp lại. **Đủ cả tám cái
+đáng có**, tính đến 9/11.
+
+| Pattern | Chốt được gì |
+|---|---|
+| [Record form](patterns/record-form.md) | Thứ tự các dải, hai chế độ, và luồng discard — chỗ mà ba nguồn nói ba kiểu khác nhau |
+| [Destructive action](patterns/destructive-action.md) | More ▾ → mực danger → hộp xác nhận, và bỏ bất kỳ bước nào thì mất gì |
+| [List screen](patterns/list-screen.md) | Bốn cách thu hẹp một danh sách — trông đều giống "lọc" nhưng không thay nhau được |
+| [Wizard](patterns/wizard.md) | Mỗi bước đúng một nút filled, và hai popup manual yêu cầu mà bản này cố ý không làm |
+| [Feedback](patterns/feedback.md) | Bốn loại toast — và vì sao một thất bại là một **loại** khác, không phải một chuỗi chữ khác |
+| [File upload](patterns/file-upload.md) | Chọn file là thật; gửi đi thì không, và màn hình nói rõ cái nào |
+| [Dashboard](patterns/dashboard.md) | Vì sao Home và My Queues vẫn là hai màn — và vì sao màu một mảng biểu đồ không phải màu một badge |
+| [Search](patterns/search.md) | Bảy chỗ gõ được, ba dạng control, và ba lời hứa mà chính các ô tìm kiếm không giữ |
+
+Mỗi trang nói rõ nó chốt được gì, bằng chứng đằng sau, và cái gì cố ý để lại.
+
 ## D1 · Nút
+
+> **Trang đầy đủ ở [`components/button.md`](components/button.md)** — dùng
+> khi nào và không dùng khi nào, cấu tạo, mọi biến thể và trạng thái, chữ
+> nghĩa, hành vi bàn phím, khả năng tiếp cận và API. Đó là **trang mẫu**:
+> hình dạng mà mọi component còn lại nên được viết theo, và là lý do phần D
+> còn lại đọc thấy mỏng. Dưới đây là bản tóm tắt.
 
 ![Các biến thể nút, kèm trạng thái disabled](assets/design-system/states-buttons.png)
 
@@ -928,23 +1400,45 @@ render thì bấm Copy xong là người dùng cầm một con số khác cho c�
 
 ## E1 · Khả năng tiếp cận
 
-**Đo, không phải khẳng định suông.** Bản quét đầy đủ ở
-[`contrast-sweep.md`](contrast-sweep.md); phần bàn phím ở
-[`focus-order.md`](focus-order.md).
+**Đo, không phải khẳng định suông** — và đo **mỗi lần push**, điều mà tới
+ngày 8/11 vẫn chưa đúng. Phần bàn phím ở [`focus-order.md`](focus-order.md).
 
-| Yêu cầu | Ngưỡng | Tình trạng |
-|---|---|---|
-| Tương phản chữ — WCAG 1.4.3 | 4.5:1 chữ thường · 3:1 chữ lớn (≥24px, hoặc ≥18.66px ở độ đậm ≥700) | **Đo 78 tổ hợp, 0 lỗi** |
-| Tương phản phi-chữ — WCAG 1.4.11 | 3:1 cho viền control | Ba control hỏng ở 1.30 / 1.64 / 2.55 · đã vá bằng `--vy-border-control` ở **3.06:1** |
-| Kích thước vùng chạm — WCAG 2.5.5 | 44×44 | Áp dụng dưới `pointer: coarse` |
-| Giảm chuyển động | có tôn trọng | [B6](#b6--chuyển-động) |
+| Yêu cầu | Ngưỡng | Tình trạng | Chạy lại |
+|---|---|---|---|
+| Tương phản chữ — WCAG 1.4.3 | 4.5:1 chữ thường · 3:1 chữ lớn (≥24px, hoặc ≥18.66px ở độ đậm ≥700) | **184 cặp token, cả hai theme, 0 cặp dưới ngưỡng.** Cặp chữ chặt nhất 4.53:1 | `contrast:check`, mỗi lần push |
+| Tương phản phi-chữ — WCAG 1.4.11 | 3:1 cho viền control **và các trạng thái của nó**, đo trên **mọi nền** control có thể nằm lên | Viền lúc nghỉ, viền lúc hover, vòng focus và viền focus đều đạt 3 trên cả tám nền; chặt nhất **3.05:1**. Ngày 8/11 có bảy control dưới ngưỡng ([`vien-control-08nov.md`](vien-control-08nov.md)); ngày 9/11 thêm hai token và năm rule ([`vien-state-09nov.md`](vien-state-09nov.md)) | `contrast:check`, mỗi lần push |
+| Tương phản phi-chữ — **mảng màu không mang chữ** | 3:1 so với tấm card nó được vẽ lên | Năm series của biểu đồ, cả hai theme. Series In-Progress chỉ đạt **1.12:1** ở light và **1.37:1** ở dark cho tới 9/11, vì nó đọc màu nền của chip; giờ chặt nhất là **3.03:1** ([Dashboard](patterns/dashboard.md)) | `contrast:check`, mỗi lần push |
+| Kích thước vùng chạm — WCAG 2.5.5 | 44×44 | Áp dụng dưới `pointer: coarse` | `touch:check`, mỗi lần push |
+| Focus bàn phím | thấy được, nằm trong màn hình | 1305 control trên 10 route × 3 bề rộng · 0 bị che, 0 thiếu chỉ báo | `focus:check`, mỗi lần push |
+| Viền control, **như đang vẽ thật**, ở ba trạng thái | 3:1 so với thứ phía sau nó, lúc nghỉ **và** lúc hover **và** lúc focus | 1122 lượt đo trên 12 route × 2 theme × 3 trạng thái · 0 dưới ngưỡng. Lúc hover có 442 control vẽ viền so với 340 lúc nghỉ — 102 cái chênh ra là những control trong suốt cho tới khi có chuột trỏ vào | `border:check`, mỗi lần push |
+| Hộp nội dung | rail + máng + nội dung = viewport · dạng có trần không vượt `--vy-page-max` · dạng danh sách vẫn không trần · đúng một bậc khai báo | 72 lượt đo trên 6 route × 12 bề rộng · 2 lỗi gài, bắt được cả hai · 0 phát hiện ([B8](#b8--lưới-layout)) | `grid:check`, mỗi lần push |
+| Giảm chuyển động | có tôn trọng | [B6](#b6--chuyển-động) | — |
 
-**Vì sao bộ đo tương phản tin được:** màu được đọc qua **pixel trên canvas**
-chứ không bóc từ chuỗi — vì Kendo xuất `oklch()`, thứ mà không regex nào trên
-`getComputedStyle` sống sót được. Nền được ghép chồng ngược lên cây cha. Và
-**trước khi tin kết quả**, một phần tử `#bbbbbb` trên nền trắng được cấy vào
-trang: nó bị bắt ở **1.92:1**. Một bản quét báo "không có lỗi" chỉ đáng đọc
-nếu nó chứng minh được là nó sẽ tìm ra lỗi nếu có.
+**Hai phép đo, trả lời hai câu hỏi khác nhau.**
+[`contrast-sweep.md`](contrast-sweep.md) ngày 5/9 là bản thật: một trình
+duyệt, một pixel canvas cho mỗi phần tử, nền được ghép chồng ngược lên cây
+cha — vì Kendo xuất `oklch()`, thứ mà không regex nào trên `getComputedStyle`
+sống sót được. Chính bản quét đó tìm ra ba cái viền control. Nhưng nó cũng là
+**một lần duy nhất**: chạy một lần, trên bảng màu của hôm đó, trong khi dark
+theme, bộ từ vựng status và sàn 12px đều tới sau.
+
+`contrast:check` là nửa rẻ tiền, và thành thật về việc mình là nửa rẻ tiền.
+Nó đọc `tokens.css`, resolve mọi chuỗi `var()` ở cả hai theme, và kiểm đúng
+những cặp hệ thống đã hứa: từng bậc chữ trên từng nền nó có thể nằm lên,
+brand và danger, cả tám status pill, các row tone, và hai đường biên phi-chữ.
+Không trình duyệt, không server. Nó **không** thấy được một component đặt chữ
+lên nền mà hệ thống chưa bao giờ định, hay một opacity làm nền thật thành thứ
+không token nào nói ra — mấy cái đó vẫn cần bản quét trình duyệt. Thứ nó bắt
+được là **bảng màu trôi ra khỏi tài liệu này**, đúng chuyện đã xảy ra giữa
+tháng 9 và tháng 11 — và nó bắt được một cái ngay hôm được viết: `subtle`
+trên `surface-strong` ở 4.02:1. Xem [B1.3](#b13-màu-chữ--sáu-bậc).
+
+**Vì sao bộ đo tin được.** Màu trong bản quét tháng 9 đọc qua pixel canvas
+chứ không bóc từ chuỗi. Và **trước khi tin kết quả**, một phần tử `#bbbbbb`
+trên nền trắng được cấy vào trang: nó bị bắt ở **1.92:1**. `contrast:check`
+cấy đúng giá trị đó ở mỗi lần chạy và thoát với mã lỗi nếu không phát hiện ra
+— một bản quét báo "không có lỗi" chỉ đáng đọc nếu nó chứng minh được là nó
+sẽ tìm ra lỗi nếu có.
 
 Bốn luật dễ làm sai và đã chốt ở đây:
 
@@ -1018,8 +1512,9 @@ Hai hành vi của Kendo nên biết trước khi ngồi debug một component:
 2. Role cột, không phải số pixel.
 3. Kiểm ở 1180, 980 và 820, ở cả hai theme.
 
-**CI chạy gì mỗi lần push:** `render:check` · `touch:check` · `mobile:check` ·
-`focus:check` · `hover:check`.
+**CI chạy gì mỗi lần push:** `contrast:check` (nằm trong `css:check`, nên nó
+chặn build) · `render:check` · `touch:check` · `mobile:check` ·
+`focus:check` · `hover:check` · `border:check`.
 
 ## F3 · Quản trị
 
@@ -1041,33 +1536,60 @@ Hai hành vi của Kendo nên biết trước khi ngồi debug một component:
 ## F4 · Một bộ bàn giao cần có gì
 
 Bố cục của tài liệu này được **đối chiếu với thực hành hiện hành** chứ không
-tự nghĩ ra. Danh sách lặp đi lặp lại trong các checklist đã công bố là:
-**design token** kèm giá trị · **spec component** kèm đủ trạng thái và biến
-thể · **luật dùng** kèm nên/không nên · **khả năng tiếp cận** có ghi rõ ngưỡng
-WCAG · **ví dụ code** · **responsive** có ghi breakpoint · **chuyển động** có
-thời lượng, đường cong và phương án giảm chuyển động · và **quản trị** — ai
-giữ, quy trình đóng góp, đánh phiên bản.
+tự nghĩ ra. Lần đối chiếu tháng 11 làm lại trực tiếp trên trang của chính các
+hệ thống đã công bố, thay vì qua blog viết về họ — và nó đổi câu trả lời: bản
+trước của mục này liệt kê một bộ bàn giao **cần có gì**, mà không nói trong
+đó file này **đang có gì**. Dưới đây là cả hai cột.
 
-Nhiều nguồn cũng gọi tên đúng cái lỗi mà file này dễ mắc nhất: **tài liệu
-trôi xa khỏi code** khi đội ngũ đi làm việc khác. Đó là lý do
-[F3](#f3--quản-trị) quy định **trang mẫu sống** mới là trọng tài, chứ không
-phải tài liệu này.
+| Các hệ thống đã công bố làm gì | Ở đây |
+|---|---|
+| **Token** kèm giá trị, chia tầng có tên | [A2](#a2--ba-lớp), [B1](#b1--màu)–[B6](#b6--chuyển-động). Ba tầng — ramp, role, component — cùng mô hình với Material 3 (tonal palette → role → component) và tương thích định dạng token của W3C |
+| **Khả năng tiếp cận** có ghi rõ ngưỡng | [E1](#e1--khả-năng-tiếp-cận), và **đo từng cặp token** chứ không khẳng định suông. Carbon nêu đúng những ngưỡng đó nhưng không công bố giá trị từng cặp; GOV.UK nêu ngưỡng bên trong một component |
+| **Responsive** có ghi breakpoint | [B7](#b7--responsive) — đủ mười một cái, shell và component, từ bản 1.2 |
+| **Chuyển động** có thời lượng, đường cong, phương án giảm | [B6](#b6--chuyển-động) |
+| **Quản trị** — ai giữ, đóng góp, phiên bản | [F2](#f2--muốn-sửa-một-thứ-thì-làm-gì), [F3](#f3--quản-trị) |
+| **Spec component**: dùng khi nào · **không** dùng khi nào · cấu tạo · biến thể × trạng thái · nội dung · hành vi · tiếp cận · code · nên/không nên | **Đủ 29**, trong [`docs/components/`](components/button.md), theo đúng khung đó. [D1](#d1--nút)–[D4](#d4--hộp-thoại) giữ lại như phần văn xuôi cũ, mỏng hơn |
+| **Pattern** — form, filter, hành động phá huỷ, thông báo, page template | **Tám**, trong [`docs/patterns/`](patterns/record-form.md) |
+| **Trạng thái vòng đời** từng component — trial · stable · deprecated | **Có trên mọi trang**, ba mức của GOV.UK. Bốn cái đang `trial`, mỗi cái kèm lý do: file drop, rich text, support ticket, chip |
+| **Changelog** từng component | **Có trên mọi trang**, dạng bảng *Recent changes* có ngày. [F3](#f3--quản-trị) vẫn giữ chính sách phiên bản |
+| **Lưới layout** như một nền móng | [B8](#b8--lưới-layout) — thang container, một lối viết và mười sáu giá trị tối thiểu, đo bằng `grid:check` |
 
-Tham khảo ngày 3/11/2026:
-[Magic Patterns](https://www.magicpatterns.com/blog/design-system-documentation) ·
-[Figr checklist](https://figr.design/design-system-checklist) ·
-[Supernova](https://www.supernova.io/blog/popular-content-blocks-document-design-system-guidelines) ·
-[Docsie](https://www.docsie.io/blog/glossary/design-system/) ·
-[Eleken](https://www.eleken.co/blog-posts/design-handoff-checklist) ·
-[UX Planet](https://uxplanet.org/design-handoff-checklist-a9d40e9a7704).
-Đây là blog của nhà cung cấp và checklist cộng đồng, **không phải tiêu
-chuẩn**; chúng thống nhất ở phần lõi và khác nhau ở độ sâu.
+**Không còn mục nào trong danh sách bị bỏ trống**, tính tới 9/11.
+`docs/chuan-design-system.md` giữ bản đối chiếu đầy đủ, template trang
+component mà 29 trang này viết theo, và bản phân loại đã xếp thứ tự cho chúng.
+
+> Lưới layout xếp cuối danh sách với lập luận rằng nó ít dùng nhất trong ba
+> cái, cho tới khi các màn hình thôi đổi hình dạng. Viết ra thì thấy ngược
+> lại: hai trong bốn dạng trang không hề khai báo bề rộng, và hộp nội dung
+> **mất 112px** ở một breakpoint trong khi cửa sổ rộng thêm 100. Cả hai đã
+> đúng từ lúc dựng shell, và không cái nào lộ ra nếu không đo đủ mọi bề rộng.
+
+Mọi nguồn cũng gọi tên đúng cái lỗi mà file này dễ mắc nhất: **tài liệu trôi
+xa khỏi code** khi đội ngũ đi làm việc khác. Đó là lý do
+[F3](#f3--quản-trị) quy định **trang mẫu sống** mới là trọng tài chứ không
+phải tài liệu này, và là lý do các con số ở trên được
+[`contrast:check`](#e1--khả-năng-tiếp-cận) chứng minh lại thay vì chép lại.
+
+Đọc trực tiếp ngày 8/11/2026:
+[Carbon — Button usage](https://carbondesignsystem.com/components/button/usage/) ·
+[Carbon — Accessibility: colour](https://carbondesignsystem.com/guidelines/accessibility/color/) ·
+[Atlassian — Foundations](https://atlassian.design/foundations) ·
+[Atlassian — Button](https://atlassian.design/components/button/examples) ·
+[GOV.UK — Button](https://design-system.service.gov.uk/components/button/) ·
+[GOV.UK — Component lifecycle statuses](https://design-system.service.gov.uk/community/component-lifecycle-statuses/) ·
+[W3C Design Tokens format (draft)](https://www.designtokens.org/tr/drafts/format/) ·
+[Material 3 — Colour roles](https://m3.material.io/styles/color/roles).
+Bản W3C là draft và chính nó ghi là **chưa nên implement**; các nguồn còn lại
+là thực hành của từng tổ chức, không phải tiêu chuẩn. Chúng thống nhất ở bố
+cục và khác nhau ở độ sâu.
 
 ## F5 · Chỉ mục nguồn
 
 | Tài liệu | Chốt điều gì |
 |---|---|
 | [`contrast-sweep.md`](contrast-sweep.md) | Mọi tỉ số tương phản đã đo, và phương pháp |
+| [`vien-control-08nov.md`](vien-control-08nov.md) | Bảy viền control trỏ sai token, và bản quét tìm ra chúng |
+| [`vien-state-09nov.md`](vien-state-09nov.md) | Viền hover và viền focus, và cách đo một trạng thái mà không có chuột |
 | [`focus-order.md`](focus-order.md) | Thứ tự bàn phím và vòng focus |
 | [`modal-patterns.md`](modal-patterns.md) | Cỡ hộp thoại, vị trí nút, cách đóng |
 | [`table-patterns.md`](table-patterns.md) | Hành vi lưới, role cột, mật độ |

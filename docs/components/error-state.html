@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Error state</title>
+<style>
+:root{
+  --ink:#131820; --ink-2:#363e4b; --ink-3:#4d5766; --ink-4:#626d7e;
+  --line:#dde2e9; --line-soft:#eceff3; --paper:#ffffff; --app:#f5f7fa;
+  --brand:#1a419e; --brand-soft:#f1f4fa; --code:#15347e;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--app);color:var(--ink-2);
+  font:15px/1.65 "Inter","Segoe UI",system-ui,-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:40px 28px 80px;background:var(--paper);
+  box-shadow:0 1px 2px rgba(19,24,32,.06)}
+h1,h2,h3,h4{color:var(--ink);line-height:1.25;text-wrap:balance}
+h1{font-size:34px;font-weight:700;margin:0 0 8px;letter-spacing:-.01em}
+h2{font-size:25px;font-weight:650;margin:52px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line)}
+h3{font-size:19px;font-weight:600;margin:32px 0 10px}
+h4{font-size:16px;font-weight:600;margin:24px 0 8px;color:var(--ink-2)}
+p{margin:0 0 14px;max-width:86ch}
+ul,ol{margin:0 0 14px;padding-left:22px;max-width:86ch}
+li{margin:5px 0}
+a{color:var(--brand);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:.18em}
+hr{border:0;border-top:1px solid var(--line-soft);margin:34px 0}
+code{font:500 13px/1.5 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  background:var(--brand-soft);color:var(--code);padding:1px 5px;border-radius:3px}
+blockquote{margin:0 0 16px;padding:12px 16px;background:var(--brand-soft);
+  border-left:3px solid var(--brand);border-radius:0 4px 4px 0;color:var(--ink-2);max-width:86ch}
+blockquote p{margin:0}
+.t{overflow-x:auto;margin:0 0 18px}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th{text-align:left;font-weight:600;color:var(--ink);background:var(--app);
+  border-bottom:1px solid var(--line);padding:8px 10px;white-space:nowrap}
+td{border-bottom:1px solid var(--line-soft);padding:8px 10px;vertical-align:top}
+td code{white-space:nowrap}
+tr:last-child td{border-bottom:0}
+figure{margin:18px 0 24px}
+img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:6px}
+.toc{background:var(--app);border:1px solid var(--line);border-radius:8px;
+  padding:18px 22px;margin:26px 0 34px}
+.toc h2{margin:0 0 10px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink-4);border:0;padding:0}
+.toc ol{list-style:none;margin:0;padding:0;columns:2;column-gap:36px}
+.toc li{margin:3px 0;break-inside:avoid}
+.toc li.l1{font-weight:600;color:var(--ink);margin-top:10px}
+.toc li.l1:first-child{margin-top:0}
+.toc li.l2{padding-left:14px}
+@media (max-width:760px){.wrap{padding:24px 16px 60px}.toc ol{columns:1}h1{font-size:27px}}
+@media print{
+  body{background:#fff}
+  .wrap{max-width:none;padding:0;box-shadow:none}
+  h2{page-break-after:avoid}
+  figure,table,blockquote{page-break-inside:avoid}
+  .toc{break-after:page}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="toc"><h2>Contents</h2><ol>
+<li class="l2"><a href="#when-to-use">When to use</a></li>
+<li class="l2"><a href="#when-not-to-use">When not to use</a></li>
+<li class="l2"><a href="#it-was-a-comment-for-weeks-before-it-was-a-state">It was a comment for weeks before it was a state</a></li>
+<li class="l2"><a href="#the-same-rocket-back-on-the-pad">The same rocket, back on the pad</a></li>
+<li class="l2"><a href="#three-slots-because-a-person-has-three-questions">Three slots, because a person has three questions</a></li>
+<li class="l2"><a href="#three-ways-out-not-one">Three ways out, not one</a></li>
+<li class="l2"><a href="#accessibility">Accessibility</a></li>
+<li class="l2"><a href="#api">API</a></li>
+<li class="l2"><a href="#related">Related</a></li>
+<li class="l2"><a href="#recent-changes">Recent changes</a></li>
+</ol></nav>
+<h1 id="error-state">Error state</h1>
+<blockquote><strong>Status: stable</strong> · <code>src/ui/ErrorState.tsx</code> · reached through <code>ErrorBoundary</code>, and directly where one part of a record fails. Written to the template set by <a href="button.html"><code>button.md</code></a>.</blockquote>
+<hr>
+<h2 id="when-to-use">When to use</h2>
+<p><strong>When a screen cannot show what the user came for</strong> — a route threw, a fetch failed, a tab's panel could not load.</p>
+<h2 id="when-not-to-use">When not to use</h2>
+<div class="t"><table><thead><tr><th>Instead of the error state</th><th>Use</th><th>Why</th></tr></thead><tbody><tr><td>A field is wrong</td><td>An error on the field</td><td>The screen works; one value does not</td></tr><tr><td>An action failed, screen intact</td><td><code>toast.error</code> — see <a href="../patterns/feedback.html">Feedback</a></td><td>A whole-screen error over a failed save throws away the user's typing</td></tr><tr><td>Nothing to show, nothing broken</td><td>The empty state</td><td><em>Empty</em> and <em>broken</em> are different answers</td></tr></tbody></table></div>
+<hr>
+<h2 id="it-was-a-comment-for-weeks-before-it-was-a-state">It was a comment for weeks before it was a state</h2>
+<p>Audit finding <strong>T5</strong> records that the live system conflates <em>loading</em> and <em>empty</em>. This prototype had the same gap from the other end:</p>
+<blockquote><code>app.css</code> carried a comment block headed <code>--- Error state ---</code> from the day the loading state was built, with the sentence <em>"The third of the three"</em> under it and <strong>no rule beneath it at all</strong>. The state was asserted in a comment for weeks and never drawn. Closed 27 Oct.</blockquote>
+<p>Written down here because it is the exact failure this documentation exists to catch: a claim in a file with nothing behind it.</p>
+<hr>
+<h2 id="the-same-rocket-back-on-the-pad">The same rocket, back on the pad</h2>
+<p>Tilted, cracked, one fin lying beside it, smoking.</p>
+<blockquote>The failure is legible before the sentence is read — and a <strong>separate</strong> illustration for failure would be a second thing to learn at the worst possible moment.</blockquote>
+<p>It takes <code>step</code>, so when a launch was running the picture says <strong>how far it got</strong>.</p>
+<h2 id="three-slots-because-a-person-has-three-questions">Three slots, because a person has three questions</h2>
+<div class="t"><table><thead><tr><th>Slot</th><th>The question</th><th>Rule</th></tr></thead><tbody><tr><td><code>title</code></td><td><strong>What failed</strong></td><td>In the user's words. Never an exception message</td></tr><tr><td><code>body</code></td><td><strong>What it means for them</strong> — and what it does not mean</td><td>≤ 60ch, like every other block of prose here</td></tr><tr><td>Actions</td><td><strong>What they can do next</strong></td><td>At least two</td></tr></tbody></table></div>
+<blockquote><em>Something went wrong</em> is the error message that tells the user to try the thing that just failed, with nothing to go on.</blockquote>
+<h2 id="three-ways-out-not-one">Three ways out, not one</h2>
+<p>The customer's redesign of <strong>29 Oct</strong>. <em>Reload</em> was the only answer, and a screen that fails twice left the user holding a button that had already not worked.</p>
+<div class="t"><table><thead><tr><th>Way out</th><th>Note</th></tr></thead><tbody><tr><td><strong>Try again</strong></td><td>First, and optional — only where retrying can succeed</td></tr><tr><td><strong>Back to Home</strong></td><td>A <strong>route</strong>, not a reload: the rest of the app is still running, and reloading the document throws away everything else the user has open</td></tr><tr><td><strong><a href="support-ticket.html">Support ticket</a></strong></td><td>Turns <em>"it is broken"</em> into something with an id on it</td></tr></tbody></table></div>
+<p><strong>The error id is shown whether or not a ticket is sent</strong>, because the first thing a colleague asks is which error. It has a <strong>Copy</strong> button — this number's whole job is to be pasted into a message to someone else.</p>
+<p>The confirmation <strong>replaces</strong> the offer rather than joining it: two lines, one saying <em>send a ticket</em> and one saying <em>ticket sent</em>, is a screen arguing with itself.</p>
+<h2 id="accessibility">Accessibility</h2>
+<div class="t"><table><tbody><tr><td>Role</td><td><strong><code>role="alert"</code></strong>, not <code>status</code> — this one interrupts. A person who cannot see it has otherwise been left on a screen that stopped responding for no stated reason</td></tr><tr><td>Illustration</td><td><code>aria-hidden</code>; the title carries the meaning</td></tr><tr><td>Error id</td><td>Real text, selectable, plus the Copy button — not an image or a tooltip</td></tr><tr><td>Focus</td><td>Not stolen; the heading is the first thing in reading order</td></tr></tbody></table></div>
+<h2 id="api">API</h2>
+<div class="t"><table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody><tr><td><code>title</code> / <code>body</code></td><td><code>string</code></td><td>The two sentences above</td></tr><tr><td><code>step</code></td><td><code>number</code></td><td>How far the launch got</td></tr><tr><td><code>errorId</code></td><td><code>string</code></td><td><code>newErrorId()</code> <strong>at the point of catching</strong> — see <a href="support-ticket.html">Support ticket</a></td></tr><tr><td><code>screen</code></td><td><code>string</code></td><td>Prefills the ticket's subject</td></tr><tr><td><code>onRetry</code> / <code>retryLabel</code></td><td></td><td>Omit <code>onRetry</code> where a retry cannot help</td></tr><tr><td><code>children</code></td><td><code>ReactNode</code></td><td>A further way out, where a caller has one</td></tr></tbody></table></div>
+<hr>
+<h2 id="related">Related</h2>
+<p><a href="support-ticket.html">Support ticket</a> · <a href="toast.html">Toast</a> · <a href="../patterns/feedback.html">Feedback</a> · <a href="../design-system.html#d5--the-four-screen-states">D5 · The four screen states</a></p>
+<h2 id="recent-changes">Recent changes</h2>
+<div class="t"><table><thead><tr><th>Date</th><th>Change</th></tr></thead><tbody><tr><td>8 Nov 2026</td><td>This page</td></tr></tbody></table></div>
+</div>
+</body>
+</html>

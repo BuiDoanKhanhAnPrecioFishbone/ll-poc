@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grid skeleton</title>
+<style>
+:root{
+  --ink:#131820; --ink-2:#363e4b; --ink-3:#4d5766; --ink-4:#626d7e;
+  --line:#dde2e9; --line-soft:#eceff3; --paper:#ffffff; --app:#f5f7fa;
+  --brand:#1a419e; --brand-soft:#f1f4fa; --code:#15347e;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--app);color:var(--ink-2);
+  font:15px/1.65 "Inter","Segoe UI",system-ui,-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:40px 28px 80px;background:var(--paper);
+  box-shadow:0 1px 2px rgba(19,24,32,.06)}
+h1,h2,h3,h4{color:var(--ink);line-height:1.25;text-wrap:balance}
+h1{font-size:34px;font-weight:700;margin:0 0 8px;letter-spacing:-.01em}
+h2{font-size:25px;font-weight:650;margin:52px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line)}
+h3{font-size:19px;font-weight:600;margin:32px 0 10px}
+h4{font-size:16px;font-weight:600;margin:24px 0 8px;color:var(--ink-2)}
+p{margin:0 0 14px;max-width:86ch}
+ul,ol{margin:0 0 14px;padding-left:22px;max-width:86ch}
+li{margin:5px 0}
+a{color:var(--brand);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:.18em}
+hr{border:0;border-top:1px solid var(--line-soft);margin:34px 0}
+code{font:500 13px/1.5 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  background:var(--brand-soft);color:var(--code);padding:1px 5px;border-radius:3px}
+blockquote{margin:0 0 16px;padding:12px 16px;background:var(--brand-soft);
+  border-left:3px solid var(--brand);border-radius:0 4px 4px 0;color:var(--ink-2);max-width:86ch}
+blockquote p{margin:0}
+.t{overflow-x:auto;margin:0 0 18px}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th{text-align:left;font-weight:600;color:var(--ink);background:var(--app);
+  border-bottom:1px solid var(--line);padding:8px 10px;white-space:nowrap}
+td{border-bottom:1px solid var(--line-soft);padding:8px 10px;vertical-align:top}
+td code{white-space:nowrap}
+tr:last-child td{border-bottom:0}
+figure{margin:18px 0 24px}
+img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:6px}
+.toc{background:var(--app);border:1px solid var(--line);border-radius:8px;
+  padding:18px 22px;margin:26px 0 34px}
+.toc h2{margin:0 0 10px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink-4);border:0;padding:0}
+.toc ol{list-style:none;margin:0;padding:0;columns:2;column-gap:36px}
+.toc li{margin:3px 0;break-inside:avoid}
+.toc li.l1{font-weight:600;color:var(--ink);margin-top:10px}
+.toc li.l1:first-child{margin-top:0}
+.toc li.l2{padding-left:14px}
+@media (max-width:760px){.wrap{padding:24px 16px 60px}.toc ol{columns:1}h1{font-size:27px}}
+@media print{
+  body{background:#fff}
+  .wrap{max-width:none;padding:0;box-shadow:none}
+  h2{page-break-after:avoid}
+  figure,table,blockquote{page-break-inside:avoid}
+  .toc{break-after:page}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="toc"><h2>Contents</h2><ol>
+<li class="l2"><a href="#when-to-use">When to use</a></li>
+<li class="l2"><a href="#when-not-to-use">When not to use</a></li>
+<li class="l2"><a href="#the-cells-are-proportioned-by-column-role">The cells are proportioned by column **role**</a></li>
+<li class="l2"><a href="#what-the-live-system-does-instead">What the live system does instead</a></li>
+<li class="l2"><a href="#accessibility">Accessibility</a></li>
+<li class="l2"><a href="#api">API</a></li>
+<li class="l2"><a href="#related">Related</a></li>
+<li class="l2"><a href="#recent-changes">Recent changes</a></li>
+</ol></nav>
+<h1 id="grid-skeleton">Grid skeleton</h1>
+<blockquote><strong>Status: stable</strong> · <code>src/ui/GridSkeleton.tsx</code> · the first-load state of the standard list pattern. Written to the template set by <a href="button.html"><code>button.md</code></a>.</blockquote>
+<hr>
+<h2 id="when-to-use">When to use</h2>
+<p><strong>A first load, where nothing is on screen yet.</strong> The route has resolved, the rows have not arrived, and the user is looking at the screen they asked for.</p>
+<h2 id="when-not-to-use">When not to use</h2>
+<div class="t"><table><thead><tr><th>Instead of a skeleton</th><th>Use</th><th>Why</th></tr></thead><tbody><tr><td>Work over rows already on screen</td><td><a href="loader.html"><code>BusyOverlay</code></a></td><td><em>"What will this look like?"</em> is already answered</td></tr><tr><td>A list with no rows to show</td><td>The empty state</td><td>A skeleton promises rows that are coming</td></tr><tr><td>A failed load</td><td>The <a href="error-state.html">error state</a></td><td>A skeleton that never resolves is the worst of the four states</td></tr></tbody></table></div>
+<hr>
+<h2 id="the-cells-are-proportioned-by-column-role">The cells are proportioned by column <strong>role</strong></h2>
+<p>It takes the real <code>ColumnSpec[]</code> and sets <code>data-role</code> on each cell, so the placeholder reads as <strong>the same shape of table that is coming</strong>.</p>
+<div class="t"><table><thead><tr><th><code>data-role</code></th><th>Share of the row</th></tr></thead><tbody><tr><td><code>ident</code></td><td>18%</td></tr><tr><td><code>text</code></td><td>22%, and the only flexible one</td></tr><tr><td><code>date</code></td><td>11%</td></tr><tr><td><code>money</code></td><td>9%</td></tr><tr><td><code>status</code> · <code>rating</code></td><td>9%</td></tr><tr><td><code>code</code> · <code>number</code></td><td>7%</td></tr></tbody></table></div>
+<blockquote>They <strong>approximate rather than match exactly</strong>. The real widths are numbers in the token layer, and reproducing them here would mean an inline style per cell — a second copy of the width table, kept in step by hand.</blockquote>
+<p>A skeleton whose bars are all the same width tells you a table is coming. One whose bars follow the roles tells you <strong>which</strong> table.</p>
+<hr>
+<h2 id="what-the-live-system-does-instead">What the live system does instead</h2>
+<p>The customer's build renders <strong>"No records available" while its spinner is still turning</strong> — audit finding <strong>T5</strong>.</p>
+<blockquote>For the first moment of every list screen, the product says there is nothing there. Then the rows appear. The empty state and the loading state were wired to the same condition.</blockquote>
+<p><em>Loading</em> and <em>empty</em> are two different answers, and only one of them is true at a time.</p>
+<h2 id="accessibility">Accessibility</h2>
+<p>``<code>tsx role="status" aria-live="polite" aria-busy="true" </code>``</p>
+<div class="t"><table><tbody><tr><td>Announced</td><td><strong>Once</strong>, in words — a <code>vy-sr-only</code> <em>"Loading records"</em> — not once per bar</td></tr><tr><td>The bars</td><td>Carry no text and no label, so a screen reader is not read a picture of a table 12 rows deep</td></tr><tr><td><code>aria-busy</code></td><td>Stays on the container until the real rows replace it</td></tr><tr><td>Reduced motion</td><td>The shimmer stops; the layout stays. See <a href="../design-system.html#b6--motion">B6</a></td></tr></tbody></table></div>
+<h2 id="api">API</h2>
+<div class="t"><table><thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Notes</th></tr></thead><tbody><tr><td><code>columns</code></td><td><code>ColumnSpec&lt;T&gt;[]</code></td><td>—</td><td>The screen's real columns, so the proportions cannot drift</td></tr><tr><td><code>rows</code></td><td><code>number</code></td><td><code>12</code></td><td>Match the page size, so nothing jumps when data lands</td></tr></tbody></table></div>
+<hr>
+<h2 id="related">Related</h2>
+<p><a href="record-skeleton.html">Record skeleton</a> · <a href="data-grid.html">Data grid</a> · <a href="loader.html">Loader</a> · <a href="../design-system.html#d5--the-four-screen-states">D5 · The four screen states</a></p>
+<h2 id="recent-changes">Recent changes</h2>
+<div class="t"><table><thead><tr><th>Date</th><th>Change</th></tr></thead><tbody><tr><td>8 Nov 2026</td><td>This page</td></tr></tbody></table></div>
+</div>
+</body>
+</html>

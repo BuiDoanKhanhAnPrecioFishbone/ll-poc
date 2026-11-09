@@ -84,10 +84,26 @@
 
      For boundaries only: inputs, dropdowns, checkboxes, radios. Panel edges,
      card outlines, table rules and dashed drop zones are structure rather than
-     controls, 1.4.11 does not cover them, and they stay on the grey scale. */
-  /* #8A94A6, the standard's `border-input`. Ours was #8A94A3 — three
-     hex digits of drift from a value the standard took from us. */
-  --vy-border-control: #8a94a6;
+     controls, 1.4.11 does not cover them, and they stay on the grey scale.
+
+     ON WHITE WAS THE WRONG TEST, AND IT TOOK UNTIL 8 NOV TO NOTICE. "The
+     lightest value that conforms" conformed against one ground: the panel.
+     A control also sits on the page, on a sunken strip, on a hover tint, on a
+     selected row. Swept across every ground a control can land on, #8a94a6
+     cleared exactly one of them —
+
+        surface 3.06 · subtle 2.98 · app 2.85 · hover 2.85
+        selected 2.78 · sunken 2.65 · surface-strong 2.35
+
+     — which is how a checkbox measured 2.85 in the control sweep while the
+     bridge was already pointing it at this token. The token was right and the
+     value was short. Same mistake as the `subtle` text tier four hours
+     earlier, and the same fix: SET BY ITS WORST GROUND. #758096 is the
+     lightest value on the same hue and saturation line that clears 3 on all
+     of them, with the tightest at 3.05 on surface-strong. `contrast:check`
+     now measures boundaries against every ground rather than against the
+     panel, so this cannot come back. */
+  --vy-border-control: #758096;
   --vy-grey-600: #4d5766;
   --vy-grey-700: #363e4b;
   --vy-grey-800: #232a34;
@@ -150,7 +166,23 @@
   --vy-on-surface:        var(--vy-grey-800);
   --vy-on-surface-soft:   var(--vy-grey-700);
   --vy-on-surface-muted:  var(--vy-grey-600);
-  --vy-on-surface-subtle: var(--vy-grey-500);
+  /* THE SUBTLE TIER IS SET BY ITS WORST GROUND, not by the panel — the same
+     rule the dark theme already follows a few hundred lines down, applied to
+     light on 8 Nov when `contrast:check` was written and immediately found the
+     gap. grey-500 `#626d7e` clears 4.5 on white (5.24), the page (4.88) and
+     the sunken panel (4.54), and FAILS on `surface-strong` at 4.02. No rule
+     pairs the two today — `surface-strong` carries text in one place and that
+     one uses `muted` — so this was a hole waiting rather than a live failure,
+     which is exactly when it is cheap to close.
+
+     SECOND VALUE IN THE SYSTEM CHOSEN BY MEASUREMENT rather than by the ramp,
+     after `--vy-border-control`, and for the same reason: no step conforms.
+     grey-500 misses by 0.48 and grey-600 overshoots to 5.62, where it would be
+     indistinguishable from `muted` and the tier would stop being a tier.
+     `#5b6575` sits on grey-500's own hue and saturation, one notch darker:
+     4.53 on `surface-strong`, and every other ground improves with it —
+     white 5.89, page 5.49, sunken 5.11. */
+  --vy-on-surface-subtle: #5b6575;
   --vy-on-surface-faint:  var(--vy-grey-400);
   --vy-on-surface-invert: var(--vy-grey-0);
   /* Text on chrome. Not the same job as `on-surface-faint`: a grey that reads
@@ -168,6 +200,24 @@
   --vy-border-strong:     var(--vy-grey-300);
   --vy-border-mid:        var(--vy-grey-400);
   --vy-border-heavy:      var(--vy-grey-500);
+
+  /* A STATE IS A BOUNDARY TOO, and this is the role 1.4.11 asks for in the one
+     place the resting sweep cannot look. `--vy-border-heavy` was doing this
+     job for `.vy-input` and `.vy-sup-btn`, and the comment beside it reasoned
+     in light mode only: "grey-500, not grey-400 — the resting border is now
+     darker than grey-400, so the old hover was lighter than the state it was
+     meant to emphasise." True on white. In DARK the resting border is #707c8d
+     and grey-500 is DARKER than it, so the same declaration made the hover
+     both fainter than the resting state and non-conforming: measured 2.68 on
+     the panel, 2.41 on a raised one, 2.02 on `surface-strong`. The app's main
+     text input, on hover, in the theme half the team uses.
+
+     ONE VALUE CANNOT DO IT, for the same reason the brand fill and the brand
+     text cannot share one — "more visible" is darker on white and lighter on
+     near-black. So this is a role, re-pointed per theme, and in light the ramp
+     answers it: grey-500 reads 5.24 on a panel against the resting 3.97, and
+     4.02 on its worst ground. 9 Nov. */
+  --vy-border-control-hover: var(--vy-grey-500);
 
   /* Brand, by role rather than by step, so a theme can re-point them. In dark
      mode the fill and the text CANNOT be the same token: a 9:1-on-white blue is
@@ -302,18 +352,33 @@
   /* --- Typography -----------------------------------------------------------
      The legacy app declared NO font stack at all (computed font-family was the
      bare keyword `sans-serif`), so it rendered in the browser default and
-     varied per OS. This pins it. */
-  --vy-font-sans: "Inter Variable", "Inter", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
-  --vy-font-mono: "JetBrains Mono", ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+     varied per OS. This pins it.
 
-  --vy-text-2xs:  10px;
+     ONE FAMILY, SINCE 7 NOV. There was a second — JetBrains Mono, for
+     identifiers. The 13 October meeting ended that: "do not use monotext, hard
+     to read". `.vy-ident` was rewritten the same day; the last holdout, the
+     MiniTable grids, went on 22 Oct. On 22 Oct the customer also said what
+     mono had been FOR — "vì nó là unique value. Nếu e để giống field bình
+     thường thì nó k đc nổi bật lắm" — so the requirement is PROMINENCE, not a
+     typeface, and prominence is cheaper than a second font: semibold, the
+     strong ink, and `tabular-nums` to hold digits in columns. The token itself
+     went once nothing but code samples still asked for it; Kendo's monospace
+     variable is bridged to this same sans. */
+  --vy-font-sans: "Inter Variable", "Inter", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+
   /* 12px IS THE FLOOR, since 22 Oct. It was 11px, and the customer agreed to
      raise it when we proposed it — "hệ thống mình xử lý chữ và dữ liệu nhiều",
      and our own small-text check has flagged anything under 12 all along.
-     `xs` and `sm` therefore hold the same size for now. The two names stay
-     because they mean different things — `xs` is metadata and labels, `sm` is
-     secondary text — and a scale that has nowhere left to go downwards is the
-     point rather than an oversight. */
+     `2xs`, `xs` and `sm` therefore hold the same size on a fine pointer. The
+     three names stay because they mean different things — `2xs` is a badge or
+     a chip, `xs` is metadata and labels, `sm` is secondary text — and they
+     separate again under `pointer: coarse` below. A scale with nowhere left to
+     go downwards is the point rather than an oversight.
+
+     `2xs` WAS THE ONE STILL UNDER THE FLOOR, at 10px, in ten rules the floor
+     was meant to cover — badges, the avatar chip, `.vy-column-req`,
+     `.vy-vs-required`. Raised 7 Nov. */
+  --vy-text-2xs:  12px;
   --vy-text-xs:   12px;
   --vy-text-sm:   12px;
   --vy-text-base: 13px;   /* grid + form default */
@@ -327,14 +392,14 @@
      `mobile:check` found 126 pieces of text under 12px on customer screens,
      nearly all at `xs`. None of it is a conformance failure — 1.4.4 is about
      zoom, which works — but 10 and 11px is small on a device held at arm's
-     length, and this scale steps in single pixels at the bottom, so 10, 11 and
-     12 are barely three sizes at all.
+     length.
 
-     A FLOOR WOULD HAVE COLLAPSED IT. Clamping everything to 12 makes 2xs, xs
-     and sm one size and throws away the hierarchy the scale exists to carry.
-     Shifting the body range by a constant +2 keeps every relationship exactly
-     as it is and lifts the smallest step to 12: 12, 13, 14, 15, 16, 18 instead
-     of 10, 11, 12, 13, 14, 16.
+     THE BOTTOM OF THE SCALE IS COLLAPSED on a fine pointer: 12 is the floor,
+     so `2xs`, `xs` and `sm` all sit on it and three names carry one size.
+     Here they come apart again — 12, 13, 14 — and every step above them moves
+     +2: 15, 16, 18. That is what this block is for. A finger gets back the
+     hierarchy the floor costs a mouse, and the floor is never crossed in
+     either direction.
 
      THE DISPLAY SIZES DO NOT MOVE. `xl` and up are 20px and over; they are
      already comfortable, and growing a heading on a 375px screen buys nothing
@@ -582,8 +647,6 @@
   --vy-chart-bar-w:       28px;  /* a bar wide enough to segment, narrow enough for 12 */
   --vy-swatch-h:          52px;
   --vy-palette-w:        620px;
-  --vy-palette-group-w:   66px;
-  --vy-palette-indent:    74px;  /* aligns the sub-line under the palette title */
   --vy-finding-label-w:  128px;
   --vy-finding-title-w:  260px;
   --vy-stat-min-w:       150px;
@@ -591,7 +654,32 @@
   --vy-link-card-min-w:  220px;
   --vy-search-w:         420px;
   --vy-grid-search-min:  220px;  /* below this the placeholder truncates */
-  --vy-doc-max-w:       1180px;
+
+  /* --- The content cap ------------------------------------------------------
+     ONE NUMBER, THREE USES, and they are the same number on purpose.
+
+     A page in this app is one of four shapes, and until 9 Nov only two of them
+     declared a width. `.vy-page--doc` and `.vy-page--record` capped at 1180;
+     `.vy-page--grid` and bare `.vy-page` declared nothing, so they grew with
+     the window without limit — at a 1920 viewport the content box is 1624px
+     and at 2560 it is 2264px.
+
+     For a LIST that is right, and it is a decision rather than an omission:
+     the widest grid in this product is 1806px at its default view (Project
+     Requirements, 12 columns at their B5.3 role widths) and 2106px with every
+     column turned on (Part Master, 16). Any cap below those numbers would
+     create horizontal scrolling on a window that had the width to avoid it.
+     `.vy-page--grid` therefore opts out, explicitly.
+
+     For a page with NO GRID TO FILL there is nothing to spend the width on,
+     and the measured cost is real: on the Home chart at 1920 the twelve bars
+     stay 28px wide (`--vy-chart-bar-w`) and the air between them grows to
+     98px, so a series reads as twelve isolated sticks; the four My Queues
+     tiles become 400px each to hold a one-digit number. So the BASE rule caps
+     and the grid shape opts out — a page that declares nothing now gets the
+     conservative width rather than the unbounded one. */
+  --vy-page-max:        1180px;
+  --vy-doc-max-w:       var(--vy-page-max);
 
   /* --- Elevation layers ------------------------------------------------------ */
 /* ---- Layering ---------------------------------------------------------------
@@ -662,7 +750,7 @@
   --vy-view-picker-w:    180px;
   --vy-tz-w:             180px;  /* timezone select in the global header */
   --vy-kpi-min-w:        140px;
-  --vy-record-max-w:     1180px;
+  --vy-record-max-w:    var(--vy-page-max);
   --vy-login-form-w:      380px;  /* the login form, held to a readable width */
   --vy-select-col-w:       40px;  /* the row-selection checkbox column */
   --vy-people-menu-w:     320px;  /* the people picker's list, sized for name + email */
@@ -732,7 +820,16 @@
      Run Quotation reference panel started drawing its boxes with border-mid. */
   --vy-border-mid: #55606f;
   --vy-border-heavy: #55606f;
-  --vy-border-control: #6d7889;
+  --vy-border-control: #707c8d;   /* worst ground 3.05 on surface-strong — see the light note */
+  /* ONE NOTCH LIGHTER THAN `border-control`, on its own hue and saturation
+     line (H 215.2, S 11.5%, L 49.6% -> 56.7%) — the construction
+     `--vy-border-control` itself was chosen by. The ramp does not answer it
+     here: grey-500 and border-mid are DARKER than the resting border, and the
+     next step up, grey-400 at #97a2b2, is lighter than `on-surface-subtle`, so
+     a hovered edge would outshine the quietest text on the page. Measured 5.23
+     on a panel against the resting 4.04, and 3.95 on `surface-strong` — within
+     0.07 of what light gets from grey-500, which is the point. */
+  --vy-border-control-hover: #858f9e;
   --vy-brand: var(--vy-blue-300);
   --vy-brand-hover: var(--vy-blue-200);
   --vy-brand-active: var(--vy-blue-100);
@@ -742,10 +839,29 @@
   --vy-brand-on: #0f131a;
   --vy-brand-subtle: #1b2a4a;
   --vy-brand-subtle-strong: #223357;
-  --vy-brand-boundary: var(--vy-blue-400);
+  /* blue-300 in dark, not blue-400. The focus ring is drawn on the GROUND
+     beside the control, offset 2px, so the ground is what it has to clear —
+     and in dark, blue-400 reached only 2.88 on `surface-strong`. blue-300
+     clears every dark ground, the tightest being 4.76 on the same one.
+     Found on 8 Nov by the first run of `contrast:check` after it was taught
+     to measure boundaries against every ground instead of the panel. */
+  --vy-brand-boundary: var(--vy-blue-300);
   --vy-brand-boundary-soft: var(--vy-blue-500);
   --vy-brand-boundary-light: var(--vy-blue-300);
-  --vy-brand-boundary-strong: var(--vy-blue-400);
+  /* blue-200, NOT blue-400 — and the measurement that proves it is already in
+     the note above. That note fixed the focus RING and left the focus BORDER
+     behind: `--vy-brand-boundary-strong` is what `.vy-input:focus`,
+     `.vy-cell-input:focus` and `.vy-richtext:focus-within` draw their edge
+     with, and it stayed on blue-400 at the same 2.88 on `surface-strong` that
+     disqualified the ring. Both tokens were measured in one pass on 8 Nov and
+     only one of them moved.
+
+     "Strong" means one step MORE emphatic than `boundary` — in light one step
+     darker (blue-400 -> blue-500), in dark one step lighter. Keeping blue-400
+     here left the pair un-inverted: in dark, "strong" was darker than plain
+     `boundary`, and therefore weaker than it. blue-200 restores the
+     relationship and clears every dark ground, tightest 7.22. 9 Nov. */
+  --vy-brand-boundary-strong: var(--vy-blue-200);
   --vy-brand-light: var(--vy-blue-300);
   --vy-brand-soft: var(--vy-blue-400);
   --vy-on-chrome-muted: var(--vy-grey-300);
@@ -783,6 +899,22 @@
   --vy-status-draft-bg: #2a323f;
   --vy-status-open-fg: #eeb796;
   --vy-status-open-bg: #38281e;
+  /* PROGRESS WAS THE ONE STATUS NOBODY DARKENED. Seven of the eight invert
+     here; `progress` kept its light pair — `#155e75` on `#cffafe` — so a
+     dark grid showed one bright cyan chip among seven dark ones. Contrast
+     inside the chip was never the problem (6.49:1); looking wrong was.
+     Added 8 Nov, built the way the other seven are: the foreground runs
+     between `96` and `ee`, the background between `1e` and `38`, and the
+     middle channel carries the hue. 8.72:1, inside the 6.16–9.30 band the
+     rest of the vocabulary occupies.
+
+     IT STILL SITS ALMOST ON TOP OF `review`, and that is not new: in light
+     the two are 1.5° apart in hue and told apart only by how pale the chip
+     is. Here they are 6° apart. The word is what separates them, which is
+     what B1.6 says a status is — but if the two are ever confused on screen,
+     the fix is a different hue for one of them, not a darker cyan. */
+  --vy-status-progress-fg: #96e4ee;
+  --vy-status-progress-bg: #1e3838;
   --vy-status-done-fg: #96eed5;
   --vy-status-done-bg: #1e3831;
   --vy-status-waiting-fg: #b896ee;
@@ -844,7 +976,8 @@
     --vy-border: #2a323f;
     --vy-border-strong: #3b4553;
     --vy-border-heavy: #55606f;
-    --vy-border-control: #6d7889;
+    --vy-border-control: #707c8d;   /* worst ground 3.05 on surface-strong — see the light note */
+    --vy-border-control-hover: #858f9e;   /* worst ground 3.95 on surface-strong — see the dark note */
     --vy-brand: var(--vy-blue-300);
     --vy-brand-hover: var(--vy-blue-200);
     --vy-brand-active: var(--vy-blue-100);
@@ -854,10 +987,16 @@
     --vy-brand-on: #0f131a;
     --vy-brand-subtle: #1b2a4a;
     --vy-brand-subtle-strong: #223357;
-    --vy-brand-boundary: var(--vy-blue-400);
+    /* blue-300 in dark, not blue-400. The focus ring is drawn on the GROUND
+       beside the control, offset 2px, so the ground is what it has to clear —
+       and in dark, blue-400 reached only 2.88 on `surface-strong`. blue-300
+       clears every dark ground, the tightest being 4.76 on the same one.
+       Found on 8 Nov by the first run of `contrast:check` after it was taught
+       to measure boundaries against every ground instead of the panel. */
+    --vy-brand-boundary: var(--vy-blue-300);
     --vy-brand-boundary-soft: var(--vy-blue-500);
     --vy-brand-boundary-light: var(--vy-blue-300);
-    --vy-brand-boundary-strong: var(--vy-blue-400);
+    --vy-brand-boundary-strong: var(--vy-blue-200);   /* tightest 7.22 — see the dark note */
     --vy-on-chrome-muted: var(--vy-grey-300);
   
     --vy-border-mid: #55606f;
@@ -873,6 +1012,10 @@
     --vy-status-draft-bg: #2a323f;
     --vy-status-open-fg: #eeb796;
     --vy-status-open-bg: #38281e;
+    /* Added 8 Nov — see the note in the block above. A token must appear in
+       all three blocks or the two ways of choosing dark disagree (B1.8). */
+    --vy-status-progress-fg: #96e4ee;
+    --vy-status-progress-bg: #1e3838;
     --vy-status-done-fg: #96eed5;
     --vy-status-done-bg: #1e3831;
     --vy-status-waiting-fg: #b896ee;
@@ -882,7 +1025,7 @@
     --vy-status-blocked-fg: #ee9a96;
     --vy-status-blocked-bg: #38201e;
     --vy-status-cancelled-fg: #aab4c3;
-  --vy-chart-cancelled: #5d6878;
+    --vy-chart-cancelled: #5d6878;
     --vy-status-cancelled-bg: #2a323f;
     --vy-tone-excluded-bg: #2a323f;
     --vy-tone-excluded-fg: #aab4c3;

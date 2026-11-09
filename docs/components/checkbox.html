@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Checkbox</title>
+<style>
+:root{
+  --ink:#131820; --ink-2:#363e4b; --ink-3:#4d5766; --ink-4:#626d7e;
+  --line:#dde2e9; --line-soft:#eceff3; --paper:#ffffff; --app:#f5f7fa;
+  --brand:#1a419e; --brand-soft:#f1f4fa; --code:#15347e;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--app);color:var(--ink-2);
+  font:15px/1.65 "Inter","Segoe UI",system-ui,-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:40px 28px 80px;background:var(--paper);
+  box-shadow:0 1px 2px rgba(19,24,32,.06)}
+h1,h2,h3,h4{color:var(--ink);line-height:1.25;text-wrap:balance}
+h1{font-size:34px;font-weight:700;margin:0 0 8px;letter-spacing:-.01em}
+h2{font-size:25px;font-weight:650;margin:52px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line)}
+h3{font-size:19px;font-weight:600;margin:32px 0 10px}
+h4{font-size:16px;font-weight:600;margin:24px 0 8px;color:var(--ink-2)}
+p{margin:0 0 14px;max-width:86ch}
+ul,ol{margin:0 0 14px;padding-left:22px;max-width:86ch}
+li{margin:5px 0}
+a{color:var(--brand);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:.18em}
+hr{border:0;border-top:1px solid var(--line-soft);margin:34px 0}
+code{font:500 13px/1.5 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  background:var(--brand-soft);color:var(--code);padding:1px 5px;border-radius:3px}
+blockquote{margin:0 0 16px;padding:12px 16px;background:var(--brand-soft);
+  border-left:3px solid var(--brand);border-radius:0 4px 4px 0;color:var(--ink-2);max-width:86ch}
+blockquote p{margin:0}
+.t{overflow-x:auto;margin:0 0 18px}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th{text-align:left;font-weight:600;color:var(--ink);background:var(--app);
+  border-bottom:1px solid var(--line);padding:8px 10px;white-space:nowrap}
+td{border-bottom:1px solid var(--line-soft);padding:8px 10px;vertical-align:top}
+td code{white-space:nowrap}
+tr:last-child td{border-bottom:0}
+figure{margin:18px 0 24px}
+img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:6px}
+.toc{background:var(--app);border:1px solid var(--line);border-radius:8px;
+  padding:18px 22px;margin:26px 0 34px}
+.toc h2{margin:0 0 10px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink-4);border:0;padding:0}
+.toc ol{list-style:none;margin:0;padding:0;columns:2;column-gap:36px}
+.toc li{margin:3px 0;break-inside:avoid}
+.toc li.l1{font-weight:600;color:var(--ink);margin-top:10px}
+.toc li.l1:first-child{margin-top:0}
+.toc li.l2{padding-left:14px}
+@media (max-width:760px){.wrap{padding:24px 16px 60px}.toc ol{columns:1}h1{font-size:27px}}
+@media print{
+  body{background:#fff}
+  .wrap{max-width:none;padding:0;box-shadow:none}
+  h2{page-break-after:avoid}
+  figure,table,blockquote{page-break-inside:avoid}
+  .toc{break-after:page}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="toc"><h2>Contents</h2><ol>
+<li class="l2"><a href="#when-to-use">When to use</a></li>
+<li class="l2"><a href="#when-not-to-use">When not to use</a></li>
+<li class="l2"><a href="#why-the-class-not-kendos-react-component">Why the class, not Kendo's React component</a></li>
+<li class="l2"><a href="#k-checkbox-lg-and-why-the-size-is-not-a-detail">`k-checkbox-lg`, and why the size is not a detail</a></li>
+<li class="l2"><a href="#two-kendo-defaults-the-bridge-has-to-correct">Two Kendo defaults the bridge has to correct</a></li>
+<li class="l2"><a href="#accessibility">Accessibility</a></li>
+<li class="l2"><a href="#api">API</a></li>
+<li class="l2"><a href="#related">Related</a></li>
+<li class="l2"><a href="#recent-changes">Recent changes</a></li>
+</ol></nav>
+<h1 id="checkbox">Checkbox</h1>
+<blockquote><strong>Status: stable</strong> · <code>src/ui/Overlays.tsx</code> · a <strong>native input wearing Kendo's classes</strong>, and that is the interesting part. Written to the template set by <a href="button.html"><code>button.md</code></a>.</blockquote>
+<hr>
+<h2 id="when-to-use">When to use</h2>
+<p>A single yes/no, or one of several independent yes/nos: <em>Conformal Coating</em>, <em>Provide Alt AML For Out of Stock</em>, a column in the <a href="column-chooser.html">column chooser</a>, a row in a grid.</p>
+<h2 id="when-not-to-use">When not to use</h2>
+<div class="t"><table><thead><tr><th>Instead of a checkbox</th><th>Use</th><th>Why</th></tr></thead><tbody><tr><td>One choice among several</td><td><a href="radio-group.html">Radio group</a></td><td>Checkboxes are independent; radios are exclusive</td></tr><tr><td>A setting that applies immediately and can be undone</td><td>A switch — <strong>which this app does not have</strong></td><td>The live system uses <code>k-switch</code> ×4 and nothing here matches it yet</td></tr><tr><td>Filtering a list</td><td><a href="chip.html">Chip</a> or the <a href="filter-toolbar.html">filter toolbar</a></td><td></td></tr></tbody></table></div>
+<hr>
+<h2 id="why-the-class-not-kendos-react-component">Why the class, not Kendo's React component</h2>
+<p>Kendo's <code>&lt;Checkbox&gt;</code> cannot express two things this app needs:</p>
+<p><strong><code>indeterminate</code>.</strong> There is no prop for it. The grid's select-all box needs it to mean <em>"some rows on this page, not all"</em>, and it has to be set through the DOM node either way.</p>
+<p><strong><code>aria-label</code>.</strong> Only <code>ariaLabelledBy</code> / <code>ariaDescribedBy</code> are offered — and the grid names <strong>every row's box individually</strong>:</p>
+<blockquote><em>"Select 01455-387-9552"</em>, because a screen reader moving down twenty identical labels reading <em>"Select row"</em> learns nothing.</blockquote>
+<p>Kendo's component renders exactly this markup anyway: a native input carrying <code>k-checkbox</code>. Using the class directly gives the same pixels, keeps both capabilities, and <strong>avoids a React wrapper around each of the ~300 checkboxes a full grid page renders</strong>.</p>
+<blockquote>Kendo styles <code>.k-checkbox:indeterminate</code> — the <strong>native pseudo-class</strong> — so the state comes through with no help from us.</blockquote>
+<hr>
+<h2 id="k-checkbox-lg-and-why-the-size-is-not-a-detail"><code>k-checkbox-lg</code>, and why the size is not a detail</h2>
+<p><strong>20px, measured</strong> — exactly the size the hand-written box was.</p>
+<p><code>md</code> is 16px and would have <strong>quietly shrunk every checkbox in the app by a fifth</strong>, including the grid's, where the label's 24px target is switched off and **the box <em>is</em> the pointer target**.</p>
+<hr>
+<h2 id="two-kendo-defaults-the-bridge-has-to-correct">Two Kendo defaults the bridge has to correct</h2>
+<div class="t"><table><thead><tr><th></th><th>Kendo's default</th><th>Here</th></tr></thead><tbody><tr><td><strong>Unchecked boundary</strong></td><td><code>--kendo-color-border</code> → grey-200, <strong>1.30:1</strong></td><td><code>--vy-border-control</code></td></tr><tr><td><strong>Indeterminate box</strong></td><td>A white box with a blue dash — the dash reads at 5.9:1, but the <strong>outline</strong> still came from the global border</td><td>Same visible edge as an empty box</td></tr><tr><td><strong>Disabled</strong></td><td>Styled <strong>by class</strong>, so a plain <code>&lt;input disabled&gt;</code> renders identically to an enabled one</td><td>Keyed off <code>:disabled</code>, dimmed by <code>--vy-state-disabled</code></td></tr></tbody></table></div>
+<blockquote><strong>An indeterminate box is not a checked one.</strong> It needs the same visible boundary as an empty one, which is why the rule is <code>:not(:checked)</code> and not <code>:not(:checked):not(:indeterminate)</code> — the first attempt left the select-all header with the faint edge the rule was written to fix.</blockquote>
+<p><strong>Disabled uses opacity, not a grey wash.</strong> The earlier rule put <code>:disabled</code> after <code>:checked</code> at equal specificity, so a disabled <strong>ticked</strong> box went grey and took its white tick with it — on exactly the control whose whole job was to show <em>"this column is always shown"</em>.</p>
+<h2 id="accessibility">Accessibility</h2>
+<div class="t"><table><tbody><tr><td>Label</td><td>The <code>&lt;label&gt;</code> wraps the input, so there is no <code>for</code>/<code>id</code> to get wrong</td></tr><tr><td>Grid rows</td><td>Each box is named individually, with the record it selects</td></tr><tr><td>Indeterminate</td><td>The native pseudo-class, so assistive tech reports <em>mixed</em></td></tr><tr><td>Disabled</td><td>Dimmed and announced; where it matters, the reason sits beside it</td></tr><tr><td>Target</td><td>20px box; where the label's target is off, the box carries it</td></tr></tbody></table></div>
+<h2 id="api">API</h2>
+<p>``<code>tsx &lt;Checkbox checked={on} onCheckedChange={setOn} label="Conformal Coating" /&gt; </code>``</p>
+<div class="t"><table><thead><tr><th>Prop</th><th>Type</th></tr></thead><tbody><tr><td><code>checked</code></td><td><code>boolean</code></td></tr><tr><td><code>onCheckedChange</code></td><td><code>(c: boolean) =&gt; void</code></td></tr><tr><td><code>label</code></td><td><code>ReactNode</code></td></tr></tbody></table></div>
+<p>For a grid row or the column chooser, the raw input is used directly with <code>k-checkbox k-checkbox-lg</code> — the wrapper exists for the labelled case.</p>
+<hr>
+<h2 id="related">Related</h2>
+<p><a href="radio-group.html">Radio group</a> · <a href="column-chooser.html">Column chooser</a> · <a href="data-grid.html">Data grid</a> · <a href="../design-system.html#e2--kendoreact">E2 · KendoReact</a> · <a href="../design-system.html#b14-lines">B1.4 · Lines</a></p>
+<h2 id="recent-changes">Recent changes</h2>
+<div class="t"><table><thead><tr><th>Date</th><th>Change</th></tr></thead><tbody><tr><td>8 Nov 2026</td><td>This page</td></tr><tr><td>8 Nov 2026</td><td><code>--vy-border-control</code> re-measured against every ground — the unchecked box was reading 2.85 on the page</td></tr></tbody></table></div>
+</div>
+</body>
+</html>

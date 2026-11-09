@@ -1,10 +1,12 @@
 import { ROLE_WIDTH } from '../components/column-model';
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { RocketLaunch } from '../ui/RocketLaunch';
 import { BOOT_STAGES } from '../ui/bootStages';
 import { ErrorBoundary } from '../ui/ErrorBoundary';
 import { StatusBadge } from '../ui/Badge';
 import { Button } from '../ui/Button';
+import { Chip } from '../ui/Chip';
+import { Icon } from '../ui/icons';
 
 /**
  * The design system, on screen.
@@ -111,7 +113,7 @@ export function DesignSystemPage() {
       </Section>
 
       <Section title="Status vocabulary"
-        note="Eight tokens, and what they encode is who is blocked — not what stage the record is at. `open` means waiting on us and is what a work queue filters to; `waiting` means waiting on a customer, supplier or approver. Production colours every Part Master status the same green, which makes the column decorative. In dark, `In-Progress` deliberately keeps its solid green while `Completed` becomes a tint — the guideline names them Green and Light Green, and that only reads if one of them is actually saturated.">
+        note="Eight tokens, and what they encode is who is blocked — not what stage the record is at. `open` means waiting on us and is what a work queue filters to; `waiting` means waiting on a customer, supplier or approver. Production colours every Part Master status the same green, which makes the column decorative. In dark every pair is built the same way — foreground between `96` and `ee`, background between `1e` and `38` — so `In-Progress` and `Completed` are separated by hue and by the word, not by one of them staying saturated. `In-Progress` was the last to get a dark pair, on 8 Nov; until then it kept its light chip and read as the one bright badge on a dark grid.">
         <div className="vy-badge-row">
           {['Draft','New','In-Progress','Quoted','Completed','Blocked','Cancelled'].map(s => <StatusBadge key={s} value={s} />)}
         </div>
@@ -150,6 +152,43 @@ export function DesignSystemPage() {
           <Button variant="text">Text</Button>
           <Button variant="danger">Danger</Button>
           <Button variant="filled" disabled>Disabled</Button>
+        </div>
+      </Section>
+
+      <Section title="Chip — selected and unselected"
+        note="A filter chip. Selected is a tonal fill, a blue border AND a leading check — never colour alone, so it survives greyscale and colour-blindness. Both fills are close to their ground, so the BORDER is what defines the chip and WCAG 1.4.11's 3:1 applies to it twice over: `--vy-brand-boundary` when selected, where blue-300 measured 2.50 and would have failed, and `--vy-border-control` at rest, which until 8 Nov was the structure token at 1.64. In the product only the selected state ships — both call sites pass it, because a chip there is a filter you can take off, not one you can put on. Drawing the resting state here anyway is what found both of its defects — that border, and an `aria-pressed` that vanished instead of saying `false`.">
+        <div className="vy-badge-row">
+          <Chip label="Unselected" />
+          <Chip label="Selected" selected />
+          <Chip label="Due this week · Mine" selected />
+        </div>
+      </Section>
+
+      <Section title="Button — anatomy"
+        note="Three parts and nothing else. The icon slot holds the busy indicator when the action is running, so the button keeps its width and the toolbar does not move. Numbers read left to right.">
+        <div className="vy-anatomy">
+          <Button variant="filled" icon={<Icon name="download" />}>Export</Button>
+          <div className="vy-anatomy-parts">
+            <div><b>1</b><span>Container — <code>--vy-shape-full</code>, height from the size rung, 1px transparent border so outlined and filled measure the same</span></div>
+            <div><b>2</b><span>Icon slot — optional, <code>aria-hidden</code> unless it is the busy indicator. Alone, it makes the button square</span></div>
+            <div><b>3</b><span>Label — <code>--vy-text-base</code> at <code>--vy-weight-medium</code>, Title Case, never wraps</span></div>
+          </div>
+        </div>
+      </Section>
+
+      <Section title="Button — the states that hold still"
+        note="Default, disabled and busy are rendered here because they are real without a pointer. Hover, focus and press are NOT drawn: they need a live cursor or a live keyboard, and a class that imitates them photographs a rule the product never runs — `.k-hover` turns a tonal button dark here while a real pointer leaves it tinted. What those three do is written down instead, with the token that does it. Busy is disabled as well as spinning: the indicator says something is happening, the disable is what stops a second click spending a second request.">
+        <div className="vy-btn-matrix">
+          <span />
+          {['default', 'disabled', 'busy'].map(s => <span className="h" key={s}>{s}</span>)}
+          {(['filled', 'tonal', 'outlined', 'text', 'danger'] as const).map(v => (
+            <Fragment key={v}>
+              <span className="r">{v}</span>
+              <span><Button variant={v}>Save</Button></span>
+              <span><Button variant={v} disabled>Save</Button></span>
+              <span><Button variant={v} busy>Save</Button></span>
+            </Fragment>
+          ))}
         </div>
       </Section>
 
@@ -204,9 +243,9 @@ export function DesignSystemPage() {
         </div>
       </Section>
 
-      <Section title="Type scale" note="The production app declares no font-family at all — the computed value is the bare keyword `sans-serif`, so it renders differently on every OS. English only, per design decision D12, so the scale carries no CJK line-height allowance.">
+      <Section title="Type scale" note="The production app declares no font-family at all — the computed value is the bare keyword `sans-serif`, so it renders differently on every OS. English only, per design decision D12, so the scale carries no CJK line-height allowance. 12px is the floor, agreed with the customer on 22 Oct, so the bottom three steps all sit on it on a fine pointer; under `pointer: coarse` they come apart again as 12 · 13 · 14.">
         <div className="vy-type-scale">
-          {[['--vy-text-2xl','24px','Page title'],['--vy-text-xl','20px','Section title'],['--vy-text-lg','16px','Subsection'],['--vy-text-md','14px','Body emphasis'],['--vy-text-base','13px','Body / grid default'],['--vy-text-sm','12px','Secondary'],['--vy-text-xs','11px','Column headers, meta']].map(([v,size,use]) => (
+          {[['--vy-text-3xl','28px','Display'],['--vy-text-2xl','24px','Page title'],['--vy-text-xl','20px','Section title'],['--vy-text-lg','16px','Subsection'],['--vy-text-md','14px','Body emphasis'],['--vy-text-base','13px','Body / grid default'],['--vy-text-sm','12px','Secondary'],['--vy-text-xs','12px','Column headers, meta'],['--vy-text-2xs','12px','Badges and chips']].map(([v,size,use]) => (
             <div className="vy-type-row" key={v}>
               <span style={{ fontSize: `var(${v})` }}>{use}</span>
               <code>{v} · {size}</code>

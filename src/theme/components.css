@@ -60,11 +60,32 @@ a.vy-btn, a.vy-btn:hover { text-decoration: none; }
 }
 .k-button.k-button-solid.vy-btn--tonal:hover { background-color: var(--vy-brand-subtle-strong); }
 .vy-btn--tonal    { background: var(--vy-brand-subtle); color: var(--vy-brand-text-deep); }
-.vy-btn--outlined { background: var(--vy-surface); color: var(--vy-on-surface); border-color: var(--vy-border-strong); }
-.vy-btn--outlined:hover { border-color: var(--vy-border-mid); }
+/* `border-control`, like the chip and the search box. This variant reaches the
+   DOM only through `asChild` — a router Link wearing a button's clothes, such
+   as "Back to Home" on the error state — so the Kendo bridge's
+   `.k-button-outline` correction never touches it, and it kept the structure
+   token at 1.64:1. An outlined button is identified by its outline; that is
+   the definition of the case 1.4.11 covers. 8 Nov.
+
+   HOVER NO LONGER MOVES THE BORDER: it went to `border-mid` at 2.58:1, fainter
+   than the resting edge now is. `data-state-layer` already gives this variant a
+   hover layer, so the state is carried without weakening the boundary. */
+.vy-btn--outlined { background: var(--vy-surface); color: var(--vy-on-surface); border-color: var(--vy-border-control); }
 .vy-btn--text     { background: transparent; color: var(--vy-brand-text-hover); padding-inline: var(--vy-space-5); }
 .vy-btn--danger   { background: var(--vy-danger); color: var(--vy-on-dark-fg); box-shadow: var(--vy-elev-1); }
 .vy-btn-icon { display: inline-flex; }
+
+/* THE BUSY INDICATOR, ON A SOLID FILL. Kendo paints the loader segments from
+   its own theme colour, and the Loader accepts only base / primary /
+   secondary / tertiary — none of which is light. On `filled` and `danger`
+   that left a dark indicator on a dark fill: 1.19:1 and 1.97:1 measured on
+   8 Nov, against the 3:1 WCAG 1.4.11 asks of an indicator carrying meaning.
+   The colour belongs to the fill, not to the loader, so it comes from the
+   `on-` half of the fill's own pair — which is also what keeps it right in
+   dark, where `--vy-brand` lightens and `--vy-brand-on` darkens with it.
+   `.k-loader` is in the selector only to clear Kendo's own (0,2,0). */
+.vy-btn-busy--on-brand  .k-loader .k-loader-segment { background-color: var(--vy-brand-on); }
+.vy-btn-busy--on-danger .k-loader .k-loader-segment { background-color: var(--vy-danger-on); }
 
 /* --- Badge / pill ---------------------------------------------------------
    Fixed width so a status column scans as a straight edge. This was GAP-01
@@ -91,7 +112,16 @@ a.vy-btn, a.vy-btn:hover { text-decoration: none; }
 .vy-chip {
   display: inline-flex; align-items: center; gap: var(--vy-space-2);
   font-family: inherit; font-size: var(--vy-text-base); color: var(--vy-on-surface-soft);
-  background: var(--vy-surface); border: 1px solid var(--vy-border-strong);
+  /* `border-control`, not `border-strong`. The resting border was the
+     structure token at 1.64:1 against the panel, which B1.4 defines as the
+     category WCAG 1.4.11 does NOT cover — panel edges, table rules. A chip is
+     something you operate, so its boundary is the category that IS covered,
+     and `--vy-border-control` is the token measured for exactly that job at
+     3.06:1. Changed 8 Nov; latent until then because both call sites pass
+     `selected` and the resting state had never rendered. The comment below
+     reasons carefully about the SELECTED border and says nothing about this
+     one, which is how it survived. */
+  background: var(--vy-surface); border: 1px solid var(--vy-border-control);
   border-radius: var(--vy-shape-sm); padding: var(--vy-space-2) var(--vy-space-5); cursor: pointer;
   transition: background-color var(--vy-dur-short) var(--vy-ease-standard);
 }
@@ -136,9 +166,13 @@ a.vy-btn, a.vy-btn:hover { text-decoration: none; }
   padding-block: 0;
   transition: border-color var(--vy-dur-short) var(--vy-ease-standard);
 }
-/* grey-500, not grey-400. The resting border is now darker than grey-400, so
-   the old hover was lighter than the state it was meant to emphasise. */
-.vy-input:hover { border-color: var(--vy-border-heavy); }
+/* THE HOVER EDGE HAS ITS OWN TOKEN, because this rule was written in light
+   mode and `--vy-border-heavy` is darker than the resting border on white and
+   LIGHTER-is-what-dark-needs on #161c25. In dark it measured 2.68 on the
+   panel and 2.02 on `surface-strong`: a hover that both dimmed the control
+   and fell under 1.4.11, on the app's main text input. The token now
+   re-points per theme — grey-500 in light, #858f9e in dark. 9 Nov. */
+.vy-input:hover { border-color: var(--vy-border-control-hover); }
 .vy-input:focus { border-color: var(--vy-brand-boundary-strong); outline: none; box-shadow: var(--vy-focus-ring); }
 .vy-textarea { resize: vertical; min-height: calc(var(--vy-space-14) * 2); line-height: 1.5; }
 .vy-search-field { position: relative; display: flex; align-items: center; flex: 1; max-width: var(--vy-search-w); }
@@ -650,17 +684,13 @@ a.vy-btn, a.vy-btn:hover { text-decoration: none; }
 .vy-suffix { font-size: var(--vy-text-base); color: var(--vy-on-surface-subtle); white-space: nowrap; }
 .vy-notes-edit { display: grid; grid-template-columns: repeat(auto-fit, minmax(var(--vy-note-min-w), 1fr)); gap: var(--vy-space-8); margin-top: var(--vy-space-9); }
 
-/* --- Identifiers -----------------------------------------------------------
-   Part numbers, RFQ numbers, MPNs. Monospaced and tabular so they align
-   digit-for-digit down a column and a transposed character is visible.
+/* --- Identifiers are TEXT, not code ----------------------------------------
+   Part numbers, RFQ numbers, MPNs, assembly numbers. The DataGrid applies this
+   via [data-role="ident"]; this class is for the places that render an
+   identifier outside a grid — MiniTable cells, the record header.
 
-   The DataGrid applies this via [data-role="ident"]; this class is for the
-   places that render an identifier outside a grid — MiniTable cells, the
-   record header. It was lost with kendo-bridge.css and those identifiers
-   silently fell back to the body font. */
-/* ---- Identifiers are TEXT, not code --------------------------------------
-   They were set in JetBrains Mono: part numbers, MPNs, RFQ numbers, assembly
-   numbers. The 13 October meeting: "do not use monotext, hard to read".
+   They were set in JetBrains Mono. The 13 October meeting: "do not use
+   monotext, hard to read".
 
    A monospaced face earns its keep where characters must be told apart one at a
    time — a licence key, a hash, a diff. A part number is read as a WORD by
@@ -844,11 +874,11 @@ a.vy-btn, a.vy-btn:hover { text-decoration: none; }
    3:1 WCAG's G183 asks for is not reachable on the colour axis at all, so the
    resting distinction has to be something other than colour.
 
-   Weight rather than a resting underline: twenty stacked monospace identifiers
-   carry twenty rules, and this column is the one people read down. 500 is a
-   REAL face — `@fontsource/jetbrains-mono/500.css` is loaded next to 400 in
-   main.tsx — not a synthesised bold, and monospace keeps its advance width, so
-   nothing reflows. It is the quieter signal of the two and the weaker one; the
+   Weight rather than a resting underline: twenty stacked identifiers carry
+   twenty rules, and this column is the one people read down. 500 is a REAL
+   instance of Inter Variable, not a synthesised bold, and it is the resting
+   state rather than a hover state, so no width is ever reserved and nothing
+   reflows. It is the quieter signal of the two and the weaker one; the
    underline still arrives on hover, and every one of these links is a standalone
    control rather than a link inside a sentence, which is the case G183 is
    actually written about.
@@ -1234,9 +1264,12 @@ a.vy-btn, a.vy-btn:hover { text-decoration: none; }
    switched rather than merely hovered. */
 .vy-rt-btn[aria-pressed="true"] { background: var(--vy-brand-subtle); color: var(--vy-brand-text-hover); }
 
+/* A real `<select>`, so `border-control` — B1.4 names dropdowns in the list
+   this token exists for, and this one had been left on the structure token at
+   1.27 against its toolbar. Found by the control sweep on 8 Nov. */
 .vy-rt-block select {
   font: inherit; font-size: var(--vy-text-sm); color: var(--vy-on-surface);
-  background: var(--vy-surface); border: 1px solid var(--vy-border);
+  background: var(--vy-surface); border: 1px solid var(--vy-border-control);
   border-radius: var(--vy-radius-sm); padding: var(--vy-space-1) var(--vy-space-3);
   cursor: pointer; margin-right: var(--vy-space-3);
 }
@@ -1304,9 +1337,15 @@ a.vy-btn, a.vy-btn:hover { text-decoration: none; }
   border-radius: var(--vy-radius-md);
   box-shadow: var(--vy-shadow-lg);
 }
+/* `border-control`, like the chip, and for a sharper version of the same
+   reason: this button's entire content is a colour fill. There is no text and
+   no icon, so the border is the ONLY thing separating a pale swatch from the
+   popover behind it — the textbook case WCAG 1.4.11 is written for. At
+   `--vy-border-strong` it measured 1.64:1 against the popover. Changed 8 Nov,
+   with the chip, after a sweep of every focusable control found both. */
 .vy-rt-swatch {
   width: var(--vy-space-9); height: var(--vy-space-9);
-  border: 1px solid var(--vy-border-strong); border-radius: var(--vy-radius-sm);
+  border: 1px solid var(--vy-border-control); border-radius: var(--vy-radius-sm);
   cursor: pointer; padding: 0;
 }
 .vy-rt-swatch:hover { transform: scale(1.12); }
@@ -1657,7 +1696,7 @@ a.vy-btn, a.vy-btn:hover { text-decoration: none; }
 }
 .vy-sup-btn-label { color: var(--vy-on-surface-muted); }
 .vy-sup-btn-value { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.vy-sup-btn:hover { border-color: var(--vy-border-heavy); }
+.vy-sup-btn:hover { border-color: var(--vy-border-control-hover); }
 .vy-sup-btn:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
 .vy-sup-btn[data-changed] {
   background: var(--vy-brand-subtle); border-color: var(--vy-brand-boundary-strong);
@@ -1874,7 +1913,12 @@ a.vy-btn, a.vy-btn:hover { text-decoration: none; }
   background: transparent; border-color: transparent;
   padding: var(--vy-space-2) var(--vy-space-3);
 }
-.vy-cell-input:hover { border-color: var(--vy-border-strong); background: var(--vy-surface); }
+/* THE HOVER BORDER IS THE WHOLE AFFORDANCE HERE — the cell is transparent at
+   rest, and this edge is the only thing that says the number can be typed over.
+   So it is `border-control`, the token measured for a control boundary, not
+   `border-strong` at 1.64:1. A boundary that exists to identify a control is
+   covered by 1.4.11 whether it shows at rest or on hover. 8 Nov. */
+.vy-cell-input:hover { border-color: var(--vy-border-control); background: var(--vy-surface); }
 .vy-cell-input:focus { border-color: var(--vy-brand-boundary-strong); background: var(--vy-surface); }
 
 .vy-line-status {

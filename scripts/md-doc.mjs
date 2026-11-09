@@ -69,7 +69,29 @@ function inline(s) {
   s = s.replace(/!\[([^\]]*)\]\(([^)]+)\)/g,
     (_, alt, href) => `<figure><img alt="${alt}" src="${dataUri(href)}"></figure>`);
   s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, text, href) => {
-    const target = href.startsWith('#') || href.startsWith('http') ? href : href;
+    /* A LINK BETWEEN TWO DOCUMENTS HAS TO SURVIVE THE RENDER. In the markdown
+       a sibling page is `../design-system.md#b2--typography`, which is right
+       for a reader in the repository and wrong in the HTML, where that path
+       is a file the browser downloads instead of a page it opens.
+       ONLY WHERE THE HTML ACTUALLY EXISTS. The first version of this rewrote
+       every relative `.md`, which broke nine links per document in one go:
+       the design system cites seven working notes — `contrast-sweep.md`,
+       `focus-order.md`, `table-patterns.md` and the rest — that nothing
+       builds to HTML, and they all became dead `.html` paths. So the
+       rewrite is conditional on the file being there, which also means the
+       component pages have to be built before the document that links to
+       them. An absolute URL is someone else's and is left exactly as
+       written. */
+    const target = (() => {
+      if (/^(https?:|#|mailto:)/.test(href)) return href;
+      /* NOT `path` — that is the node module, in scope here, and shadowing it
+         made every build die with "path.dirname is not a function". */
+      const [rel, frag] = href.split('#');
+      if (!rel.endsWith('.md')) return href;
+      const asHtml = rel.replace(/\.md$/, '.html');
+      const onDisk = path.resolve(path.dirname(out), asHtml);
+      return fs.existsSync(onDisk) ? asHtml + (frag ? '#' + frag : '') : href;
+    })();
     const ext = /^https?:/.test(href) ? ' target="_blank" rel="noopener"' : '';
     return `<a href="${target}"${ext}>${text}</a>`;
   });

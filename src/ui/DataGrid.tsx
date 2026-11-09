@@ -203,7 +203,28 @@ export function DataGrid<T extends { id: string | number }>({
     [columns]
   );
   const hiddenCount = (allColumns?.length ?? columns.length) - columns.length;
-  const searchFields = useMemo(() => columns.filter(c => c.searchable).map(c => c.field), [columns]);
+  /* SEARCHED OVER THE WHOLE COLUMN SET, not the visible one — 9 Nov.
+     This read `columns`, which is what the view currently shows, so hiding a
+     column in the Columns checklist silently narrowed what the list could
+     find. Measured on Manufacturers: "SEMCO" is an alias of Samsung
+     Electro-Mechanics and nothing else, so it matches 1 of 18 — untick the
+     Aliases column and the same query returns 0 rows under "Nothing matches
+     'SEMCO'", with the record still in the list and the box still captioned
+     "Search name, website or alias".
+
+     Two reasons that is wrong and not a trade-off. The pattern page defines
+     Columns as which of the view's columns YOU PERSONALLY SHOW, stored in your
+     browser — a display preference, and a display preference must not change
+     the answer to a question. And `searchPlaceholder` is a fixed string the
+     page author wrote, naming the fields; it cannot know what you hid, so the
+     caption goes on promising a field the search has stopped reading.
+
+     The cost, stated: a row can now match on a column you cannot see. That is
+     the smaller harm — a hit you have to widen the view to explain, against a
+     record the list told you does not exist. */
+  const searchFields = useMemo(
+    () => (allColumns ?? columns).filter(c => c.searchable).map(c => c.field),
+    [allColumns, columns]);
 
   const filtered = useMemo(() => {
     const n = search.trim().toLowerCase();

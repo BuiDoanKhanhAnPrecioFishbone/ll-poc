@@ -1,10 +1,10 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 /* Self-hosted, so there is no request to Google and no flash of fallback text.
-   Variable Inter is one file for every weight. */
+   Variable Inter is one file for every weight — and, since 7 Nov, the only
+   family. JetBrains Mono went with the last rule that asked for it; it was
+   still being downloaded by every user for a face nothing rendered. */
 import '@fontsource-variable/inter';
-import '@fontsource/jetbrains-mono/400.css';
-import '@fontsource/jetbrains-mono/500.css';
 
 import './theme/tokens.css';      // primitives — the only raw values
 import './theme/base.css';        // reset + document defaults

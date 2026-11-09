@@ -115,10 +115,29 @@ export function Button({
   /* An icon with nothing beside it. Kendo has a class for exactly this and it
      carries the squareness, so the test is here rather than at each call site. */
   const iconOnly = icon != null && children == null;
+  /**
+   * THE INDICATOR TAKES THE `on-` COLOUR OF THE FILL IT SITS ON.
+   *
+   * It used to take Kendo's `base` theme colour on the two solid variants,
+   * which resolves to `#3d3d3d`. Measured on 8 Nov while writing the
+   * component page: **1.19:1** against `--vy-brand` and **1.97:1** against
+   * `--vy-danger`, where WCAG 1.4.11 asks 3:1 of an indicator that carries
+   * meaning. The two it failed on were the primary action and the
+   * destructive one — the two buttons whose busy state matters most.
+   *
+   * `themeColor` cannot fix it: Kendo's Loader takes only
+   * `base | primary | secondary | tertiary` and none of them is light. So the
+   * colour comes from the token that already exists for exactly this job —
+   * the `on-` half of the fill's pair, which is white on `--vy-danger` and
+   * follows the brand through both themes on `--vy-brand`. In dark, where
+   * `--vy-brand` becomes a light blue, `--vy-brand-on` becomes dark with it
+   * and the indicator stays legible without a second rule.
+   */
+  const onFill = variant === 'filled' ? ' vy-btn-busy--on-brand'
+    : variant === 'danger' ? ' vy-btn-busy--on-danger' : '';
   const shown = busy
-    ? <span className="vy-btn-busy"><Loader size="small" type="pulsing"
-             themeColor={variant === 'filled' || variant === 'danger' ? 'base' : 'primary'}
-             label="Working" /></span>
+    ? <span className={`vy-btn-busy${onFill}`}><Loader size="small" type="pulsing"
+             themeColor="primary" label="Working" /></span>
     : icon;
 
   const forwardToDom = useCallback((handle: { element?: HTMLElement | null } | null) => {

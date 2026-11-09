@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pattern · File upload</title>
+<style>
+:root{
+  --ink:#131820; --ink-2:#363e4b; --ink-3:#4d5766; --ink-4:#626d7e;
+  --line:#dde2e9; --line-soft:#eceff3; --paper:#ffffff; --app:#f5f7fa;
+  --brand:#1a419e; --brand-soft:#f1f4fa; --code:#15347e;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--app);color:var(--ink-2);
+  font:15px/1.65 "Inter","Segoe UI",system-ui,-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:40px 28px 80px;background:var(--paper);
+  box-shadow:0 1px 2px rgba(19,24,32,.06)}
+h1,h2,h3,h4{color:var(--ink);line-height:1.25;text-wrap:balance}
+h1{font-size:34px;font-weight:700;margin:0 0 8px;letter-spacing:-.01em}
+h2{font-size:25px;font-weight:650;margin:52px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line)}
+h3{font-size:19px;font-weight:600;margin:32px 0 10px}
+h4{font-size:16px;font-weight:600;margin:24px 0 8px;color:var(--ink-2)}
+p{margin:0 0 14px;max-width:86ch}
+ul,ol{margin:0 0 14px;padding-left:22px;max-width:86ch}
+li{margin:5px 0}
+a{color:var(--brand);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:.18em}
+hr{border:0;border-top:1px solid var(--line-soft);margin:34px 0}
+code{font:500 13px/1.5 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  background:var(--brand-soft);color:var(--code);padding:1px 5px;border-radius:3px}
+blockquote{margin:0 0 16px;padding:12px 16px;background:var(--brand-soft);
+  border-left:3px solid var(--brand);border-radius:0 4px 4px 0;color:var(--ink-2);max-width:86ch}
+blockquote p{margin:0}
+.t{overflow-x:auto;margin:0 0 18px}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th{text-align:left;font-weight:600;color:var(--ink);background:var(--app);
+  border-bottom:1px solid var(--line);padding:8px 10px;white-space:nowrap}
+td{border-bottom:1px solid var(--line-soft);padding:8px 10px;vertical-align:top}
+td code{white-space:nowrap}
+tr:last-child td{border-bottom:0}
+figure{margin:18px 0 24px}
+img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:6px}
+.toc{background:var(--app);border:1px solid var(--line);border-radius:8px;
+  padding:18px 22px;margin:26px 0 34px}
+.toc h2{margin:0 0 10px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink-4);border:0;padding:0}
+.toc ol{list-style:none;margin:0;padding:0;columns:2;column-gap:36px}
+.toc li{margin:3px 0;break-inside:avoid}
+.toc li.l1{font-weight:600;color:var(--ink);margin-top:10px}
+.toc li.l1:first-child{margin-top:0}
+.toc li.l2{padding-left:14px}
+@media (max-width:760px){.wrap{padding:24px 16px 60px}.toc ol{columns:1}h1{font-size:27px}}
+@media print{
+  body{background:#fff}
+  .wrap{max-width:none;padding:0;box-shadow:none}
+  h2{page-break-after:avoid}
+  figure,table,blockquote{page-break-inside:avoid}
+  .toc{break-after:page}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="toc"><h2>Contents</h2><ol>
+<li class="l2"><a href="#where-it-appears">Where it appears</a></li>
+<li class="l2"><a href="#the-honest-half">The honest half</a></li>
+<li class="l2"><a href="#what-is-deliberately-not-here">What is deliberately not here</a></li>
+<li class="l2"><a href="#rules">Rules</a></li>
+<li class="l2"><a href="#content">Content</a></li>
+<li class="l2"><a href="#accessibility">Accessibility</a></li>
+<li class="l2"><a href="#related">Related</a></li>
+<li class="l2"><a href="#recent-changes">Recent changes</a></li>
+</ol></nav>
+<h1 id="pattern--file-upload">Pattern · File upload</h1>
+<blockquote>Choosing a file is real. Sending it is not, and the screen says so. <strong>Components:</strong> FileDrop · <a href="../components/button.html">Button</a> · Toast</blockquote>
+<hr>
+<h2 id="where-it-appears">Where it appears</h2>
+<p>Five places, and they are the reason the component exists: the BoM file on <strong>Run Quotation</strong> and on <strong>Create BoM</strong>, a document on a <strong>checklist task</strong>, <strong>attachments</strong> on a new part, and the file for <strong>BoM Comparison</strong>.</p>
+<p>Before it, <code>live-component-sweep.md</code> recorded the gap plainly: <em>"<code>k-upload</code> ships and we have no file input at all — every upload in this prototype reports what it would do."</em></p>
+<hr>
+<h2 id="the-honest-half">The honest half</h2>
+<div class="t"><table><thead><tr><th>What the user gets</th><th>What they do not</th></tr></thead><tbody><tr><td>A file picker</td><td>A transfer</td></tr><tr><td>Drag and drop</td><td>A progress bar that means anything</td></tr><tr><td>The file's <strong>name and size</strong> on screen</td><td>A server-side result</td></tr><tr><td>The ability to <strong>remove</strong> it</td><td>Parsing</td></tr></tbody></table></div>
+<p><strong>Nothing is uploaded, and that is deliberate.</strong> <code>autoUpload</code> is off and no <code>saveUrl</code> is set, because there is nowhere to send it.</p>
+<blockquote>A <code>saveUrl</code> pointing at nothing would show <strong>every file as failed</strong> — which is not "not implemented", it is "implemented and broken". The difference matters to a reviewer, and it is the whole argument for leaving it unset.</blockquote>
+<p><strong>And the caller says so</strong>, rather than letting the control imply otherwise. The hint under every drop zone reads:</p>
+<blockquote><em>.xlsx only. Chosen files stay in this browser — this prototype has nowhere to send them.</em></blockquote>
+<hr>
+<h2 id="what-is-deliberately-not-here">What is deliberately not here</h2>
+<p><strong>Parsing the spreadsheet</strong> — column detection, merge rules, the MFG/MPN pairs — is a separate piece of work that needs a real file reader. It is recorded as unbuilt in the testing docs, not hidden behind a spinner.</p>
+<p>Choosing the file was the part missing from the UI; that is the part that was built.</p>
+<hr>
+<h2 id="rules">Rules</h2>
+<ol><li><strong>Restrict by extension, and say the restriction.</strong> <code>.xlsx only</code> sits under the control, not in an error after the fact.</li><li><strong>One file unless the screen needs more.</strong> <code>multiple</code> is off by default; the checklist task is the exception, and it accepts <code>.xlsx,.pdf,.png,.jpg,.doc,.docx</code> because a task attachment is whatever the task needs.</li><li><strong>A chosen file is removable.</strong> The list is state, not a receipt.</li><li><strong>The caller handles the "and then what".</strong> <code>onPick</code> receives the names and the screen decides — the control never claims the work is done.</li></ol>
+<h2 id="content">Content</h2>
+<ul><li>The hint names the <strong>filter</strong> and the <strong>limitation</strong>, in that order.</li><li>A file that does not match shows <strong>what it is</strong> rather than only that it is wrong — the attachments list on Run Quotation marks a <code>.pdf</code> as <em>not .xlsx</em> beside it, so the user can see why it is not selectable.</li></ul>
+<h2 id="accessibility">Accessibility</h2>
+<div class="t"><table><tbody><tr><td>Keyboard</td><td>Kendo's Upload is reachable and operable without a pointer; drag and drop is never the only way</td></tr><tr><td>Name and size</td><td>Real text beside each file, not a tooltip</td></tr><tr><td>Remove</td><td>A real button per file</td></tr><tr><td>Hint</td><td>A sibling of the control, so it is not folded into the accessible name</td></tr></tbody></table></div>
+<hr>
+<h2 id="related">Related</h2>
+<p><a href="wizard.html">Wizard</a> · <a href="feedback.html">Feedback and toasts</a> · <a href="../design-system.html#a3--five-rules-before-you-build">A3 · Five rules before you build</a> · <a href="../design-system.html#e2--kendoreact">E2 · KendoReact</a></p>
+<h2 id="recent-changes">Recent changes</h2>
+<div class="t"><table><thead><tr><th>Date</th><th>Change</th></tr></thead><tbody><tr><td>8 Nov 2026</td><td>This page</td></tr></tbody></table></div>
+</div>
+</body>
+</html>

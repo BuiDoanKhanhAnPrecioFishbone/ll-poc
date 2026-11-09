@@ -61,6 +61,18 @@ h1, h2, h3, h4, h5, h6, p, figure, blockquote, dl, dd { margin: 0; }
 img, svg, video { max-width: 100%; display: block; }
 a { color: inherit; }
 
+/* ONE FAMILY MEANS THE USER-AGENT'S TOO. `code`, `kbd`, `samp` and `pre` carry
+   a monospace default from the browser, not from us — so dropping
+   `--vy-font-mono` on 7 Nov would have left thirteen of them rendering in
+   whatever mono the OS supplies, which is the face the 13 Oct review asked us
+   to remove. Caught in the design-system capture, where the token labels came
+   back monospaced after the rule that set them was deleted. Digits stay in
+   columns because that is what these elements are usually holding. */
+code, kbd, samp, pre {
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
+}
+
 /* Tabular figures wherever numbers are compared vertically. Proportional digits
    in a grid make a mis-keyed value impossible to spot. */
 table, .vy-num, [data-role="number"], [data-role="money"], [data-role="date"] {

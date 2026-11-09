@@ -9,7 +9,7 @@ import { fmtDate, fmtDateTime, fmtLongDate, fmtMoney, fmtNumber } from './region
  * Roles drive rendering, so a date cannot be formatted two ways on two screens
  * and a number cannot be left-aligned on one and right on another. This lived
  * inside DataGrid; MiniTable had its own path that used roles for WIDTH but
- * fell back to String(value) for content — so identifiers lost their monospace
+ * fell back to String(value) for content — so identifiers lost their treatment
  * and dates rendered as raw Date objects in every in-record table. Two
  * renderers is one renderer too many.
  */

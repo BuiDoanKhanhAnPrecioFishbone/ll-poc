@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rich text</title>
+<style>
+:root{
+  --ink:#131820; --ink-2:#363e4b; --ink-3:#4d5766; --ink-4:#626d7e;
+  --line:#dde2e9; --line-soft:#eceff3; --paper:#ffffff; --app:#f5f7fa;
+  --brand:#1a419e; --brand-soft:#f1f4fa; --code:#15347e;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--app);color:var(--ink-2);
+  font:15px/1.65 "Inter","Segoe UI",system-ui,-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:40px 28px 80px;background:var(--paper);
+  box-shadow:0 1px 2px rgba(19,24,32,.06)}
+h1,h2,h3,h4{color:var(--ink);line-height:1.25;text-wrap:balance}
+h1{font-size:34px;font-weight:700;margin:0 0 8px;letter-spacing:-.01em}
+h2{font-size:25px;font-weight:650;margin:52px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line)}
+h3{font-size:19px;font-weight:600;margin:32px 0 10px}
+h4{font-size:16px;font-weight:600;margin:24px 0 8px;color:var(--ink-2)}
+p{margin:0 0 14px;max-width:86ch}
+ul,ol{margin:0 0 14px;padding-left:22px;max-width:86ch}
+li{margin:5px 0}
+a{color:var(--brand);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:.18em}
+hr{border:0;border-top:1px solid var(--line-soft);margin:34px 0}
+code{font:500 13px/1.5 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  background:var(--brand-soft);color:var(--code);padding:1px 5px;border-radius:3px}
+blockquote{margin:0 0 16px;padding:12px 16px;background:var(--brand-soft);
+  border-left:3px solid var(--brand);border-radius:0 4px 4px 0;color:var(--ink-2);max-width:86ch}
+blockquote p{margin:0}
+.t{overflow-x:auto;margin:0 0 18px}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th{text-align:left;font-weight:600;color:var(--ink);background:var(--app);
+  border-bottom:1px solid var(--line);padding:8px 10px;white-space:nowrap}
+td{border-bottom:1px solid var(--line-soft);padding:8px 10px;vertical-align:top}
+td code{white-space:nowrap}
+tr:last-child td{border-bottom:0}
+figure{margin:18px 0 24px}
+img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:6px}
+.toc{background:var(--app);border:1px solid var(--line);border-radius:8px;
+  padding:18px 22px;margin:26px 0 34px}
+.toc h2{margin:0 0 10px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink-4);border:0;padding:0}
+.toc ol{list-style:none;margin:0;padding:0;columns:2;column-gap:36px}
+.toc li{margin:3px 0;break-inside:avoid}
+.toc li.l1{font-weight:600;color:var(--ink);margin-top:10px}
+.toc li.l1:first-child{margin-top:0}
+.toc li.l2{padding-left:14px}
+@media (max-width:760px){.wrap{padding:24px 16px 60px}.toc ol{columns:1}h1{font-size:27px}}
+@media print{
+  body{background:#fff}
+  .wrap{max-width:none;padding:0;box-shadow:none}
+  h2{page-break-after:avoid}
+  figure,table,blockquote{page-break-inside:avoid}
+  .toc{break-after:page}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="toc"><h2>Contents</h2><ol>
+<li class="l2"><a href="#when-to-use">When to use</a></li>
+<li class="l2"><a href="#when-not-to-use">When not to use</a></li>
+<li class="l2"><a href="#the-toolbar-is-the-live-one-in-its-order">The toolbar is the live one, in its order</a></li>
+<li class="l2"><a href="#what-is-deliberately-not-built">What is deliberately **not** built</a></li>
+<li class="l2"><a href="#implementation-and-why-it-is-trial">Implementation, and why it is `trial`</a></li>
+<li class="l2"><a href="#accessibility">Accessibility</a></li>
+<li class="l2"><a href="#api">API</a></li>
+<li class="l2"><a href="#related">Related</a></li>
+<li class="l2"><a href="#recent-changes">Recent changes</a></li>
+</ol></nav>
+<h1 id="rich-text">Rich text</h1>
+<blockquote><strong>Status: trial</strong> · <code>src/ui/RichText.tsx</code> · the Conversations tab. <strong>Trial</strong>, because the implementation is deliberately provisional — see below. Written to the template set by <a href="button.html"><code>button.md</code></a>.</blockquote>
+<hr>
+<h2 id="when-to-use">When to use</h2>
+<p>Where a comment written <strong>in the real system</strong> can arrive formatted — the Conversations tab, and nowhere else yet.</p>
+<h2 id="when-not-to-use">When not to use</h2>
+<div class="t"><table><thead><tr><th>Instead of rich text</th><th>Use</th><th>Why</th></tr></thead><tbody><tr><td>A description or note field</td><td>A textarea — see <a href="field.html">Field</a></td><td>Formatting someone cannot see elsewhere is formatting lost</td></tr><tr><td>A single line</td><td>An input</td><td></td></tr></tbody></table></div>
+<blockquote>A plain textarea here would render a formatted note as <strong>a wall of unstyled text</strong>, and an editor missing <em>Clean formatting</em> cannot undo a paste from Word. Those two facts are why this component exists.</blockquote>
+<hr>
+<h2 id="the-toolbar-is-the-live-one-in-its-order">The toolbar is the live one, in its order</h2>
+<p>``<code> Undo · Redo | Bold · Italic · Underline · Strikethrough | Unordered list · Ordered list | Color · Background color | Outdent · Indent | Format | Clean formatting </code>``</p>
+<p>Read off the live editor and reproduced exactly, because a comment in the real system can contain all of it.</p>
+<p><strong>The glyphs are drawn, not lettered</strong> — B/I/U as paths rather than characters, so the toolbar does not depend on the UI font.</p>
+<h3 id="two-places-it-narrows-the-live-control-on-purpose">Two places it narrows the live control on purpose</h3>
+<div class="t"><table><thead><tr><th></th><th>Live</th><th>Here</th><th>Why</th></tr></thead><tbody><tr><td><strong>Text colour</strong></td><td>Kendo's full spectrum</td><td><strong>5 system ink colours</strong></td><td>In a comment thread a wheel is more freedom than anyone needs and a reliable way to produce unreadable text on white</td></tr><tr><td><strong>Highlight</strong></td><td>Full spectrum</td><td>4, including <em>None</em></td><td>Same, and all four are grounds the ink above stays legible on</td></tr></tbody></table></div>
+<hr>
+<h2 id="what-is-deliberately-not-built">What is deliberately <strong>not</strong> built</h2>
+<p>The live tab shows a <strong>"?"</strong> beside the toolbar. It looks like a help control.</p>
+<blockquote>It is not. It is the current user's <strong>avatar with no initials to show</strong>.  Worth recording, because building a help affordance that does not exist is exactly the kind of invention this project has had to keep undoing.</blockquote>
+<h2 id="implementation-and-why-it-is-trial">Implementation, and why it is <code>trial</code></h2>
+<p><code>contentEditable</code> plus <code>document.execCommand</code>.</p>
+<p><code>execCommand</code> is deprecated, and its replacement is to ship a full editor framework — a large dependency to prove a small point in a prototype. It is supported in every current browser, and <strong>the seam is one file</strong>: swapping in a real editor later means replacing this component, not its callers.</p>
+<p>That is the whole reason for the <strong>trial</strong> status. The surface is right; the engine is provisional.</p>
+<h2 id="accessibility">Accessibility</h2>
+<div class="t"><table><tbody><tr><td>Toolbar</td><td><code>role="toolbar"</code>; every button has a text label, never the glyph alone</td></tr><tr><td>Pressed state</td><td><code>aria-pressed</code> on the mark buttons; Undo/Redo are <code>stateless</code> and carry none, because they have no on/off to reflect</td></tr><tr><td>The surface</td><td>Labelled, and reachable with one <code>Tab</code> from the toolbar</td></tr><tr><td>Keyboard</td><td>The browser's own <code>Cmd/Ctrl+B/I/U</code> work, because the surface is a real editable region</td></tr><tr><td>Colour menus</td><td>Each swatch is named — <em>Red</em>, <em>Amber</em> — not colour alone</td></tr></tbody></table></div>
+<h2 id="api">API</h2>
+<div class="t"><table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody><tr><td><code>value</code></td><td><code>string</code></td><td>HTML</td></tr><tr><td><code>onChange</code></td><td><code>(html: string) =&gt; void</code></td><td></td></tr><tr><td><code>placeholder</code></td><td><code>string</code></td><td>Rendered as <strong>a real element</strong>, not a CSS <code>::before</code>, so it can be <code>aria-hidden</code> and not read as content</td></tr><tr><td><code>ariaLabel</code></td><td><code>string</code></td><td>Names the surface, and the toolbar as <em>"{ariaLabel} formatting"</em></td></tr></tbody></table></div>
+<hr>
+<h2 id="related">Related</h2>
+<p><a href="field.html">Field</a> · <a href="button.html">Button</a> · <a href="../design-system.html#b14-lines">B1.4 · Lines</a> · <a href="../design-system.html#e2--kendoreact">E2 · KendoReact</a></p>
+<h2 id="recent-changes">Recent changes</h2>
+<div class="t"><table><thead><tr><th>Date</th><th>Change</th></tr></thead><tbody><tr><td>8 Nov 2026</td><td>This page</td></tr></tbody></table></div>
+</div>
+</body>
+</html>

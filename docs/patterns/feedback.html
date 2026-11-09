@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pattern · Feedback</title>
+<style>
+:root{
+  --ink:#131820; --ink-2:#363e4b; --ink-3:#4d5766; --ink-4:#626d7e;
+  --line:#dde2e9; --line-soft:#eceff3; --paper:#ffffff; --app:#f5f7fa;
+  --brand:#1a419e; --brand-soft:#f1f4fa; --code:#15347e;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--app);color:var(--ink-2);
+  font:15px/1.65 "Inter","Segoe UI",system-ui,-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:40px 28px 80px;background:var(--paper);
+  box-shadow:0 1px 2px rgba(19,24,32,.06)}
+h1,h2,h3,h4{color:var(--ink);line-height:1.25;text-wrap:balance}
+h1{font-size:34px;font-weight:700;margin:0 0 8px;letter-spacing:-.01em}
+h2{font-size:25px;font-weight:650;margin:52px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line)}
+h3{font-size:19px;font-weight:600;margin:32px 0 10px}
+h4{font-size:16px;font-weight:600;margin:24px 0 8px;color:var(--ink-2)}
+p{margin:0 0 14px;max-width:86ch}
+ul,ol{margin:0 0 14px;padding-left:22px;max-width:86ch}
+li{margin:5px 0}
+a{color:var(--brand);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:.18em}
+hr{border:0;border-top:1px solid var(--line-soft);margin:34px 0}
+code{font:500 13px/1.5 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  background:var(--brand-soft);color:var(--code);padding:1px 5px;border-radius:3px}
+blockquote{margin:0 0 16px;padding:12px 16px;background:var(--brand-soft);
+  border-left:3px solid var(--brand);border-radius:0 4px 4px 0;color:var(--ink-2);max-width:86ch}
+blockquote p{margin:0}
+.t{overflow-x:auto;margin:0 0 18px}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th{text-align:left;font-weight:600;color:var(--ink);background:var(--app);
+  border-bottom:1px solid var(--line);padding:8px 10px;white-space:nowrap}
+td{border-bottom:1px solid var(--line-soft);padding:8px 10px;vertical-align:top}
+td code{white-space:nowrap}
+tr:last-child td{border-bottom:0}
+figure{margin:18px 0 24px}
+img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:6px}
+.toc{background:var(--app);border:1px solid var(--line);border-radius:8px;
+  padding:18px 22px;margin:26px 0 34px}
+.toc h2{margin:0 0 10px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink-4);border:0;padding:0}
+.toc ol{list-style:none;margin:0;padding:0;columns:2;column-gap:36px}
+.toc li{margin:3px 0;break-inside:avoid}
+.toc li.l1{font-weight:600;color:var(--ink);margin-top:10px}
+.toc li.l1:first-child{margin-top:0}
+.toc li.l2{padding-left:14px}
+@media (max-width:760px){.wrap{padding:24px 16px 60px}.toc ol{columns:1}h1{font-size:27px}}
+@media print{
+  body{background:#fff}
+  .wrap{max-width:none;padding:0;box-shadow:none}
+  h2{page-break-after:avoid}
+  figure,table,blockquote{page-break-inside:avoid}
+  .toc{break-after:page}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="toc"><h2>Contents</h2><ol>
+<li class="l2"><a href="#four-kinds-and-when-each-one">Four kinds, and when each one</a></li>
+<li class="l2"><a href="#the-one-that-was-wrong-and-why-it-has-its-own-kind">The one that was wrong, and why it has its own kind</a></li>
+<li class="l2"><a href="#undo-is-what-pays-for-inline-editing">Undo is what pays for inline editing</a></li>
+<li class="l2"><a href="#nothing-silently-does-nothing">Nothing silently does nothing</a></li>
+<li class="l2"><a href="#toast-banner-or-dialog">Toast, banner, or dialog</a></li>
+<li class="l2"><a href="#content">Content</a></li>
+<li class="l2"><a href="#accessibility">Accessibility</a></li>
+<li class="l2"><a href="#related">Related</a></li>
+<li class="l2"><a href="#recent-changes">Recent changes</a></li>
+</ol></nav>
+<h1 id="pattern--feedback">Pattern · Feedback</h1>
+<blockquote>What the screen says back after you press something. Four kinds, and the colour has to agree with the words. <strong>Components:</strong> Toast · <a href="../components/button.html">Button</a> · banners</blockquote>
+<hr>
+<h2 id="four-kinds-and-when-each-one">Four kinds, and when each one</h2>
+<div class="t"><table><thead><tr><th>Kind</th><th>Says</th><th>Lives</th><th>Call sites</th></tr></thead><tbody><tr><td><strong>success</strong></td><td>It worked</td><td>4.5s, background</td><td>27</td></tr><tr><td><strong>error</strong></td><td>It did <strong>not</strong> work, and what to fix</td><td><strong>9s, foreground</strong></td><td>8</td></tr><tr><td><strong>undoable</strong></td><td>It worked, and here is the way back</td><td>4.5s, with an <strong>Undo</strong></td><td>5</td></tr><tr><td><strong>notImplemented</strong></td><td>This would do X, but not in this prototype</td><td>4.5s, background</td><td>28</td></tr></tbody></table></div>
+<hr>
+<h2 id="the-one-that-was-wrong-and-why-it-has-its-own-kind">The one that was wrong, and why it has its own kind</h2>
+<p><code>error</code> exists because the app used to announce failures through <code>success</code>.</p>
+<blockquote>A validation message telling you which required fields were still empty arrived on the <strong>green</strong> toast. So did <em>"Select assembly first!"</em>.  The words were right and <strong>the colour said the opposite</strong> — which is worse than saying nothing, because a user who trusts the colour carries on believing the step worked.</blockquote>
+<p>So a failure is a different kind, not a different string, and it gets two things the others do not:</p>
+<ul><li><strong>9 seconds instead of 4.5.</strong> The default is tuned for <em>that worked</em> — a message you can miss without cost. A message naming what you must fix before continuing is one you cannot, and the user is usually still reading the form rather than watching the corner.</li><li><strong><code>foreground</code></strong>, so a screen reader announces it assertively rather than waiting its turn.</li></ul>
+<hr>
+<h2 id="undo-is-what-pays-for-inline-editing">Undo is what pays for inline editing</h2>
+<p>Inline editing buys speed by removing the Save step. The price is that a mis-click is a <strong>silent commit</strong>.</p>
+<p><code>undoable</code> is how that price is paid. Without it, <em>"saves as you go"</em> just means <em>"cannot be taken back"</em>.</p>
+<blockquote>The Undo button is a Radix <code>Action</code>, not a plain button: it keeps the toast alive while focus is inside it, so <strong>tabbing to Undo cannot race the timeout</strong>. A way back that disappears while you are reaching for it is not a way back.</blockquote>
+<hr>
+<h2 id="nothing-silently-does-nothing">Nothing silently does nothing</h2>
+<p><code>notImplemented</code> has the most call sites of any kind — <strong>28</strong> — and that is the point.</p>
+<blockquote>A mockup full of buttons that silently do nothing is worse than one with fewer buttons: a reviewer cannot tell a missing feature from a broken one.</blockquote>
+<p>The wording is fixed so it cannot drift: <strong>"Not in this prototype — this would {what}."</strong>, where <code>what</code> completes the sentence. It is the toast half of <a href="../design-system.html#a3--five-rules-before-you-build">A3 rule 5</a> — <em>say what is not real</em>.</p>
+<hr>
+<h2 id="toast-banner-or-dialog">Toast, banner, or dialog</h2>
+<div class="t"><table><thead><tr><th>Use</th><th>When</th><th>Example</th></tr></thead><tbody><tr><td><strong>Toast</strong></td><td>It is done, and you do not have to act</td><td><code>Published</code></td></tr><tr><td><strong>Banner</strong></td><td>A condition that persists while you are on the screen</td><td><em>Editing RFQ…. Nothing is saved until you choose Save.</em> · a credit-limit warning</td></tr><tr><td><strong>Dialog</strong></td><td>You must answer before anything happens</td><td><a href="destructive-action.html">Destructive action</a></td></tr><tr><td><strong>Field error</strong></td><td>One field is wrong</td><td>On blur, beside its own field</td></tr></tbody></table></div>
+<p>A toast for something the user must act on is a message that will be missed. A banner for something transient is clutter that outlives its reason.</p>
+<hr>
+<h2 id="content">Content</h2>
+<ul><li><strong>A control says what happens; the toast confirms it in the same words.</strong> <code>Publish</code> → <code>Published</code>. Not <code>Publish</code> → <code>Success</code>.</li><li>An error says <strong>what to do</strong>, never <em>Something went wrong</em>.</li><li>A derived figure says it is derived. A session-only change says so.</li></ul>
+<h2 id="accessibility">Accessibility</h2>
+<div class="t"><table><tbody><tr><td>Live region</td><td>Radix Toast provides it; <code>success</code>/<code>info</code> are polite, <code>error</code> is assertive</td></tr><tr><td>Timer</td><td>Pauses while the pointer is over the toast</td></tr><tr><td>Dismiss</td><td>A real button, <code>aria-label="Dismiss"</code></td></tr><tr><td>Undo</td><td><code>altText="Undo this change"</code>, so the action is announced even when the visual label is not read</td></tr><tr><td>Swipe</td><td>Down, on touch — and never the only way to dismiss</td></tr><tr><td>Colour</td><td>Never alone: the kind is in the words as well as the fill</td></tr></tbody></table></div>
+<hr>
+<h2 id="related">Related</h2>
+<p><a href="../design-system.html#d5--the-four-screen-states">D5 · The four screen states</a> · <a href="../design-system.html#d6--words">D6 · Words</a> · <a href="destructive-action.html">Destructive action</a> · <a href="record-form.html">Record form</a></p>
+<h2 id="recent-changes">Recent changes</h2>
+<div class="t"><table><thead><tr><th>Date</th><th>Change</th></tr></thead><tbody><tr><td>8 Nov 2026</td><td>This page</td></tr></tbody></table></div>
+</div>
+</body>
+</html>

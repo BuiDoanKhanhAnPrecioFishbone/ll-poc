@@ -1,7 +1,11 @@
 import { STATUS_TOKEN } from '../data/status';
 
 /**
- * Status badge — the six-token vocabulary, unchanged from the Kendo build.
+ * Status badge — the seven-token vocabulary, unchanged from the Kendo build.
+ * (Said "six" until 8 Nov 2026, three weeks after `waiting` was added and the
+ * argument for the seventh was written into `status.ts` above the map. A
+ * stale count is the kind of comment that sends the next reader to the wrong
+ * number, which is the one thing a comment must not do.)
  * The vocabulary was always the design decision; the component rendering it
  * was incidental. Fixed width (formerly GAP-01) is now just a token, with no
  * library to work around.

@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dialog</title>
+<style>
+:root{
+  --ink:#131820; --ink-2:#363e4b; --ink-3:#4d5766; --ink-4:#626d7e;
+  --line:#dde2e9; --line-soft:#eceff3; --paper:#ffffff; --app:#f5f7fa;
+  --brand:#1a419e; --brand-soft:#f1f4fa; --code:#15347e;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--app);color:var(--ink-2);
+  font:15px/1.65 "Inter","Segoe UI",system-ui,-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:40px 28px 80px;background:var(--paper);
+  box-shadow:0 1px 2px rgba(19,24,32,.06)}
+h1,h2,h3,h4{color:var(--ink);line-height:1.25;text-wrap:balance}
+h1{font-size:34px;font-weight:700;margin:0 0 8px;letter-spacing:-.01em}
+h2{font-size:25px;font-weight:650;margin:52px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line)}
+h3{font-size:19px;font-weight:600;margin:32px 0 10px}
+h4{font-size:16px;font-weight:600;margin:24px 0 8px;color:var(--ink-2)}
+p{margin:0 0 14px;max-width:86ch}
+ul,ol{margin:0 0 14px;padding-left:22px;max-width:86ch}
+li{margin:5px 0}
+a{color:var(--brand);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:.18em}
+hr{border:0;border-top:1px solid var(--line-soft);margin:34px 0}
+code{font:500 13px/1.5 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  background:var(--brand-soft);color:var(--code);padding:1px 5px;border-radius:3px}
+blockquote{margin:0 0 16px;padding:12px 16px;background:var(--brand-soft);
+  border-left:3px solid var(--brand);border-radius:0 4px 4px 0;color:var(--ink-2);max-width:86ch}
+blockquote p{margin:0}
+.t{overflow-x:auto;margin:0 0 18px}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th{text-align:left;font-weight:600;color:var(--ink);background:var(--app);
+  border-bottom:1px solid var(--line);padding:8px 10px;white-space:nowrap}
+td{border-bottom:1px solid var(--line-soft);padding:8px 10px;vertical-align:top}
+td code{white-space:nowrap}
+tr:last-child td{border-bottom:0}
+figure{margin:18px 0 24px}
+img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:6px}
+.toc{background:var(--app);border:1px solid var(--line);border-radius:8px;
+  padding:18px 22px;margin:26px 0 34px}
+.toc h2{margin:0 0 10px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink-4);border:0;padding:0}
+.toc ol{list-style:none;margin:0;padding:0;columns:2;column-gap:36px}
+.toc li{margin:3px 0;break-inside:avoid}
+.toc li.l1{font-weight:600;color:var(--ink);margin-top:10px}
+.toc li.l1:first-child{margin-top:0}
+.toc li.l2{padding-left:14px}
+@media (max-width:760px){.wrap{padding:24px 16px 60px}.toc ol{columns:1}h1{font-size:27px}}
+@media print{
+  body{background:#fff}
+  .wrap{max-width:none;padding:0;box-shadow:none}
+  h2{page-break-after:avoid}
+  figure,table,blockquote{page-break-inside:avoid}
+  .toc{break-after:page}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="toc"><h2>Contents</h2><ol>
+<li class="l2"><a href="#when-to-use">When to use</a></li>
+<li class="l2"><a href="#when-not-to-use">When not to use</a></li>
+<li class="l2"><a href="#three-sizes-and-the-default-to-open-maximised">Three sizes, and the default to open maximised</a></li>
+<li class="l2"><a href="#maximize-is-built-minimize-is-not">Maximize is built; Minimize is not</a></li>
+<li class="l2"><a href="#stacking-and-the-bug-that-was-invisible">Stacking, and the bug that was invisible</a></li>
+<li class="l2"><a href="#rules">Rules</a></li>
+<li class="l2"><a href="#accessibility">Accessibility</a></li>
+<li class="l2"><a href="#api">API</a></li>
+<li class="l2"><a href="#related">Related</a></li>
+<li class="l2"><a href="#recent-changes">Recent changes</a></li>
+</ol></nav>
+<h1 id="dialog">Dialog</h1>
+<blockquote><strong>Status: stable</strong> · <code>src/ui/Overlays.tsx</code> · 30 call sites. Written to the template set by <a href="button.html"><code>button.md</code></a>.</blockquote>
+<hr>
+<h2 id="when-to-use">When to use</h2>
+<p>When the user must deal with <strong>one thing</strong> before carrying on: a question, a short form, or a work surface too big to sit inside the record.</p>
+<h2 id="when-not-to-use">When not to use</h2>
+<div class="t"><table><thead><tr><th>Instead of a dialog</th><th>Use</th><th>Why</th></tr></thead><tbody><tr><td>Telling the user something worked</td><td>A <a href="../patterns/feedback.html">toast</a></td><td>A dialog that only needs <em>OK</em> is a dialog that should have been a toast</td></tr><tr><td>A condition that lasts while they are on the screen</td><td>A banner</td><td></td></tr><tr><td>A whole second task</td><td>A route</td><td>A dialog you cannot link to is a page you cannot come back to</td></tr><tr><td>A fourth stacked level</td><td>Rethink the flow</td><td>Three is already the depth this app reaches, and it took a z-index system to make it correct</td></tr></tbody></table></div>
+<hr>
+<h2 id="three-sizes-and-the-default-to-open-maximised">Three sizes, and the default to open maximised</h2>
+<div class="t"><table><thead><tr><th>Size</th><th>Width</th><th>Opens maximised</th><th>For</th></tr></thead><tbody><tr><td><code>md</code></td><td>640px</td><td><strong>No</strong></td><td>A question: a confirmation, a short form</td></tr><tr><td><code>lg</code></td><td>960px</td><td><strong>Yes</strong></td><td>Two blocks and a short table</td></tr><tr><td><code>xl</code></td><td>1180px</td><td><strong>Yes</strong></td><td>A work surface: a 21-column grid, a four-step wizard</td></tr></tbody></table></div>
+<p><strong><code>lg</code> and <code>xl</code> default to maximised since 13 October</strong>, asked for at the meeting: <em>"open one modal/dialog now open full size first."</em></p>
+<blockquote>Measured on 6 Oct: Run Quotation asked for <strong>625px of scrolling on a 1920px screen while leaving 740px of that screen empty</strong>, because the dialog was a fixed 1180px at every screen size. The customer's own window for this flow fills the screen, and their reviewers said ours was small beside it. They were describing arithmetic.</blockquote>
+<p><strong><code>md</code> never maximises.</strong> One that fills a 27-inch screen to ask <em>are you sure</em> is a worse answer than the one it replaced.</p>
+<hr>
+<h2 id="maximize-is-built-minimize-is-not">Maximize is built; Minimize is not</h2>
+<p>Both are in the customer's guideline — <em>"Allow user to use modal window actions: Minimize · Maximize/Restore Down · Close"</em> — and only one is here.</p>
+<p><strong>Maximize earns its place.</strong> Run Quotation's pricing grid has fourteen columns, and filling the screen with it is the difference between reading the table and scrolling it sideways.</p>
+<p><strong>Minimize is deliberately absent.</strong> In Kendo it collapses a <em>draggable</em> window to its title bar, in place. These dialogs are centred and modal, not draggable, so a minimised one would be <strong>a title bar floating in the middle of a dimmed screen</strong> — which does not do the thing minimising is for. What a user wants there is to see the list behind, and Close already does that without losing anything, since nothing here is a long-running form.</p>
+<blockquote>Raised as <strong>question 9</strong> rather than guessed at. If their users minimise dialogs to compare against the list underneath, the answer is a non-modal draggable window — a different component, and worth knowing before it is built.</blockquote>
+<hr>
+<h2 id="stacking-and-the-bug-that-was-invisible">Stacking, and the bug that was invisible</h2>
+<p>This app stacks dialogs <strong>three deep</strong>: a Part record opens a Stock Report, which opens Update Quantity. Every one of them used to carry the same z-index, as did every scrim. Two consequences, both invisible until you look:</p>
+<ol><li><strong>The innermost dialog was on top only because its portal mounted last.</strong> Correct by accident is the same fault that once put an error toast <em>behind</em> the Run Quotation dialog.</li><li><strong>A child's scrim could not dim its parent</strong>, so three stacked dialogs all rendered at full brightness with nothing to say which one was live.</li></ol>
+<p>Each level now steps its own scrim and panel above the level before it, through a depth context.</p>
+<hr>
+<h2 id="rules">Rules</h2>
+<ol><li><strong>Actions top-left on a work surface, in a footer on a question.</strong> The way out goes on the left wherever the bar sits.</li><li><strong>Escape dismisses the innermost thing</strong> — which Select had to be taught by hand, because Kendo's own handling closed the dialog from an open dropdown.</li><li><strong>The dismiss never repeats the confirm's verb.</strong> See <a href="../patterns/destructive-action.html">Destructive action</a>.</li><li><strong>A dialog has a title that names the record</strong>, not just the action — <code>Discard changes to RFQ0000000358?</code>, because on a screen this deep the record number is the fastest answer to <em>which one</em>.</li></ol>
+<h2 id="accessibility">Accessibility</h2>
+<div class="t"><table><tbody><tr><td>Focus</td><td>Trapped inside, returned to the trigger on close</td></tr><tr><td>Escape</td><td>Innermost first</td></tr><tr><td>Scrim</td><td>Each level dims the one beneath it, so the live layer is visible as well as focusable</td></tr><tr><td>Title</td><td>The accessible name of the dialog</td></tr><tr><td>Busy</td><td>While a confirmed action runs, both buttons disable — leaving mid-write is how a record ends up changed with nobody watching</td></tr></tbody></table></div>
+<h2 id="api">API</h2>
+<div class="t"><table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody><tr><td><code>open</code> / <code>onClose</code></td><td><code>boolean</code> / <code>() =&gt; void</code></td><td></td></tr><tr><td><code>title</code></td><td><code>string</code></td><td>Names the record where there is one</td></tr><tr><td><code>subtitle</code></td><td><code>ReactNode</code></td><td>The consequence, or the facts that do not change</td></tr><tr><td><code>size</code></td><td>`md \</td><td>lg \</td><td>xl`</td><td>Defaults to <code>md</code></td></tr><tr><td><code>startMaximised</code></td><td><code>boolean</code></td><td>Defaults to <strong>true</strong> for <code>lg</code> and <code>xl</code></td></tr><tr><td><code>actions</code></td><td><code>ReactNode</code></td><td></td></tr></tbody></table></div>
+<hr>
+<h2 id="related">Related</h2>
+<p><a href="button.html">Button</a> · <a href="select.html">Select</a> · <a href="../patterns/destructive-action.html">Destructive action</a> · <a href="../patterns/wizard.html">Wizard</a> · <a href="../design-system.html#d4--dialogs">D4 · Dialogs</a> · <a href="../design-system.html#b54-dialogs-and-shell">B5.4 · Dialogs and shell</a></p>
+<h2 id="recent-changes">Recent changes</h2>
+<div class="t"><table><thead><tr><th>Date</th><th>Change</th></tr></thead><tbody><tr><td>8 Nov 2026</td><td>This page</td></tr></tbody></table></div>
+</div>
+</body>
+</html>

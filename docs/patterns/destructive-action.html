@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pattern · Destructive action</title>
+<style>
+:root{
+  --ink:#131820; --ink-2:#363e4b; --ink-3:#4d5766; --ink-4:#626d7e;
+  --line:#dde2e9; --line-soft:#eceff3; --paper:#ffffff; --app:#f5f7fa;
+  --brand:#1a419e; --brand-soft:#f1f4fa; --code:#15347e;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--app);color:var(--ink-2);
+  font:15px/1.65 "Inter","Segoe UI",system-ui,-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:40px 28px 80px;background:var(--paper);
+  box-shadow:0 1px 2px rgba(19,24,32,.06)}
+h1,h2,h3,h4{color:var(--ink);line-height:1.25;text-wrap:balance}
+h1{font-size:34px;font-weight:700;margin:0 0 8px;letter-spacing:-.01em}
+h2{font-size:25px;font-weight:650;margin:52px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line)}
+h3{font-size:19px;font-weight:600;margin:32px 0 10px}
+h4{font-size:16px;font-weight:600;margin:24px 0 8px;color:var(--ink-2)}
+p{margin:0 0 14px;max-width:86ch}
+ul,ol{margin:0 0 14px;padding-left:22px;max-width:86ch}
+li{margin:5px 0}
+a{color:var(--brand);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:.18em}
+hr{border:0;border-top:1px solid var(--line-soft);margin:34px 0}
+code{font:500 13px/1.5 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  background:var(--brand-soft);color:var(--code);padding:1px 5px;border-radius:3px}
+blockquote{margin:0 0 16px;padding:12px 16px;background:var(--brand-soft);
+  border-left:3px solid var(--brand);border-radius:0 4px 4px 0;color:var(--ink-2);max-width:86ch}
+blockquote p{margin:0}
+.t{overflow-x:auto;margin:0 0 18px}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th{text-align:left;font-weight:600;color:var(--ink);background:var(--app);
+  border-bottom:1px solid var(--line);padding:8px 10px;white-space:nowrap}
+td{border-bottom:1px solid var(--line-soft);padding:8px 10px;vertical-align:top}
+td code{white-space:nowrap}
+tr:last-child td{border-bottom:0}
+figure{margin:18px 0 24px}
+img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:6px}
+.toc{background:var(--app);border:1px solid var(--line);border-radius:8px;
+  padding:18px 22px;margin:26px 0 34px}
+.toc h2{margin:0 0 10px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink-4);border:0;padding:0}
+.toc ol{list-style:none;margin:0;padding:0;columns:2;column-gap:36px}
+.toc li{margin:3px 0;break-inside:avoid}
+.toc li.l1{font-weight:600;color:var(--ink);margin-top:10px}
+.toc li.l1:first-child{margin-top:0}
+.toc li.l2{padding-left:14px}
+@media (max-width:760px){.wrap{padding:24px 16px 60px}.toc ol{columns:1}h1{font-size:27px}}
+@media print{
+  body{background:#fff}
+  .wrap{max-width:none;padding:0;box-shadow:none}
+  h2{page-break-after:avoid}
+  figure,table,blockquote{page-break-inside:avoid}
+  .toc{break-after:page}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="toc"><h2>Contents</h2><ol>
+<li class="l2"><a href="#the-shape">The shape</a></li>
+<li class="l2"><a href="#why-three-and-not-one">Why three and not one</a></li>
+<li class="l2"><a href="#the-confirmation">The confirmation</a></li>
+<li class="l2"><a href="#busy-is-the-load-bearing-half">Busy is the load-bearing half</a></li>
+<li class="l2"><a href="#when-the-three-steps-are-too-many">When the three steps are too many</a></li>
+<li class="l2"><a href="#accessibility">Accessibility</a></li>
+<li class="l2"><a href="#related">Related</a></li>
+<li class="l2"><a href="#recent-changes">Recent changes</a></li>
+</ol></nav>
+<h1 id="pattern--destructive-action">Pattern · Destructive action</h1>
+<blockquote>Three presses between a user and something they cannot undo, and each one earns its place. <strong>Components:</strong> <a href="../components/more-menu.html">More menu</a> · <a href="../components/button.html">Button</a> · ConfirmDialog</blockquote>
+<hr>
+<h2 id="the-shape">The shape</h2>
+<p>``<code> More ▾   →   the item, in danger ink   →   a confirmation   →   it happens </code>``</p>
+<div class="t"><table><thead><tr><th>Step</th><th>What it is for</th></tr></thead><tbody><tr><td><strong>1 · Behind More ▾</strong></td><td>Distance. The action is not next to the one you press all day</td></tr><tr><td><strong>2 · Danger ink in the menu</strong></td><td>Recognition, before the press</td></tr><tr><td><strong>3 · The confirmation</strong></td><td>A statement of consequence, and a way out</td></tr></tbody></table></div>
+<p>No step is decoration. Remove the menu and you get the 69px problem back; remove the confirmation and the menu is the only guard; remove the danger ink and the menu is a list of equals.</p>
+<hr>
+<h2 id="why-three-and-not-one">Why three and not one</h2>
+<p>Two independent routes arrived at the same answer, which is why this is not negotiable per screen:</p>
+<ul><li><strong>Asked for</strong>, 8 October review: <em>"Some 'danger' or less use actions such as Deactivate, Cancel, Reprint … should be kept under a More button"</em>.</li><li><strong>Measured</strong>, before that: Cancel RFQ sat <strong>69px</strong> from Run Quotation. Nielsen Norman's work on consequential options placed beside benign ones says that is where accidental clicks come from.</li></ul>
+<hr>
+<h2 id="the-confirmation">The confirmation</h2>
+<p>One question, one consequence, two verbs.</p>
+<div class="t"><table><thead><tr><th>Part</th><th>Rule</th><th>Example</th></tr></thead><tbody><tr><td><strong>Size</strong></td><td><code>md</code>, always — it holds one sentence</td><td></td></tr><tr><td><strong>Title</strong></td><td>The question, <strong>naming the record</strong></td><td><code>Cancel this RFQ?</code></td></tr><tr><td><strong>Body</strong></td><td>The <strong>consequence</strong>, not the action. The title already said the action</td><td></td></tr><tr><td><strong>Confirm</strong></td><td><strong>The verb.</strong> Never <em>Yes</em> or <em>OK</em></td><td><code>Cancel RFQ</code></td></tr><tr><td><strong>Dismiss</strong></td><td>Names what you keep</td><td><code>Go back</code>, <code>Keep Editing</code></td></tr><tr><td><strong>Tone</strong></td><td><code>danger</code> only when the thing is destructive</td><td></td></tr></tbody></table></div>
+<p><strong>The button says the verb.</strong> A dialog answered by <em>Yes</em> has to be re-read to find out what was agreed to — and the answer is usually read second. <code>Cancel RFQ</code> and <code>Confirm RFQ</code> are unambiguous on their own.</p>
+<p><strong>Dismiss is never a bare "Cancel" when the confirm is also "Cancel".</strong> <code>Cancel RFQ</code> beside <code>Cancel</code> is a coin toss.</p>
+<blockquote><strong>A note on where that rule is stricter than the system's.</strong> <a href="../design-system.html#d1--buttons">D1</a> says <em>Cancel only in dialogs</em>, which permits a bare <code>Cancel</code> as the dismiss. <code>ConfirmDialog</code>'s own rule says never a bare Cancel. In the build, two of three call sites use the default <code>Go back</code> and one uses <code>Cancel</code> — on a dialog whose confirm is <em>Refresh Prices</em>, where there is no ambiguity. Both readings are defensible; the one that matters is the narrow one: <strong>the dismiss may not repeat the confirm's verb.</strong></blockquote>
+<hr>
+<h2 id="busy-is-the-load-bearing-half">Busy is the load-bearing half</h2>
+<p>While the confirmed action runs, <strong>both</strong> buttons are disabled and the confirm shows an indicator.</p>
+<ul><li>The indicator says something is happening.</li><li><strong>The disable is what stops a second press doing it twice.</strong> Every confirmation here guards something a second press would repeat — confirm an RFQ, cancel one, spend marketplace quota — and the window between the press and the answer is exactly when a user presses again because nothing has happened yet.</li><li><strong>Dismiss is disabled too.</strong> Leaving mid-write is how a record ends up confirmed with nobody watching the result.</li></ul>
+<hr>
+<h2 id="when-the-three-steps-are-too-many">When the three steps are too many</h2>
+<div class="t"><table><thead><tr><th>Case</th><th>Do this instead</th></tr></thead><tbody><tr><td>Reversible, and the user can see it reversed</td><td>Just do it, with an undo in the toast</td></tr><tr><td>Destructive but trivial — removing a row from a draft</td><td>One step: the action, no confirm</td></tr><tr><td>Destructive and irreversible</td><td>All three. No exceptions</td></tr></tbody></table></div>
+<p>A confirmation on something reversible teaches people to dismiss confirmations, which is how the one that mattered gets dismissed too.</p>
+<h2 id="accessibility">Accessibility</h2>
+<div class="t"><table><tbody><tr><td>Menu item</td><td>Danger items carry colour <strong>and</strong> position — apart from the rest — so the warning is not hue alone</td></tr><tr><td>Disabled item</td><td>Keeps its reason in <code>title</code>; a dead end with no explanation is worse than a missing item</td></tr><tr><td>Dialog</td><td>Focus moves in and returns to the trigger on close</td></tr><tr><td><code>Esc</code></td><td>Closes the innermost thing first — a dropdown inside the dialog goes before the dialog</td></tr><tr><td>Busy</td><td><code>aria-busy</code> on the confirm; the loader is <code>role="status"</code></td></tr></tbody></table></div>
+<hr>
+<h2 id="related">Related</h2>
+<p><a href="../components/more-menu.html">More menu</a> · <a href="../components/button.html">Button</a> · <a href="../design-system.html#d1--buttons">D1 · Buttons</a> · <a href="../design-system.html#d4--dialogs">D4 · Dialogs</a> · <a href="record-form.html">Record form</a></p>
+<h2 id="recent-changes">Recent changes</h2>
+<div class="t"><table><thead><tr><th>Date</th><th>Change</th></tr></thead><tbody><tr><td>8 Nov 2026</td><td>This page</td></tr></tbody></table></div>
+</div>
+</body>
+</html>

@@ -43,8 +43,8 @@ import { renderCell } from './renderCell';
  *     emphasis. Kendo has no row-state concept, so the `rows.data` component
  *     puts our `data-tone` back on the <tr> and the stylesheet does the rest.
  *   - Column roles. `widthOf` and `data-role` still decide width and alignment,
- *     so a money column stays right-aligned and a code column stays monospaced
- *     — see `docs/table-patterns.md`.
+ *     so a money column stays right-aligned and an identifier column keeps its
+ *     semibold and tabular digits — see `docs/table-patterns.md`.
  *   - Control columns opt out of BOTH sorting and filtering via
  *     `sortable: false`. A column of buttons has no order and nothing to match.
  * ---------------------------------------------------------------------------

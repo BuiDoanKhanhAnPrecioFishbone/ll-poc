@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>File drop</title>
+<style>
+:root{
+  --ink:#131820; --ink-2:#363e4b; --ink-3:#4d5766; --ink-4:#626d7e;
+  --line:#dde2e9; --line-soft:#eceff3; --paper:#ffffff; --app:#f5f7fa;
+  --brand:#1a419e; --brand-soft:#f1f4fa; --code:#15347e;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--app);color:var(--ink-2);
+  font:15px/1.65 "Inter","Segoe UI",system-ui,-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:40px 28px 80px;background:var(--paper);
+  box-shadow:0 1px 2px rgba(19,24,32,.06)}
+h1,h2,h3,h4{color:var(--ink);line-height:1.25;text-wrap:balance}
+h1{font-size:34px;font-weight:700;margin:0 0 8px;letter-spacing:-.01em}
+h2{font-size:25px;font-weight:650;margin:52px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line)}
+h3{font-size:19px;font-weight:600;margin:32px 0 10px}
+h4{font-size:16px;font-weight:600;margin:24px 0 8px;color:var(--ink-2)}
+p{margin:0 0 14px;max-width:86ch}
+ul,ol{margin:0 0 14px;padding-left:22px;max-width:86ch}
+li{margin:5px 0}
+a{color:var(--brand);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:.18em}
+hr{border:0;border-top:1px solid var(--line-soft);margin:34px 0}
+code{font:500 13px/1.5 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  background:var(--brand-soft);color:var(--code);padding:1px 5px;border-radius:3px}
+blockquote{margin:0 0 16px;padding:12px 16px;background:var(--brand-soft);
+  border-left:3px solid var(--brand);border-radius:0 4px 4px 0;color:var(--ink-2);max-width:86ch}
+blockquote p{margin:0}
+.t{overflow-x:auto;margin:0 0 18px}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th{text-align:left;font-weight:600;color:var(--ink);background:var(--app);
+  border-bottom:1px solid var(--line);padding:8px 10px;white-space:nowrap}
+td{border-bottom:1px solid var(--line-soft);padding:8px 10px;vertical-align:top}
+td code{white-space:nowrap}
+tr:last-child td{border-bottom:0}
+figure{margin:18px 0 24px}
+img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:6px}
+.toc{background:var(--app);border:1px solid var(--line);border-radius:8px;
+  padding:18px 22px;margin:26px 0 34px}
+.toc h2{margin:0 0 10px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink-4);border:0;padding:0}
+.toc ol{list-style:none;margin:0;padding:0;columns:2;column-gap:36px}
+.toc li{margin:3px 0;break-inside:avoid}
+.toc li.l1{font-weight:600;color:var(--ink);margin-top:10px}
+.toc li.l1:first-child{margin-top:0}
+.toc li.l2{padding-left:14px}
+@media (max-width:760px){.wrap{padding:24px 16px 60px}.toc ol{columns:1}h1{font-size:27px}}
+@media print{
+  body{background:#fff}
+  .wrap{max-width:none;padding:0;box-shadow:none}
+  h2{page-break-after:avoid}
+  figure,table,blockquote{page-break-inside:avoid}
+  .toc{break-after:page}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="toc"><h2>Contents</h2><ol>
+<li class="l2"><a href="#when-to-use">When to use</a></li>
+<li class="l2"><a href="#when-not-to-use">When not to use</a></li>
+<li class="l2"><a href="#why-it-exists-at-all">Why it exists at all</a></li>
+<li class="l2"><a href="#autoupload-is-off-and-there-is-deliberately-no-saveurl">`autoUpload` is off, and there is deliberately no `saveUrl`</a></li>
+<li class="l2"><a href="#what-it-returns-and-why-that-is-trial">What it returns, and why that is `trial`</a></li>
+<li class="l2"><a href="#anatomy">Anatomy</a></li>
+<li class="l2"><a href="#states">States</a></li>
+<li class="l2"><a href="#accessibility">Accessibility</a></li>
+<li class="l2"><a href="#api">API</a></li>
+<li class="l2"><a href="#related">Related</a></li>
+<li class="l2"><a href="#recent-changes">Recent changes</a></li>
+</ol></nav>
+<h1 id="file-drop">File drop</h1>
+<blockquote><strong>Status: trial</strong> · <code>src/ui/FileDrop.tsx</code> · <strong>4 call sites</strong>, covering the five places <code>live-component-sweep.md</code> named. <strong>Trial</strong>, because what it returns is a file <em>name</em> — see below. Written to the template set by <a href="button.html"><code>button.md</code></a>.</blockquote>
+<p>The flow around it is <a href="../patterns/file-upload.html">File upload</a>. This page is the control.</p>
+<hr>
+<h2 id="when-to-use">When to use</h2>
+<p>To take a file from this machine: the BoM on Run Quotation and Create BoM (one shared dialog), a document on a checklist task, attachments on a new part, and BoM Comparison.</p>
+<h2 id="when-not-to-use">When not to use</h2>
+<div class="t"><table><thead><tr><th>Instead of a file drop</th><th>Use</th><th>Why</th></tr></thead><tbody><tr><td>A file already on the record</td><td>The attachment list</td><td>Dropping is for adding; the list is for what is there</td></tr><tr><td>A file already in Voyager</td><td>The picker beside it</td><td><code>ImportFileDialog</code> offers both, and the second path needs no upload at all</td></tr></tbody></table></div>
+<hr>
+<h2 id="why-it-exists-at-all">Why it exists at all</h2>
+<p>Phase 7 of the Kendo migration, and the second capability win. The sweep put it plainly:</p>
+<blockquote><em><code>k-upload</code> ships and we have no file input at all — every upload in this prototype reports what it would do.</em></blockquote>
+<p>What the user now gets is real and was missing: <strong>a file picker, drag and drop, the file's name and size on screen, and the ability to remove it.</strong></p>
+<hr>
+<h2 id="autoupload-is-off-and-there-is-deliberately-no-saveurl"><code>autoUpload</code> is off, and there is deliberately no <code>saveUrl</code></h2>
+<div class="t"><table><tbody><tr><td><code>autoUpload={false}</code></td><td>The drop is a selection, not a transfer</td></tr><tr><td><strong>No <code>saveUrl</code></strong></td><td>With none set and autoUpload off, Kendo keeps the file client-side and <strong>never attempts a request</strong>. A <code>saveUrl</code> pointing at nothing would show every file as <strong>failed</strong></td></tr><tr><td><code>batch={false}</code></td><td>Files are listed and removed one at a time</td></tr><tr><td><code>restrictions</code></td><td><code>allowedExtensions</code>, split from <code>accept</code> — stated <strong>before</strong> the drop, not after</td></tr></tbody></table></div>
+<p><strong>The hint says so in words</strong>, every time:</p>
+<blockquote><em>.xlsx only. Chosen files stay in this browser — this prototype has nowhere to send them.</em></blockquote>
+<p>Writing <em>Uploading…</em> over a bar that is measuring nothing would be the invention this project keeps having to undo.</p>
+<h2 id="what-it-returns-and-why-that-is-trial">What it returns, and why that is <code>trial</code></h2>
+<p><code>onPick</code> is called with <strong>file names</strong>, not <code>File</code> objects.</p>
+<blockquote>In <code>ImportFileDialog</code> that is the point: choosing a local file returns its name exactly as picking a Voyager file does, so the two paths end in the same place and <strong>the wizard cannot tell them apart</strong>.</blockquote>
+<p>It is also the honest half of the feature. <strong>Parsing the spreadsheet</strong> — the column detection, the merge rules, the MFG/MPN pairs — needs a real file reader and is recorded as unbuilt. Choosing the file was the part missing from the UI.</p>
+<p>When an endpoint exists, <code>saveUrl</code> arrives, the hint changes, and <code>onPick</code> starts carrying the file itself. Nothing else here moves.</p>
+<h2 id="anatomy">Anatomy</h2>
+<div class="t"><table><thead><tr><th>Part</th><th>Rule</th></tr></thead><tbody><tr><td><strong>Zone and select button</strong></td><td>Kendo's own <code>k-upload</code>, rounded to <code>--vy-radius-md</code> so it matches the cards around it</td></tr><tr><td><strong>File list</strong></td><td>Name · size · remove, inside the same box</td></tr><tr><td><strong>Hint</strong></td><td>Accepted extensions <strong>and</strong> where the file goes. Two facts, one line, always present</td></tr></tbody></table></div>
+<h2 id="states">States</h2>
+<div class="t"><table><thead><tr><th>State</th><th>What is shown</th></tr></thead><tbody><tr><td>Empty</td><td>Zone, select button, hint</td></tr><tr><td>Selected</td><td>The file row, with its size and a remove control</td></tr><tr><td><strong>Rejected</strong></td><td>Kendo's own restriction message, naming the extension rule the file broke</td></tr></tbody></table></div>
+<blockquote>A rejection names <strong>which rule</strong>. <em>Invalid file</em> tells someone to try the same file again.</blockquote>
+<h2 id="accessibility">Accessibility</h2>
+<div class="t"><table><tbody><tr><td>Keyboard</td><td>The select button is a real control, and it is not a fallback — a drop-only target is reachable by one input device</td></tr><tr><td>Restrictions</td><td>In the hint, so they are read <strong>before</strong> the picker opens</td></tr><tr><td>Remove</td><td>One control per file, named with the file</td></tr><tr><td>Boundary</td><td>The box is drawn with Kendo's global border → <code>--vy-border</code>. It is a <strong>container</strong>, identified by the button and hint inside it, not by its edge — the 3:1 rule in <a href="../design-system.html#b14-lines">B1.4</a> is for the controls within</td></tr><tr><td>Focus</td><td><code>.k-upload-button</code> and each <code>.k-file</code> get the app's own ring from the bridge, so a file row can be reached and removed by keyboard</td></tr><tr><td>Not swept</td><td><code>border:check</code> never reaches this control — it only appears inside dialogs the sweep does not open. Checked by hand instead, and recorded here so that is not mistaken for a pass</td></tr></tbody></table></div>
+<h2 id="api">API</h2>
+<div class="t"><table><thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Notes</th></tr></thead><tbody><tr><td><code>onPick</code></td><td><code>(names: string[]) =&gt; void</code></td><td>—</td><td>Called with the chosen names; <strong>empty when the last one is removed</strong></td></tr><tr><td><code>accept</code></td><td><code>string</code></td><td><code>'.xlsx'</code></td><td>Comma-separated extensions. Also printed in the hint and enforced as <code>allowedExtensions</code></td></tr><tr><td><code>multiple</code></td><td><code>boolean</code></td><td><code>false</code></td><td></td></tr><tr><td><code>hint</code></td><td><code>string</code></td><td>`<code> </code>${accept} only.<code> </code>`</td><td>Replaces the first sentence only — the <em>stays in this browser</em> sentence is not optional</td></tr></tbody></table></div>
+<hr>
+<h2 id="related">Related</h2>
+<p><a href="../patterns/file-upload.html">File upload</a> · <a href="support-ticket.html">Support ticket</a> · <a href="dialog.html">Dialog</a> · <a href="../design-system.html#e2--kendoreact">E2 · KendoReact</a></p>
+<h2 id="recent-changes">Recent changes</h2>
+<div class="t"><table><thead><tr><th>Date</th><th>Change</th></tr></thead><tbody><tr><td>8 Nov 2026</td><td>This page</td></tr></tbody></table></div>
+</div>
+</body>
+</html>

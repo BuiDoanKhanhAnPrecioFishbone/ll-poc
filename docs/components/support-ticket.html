@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Support ticket</title>
+<style>
+:root{
+  --ink:#131820; --ink-2:#363e4b; --ink-3:#4d5766; --ink-4:#626d7e;
+  --line:#dde2e9; --line-soft:#eceff3; --paper:#ffffff; --app:#f5f7fa;
+  --brand:#1a419e; --brand-soft:#f1f4fa; --code:#15347e;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--app);color:var(--ink-2);
+  font:15px/1.65 "Inter","Segoe UI",system-ui,-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:40px 28px 80px;background:var(--paper);
+  box-shadow:0 1px 2px rgba(19,24,32,.06)}
+h1,h2,h3,h4{color:var(--ink);line-height:1.25;text-wrap:balance}
+h1{font-size:34px;font-weight:700;margin:0 0 8px;letter-spacing:-.01em}
+h2{font-size:25px;font-weight:650;margin:52px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line)}
+h3{font-size:19px;font-weight:600;margin:32px 0 10px}
+h4{font-size:16px;font-weight:600;margin:24px 0 8px;color:var(--ink-2)}
+p{margin:0 0 14px;max-width:86ch}
+ul,ol{margin:0 0 14px;padding-left:22px;max-width:86ch}
+li{margin:5px 0}
+a{color:var(--brand);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:.18em}
+hr{border:0;border-top:1px solid var(--line-soft);margin:34px 0}
+code{font:500 13px/1.5 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  background:var(--brand-soft);color:var(--code);padding:1px 5px;border-radius:3px}
+blockquote{margin:0 0 16px;padding:12px 16px;background:var(--brand-soft);
+  border-left:3px solid var(--brand);border-radius:0 4px 4px 0;color:var(--ink-2);max-width:86ch}
+blockquote p{margin:0}
+.t{overflow-x:auto;margin:0 0 18px}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th{text-align:left;font-weight:600;color:var(--ink);background:var(--app);
+  border-bottom:1px solid var(--line);padding:8px 10px;white-space:nowrap}
+td{border-bottom:1px solid var(--line-soft);padding:8px 10px;vertical-align:top}
+td code{white-space:nowrap}
+tr:last-child td{border-bottom:0}
+figure{margin:18px 0 24px}
+img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:6px}
+.toc{background:var(--app);border:1px solid var(--line);border-radius:8px;
+  padding:18px 22px;margin:26px 0 34px}
+.toc h2{margin:0 0 10px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink-4);border:0;padding:0}
+.toc ol{list-style:none;margin:0;padding:0;columns:2;column-gap:36px}
+.toc li{margin:3px 0;break-inside:avoid}
+.toc li.l1{font-weight:600;color:var(--ink);margin-top:10px}
+.toc li.l1:first-child{margin-top:0}
+.toc li.l2{padding-left:14px}
+@media (max-width:760px){.wrap{padding:24px 16px 60px}.toc ol{columns:1}h1{font-size:27px}}
+@media print{
+  body{background:#fff}
+  .wrap{max-width:none;padding:0;box-shadow:none}
+  h2{page-break-after:avoid}
+  figure,table,blockquote{page-break-inside:avoid}
+  .toc{break-after:page}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="toc"><h2>Contents</h2><ol>
+<li class="l2"><a href="#when-to-use">When to use</a></li>
+<li class="l2"><a href="#when-not-to-use">When not to use</a></li>
+<li class="l2"><a href="#what-it-attaches-and-why-that-is-the-point">What it attaches, and why that is the point</a></li>
+<li class="l2"><a href="#the-send-is-not-real">The send is not real</a></li>
+<li class="l2"><a href="#anatomy">Anatomy</a></li>
+<li class="l2"><a href="#accessibility">Accessibility</a></li>
+<li class="l2"><a href="#api">API</a></li>
+<li class="l2"><a href="#related">Related</a></li>
+<li class="l2"><a href="#recent-changes">Recent changes</a></li>
+</ol></nav>
+<h1 id="support-ticket">Support ticket</h1>
+<blockquote><strong>Status: trial</strong> · <code>src/ui/SupportTicket.tsx</code> · the customer's screen of <strong>29 Oct</strong>, reached from the <a href="error-state.html">error state</a>. <strong>Trial</strong>, because what stands between it and a real ticket is one POST and the answer to open question 12. Written to the template set by <a href="button.html"><code>button.md</code></a>.</blockquote>
+<hr>
+<h2 id="when-to-use">When to use</h2>
+<p>As the way out of an error **that is not <em>try again</em>**.</p>
+<blockquote>A user whose screen fails twice has nowhere to go — and the thing they would otherwise do by hand (find someone, describe what broke, remember which screen it was) is exactly what a program can do for them.</blockquote>
+<h2 id="when-not-to-use">When not to use</h2>
+<div class="t"><table><thead><tr><th>Instead of a ticket</th><th>Use</th><th>Why</th></tr></thead><tbody><tr><td>A recoverable failure</td><td><em>Try again</em> on the <a href="error-state.html">error state</a></td><td>Reload is the right first answer</td></tr><tr><td>A feature that does not exist</td><td><code>toast.notImplemented</code></td><td>That is not a fault to report</td></tr></tbody></table></div>
+<hr>
+<h2 id="what-it-attaches-and-why-that-is-the-point">What it attaches, and why that is the point</h2>
+<div class="t"><table><thead><tr><th>Field</th><th>Source</th></tr></thead><tbody><tr><td><strong>Error ID</strong></td><td><code>newErrorId()</code>, from the failure</td></tr><tr><td><strong>Screen</strong></td><td>The screen that failed, in the user's words</td></tr><tr><td><strong>Time</strong></td><td><code>fmtDateTime(new Date())</code> — the app's own regional formatter</td></tr><tr><td><strong>Browser</strong></td><td><code>browserName()</code></td></tr></tbody></table></div>
+<p>Those four are what a support engineer needs and what a cost estimator has no reason to know. The one question left is the one <strong>only the person can answer</strong> — <em>What were you doing?</em></p>
+<blockquote>The block is headed <strong>"Added for you"</strong> rather than hidden, because a ticket that quietly collects details about the sender is a different thing from one that shows them what it is sending.</blockquote>
+<h3 id="browsername--every-browser-claims-to-be-the-others"><code>browserName()</code> — every browser claims to be the others</h3>
+<p>Edge's user agent contains <em>Chrome</em> <strong>and</strong> <em>Safari</em>; Chrome's contains <em>Safari</em>. So the test runs <strong>most specific first</strong>, and Safari — which claims nothing — is last. Four names, because four is what a support engineer acts on.</p>
+<h3 id="newerrorid--viq-7f3a2c"><code>newErrorId()</code> — <code>VIQ-7F3A2C</code></h3>
+<p>One per failure, so two people reporting the same screen are not reporting the same incident.</p>
+<p><strong>Uppercase hex without the vowel-shaped digits</strong>, deliberately: this number gets read down a phone line, and <code>0</code>/<code>O</code> and <code>1</code>/<code>I</code> are where that goes wrong. <code>crypto.getRandomValues</code> where it exists — two users failing in the same millisecond is not a reason to hand them one id.</p>
+<hr>
+<h2 id="the-send-is-not-real">The send is not real</h2>
+<p>There is no helpdesk behind this prototype. <strong>The number is drawn here and no request leaves the browser.</strong></p>
+<p>The flow is kept whole so it can be demonstrated end to end, and the copy is the customer's own. Written down in three places — this page, the file's header, and the gap register — so nobody demonstrates it as working.</p>
+<h2 id="anatomy">Anatomy</h2>
+<div class="t"><table><thead><tr><th>Part</th><th>Rule</th></tr></thead><tbody><tr><td><strong>Subject</strong></td><td>Prefilled: <em>"Screen stopped loading: {screen}"</em>. Required, with the app's <strong>red asterisk</strong> — the customer's Testing Guideline says red, and a bare <code>required</code> attribute marks the field for the browser and for nobody looking at it</td></tr><tr><td><strong>What were you doing?</strong></td><td>A textarea with a real example as its placeholder, not <em>"Enter details"</em></td></tr><tr><td><strong>Added for you</strong></td><td>The four facts above, in a <code>&lt;dl&gt;</code></td></tr><tr><td><strong>Send Ticket</strong></td><td>Disabled without a subject, <strong>with the reason in <code>title</code></strong></td></tr></tbody></table></div>
+<h2 id="accessibility">Accessibility</h2>
+<div class="t"><table><tbody><tr><td>Dialog</td><td>Everything in <a href="dialog.html">Dialog</a> — focus trap, <code>Escape</code>, return focus to the control that opened it</td></tr><tr><td>Required</td><td>The asterisk is <code>aria-hidden</code> and <code>required</code> carries the meaning, so it is not announced as <em>"star"</em></td></tr><tr><td>Disabled send</td><td>The reason is on the control, not only implied by the greying</td></tr><tr><td>Confirmation</td><td>Announced; the ticket number is text, and the error id stays visible behind the dialog</td></tr></tbody></table></div>
+<h2 id="api">API</h2>
+<div class="t"><table><thead><tr><th>Prop</th><th>Type</th></tr></thead><tbody><tr><td><code>open</code> / <code>onClose</code></td><td></td></tr><tr><td><code>errorId</code></td><td><code>string</code></td></tr><tr><td><code>screen</code></td><td><code>string</code> — prefills the subject</td></tr><tr><td><code>onSent</code></td><td><code>(ticketNo: string) =&gt; void</code></td></tr></tbody></table></div>
+<p>Also exported: <code>browserName(ua?)</code> and <code>newErrorId()</code>.</p>
+<hr>
+<h2 id="related">Related</h2>
+<p><a href="error-state.html">Error state</a> · <a href="dialog.html">Dialog</a> · <a href="field.html">Field</a> · <a href="../patterns/feedback.html">Feedback</a></p>
+<h2 id="recent-changes">Recent changes</h2>
+<div class="t"><table><thead><tr><th>Date</th><th>Change</th></tr></thead><tbody><tr><td>8 Nov 2026</td><td>This page</td></tr></tbody></table></div>
+</div>
+</body>
+</html>

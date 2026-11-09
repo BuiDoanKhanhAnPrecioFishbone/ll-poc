@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Field</title>
+<style>
+:root{
+  --ink:#131820; --ink-2:#363e4b; --ink-3:#4d5766; --ink-4:#626d7e;
+  --line:#dde2e9; --line-soft:#eceff3; --paper:#ffffff; --app:#f5f7fa;
+  --brand:#1a419e; --brand-soft:#f1f4fa; --code:#15347e;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--app);color:var(--ink-2);
+  font:15px/1.65 "Inter","Segoe UI",system-ui,-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:40px 28px 80px;background:var(--paper);
+  box-shadow:0 1px 2px rgba(19,24,32,.06)}
+h1,h2,h3,h4{color:var(--ink);line-height:1.25;text-wrap:balance}
+h1{font-size:34px;font-weight:700;margin:0 0 8px;letter-spacing:-.01em}
+h2{font-size:25px;font-weight:650;margin:52px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line)}
+h3{font-size:19px;font-weight:600;margin:32px 0 10px}
+h4{font-size:16px;font-weight:600;margin:24px 0 8px;color:var(--ink-2)}
+p{margin:0 0 14px;max-width:86ch}
+ul,ol{margin:0 0 14px;padding-left:22px;max-width:86ch}
+li{margin:5px 0}
+a{color:var(--brand);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:.18em}
+hr{border:0;border-top:1px solid var(--line-soft);margin:34px 0}
+code{font:500 13px/1.5 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  background:var(--brand-soft);color:var(--code);padding:1px 5px;border-radius:3px}
+blockquote{margin:0 0 16px;padding:12px 16px;background:var(--brand-soft);
+  border-left:3px solid var(--brand);border-radius:0 4px 4px 0;color:var(--ink-2);max-width:86ch}
+blockquote p{margin:0}
+.t{overflow-x:auto;margin:0 0 18px}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th{text-align:left;font-weight:600;color:var(--ink);background:var(--app);
+  border-bottom:1px solid var(--line);padding:8px 10px;white-space:nowrap}
+td{border-bottom:1px solid var(--line-soft);padding:8px 10px;vertical-align:top}
+td code{white-space:nowrap}
+tr:last-child td{border-bottom:0}
+figure{margin:18px 0 24px}
+img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:6px}
+.toc{background:var(--app);border:1px solid var(--line);border-radius:8px;
+  padding:18px 22px;margin:26px 0 34px}
+.toc h2{margin:0 0 10px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink-4);border:0;padding:0}
+.toc ol{list-style:none;margin:0;padding:0;columns:2;column-gap:36px}
+.toc li{margin:3px 0;break-inside:avoid}
+.toc li.l1{font-weight:600;color:var(--ink);margin-top:10px}
+.toc li.l1:first-child{margin-top:0}
+.toc li.l2{padding-left:14px}
+@media (max-width:760px){.wrap{padding:24px 16px 60px}.toc ol{columns:1}h1{font-size:27px}}
+@media print{
+  body{background:#fff}
+  .wrap{max-width:none;padding:0;box-shadow:none}
+  h2{page-break-after:avoid}
+  figure,table,blockquote{page-break-inside:avoid}
+  .toc{break-after:page}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="toc"><h2>Contents</h2><ol>
+<li class="l2"><a href="#when-to-use">When to use</a></li>
+<li class="l2"><a href="#when-not-to-use">When not to use</a></li>
+<li class="l2"><a href="#anatomy">Anatomy</a></li>
+<li class="l2"><a href="#errors-arrive-on-blur">Errors arrive on blur</a></li>
+<li class="l2"><a href="#searchfield-is-its-own-component-on-purpose">SearchField is its own component on purpose</a></li>
+<li class="l2"><a href="#ref-is-declared-not-inherited">`ref` is declared, not inherited</a></li>
+<li class="l2"><a href="#the-three-edges-measured">The three edges, measured</a></li>
+<li class="l2"><a href="#accessibility">Accessibility</a></li>
+<li class="l2"><a href="#api">API</a></li>
+<li class="l2"><a href="#related">Related</a></li>
+<li class="l2"><a href="#recent-changes">Recent changes</a></li>
+</ol></nav>
+<h1 id="field">Field</h1>
+<blockquote><strong>Status: stable</strong> · <code>src/ui/Field.tsx</code> · <strong>91 call sites</strong> — the most used component in the product. Written to the template set by <a href="button.html"><code>button.md</code></a>.</blockquote>
+<p>Three controls in one file, because they are one idea wearing three shapes: <code>TextField</code>, <code>TextArea</code>, <code>SearchField</code>.</p>
+<hr>
+<h2 id="when-to-use">When to use</h2>
+<div class="t"><table><thead><tr><th>Control</th><th>For</th></tr></thead><tbody><tr><td><strong>TextField</strong></td><td>One line of typed text, a date, a number</td></tr><tr><td><strong>TextArea</strong></td><td>Prose the user writes — notes, a description</td></tr><tr><td><strong>SearchField</strong></td><td>Narrowing a list by a value the user already knows</td></tr></tbody></table></div>
+<h2 id="when-not-to-use">When not to use</h2>
+<div class="t"><table><thead><tr><th>Instead of a Field</th><th>Use</th><th>Why</th></tr></thead><tbody><tr><td>Choosing from a known list</td><td><a href="select.html">Select</a></td><td>A field that accepts anything cannot accept only what exists</td></tr><tr><td>A value this screen does not own</td><td>A read-only box with a padlock</td><td><a href="../design-system.html#d2--fields">D2</a>: grey means not editable, and the padlock carries the reason</td></tr><tr><td>A yes/no</td><td>Checkbox</td><td>A field for "Yes"/"No" is three ways to be wrong</td></tr><tr><td>Filtering a list</td><td><a href="filter-toolbar.html">Filter toolbar</a></td><td>Search finds a record you can name; filters describe a set</td></tr></tbody></table></div>
+<hr>
+<h2 id="anatomy">Anatomy</h2>
+<p>A <code>&lt;label&gt;</code> wrapping everything, so the whole thing is one hit target and the label needs no <code>for</code>.</p>
+<div class="t"><table><thead><tr><th>Part</th><th>Rule</th></tr></thead><tbody><tr><td><strong>Label</strong></td><td><strong>Above</strong> the value, never beside it. Title Case, 12px, 600</td></tr><tr><td><strong>Required</strong></td><td>A <strong>red asterisk</strong> right after the label, in view <strong>and</strong> edit mode</td></tr><tr><td><strong>Optional</strong></td><td>No mark. Never the word <em>(optional)</em></td></tr><tr><td><strong>Input</strong></td><td><code>--vy-border-control</code> in edit mode; a sunken box in view mode</td></tr><tr><td><strong>Hint</strong></td><td>Below the field, italic, at or below the label's size</td></tr></tbody></table></div>
+<p><strong>A hint is a sibling of the label, never inside it</strong> — inside, it joins the accessible name and gets read as part of the field's title.</p>
+<p><strong>A hint and an error never appear together.</strong> Two lines, each claiming to say what to do next, is one line too many.</p>
+<hr>
+<h2 id="errors-arrive-on-blur">Errors arrive on blur</h2>
+<p>Not on every keystroke. A field that goes red while you are still typing the third character of a part number is telling you that you are wrong before you have finished being right.</p>
+<p>The message is red text below the field — and wherever the system settles that placement, <strong>the timing does not change</strong>.</p>
+<hr>
+<h2 id="searchfield-is-its-own-component-on-purpose">SearchField is its own component on purpose</h2>
+<blockquote>Search is the single most-used control on every list screen and must look identical on all of them.</blockquote>
+<p>It is a <code>type="search"</code> input with a leading magnifier, and it is the one field with no label — the icon and the placeholder carry it, which is only acceptable because the control is in the same place on every screen.</p>
+<hr>
+<h2 id="ref-is-declared-not-inherited"><code>ref</code> is declared, not inherited</h2>
+<p>React 19 passes <code>ref</code> to a function component as an ordinary prop, but <code>InputHTMLAttributes</code> does not carry it, so TypeScript rejects it.</p>
+<p>It is declared because <strong>Login needs it</strong>: to put the cursor in the first field, and to send it back there when a submit finds the field empty.</p>
+<h2 id="the-three-edges-measured">The three edges, measured</h2>
+<p><code>.vy-input</code> draws its own boundary in three states, and all three are 1.4.11's business. On the panel, transitions stopped:</p>
+<div class="t"><table><thead><tr><th></th><th>rest</th><th>hover</th><th>focus</th></tr></thead><tbody><tr><td>light</td><td>3.97</td><td>5.24</td><td>6.82</td></tr><tr><td>dark</td><td>4.04</td><td>5.23</td><td>9.58</td></tr></tbody></table></div>
+<blockquote><strong>Two of those six numbers were wrong until 9 November</strong>, and both only in dark. <code>:hover</code> pointed at <code>--vy-border-heavy</code> — darker than the resting border on white, <em>lighter</em> than it is what dark needs — so the hover edge measured <strong>2.68</strong> on the panel and <strong>2.02</strong> on <code>surface-strong</code>: fainter than the state it replaced, and under the threshold. <code>:focus</code> pointed at <code>--vy-brand-boundary-strong</code>, which kept blue-400 at <strong>2.88</strong> after the note beside it had already measured that number and moved the focus <em>ring</em> off it.  Neither check could see them: one reads the palette, the other swept a page nobody was pointing at. Both measure states now — <a href="../vien-state-09nov.md"><code>vien-state-09nov.md</code></a>.</blockquote>
+<p>The hover edge has its own token, <code>--vy-border-control-hover</code>, because <em>more visible</em> means darker on white and lighter on near-black, so one value cannot carry it. Light is unchanged.</p>
+<h2 id="accessibility">Accessibility</h2>
+<div class="t"><table><tbody><tr><td>Label</td><td>The <code>&lt;label&gt;</code> wraps the control, so no <code>for</code>/<code>id</code> pairing to get wrong</td></tr><tr><td>Required</td><td>The asterisk is visible; the control carries <code>required</code></td></tr><tr><td>Hint</td><td>A sibling, not inside the label</td></tr><tr><td>Error</td><td>On blur, below the field, in red text — and the summary banner carries <code>role="alert"</code></td></tr><tr><td>Search</td><td><code>type="search"</code>, so the browser offers its own clear control</td></tr><tr><td>Hover and focus</td><td>Both edges clear 3:1 on every ground in both themes, and <code>border:check</code> sweeps all three states — see above</td></tr></tbody></table></div>
+<h2 id="api">API</h2>
+<p>``<code>tsx &lt;TextField label="Project Name" required value={name} onChange={…} /&gt; &lt;TextArea label="Internal Notes" hint="Not sent to the customer." /&gt; &lt;SearchField placeholder="Search RFQ number, project or customer" /&gt; </code>``</p>
+<div class="t"><table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody><tr><td><code>label</code></td><td><code>string</code> <em>(optional)</em></td><td>Omit only where the control is labelled by its surroundings</td></tr><tr><td><code>hint</code></td><td><code>string</code> <em>(optional)</em></td><td></td></tr><tr><td><code>ref</code></td><td><code>Ref&lt;HTMLInputElement&gt;</code></td><td>TextField only</td></tr><tr><td>…rest</td><td><code>InputHTMLAttributes</code> / <code>TextareaHTMLAttributes</code></td><td></td></tr></tbody></table></div>
+<hr>
+<h2 id="related">Related</h2>
+<p><a href="select.html">Select</a> · <a href="dialog.html">Dialog</a> · <a href="../design-system.html#d2--fields">D2 · Fields</a> · <a href="../patterns/record-form.html">Record form</a> · <a href="../design-system.html#b14-lines">B1.4 · Lines</a></p>
+<h2 id="recent-changes">Recent changes</h2>
+<div class="t"><table><thead><tr><th>Date</th><th>Change</th></tr></thead><tbody><tr><td>8 Nov 2026</td><td>This page</td></tr><tr><td>8 Nov 2026</td><td><code>--vy-border-control</code> re-measured against every ground: 2.35–3.06 → 3.05–3.97</td></tr><tr><td>9 Nov 2026</td><td><code>:hover</code> moved to the new <code>--vy-border-control-hover</code>: 2.68 → 5.23 on the dark panel, 2.02 → 3.95 on its worst ground. Light unchanged</td></tr><tr><td>9 Nov 2026</td><td><code>:focus</code> edge fixed in dark — <code>--vy-brand-boundary-strong</code> blue-400 → blue-200, 2.88 → 7.22 on its worst ground</td></tr></tbody></table></div>
+</div>
+</body>
+</html>

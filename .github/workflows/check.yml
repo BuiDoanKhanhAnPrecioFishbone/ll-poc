@@ -5,9 +5,9 @@
 # (.githooks/pre-push) catches the cheap half in ten seconds; this catches the
 # half that takes ten minutes.
 #
-# THE FIVE BROWSER CHECKS RUN AS SEPARATE JOBS, not as one `check:visual`.
-# They are independent measurements, so `fail-fast: false` keeps the other
-# four running when one fails — one round of fixes instead of five — and each
+# THE SEVEN BROWSER CHECKS RUN AS SEPARATE JOBS, not as one `check:visual`.
+# They are independent measurements, so `fail-fast: false` keeps the others
+# running when one fails — one round of fixes instead of seven — and each
 # reports under its own name, so "mobile:check failed" is legible from the
 # checks list without opening a log.
 name: check
@@ -66,7 +66,7 @@ jobs:
       - run: npm run check:fast
 
   visual:
-    # Five runners are not worth spending on a tree that does not compile.
+    # Seven runners are not worth spending on a tree that does not compile.
     needs: fast
     name: ${{ matrix.check }}
     runs-on: ubuntu-latest
@@ -74,7 +74,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        check: [render:check, touch:check, mobile:check, focus:check, hover:check]
+        check: [render:check, touch:check, mobile:check, focus:check, hover:check, border:check, grid:check]
     steps:
       - uses: actions/checkout@v4
 

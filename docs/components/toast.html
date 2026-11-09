@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Toast</title>
+<style>
+:root{
+  --ink:#131820; --ink-2:#363e4b; --ink-3:#4d5766; --ink-4:#626d7e;
+  --line:#dde2e9; --line-soft:#eceff3; --paper:#ffffff; --app:#f5f7fa;
+  --brand:#1a419e; --brand-soft:#f1f4fa; --code:#15347e;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--app);color:var(--ink-2);
+  font:15px/1.65 "Inter","Segoe UI",system-ui,-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:40px 28px 80px;background:var(--paper);
+  box-shadow:0 1px 2px rgba(19,24,32,.06)}
+h1,h2,h3,h4{color:var(--ink);line-height:1.25;text-wrap:balance}
+h1{font-size:34px;font-weight:700;margin:0 0 8px;letter-spacing:-.01em}
+h2{font-size:25px;font-weight:650;margin:52px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line)}
+h3{font-size:19px;font-weight:600;margin:32px 0 10px}
+h4{font-size:16px;font-weight:600;margin:24px 0 8px;color:var(--ink-2)}
+p{margin:0 0 14px;max-width:86ch}
+ul,ol{margin:0 0 14px;padding-left:22px;max-width:86ch}
+li{margin:5px 0}
+a{color:var(--brand);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:.18em}
+hr{border:0;border-top:1px solid var(--line-soft);margin:34px 0}
+code{font:500 13px/1.5 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  background:var(--brand-soft);color:var(--code);padding:1px 5px;border-radius:3px}
+blockquote{margin:0 0 16px;padding:12px 16px;background:var(--brand-soft);
+  border-left:3px solid var(--brand);border-radius:0 4px 4px 0;color:var(--ink-2);max-width:86ch}
+blockquote p{margin:0}
+.t{overflow-x:auto;margin:0 0 18px}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th{text-align:left;font-weight:600;color:var(--ink);background:var(--app);
+  border-bottom:1px solid var(--line);padding:8px 10px;white-space:nowrap}
+td{border-bottom:1px solid var(--line-soft);padding:8px 10px;vertical-align:top}
+td code{white-space:nowrap}
+tr:last-child td{border-bottom:0}
+figure{margin:18px 0 24px}
+img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:6px}
+.toc{background:var(--app);border:1px solid var(--line);border-radius:8px;
+  padding:18px 22px;margin:26px 0 34px}
+.toc h2{margin:0 0 10px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink-4);border:0;padding:0}
+.toc ol{list-style:none;margin:0;padding:0;columns:2;column-gap:36px}
+.toc li{margin:3px 0;break-inside:avoid}
+.toc li.l1{font-weight:600;color:var(--ink);margin-top:10px}
+.toc li.l1:first-child{margin-top:0}
+.toc li.l2{padding-left:14px}
+@media (max-width:760px){.wrap{padding:24px 16px 60px}.toc ol{columns:1}h1{font-size:27px}}
+@media print{
+  body{background:#fff}
+  .wrap{max-width:none;padding:0;box-shadow:none}
+  h2{page-break-after:avoid}
+  figure,table,blockquote{page-break-inside:avoid}
+  .toc{break-after:page}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="toc"><h2>Contents</h2><ol>
+<li class="l2"><a href="#when-to-use">When to use</a></li>
+<li class="l2"><a href="#when-not-to-use">When not to use</a></li>
+<li class="l2"><a href="#the-api-is-four-verbs-not-a-kind-prop">The API is four verbs, not a `kind` prop</a></li>
+<li class="l2"><a href="#what-radix-handles-and-why-that-is-the-whole-reason">What Radix handles, and why that is the whole reason</a></li>
+<li class="l2"><a href="#anatomy">Anatomy</a></li>
+<li class="l2"><a href="#content">Content</a></li>
+<li class="l2"><a href="#accessibility">Accessibility</a></li>
+<li class="l2"><a href="#api">API</a></li>
+<li class="l2"><a href="#related">Related</a></li>
+<li class="l2"><a href="#recent-changes">Recent changes</a></li>
+</ol></nav>
+<h1 id="toast">Toast</h1>
+<blockquote><strong>Status: stable</strong> · <code>src/ui/Toast.tsx</code> · <strong>68 call sites</strong>, reached through <code>useToast()</code> rather than rendered directly. Written to the template set by <a href="button.html"><code>button.md</code></a>.</blockquote>
+<p>The behaviour and the four kinds are in <a href="../patterns/feedback.html">Feedback</a>. This page is the component: how to call it, and what it does that you did not have to build.</p>
+<hr>
+<h2 id="when-to-use">When to use</h2>
+<p>To confirm something <strong>that is already done</strong> and that the user does not have to act on.</p>
+<h2 id="when-not-to-use">When not to use</h2>
+<div class="t"><table><thead><tr><th>Instead of a toast</th><th>Use</th><th>Why</th></tr></thead><tbody><tr><td>Something the user must act on</td><td>A banner or a <a href="dialog.html">dialog</a></td><td>A toast that must be read will be missed</td></tr><tr><td>A condition that lasts</td><td>A banner</td><td>A toast outlives its reason by 4.5 seconds, then stops existing</td></tr><tr><td>A field being wrong</td><td>An error on the field</td><td>The toast is in the corner; the field is where the eye is</td></tr></tbody></table></div>
+<hr>
+<h2 id="the-api-is-four-verbs-not-a-kind-prop">The API is four verbs, not a <code>kind</code> prop</h2>
+<p>``<code>tsx const toast = useToast(); toast.success('Published'); toast.error('2 required fields are missing.'); toast.undoable('Priority set to High', () =&gt; restore()); toast.notImplemented('export this list to Excel'); </code>``</p>
+<p><strong>Four named methods instead of <code>push(text, kind)</code></strong> — because the kind is not a style, it is a decision about duration, announcement and whether a way back is offered. A single <code>push</code> lets a caller pick green for a failure, which is exactly what happened before.</p>
+<div class="t"><table><thead><tr><th>Method</th><th>Duration</th><th>Announcement</th><th>Call sites</th></tr></thead><tbody><tr><td><code>success</code></td><td>4.5s</td><td>polite</td><td>27</td></tr><tr><td><code>error</code></td><td><strong>9s</strong></td><td><strong>assertive</strong></td><td>8</td></tr><tr><td><code>undoable</code></td><td>4.5s</td><td>polite, with <strong>Undo</strong></td><td>5</td></tr><tr><td><code>notImplemented</code></td><td>4.5s</td><td>polite</td><td>28</td></tr></tbody></table></div>
+<p><code>notImplemented</code> takes the <strong>rest of a sentence</strong>: <code>what</code> completes <em>"This would …"</em>, so the message cannot drift from screen to screen.</p>
+<hr>
+<h2 id="what-radix-handles-and-why-that-is-the-whole-reason">What Radix handles, and why that is the whole reason</h2>
+<p>Radix Toast was taken for the parts that are <strong>easy to get wrong</strong>:</p>
+<ul><li><strong>a live region</strong>, so a screen reader announces it at all;</li><li><strong>the timer pausing while the pointer is over it</strong>;</li><li><strong>swipe dismissal</strong>, down, on touch.</li></ul>
+<blockquote>And one that is easy to get wrong <em>invisibly</em>: the Undo button is a Radix <code>Action</code>, not a plain button. It <strong>keeps the toast alive while focus is inside it</strong>, so tabbing to Undo cannot race the timeout. A way back that disappears while you are reaching for it is not a way back.</blockquote>
+<hr>
+<h2 id="anatomy">Anatomy</h2>
+<div class="t"><table><thead><tr><th>Part</th><th>Rule</th></tr></thead><tbody><tr><td><strong>Text</strong></td><td>One sentence. It is a description, not a heading plus a body</td></tr><tr><td><strong>Undo</strong></td><td>Only on <code>undoable</code></td></tr><tr><td><strong>Close</strong></td><td>Always. <code>aria-label="Dismiss"</code></td></tr><tr><td><strong>Viewport</strong></td><td>Bottom, stacked; swipe direction is down</td></tr></tbody></table></div>
+<h2 id="content">Content</h2>
+<ul><li><strong>The toast repeats the button's word.</strong> <code>Publish</code> → <code>Published</code>. Not <code>Publish</code> → <code>Success</code>.</li><li>An error names <strong>what to fix</strong>, never <em>Something went wrong</em>.</li><li><code>notImplemented</code> never apologises and never says <em>coming soon</em> — it says what the action would do.</li></ul>
+<h2 id="accessibility">Accessibility</h2>
+<div class="t"><table><tbody><tr><td>Live region</td><td>Provided by Radix; <code>error</code> is <code>foreground</code> (assertive), the rest <code>background</code></td></tr><tr><td>Timer</td><td>Pauses on hover and while focus is inside</td></tr><tr><td>Undo</td><td><code>altText="Undo this change"</code></td></tr><tr><td>Close</td><td>A real button with a label; the glyph is <code>aria-hidden</code></td></tr><tr><td>Swipe</td><td>Never the only way to dismiss</td></tr></tbody></table></div>
+<h2 id="api">API</h2>
+<p>``<code>tsx const { success, error, undoable, notImplemented } = useToast(); </code>``</p>
+<p>Mounted once, by <code>ToastProvider</code>, around the app. There is no <code>&lt;Toast&gt;</code> to render and no place to put one — which is why the call-site count is 68 and the component count is one.</p>
+<hr>
+<h2 id="related">Related</h2>
+<p><a href="../patterns/feedback.html">Feedback</a> · <a href="button.html">Button</a> · <a href="../design-system.html#d6--words">D6 · Words</a> · <a href="../design-system.html#a3--five-rules-before-you-build">A3 · Five rules before you build</a></p>
+<h2 id="recent-changes">Recent changes</h2>
+<div class="t"><table><thead><tr><th>Date</th><th>Change</th></tr></thead><tbody><tr><td>8 Nov 2026</td><td>This page</td></tr></tbody></table></div>
+</div>
+</body>
+</html>

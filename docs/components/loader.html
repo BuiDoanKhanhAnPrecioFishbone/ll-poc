@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loader</title>
+<style>
+:root{
+  --ink:#131820; --ink-2:#363e4b; --ink-3:#4d5766; --ink-4:#626d7e;
+  --line:#dde2e9; --line-soft:#eceff3; --paper:#ffffff; --app:#f5f7fa;
+  --brand:#1a419e; --brand-soft:#f1f4fa; --code:#15347e;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--app);color:var(--ink-2);
+  font:15px/1.65 "Inter","Segoe UI",system-ui,-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:40px 28px 80px;background:var(--paper);
+  box-shadow:0 1px 2px rgba(19,24,32,.06)}
+h1,h2,h3,h4{color:var(--ink);line-height:1.25;text-wrap:balance}
+h1{font-size:34px;font-weight:700;margin:0 0 8px;letter-spacing:-.01em}
+h2{font-size:25px;font-weight:650;margin:52px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line)}
+h3{font-size:19px;font-weight:600;margin:32px 0 10px}
+h4{font-size:16px;font-weight:600;margin:24px 0 8px;color:var(--ink-2)}
+p{margin:0 0 14px;max-width:86ch}
+ul,ol{margin:0 0 14px;padding-left:22px;max-width:86ch}
+li{margin:5px 0}
+a{color:var(--brand);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:.18em}
+hr{border:0;border-top:1px solid var(--line-soft);margin:34px 0}
+code{font:500 13px/1.5 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  background:var(--brand-soft);color:var(--code);padding:1px 5px;border-radius:3px}
+blockquote{margin:0 0 16px;padding:12px 16px;background:var(--brand-soft);
+  border-left:3px solid var(--brand);border-radius:0 4px 4px 0;color:var(--ink-2);max-width:86ch}
+blockquote p{margin:0}
+.t{overflow-x:auto;margin:0 0 18px}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th{text-align:left;font-weight:600;color:var(--ink);background:var(--app);
+  border-bottom:1px solid var(--line);padding:8px 10px;white-space:nowrap}
+td{border-bottom:1px solid var(--line-soft);padding:8px 10px;vertical-align:top}
+td code{white-space:nowrap}
+tr:last-child td{border-bottom:0}
+figure{margin:18px 0 24px}
+img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:6px}
+.toc{background:var(--app);border:1px solid var(--line);border-radius:8px;
+  padding:18px 22px;margin:26px 0 34px}
+.toc h2{margin:0 0 10px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink-4);border:0;padding:0}
+.toc ol{list-style:none;margin:0;padding:0;columns:2;column-gap:36px}
+.toc li{margin:3px 0;break-inside:avoid}
+.toc li.l1{font-weight:600;color:var(--ink);margin-top:10px}
+.toc li.l1:first-child{margin-top:0}
+.toc li.l2{padding-left:14px}
+@media (max-width:760px){.wrap{padding:24px 16px 60px}.toc ol{columns:1}h1{font-size:27px}}
+@media print{
+  body{background:#fff}
+  .wrap{max-width:none;padding:0;box-shadow:none}
+  h2{page-break-after:avoid}
+  figure,table,blockquote{page-break-inside:avoid}
+  .toc{break-after:page}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="toc"><h2>Contents</h2><ol>
+<li class="l2"><a href="#when-to-use">When to use</a></li>
+<li class="l2"><a href="#which-type-and-it-is-a-real-distinction">Which type, and it is a real distinction</a></li>
+<li class="l2"><a href="#why-this-file-is-a-thin-wrapper-and-not-a-design">Why this file is a thin wrapper and not a design</a></li>
+<li class="l2"><a href="#busyoverlay">BusyOverlay</a></li>
+<li class="l2"><a href="#the-label-is-the-whole-point">The label is the whole point</a></li>
+<li class="l2"><a href="#accessibility">Accessibility</a></li>
+<li class="l2"><a href="#api">API</a></li>
+<li class="l2"><a href="#related">Related</a></li>
+<li class="l2"><a href="#recent-changes">Recent changes</a></li>
+</ol></nav>
+<h1 id="loader">Loader</h1>
+<blockquote><strong>Status: stable</strong> · <code>src/ui/Loader.tsx</code> · two exports: <code>Loader</code> and <code>BusyOverlay</code>. Written to the template set by <a href="button.html"><code>button.md</code></a>.</blockquote>
+<hr>
+<h2 id="when-to-use">When to use</h2>
+<div class="t"><table><thead><tr><th>Situation</th><th>Use</th></tr></thead><tbody><tr><td>A button's action is running</td><td><code>busy</code> on the <a href="button.html">Button</a> — it puts a <code>Loader</code> in the icon slot</td></tr><tr><td>Work over data <strong>already on screen</strong></td><td><strong><code>BusyOverlay</code></strong></td></tr><tr><td>A first load, where nothing is on screen yet</td><td>A <strong>skeleton</strong>, not a loader</td></tr><tr><td>The app booting</td><td>The boot screen</td></tr></tbody></table></div>
+<p>**A skeleton answers <em>"what will this look like?"</em>.** Once the user has seen rows, that question is answered — so a re-price dims what is there and puts an indicator over it instead.</p>
+<hr>
+<h2 id="which-type-and-it-is-a-real-distinction">Which type, and it is a real distinction</h2>
+<div class="t"><table><thead><tr><th>Type</th><th>Looks like</th><th>For</th></tr></thead><tbody><tr><td><strong><code>pulsing</code></strong> <em>(default)</em></td><td>Three dots, <strong>no rotation</strong></td><td>Inside a button or a cell. It holds still, so the control it sits in does not appear to spin</td></tr><tr><td><strong><code>converging-spinner</code></strong></td><td>Rotating</td><td>A whole page or a blocking overlay, where rotation is the point: something is working and there is nothing else to look at</td></tr><tr><td><code>infinite-spinner</code></td><td>Also rotating</td><td>Not used. Kept reachable so a third case does not have to reach past this file</td></tr></tbody></table></div>
+<hr>
+<h2 id="why-this-file-is-a-thin-wrapper-and-not-a-design">Why this file is a thin wrapper and not a design</h2>
+<p>The customer's live bundle <strong>already ships <code>k-loader</code></strong> — with <code>sm/md/lg</code>, the eleven theme colours, and all three animation types.</p>
+<blockquote>The indicator was never an open question. We simply did not have <code>@progress/kendo-react-indicators</code> installed, so the one thing the product already uses was the one thing we could not draw.</blockquote>
+<p><strong>Kendo's type names are kept verbatim.</strong> <code>Button</code> maps MD3's variant ladder onto Kendo's fill modes because MD3 has a ladder worth keeping; a loader has no such vocabulary to reconcile, so inventing <code>dots</code> / <code>spinner</code> / <code>ring</code> here would be <strong>a second set of names for one set of things</strong>.</p>
+<hr>
+<h2 id="busyoverlay">BusyOverlay</h2>
+<p>Dims what is on screen, puts a spinner and <strong>a sentence</strong> over it.</p>
+<div class="t"><table><thead><tr><th>Prop</th><th>Rule</th></tr></thead><tbody><tr><td><code>label</code></td><td><strong>What is happening, in words.</strong> It is shown <em>and</em> read aloud — <em>"Updating results…"</em>, not <em>"Loading"</em></td></tr><tr><td><code>blocking</code></td><td>True when the user must not touch what is underneath</td></tr></tbody></table></div>
+<p>Two things it does that are easy to miss:</p>
+<ul><li>The content underneath gets <code>aria-hidden</code> while busy, so a screen reader does not read a table that is about to change.</li><li>When <code>blocking</code>, it also gets <strong><code>inert</code></strong> — the right word for this, which React 19 passes through. It is only honoured once the overlay is actually up, which is why both are set rather than either alone.</li></ul>
+<hr>
+<h2 id="the-label-is-the-whole-point">The label is the whole point</h2>
+<p>``<code>tsx &lt;Loader label="Working" /&gt;          // on a button &lt;BusyOverlay label="Updating results…"&gt;…&lt;/BusyOverlay&gt; </code>``</p>
+<blockquote><strong>Say what is loading, not that something is.</strong> <em>Loading</em> tells a screen reader user that the page is busy, which they already know from the fact that nothing is happening. <em>Updating results</em> tells them what to expect back.</blockquote>
+<h2 id="accessibility">Accessibility</h2>
+<div class="t"><table><tbody><tr><td>Role</td><td><code>role="status"</code> with <code>aria-live="polite"</code> on the overlay — it waits its turn, unlike an error</td></tr><tr><td>Label</td><td><code>aria-label</code> on the loader, and the same words visible under it</td></tr><tr><td>Underneath</td><td><code>aria-hidden</code> while busy; <code>inert</code> as well when blocking</td></tr><tr><td>Reduced motion</td><td>Honoured — see <a href="../design-system.html#b6--motion">B6</a>. Reduced motion is a <strong>state</strong>, not a switch: things that fade in stay</td></tr></tbody></table></div>
+<h2 id="api">API</h2>
+<p><strong>Loader</strong></p>
+<div class="t"><table><thead><tr><th>Prop</th><th>Type</th><th>Default</th></tr></thead><tbody><tr><td><code>size</code></td><td>`small \</td><td>medium \</td><td>large`</td><td><code>medium</code></td></tr><tr><td><code>type</code></td><td>`pulsing \</td><td>converging-spinner \</td><td>infinite-spinner`</td><td><code>pulsing</code></td></tr><tr><td><code>themeColor</code></td><td>`base \</td><td>primary \</td><td>secondary \</td><td>tertiary`</td><td><code>primary</code></td></tr><tr><td><code>label</code></td><td><code>string</code></td><td><code>Loading</code> — replace it</td></tr></tbody></table></div>
+<p><strong>BusyOverlay</strong></p>
+<div class="t"><table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody><tr><td><code>busy</code></td><td><code>boolean</code></td><td></td></tr><tr><td><code>label</code></td><td><code>string</code></td><td>Required, and said in words</td></tr><tr><td><code>blocking</code></td><td><code>boolean</code></td><td>Adds <code>inert</code> underneath</td></tr></tbody></table></div>
+<hr>
+<h2 id="related">Related</h2>
+<p><a href="button.html">Button</a> · <a href="../patterns/feedback.html">Feedback</a> · <a href="../design-system.html#d5--the-four-screen-states">D5 · The four screen states</a> · <a href="../design-system.html#b6--motion">B6 · Motion</a></p>
+<h2 id="recent-changes">Recent changes</h2>
+<div class="t"><table><thead><tr><th>Date</th><th>Change</th></tr></thead><tbody><tr><td>8 Nov 2026</td><td>This page</td></tr><tr><td>8 Nov 2026</td><td>The button's busy indicator moved to the fill's <code>on-</code> token — it was 1.19:1 on <code>filled</code></td></tr></tbody></table></div>
+</div>
+</body>
+</html>

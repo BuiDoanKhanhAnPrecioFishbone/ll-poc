@@ -1,11 +1,13 @@
 #!/bin/sh
 #
-# Runs before every `git push`. Lint, the two CSS checks, and the build —
-# about ten seconds.
+# Runs before every `git push`. Lint, the CSS checks — which now include
+# `contrast:check`, 184 token pairs read straight out of tokens.css with no
+# browser — and the build. About ten seconds.
 #
-# WHAT IT DELIBERATELY DOES NOT RUN. The four browser checks take roughly ten
-# minutes: twelve routes at four viewport-and-theme passes, plus a thousand
-# controls focused one at a time in three passes. A ten-minute wait on every
+# WHAT IT DELIBERATELY DOES NOT RUN. The seven browser checks take roughly ten
+# minutes: twelve routes at several viewport-and-theme passes, a thousand
+# controls focused one at a time in three passes, and the content box measured
+# at twelve widths. A ten-minute wait on every
 # push is a hook people disable in a week, and a disabled hook checks nothing.
 # Those run in CI instead — see .github/workflows/check.yml — where the wait
 # costs nobody their terminal.

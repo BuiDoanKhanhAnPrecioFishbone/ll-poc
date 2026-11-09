@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MiniTable</title>
+<style>
+:root{
+  --ink:#131820; --ink-2:#363e4b; --ink-3:#4d5766; --ink-4:#626d7e;
+  --line:#dde2e9; --line-soft:#eceff3; --paper:#ffffff; --app:#f5f7fa;
+  --brand:#1a419e; --brand-soft:#f1f4fa; --code:#15347e;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--app);color:var(--ink-2);
+  font:15px/1.65 "Inter","Segoe UI",system-ui,-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:40px 28px 80px;background:var(--paper);
+  box-shadow:0 1px 2px rgba(19,24,32,.06)}
+h1,h2,h3,h4{color:var(--ink);line-height:1.25;text-wrap:balance}
+h1{font-size:34px;font-weight:700;margin:0 0 8px;letter-spacing:-.01em}
+h2{font-size:25px;font-weight:650;margin:52px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line)}
+h3{font-size:19px;font-weight:600;margin:32px 0 10px}
+h4{font-size:16px;font-weight:600;margin:24px 0 8px;color:var(--ink-2)}
+p{margin:0 0 14px;max-width:86ch}
+ul,ol{margin:0 0 14px;padding-left:22px;max-width:86ch}
+li{margin:5px 0}
+a{color:var(--brand);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:.18em}
+hr{border:0;border-top:1px solid var(--line-soft);margin:34px 0}
+code{font:500 13px/1.5 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  background:var(--brand-soft);color:var(--code);padding:1px 5px;border-radius:3px}
+blockquote{margin:0 0 16px;padding:12px 16px;background:var(--brand-soft);
+  border-left:3px solid var(--brand);border-radius:0 4px 4px 0;color:var(--ink-2);max-width:86ch}
+blockquote p{margin:0}
+.t{overflow-x:auto;margin:0 0 18px}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th{text-align:left;font-weight:600;color:var(--ink);background:var(--app);
+  border-bottom:1px solid var(--line);padding:8px 10px;white-space:nowrap}
+td{border-bottom:1px solid var(--line-soft);padding:8px 10px;vertical-align:top}
+td code{white-space:nowrap}
+tr:last-child td{border-bottom:0}
+figure{margin:18px 0 24px}
+img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:6px}
+.toc{background:var(--app);border:1px solid var(--line);border-radius:8px;
+  padding:18px 22px;margin:26px 0 34px}
+.toc h2{margin:0 0 10px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink-4);border:0;padding:0}
+.toc ol{list-style:none;margin:0;padding:0;columns:2;column-gap:36px}
+.toc li{margin:3px 0;break-inside:avoid}
+.toc li.l1{font-weight:600;color:var(--ink);margin-top:10px}
+.toc li.l1:first-child{margin-top:0}
+.toc li.l2{padding-left:14px}
+@media (max-width:760px){.wrap{padding:24px 16px 60px}.toc ol{columns:1}h1{font-size:27px}}
+@media print{
+  body{background:#fff}
+  .wrap{max-width:none;padding:0;box-shadow:none}
+  h2{page-break-after:avoid}
+  figure,table,blockquote{page-break-inside:avoid}
+  .toc{break-after:page}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="toc"><h2>Contents</h2><ol>
+<li class="l2"><a href="#when-to-use">When to use</a></li>
+<li class="l2"><a href="#when-not-to-use">When not to use</a></li>
+<li class="l2"><a href="#what-it-brought-that-nothing-else-had">What it brought that nothing else had</a></li>
+<li class="l2"><a href="#what-was-kept-on-purpose-because-kendo-does-it-differently">What was kept on purpose, because Kendo does it differently</a></li>
+<li class="l2"><a href="#row-tones">Row tones</a></li>
+<li class="l2"><a href="#one-renderer-shared">One renderer, shared</a></li>
+<li class="l2"><a href="#accessibility">Accessibility</a></li>
+<li class="l2"><a href="#api">API</a></li>
+<li class="l2"><a href="#related">Related</a></li>
+<li class="l2"><a href="#recent-changes">Recent changes</a></li>
+</ol></nav>
+<h1 id="minitable">MiniTable</h1>
+<blockquote><strong>Status: stable</strong> · <code>src/ui/MiniTable.tsx</code> · 15 call sites — the short lists inside a record. Written to the template set by <a href="button.html"><code>button.md</code></a>.</blockquote>
+<hr>
+<h2 id="when-to-use">When to use</h2>
+<p>A list <strong>inside</strong> something else: documents on a record, quotation results, the wizard's line items. Tens of rows, not tens of thousands.</p>
+<h2 id="when-not-to-use">When not to use</h2>
+<div class="t"><table><thead><tr><th>Instead of MiniTable</th><th>Use</th><th>Why</th></tr></thead><tbody><tr><td>A module's main list</td><td><a href="data-grid.html">DataGrid</a></td><td>That one brings the title, KPIs, search, view picker, pager and empty state with it</td></tr><tr><td>Three facts about one thing</td><td>A field group</td><td></td></tr><tr><td>A list nobody filters or sorts</td><td>A plain list</td><td>The filter cells are the reason to pay for a table</td></tr></tbody></table></div>
+<p><strong>Same column-role model and the same visual language as the main grid</strong>, without the virtualiser — these lists are tens of rows, and paying for virtualisation would add machinery with nothing to gain.</p>
+<hr>
+<h2 id="what-it-brought-that-nothing-else-had">What it brought that nothing else had</h2>
+<p><strong>Per-column filter cells</strong>: <em>Contains · Does not contain · Is (not) equal to · Starts/Ends with · Is null</em>.</p>
+<p>The Testing Guideline asks for exactly this on the BoM Components tab, and <code>live-component-sweep.md</code> recorded it as <strong>the one real gap</strong> between the live system and this prototype.</p>
+<blockquote>It arrived as a prop rather than as a fortnight of work. That is the single clearest return the Kendo migration produced, and it is why this component was migrated <strong>before</strong> phase 1 — which was blocked at the time, because KendoReact 16's Button loops infinitely under React 19 while its Grid renders fine.</blockquote>
+<hr>
+<h2 id="what-was-kept-on-purpose-because-kendo-does-it-differently">What was kept on purpose, because Kendo does it differently</h2>
+<p><strong>asc → desc → none.</strong> Kendo's default is a two-state toggle; <code>allowUnsort</code> restores the third click, which the guideline calls the <em>Clear</em> reset and which the main <a href="data-grid.html">DataGrid</a> already uses. A sort you cannot undo is a sort that has to be undone by reloading.</p>
+<p><strong>Zebra by record, not by row.</strong> The rules between the rows of one record are already suppressed so the line's cells read as one merged block — but Kendo stripes by <em>row</em>, so a three-manufacturer part came out white / grey / white with the "merged" cell banded down the middle.</p>
+<blockquote>The question was whether these should be truly merged cells, as the customer's mockup shows. The honest answer is that <strong>the merge was already there and the zebra was undoing it.</strong> Striping by record does both jobs: the eye still tracks a wide row across the table, and one record is one tint.</blockquote>
+<hr>
+<h2 id="row-tones">Row tones</h2>
+<p>A tone is a row's <strong>state in the quote</strong>, not a severity:</p>
+<div class="t"><table><thead><tr><th>Tone</th><th>Means</th></tr></thead><tbody><tr><td><code>covered</code></td><td>Covered by the chosen supplier</td></tr><tr><td><code>short</code></td><td>Short of the quantity</td></tr><tr><td><code>no-supplier</code> / <code>missing</code></td><td>No bid</td></tr><tr><td><code>excluded</code></td><td>Excluded from the quote entirely</td></tr><tr><td><code>known-mfg</code></td><td>Manufacturer already known</td></tr></tbody></table></div>
+<p><strong>Every tone is named in a legend under the grid it paints.</strong> A colour only the author can decode is a colour that means nothing — and the legend is also what lets the same amber mean <em>short</em> on one grid and <em>known manufacturer</em> on another without either becoming ambiguous.</p>
+<h2 id="one-renderer-shared">One renderer, shared</h2>
+<p>Cells go through the same <code>renderCell</code> as the main grid. Before that, MiniTable used roles for <strong>width</strong> but fell back to <code>String(value)</code> for content — so identifiers lost their treatment and dates rendered as raw <code>Date</code> objects in every in-record table.</p>
+<blockquote>Two renderers is one renderer too many.</blockquote>
+<h2 id="accessibility">Accessibility</h2>
+<div class="t"><table><tbody><tr><td>Filter cells</td><td>Real inputs with their own labels, not a menu behind an icon</td></tr><tr><td>Sort</td><td>Three states, announced</td></tr><tr><td>Tone</td><td>Never the only carrier — the legend names it and the cells say it</td></tr><tr><td>Identifiers</td><td>Body face, semibold, <code>tabular-nums</code> — and <strong>not</strong> monospace, since 13 Oct</td></tr></tbody></table></div>
+<h2 id="api">API</h2>
+<p>The same <code>ColumnSpec</code> the main grid takes. <strong>All eleven callers kept passing it and know nothing about Kendo</strong> — which was the condition the migration had to meet before it was allowed to happen.</p>
+<hr>
+<h2 id="related">Related</h2>
+<p><a href="data-grid.html">Data grid</a> · <a href="badge.html">Status badge</a> · <a href="../design-system.html#d3--grids">D3 · Grids</a> · <a href="../design-system.html#b17-row-tones-and-accents">B1.7 · Row tones and accents</a> · <a href="../patterns/list-screen.html">List screen</a></p>
+<h2 id="recent-changes">Recent changes</h2>
+<div class="t"><table><thead><tr><th>Date</th><th>Change</th></tr></thead><tbody><tr><td>8 Nov 2026</td><td>This page</td></tr></tbody></table></div>
+</div>
+</body>
+</html>

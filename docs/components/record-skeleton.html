@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Record skeleton</title>
+<style>
+:root{
+  --ink:#131820; --ink-2:#363e4b; --ink-3:#4d5766; --ink-4:#626d7e;
+  --line:#dde2e9; --line-soft:#eceff3; --paper:#ffffff; --app:#f5f7fa;
+  --brand:#1a419e; --brand-soft:#f1f4fa; --code:#15347e;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--app);color:var(--ink-2);
+  font:15px/1.65 "Inter","Segoe UI",system-ui,-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:40px 28px 80px;background:var(--paper);
+  box-shadow:0 1px 2px rgba(19,24,32,.06)}
+h1,h2,h3,h4{color:var(--ink);line-height:1.25;text-wrap:balance}
+h1{font-size:34px;font-weight:700;margin:0 0 8px;letter-spacing:-.01em}
+h2{font-size:25px;font-weight:650;margin:52px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line)}
+h3{font-size:19px;font-weight:600;margin:32px 0 10px}
+h4{font-size:16px;font-weight:600;margin:24px 0 8px;color:var(--ink-2)}
+p{margin:0 0 14px;max-width:86ch}
+ul,ol{margin:0 0 14px;padding-left:22px;max-width:86ch}
+li{margin:5px 0}
+a{color:var(--brand);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:.18em}
+hr{border:0;border-top:1px solid var(--line-soft);margin:34px 0}
+code{font:500 13px/1.5 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  background:var(--brand-soft);color:var(--code);padding:1px 5px;border-radius:3px}
+blockquote{margin:0 0 16px;padding:12px 16px;background:var(--brand-soft);
+  border-left:3px solid var(--brand);border-radius:0 4px 4px 0;color:var(--ink-2);max-width:86ch}
+blockquote p{margin:0}
+.t{overflow-x:auto;margin:0 0 18px}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th{text-align:left;font-weight:600;color:var(--ink);background:var(--app);
+  border-bottom:1px solid var(--line);padding:8px 10px;white-space:nowrap}
+td{border-bottom:1px solid var(--line-soft);padding:8px 10px;vertical-align:top}
+td code{white-space:nowrap}
+tr:last-child td{border-bottom:0}
+figure{margin:18px 0 24px}
+img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:6px}
+.toc{background:var(--app);border:1px solid var(--line);border-radius:8px;
+  padding:18px 22px;margin:26px 0 34px}
+.toc h2{margin:0 0 10px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink-4);border:0;padding:0}
+.toc ol{list-style:none;margin:0;padding:0;columns:2;column-gap:36px}
+.toc li{margin:3px 0;break-inside:avoid}
+.toc li.l1{font-weight:600;color:var(--ink);margin-top:10px}
+.toc li.l1:first-child{margin-top:0}
+.toc li.l2{padding-left:14px}
+@media (max-width:760px){.wrap{padding:24px 16px 60px}.toc ol{columns:1}h1{font-size:27px}}
+@media print{
+  body{background:#fff}
+  .wrap{max-width:none;padding:0;box-shadow:none}
+  h2{page-break-after:avoid}
+  figure,table,blockquote{page-break-inside:avoid}
+  .toc{break-after:page}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="toc"><h2>Contents</h2><ol>
+<li class="l2"><a href="#when-to-use">When to use</a></li>
+<li class="l2"><a href="#when-not-to-use">When not to use</a></li>
+<li class="l2"><a href="#the-labels-are-real-and-only-the-values-are-bars">The labels are real, and only the values are bars</a></li>
+<li class="l2"><a href="#it-is-built-from-the-same-declarations-the-form-is">It is built from the same declarations the form is</a></li>
+<li class="l2"><a href="#it-wears-the-records-own-container-classes">It wears the record's own container classes</a></li>
+<li class="l2"><a href="#anatomy">Anatomy</a></li>
+<li class="l2"><a href="#accessibility">Accessibility</a></li>
+<li class="l2"><a href="#api">API</a></li>
+<li class="l2"><a href="#related">Related</a></li>
+<li class="l2"><a href="#recent-changes">Recent changes</a></li>
+</ol></nav>
+<h1 id="record-skeleton">Record skeleton</h1>
+<blockquote><strong>Status: stable</strong> · <code>src/ui/RecordSkeleton.tsx</code> · the first-load state of a <a href="../patterns/record-form.html">record form</a>, as <a href="grid-skeleton.html"><code>GridSkeleton</code></a> is for the list. Written to the template set by <a href="button.html"><code>button.md</code></a>.</blockquote>
+<hr>
+<h2 id="when-to-use">When to use</h2>
+<p>While one record's values are loading, on a screen whose <strong>fields are already known</strong>.</p>
+<h2 id="when-not-to-use">When not to use</h2>
+<div class="t"><table><thead><tr><th>Instead of this</th><th>Use</th><th>Why</th></tr></thead><tbody><tr><td>A save in progress</td><td><a href="loader.html"><code>BusyOverlay</code></a></td><td>The values are on screen; they are being sent, not fetched</td></tr><tr><td>A new, empty record</td><td>The form itself</td><td>There is nothing to wait for</td></tr></tbody></table></div>
+<hr>
+<h2 id="the-labels-are-real-and-only-the-values-are-bars">The labels are real, and only the values are bars</h2>
+<p>A skeleton greys out <strong>what it does not know yet</strong> — and on a record screen that is less than people assume.</p>
+<blockquote>The labels, the grouping and the order are in the field declarations, which are already in the bundle. It is the customer's name and the due date that are still in flight. Greying the labels as well would be hiding something we are holding, and it would cost the reader the one thing that makes a wait bearable: knowing what they are about to see.</blockquote>
+<p>So <em>Customer</em>, <em>Project</em> and <em>Schedule &amp; ownership</em> read normally from the first frame.</p>
+<blockquote>Nothing moves when the data arrives — the labels are already in their final positions, which is the whole promise a skeleton makes and the usual one it breaks.</blockquote>
+<h2 id="it-is-built-from-the-same-declarations-the-form-is">It is built from the same declarations the form is</h2>
+<p>It takes <strong><code>HEADER_GROUPS</code></strong>, the same array <code>QuotationDetail</code> renders from.</p>
+<blockquote>A field added to the form appears here too, and the skeleton cannot drift into describing a screen that no longer exists.</blockquote>
+<p>Bars are sized by <strong>field kind</strong> (<code>data-sk</code>), the same idea as the grid's widths by column role — a date's placeholder is a date's width, and a <code>notes</code> field gets <strong>two</strong> bars.</p>
+<hr>
+<h2 id="it-wears-the-records-own-container-classes">It wears the record's own container classes</h2>
+<p><code>vy-rfq-head</code>, <code>vy-action-bar</code>, <code>vy-record-bar</code>, <code>vy-back</code>, <code>vy-record-title</code> — rather than a parallel set with the numbers copied across.</p>
+<blockquote><strong>Borrowing the class is exact; copying the number is exact until someone edits the original.</strong></blockquote>
+<p>This was found by measuring, not by looking:</p>
+<div class="t"><table><thead><tr><th>Attempt</th><th>What happened</th></tr></thead><tbody><tr><td>First</td><td>The top rows were skipped entirely, so the field groups sat <strong>92px too high</strong> — when the record arrived the whole form jumped down, breaking the one promise a skeleton makes, in the same file whose comment claims it keeps it</td></tr><tr><td>Second</td><td>Still <strong>24px</strong> out. 18 of those were margins living on <code>vy-back</code> and <code>vy-record-title</code>, so those two classes are worn as well</td></tr></tbody></table></div>
+<h2 id="anatomy">Anatomy</h2>
+<div class="t"><table><thead><tr><th>Part</th><th>Treatment</th></tr></thead><tbody><tr><td>Back link · action bar · record bar · title</td><td>Bars in the <strong>real containers</strong>, all <code>aria-hidden</code></td></tr><tr><td>Group heading</td><td><strong>Real text</strong>, with the icon slot left empty — the glyph is one more thing we have, and the title carries the meaning without it</td></tr><tr><td>Field label</td><td><strong>Real text</strong></td></tr><tr><td>Field value</td><td>A bar sized by the field's kind</td></tr></tbody></table></div>
+<h2 id="accessibility">Accessibility</h2>
+<div class="t"><table><tbody><tr><td>Role</td><td><code>role="status"</code>, <code>aria-live="polite"</code>, <code>aria-busy="true"</code> on the header</td></tr><tr><td>Announced</td><td>A <code>vy-sr-only</code> <em>"Loading the record"</em>, once</td></tr><tr><td>Labels</td><td>Read normally, because they are real — a screen reader user learns the shape of the form while it loads, which is what a sighted user gets too</td></tr><tr><td>The bars</td><td><code>aria-hidden</code>, including the whole top block</td></tr></tbody></table></div>
+<h2 id="api">API</h2>
+<div class="t"><table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody><tr><td><code>groups</code></td><td><code>readonly HeaderGroup[]</code></td><td>Pass <code>HEADER_GROUPS</code>, or a subset for a narrower form</td></tr></tbody></table></div>
+<hr>
+<h2 id="related">Related</h2>
+<p><a href="../patterns/record-form.html">Record form</a> · <a href="grid-skeleton.html">Grid skeleton</a> · <a href="field-row.html">Field row</a> · <a href="../design-system.html#d5--the-four-screen-states">D5 · The four screen states</a></p>
+<h2 id="recent-changes">Recent changes</h2>
+<div class="t"><table><thead><tr><th>Date</th><th>Change</th></tr></thead><tbody><tr><td>8 Nov 2026</td><td>This page</td></tr></tbody></table></div>
+</div>
+</body>
+</html>

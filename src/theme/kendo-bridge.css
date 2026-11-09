@@ -102,7 +102,10 @@ html[data-kendo-bridged] {
      tokens.css. Kendo's own default is 14px, so leaving this unmapped is the
      single most visible difference between a bridged and an unbridged grid. */
   --kendo-font-family: var(--vy-font-sans);
-  --kendo-font-family-monospace: var(--vy-font-mono);
+  /* The product has one family (tokens.css, Typography). This stays mapped
+     rather than deleted: unmapped, Kendo falls back to the browser's own
+     monospace, which is the thing the 13 Oct meeting asked us to remove. */
+  --kendo-font-family-monospace: var(--vy-font-sans);
   --kendo-font-size: var(--vy-text-base);
   --kendo-font-size-md: var(--vy-text-base);
   --kendo-font-size-sm: var(--vy-text-sm);
@@ -269,6 +272,20 @@ html[data-kendo-bridged] .k-checkbox:not(:checked) {
    being made. So the controls are named here instead. */
 html[data-kendo-bridged] .k-input,
 html[data-kendo-bridged] .k-picker {
+  border-color: var(--vy-border-control);
+}
+
+/* AND THE OUTLINED BUTTON, which the same sweep missed in September because
+   it was looking for inputs. `outlined` is the DEFAULT variant of our Button
+   — 51 of the call sites, counting the ones that pass no variant at all — and
+   it has no fill, so the border is not decoration on the control, it IS the
+   control's shape. It came through the same `--kendo-color-border` mapping as
+   the combobox did, at 1.30:1.
+   Scoped to `.k-button-base`: `danger` and `filled` are solid and identified
+   by their fill, so their borders are not carrying 1.4.11 and are left alone.
+   Found by the control sweep of 8 Nov, written up in
+   docs/vien-control-08nov.md. */
+html[data-kendo-bridged] .k-button-outline.k-button-base {
   border-color: var(--vy-border-control);
 }
 

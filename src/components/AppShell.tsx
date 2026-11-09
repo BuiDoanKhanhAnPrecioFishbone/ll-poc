@@ -237,7 +237,12 @@ export function AppShell() {
             <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
               <circle cx="9" cy="9" r="5.5" /><path d="m13.5 13.5 3 3" strokeLinecap="round" />
             </svg>
-            <span>Search screens, orders, parts…</span>
+            {/* "Search screens, orders, parts…" until 9 Nov, and it searched
+                screens. Orders and parts are not in the index — ⌘K walks the
+                47 nav destinations and nothing else — so the button was
+                promising two record types it cannot find, which is A3 rule 5
+                (say what is not real) broken by its own search box. */}
+            <span>Search screens…</span>
             <kbd>⌘K</kbd>
           </button>
 

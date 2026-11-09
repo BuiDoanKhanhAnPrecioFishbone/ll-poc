@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>People picker</title>
+<style>
+:root{
+  --ink:#131820; --ink-2:#363e4b; --ink-3:#4d5766; --ink-4:#626d7e;
+  --line:#dde2e9; --line-soft:#eceff3; --paper:#ffffff; --app:#f5f7fa;
+  --brand:#1a419e; --brand-soft:#f1f4fa; --code:#15347e;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--app);color:var(--ink-2);
+  font:15px/1.65 "Inter","Segoe UI",system-ui,-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:40px 28px 80px;background:var(--paper);
+  box-shadow:0 1px 2px rgba(19,24,32,.06)}
+h1,h2,h3,h4{color:var(--ink);line-height:1.25;text-wrap:balance}
+h1{font-size:34px;font-weight:700;margin:0 0 8px;letter-spacing:-.01em}
+h2{font-size:25px;font-weight:650;margin:52px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line)}
+h3{font-size:19px;font-weight:600;margin:32px 0 10px}
+h4{font-size:16px;font-weight:600;margin:24px 0 8px;color:var(--ink-2)}
+p{margin:0 0 14px;max-width:86ch}
+ul,ol{margin:0 0 14px;padding-left:22px;max-width:86ch}
+li{margin:5px 0}
+a{color:var(--brand);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:.18em}
+hr{border:0;border-top:1px solid var(--line-soft);margin:34px 0}
+code{font:500 13px/1.5 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  background:var(--brand-soft);color:var(--code);padding:1px 5px;border-radius:3px}
+blockquote{margin:0 0 16px;padding:12px 16px;background:var(--brand-soft);
+  border-left:3px solid var(--brand);border-radius:0 4px 4px 0;color:var(--ink-2);max-width:86ch}
+blockquote p{margin:0}
+.t{overflow-x:auto;margin:0 0 18px}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th{text-align:left;font-weight:600;color:var(--ink);background:var(--app);
+  border-bottom:1px solid var(--line);padding:8px 10px;white-space:nowrap}
+td{border-bottom:1px solid var(--line-soft);padding:8px 10px;vertical-align:top}
+td code{white-space:nowrap}
+tr:last-child td{border-bottom:0}
+figure{margin:18px 0 24px}
+img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:6px}
+.toc{background:var(--app);border:1px solid var(--line);border-radius:8px;
+  padding:18px 22px;margin:26px 0 34px}
+.toc h2{margin:0 0 10px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink-4);border:0;padding:0}
+.toc ol{list-style:none;margin:0;padding:0;columns:2;column-gap:36px}
+.toc li{margin:3px 0;break-inside:avoid}
+.toc li.l1{font-weight:600;color:var(--ink);margin-top:10px}
+.toc li.l1:first-child{margin-top:0}
+.toc li.l2{padding-left:14px}
+@media (max-width:760px){.wrap{padding:24px 16px 60px}.toc ol{columns:1}h1{font-size:27px}}
+@media print{
+  body{background:#fff}
+  .wrap{max-width:none;padding:0;box-shadow:none}
+  h2{page-break-after:avoid}
+  figure,table,blockquote{page-break-inside:avoid}
+  .toc{break-after:page}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="toc"><h2>Contents</h2><ol>
+<li class="l2"><a href="#when-to-use">When to use</a></li>
+<li class="l2"><a href="#when-not-to-use">When not to use</a></li>
+<li class="l2"><a href="#it-replaced-a-single-value-dropdown-which-was-wrong-twice">It replaced a single-value dropdown, which was wrong twice</a></li>
+<li class="l2"><a href="#the-email-is-not-decoration">The email is not decoration</a></li>
+<li class="l2"><a href="#on-popover-not-select">On Popover, not Select</a></li>
+<li class="l2"><a href="#anatomy">Anatomy</a></li>
+<li class="l2"><a href="#states">States</a></li>
+<li class="l2"><a href="#accessibility">Accessibility</a></li>
+<li class="l2"><a href="#api">API</a></li>
+<li class="l2"><a href="#related">Related</a></li>
+<li class="l2"><a href="#recent-changes">Recent changes</a></li>
+</ol></nav>
+<h1 id="people-picker">People picker</h1>
+<blockquote><strong>Status: stable</strong> · <code>src/ui/PeoplePicker.tsx</code> · <em>Assigned To</em>, and every other field that names colleagues. Written to the template set by <a href="button.html"><code>button.md</code></a>.</blockquote>
+<hr>
+<h2 id="when-to-use">When to use</h2>
+<p>To choose <strong>one or more people</strong> from the directory.</p>
+<h2 id="when-not-to-use">When not to use</h2>
+<div class="t"><table><thead><tr><th>Instead of a people picker</th><th>Use</th><th>Why</th></tr></thead><tbody><tr><td>A list of codes or statuses</td><td><a href="select.html">Select</a></td><td>People need a face and an address; a status needs neither</td></tr><tr><td>A free-text name</td><td>Nothing — don't</td><td>A typed name cannot be assigned to</td></tr></tbody></table></div>
+<hr>
+<h2 id="it-replaced-a-single-value-dropdown-which-was-wrong-twice">It replaced a single-value dropdown, which was wrong twice</h2>
+<p>Built from the live control An sent on <strong>31 Aug 2026</strong> and confirmed in the bundle: <code>component: "MultiSelect"</code>, with <code>tagRender</code> and <code>onTagDelete</code> for the chips and options carrying an <code>avatar</code>.</p>
+<blockquote>Our <em>Assigned To</em> was a single-value dropdown of bare names — <strong>one value where the live system takes several, and a name where it shows a face and an address.</strong></blockquote>
+<h2 id="the-email-is-not-decoration">The email is not decoration</h2>
+<p>The live directory holds <strong>"Linh 4 Tran"</strong>, <strong>"Linh Tran 5"</strong> and <strong>"Linh Tran 1"</strong>. Ours has <em>Linh Tran</em> and <em>Toan Dinh</em>, whose initials collide at a glance.</p>
+<blockquote>A directory of colleagues is precisely where names repeat, and the email is the line that tells two of them apart. The avatar is what makes the row scannable once you already know which one you want.</blockquote>
+<p>So the row is <strong>avatar · name · email</strong>, and the filter matches <strong>both</strong> fields, contains and case-insensitive, as the live filter descriptor does — someone who knows the address rather than the spelling of the name should not have to guess.</p>
+<hr>
+<h2 id="on-popover-not-select">On Popover, not Select</h2>
+<p>Radix <code>Select</code> holds options and manages focus for a listbox. It <strong>cannot express multiple values</strong>, and its focus scope is the thing that stopped <a href="select.html">Select</a>'s own filter box taking focus.</p>
+<p><code>Popover</code> has no such scope, so <strong>the filter input here is focusable and typing goes to it immediately</strong> — the way the live filterable control behaves.</p>
+<h2 id="anatomy">Anatomy</h2>
+<div class="t"><table><thead><tr><th>Part</th><th>Rule</th></tr></thead><tbody><tr><td><strong>Chips, in the control</strong></td><td>As the live one does, so the field shows its value <strong>without being opened</strong></td></tr><tr><td>Chip ×</td><td>One per person, labelled <em>"Remove Linh Tran"</em></td></tr><tr><td><strong>Add… / Choose…</strong></td><td>The trigger's word changes with the state</td></tr><tr><td><strong>Clear all</strong></td><td>Only once there is <strong>more than one</strong> chip — at a single chip its own × is nearer and less ambiguous</td></tr><tr><td>Filter</td><td>First thing in the popover, focused on open</td></tr><tr><td>Rows</td><td>Avatar · name · email, ticked when chosen</td></tr></tbody></table></div>
+<h2 id="states">States</h2>
+<div class="t"><table><thead><tr><th>State</th><th></th></tr></thead><tbody><tr><td>Empty</td><td><em>Choose…</em></td></tr><tr><td>One or more</td><td>Chips, then <em>Add…</em></td></tr><tr><td><strong>Invalid</strong></td><td><code>data-invalid</code> on the control; the message comes from the <a href="field.html">field</a>, not from here</td></tr><tr><td>No match</td><td><em>"No one matches "{query}"."</em> — a sentence naming what was typed, not a blank panel</td></tr></tbody></table></div>
+<h2 id="accessibility">Accessibility</h2>
+<div class="t"><table><tbody><tr><td>Trigger</td><td>Named for its job — <em>"Add to Assigned To"</em> once there are chips, the label itself when empty</td></tr><tr><td>Each ×</td><td>Names the person it removes</td></tr><tr><td>Rows</td><td>A real <code>listbox</code>, <code>aria-multiselectable</code>, each row <code>role="option"</code> with <code>aria-selected</code>; the tick is <code>aria-hidden</code> because <code>aria-selected</code> already says it</td></tr><tr><td>Avatar</td><td><code>aria-hidden</code> — and <strong>initials, not an image</strong>. The live options carry avatar photographs; this prototype has none, and inventing them would put fictional faces on a colleague list</td></tr><tr><td>Clear</td><td>Named with its count — <em>"Clear all 3"</em></td></tr><tr><td>Filter</td><td>Reachable and focused, which is the reason for Popover</td></tr><tr><td>Target</td><td>Chip × meets the 24px minimum even though the glyph is smaller</td></tr></tbody></table></div>
+<h2 id="api">API</h2>
+<div class="t"><table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody><tr><td><code>value</code></td><td><code>string[]</code></td><td>Names, matching <code>PEOPLE_DIRECTORY</code>. Empty means unassigned</td></tr><tr><td><code>onChange</code></td><td><code>(next: string[]) =&gt; void</code></td><td></td></tr><tr><td><code>label</code> / <code>id</code></td><td><code>string</code></td><td>For the <a href="field.html">field</a> around it</td></tr><tr><td><code>invalid</code></td><td><code>boolean</code></td><td></td></tr></tbody></table></div>
+<hr>
+<h2 id="related">Related</h2>
+<p><a href="select.html">Select</a> · <a href="field.html">Field</a> · <a href="chip.html">Chip</a> · <a href="../patterns/record-form.html">Record form</a> · <a href="../design-system.html#e2--kendoreact">E2 · KendoReact</a></p>
+<h2 id="recent-changes">Recent changes</h2>
+<div class="t"><table><thead><tr><th>Date</th><th>Change</th></tr></thead><tbody><tr><td>8 Nov 2026</td><td>This page</td></tr><tr><td>8 Nov 2026</td><td><code>.vy-people-add</code>'s dashed edge moved to <code>--vy-border-control</code>. It was the structure token at <strong>1.64:1</strong>, and a dashed edge with one muted word in it is the whole of that control. Its hover no longer touches the border either — it went to <code>--vy-border-mid</code> at <strong>2.58:1</strong>, <em>fainter</em> than the resting edge. Found by hand while writing this page; <code>border:check</code> had not reached it, because it only renders once a record is in edit mode</td></tr></tbody></table></div>
+</div>
+</body>
+</html>
