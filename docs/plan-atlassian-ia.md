@@ -269,7 +269,13 @@ Làm trước mọi thứ, không song song được với gì.
 **Verify:** manifest parse được, mọi slug là duy nhất, mọi khoảng dòng cộng lại
 phủ hết Part B+C không chồng lấn (script 20 dòng).
 
-### Phase 1 · Tách 14 trang foundation — **Sonnet** ×2 *agent song song*, ⏱ 3h
+### Phase 1 · Tách foundation — **Sonnet** ×3 *agent song song* — ✅ **XONG 14/11/2026**
+
+> **17 trang** (không phải 14: cộng 4 trang con của Color và `tokens/index`).
+> Phép kiểm "mọi dòng không trống phải có đích đến" chạy trên cả 17: **sạch**.
+> Toàn bộ sổ thay đổi trong 1.625 dòng là **16 dòng** — 1 câu mở đầu cố ý cắt
+> làm hai (radius/elevation) và 15 neo nội bộ phải trỏ lại. Tất cả ghi trong
+> bảng phán đoán của `split-map.md`.
 - Agent 1A: colour (+4 con) · typography · spacing · grid · border · radius
 - Agent 1B: elevation · motion · iconography · illustrations · logos ·
   accessibility · tokens overview
@@ -283,7 +289,11 @@ chết · không trang nào trống.
 Vì sao Sonnet mà không Haiku: phải viết lại cross-reference và quyết định mục
 nào thuộc trang nào ở ranh giới (vd z-index thuộc elevation hay layout).
 
-### Phase 2 · `ds-site.mjs` — **Sonnet**, 1 *agent*, ⏱ 4h
+### Phase 2 · `ds-site.mjs` — **Sonnet**, 1 *agent* — ✅ **XONG 14/11/2026**
+
+> `npm run ds:site` → **81 trang**, 81 mục search, 7.871 link nội bộ, **0 chết**,
+> 0 cảnh báo. `md-doc.mjs` nay export `renderMarkdown`, và bốn tài liệu cũ vẫn
+> render **byte-identical** với bản đã commit — đường PDF bàn giao không xê dịch.
 Spec đưa sẵn, không để agent tự thiết kế:
 sidebar 3 cấp · breadcrumb · tab bar · Contents phải · phase badge · prev/next ·
 search index (`title + h2 + path`, lọc client-side, không dep) · theme toggle

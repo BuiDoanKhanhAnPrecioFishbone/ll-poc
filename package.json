@@ -13,6 +13,7 @@
     "contrast:check": "node scripts/contrast-check.mjs",
     "border:check": "node scripts/border-check.mjs",
     "ia:check": "node scripts/ia-check.mjs",
+    "ds:site": "node scripts/ds-site.mjs",
     "css:check": "npm run css:orphans && npm run css:consistency && npm run contrast:check",
     "check": "npm run check:fast && npm run check:visual",
     "check:fast": "npm run lint && npm run ia:check && npm run css:check && npm run build",

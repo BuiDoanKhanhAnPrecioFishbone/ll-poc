@@ -27,182 +27,234 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { execFileSync } from 'node:child_process';
+import { pathToFileURL } from 'node:url';
 
-const [src, out] = process.argv.slice(2);
-if (!src || !out) {
-  console.error('usage: node scripts/md-doc.mjs <in.md> <out.html>');
-  process.exit(1);
-}
+export const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-const MAX_PX = Number(process.env.MAX_PX || 1100);
-const baseDir = path.dirname(src);
-const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'vy-mddoc-'));
+/**
+ * Render markdown to an HTML fragment.
+ *
+ *   opts.baseDir       where relative image paths start (default '.')
+ *   opts.outPath       where the standalone page will be written; the default link
+ *                      rewrite looks for sibling .html files next to it
+ *   opts.tocLabel      the document's own contents section, which is dropped
+ *   opts.imageHandler  rel => src; default folds the picture in as a data: URI
+ *   opts.linkHandler   href => href | null; default is the standalone rewrite,
+ *                      null renders the link text unlinked
+ *
+ * Returns { html, title, toc, imageCount }.
+ */
+export function renderMarkdown(markdown, opts = {}) {
+  const { baseDir = '.', outPath = '', tocLabel = 'Contents' } = opts;
+  const MAX_PX = Number(process.env.MAX_PX || 1100);
+  let tmp = null;
 
-/* ---- inline helpers ------------------------------------------------------ */
+  /* ---- inline helpers ------------------------------------------------------ */
 
-const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  /** GitHub's own rule, so the anchors a Markdown reader followed still work. */
+  const slug = t => t.trim().toLowerCase()
+    .replace(/[^\p{L}\p{N}\s_-]/gu, '')
+    .replace(/\s/g, '-');
 
-/** GitHub's own rule, so the anchors a Markdown reader followed still work. */
-const slug = t => t.trim().toLowerCase()
-  .replace(/[^\p{L}\p{N}\s_-]/gu, '')
-  .replace(/\s/g, '-');
+  /* Default: the rewrite the standalone documents have always used. */
+  const defaultLink = href => {
+    if (/^(https?:|#|mailto:)/.test(href)) return href;
+    /* NOT `path` — that is the node module, in scope here, and shadowing it
+       made every build die with "path.dirname is not a function". */
+    const [rel, frag] = href.split('#');
+    if (!rel.endsWith('.md')) return href;
+    const asHtml = rel.replace(/\.md$/, '.html');
+    const onDisk = path.resolve(path.dirname(outPath), asHtml);
+    return fs.existsSync(onDisk) ? asHtml + (frag ? '#' + frag : '') : href;
+  };
 
-let imageCount = 0;
-function dataUri(rel) {
-  const file = path.resolve(baseDir, rel);
-  if (!fs.existsSync(file)) { console.error('missing image:', rel); process.exit(1); }
-  const small = path.join(tmp, `${imageCount++}-${path.basename(file)}`);
-  fs.copyFileSync(file, small);
-  try {
-    execFileSync('sips', ['-Z', String(MAX_PX), small], { stdio: 'ignore' });
-  } catch { /* sips is macOS-only; the full-size image is still correct */ }
-  const ext = path.extname(file).slice(1).toLowerCase();
-  const mime = ext === 'svg' ? 'image/svg+xml' : `image/${ext === 'jpg' ? 'jpeg' : ext}`;
-  return `data:${mime};base64,${fs.readFileSync(small).toString('base64')}`;
-}
+  const imageHandler = opts.imageHandler || dataUri;
+  const linkHandler = opts.linkHandler || defaultLink;
+  let imageCount = 0;
+  function dataUri(rel) {
+    const file = path.resolve(baseDir, rel);
+    if (!fs.existsSync(file)) throw new Error(`missing image: ${rel}`);
+    if (!tmp) tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'vy-mddoc-'));
+    const small = path.join(tmp, `${imageCount++}-${path.basename(file)}`);
+    fs.copyFileSync(file, small);
+    try {
+      execFileSync('sips', ['-Z', String(MAX_PX), small], { stdio: 'ignore' });
+    } catch { /* sips is macOS-only; the full-size image is still correct */ }
+    const ext = path.extname(file).slice(1).toLowerCase();
+    const mime = ext === 'svg' ? 'image/svg+xml' : `image/${ext === 'jpg' ? 'jpeg' : ext}`;
+    return `data:${mime};base64,${fs.readFileSync(small).toString('base64')}`;
+  }
 
-/** Inline spans, in the order that keeps code literal. */
-function inline(s) {
-  const code = [];
-  s = s.replace(/`([^`]+)`/g, (_, c) => `\u0000${code.push(c) - 1}\u0000`);
-  s = esc(s);
-  s = s.replace(/!\[([^\]]*)\]\(([^)]+)\)/g,
-    (_, alt, href) => `<figure><img alt="${alt}" src="${dataUri(href)}"></figure>`);
-  s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, text, href) => {
-    /* A LINK BETWEEN TWO DOCUMENTS HAS TO SURVIVE THE RENDER. In the markdown
-       a sibling page is `../design-system.md#b2--typography`, which is right
-       for a reader in the repository and wrong in the HTML, where that path
-       is a file the browser downloads instead of a page it opens.
-       ONLY WHERE THE HTML ACTUALLY EXISTS. The first version of this rewrote
-       every relative `.md`, which broke nine links per document in one go:
-       the design system cites seven working notes — `contrast-sweep.md`,
-       `focus-order.md`, `table-patterns.md` and the rest — that nothing
-       builds to HTML, and they all became dead `.html` paths. So the
-       rewrite is conditional on the file being there, which also means the
-       component pages have to be built before the document that links to
-       them. An absolute URL is someone else's and is left exactly as
-       written. */
-    const target = (() => {
-      if (/^(https?:|#|mailto:)/.test(href)) return href;
-      /* NOT `path` — that is the node module, in scope here, and shadowing it
-         made every build die with "path.dirname is not a function". */
-      const [rel, frag] = href.split('#');
-      if (!rel.endsWith('.md')) return href;
-      const asHtml = rel.replace(/\.md$/, '.html');
-      const onDisk = path.resolve(path.dirname(out), asHtml);
-      return fs.existsSync(onDisk) ? asHtml + (frag ? '#' + frag : '') : href;
-    })();
-    const ext = /^https?:/.test(href) ? ' target="_blank" rel="noopener"' : '';
-    return `<a href="${target}"${ext}>${text}</a>`;
-  });
-  s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-  s = s.replace(/(^|[\s(])\*([^*\n]+)\*/g, '$1<em>$2</em>');
-  s = s.replace(/\u0000(\d+)\u0000/g, (_, i) => `<code>${esc(code[Number(i)])}</code>`);
-  return s;
-}
+  /** Inline spans, in the order that keeps code literal. */
+  function inline(s) {
+    const code = [];
+    s = s.replace(/`([^`]+)`/g, (_, c) => `\u0000${code.push(c) - 1}\u0000`);
+    s = esc(s);
+    s = s.replace(/!\[([^\]]*)\]\(([^)]+)\)/g,
+      (_, alt, href) => `<figure><img alt="${alt}" src="${imageHandler(href)}"></figure>`);
+    s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, text, href) => {
+      /* A LINK BETWEEN TWO DOCUMENTS HAS TO SURVIVE THE RENDER. In the markdown
+         a sibling page is `../design-system.md#b2--typography`, which is right
+         for a reader in the repository and wrong in the HTML, where that path
+         is a file the browser downloads instead of a page it opens.
+         ONLY WHERE THE HTML ACTUALLY EXISTS. The first version of this rewrote
+         every relative `.md`, which broke nine links per document in one go:
+         the design system cites seven working notes — `contrast-sweep.md`,
+         `focus-order.md`, `table-patterns.md` and the rest — that nothing
+         builds to HTML, and they all became dead `.html` paths. So the
+         rewrite is conditional on the file being there, which also means the
+         component pages have to be built before the document that links to
+         them. An absolute URL is someone else's and is left exactly as
+         written. */
+      const target = linkHandler(href);
+      if (target === null) return `<span class="unlinked">${text}</span>`;
+      const ext = /^https?:/.test(href) ? ' target="_blank" rel="noopener"' : '';
+      return `<a href="${target}"${ext}>${text}</a>`;
+    });
+    s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    s = s.replace(/(^|[\s(])\*([^*\n]+)\*/g, '$1<em>$2</em>');
+    s = s.replace(/\u0000(\d+)\u0000/g, (_, i) => `<code>${esc(code[Number(i)])}</code>`);
+    return s;
+  }
 
-/* ---- block parse --------------------------------------------------------- */
+  /* ---- block parse --------------------------------------------------------- */
 
-const lines = fs.readFileSync(src, 'utf8').split('\n');
-const html = [];
-const toc = [];
-const tocLabel = process.env.DOC_TOC_LABEL || 'Contents';
-let seenTitle = false;
-let i = 0;
+  const lines = markdown.split('\n');
+  const html = [];
+  const toc = [];
+  let seenTitle = false;
+  let i = 0;
 
-const isTableRow = l => /^\s*\|.*\|\s*$/.test(l);
-const cells = l => l.trim().replace(/^\||\|$/g, '').split('|').map(c => c.trim());
+  const isTableRow = l => /^\s*\|.*\|\s*$/.test(l);
+  const cells = l => l.trim().replace(/^\||\|$/g, '').split('|').map(c => c.trim());
 
-while (i < lines.length) {
-  const line = lines[i];
+  /* There is no fenced-code renderer here, but a fence still marks text the
+     author means literally — including the `<!-- ds:tab … -->` directives that
+     docs/plan-atlassian-ia.md prints as an EXAMPLE. Dropping those as
+     directives deleted four lines from that page's example and made it
+     meaningless, so the drop below is fence-aware. */
+  let inFence = false;
 
-  if (!line.trim()) { i++; continue; }
+  while (i < lines.length) {
+    const line = lines[i];
 
-  if (/^---+$/.test(line.trim())) { html.push('<hr>'); i++; continue; }
+    if (/^\s*```/.test(line)) inFence = !inFence;
 
-  const h = /^(#{1,4})\s+(.*)$/.exec(line);
-  if (h) {
-    const level = h[1].length;
-    const text = h[2].trim();
-    const id = slug(text);
+    if (!line.trim()) { i++; continue; }
 
-    /* THE DOCUMENT'S OWN CONTENTS SECTION IS DROPPED. A Markdown file needs a
-       hand-written index because nothing renders one for it; this page builds
-       a better one from the headings, and printing both gives the reader two
-       tables of contents to choose between. Everything up to the next rule
-       goes with the heading. */
-    if (id === slug(tocLabel)) {
-      i++;
-      while (i < lines.length && !/^---+$/.test(lines[i].trim())) i++;
-      i++;
+    /* A STANDALONE HTML COMMENT IS A DIRECTIVE, NOT PROSE (`<!-- ds:tab usage -->`) —
+       unless it is inside a fence, where it is the thing being shown. */
+    if (!inFence && /^\s*<!--.*-->\s*$/.test(line)) { i++; continue; }
+
+    if (/^---+$/.test(line.trim())) { html.push('<hr>'); i++; continue; }
+
+    const h = /^(#{1,4})\s+(.*)$/.exec(line);
+    if (h) {
+      const level = h[1].length;
+      const text = h[2].trim();
+      const id = slug(text);
+
+      /* THE DOCUMENT'S OWN CONTENTS SECTION IS DROPPED. A Markdown file needs a
+         hand-written index because nothing renders one for it; this page builds
+         a better one from the headings, and printing both gives the reader two
+         tables of contents to choose between. Everything up to the next rule
+         goes with the heading. */
+      if (id === slug(tocLabel)) {
+        i++;
+        while (i < lines.length && !/^---+$/.test(lines[i].trim())) i++;
+        i++;
+        continue;
+      }
+
+      html.push(`<h${level} id="${id}">${inline(text)}</h${level}>`);
+      /* The title is not an entry in its own index. */
+      if (level === 1 && !seenTitle) { seenTitle = true; i++; continue; }
+      if (level <= 2) toc.push({ level, text, id });
+      i++; continue;
+    }
+
+    if (line.startsWith('> ')) {
+      const buf = [];
+      while (i < lines.length && lines[i].startsWith('>')) {
+        buf.push(lines[i].replace(/^>\s?/, ''));
+        i++;
+      }
+      html.push(`<blockquote>${inline(buf.join(' ').trim())}</blockquote>`);
       continue;
     }
 
-    html.push(`<h${level} id="${id}">${inline(text)}</h${level}>`);
-    /* The title is not an entry in its own index. */
-    if (level === 1 && !seenTitle) { seenTitle = true; i++; continue; }
-    if (level <= 2) toc.push({ level, text, id });
-    i++; continue;
-  }
-
-  if (line.startsWith('> ')) {
-    const buf = [];
-    while (i < lines.length && lines[i].startsWith('>')) {
-      buf.push(lines[i].replace(/^>\s?/, ''));
-      i++;
+    if (isTableRow(line) && isTableRow(lines[i + 1] || '') && /^[\s|:-]+$/.test(lines[i + 1])) {
+      const head = cells(line);
+      i += 2;
+      const body = [];
+      while (i < lines.length && isTableRow(lines[i])) { body.push(cells(lines[i])); i++; }
+      /* A header row of empty cells is a layout device, not a heading — the
+         two-column spec tables in this document use one. Rendering it draws a
+         grey band over nothing. */
+      const headed = head.some(c => c.trim());
+      html.push('<div class="t"><table>'
+        + (headed ? '<thead><tr>' + head.map(c => `<th>${inline(c)}</th>`).join('') + '</tr></thead>' : '')
+        + '<tbody>'
+        + body.map(r => '<tr>' + r.map(c => `<td>${inline(c)}</td>`).join('') + '</tr>').join('')
+        + '</tbody></table></div>');
+      continue;
     }
-    html.push(`<blockquote>${inline(buf.join(' ').trim())}</blockquote>`);
-    continue;
-  }
 
-  if (isTableRow(line) && isTableRow(lines[i + 1] || '') && /^[\s|:-]+$/.test(lines[i + 1])) {
-    const head = cells(line);
-    i += 2;
-    const body = [];
-    while (i < lines.length && isTableRow(lines[i])) { body.push(cells(lines[i])); i++; }
-    /* A header row of empty cells is a layout device, not a heading — the
-       two-column spec tables in this document use one. Rendering it draws a
-       grey band over nothing. */
-    const headed = head.some(c => c.trim());
-    html.push('<div class="t"><table>'
-      + (headed ? '<thead><tr>' + head.map(c => `<th>${inline(c)}</th>`).join('') + '</tr></thead>' : '')
-      + '<tbody>'
-      + body.map(r => '<tr>' + r.map(c => `<td>${inline(c)}</td>`).join('') + '</tr>').join('')
-      + '</tbody></table></div>');
-    continue;
-  }
-
-  if (/^\s*[-*]\s+/.test(line) || /^\s*\d+\.\s+/.test(line)) {
-    const ordered = /^\s*\d+\.\s+/.test(line);
-    const items = [];
-    while (i < lines.length && (/^\s*[-*]\s+/.test(lines[i]) || /^\s*\d+\.\s+/.test(lines[i]))) {
-      let text = lines[i].replace(/^\s*(?:[-*]|\d+\.)\s+/, '');
-      i++;
-      /* A continuation line is indented and is not itself a new item. */
-      while (i < lines.length && /^\s{2,}\S/.test(lines[i])
-             && !/^\s*(?:[-*]|\d+\.)\s+/.test(lines[i])) {
-        text += ' ' + lines[i].trim();
+    if (/^\s*[-*]\s+/.test(line) || /^\s*\d+\.\s+/.test(line)) {
+      const ordered = /^\s*\d+\.\s+/.test(line);
+      const items = [];
+      while (i < lines.length && (/^\s*[-*]\s+/.test(lines[i]) || /^\s*\d+\.\s+/.test(lines[i]))) {
+        let text = lines[i].replace(/^\s*(?:[-*]|\d+\.)\s+/, '');
         i++;
+        /* A continuation line is indented and is not itself a new item. */
+        while (i < lines.length && /^\s{2,}\S/.test(lines[i])
+               && !/^\s*(?:[-*]|\d+\.)\s+/.test(lines[i])) {
+          text += ' ' + lines[i].trim();
+          i++;
+        }
+        items.push(`<li>${inline(text)}</li>`);
       }
-      items.push(`<li>${inline(text)}</li>`);
+      html.push(`<${ordered ? 'ol' : 'ul'}>${items.join('')}</${ordered ? 'ol' : 'ul'}>`);
+      continue;
     }
-    html.push(`<${ordered ? 'ol' : 'ul'}>${items.join('')}</${ordered ? 'ol' : 'ul'}>`);
-    continue;
+
+    const buf = [];
+    while (i < lines.length && lines[i].trim() && !(!inFence && /^\s*<!--.*-->\s*$/.test(lines[i])) && !/^(#{1,4}\s|>|---+$)/.test(lines[i])
+           && !isTableRow(lines[i]) && !/^\s*(?:[-*]|\d+\.)\s+/.test(lines[i])) {
+      buf.push(lines[i]); i++;
+    }
+    const para = inline(buf.join(' ').trim());
+    /* A paragraph that is only a picture is a figure, not a paragraph. */
+    html.push(/^<figure>/.test(para) ? para : `<p>${para}</p>`);
   }
 
-  const buf = [];
-  while (i < lines.length && lines[i].trim() && !/^(#{1,4}\s|>|---+$)/.test(lines[i])
-         && !isTableRow(lines[i]) && !/^\s*(?:[-*]|\d+\.)\s+/.test(lines[i])) {
-    buf.push(lines[i]); i++;
-  }
-  const para = inline(buf.join(' ').trim());
-  /* A paragraph that is only a picture is a figure, not a paragraph. */
-  html.push(/^<figure>/.test(para) ? para : `<p>${para}</p>`);
+  const title = (lines.find(l => l.startsWith('# ')) || '# Document').slice(2).trim();
+  if (tmp) fs.rmSync(tmp, { recursive: true, force: true });
+  return { html: html.join('\n'), title, toc, imageCount };
 }
 
-/* ---- the shell ----------------------------------------------------------- */
+/* ---- the command line ---------------------------------------------------- */
 
-const title = (lines.find(l => l.startsWith('# ')) || '# Document').slice(2).trim();
+function main() {
+  const [src, out] = process.argv.slice(2);
+  if (!src || !out) {
+    console.error('usage: node scripts/md-doc.mjs <in.md> <out.html>');
+    process.exit(1);
+  }
+  const tocLabel = process.env.DOC_TOC_LABEL || 'Contents';
+  let rendered;
+  try {
+    rendered = renderMarkdown(fs.readFileSync(src, 'utf8'), {
+      baseDir: path.dirname(src), outPath: out, tocLabel,
+    });
+  } catch (e) {
+    if (!/^missing image:/.test(e.message)) throw e;
+    console.error('missing image:', e.message.slice('missing image: '.length));
+    process.exit(1);
+  }
+  const { html, title, toc, imageCount } = rendered;
+
+/* ---- the shell ----------------------------------------------------------- */
 
 const page = `<!doctype html>
 <html lang="${process.env.DOC_LANG || 'en'}">
@@ -269,16 +321,18 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 </head>
 <body>
 <div class="wrap">
-<nav class="toc"><h2>${process.env.DOC_TOC_LABEL || 'Contents'}</h2><ol>
+<nav class="toc"><h2>${tocLabel}</h2><ol>
 ${toc.map(t => `<li class="l${t.level}"><a href="#${t.id}">${esc(t.text)}</a></li>`).join('\n')}
 </ol></nav>
-${html.join('\n')}
+${html}
 </div>
 </body>
 </html>`;
 
 fs.mkdirSync(path.dirname(out), { recursive: true });
 fs.writeFileSync(out, page);
-fs.rmSync(tmp, { recursive: true, force: true });
 console.log(`${out} — ${(fs.statSync(out).size / 1024 / 1024).toFixed(2)} MB, `
   + `${imageCount} images inlined, self-contained`);
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) main();
