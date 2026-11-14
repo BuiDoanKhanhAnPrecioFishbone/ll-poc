@@ -39,7 +39,7 @@ cần phán đoán, phần còn lại là chuyển nguyên văn.
 | B1.6a | foundations/color/status-vocabulary | 384-424,426 | **TABLE SPLIT.** Giữ các dòng `--vy-status-*`. Dòng **426** (`--vy-status-slot-w`) ở lại đây — nó là bề rộng ô status, không phải chart |
 | B1.6b | foundations/color/data-visualization-color | 425,428-440 | **TABLE SPLIT.** Dòng **425** (`--vy-chart-cancelled`) là giá trị chart-only duy nhất. 428-440 là ghi chú đã đo về năm fill chart |
 | B1.7 | foundations/color/accents | 443-500 | Row tones và accent |
-| B1.8 | foundations/color | 501-526 | → H2 *Designing in dark mode* — đúng tên heading Atlassian dùng |
+| B1.8 | foundations/color | 501-526 | → H2 *How dark mode is wired* — **giữ nguyên chữ của mình**, chỉ bỏ mã `B1.8`. Atlassian gọi mục này là *Designing in dark mode*, nhưng mình copy **cấu trúc** của họ, không copy câu chữ |
 | B2 | foundations/typography | 527-620 | Gồm *Casing* (từ 606) |
 | B3 | foundations/spacing | 621-662 | Thang, và khe nào giữa hai control |
 | B4a | foundations/radius | (663-673),674-677,682-683 | **TABLE SPLIT.** Bốn radius. 663-673 là mở đầu dùng chung với elevation — **viết lại**, đừng copy |
@@ -96,16 +96,92 @@ Phase 1 đọc D1–D4 một lần rồi điền bảng này. **Chưa điền th
 | D3 | `components/data-grid.md` | *chưa soát* | | |
 | D4 | `components/dialog.md` | *chưa soát* | | |
 
+## Hợp đồng một trang — chốt 14/11/2026
+
+Đo từ `scripts/md-doc.mjs` chứ không phải quy ước em tự đặt:
+
+1. **Mở đầu bằng `# <Title>`**, đúng chữ `title` trong `ia.config.mjs`.
+   `md-doc.mjs` lấy dòng `# ` đầu tiên làm tiêu đề trang.
+2. **Không front-matter.** `md-doc.mjs` đọc thẳng từng dòng, không hiểu YAML —
+   front-matter sẽ **hiện ra thành chữ** trên trang. Metadata (phase, basis,
+   group, origin) nằm ở `ia.config.mjs`, không lặp lại trong file md.
+3. **Bỏ mã `B6`, `C2`, `B1.4`… khỏi tiêu đề.** Đó là số thứ tự của một tài
+   liệu đọc tuyến tính, không phải tên của thứ gì. Bản đồ chuyển đổi là chính
+   bảng trên.
+4. `###` trong tài liệu cũ → `##` khi tiểu mục đó lên thành mục của trang.
+5. **Đường ảnh thêm `../` theo độ sâu**: trang ở `docs/foundations/` dùng
+   `../assets/...`; trang ở `docs/foundations/color/` dùng `../../assets/...`.
+6. **Bỏ dấu `---` phân cách** ở cuối mỗi mục. Nó là vách giữa hai mục của một
+   file dài; một trang không cần vách.
+7. **Không tự viết mục lục.** Generator dựng từ các `##`.
+8. Link `.md` để nguyên dạng `.md` — `md-doc.mjs` tự đổi sang `.html` khi file
+   đích có thật trên đĩa.
+9. **Link `.md` tương đối cũng phải thêm `../` theo độ sâu**, y như ảnh ở luật 5.
+   Trang ở `foundations/` trỏ về `docs/` bằng `../ten-file.md`; trang ở
+   `foundations/color/` bằng `../../ten-file.md`. Bỏ sót luật này thì link chết
+   mà không ai thấy, vì `md-doc.mjs` im lặng để nguyên link khi file không có.
+
+## Phán đoán đã dùng trong Phase 1 — ghi lại để kiểm được
+
+Ba chỗ cả phase phải quyết thay vì chép. Không chỗ nào thêm một thông tin mới.
+
+| Chỗ | Nguồn | Đã làm gì |
+|---|---|---|
+| Câu mở `B4` dòng 665 | *"Four radii, three shadows. Elevation is for things that float…"* | Cắt làm hai nửa của chính nó: `radius.md` lấy **"Four radii."**, `elevation.md` lấy **"Three shadows."** cộng phần còn lại nguyên văn. Đây là **dòng duy nhất** trong 1.625 dòng bị viết lại |
+| Ảnh `elevation.png` | specimen tiêu đề *Elevation*, năm bậc shadow | Chỉ nằm ở `elevation.md`. Agent 1B ban đầu đặt ở cả hai trang và **tự báo là không chắc**; mở ảnh ra xem thì nó vẽ shadow, không vẽ bo góc. `radius.md` do đó không có ảnh — và đúng là không có specimen radius nào trong `docs/assets/` |
+| Bảng `B4` dòng 674-681 | một bảng, hai chủ đề | Tách: 4 dòng `--vy-radius-*` sang radius, 3 dòng `--vy-shadow-*` + `--vy-overlay-scrim` sang elevation. Header 672-673 chép nguyên văn vào cả hai |
+| Bảng `B1.6` dòng 407-426 | status và chart xen kẽ | Tách: dòng 425 (`--vy-chart-cancelled`) sang data-viz, dòng 426 (`--vy-status-slot-w`) ở lại status. Header 407-408 chép nguyên văn vào cả hai |
+| Đường dẫn `.md` tương đối | 7 link trong 3 trang | Hợp đồng chỉ nói độ sâu cho **ảnh**, quên nói cho **link** — thiếu sót của bản hợp đồng. Agent 1A báo đúng chỗ này thay vì tự sửa. Đã thêm `../` / `../../` cho cả 7, và bổ sung luật 9 |
+| Neo nội bộ `#b7--responsive` | 15 link trong 6 trang | **Hệ quả không ai lường của luật 3.** Bỏ mã khỏi heading làm chết mọi neo trỏ theo mã. Agent Phase 2 phát hiện khi dựng site. Đã trỏ lại cả 15 — và **đổi cả chữ của link**: `[B1.5]` trỏ tới một mã không còn tồn tại ở đâu nữa, nên nó thành `[Brand and danger]`, tức là dùng chính chữ của heading đích. Đây là lần duy nhất chữ trong câu bị đổi, và danh sách đủ 15 chỗ nằm trong git |
+| `color` ở đâu | manifest ghi `color/index.md` | Brief của Phase 1 lại ghi `color.md` — **mâu thuẫn do người viết brief**. Theo manifest: file đã chuyển sang `docs/foundations/color/index.md`, ảnh đổi sang `../../` |
+
 ## Luật cho agent Phase 1
 
 1. **Chỉ đọc khoảng dòng của mình.** `sed -n '249,330p' docs/design-system.md`.
-   Không `cat` cả file.
-2. **Không sửa một chữ nào** trong phần nội dung. Được sửa đúng bốn thứ:
-   cấp heading (h3 → h2 khi một tiểu mục lên thành trang) · link nội bộ ·
-   front-matter · mở đầu của những trang dùng chung ngữ cảnh `(…)`.
+   Không `cat` cả file. Không đọc khoảng dòng của agent khác.
+2. **Không sửa một chữ nào** trong nội dung. Được sửa đúng năm thứ: cấp heading
+   (luật 4) · đường ảnh (luật 5) · dấu phân cách (luật 6) · tiêu đề trang
+   (luật 1, 3) · và mở đầu của những trang dùng chung ngữ cảnh `(…)`.
 3. **Số đo và ngày là bất khả xâm phạm.** Mọi giá trị trong tài liệu này đều
-   kèm nguồn đo (luật A3.4). Làm tròn hay bỏ ngày là làm hỏng thứ giá trị nhất
-   của bộ tài liệu.
-4. **Chạy verify trước khi báo xong:** `npm run ia:check`, rồi
-   `node scripts/md-doc.mjs <trang mới> /tmp/x.html` phải chạy không lỗi.
-5. **Báo về: đường dẫn file + 5 dòng tóm tắt.** Không paste nội dung.
+   kèm nguồn đo (luật A3.4). Làm tròn, bỏ ngày, hay "viết cho gọn" là làm hỏng
+   thứ giá trị nhất của bộ tài liệu.
+4. **KHÔNG sửa `docs/design-system.md`.** Nó vẫn là bản đang chạy cho tới khi
+   `ds-handover.mjs` sinh lại được nó (Phase 2). Agent khác đang đọc nó cùng lúc.
+5. **Chỉ ghi vào file của mình.** Không chạm `ia.config.mjs`, `docs/_plan/*`,
+   `scripts/*`, `README.md` — mỗi file có một chủ, và chủ của những file đó
+   không phải agent Phase 1.
+
+## Cách tự chứng minh không mất chữ
+
+Chạy cho **từng trang** trước khi báo xong. Khác biệt duy nhất được phép là
+dấu `---` phân cách (luật 6):
+
+```bash
+A=249; B=330; PAGE=docs/foundations/border.md; DEPTH=..
+sed -n "${A},${B}p" docs/design-system.md \
+  | sed "s|](assets/|](${DEPTH}/assets/|g" \
+  | sed 's/^### /## /' > /tmp/src.md
+sed -n '2,$p' "$PAGE" > /tmp/page.md
+diff /tmp/src.md /tmp/page.md     # chỉ được còn dòng --- và dòng trống của nó
+```
+
+Rồi:
+
+```bash
+node scripts/md-doc.mjs <trang mới> /tmp/x.html   # phải chạy không lỗi
+npm run ia:check                                   # phải OK
+```
+
+Nếu `md-doc.mjs` báo lỗi: **báo lại, đừng sửa nó.** File đó đang có chủ khác
+(agent Phase 2) làm việc trên nó cùng lúc.
+
+## Trang mẫu vàng
+
+`docs/foundations/motion.md` — đã làm xong 14/11, từ B6 (784-823). Mở ra xem
+trước khi bắt đầu: nó thể hiện cả tám luật của hợp đồng, và `diff` của nó chỉ
+còn đúng hai dòng `---` và dòng trống.
+
+## Báo về
+
+Đường dẫn các file đã tạo + 5 dòng tóm tắt + kết quả `diff` của từng trang.
+**Không paste nội dung trang.**

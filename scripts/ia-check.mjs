@@ -39,7 +39,11 @@ for (const n of nodes) {
 /* ---- 2 · sources either exist, or are accounted for ------------------- */
 for (const n of nodes) {
   if (!n.src) continue;
-  if (existsSync(n.src)) continue;
+  if (existsSync(n.src)) {
+    // The flag is a promise about the future; once the file lands it is stale.
+    if (n.status === 'planned') warn.push(`2b· ${n.path} is still marked planned, but ${n.src} now exists`);
+    continue;
+  }
   const planned = n.status === 'planned';
   const fromOld = Object.prototype.hasOwnProperty.call(cfg.splitSources, n.path);
   const hasMaterial = Object.prototype.hasOwnProperty.call(cfg.material, n.path);
