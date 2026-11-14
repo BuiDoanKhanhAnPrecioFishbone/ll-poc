@@ -38,8 +38,18 @@ import { site, PHASES, GROUPS, nav, splitSources, material } from '../docs/ia.co
 import { renderMarkdown, esc } from './md-doc.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const OUT = path.resolve(ROOT, site.outDir);
-if (path.basename(OUT) !== 'site') throw new Error(`refusing to clear ${OUT}: not a "site" directory`);
+/* `--out <dir>` sends the site somewhere else, which is how it reaches Vercel:
+   the deploy runs the build, the build writes the site into dist/ds, and
+   nothing is committed. Paths inside a page are all relative, so the site
+   works at any prefix.
+   The generator CLEARS its output directory, so the guard stays: either the
+   directory is named "site", or it is inside dist/, which the build owns. */
+const outArg = (() => { const i = process.argv.indexOf('--out'); return i > -1 ? process.argv[i + 1] : null; })();
+const OUT = path.resolve(ROOT, outArg || site.outDir);
+const DIST = path.join(ROOT, 'dist');
+const safe = OUT.startsWith(ROOT + path.sep)
+  && (path.basename(OUT) === 'site' || OUT === DIST || OUT.startsWith(DIST + path.sep));
+if (!safe) throw new Error(`refusing to clear ${OUT}: not a "site" directory and not inside dist/`);
 
 const TAB_ORDER = ['examples', 'code', 'usage', 'changelog'];
 const TAB_LABEL = { examples: 'Examples', code: 'Code', usage: 'Usage', changelog: 'Changelog' };
