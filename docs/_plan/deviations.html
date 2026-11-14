@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sổ lệch — chỗ nào cố ý khác Atlassian, và vì sao</title>
+<style>
+:root{
+  --ink:#131820; --ink-2:#363e4b; --ink-3:#4d5766; --ink-4:#626d7e;
+  --line:#dde2e9; --line-soft:#eceff3; --paper:#ffffff; --app:#f5f7fa;
+  --brand:#1a419e; --brand-soft:#f1f4fa; --code:#15347e;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--app);color:var(--ink-2);
+  font:15px/1.65 "Inter","Segoe UI",system-ui,-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:40px 28px 80px;background:var(--paper);
+  box-shadow:0 1px 2px rgba(19,24,32,.06)}
+h1,h2,h3,h4{color:var(--ink);line-height:1.25;text-wrap:balance}
+h1{font-size:34px;font-weight:700;margin:0 0 8px;letter-spacing:-.01em}
+h2{font-size:25px;font-weight:650;margin:52px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line)}
+h3{font-size:19px;font-weight:600;margin:32px 0 10px}
+h4{font-size:16px;font-weight:600;margin:24px 0 8px;color:var(--ink-2)}
+p{margin:0 0 14px;max-width:86ch}
+ul,ol{margin:0 0 14px;padding-left:22px;max-width:86ch}
+li{margin:5px 0}
+a{color:var(--brand);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:.18em}
+hr{border:0;border-top:1px solid var(--line-soft);margin:34px 0}
+code{font:500 13px/1.5 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  background:var(--brand-soft);color:var(--code);padding:1px 5px;border-radius:3px}
+blockquote{margin:0 0 16px;padding:12px 16px;background:var(--brand-soft);
+  border-left:3px solid var(--brand);border-radius:0 4px 4px 0;color:var(--ink-2);max-width:86ch}
+blockquote p{margin:0}
+.t{overflow-x:auto;margin:0 0 18px}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th{text-align:left;font-weight:600;color:var(--ink);background:var(--app);
+  border-bottom:1px solid var(--line);padding:8px 10px;white-space:nowrap}
+td{border-bottom:1px solid var(--line-soft);padding:8px 10px;vertical-align:top}
+td code{white-space:nowrap}
+tr:last-child td{border-bottom:0}
+figure{margin:18px 0 24px}
+img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:6px}
+.toc{background:var(--app);border:1px solid var(--line);border-radius:8px;
+  padding:18px 22px;margin:26px 0 34px}
+.toc h2{margin:0 0 10px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink-4);border:0;padding:0}
+.toc ol{list-style:none;margin:0;padding:0;columns:2;column-gap:36px}
+.toc li{margin:3px 0;break-inside:avoid}
+.toc li.l1{font-weight:600;color:var(--ink);margin-top:10px}
+.toc li.l1:first-child{margin-top:0}
+.toc li.l2{padding-left:14px}
+@media (max-width:760px){.wrap{padding:24px 16px 60px}.toc ol{columns:1}h1{font-size:27px}}
+@media print{
+  body{background:#fff}
+  .wrap{max-width:none;padding:0;box-shadow:none}
+  h2{page-break-after:avoid}
+  figure,table,blockquote{page-break-inside:avoid}
+  .toc{break-after:page}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="toc"><h2>Mục lục</h2><ol>
+<li class="l2"><a href="#dev-01--không-dựng-tầng-primitives">DEV-01 · Không dựng tầng Primitives</a></li>
+<li class="l2"><a href="#dev-02--thêm-foundation-thứ-15-sizing">DEV-02 · Thêm foundation thứ 15: `Sizing`</a></li>
+<li class="l2"><a href="#dev-03--tầng-pattern-giữ-tên-patterns">DEV-03 · Tầng pattern giữ tên `Patterns`</a></li>
+<li class="l2"><a href="#dev-04--trang-tools-liệt-kê-đúng-cái-mình-có">DEV-04 · Trang `Tools` liệt kê đúng cái mình có</a></li>
+<li class="l2"><a href="#dev-05--không-có-rovo-ui">DEV-05 · Không có `Rovo UI`</a></li>
+<li class="l2"><a href="#dev-06--không-có-mục-data-center-apps-trong-tab-usage">DEV-06 · Không có mục `Data Center apps` trong tab Usage</a></li>
+<li class="l2"><a href="#dev-07--họ-component-chỉ-dựng-khi-code-đã-có">DEV-07 · Họ component chỉ dựng khi code đã có</a></li>
+<li class="l2"><a href="#dev-08--không-đổi-tên-414-token-sang-kiểu-dotted">DEV-08 · Không đổi tên 414 token sang kiểu dotted</a></li>
+<li class="l2"><a href="#dev-09--bản-tiếng-việt-là-handover-sinh-ra-không-phải-site-song-song">DEV-09 · Bản tiếng Việt là handover sinh ra, không phải site song song</a></li>
+<li class="l2"><a href="#dev-10--status-vocabulary-là-trang-con-thứ-5-của-color">DEV-10 · `Status vocabulary` là trang con thứ 5 của Color</a></li>
+<li class="l2"><a href="#dev-11--không-có-color-picker-swatches">DEV-11 · Không có `color-picker-swatches`</a></li>
+<li class="l2"><a href="#dev-12--một-trang-whats-new-không-có-news">DEV-12 · Một trang `What's new`, không có `News`</a></li>
+<li class="l2"><a href="#ngược-lại--bốn-thứ-mình-có-mà-họ-không-có">Ngược lại — bốn thứ mình có mà họ không có</a></li>
+</ol></nav>
+<h1 id="sổ-lệch--chỗ-nào-cố-ý-khác-atlassian-và-vì-sao">Sổ lệch — chỗ nào cố ý khác Atlassian, và vì sao</h1>
+<p><strong>Phase 0 · 14/11/2026.</strong> Mục tiêu là <em>đúng cấu trúc</em> Atlassian, không phải <em>giả vờ là</em> Atlassian. Mười ba chỗ dưới đây là quyết định, không phải chỗ bỏ quên. Ghi ra trước thì là quyết định; để người khác tìm ra thì là lỗ hổng.</p>
+<p>Cột <strong>Đảo lại</strong> cho biết phải sửa gì nếu An hoặc chị Huyền muốn làm theo đúng họ — gần hết là một dòng trong <code>docs/ia.config.mjs</code>.</p>
+<p>Mã ở đây là <strong>DEV-NN</strong>, cố ý khác <strong>D1–D12</strong> là mã <em>quyết định thiết kế</em> của chính dự án (D1 sitemap, D3 logo, D7 depth, D8 radius, D10 showcase, D12 English only). Hai hệ mã khác nhau, đừng lẫn.</p>
+<p><strong>Gốc thư viện của từng component</strong> không viết tay ở đây — in ra bằng <code>node scripts/ia-check.mjs --origins</code>, và <code>ia:check</code> đối chiếu từng claim với import thật trong code, nên nó không lệch được.</p>
+<hr>
+<h2 id="dev-01--không-dựng-tầng-primitives">DEV-01 · Không dựng tầng Primitives</h2>
+<p><strong>Họ:</strong> 14 trang — <code>Box</code> <code>Inline</code> <code>Stack</code> <code>Flex</code> <code>Grid</code> <code>Bleed</code> <code>xcss</code> <code>Responsive</code> <code>Text</code> <code>MetricText</code> <code>Pressable</code> <code>Anchor</code> <code>Focusable</code> + overview.</p>
+<p><strong>Mình:</strong> không có tầng này.</p>
+<p><strong>Vì sao.</strong> Primitives là <strong>API layout của Atlaskit</strong> — thư viện React của riêng họ. Mình đứng trên KendoReact cộng CSS token, không có <code>Box</code> hay <code>xcss</code> nào tồn tại trong <code>src/</code>. Dựng 14 trang cho code không có thật là viết tài liệu cho thứ không ai gọi được. Việc mà Primitives làm, bên mình do <code>src/theme/*.css</code> và token làm, và đã có trang Foundations nói về nó.</p>
+<p><strong>Đảo lại:</strong> không đảo được bằng tài liệu. Phải viết một tầng primitive thật trong <code>src/ui</code> trước.</p>
+<hr>
+<h2 id="dev-02--thêm-foundation-thứ-15-sizing">DEV-02 · Thêm foundation thứ 15: <code>Sizing</code></h2>
+<p><strong>Họ:</strong> đúng 14 foundation. Chiều cao control nằm trong tab <em>Examples</em> của từng component (mục <em>Spacing</em>); row density và column role thì thuộc trang <code>Table</code>.</p>
+<p><strong>Mình:</strong> thêm <code>/foundations/sizing</code> — chiều cao control · row density · <strong>column role</strong> · bề rộng dialog và shell (Part B5 của tài liệu cũ).</p>
+<p><strong>Vì sao.</strong> Atlassian đẩy được mấy thứ này xuống component vì bảng không phải sản phẩm của họ. Voyager IQ <strong>là</strong> sản phẩm bảng: mười sáu bề rộng tối thiểu theo <em>role</em> của cột là một luật cắt ngang toàn hệ thống, <code>grid:check</code> và <code>touch:check</code> đo nó trong CI, và nó được dẫn chiếu từ <code>renderCell</code>, <code>column-model</code>, <code>DataGrid</code>, <code>MiniTable</code>. Nhét vào một trang component là chôn luật cắt ngang xuống dưới một chi tiết.</p>
+<p><strong>Đảo lại:</strong> bỏ node <code>sizing</code> trong <code>ia.config.mjs</code>, chuyển dòng <code>B5</code> trong split map sang <code>foundations/spacing</code> (B5.1, B5.4) và <code>components/data-grid</code> (B5.2, B5.3).</p>
+<hr>
+<h2 id="dev-03--tầng-pattern-giữ-tên-patterns">DEV-03 · Tầng pattern giữ tên <code>Patterns</code></h2>
+<p><strong>Họ:</strong> mục sidebar tên <strong>AMP Patterns</strong> (AMP = chương trình marketplace partner của họ).</p>
+<p><strong>Mình:</strong> <code>Patterns</code>, 8 trang đã có + <code>screen-states</code> tách ra từ D5.</p>
+<p><strong>Vì sao.</strong> AMP là tên riêng của một chương trình của họ, không phải tên một tầng IA. Ô trong cây thì y nguyên, chỉ cái nhãn là của mình.</p>
+<p><strong>Đảo lại:</strong> sửa <code>title</code> của node <code>patterns</code>.</p>
+<hr>
+<h2 id="dev-04--trang-tools-liệt-kê-đúng-cái-mình-có">DEV-04 · Trang <code>Tools</code> liệt kê đúng cái mình có</h2>
+<p><strong>Họ:</strong> Figma library · App provider · ESLint plugin · Storybook addon · Stylelint plugin · UI Styling Standard.</p>
+<p><strong>Mình:</strong> tám phép kiểm · <code>md-doc.mjs</code> · <code>capture-*.mjs</code> · <code>with-server.mjs</code> · <code>kendo-bridge.css</code> · <code>tokens-build.mjs</code> (Phase 5). Nói cho đúng chỗ chạy: <code>contrast:check</code> chạy trong <strong>pre-push hook</strong> (184 cặp token, không cần trình duyệt, ~10s cùng lint và build); <strong>bảy phép kiểm trình duyệt</strong> — render · touch · mobile · focus · hover · border · grid — chạy trong <strong>CI</strong> (<code>.github/workflows/check.yml</code>, ~10 phút). Hook tự nói lý do: chờ 10 phút mỗi lần push là cái hook người ta tắt sau một tuần.</p>
+<p><strong>Vì sao.</strong> Luật A3.5: nói thật về cái chưa làm. Mình <strong>không có</strong> Figma library, không có eslint plugin. Nhưng <code>css:consistency</code> và <code>css:orphans</code> đang làm gần đúng việc của stylelint plugin. Và theo khảo sát trong <code>chuan-design-system.md</code> §3.1 (đọc trực tiếp trang của họ hôm 8/11), không hệ thống nào trong bốn hệ đã đọc công bố bộ kiểm tự động như vậy — nên trang này là chỗ mình <strong>mạnh hơn</strong>, miễn là không bịa.</p>
+<p><strong>Đảo lại:</strong> không cần đảo. Khi nào có Figma library thật thì thêm node.</p>
+<hr>
+<h2 id="dev-05--không-có-rovo-ui">DEV-05 · Không có <code>Rovo UI</code></h2>
+<p>Phần riêng cho sản phẩm AI của họ. Mình không có sản phẩm tương ứng. <strong>Đảo lại:</strong> không áp dụng.</p>
+<hr>
+<h2 id="dev-06--không-có-mục-data-center-apps-trong-tab-usage">DEV-06 · Không có mục <code>Data Center apps</code> trong tab Usage</h2>
+<p>Mỗi tab <em>Usage</em> của họ có một mục cho bản Data Center. Voyager IQ chỉ có một bản triển khai. <strong>Đảo lại:</strong> thêm vào template tab <code>usage</code> khi nào có bản thứ hai.</p>
+<hr>
+<h2 id="dev-07--họ-component-chỉ-dựng-khi-code-đã-có">DEV-07 · Họ component chỉ dựng khi code đã có</h2>
+<p><strong>Họ:</strong> <code>Button</code> có 7 thành viên (<code>icon-button</code> <code>link-button</code> <code>link-icon-button</code> <code>split-button</code> <code>filter-button</code> <code>button-group</code> <code>button-legacy</code>).</p>
+<p><strong>Mình:</strong> <code>button</code> đứng một mình — <code>src/ui/Button.tsx</code> không có 7 biến thể đó. Ngược lại mình dựng <strong>họ <code>data-grid</code></strong> với 5 thành viên (<code>column-chooser</code> <code>filter-toolbar</code> <code>view-picker</code> <code>view-setting</code> <code>pager</code>), vì năm cái đó tồn tại chỉ để phục vụ grid và slug nên nói ra điều đó.</p>
+<p><strong>Vì sao.</strong> Không có <code>SplitButton</code> thì không có trang <code>split-button</code>. Cấu trúc phải mô tả code đang có, không phải code của người khác.</p>
+<p><strong>Đảo lại:</strong> thêm <code>children</code> vào node <code>button</code> khi nào code có thành viên mới.</p>
+<hr>
+<h2 id="dev-08--không-đổi-tên-414-token-sang-kiểu-dotted">DEV-08 · Không đổi tên 414 token sang kiểu dotted</h2>
+<p><strong>Họ:</strong> <code>color.background.accent.blue.subtler</code>.</p>
+<p><strong>Mình:</strong> giữ <code>--vy-surface-selected</code>, <code>--vy-status-done-bg</code>…</p>
+<p><strong>Vì sao.</strong> 414 token nằm rải trong ~8.000 dòng CSS cộng <code>kendo-bridge</code>. Đổi tên là rủi ro lớn mà <strong>người đọc tài liệu không được thêm gì</strong> — ba tầng ramp → role → component của mình đã khớp đúng cách ngành làm (đã đối chiếu W3C DTCG và Material 3 ở <code>chuan-design-system.md</code> §2.3). Phase 5 làm JSON thành nguồn thật nhưng <strong>sinh ra đúng tên CSS cũ</strong>, và chứng minh bằng <code>diff</code> byte-identical.</p>
+<p><strong>Đảo lại:</strong> một phase riêng, có codemod + tám phép kiểm làm lưới an toàn. Không gộp vào việc này.</p>
+<hr>
+<h2 id="dev-09--bản-tiếng-việt-là-handover-sinh-ra-không-phải-site-song-song">DEV-09 · Bản tiếng Việt là handover sinh ra, không phải site song song</h2>
+<p><strong>Họ:</strong> một thứ tiếng.</p>
+<p><strong>Mình:</strong> site tiếng Anh + bản bàn giao một-file tiếng Việt, <strong>sinh</strong> bằng <code>ds-handover.mjs</code> theo <code>handoverOrder</code>.</p>
+<p><strong>Vì sao.</strong> Dịch song song ~160 trang là nhân đôi chi phí và bảo đảm lệch — <code>design-system-vi.md</code> là một file riêng 1.604 dòng, có đường build riêng (<code>doc:ds-vi</code>), nên mọi sửa ở bản Anh phải lặp lại ở đó. Đường PDF tiếng Việt (<code>doc:ds-vi</code>) đã chạy, nên giữ đúng đường đó.</p>
+<p><strong>Đảo lại:</strong> <code>site.locales = ['en','vi']</code> trong <code>ia.config.mjs</code> — nhưng đọc §9 của <code>plan-atlassian-ia.md</code> trước, đây là quyết định chi phí, không phải kỹ thuật.</p>
+<hr>
+<h2 id="dev-10--status-vocabulary-là-trang-con-thứ-5-của-color">DEV-10 · <code>Status vocabulary</code> là trang con thứ 5 của Color</h2>
+<p><strong>Họ:</strong> Color có 4 trang con — <code>color-palette</code> <code>accents</code> <code>data-visualization-color</code> <code>color-picker-swatches</code>.</p>
+<p><strong>Mình:</strong> thêm <code>status-vocabulary</code>.</p>
+<p><strong>Vì sao.</strong> Tám status là <strong>từ vựng cắt ngang</strong> của sản phẩm: dùng bởi <code>Badge</code>, <code>Priority</code>, row tone, và năm fill chart. Luật <em>"một status là một chữ và một màu, không bao giờ chỉ là màu"</em> là luật a11y, không phải một bảng màu. Để chìm trong trang Color thì mất.</p>
+<p><strong>Đảo lại:</strong> gộp node đó vào <code>foundations/color</code> như một H2.</p>
+<hr>
+<h2 id="dev-11--không-có-color-picker-swatches">DEV-11 · Không có <code>color-picker-swatches</code></h2>
+<p>Trang đó dành cho tính năng <strong>người dùng cuối tự chọn màu</strong> (label trong Jira). Voyager IQ không có tính năng đó. <strong>Đảo lại:</strong> thêm node khi nào có.</p>
+<hr>
+<h2 id="dev-12--một-trang-whats-new-không-có-news">DEV-12 · Một trang <code>What's new</code>, không có <code>News</code></h2>
+<p><strong>Họ:</strong> <code>/whats-new</code> (changelog sản phẩm) <strong>và</strong> <code>/news</code> (blog, talk, team story).</p>
+<p><strong>Mình:</strong> chỉ <code>/whats-new</code>, <strong>sinh từ <code>git log</code> + <code>docs/worklog.md</code></strong>.</p>
+<p><strong>Vì sao.</strong> <code>/news</code> là marketing của một tổ chức. Changelog thì có thật và sinh được tự động.</p>
+<p><strong>Đảo lại:</strong> thêm node <code>news</code> trỏ vào một file md viết tay.</p>
+<hr>
+<h2 id="ngược-lại--bốn-thứ-mình-có-mà-họ-không-có">Ngược lại — bốn thứ mình có mà họ không có</h2>
+<p>Phải nêu ở trang <code>get-started/about</code>, vì đây là chỗ bộ này <strong>hơn</strong> mặt bằng chung, và nói trước thì mạnh hơn để người khác tìm ra.</p>
+<div class="t"><table><thead><tr><th></th><th>Mình</th><th>Carbon · Atlassian · Polaris · GOV.UK</th></tr></thead><tbody><tr><td>1</td><td><strong>Mọi con số kèm nguồn đo và ngày</strong> (luật A3.4)</td><td>nêu ngưỡng WCAG, không công bố giá trị đo từng cặp token</td></tr><tr><td>2</td><td><strong>Quyết định ghi kèm lý do và ngày</strong> ở cấp token</td><td>GOV.UK có ở cấp component, không ở cấp token</td></tr><tr><td>3</td><td><strong>Tám phép kiểm tự động</strong> — contrast trong pre-push hook, bảy phép trình duyệt trong CI, mỗi lần push</td><td>không hệ thống nào trong bốn hệ đã đọc công bố (khảo sát <code>chuan-design-system.md</code> §3.1)</td></tr><tr><td>4</td><td><strong>Specimen thắng tài liệu khi hai bên mâu thuẫn</strong> (F3)</td><td>không có luật tương đương</td></tr></tbody></table></div>
+<p>Thêm một thứ Phase 0 này tạo ra mà họ cũng không có: <strong>nhãn phase của mọi component đều kèm bằng chứng</strong> (<code>basis</code> trong <code>ia.config.mjs</code>) — số màn đang dùng, ngày sửa cuối, câu hỏi còn treo. Atlassian gắn nhãn <code>Beta</code> mà không nói vì sao.</p>
+</div>
+</body>
+</html>

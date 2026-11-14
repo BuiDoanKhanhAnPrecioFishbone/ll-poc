@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dựng lại design system theo đúng cấu trúc Atlassian — plan build</title>
+<style>
+:root{
+  --ink:#131820; --ink-2:#363e4b; --ink-3:#4d5766; --ink-4:#626d7e;
+  --line:#dde2e9; --line-soft:#eceff3; --paper:#ffffff; --app:#f5f7fa;
+  --brand:#1a419e; --brand-soft:#f1f4fa; --code:#15347e;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--app);color:var(--ink-2);
+  font:15px/1.65 "Inter","Segoe UI",system-ui,-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:40px 28px 80px;background:var(--paper);
+  box-shadow:0 1px 2px rgba(19,24,32,.06)}
+h1,h2,h3,h4{color:var(--ink);line-height:1.25;text-wrap:balance}
+h1{font-size:34px;font-weight:700;margin:0 0 8px;letter-spacing:-.01em}
+h2{font-size:25px;font-weight:650;margin:52px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line)}
+h3{font-size:19px;font-weight:600;margin:32px 0 10px}
+h4{font-size:16px;font-weight:600;margin:24px 0 8px;color:var(--ink-2)}
+p{margin:0 0 14px;max-width:86ch}
+ul,ol{margin:0 0 14px;padding-left:22px;max-width:86ch}
+li{margin:5px 0}
+a{color:var(--brand);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:.18em}
+hr{border:0;border-top:1px solid var(--line-soft);margin:34px 0}
+code{font:500 13px/1.5 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  background:var(--brand-soft);color:var(--code);padding:1px 5px;border-radius:3px}
+blockquote{margin:0 0 16px;padding:12px 16px;background:var(--brand-soft);
+  border-left:3px solid var(--brand);border-radius:0 4px 4px 0;color:var(--ink-2);max-width:86ch}
+blockquote p{margin:0}
+.t{overflow-x:auto;margin:0 0 18px}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th{text-align:left;font-weight:600;color:var(--ink);background:var(--app);
+  border-bottom:1px solid var(--line);padding:8px 10px;white-space:nowrap}
+td{border-bottom:1px solid var(--line-soft);padding:8px 10px;vertical-align:top}
+td code{white-space:nowrap}
+tr:last-child td{border-bottom:0}
+figure{margin:18px 0 24px}
+img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:6px}
+.toc{background:var(--app);border:1px solid var(--line);border-radius:8px;
+  padding:18px 22px;margin:26px 0 34px}
+.toc h2{margin:0 0 10px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink-4);border:0;padding:0}
+.toc ol{list-style:none;margin:0;padding:0;columns:2;column-gap:36px}
+.toc li{margin:3px 0;break-inside:avoid}
+.toc li.l1{font-weight:600;color:var(--ink);margin-top:10px}
+.toc li.l1:first-child{margin-top:0}
+.toc li.l2{padding-left:14px}
+@media (max-width:760px){.wrap{padding:24px 16px 60px}.toc ol{columns:1}h1{font-size:27px}}
+@media print{
+  body{background:#fff}
+  .wrap{max-width:none;padding:0;box-shadow:none}
+  h2{page-break-after:avoid}
+  figure,table,blockquote{page-break-inside:avoid}
+  .toc{break-after:page}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="toc"><h2>Mục lục</h2><ol>
+<li class="l2"><a href="#0--ba-câu-kết-luận-trước">0 · Ba câu kết luận trước</a></li>
+<li class="l2"><a href="#1--cấu-trúc-atlassian--soát-trực-tiếp-14112026">1 · Cấu trúc Atlassian — soát trực tiếp 14/11/2026</a></li>
+<li class="l2"><a href="#2--bộ-hiện-tại--đếm-thật">2 · Bộ hiện tại — đếm thật</a></li>
+<li class="l2"><a href="#3--còn-thiếu-gì--bảng-đối-chiếu-từng-mục">3 · Còn thiếu gì — bảng đối chiếu từng mục</a></li>
+<li class="l2"><a href="#4--kiến-trúc-đề-xuất--bốn-quyết-định">4 · Kiến trúc đề xuất — bốn quyết định</a></li>
+<li class="l2"><a href="#variants">Variants</a></li>
+<li class="l2"><a href="#api">API</a></li>
+<li class="l2"><a href="#when-to-use">When to use</a></li>
+<li class="l2"><a href="#recent-changes">Recent changes</a></li>
+<li class="l2"><a href="#5--plan-build--10-phase">5 · Plan build — 10 phase</a></li>
+<li class="l2"><a href="#6--phân-công-agent--bảng-tra">6 · Phân công agent — bảng tra</a></li>
+<li class="l2"><a href="#7--tiết-kiệm-token--8-chiến-thuật-cụ-thể">7 · Tiết kiệm token — 8 chiến thuật cụ thể</a></li>
+<li class="l2"><a href="#8--sổ-chỗ-cố-ý-khác-atlassian">8 · Sổ chỗ cố ý khác Atlassian</a></li>
+<li class="l2"><a href="#9--ba-quyết-định-cần-anchị-huyền-chốt-trước-khi-build">9 · Ba quyết định cần An/chị Huyền chốt trước khi build</a></li>
+</ol></nav>
+<h1 id="dựng-lại-design-system-theo-đúng-cấu-trúc-atlassian--plan-build">Dựng lại design system theo đúng cấu trúc Atlassian — plan build</h1>
+<p><strong>14/11/2026</strong> · Soát <code>atlassian.design</code> trực tiếp trên trang hôm nay (không qua blog), đối chiếu với bộ đang có trong repo, rồi chia việc.</p>
+<p>Tài liệu này tiếp nối <code>docs/chuan-design-system.md</code> (8/11). Bản đó so cách <em>viết</em>; bản này so cách <em>tổ chức</em> và nói rõ phải dựng những gì.</p>
+<hr>
+<h2 id="0--ba-câu-kết-luận-trước">0 · Ba câu kết luận trước</h2>
+<ol><li><strong>Nội dung đã gần đủ, cấu trúc thì chưa có.</strong> Phần Foundation + 28 trang component + 8 trang pattern đã viết rồi. Thiếu là <strong>IA</strong> (cây điều hướng), <strong>tab mỗi component</strong>, <strong>search / deep-link</strong>, và <strong>tầng meta</strong> (get started · release phases · tools · what's new).</li><li><strong>Không viết lại nội dung. Chỉ tách và sinh ra.</strong> Một file <code>.md</code> cho một component, trong đó đánh dấu ranh giới tab; generator sinh 4 trang HTML. Nhờ vậy 45 file nguồn → <strong>177 trang</strong> như Atlassian mà không nhân đôi chữ nào (32 component × 4 tab + 49 trang còn lại, đếm từ <code>ia.config.mjs</code>).</li><li><strong>Bản handover một-file phải đảo chiều.</strong> Hôm nay <code>design-system.md</code> là nguồn và các trang là nhánh. Sau phase 2 thì ngược lại: các trang là nguồn, bản một-file (và PDF, và bản tiếng Việt) được <strong>sinh ra</strong> bằng cách nối lại theo thứ tự IA. Đây là thứ chặn vĩnh viễn bệnh lệch giữa hai bản.</li></ol>
+<hr>
+<h2 id="1--cấu-trúc-atlassian--soát-trực-tiếp-14112026">1 · Cấu trúc Atlassian — soát trực tiếp 14/11/2026</h2>
+<h3 id="11-điều-hướng-gốc">1.1 Điều hướng gốc</h3>
+<p>Thanh trên: <code>Design system</code> · <code>News</code> · Search · Theme toggle. Sidebar của mục Design system, đúng thứ tự:</p>
+<p>``<code> Get started · Foundations · Components · Rovo UI · Tools · AMP Patterns · Release phases · Contact us </code>``</p>
+<p><code>Rovo UI</code> là phần riêng cho sản phẩm AI của họ — không có cái tương ứng ở mình. <code>AMP Patterns</code> chính là <strong>chỗ của tầng Pattern</strong> trong IA của họ; 8 pattern của mình ngồi đúng vào ô này.</p>
+<h3 id="12-cây-đầy-đủ">1.2 Cây đầy đủ</h3>
+<p>``<code> /                              trang chủ /get-started                   overview   /design · /develop · /with-ai · /content-design   /about-atlassian-design-system   /design/figma-libraries /foundations                   overview — 14 mục   /tokens                      + /design-tokens /use-tokens-in-code                                  /use-tokens-in-design /migrate-to-tokens   /accessibility   /content                     + /voice-tone /language-and-grammar                                  /inclusive-writing /date-time /designing-messages   /spacing · /grid · /typography · /motion · /iconography   /illustrations · /logos · /elevation · /border · /radius   /color                       + /color-palette /accents                                  /data-visualization-color /color-picker-swatches /components                    overview — 92 mục, chia 13 nhóm   /&lt;component&gt;                 4 tab: /examples /code /usage /changelog   /&lt;component&gt;/&lt;biến thể&gt;      họ component, vd button → icon-button,                                  link-button, split-button, filter-button,                                  button-group, button-legacy   /primitives/*                14 mục   /tokens/all-tokens           bảng tra toàn bộ token /tools                         Figma library · app provider · eslint ·                                storybook addon · stylelint · UI Styling Standard /release-phases                3 phase phát hành + 2 phase khai tử /whats-new · /news · /license · /contact-us </code>``</p>
+<h3 id="13-mười-ba-nhóm-component-tên-y-nguyên-của-họ">1.3 Mười ba nhóm component (tên y nguyên của họ)</h3>
+<p><code>Forms and input</code> · <code>Images and icons</code> · <code>Labels</code> · <code>Layout and structure</code> · <code>Loading</code> · <code>Messaging</code> · <code>Navigation</code> · <code>Overlays and layering</code> · <code>Primitives</code> · <code>Status indicators</code> · <code>Text and data display</code> · <code>Libraries</code> · <code>Tooling</code> — cộng các mục <code>Deprecated</code> nằm cuối.</p>
+<h3 id="14-vòng-đời--nguyên-văn">1.4 Vòng đời — nguyên văn</h3>
+<div class="t"><table><thead><tr><th>Phase</th><th>Nghĩa</th></tr></thead><tbody><tr><td><strong>Early Access</strong></td><td>Thực nghiệm. Breaking change ngay ở minor, version 0.x. Không support.</td></tr><tr><td><strong>Beta</strong></td><td>Dùng được, đã support, stable từ 1.0+. Breaking change chỉ ở major.</td></tr><tr><td><strong>General Availability</strong></td><td>Ổn định hoàn toàn. Không bị xoá mà không có thông báo khai tử.</td></tr><tr><td><strong>Intent to Deprecate</strong> (nhãn <em>Caution</em>)</td><td>Đang bị xem xét khai tử. Chưa dùng thì dùng cái khác.</td></tr><tr><td><strong>Deprecated</strong></td><td>Hết support, sẽ bị xoá, đã có đường thay thế.</td></tr></tbody></table></div>
+<p>Nhãn hiện <strong>ngay trong sidebar</strong> cạnh tên component (<code>Beta</code>, <code>Caution</code>, <code>Deprecated</code>). Mình có 29 component, <strong>không cái nào có nhãn</strong> — đây là lỗ dễ thấy nhất khi bàn giao.</p>
+<h3 id="15-khung-một-trang-component">1.5 Khung một trang component</h3>
+<div class="t"><table><thead><tr><th>Tab</th><th>Nội dung</th></tr></thead><tbody><tr><td><strong>Examples</strong></td><td>Default example mở đầu, rồi Appearance (mỗi variant một mục) · States · Spacing · Full width · với icon · Truncation · Custom</td></tr><tr><td><strong>Code</strong></td><td>Installation · Props (một mục cho <strong>mỗi</strong> prop)</td></tr><tr><td><strong>Usage</strong></td><td>Usage · Parts · Accessibility · Best practices · Content guidelines · Data Center apps · Related</td></tr><tr><td><strong>Changelog</strong></td><td>Lịch sử theo version</td></tr></tbody></table></div>
+<p>Mọi trang có: breadcrumb · sidebar trái · mục lục <strong>Contents</strong> bên phải · đáy trang <em>"Was this page helpful? Yes / No"</em>.</p>
+<hr>
+<h2 id="2--bộ-hiện-tại--đếm-thật">2 · Bộ hiện tại — đếm thật</h2>
+<div class="t"><table><thead><tr><th></th><th>Có gì</th><th>Ở đâu</th></tr></thead><tbody><tr><td>Token</td><td><strong>414 token</strong> <code>--vy-*</code>, 3 tầng (ramp → role → component)</td><td><code>src/theme/tokens.css</code></td></tr><tr><td>Foundation</td><td><strong>Part B + C</strong> của một file 1.625 dòng: colour · type · spacing · shape/elevation · sizing · motion · responsive · layout · icon · illustration</td><td><code>docs/design-system.md</code></td></tr><tr><td>Component</td><td><strong>28 trang</strong> <code>.md</code>, template cố định 13 mục</td><td><code>docs/components/*.md</code></td></tr><tr><td>Pattern</td><td><strong>8 trang</strong></td><td><code>docs/patterns/*.md</code></td></tr><tr><td>Component code</td><td><strong>29</strong> trong <code>src/ui</code> + 4 helper</td><td><code>src/ui/*.tsx</code></td></tr><tr><td>Ảnh</td><td>16 component × 2 theme, 7 illustration, ~25 ảnh foundation</td><td><code>docs/assets/**</code></td></tr><tr><td>Specimen sống</td><td><strong>1 trang</strong> 13 mục, trong app</td><td><code>src/pages/DesignSystem.tsx</code></td></tr><tr><td>Generator</td><td>md → HTML đứng một mình, có mục lục riêng</td><td><code>scripts/md-doc.mjs</code> (284 dòng)</td></tr><tr><td>Kiểm tự động</td><td><strong>8 phép</strong>: contrast · render · touch · mobile · focus · hover · border · grid. <code>contrast:check</code> chạy trong <strong>pre-push hook</strong> (184 cặp token, không cần trình duyệt, ~10s cùng lint và build); <strong>bảy phép kiểm trình duyệt</strong> — render · touch · mobile · focus · hover · border · grid — chạy trong <strong>CI</strong> (<code>.github/workflows/check.yml</code>, ~10 phút)</td><td><code>scripts/*.mjs</code> · <code>.githooks/pre-push</code> · <code>.github/workflows/check.yml</code></td></tr><tr><td>Bản tiếng Việt</td><td>1 file 1.604 dòng, dịch song song bằng tay</td><td><code>docs/design-system-vi.md</code></td></tr></tbody></table></div>
+<p>Những thứ <strong>hơn</strong> Atlassian và phải giữ nguyên: mọi con số đều có nguồn đo và ngày · quyết định ghi kèm lý do · tám phép kiểm tự động mỗi lần push (theo khảo sát trong <code>chuan-design-system.md</code> §3.1, không hệ thống nào trong bốn hệ đã đọc công bố bộ kiểm như vậy) · luật "specimen thắng tài liệu khi hai bên mâu thuẫn".</p>
+<hr>
+<h2 id="3--còn-thiếu-gì--bảng-đối-chiếu-từng-mục">3 · Còn thiếu gì — bảng đối chiếu từng mục</h2>
+<div class="t"><table><thead><tr><th>#</th><th>Mục của Atlassian</th><th>Mình đang có</th><th>Thiếu</th><th>Mức</th></tr></thead><tbody><tr><td>1</td><td><strong>IA / điều hướng</strong></td><td>mỗi <code>.md</code> ra một HTML rời, mục lục trong trang</td><td>cây nav, breadcrumb, sidebar, trang overview mỗi tầng, deep-link</td><td><strong>nặng nhất</strong></td></tr><tr><td>2</td><td><strong>Search</strong></td><td>không</td><td>index JSON + ô tìm kiếm</td><td>nặng</td></tr><tr><td>3</td><td><strong>4 tab mỗi component</strong></td><td>1 trang 13 mục</td><td>tách examples / code / usage / changelog</td><td>nặng</td></tr><tr><td>4</td><td><strong>14 trang foundation rời</strong></td><td>gộp trong Part B+C một file</td><td>tách 14 trang + 12 trang con</td><td>nặng</td></tr><tr><td>5</td><td><strong>Release phases + nhãn vòng đời</strong></td><td>không có nhãn nào</td><td>trang policy + nhãn cho 29 component</td><td>nặng (rẻ nhưng lộ rõ)</td></tr><tr><td>6</td><td><strong>Nhóm component</strong></td><td>danh sách phẳng A→Z</td><td>13 nhóm, họ component (Button family)</td><td>vừa</td></tr><tr><td>7</td><td><strong>Bảng all-tokens</strong></td><td>414 token chỉ nằm trong CSS</td><td>trang tra cứu, lọc theo nhóm/theme</td><td>vừa</td></tr><tr><td>8</td><td><strong>Token là nguồn thật</strong></td><td>CSS là nguồn</td><td>JSON theo chuẩn DTCG → sinh ra CSS</td><td>vừa</td></tr><tr><td>9</td><td><strong>Foundation: content design</strong></td><td>mục D6, một bảng</td><td>5 trang con: voice &amp; tone · ngữ pháp · viết bao trùm · ngày giờ · thiết kế thông báo</td><td>vừa</td></tr><tr><td>10</td><td><strong>Foundation: border · radius · logos · data-viz colour</strong></td><td>rải trong B4/B1; 5 token <code>--vy-chart-*</code> có mặt trong B1.6 nhưng chỉ như một phần của status vocabulary</td><td>4 trang — data-viz cần hướng dẫn thật: loại biểu đồ, bảng màu phân loại vs tuần tự, trục, legend</td><td>vừa</td></tr><tr><td>11</td><td><strong>Get started</strong></td><td>README</td><td>4 trang: cho designer · cho dev · content · about</td><td>vừa</td></tr><tr><td>12</td><td><strong>Tools</strong></td><td>8 script kiểm, md-doc, capture</td><td>1 trang liệt kê thật (xem §8 — không bắt chước danh sách của họ)</td><td>nhẹ</td></tr><tr><td>13</td><td><strong>What's new</strong></td><td><code>docs/worklog.md</code>, <code>what-changed.md</code></td><td>1 trang feed, sinh từ git</td><td>nhẹ</td></tr><tr><td>14</td><td><strong>Primitives</strong></td><td>không có tầng này</td><td><strong>cố ý không làm</strong> — xem §8</td><td>—</td></tr><tr><td>15</td><td><strong>Cặp <code>on-</code> cho mọi surface</strong></td><td>có cho brand/danger, thiếu cho surface-selected/strong/sunken</td><td>hoàn thiện cặp → <code>contrast:check</code> chặt hơn</td><td>vừa</td></tr><tr><td>16</td><td><strong>Pattern</strong></td><td>8 trang (họ gọi <em>AMP Patterns</em>)</td><td>chỉ cần đặt vào IA</td><td>nhẹ</td></tr></tbody></table></div>
+<hr>
+<h2 id="4--kiến-trúc-đề-xuất--bốn-quyết-định">4 · Kiến trúc đề xuất — bốn quyết định</h2>
+<h3 id="41-một-file-md-cho-một-component-tab-đánh-dấu-bằng-directive">4.1 Một file md cho một component, tab đánh dấu bằng directive</h3>
+<p>Không tách 28 file thành 112 file. Trong mỗi file component, chèn mốc:</p>
+<p>```md &lt;!-- ds:tab examples --&gt;</p>
+<h2 id="variants">Variants</h2>
+<p>... &lt;!-- ds:tab code --&gt;</p>
+<h2 id="api">API</h2>
+<p>&lt;!-- ds:tab usage --&gt;</p>
+<h2 id="when-to-use">When to use</h2>
+<p>&lt;!-- ds:tab changelog --&gt;</p>
+<h2 id="recent-changes">Recent changes</h2>
+<p>```</p>
+<p>13 mục của template hiện tại map sang 4 tab <strong>không cần viết lại gì</strong>:</p>
+<div class="t"><table><thead><tr><th>Mục đang có</th><th>→ tab</th></tr></thead><tbody><tr><td>Anatomy · Variants · Sizes · States</td><td><code>examples</code></td></tr><tr><td>API</td><td><code>code</code></td></tr><tr><td>When to use · When not to use · Content · Behaviour · Accessibility · Gotcha · Related</td><td><code>usage</code></td></tr><tr><td>Recent changes</td><td><code>changelog</code></td></tr></tbody></table></div>
+<p>Tiết kiệm: 28 lần sửa file nhẹ, thay vì 112 lần tạo file.</p>
+<h3 id="42-một-manifest-là-nguồn-duy-nhất-của-ia">4.2 Một manifest là nguồn duy nhất của IA</h3>
+<p><code>docs/ia.config.mjs</code> khai: cây nav · nhóm · nhãn phase · tab của từng loại trang · redirect từ URL cũ · thứ tự nối cho bản handover. <strong>Mọi agent đọc file này thay vì tự đoán cấu trúc</strong> — đây là chỗ tiết kiệm token lớn nhất của cả plan.</p>
+<h3 id="43-md-docmjs-lớn-lên-thành-ds-sitemjs-không-thêm-framework">4.3 <code>md-doc.mjs</code> lớn lên thành <code>ds-site.mjs</code>, không thêm framework</h3>
+<p>Không Docusaurus, không Astro. Lý do: repo là Vite SPA, <code>md-doc.mjs</code> đã sinh HTML đạt chuẩn và đang nuôi đường PDF bàn giao; thêm framework là mất đường đó và thêm một build nữa. <code>ds-site.mjs</code> thêm: sidebar từ manifest · breadcrumb · tab bar · Contents bên phải · search index JSON · nhãn phase · "trang này có giúp được không".</p>
+<h3 id="44-một-nguồn-ba-đầu-ra">4.4 Một nguồn, ba đầu ra</h3>
+<p>``<code> docs/**/*.md  ──┬─→ docs/site/**         site tra cứu, có nav + search                 ├─→ docs/design-system.html + .pdf   bản handover một-file                 └─→ docs/assets/**        ảnh, do capture-*.mjs sinh </code>``</p>
+<p>Bản một-file <strong>thôi làm nguồn</strong>, chuyển thành đầu ra. Script <code>ds-handover.mjs</code> nối theo thứ tự trong manifest.</p>
+<hr>
+<h2 id="5--plan-build--10-phase">5 · Plan build — 10 phase</h2>
+<p>Ký hiệu: <strong>model</strong> · <em>agent</em> · ⏱ ước lượng (giờ người, kể cả review).</p>
+<h3 id="phase-0--manifest--luật-tách--opus-tự-làm--15h---xong-14112026">Phase 0 · Manifest + luật tách — <strong>Opus</strong>, tự làm, ⏱ 1.5h — ✅ <strong>XONG 14/11/2026</strong></h3>
+<blockquote>Đã có: <code>docs/ia.config.mjs</code> (<strong>81 trang · 32 component · 9 pattern · 13 nhóm</strong>, mỗi nhãn phase kèm <strong>số đo</strong> và mỗi component kèm <strong>gốc thư viện đã được kiểm lại với code</strong>) · <code>docs/_plan/split-map.md</code> (47 dòng, phủ <strong>1.622/1.625</strong> dòng tài liệu cũ — 3 dòng còn lại là dòng trống, đã in ra để chứng minh) · <code>docs/_plan/deviations.md</code> (12 chỗ lệch, mã <strong>DEV-NN</strong>, mỗi chỗ kèm cách đảo lại) · <code>scripts/ia-check.mjs</code> (<strong>11</strong> phép kiểm) nối vào <code>npm run check:fast</code>. Phase 4 còn rất ít: nhãn vòng đời và 13 nhóm đã gán xong tại đây.</blockquote>
+<h4 id="soát-lại-phase-0--những-gì-bản-đầu-viết-sai">Soát lại Phase 0 — những gì bản đầu viết sai</h4>
+<p>Bản đầu của Phase 0 có <strong>chín chỗ tự suy diễn</strong>. Soát lại ngày 14/11 và sửa hết. Ghi ra vì luật A3.5, và vì đây đúng là loại lỗi cả plan này phải tránh.</p>
+<div class="t"><table><thead><tr><th>Chỗ</th><th>Bản đầu viết</th><th>Thực tế trong code</th><th>Sửa</th></tr></thead><tbody><tr><td><code>checkbox</code></td><td>"KendoReact Checkbox qua bridge"</td><td><strong>native <code>&lt;input type="checkbox"&gt;</code> mang class <code>k-checkbox</code></strong>, cố ý <em>không</em> dùng component React của Kendo vì nó không diễn đạt được hai thứ app cần</td><td>ghi đúng, kèm lý do từ <code>checkbox.md</code></td></tr><tr><td><code>radio-group</code></td><td>"Radix RadioGroup"</td><td><strong>native <code>&lt;input type="radio"&gt;</code> mang class <code>k-radio</code></strong>. <em>Từng</em> là Radix, chuyển 15/10/2026. README vẫn còn ghi Radix — README đã cũ</td><td>ghi đúng, kèm ngày chuyển</td></tr><tr><td><code>data-grid</code>, <code>mini-table</code>, <code>button</code>, <code>loader</code>, <code>select</code>, <code>tabs</code>, <code>dialog</code>, <code>file-drop</code></td><td>không nói gốc</td><td><strong>KendoReact</strong> (grid · buttons · indicators · dropdowns→ComboBox · layout→TabStrip · dialogs · upload)</td><td>thêm trường <code>origin</code>, 15 cái, <strong>có phép kiểm đối chiếu</strong></td></tr><tr><td><code>Overlays.tsx</code></td><td>xếp vào "hạ tầng portal/layering"</td><td>nó <strong>chứa 5 component thật</strong>: Dialog · Tabs · Checkbox · RadioGroup · Select</td><td>bỏ khỏi libraries, map theo từng export</td></tr><tr><td>"8 phép kiểm chạy mỗi push"</td><td>ở 9 chỗ trong 3 file</td><td><code>pre-push</code> <strong>cố ý chỉ chạy</strong> lint + css (gồm contrast, 184 cặp) + build ≈10s; <strong>bảy phép trình duyệt chạy trong CI</strong> ≈10 phút</td><td>nói rõ chỗ chạy ở cả 9 chỗ</td></tr><tr><td><code>mini-table</code></td><td>"component được dùng nhiều thứ hai"</td><td>thứ tư: Button 33 · Toast 23 · Field 14 · MiniTable 13</td><td>bỏ xếp hạng, ghi số file</td></tr><tr><td><code>spacing</code></td><td>"một thang gốc 4px"</td><td><strong>13 token, bắt đầu 2px, bước 2px ở đáy</strong></td><td>ghi đúng, có đối chiếu doc ↔ code</td></tr><tr><td><code>list-screen</code></td><td>"chạy chín màn"</td><td><strong>6 file</strong> import <code>useListScreen</code></td><td>ghi đúng</td></tr><tr><td><code>illustrations</code></td><td>"bộ rocket còn đang bị xét (D10)"</td><td>D10 là <strong>showcase screens</strong>, không phải illustration</td><td>bỏ, thay bằng: không phép kiểm nào soi ảnh</td></tr><tr><td><code>screen-states</code></td><td>"<code>render:check</code> đi qua cả bốn state"</td><td><code>render:check</code> so <strong>màu trùng giữa các state dữ liệu</strong>, không đi qua bốn state màn hình</td><td>bỏ claim</td></tr><tr><td><code>logos</code></td><td>"là bản nháp" (đoán từ tên file)</td><td>đúng, và nay có nguồn: <code>logo-ideas.md</code> 26/9 <em>"Nothing here is built yet"</em> + quyết định D3</td><td>ghi kèm nguồn</td></tr></tbody></table></div>
+<p><strong>Bỏ bớt, vì không cần tới:</strong> <code>redirects</code> (docs HTML là file cục bộ, <code>vercel.json</code> chỉ rewrite SPA — không có URL nào để vỡ) · <code>specimenOrigin</code> (hard-code cổng, mà hai file launch.json ghi hai cổng khác nhau; việc của Phase 8) · <code>PHASES[].tone</code> (em tự ánh xạ nhãn release phase sang từ vựng status của <strong>dữ liệu</strong> — đúng thứ design system này cấm) · <code>handoverOrder</code> 24 dòng (lặp lại thứ tự nav → còn <code>handoverFirst</code> 2 dòng, phần sau suy ra từ nav) · hai node <code>page-header</code> và <code>side-navigation</code> (em tự nghĩ ra, không có gì đo được) · <strong>nhãn phase cho pattern</strong> (Atlassian chỉ gắn phase cho <em>component và foundation</em>).</p>
+<p><strong>Phép kiểm mới, và nó được thử bằng cách cố tình viết sai.</strong> <code>ia:check</code> nay đối chiếu mọi <code>origin</code> với code: package phải có trong <code>package.json</code> <strong>và</strong> được import trong file, còn tên control (<code>ComboBox</code>, <code>TabStrip</code>…) phải xuất hiện <strong>trong thân đúng export đó</strong>. Lần đầu em chỉ kiểm ở tầm file — và nó <strong>cho qua</strong> claim sai "checkbox là Kendo ComboBox", vì <code>Overlays.tsx</code> có import <code>kendo-react-dropdowns</code> thật cho Select. Thắt lại ở tầm export thì cả hai claim sai ban đầu đều bị bắt. In bảng gốc: <code>node scripts/ia-check.mjs --origins</code>.</p>
+<p>Làm trước mọi thứ, không song song được với gì.</p>
+<ul><li><code>docs/ia.config.mjs</code> — toàn bộ cây §1.2 đã map sang tên của mình</li><li><code>docs/_plan/split-map.md</code> — <strong>bảng dòng-cho-dòng</strong>: mỗi trang foundation đích ↔ khoảng dòng trong <code>design-system.md</code> (vd <code>B1.1 → 148–186</code>). Nhờ bảng này agent phase 1 chỉ <code>sed -n '148,186p'</code> chứ <strong>không đọc file 1.625 dòng</strong></li><li><code>docs/_plan/deviations.md</code> — sổ ghi chỗ cố ý khác Atlassian (§8)</li><li>Phân nhãn phase cho 29 component (xem Phase 4)</li></ul>
+<p><strong>Verify:</strong> manifest parse được, mọi slug là duy nhất, mọi khoảng dòng cộng lại phủ hết Part B+C không chồng lấn (script 20 dòng).</p>
+<h3 id="phase-1--tách-14-trang-foundation--sonnet-2-agent-song-song--3h">Phase 1 · Tách 14 trang foundation — <strong>Sonnet</strong> ×2 <em>agent song song</em>, ⏱ 3h</h3>
+<ul><li>Agent 1A: colour (+4 con) · typography · spacing · grid · border · radius</li><li>Agent 1B: elevation · motion · iconography · illustrations · logos · accessibility · tokens overview</li><li>Mỗi agent nhận: split-map, một trang mẫu đã làm sẵn, và <strong>chỉ các khoảng dòng của mình</strong></li><li>Chữ giữ nguyên tuyệt đối. Chỉ được sửa: tiêu đề cấp (h3→h2 khi lên thành trang), link nội bộ, thêm front-matter</li></ul>
+<p><strong>Verify:</strong> <code>diff</code> số từ trước/sau phải khớp ±2% · link checker không có link chết · không trang nào trống. Vì sao Sonnet mà không Haiku: phải viết lại cross-reference và quyết định mục nào thuộc trang nào ở ranh giới (vd z-index thuộc elevation hay layout).</p>
+<h3 id="phase-2--ds-sitemjs--sonnet-1-agent--4h">Phase 2 · <code>ds-site.mjs</code> — <strong>Sonnet</strong>, 1 <em>agent</em>, ⏱ 4h</h3>
+<p>Spec đưa sẵn, không để agent tự thiết kế: sidebar 3 cấp · breadcrumb · tab bar · Contents phải · phase badge · prev/next · search index (<code>title + h2 + path</code>, lọc client-side, không dep) · theme toggle dùng đúng <code>--vy-*</code> · redirect map · in được (giữ đường PDF).</p>
+<p><strong>Verify:</strong> sinh toàn site, <code>render:check</code> sạch, mở 5 trang bất kỳ bằng built-in browser, đếm link chết = 0.</p>
+<h3 id="phase-3--28-component--4-tab--sonnet-3-cái-đầu-haiku-phần-còn-lại--3h">Phase 3 · 28 component → 4 tab — <strong>Sonnet</strong> 3 cái đầu, <strong>Haiku</strong> phần còn lại, ⏱ 3h</h3>
+<ol><li>Sonnet làm <code>button</code>, <code>data-grid</code>, <code>toast</code> → ba bản mẫu vàng (3 loại khác nhau: control đơn, control phức, overlay)</li><li>Haiku ×4 <em>agent</em>, mỗi agent 6–7 component, brief = <strong>3 bản mẫu + bảng map §4.1 + danh sách của mình</strong>. Việc thuần cơ học: chèn 4 directive, không sửa chữ</li></ol>
+<p><strong>Verify:</strong> script đếm — mỗi file có đúng 4 directive, thứ tự đúng, mọi h2 cũ còn nguyên (so hash danh sách heading trước/sau). Đây là chỗ Haiku an toàn, vì sai là script bắt được ngay, không cần model đọc lại.</p>
+<h3 id="phase-4--nhóm--nhãn-vòng-đời--haiku-đo-opus-quyết--15h">Phase 4 · Nhóm + nhãn vòng đời — <strong>Haiku</strong> đo, <strong>Opus</strong> quyết, ⏱ 1.5h</h3>
+<ul><li>Haiku: đếm mỗi component trong <code>src/ui</code> được import ở bao nhiêu file, xuất bảng. Thuần <code>grep</code>, 1 agent, rẻ</li><li>Opus/An quyết nhãn theo luật: dùng ≥5 màn + API chưa đổi 30 ngày → <code>General Availability</code>; đang dùng nhưng còn đổi → <code>Beta</code>; mới hoặc chỉ 1 chỗ dùng → <code>Early Access</code>; helper → không lên trang</li><li>Map 29 component vào 13 nhóm của Atlassian, và dựng <strong>họ Button</strong> (<code>button</code> → <code>icon-button</code> · <code>split-button</code>? · <code>button-group</code>?) — nếu code chưa có thì <strong>không bịa trang</strong>, ghi vào sổ deviation</li><li>Viết <code>docs/release-phases.md</code> theo đúng 5 phase §1.4, có luật chuyển phase</li></ul>
+<p><strong>Verify:</strong> mọi component trong <code>src/ui</code> hoặc có trang hoặc có một dòng trong danh sách helper. Không cái nào không được nhắc.</p>
+<h3 id="phase-5--token-json-thành-nguồn--bảng-all-tokens--haiku-chép-sonnet-script--3h">Phase 5 · Token: JSON thành nguồn + bảng all-tokens — <strong>Haiku</strong> chép, <strong>Sonnet</strong> script, ⏱ 3h</h3>
+<ul><li>Sonnet: <code>scripts/tokens-build.mjs</code> — DTCG JSON → <code>tokens.css</code>; và <code>tokens-table.mjs</code> → trang <code>/foundations/tokens/all-tokens</code></li><li>Haiku: chép 414 token sang <code>docs/tokens/*.json</code> theo chuẩn DTCG (<code>$value</code> · <code>$type</code> · <code>$description</code> · alias <code>{group.token}</code>)</li><li><strong>Tên CSS giữ nguyên <code>--vy-*</code>.</strong> Không đổi tên gì trong phase này</li></ul>
+<p><strong>Verify — chỗ hay nhất của plan:</strong> CSS sinh ra phải <strong>byte-identical</strong> với <code>src/theme/tokens.css</code> hiện tại. Một lệnh <code>diff</code> chứng minh 414 token Haiku chép đúng từng cái. Không cần model nào đọc lại.</p>
+<h3 id="phase-5b--cặp-on--cho-mọi-surface--sonnet--15h--tuỳ-chọn-nên-làm">Phase 5b · Cặp <code>on-</code> cho mọi surface — <strong>Sonnet</strong>, ⏱ 1.5h — <em>tuỳ chọn, nên làm</em></h3>
+<p>Thêm <code>--vy-surface-selected-on</code>, <code>-strong-on</code>, <code>-sunken-on</code>. Rồi <code>contrast:check</code> chuyển từ "thử mọi tổ hợp" sang "kiểm đúng cặp đã khai" — chặt hơn, nhanh hơn. Lý do đầy đủ đã viết ở <code>chuan-design-system.md</code> §2.3.</p>
+<h3 id="phase-6--foundation-còn-thiếu--sonnet-nháp-an-sửa-giọng--4h">Phase 6 · Foundation còn thiếu — <strong>Sonnet</strong> nháp, <strong>An</strong> sửa giọng, ⏱ 4h</h3>
+<p><code>content/</code> 5 trang con · <code>logos</code> · <code>data-visualization-color</code> (5 token <code>--vy-chart-*</code> đã có và đã nằm trong <code>contrast:check</code>; thiếu là hướng dẫn dùng) · <code>border</code> · <code>radius</code>. Nháp phải lấy chất liệu từ repo (<code>docs/modal-patterns.md</code>, <code>motion-loading.md</code>, <code>ui-standard-review-16oct.md</code>), <strong>không được viết chung chung</strong>. Giọng là của An → phải có một lượt sửa người.</p>
+<h3 id="phase-7--tầng-meta--haiku-list-sonnet-policy--2h">Phase 7 · Tầng meta — <strong>Haiku</strong> list, <strong>Sonnet</strong> policy, ⏱ 2h</h3>
+<p><code>get-started/</code> 4 trang (design · develop · content-design · about) · <code>tools.md</code> (liệt kê <strong>đúng cái mình có</strong>: tám phép kiểm và chỗ chạy của từng phép, md-doc, capture, with-server, kendo bridge) · <code>whats-new.md</code> sinh từ <code>git log</code> + <code>worklog.md</code>.</p>
+<h3 id="phase-8--examples-sống--ảnh--sonnet--3h">Phase 8 · Examples sống + ảnh — <strong>Sonnet</strong>, ⏱ 3h</h3>
+<p>Route <code>/specimen/:component</code> trong SPA, render ví dụ thật đã cô lập. Tab <em>Examples</em> nhúng iframe route đó → được <strong>ví dụ sống như Atlassian</strong>, không chỉ ảnh. <code>capture-components.mjs</code> trỏ sang chính route đó, nên ảnh cho PDF và ví dụ sống <strong>cùng một nguồn</strong>. Chạy capture <strong>một lần duy nhất ở phase này</strong>, không chạy lại ở mỗi phase.</p>
+<h3 id="phase-9--bản-tiếng-việt---tuỳ-quyết-định-ở-9">Phase 9 · Bản tiếng Việt — ⏱ tuỳ quyết định ở §9</h3>
+<p>Chưa làm cho tới khi An chốt. Đề xuất: <strong>không</strong> dịch song song 177 trang. Site tiếng Anh + bản handover PDF tiếng Việt sinh từ <code>ds-handover.mjs</code> (đường đã có sẵn, <code>doc:ds-vi</code>).</p>
+<h3 id="phase-10--qa--ci--haiku--15h">Phase 10 · QA + CI — <strong>Haiku</strong>, ⏱ 1.5h</h3>
+<p><code>ds:check</code> = link chết · slug trùng · trang mồ côi (có trong manifest mà không có md, và ngược lại) · directive tab đủ 4 · search index phủ hết trang · <code>tokens-build</code> ra CSS khớp. Nối vào <code>npm run check:fast</code>.</p>
+<p><strong>Tổng ⏱ ≈ 29–32h người</strong>, trong đó Opus ~3h, Sonnet ~20h, Haiku ~6h.</p>
+<hr>
+<h2 id="6--phân-công-agent--bảng-tra">6 · Phân công agent — bảng tra</h2>
+<div class="t"><table><thead><tr><th>Phase</th><th>Việc</th><th>Model</th><th>Số agent</th><th>Vì sao model đó</th></tr></thead><tbody><tr><td>0</td><td>Manifest, split-map, deviation, nhãn phase</td><td><strong>Opus</strong></td><td>0 (tự làm)</td><td>Quyết định kiến trúc, cả plan copy từ đây</td></tr><tr><td>1</td><td>Tách 14 foundation</td><td>Sonnet</td><td>2 song song</td><td>Phải viết lại cross-ref ở ranh giới</td></tr><tr><td>2</td><td><code>ds-site.mjs</code></td><td>Sonnet</td><td>1</td><td>Code, spec đã đóng</td></tr><tr><td>3</td><td>Tab cho 3 component mẫu</td><td>Sonnet</td><td>1</td><td>Đặt chuẩn cho Haiku copy</td></tr><tr><td>3</td><td>Tab cho 25 component còn lại</td><td><strong>Haiku</strong></td><td>4</td><td>Cơ học, script verify được</td></tr><tr><td>4</td><td>Đếm usage</td><td><strong>Haiku</strong></td><td>1</td><td><code>grep</code> thuần</td></tr><tr><td>4</td><td>Quyết nhãn + nhóm</td><td><strong>Opus</strong></td><td>0</td><td>Cần biết cái nào thật sự ổn định</td></tr><tr><td>5</td><td>Chép 414 token sang JSON</td><td><strong>Haiku</strong></td><td>1</td><td><code>diff</code> byte-identical chứng minh đúng</td></tr><tr><td>5</td><td>Script build token + bảng</td><td>Sonnet</td><td>1</td><td>Code</td></tr><tr><td>5b</td><td>Cặp <code>on-</code></td><td>Sonnet</td><td>1</td><td>Sửa CSS + check, có rủi ro contrast</td></tr><tr><td>6</td><td>Viết foundation thiếu</td><td>Sonnet</td><td>2</td><td>Viết, cần lấy chất liệu từ repo</td></tr><tr><td>7</td><td>Get started / tools / what's new</td><td>Haiku + Sonnet</td><td>2</td><td>List thì Haiku, policy thì Sonnet</td></tr><tr><td>8</td><td>Specimen route + capture</td><td>Sonnet</td><td>1</td><td>React + script</td></tr><tr><td>10</td><td><code>ds:check</code></td><td>Haiku</td><td>1</td><td>Script kiểm, mẫu đã có 8 cái</td></tr></tbody></table></div>
+<p><strong>Brief cho mỗi agent gồm đúng 4 thứ:</strong> (1) đường dẫn <code>ia.config.mjs</code> · (2) khoảng dòng / danh sách file <em>của riêng nó</em> · (3) một bản mẫu vàng đã làm · (4) lệnh verify nó phải tự chạy trước khi báo xong. Báo về <strong>chỉ</strong> đường dẫn file đã sửa + 5 dòng tóm tắt — <strong>không paste nội dung ngược lại</strong>.</p>
+<hr>
+<h2 id="7--tiết-kiệm-token--8-chiến-thuật-cụ-thể">7 · Tiết kiệm token — 8 chiến thuật cụ thể</h2>
+<ol><li><strong>Một md một component, tab bằng directive</strong> → 28 lần sửa nhẹ thay vì 112 file mới.</li><li><strong>Split-map có khoảng dòng</strong> → agent <code>sed -n 'X,Yp'</code>, không agent nào đọc hết file 1.625 dòng. Riêng điều này tiết kiệm ~25k token/agent × 2 agent.</li><li><strong>Bản mẫu vàng</strong> → Sonnet làm 1, Haiku copy 25. Chênh giá model ~10×.</li><li><strong>Verify bằng script, không bằng model.</strong> <code>diff</code> byte-identical cho token · đếm directive · hash danh sách heading · link checker. Model không bao giờ đọc lại để kiểm.</li><li><strong>Agent báo đường dẫn, không báo nội dung.</strong></li><li><strong>Chia lô 6–7 component/agent</strong> → context mỗi agent chỉ chứa mẫu + lô của nó.</li><li><strong>Chụp ảnh một lần ở phase 8</strong>, không chụp lại mỗi phase (capture là việc đắt nhất về thời gian máy).</li><li><strong>Không thêm framework</strong> → không agent nào phải học dep mới.</li></ol>
+<p>Chống lặp việc: phase 1 và 3 <strong>không được chạy cùng lúc</strong> nếu cùng chạm <code>design-system.md</code>. Thứ tự bắt buộc: <code>0 → (1 ∥ 2) → 3 → 4 → (5 ∥ 6 ∥ 7) → 8 → 10</code>.</p>
+<hr>
+<h2 id="8--sổ-chỗ-cố-ý-khác-atlassian">8 · Sổ chỗ cố ý khác Atlassian</h2>
+<p>Ghi ra trước thì là quyết định; để người khác tìm ra thì là lỗ hổng.</p>
+<div class="t"><table><thead><tr><th>Mục của họ</th><th>Mình làm gì</th><th>Lý do</th></tr></thead><tbody><tr><td><strong>Primitives</strong> (14 mục: Box, Inline, Stack, xcss…)</td><td><strong>Không làm</strong></td><td>Đó là API layout của Atlaskit. Mình đứng trên KendoReact + CSS token, không có tầng này. Bịa ra là tài liệu cho code không tồn tại</td></tr><tr><td><strong>Tools</strong>: eslint plugin, stylelint plugin, storybook addon, Figma library</td><td>Liệt kê <strong>đúng cái mình có</strong>: tám phép kiểm (một trong hook, bảy trong CI) · <code>md-doc</code> · <code>capture-*</code> · <code>kendo-bridge</code></td><td>Luật A3.5: nói thật về cái chưa làm. <code>css:consistency</code> đã làm gần đúng việc của stylelint plugin</td></tr><tr><td><strong>Rovo UI</strong></td><td>Không có</td><td>Không có sản phẩm AI tương ứng</td></tr><tr><td><strong>Data Center apps</strong> (mục trong mỗi tab Usage)</td><td>Không có</td><td>Không có bản Data Center</td></tr><tr><td>Họ component sâu (Button có 7 biến thể)</td><td>Chỉ dựng họ khi <strong>code đã có</strong></td><td>Không có <code>SplitButton</code> thì không có trang <code>split-button</code></td></tr><tr><td><strong>AMP Patterns</strong></td><td>Giữ tên <strong>Patterns</strong>, 8 trang hiện có</td><td>AMP là riêng của marketplace họ</td></tr><tr><td>Đổi tên token sang <code>color.background.*</code></td><td><strong>Không</strong> trong plan này</td><td>414 token nằm rải trong 8.000 dòng CSS. Đổi tên là rủi ro mà không đổi được gì cho người đọc. Nếu muốn, đó là phase riêng, có codemod + tám phép kiểm làm lưới an toàn</td></tr></tbody></table></div>
+<p>Ngược lại, <strong>4 thứ mình giữ mà họ không có</strong>, và phải nêu ở trang <code>about</code>: mọi con số có nguồn đo và ngày · quyết định ghi kèm lý do · tám phép kiểm chạy mỗi push · luật specimen thắng tài liệu.</p>
+<hr>
+<h2 id="9--ba-quyết-định-cần-anchị-huyền-chốt-trước-khi-build">9 · Ba quyết định cần An/chị Huyền chốt trước khi build</h2>
+<ol><li><strong>Bản tiếng Việt.</strong> Dịch song song 177 trang (đắt, dễ lệch) hay site tiếng Anh + handover PDF tiếng Việt sinh tự động? <em>Đề xuất: cái thứ hai.</em></li><li><strong>Site ở đâu.</strong> <code>docs/site/</code> tĩnh mở bằng file (đi kèm bàn giao, không cần hạ tầng) hay deploy lên Vercel cạnh mockup? <em>Đề xuất: sinh tĩnh trước, deploy sau — Vercel đã cấu hình sẵn nên thêm sau rất rẻ.</em></li><li><strong>Đổi tên token.</strong> Giữ <code>--vy-*</code> (đề xuất) hay đổi sang kiểu dotted của Atlassian trong một phase riêng có codemod?</li></ol>
+<p>Phase 0 và 1 <strong>không phụ thuộc</strong> ba quyết định này, nên có thể bắt đầu ngay.</p>
+</div>
+</body>
+</html>
