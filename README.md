@@ -34,7 +34,7 @@ is not a re-skin: Kendo stays recognisably Kendo, and stops speaking two design
 languages at once.
 
 **Unchanged through both reversals.** The design system itself. Tokens, the
-seven-token status vocabulary, the column role model and the whole audit were
+eight-status vocabulary, the column role model and the whole audit were
 always library-agnostic. That is the part with the thinking in
 it, and it is why the component layer could be swapped twice without it moving.
 
@@ -42,8 +42,9 @@ it, and it is why the component layer could be swapped twice without it moving.
 
 | | | |
 | --- | --- | --- |
-| **KendoReact** | grid, dialog, tabs, combobox, upload, Excel export, button | the production library, restyled through the bridge |
-| **Radix UI** | popover, radio group, toast, slot | the four primitives Kendo does not cover |
+| **KendoReact** | grid, dialog, tabs, combobox, upload, loader, Excel export, button | the production library, restyled through the bridge |
+| **Kendo's CSS, not its React component** | checkbox, radio group | a native `<input>` wearing `k-checkbox` / `k-radio`. Kendo's own `<Checkbox>` cannot express two things this app needs, and the radio group moved here from Radix on 15 Oct 2026 |
+| **Radix UI** | popover, toast, slot | the three primitives Kendo does not cover |
 | Everything visual | `src/ui` | ours, driven entirely by tokens |
 
 `src/theme/kendo-bridge.css` maps Voyager tokens onto Kendo's CSS variable API.
@@ -119,8 +120,8 @@ Every finding is measured, not estimated — taken from the rendered DOM and the
 
 ## What this mockup proposes
 
-**A design system driven entirely by tokens.** One brand ramp, one neutral ramp, seven status
-tokens, a fixed type scale, and three grid densities.
+**A design system driven entirely by tokens.** One brand ramp, one neutral ramp, eight status
+pairs, a fixed type scale, and three grid densities.
 
 **A navigation shell, on the structure they already know.** A persistent sidebar with a
 breadcrumb and an active state, replacing 51 destinations behind a hamburger — but on the live
@@ -145,7 +146,7 @@ as declined, which is where a rejected proposal belongs.
 | `money` | 124px | Right-aligned, currency-aware |
 | `date` | 150px | Sized to the full rendered format |
 | `datetime` | 190px | A moment, not a day — 150px fits "16 May 2026" and clips the time off it |
-| `status` | 128px | One badge from the seven shared status tokens |
+| `status` | 128px | One badge from the eight shared status pairs |
 | `priority` | 104px | A dot and a word; the widest is "Medium" |
 
 Measured in this mockup: **no clipped identifiers** — `text` is the one role that truncates,
@@ -261,7 +262,7 @@ src/
     findings.ts        UX findings, each with evidence and effort/value
   ui/                  The component library — ours, driven entirely by tokens
     DataGrid.tsx       The standard list pattern
-    Badge.tsx          One badge from the seven status tokens
+    Badge.tsx          One badge from the eight status pairs
     Pager.tsx, ColumnChooser.tsx, FilterToolbar.tsx, ViewPicker.tsx, …
   components/          Application-level composites
     AppShell.tsx       Persistent sidebar, breadcrumb, top bar
