@@ -184,3 +184,26 @@ ul.children .grp{margin-top:var(--vy-space-8);font-size:var(--vy-text-sm);font-w
 .toc-inline a:hover{color:var(--vy-brand-text)}
 @media (max-width:1180px){.toc-inline{display:block}}
 @media (max-width:640px){.toc-inline ol{columns:1}}
+
+/* Do / don't / accessibility, on every component page.
+   Measured 15 Nov 2026 on --vy-surface-subtle, light / dark:
+     do      --vy-accent-positive    5.34:1 / 12.69:1
+     don't   --vy-danger-text-deep   7.54:1 /  9.46:1
+     a11y    --vy-brand-text-deep   13.54:1 / 13.58:1
+     body    --vy-on-surface        14.08:1 / 15.02:1
+   contrast:check reads only tokens.css, so these were measured by hand. */
+.guide{margin:var(--vy-space-10) 0;padding:var(--vy-space-6) var(--vy-space-8);
+  background:var(--vy-surface-subtle);border-left:3px solid var(--vy-border);
+  border-radius:0 var(--vy-radius-lg) var(--vy-radius-lg) 0}
+.guide>h2{margin-top:0;display:flex;align-items:center;gap:var(--vy-space-4)}
+.guide>h2::before{font-size:.85em;font-weight:700;line-height:1}
+.guide>:last-child{margin-bottom:0}
+.guide-do{border-left-color:var(--vy-accent-positive)}
+.guide-do>h2{color:var(--vy-accent-positive)}
+.guide-do>h2::before{content:"\2713"}
+.guide-dont{border-left-color:var(--vy-danger-text-deep)}
+.guide-dont>h2{color:var(--vy-danger-text-deep)}
+.guide-dont>h2::before{content:"\2715"}
+.guide-a11y{border-left-color:var(--vy-brand-text-deep)}
+.guide-a11y>h2{color:var(--vy-brand-text-deep)}
+.guide-a11y>h2::before{content:"\25C8"}

@@ -213,10 +213,40 @@ function render(n, md, file) {
   }).filter(Boolean).join('\n');
 
   return {
-    html: html.replace(/^<h1 [^>]*>.*?<\/h1>\n?/, ''),
+    html: guides(html.replace(/^<h1 [^>]*>.*?<\/h1>\n?/, '')),
     title: title || n.title,
     toc: toc.filter(t => t.level === 2),
   };
+}
+
+/**
+ * The three sections every component page carries get a semantic block.
+ *
+ * `When to use` and `When not to use` are a do/don't pair on 28 of the 29
+ * pages, and they were reading as two more headings in a column of prose.
+ * They are wrapped and tinted here rather than marked up by hand, so nobody
+ * has to learn a syntax and no existing page needs editing.
+ *
+ * The colours are the system's own generic severities — `--vy-accent-positive`
+ * is what the product already uses for a success toast, a done step and a
+ * completed checklist — not the status vocabulary, which belongs to data.
+ * And not colour alone: the heading keeps its words and gains a glyph, which
+ * is the same rule B1.6 applies to a status.
+ */
+const GUIDE = {
+  'When to use': 'do',
+  'When not to use': 'dont',
+  'Accessibility': 'a11y',
+};
+
+function guides(html) {
+  const parts = html.split(/(?=<h2 )/);
+  return parts.map(seg => {
+    const m = /^<h2 [^>]*>(.*?)<\/h2>/.exec(seg);
+    if (!m) return seg;
+    const kind = GUIDE[plain(m[1]).trim()];
+    return kind ? `<section class="guide guide-${kind}">${seg}</section>` : seg;
+  }).join('');
 }
 
 for (const n of flat) {
