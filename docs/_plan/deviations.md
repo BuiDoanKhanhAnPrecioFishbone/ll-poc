@@ -121,13 +121,13 @@ phải mô tả code đang có, không phải code của người khác.
 
 ---
 
-## DEV-08 · Không đổi tên 414 token sang kiểu dotted
+## DEV-08 · Không đổi tên 238 token sang kiểu dotted
 
 **Họ:** `color.background.accent.blue.subtler`.
 
 **Mình:** giữ `--vy-surface-selected`, `--vy-status-done-bg`…
 
-**Vì sao.** 414 token nằm rải trong ~8.000 dòng CSS cộng `kendo-bridge`. Đổi
+**Vì sao.** 238 token (khai 414 lần) nằm rải trong ~8.000 dòng CSS cộng `kendo-bridge`. Đổi
 tên là rủi ro lớn mà **người đọc tài liệu không được thêm gì** — ba tầng
 ramp → role → component của mình đã khớp đúng cách ngành làm (đã đối chiếu
 W3C DTCG và Material 3 ở `chuan-design-system.md` §2.3). Phase 5 làm JSON

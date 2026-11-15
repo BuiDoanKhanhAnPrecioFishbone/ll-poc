@@ -34,6 +34,14 @@
  */
 
 /**
+ * HOW THE USE-SITE COUNTS ARE TAKEN, since getting this wrong is easy and the
+ * first attempt did. A component is imported two ways — `from '../ui/Badge'`
+ * from a screen, and `from './Badge'` by a sibling inside `src/ui` — and
+ * counting only the first undercounted fifteen components, Icon by five. The
+ * counts here match BOTH forms, exclude the file itself, and exclude
+ * `src/specimens/`, because an example written to document a component is not
+ * evidence that the product uses it.
+ *
  * Where the Kendo in this system actually sits.
  *
  * Production is KendoReact, so the component layer is Kendo wherever Kendo has
@@ -102,27 +110,27 @@ export const nav = [
 
   {
     slug: 'get-started', title: 'Get started', kind: 'overview',
-    src: 'docs/get-started/index.md', status: 'planned',
+    src: 'docs/get-started/index.md',
     children: [
-      { slug: 'design',         title: 'For designers',  src: 'docs/get-started/design.md',         kind: 'page', status: 'planned' },
-      { slug: 'develop',        title: 'For developers', src: 'docs/get-started/develop.md',        kind: 'page', status: 'planned' },
-      { slug: 'content-design', title: 'For content',    src: 'docs/get-started/content-design.md', kind: 'page', status: 'planned' },
-      { slug: 'about',          title: 'About this design system', src: 'docs/get-started/about.md',kind: 'page', status: 'planned' },
+      { slug: 'design',         title: 'For designers',  src: 'docs/get-started/design.md',         kind: 'page' },
+      { slug: 'develop',        title: 'For developers', src: 'docs/get-started/develop.md',        kind: 'page' },
+      { slug: 'content-design', title: 'For content',    src: 'docs/get-started/content-design.md', kind: 'page' },
+      { slug: 'about',          title: 'About this design system', src: 'docs/get-started/about.md',kind: 'page' },
     ],
   },
 
   {
     slug: 'foundations', title: 'Foundations', kind: 'overview',
-    src: 'docs/foundations/index.md', status: 'planned',
+    src: 'docs/foundations/index.md',
     children: [
       {
         slug: 'tokens', title: 'Tokens', kind: 'overview', phase: 'ga',
-        basis: '414 custom properties in src/theme/tokens.css; three layers (ramp → role → component) as set out in A2',
+        basis: '238 custom properties in src/theme/tokens.css, declared 414 times across :root and the two dark blocks; three layers (ramp → role → component) as set out in A2',
         src: 'docs/foundations/tokens/index.md',
         children: [
-          { slug: 'design-tokens',        title: 'Design tokens',        src: 'docs/foundations/tokens/design-tokens.md',        kind: 'page', status: 'planned' },
-          { slug: 'use-tokens-in-code',   title: 'Use tokens in code',   src: 'docs/foundations/tokens/use-tokens-in-code.md',   kind: 'page', status: 'planned' },
-          { slug: 'use-tokens-in-design', title: 'Use tokens in design', src: 'docs/foundations/tokens/use-tokens-in-design.md', kind: 'page', status: 'planned' },
+          { slug: 'design-tokens',        title: 'Design tokens',        src: 'docs/foundations/tokens/design-tokens.md',        kind: 'page' },
+          { slug: 'use-tokens-in-code',   title: 'Use tokens in code',   src: 'docs/foundations/tokens/use-tokens-in-code.md',   kind: 'page' },
+          { slug: 'use-tokens-in-design', title: 'Use tokens in design', src: 'docs/foundations/tokens/use-tokens-in-design.md', kind: 'page' },
           { slug: 'all-tokens', title: 'All tokens', kind: 'page',
             src: 'docs/foundations/tokens/all-tokens.md',
             generator: 'scripts/tokens-build.mjs' },
@@ -138,8 +146,8 @@ export const nav = [
           { slug: 'voice-tone',           title: 'Voice and tone',       src: 'docs/foundations/content/voice-tone.md',           kind: 'page', status: 'planned' },
           { slug: 'language-and-grammar', title: 'Language and grammar', src: 'docs/foundations/content/language-and-grammar.md', kind: 'page', status: 'planned' },
           { slug: 'inclusive-writing',    title: 'Inclusive writing',    src: 'docs/foundations/content/inclusive-writing.md',    kind: 'page', status: 'planned' },
-          { slug: 'date-time',            title: 'Date and time',        src: 'docs/foundations/content/date-time.md',            kind: 'page', status: 'planned' },
-          { slug: 'designing-messages',   title: 'Designing messages',   src: 'docs/foundations/content/designing-messages.md',   kind: 'page', status: 'planned' },
+          { slug: 'date-time',            title: 'Date and time',        src: 'docs/foundations/content/date-time.md',            kind: 'page' },
+          { slug: 'designing-messages',   title: 'Designing messages',   src: 'docs/foundations/content/designing-messages.md',   kind: 'page' },
         ],
       },
       { slug: 'spacing', title: 'Spacing', src: 'docs/foundations/spacing.md', kind: 'page', phase: 'ga',
@@ -169,7 +177,7 @@ export const nav = [
         basis: 'C2 describes seven assets and how to regenerate them; none of the eight checks looks at an image',
         impl: ['RocketLaunch.tsx'] },
       { slug: 'logos', title: 'Logos', src: 'docs/foundations/logos.md', kind: 'page', phase: 'ea',
-        basis: 'docs/logo-ideas.md, 26 Sep 2026: "Nothing here is built yet". Decision D3 put a new mark after the revamp', status: 'planned' },
+        basis: 'docs/logo-ideas.md, 26 Sep 2026: "Nothing here is built yet". Decision D3 put a new mark after the revamp' },
       { slug: 'elevation', title: 'Elevation', src: 'docs/foundations/elevation.md', kind: 'page', phase: 'beta',
         basis: 'three shadows, one scrim and a flat z-index list in B4; decision D7 (depth) is listed as still open' },
       { slug: 'border', title: 'Border', src: 'docs/foundations/border.md', kind: 'page', phase: 'ga',
@@ -187,9 +195,9 @@ export const nav = [
     src: 'docs/components/index.md',
     children: [
       // ---- Forms and input
-      c('button', 'Button', 'Forms and input', 'ga', '33 files import it — the most used component in the system',
+      c('button', 'Button', 'Forms and input', 'ga', '40 files import it — the most used component in the system',
         ['Button.tsx'], { origin: { pkg: KENDO.buttons, as: 'Button', also: RADIX.slot } }),
-      c('checkbox', 'Checkbox', 'Forms and input', 'ga', '6 files import it',
+      c('checkbox', 'Checkbox', 'Forms and input', 'ga', '7 files import it',
         ['Overlays.tsx#Checkbox'],
         { origin: { css: 'k-checkbox',
           note: 'a native <input type="checkbox"> wearing Kendo’s classes, NOT KendoReact’s <Checkbox>, which cannot express two things this app needs. The bridge also corrects two Kendo defaults — see checkbox.md §"Why the class, not Kendo’s React component"' } }),
@@ -197,30 +205,30 @@ export const nav = [
         ['Overlays.tsx#RadioGroup'],
         { origin: { css: 'k-radio',
           note: 'a native <input type="radio"> wearing Kendo’s classes. WAS Radix react-radio-group; moved on 15 Oct 2026 because the live sweep found no radio group to match (open question 17)' } }),
-      c('select', 'Select', 'Forms and input', 'ga', '17 files import it',
+      c('select', 'Select', 'Forms and input', 'ga', '20 files import it',
         ['Overlays.tsx#Select'], { origin: { pkg: KENDO.dropdowns, as: 'ComboBox' } }),
-      c('field', 'Field', 'Forms and input', 'ga', '14 files import it', ['Field.tsx']),
+      c('field', 'Field', 'Forms and input', 'ga', '18 files import it', ['Field.tsx']),
       c('field-row', 'Field row', 'Forms and input', 'ga', '10 files import it', ['FieldRow.tsx']),
-      c('file-drop', 'File drop', 'Forms and input', 'beta', '4 files import it',
+      c('file-drop', 'File drop', 'Forms and input', 'beta', '5 files import it',
         ['FileDrop.tsx'], { origin: { pkg: KENDO.upload, as: 'Upload' } }),
       c('people-picker', 'People picker', 'Forms and input', 'ea', '1 file imports it',
         ['PeoplePicker.tsx'], { origin: { pkg: RADIX.popover, as: 'Popover' } }),
       c('rich-text', 'Rich text', 'Forms and input', 'ea', '1 file imports it', ['RichText.tsx']),
 
       // ---- Images and icons
-      c('icon', 'Icon', 'Images and icons', 'beta', '9 files import src/ui/icons.tsx; no page written',
-        ['icons.tsx'], { status: 'planned' }),
+      c('icon', 'Icon', 'Images and icons', 'beta', '14 files import src/ui/icons.tsx \u2014 9 through ui/icons, 5 more from inside src/ui itself',
+        ['icons.tsx'], { src: `docs/components/icon.md` }),
 
       // ---- Labels
-      c('badge', 'Badge', 'Labels', 'ga', '4 files import it directly, plus every status cell through renderCell', ['Badge.tsx']),
-      c('chip', 'Chip', 'Labels', 'beta', '2 files import it; last changed 10 Nov 2026', ['Chip.tsx']),
+      c('badge', 'Badge', 'Labels', 'ga', '5 files import it directly, plus every status cell through renderCell', ['Badge.tsx']),
+      c('chip', 'Chip', 'Labels', 'beta', '5 files import it; last changed 10 Nov 2026', ['Chip.tsx']),
       c('priority', 'Priority', 'Labels', 'beta',
         '3 files import it; two of the client’s own sources still disagree on stars vs label (open-questions §6)', ['Priority.tsx']),
 
       // ---- Layout and structure
       c('app-shell', 'App shell', 'Layout and structure', 'beta',
         'src/components/AppShell.tsx; built, and the sitemap restructure was declined (decision D1). No KendoReact or Radix import \u2014 ours. No page written',
-        [], { status: 'planned' }),
+        [], { src: `docs/components/app-shell.md` }),
 
       // ---- Loading
       c('loader', 'Loader', 'Loading', 'beta', '2 files import it',
@@ -239,13 +247,13 @@ export const nav = [
         ['Overlays.tsx#Tabs'], { origin: { pkg: KENDO.layout, as: 'TabStrip' } }),
 
       // ---- Overlays and layering
-      c('dialog', 'Modal dialog', 'Overlays and layering', 'ga', '17 files import it; ConfirmDialog is built on it',
+      c('dialog', 'Modal dialog', 'Overlays and layering', 'ga', '19 files import it; ConfirmDialog is built on it',
         ['Overlays.tsx#Dialog', 'ConfirmDialog.tsx'],
         { origin: { pkg: KENDO.dialogs, as: 'Dialog + DialogActionsBar' } }),
       c('more-menu', 'More menu', 'Overlays and layering', 'beta', '2 files import it',
         ['MoreMenu.tsx'], { origin: { pkg: RADIX.popover, as: 'Popover' } }),
       c('command-palette', 'Command palette', 'Overlays and layering', 'ea',
-        'src/components/CommandPalette.tsx; built, no KendoReact or Radix import \u2014 ours. No page written', [], { status: 'planned' }),
+        'src/components/CommandPalette.tsx; built, no KendoReact or Radix import \u2014 ours. No page written', [], { src: `docs/components/command-palette.md` }),
 
       // ---- Status indicators
       c('stepper', 'Stepper', 'Status indicators', 'ea', '1 file imports it', ['Stepper.tsx']),

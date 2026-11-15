@@ -446,7 +446,7 @@ Ghi ra trước thì là quyết định; để người khác tìm ra thì là 
 | **Data Center apps** (mục trong mỗi tab Usage) | Không có | Không có bản Data Center |
 | Họ component sâu (Button có 7 biến thể) | Chỉ dựng họ khi **code đã có** | Không có `SplitButton` thì không có trang `split-button` |
 | **AMP Patterns** | Giữ tên **Patterns**, 8 trang hiện có | AMP là riêng của marketplace họ |
-| Đổi tên token sang `color.background.*` | **Không** trong plan này | 414 token nằm rải trong 8.000 dòng CSS. Đổi tên là rủi ro mà không đổi được gì cho người đọc. Nếu muốn, đó là phase riêng, có codemod + tám phép kiểm làm lưới an toàn |
+| Đổi tên token sang `color.background.*` | **Không** trong plan này | 238 token nằm rải trong 8.000 dòng CSS. Đổi tên là rủi ro mà không đổi được gì cho người đọc. Nếu muốn, đó là phase riêng, có codemod + tám phép kiểm làm lưới an toàn |
 
 Ngược lại, **4 thứ mình giữ mà họ không có**, và phải nêu ở trang `about`:
 mọi con số có nguồn đo và ngày · quyết định ghi kèm lý do · tám phép kiểm chạy
