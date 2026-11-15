@@ -221,6 +221,19 @@ paid, per-developer software; the absence of a watermark is not the absence of
 the obligation. It does mean CI needs no secret, which is why
 `.github/workflows/check.yml` asks for none.
 
+## Deployed at
+
+| | |
+| --- | --- |
+| The mockup | **https://ll-poc-tau.vercel.app** |
+| The design system | **https://ll-poc-tau.vercel.app/ds** |
+
+The design system is not committed. `npm run build` generates it into
+`dist/ds` from the markdown in `docs/`, so every deploy rebuilds it and it
+cannot drift from the documents it is built from. `vercel.json` keeps `/ds`
+out of the SPA rewrite, including `/ds` with no trailing slash, which would
+otherwise land on the mockup.
+
 ## Deploying to Vercel
 
 Import the repository at [vercel.com/new](https://vercel.com/new). The defaults are correct:
