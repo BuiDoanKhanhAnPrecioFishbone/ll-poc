@@ -34,7 +34,7 @@ is not a re-skin: Kendo stays recognisably Kendo, and stops speaking two design
 languages at once.
 
 **Unchanged through both reversals.** The design system itself. Tokens, the
-eight-status vocabulary, the column role model and the whole audit were
+seven-token status vocabulary, the column role model and the whole audit were
 always library-agnostic. That is the part with the thinking in
 it, and it is why the component layer could be swapped twice without it moving.
 
@@ -120,8 +120,8 @@ Every finding is measured, not estimated — taken from the rendered DOM and the
 
 ## What this mockup proposes
 
-**A design system driven entirely by tokens.** One brand ramp, one neutral ramp, eight status
-pairs, a fixed type scale, and three grid densities.
+**A design system driven entirely by tokens.** One brand ramp, one neutral ramp, seven status
+tokens, a fixed type scale, and three grid densities.
 
 **A navigation shell, on the structure they already know.** A persistent sidebar with a
 breadcrumb and an active state, replacing 51 destinations behind a hamburger — but on the live
@@ -146,7 +146,7 @@ as declined, which is where a rejected proposal belongs.
 | `money` | 124px | Right-aligned, currency-aware |
 | `date` | 150px | Sized to the full rendered format |
 | `datetime` | 190px | A moment, not a day — 150px fits "16 May 2026" and clips the time off it |
-| `status` | 128px | One badge from the eight shared status pairs |
+| `status` | 128px | One badge from the seven shared status tokens |
 | `priority` | 104px | A dot and a word; the widest is "Medium" |
 
 Measured in this mockup: **no clipped identifiers** — `text` is the one role that truncates,
@@ -262,7 +262,7 @@ src/
     findings.ts        UX findings, each with evidence and effort/value
   ui/                  The component library — ours, driven entirely by tokens
     DataGrid.tsx       The standard list pattern
-    Badge.tsx          One badge from the eight status pairs
+    Badge.tsx          One badge from the seven status tokens
     Pager.tsx, ColumnChooser.tsx, FilterToolbar.tsx, ViewPicker.tsx, …
   components/          Application-level composites
     AppShell.tsx       Persistent sidebar, breadcrumb, top bar
