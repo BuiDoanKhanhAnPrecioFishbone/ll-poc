@@ -77,7 +77,7 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <li class="l2"><a href="#recent-changes">Recent changes</a></li>
 </ol></nav>
 <h1 id="status-badge">Status badge</h1>
-<blockquote><strong>Status: stable</strong> · <code>src/ui/Badge.tsx</code> · specimen at <code>/design-system</code> Written to the template set by <a href="button.html"><code>button.md</code></a>.</blockquote>
+<blockquote><code>src/ui/Badge.tsx</code> · specimen at <code>/design-system</code></blockquote>
 <hr>
 <h2 id="when-to-use">When to use</h2>
 <p>To show <strong>what state a record is in</strong> — on a record header, in a status column, in an activity row. One word and one colour, together.</p>
@@ -108,7 +108,7 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <h2 id="accessibility">Accessibility</h2>
 <div class="t"><table><tbody><tr><td>Name</td><td>The visible word <strong>is</strong> the accessible name. No <code>aria-label</code>, no <code>title</code></td></tr><tr><td>Colour</td><td>Never carries meaning alone — the word is always present. This is the rule <a href="../design-system.html#e1--accessibility">E1</a> lists first</td></tr><tr><td>Role</td><td>None. A <code>&lt;span&gt;</code> of text is what a status is</td></tr><tr><td>Contrast</td><td>Measured per pair, above</td></tr></tbody></table></div>
 <h2 id="api">API</h2>
-<p>``<code>tsx &lt;StatusBadge value={q.status} /&gt; </code>``</p>
+<pre class="code" data-lang="tsx"><code>&lt;StatusBadge value={q.status} /&gt;</code></pre>
 <div class="t"><table><thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Notes</th></tr></thead><tbody><tr><td><code>value</code></td><td><code>string</code></td><td>—</td><td>A live lifecycle word. Unknown values render as <code>draft</code></td></tr></tbody></table></div>
 <p>The <code>status</code> column role renders this automatically — <code>renderCell.tsx</code> maps <code>data-role="status"</code> to it, so a grid never writes the badge by hand.</p>
 <hr>

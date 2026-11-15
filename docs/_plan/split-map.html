@@ -97,9 +97,15 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <ol><li><strong>Chỉ đọc khoảng dòng của mình.</strong> <code>sed -n '249,330p' docs/design-system.md</code>. Không <code>cat</code> cả file. Không đọc khoảng dòng của agent khác.</li><li><strong>Không sửa một chữ nào</strong> trong nội dung. Được sửa đúng năm thứ: cấp heading (luật 4) · đường ảnh (luật 5) · dấu phân cách (luật 6) · tiêu đề trang (luật 1, 3) · và mở đầu của những trang dùng chung ngữ cảnh <code>(…)</code>.</li><li><strong>Số đo và ngày là bất khả xâm phạm.</strong> Mọi giá trị trong tài liệu này đều kèm nguồn đo (luật A3.4). Làm tròn, bỏ ngày, hay "viết cho gọn" là làm hỏng thứ giá trị nhất của bộ tài liệu.</li><li><strong>KHÔNG sửa <code>docs/design-system.md</code>.</strong> Nó vẫn là bản đang chạy cho tới khi <code>ds-handover.mjs</code> sinh lại được nó (Phase 2). Agent khác đang đọc nó cùng lúc.</li><li><strong>Chỉ ghi vào file của mình.</strong> Không chạm <code>ia.config.mjs</code>, <code>docs/_plan/*</code>, <code>scripts/*</code>, <code>README.md</code> — mỗi file có một chủ, và chủ của những file đó không phải agent Phase 1.</li></ol>
 <h2 id="cách-tự-chứng-minh-không-mất-chữ">Cách tự chứng minh không mất chữ</h2>
 <p>Chạy cho <strong>từng trang</strong> trước khi báo xong. Khác biệt duy nhất được phép là dấu <code>---</code> phân cách (luật 6):</p>
-<p>``<code>bash A=249; B=330; PAGE=docs/foundations/border.md; DEPTH=.. sed -n "${A},${B}p" docs/design-system.md \   | sed "s|](assets/|](${DEPTH}/assets/|g" \   | sed 's/^### /## /' &gt; /tmp/src.md sed -n '2,$p' "$PAGE" &gt; /tmp/page.md diff /tmp/src.md /tmp/page.md     # chỉ được còn dòng --- và dòng trống của nó </code>``</p>
+<pre class="code" data-lang="bash"><code>A=249; B=330; PAGE=docs/foundations/border.md; DEPTH=..
+sed -n "${A},${B}p" docs/design-system.md \
+  | sed "s|](assets/|](${DEPTH}/assets/|g" \
+  | sed 's/^### /## /' &gt; /tmp/src.md
+sed -n '2,$p' "$PAGE" &gt; /tmp/page.md
+diff /tmp/src.md /tmp/page.md     # chỉ được còn dòng --- và dòng trống của nó</code></pre>
 <p>Rồi:</p>
-<p>``<code>bash node scripts/md-doc.mjs &lt;trang mới&gt; /tmp/x.html   # phải chạy không lỗi npm run ia:check                                   # phải OK </code>``</p>
+<pre class="code" data-lang="bash"><code>node scripts/md-doc.mjs &lt;trang mới&gt; /tmp/x.html   # phải chạy không lỗi
+npm run ia:check                                   # phải OK</code></pre>
 <p>Nếu <code>md-doc.mjs</code> báo lỗi: <strong>báo lại, đừng sửa nó.</strong> File đó đang có chủ khác (agent Phase 2) làm việc trên nó cùng lúc.</p>
 <h2 id="trang-mẫu-vàng">Trang mẫu vàng</h2>
 <p><code>docs/foundations/motion.md</code> — đã làm xong 14/11, từ B6 (784-823). Mở ra xem trước khi bắt đầu: nó thể hiện cả tám luật của hợp đồng, và <code>diff</code> của nó chỉ còn đúng hai dòng <code>---</code> và dòng trống.</p>

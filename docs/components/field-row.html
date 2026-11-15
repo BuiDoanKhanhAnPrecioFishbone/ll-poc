@@ -77,7 +77,7 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <li class="l2"><a href="#recent-changes">Recent changes</a></li>
 </ol></nav>
 <h1 id="field-row">Field row</h1>
-<blockquote><strong>Status: stable</strong> · <code>src/ui/FieldRow.tsx</code> · <strong>one labelled row — every label-and-value pair in the app is this.</strong> Written to the template set by <a href="button.html"><code>button.md</code></a>.</blockquote>
+<blockquote><code>src/ui/FieldRow.tsx</code> · <strong>one labelled row — every label-and-value pair in the app is this.</strong></blockquote>
 <hr>
 <h2 id="when-to-use">When to use</h2>
 <p>Wherever a label sits above a value: a record field, a dialog form, a computed read-out, a radio pair.</p>
@@ -107,7 +107,7 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <h2 id="accessibility">Accessibility</h2>
 <div class="t"><table><tbody><tr><td>Label</td><td><code>htmlFor</code> for a single control, <code>labelId</code> for a group</td></tr><tr><td>Required</td><td>Visible asterisk, and the control carries <code>required</code></td></tr><tr><td>Error</td><td>Replaces the hint, so a screen reader is never read two instructions</td></tr><tr><td>Locked</td><td>The note is real text beside the padlock, which is <code>aria-hidden</code></td></tr><tr><td>Empty</td><td><code>empty</code> renders the value as <strong>absent</strong> rather than as a value — a blank box and <em>"nothing here"</em> are different facts</td></tr></tbody></table></div>
 <h2 id="api">API</h2>
-<div class="t"><table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody><tr><td><code>label</code></td><td><code>ReactNode</code> <em>(optional)</em></td><td>Omit where the control labels itself</td></tr><tr><td><code>htmlFor</code> / <code>labelId</code></td><td><code>string</code></td><td>One or the other, never both</td></tr><tr><td><code>required</code>, <code>invalid</code>, <code>editing</code>, <code>empty</code></td><td><code>boolean</code></td><td></td></tr><tr><td><code>hint</code> / <code>error</code></td><td><code>ReactNode</code></td><td><code>error</code> wins; they never both render</td></tr><tr><td><code>note</code></td><td><code>ReactNode</code></td><td>Its presence marks the row locked</td></tr><tr><td><code>variant</code></td><td>`'radio' \</td><td>'wide'`</td><td>Layout only</td></tr></tbody></table></div>
+<div class="t"><table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody><tr><td><code>label</code></td><td><code>ReactNode</code> <em>(optional)</em></td><td>Omit where the control labels itself</td></tr><tr><td><code>htmlFor</code> / <code>labelId</code></td><td><code>string</code></td><td>One or the other, never both</td></tr><tr><td><code>required</code>, <code>invalid</code>, <code>editing</code>, <code>empty</code></td><td><code>boolean</code></td><td></td></tr><tr><td><code>hint</code> / <code>error</code></td><td><code>ReactNode</code></td><td><code>error</code> wins; they never both render</td></tr><tr><td><code>note</code></td><td><code>ReactNode</code></td><td>Its presence marks the row locked</td></tr><tr><td><code>variant</code></td><td><code>'radio' | 'wide'</code></td><td>Layout only</td></tr></tbody></table></div>
 <hr>
 <h2 id="related">Related</h2>
 <p><a href="field.html">Field</a> · <a href="select.html">Select</a> · <a href="radio-group.html">Radio group</a> · <a href="../design-system.html#d2--fields">D2 · Fields</a> · <a href="../patterns/record-form.html">Record form</a></p>

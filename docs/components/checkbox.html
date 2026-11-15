@@ -75,7 +75,7 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <li class="l2"><a href="#recent-changes">Recent changes</a></li>
 </ol></nav>
 <h1 id="checkbox">Checkbox</h1>
-<blockquote><strong>Status: stable</strong> · <code>src/ui/Overlays.tsx</code> · a <strong>native input wearing Kendo's classes</strong>, and that is the interesting part. Written to the template set by <a href="button.html"><code>button.md</code></a>.</blockquote>
+<blockquote><code>src/ui/Overlays.tsx</code> · a <strong>native input wearing Kendo's classes</strong>, and that is the interesting part.</blockquote>
 <hr>
 <h2 id="when-to-use">When to use</h2>
 <p>A single yes/no, or one of several independent yes/nos: <em>Conformal Coating</em>, <em>Provide Alt AML For Out of Stock</em>, a column in the <a href="column-chooser.html">column chooser</a>, a row in a grid.</p>
@@ -101,7 +101,7 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <h2 id="accessibility">Accessibility</h2>
 <div class="t"><table><tbody><tr><td>Label</td><td>The <code>&lt;label&gt;</code> wraps the input, so there is no <code>for</code>/<code>id</code> to get wrong</td></tr><tr><td>Grid rows</td><td>Each box is named individually, with the record it selects</td></tr><tr><td>Indeterminate</td><td>The native pseudo-class, so assistive tech reports <em>mixed</em></td></tr><tr><td>Disabled</td><td>Dimmed and announced; where it matters, the reason sits beside it</td></tr><tr><td>Target</td><td>20px box; where the label's target is off, the box carries it</td></tr></tbody></table></div>
 <h2 id="api">API</h2>
-<p>``<code>tsx &lt;Checkbox checked={on} onCheckedChange={setOn} label="Conformal Coating" /&gt; </code>``</p>
+<pre class="code" data-lang="tsx"><code>&lt;Checkbox checked={on} onCheckedChange={setOn} label="Conformal Coating" /&gt;</code></pre>
 <div class="t"><table><thead><tr><th>Prop</th><th>Type</th></tr></thead><tbody><tr><td><code>checked</code></td><td><code>boolean</code></td></tr><tr><td><code>onCheckedChange</code></td><td><code>(c: boolean) =&gt; void</code></td></tr><tr><td><code>label</code></td><td><code>ReactNode</code></td></tr></tbody></table></div>
 <p>For a grid row or the column chooser, the raw input is used directly with <code>k-checkbox k-checkbox-lg</code> — the wrapper exists for the labelled case.</p>
 <hr>

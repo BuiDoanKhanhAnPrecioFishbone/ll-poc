@@ -239,13 +239,22 @@ const GUIDE = {
   'Accessibility': 'a11y',
 };
 
+/* Anatomy gets a wrapper but NOT a tinted panel and NOT a colour. Its table's
+   first column is a number keyed to the picture above it, and drawing those
+   as markers is the thing that helps. There is no do/don't here to encode, so
+   a colour would be decoration pretending to be meaning. */
+const PLAIN = { 'Anatomy': 'parts' };
+
 function guides(html) {
   const parts = html.split(/(?=<h2 )/);
   return parts.map(seg => {
     const m = /^<h2 [^>]*>(.*?)<\/h2>/.exec(seg);
     if (!m) return seg;
-    const kind = GUIDE[plain(m[1]).trim()];
-    return kind ? `<section class="guide guide-${kind}">${seg}</section>` : seg;
+    const label = plain(m[1]).trim();
+    const kind = GUIDE[label];
+    if (kind) return `<section class="guide guide-${kind}">${seg}</section>`;
+    const flat = PLAIN[label];
+    return flat ? `<section class="${flat}">${seg}</section>` : seg;
   }).join('');
 }
 

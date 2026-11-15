@@ -71,7 +71,7 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <li class="l2"><a href="#dev-05--không-có-rovo-ui">DEV-05 · Không có `Rovo UI`</a></li>
 <li class="l2"><a href="#dev-06--không-có-mục-data-center-apps-trong-tab-usage">DEV-06 · Không có mục `Data Center apps` trong tab Usage</a></li>
 <li class="l2"><a href="#dev-07--họ-component-chỉ-dựng-khi-code-đã-có">DEV-07 · Họ component chỉ dựng khi code đã có</a></li>
-<li class="l2"><a href="#dev-08--không-đổi-tên-414-token-sang-kiểu-dotted">DEV-08 · Không đổi tên 414 token sang kiểu dotted</a></li>
+<li class="l2"><a href="#dev-08--không-đổi-tên-238-token-sang-kiểu-dotted">DEV-08 · Không đổi tên 238 token sang kiểu dotted</a></li>
 <li class="l2"><a href="#dev-09--bản-tiếng-việt-là-handover-sinh-ra-không-phải-site-song-song">DEV-09 · Bản tiếng Việt là handover sinh ra, không phải site song song</a></li>
 <li class="l2"><a href="#dev-10--status-vocabulary-là-trang-con-thứ-5-của-color">DEV-10 · `Status vocabulary` là trang con thứ 5 của Color</a></li>
 <li class="l2"><a href="#dev-11--không-có-color-picker-swatches">DEV-11 · Không có `color-picker-swatches`</a></li>
@@ -120,10 +120,10 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <p><strong>Vì sao.</strong> Không có <code>SplitButton</code> thì không có trang <code>split-button</code>. Cấu trúc phải mô tả code đang có, không phải code của người khác.</p>
 <p><strong>Đảo lại:</strong> thêm <code>children</code> vào node <code>button</code> khi nào code có thành viên mới.</p>
 <hr>
-<h2 id="dev-08--không-đổi-tên-414-token-sang-kiểu-dotted">DEV-08 · Không đổi tên 414 token sang kiểu dotted</h2>
+<h2 id="dev-08--không-đổi-tên-238-token-sang-kiểu-dotted">DEV-08 · Không đổi tên 238 token sang kiểu dotted</h2>
 <p><strong>Họ:</strong> <code>color.background.accent.blue.subtler</code>.</p>
 <p><strong>Mình:</strong> giữ <code>--vy-surface-selected</code>, <code>--vy-status-done-bg</code>…</p>
-<p><strong>Vì sao.</strong> 414 token nằm rải trong ~8.000 dòng CSS cộng <code>kendo-bridge</code>. Đổi tên là rủi ro lớn mà <strong>người đọc tài liệu không được thêm gì</strong> — ba tầng ramp → role → component của mình đã khớp đúng cách ngành làm (đã đối chiếu W3C DTCG và Material 3 ở <code>chuan-design-system.md</code> §2.3). Phase 5 làm JSON thành nguồn thật nhưng <strong>sinh ra đúng tên CSS cũ</strong>, và chứng minh bằng <code>diff</code> byte-identical.</p>
+<p><strong>Vì sao.</strong> 238 token (khai 414 lần) nằm rải trong ~8.000 dòng CSS cộng <code>kendo-bridge</code>. Đổi tên là rủi ro lớn mà <strong>người đọc tài liệu không được thêm gì</strong> — ba tầng ramp → role → component của mình đã khớp đúng cách ngành làm (đã đối chiếu W3C DTCG và Material 3 ở <code>chuan-design-system.md</code> §2.3). Phase 5 làm JSON thành nguồn thật nhưng <strong>sinh ra đúng tên CSS cũ</strong>, và chứng minh bằng <code>diff</code> byte-identical.</p>
 <p><strong>Đảo lại:</strong> một phase riêng, có codemod + tám phép kiểm làm lưới an toàn. Không gộp vào việc này.</p>
 <hr>
 <h2 id="dev-09--bản-tiếng-việt-là-handover-sinh-ra-không-phải-site-song-song">DEV-09 · Bản tiếng Việt là handover sinh ra, không phải site song song</h2>

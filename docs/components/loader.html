@@ -75,7 +75,7 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <li class="l2"><a href="#recent-changes">Recent changes</a></li>
 </ol></nav>
 <h1 id="loader">Loader</h1>
-<blockquote><strong>Status: stable</strong> · <code>src/ui/Loader.tsx</code> · two exports: <code>Loader</code> and <code>BusyOverlay</code>. Written to the template set by <a href="button.html"><code>button.md</code></a>.</blockquote>
+<blockquote><code>src/ui/Loader.tsx</code> · two exports: <code>Loader</code> and <code>BusyOverlay</code>.</blockquote>
 <hr>
 <h2 id="when-to-use">When to use</h2>
 <div class="t"><table><thead><tr><th>Situation</th><th>Use</th></tr></thead><tbody><tr><td>A button's action is running</td><td><code>busy</code> on the <a href="button.html">Button</a> — it puts a <code>Loader</code> in the icon slot</td></tr><tr><td>Work over data <strong>already on screen</strong></td><td><strong><code>BusyOverlay</code></strong></td></tr><tr><td>A first load, where nothing is on screen yet</td><td>A <strong>skeleton</strong>, not a loader</td></tr><tr><td>The app booting</td><td>The boot screen</td></tr></tbody></table></div>
@@ -96,13 +96,14 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <ul><li>The content underneath gets <code>aria-hidden</code> while busy, so a screen reader does not read a table that is about to change.</li><li>When <code>blocking</code>, it also gets <strong><code>inert</code></strong> — the right word for this, which React 19 passes through. It is only honoured once the overlay is actually up, which is why both are set rather than either alone.</li></ul>
 <hr>
 <h2 id="the-label-is-the-whole-point">The label is the whole point</h2>
-<p>``<code>tsx &lt;Loader label="Working" /&gt;          // on a button &lt;BusyOverlay label="Updating results…"&gt;…&lt;/BusyOverlay&gt; </code>``</p>
+<pre class="code" data-lang="tsx"><code>&lt;Loader label="Working" /&gt;          // on a button
+&lt;BusyOverlay label="Updating results…"&gt;…&lt;/BusyOverlay&gt;</code></pre>
 <blockquote><strong>Say what is loading, not that something is.</strong> <em>Loading</em> tells a screen reader user that the page is busy, which they already know from the fact that nothing is happening. <em>Updating results</em> tells them what to expect back.</blockquote>
 <h2 id="accessibility">Accessibility</h2>
 <div class="t"><table><tbody><tr><td>Role</td><td><code>role="status"</code> with <code>aria-live="polite"</code> on the overlay — it waits its turn, unlike an error</td></tr><tr><td>Label</td><td><code>aria-label</code> on the loader, and the same words visible under it</td></tr><tr><td>Underneath</td><td><code>aria-hidden</code> while busy; <code>inert</code> as well when blocking</td></tr><tr><td>Reduced motion</td><td>Honoured — see <a href="../design-system.html#b6--motion">B6</a>. Reduced motion is a <strong>state</strong>, not a switch: things that fade in stay</td></tr></tbody></table></div>
 <h2 id="api">API</h2>
 <p><strong>Loader</strong></p>
-<div class="t"><table><thead><tr><th>Prop</th><th>Type</th><th>Default</th></tr></thead><tbody><tr><td><code>size</code></td><td>`small \</td><td>medium \</td><td>large`</td><td><code>medium</code></td></tr><tr><td><code>type</code></td><td>`pulsing \</td><td>converging-spinner \</td><td>infinite-spinner`</td><td><code>pulsing</code></td></tr><tr><td><code>themeColor</code></td><td>`base \</td><td>primary \</td><td>secondary \</td><td>tertiary`</td><td><code>primary</code></td></tr><tr><td><code>label</code></td><td><code>string</code></td><td><code>Loading</code> — replace it</td></tr></tbody></table></div>
+<div class="t"><table><thead><tr><th>Prop</th><th>Type</th><th>Default</th></tr></thead><tbody><tr><td><code>size</code></td><td><code>small | medium | large</code></td><td><code>medium</code></td></tr><tr><td><code>type</code></td><td><code>pulsing | converging-spinner | infinite-spinner</code></td><td><code>pulsing</code></td></tr><tr><td><code>themeColor</code></td><td><code>base | primary | secondary | tertiary</code></td><td><code>primary</code></td></tr><tr><td><code>label</code></td><td><code>string</code></td><td><code>Loading</code> — replace it</td></tr></tbody></table></div>
 <p><strong>BusyOverlay</strong></p>
 <div class="t"><table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody><tr><td><code>busy</code></td><td><code>boolean</code></td><td></td></tr><tr><td><code>label</code></td><td><code>string</code></td><td>Required, and said in words</td></tr><tr><td><code>blocking</code></td><td><code>boolean</code></td><td>Adds <code>inert</code> underneath</td></tr></tbody></table></div>
 <hr>

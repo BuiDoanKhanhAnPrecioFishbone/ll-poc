@@ -75,7 +75,7 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <li class="l2"><a href="#recent-changes">Recent changes</a></li>
 </ol></nav>
 <h1 id="rich-text">Rich text</h1>
-<blockquote><strong>Status: trial</strong> · <code>src/ui/RichText.tsx</code> · the Conversations tab. <strong>Trial</strong>, because the implementation is deliberately provisional — see below. Written to the template set by <a href="button.html"><code>button.md</code></a>.</blockquote>
+<blockquote><code>src/ui/RichText.tsx</code> · the Conversations tab. <strong>Trial</strong>, because the implementation is deliberately provisional — see below.</blockquote>
 <hr>
 <h2 id="when-to-use">When to use</h2>
 <p>Where a comment written <strong>in the real system</strong> can arrive formatted — the Conversations tab, and nowhere else yet.</p>
@@ -84,7 +84,9 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <blockquote>A plain textarea here would render a formatted note as <strong>a wall of unstyled text</strong>, and an editor missing <em>Clean formatting</em> cannot undo a paste from Word. Those two facts are why this component exists.</blockquote>
 <hr>
 <h2 id="the-toolbar-is-the-live-one-in-its-order">The toolbar is the live one, in its order</h2>
-<p>``<code> Undo · Redo | Bold · Italic · Underline · Strikethrough | Unordered list · Ordered list | Color · Background color | Outdent · Indent | Format | Clean formatting </code>``</p>
+<pre class="code"><code>Undo · Redo | Bold · Italic · Underline · Strikethrough |
+Unordered list · Ordered list | Color · Background color |
+Outdent · Indent | Format | Clean formatting</code></pre>
 <p>Read off the live editor and reproduced exactly, because a comment in the real system can contain all of it.</p>
 <p><strong>The glyphs are drawn, not lettered</strong> — B/I/U as paths rather than characters, so the toolbar does not depend on the UI font.</p>
 <h3 id="two-places-it-narrows-the-live-control-on-purpose">Two places it narrows the live control on purpose</h3>

@@ -76,7 +76,7 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <li class="l2"><a href="#recent-changes">Recent changes</a></li>
 </ol></nav>
 <h1 id="tabs">Tabs</h1>
-<blockquote><strong>Status: stable</strong> · <code>src/ui/Overlays.tsx</code> · 6 call sites, every one of them a record. Written to the template set by <a href="button.html"><code>button.md</code></a>.</blockquote>
+<blockquote><code>src/ui/Overlays.tsx</code> · 6 call sites, every one of them a record.</blockquote>
 <hr>
 <h2 id="when-to-use">When to use</h2>
 <p>To divide <strong>one record</strong> into sections the user switches between without leaving it: Specific Requirements, Checklists, Quotation Result, Conversations, Activity Logs.</p>
@@ -108,7 +108,10 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <h2 id="accessibility">Accessibility</h2>
 <div class="t"><table><tbody><tr><td>Roles</td><td>Kendo's TabStrip carries <code>tablist</code> / <code>tab</code> / <code>tabpanel</code></td></tr><tr><td>Keyboard</td><td>Arrows move between tabs, <code>Tab</code> moves into the panel</td></tr><tr><td>Count</td><td>Inside the tab's label, so it is part of the accessible name — <em>"Checklists &amp; Assignment 4"</em></td></tr><tr><td>Identity</td><td>The record number is <strong>outside</strong> the tablist, so it is not re-announced on every switch</td></tr></tbody></table></div>
 <h2 id="api">API</h2>
-<p>``<code>tsx &lt;Tabs value={tab} onValueChange={setTab} tabs={[   { value: 'spec', label: 'Specific Requirements', content: … },   { value: 'checklists', label: 'Checklists &amp; Assignment', count: 4, content: … }, ]} /&gt; </code>``</p>
+<pre class="code" data-lang="tsx"><code>&lt;Tabs value={tab} onValueChange={setTab} tabs={[
+  { value: 'spec', label: 'Specific Requirements', content: … },
+  { value: 'checklists', label: 'Checklists &amp; Assignment', count: 4, content: … },
+]} /&gt;</code></pre>
 <div class="t"><table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody><tr><td><code>tabs</code></td><td><code>{ value, label, count?, content }[]</code></td><td><code>count</code> renders only when above zero</td></tr><tr><td><code>value</code> / <code>onValueChange</code></td><td><code>string</code> / <code>(v: string) =&gt; void</code></td><td>The <strong>value</strong>, never an index</td></tr></tbody></table></div>
 <hr>
 <h2 id="related">Related</h2>

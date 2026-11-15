@@ -126,7 +126,11 @@ export function renderMarkdown(markdown, opts = {}) {
   let i = 0;
 
   const isTableRow = l => /^\s*\|.*\|\s*$/.test(l);
-  const cells = l => l.trim().replace(/^\||\|$/g, '').split('|').map(c => c.trim());
+  /* Split on a pipe that is NOT escaped. Every API table types a union as
+     `filled \| tonal \| outlined`, and splitting on every pipe cut those into
+     phantom cells — the Type column of 28 component pages was in pieces. */
+  const cells = l => l.trim().replace(/^\||\|$/g, '')
+    .split(/(?<!\\)\|/).map(c => c.trim().replace(/\\\|/g, '|'));
 
   /* There is no fenced-code renderer here, but a fence still marks text the
      author means literally — including the `<!-- ds:tab … -->` directives that
@@ -138,7 +142,20 @@ export function renderMarkdown(markdown, opts = {}) {
   while (i < lines.length) {
     const line = lines[i];
 
-    if (/^\s*```/.test(line)) inFence = !inFence;
+    /* FENCED CODE. There was no renderer for this, so the usage snippet that
+       opens every Code tab printed as a run-together line of literal text,
+       backticks and all. The fence flag below still guards the directive drop;
+       it now also collects the block. */
+    const fence = /^\s*```\s*([a-z0-9-]*)\s*$/.exec(line);
+    if (fence && !inFence) {
+      const lang = fence[1];
+      const body = [];
+      i++;
+      while (i < lines.length && !/^\s*```\s*$/.test(lines[i])) body.push(lines[i++]);
+      i++;                                   // the closing fence
+      html.push(`<pre class="code"${lang ? ` data-lang="${esc(lang)}"` : ''}><code>${esc(body.join('\n'))}</code></pre>`);
+      continue;
+    }
 
     if (!line.trim()) { i++; continue; }
 

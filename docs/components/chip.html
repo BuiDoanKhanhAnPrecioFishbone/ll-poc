@@ -78,7 +78,7 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <li class="l2"><a href="#recent-changes">Recent changes</a></li>
 </ol></nav>
 <h1 id="chip">Chip</h1>
-<blockquote><strong>Status: trial</strong> — two call sites, both selected, one screen. The unselected state is correct now but has still never shipped, so it has not been in front of a real user. Written to the template set by <a href="button.html"><code>button.md</code></a>. <code>src/ui/Chip.tsx</code> · specimen at <code>/design-system</code></blockquote>
+<blockquote>Two call sites, both selected, one screen. The unselected state is correct now but has still never shipped, so it has not been in front of a real user. <code>src/ui/Chip.tsx</code> · specimen at <code>/design-system</code></blockquote>
 <hr>
 <h2 id="when-to-use">When to use</h2>
 <p>To show <strong>a filter that is currently on</strong>, and to let the user take it off in one click. Today that is the queue filter and the customer filter on Quotations — you arrive with the filter already applied, and the chip is how you get rid of it.</p>
@@ -111,7 +111,8 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <h2 id="accessibility">Accessibility</h2>
 <div class="t"><table><tbody><tr><td>Name</td><td>The visible label</td></tr><tr><td>State</td><td><code>aria-pressed</code> — but see defect 2</td></tr><tr><td>Check icon</td><td><code>aria-hidden</code>; the pressed state is what carries the meaning to a screen reader</td></tr><tr><td>Focus</td><td><code>:focus-visible</code> only</td></tr><tr><td>Colour</td><td>Selected is fill <strong>and</strong> border <strong>and</strong> check — never colour alone</td></tr></tbody></table></div>
 <h2 id="api">API</h2>
-<p>``<code>tsx &lt;Chip label={</code>${queue.label} · ${scope === 'team' ? 'Team' : 'Mine'}<code>}       selected onClick={clearQueue} /&gt; </code>``</p>
+<pre class="code" data-lang="tsx"><code>&lt;Chip label={`${queue.label} · ${scope === 'team' ? 'Team' : 'Mine'}`}
+      selected onClick={clearQueue} /&gt;</code></pre>
 <div class="t"><table><thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Notes</th></tr></thead><tbody><tr><td><code>label</code></td><td><code>string</code></td><td>—</td><td>Text only. No node, no icon</td></tr><tr><td><code>selected</code></td><td><code>boolean</code></td><td><code>undefined</code></td><td>Drives the fill, the border, the check and <code>aria-pressed</code></td></tr><tr><td><code>onClick</code></td><td><code>() =&gt; void</code></td><td>—</td><td>At both call sites, clears the filter</td></tr></tbody></table></div>
 <hr>
 <h2 id="a-naming-mismatch-worth-settling">A naming mismatch worth settling</h2>

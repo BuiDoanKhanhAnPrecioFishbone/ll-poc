@@ -207,3 +207,26 @@ ul.children .grp{margin-top:var(--vy-space-8);font-size:var(--vy-text-sm);font-w
 .guide-a11y{border-left-color:var(--vy-brand-text-deep)}
 .guide-a11y>h2{color:var(--vy-brand-text-deep)}
 .guide-a11y>h2::before{content:"\25C8"}
+
+/* Fenced code. There was no renderer for this until now, so the snippet that
+   opens every Code tab printed as a run-together line of literal text. */
+pre.code{margin:var(--vy-space-8) 0;padding:var(--vy-space-6) var(--vy-space-8);
+  background:var(--vy-surface-sunken);border:1px solid var(--vy-border);
+  border-radius:var(--vy-radius-lg);overflow-x:auto;position:relative}
+/* NOT monospace, deliberately. The customer's review of 13 Oct 2026 said
+   "do not use monotext, hard to read", and the mono token and webfont were
+   deleted on 7 Nov. That decision was about identifiers in dense grids, and a
+   code sample is arguably a different case — every other design system sets
+   one in mono — but reintroducing a dropped typeface is not a call to make
+   inside a stylesheet. `white-space: pre` and tabular figures keep the shape;
+   if mono should come back for code only, it is one line here. */
+pre.code code{font-family:var(--vy-font-sans);font-variant-numeric:tabular-nums;
+  font-size:var(--vy-text-sm);line-height:1.65;color:var(--vy-on-surface);white-space:pre}
+pre.code[data-lang]::before{content:attr(data-lang);position:absolute;top:var(--vy-space-3);
+  right:var(--vy-space-5);font-size:var(--vy-text-2xs);letter-spacing:.08em;
+  text-transform:uppercase;color:var(--vy-on-surface-muted)}
+
+/* Anatomy: the first column is a part number keyed to the picture above. */
+.parts table td:first-child{width:1px;white-space:nowrap;text-align:center;
+  font-variant-numeric:tabular-nums;color:var(--vy-on-surface-soft);font-weight:600}
+.parts table td:first-child:not(:empty){padding-left:var(--vy-space-6);padding-right:var(--vy-space-6)}

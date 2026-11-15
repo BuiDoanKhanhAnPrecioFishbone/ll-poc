@@ -76,7 +76,7 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <li class="l2"><a href="#recent-changes">Recent changes</a></li>
 </ol></nav>
 <h1 id="priority">Priority</h1>
-<blockquote><strong>Status: stable</strong> · <code>src/ui/Priority.tsx</code> · 29 lines, the smallest component here. Written to the template set by <a href="button.html"><code>button.md</code></a>.</blockquote>
+<blockquote><code>src/ui/Priority.tsx</code> · 29 lines, the smallest component here.</blockquote>
 <hr>
 <h2 id="when-to-use">When to use</h2>
 <p>Wherever a record's priority is shown — a grid column, a record header, a queue card.</p>
@@ -102,7 +102,7 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <h2 id="accessibility">Accessibility</h2>
 <div class="t"><table><tbody><tr><td>Name</td><td>The visible word. The dot is <code>aria-hidden</code></td></tr><tr><td>Colour</td><td>Never alone — the word is always present</td></tr><tr><td>Greyscale</td><td>The three levels differ by fill <strong>and</strong> by shape, not only by tone</td></tr></tbody></table></div>
 <h2 id="api">API</h2>
-<p>``<code>tsx &lt;Priority value={rfq.priority} /&gt; </code>``</p>
+<pre class="code" data-lang="tsx"><code>&lt;Priority value={rfq.priority} /&gt;</code></pre>
 <div class="t"><table><thead><tr><th>Export</th><th>Type</th><th>Notes</th></tr></thead><tbody><tr><td><code>Priority</code></td><td><code>{ value: number }</code></td><td>1–3 from the record</td></tr><tr><td><code>priorityLevel</code></td><td><code>(n: number) =&gt; PriorityLevel</code></td><td>The one place the mapping lives</td></tr><tr><td><code>PRIORITY_LEVELS</code></td><td><code>PriorityLevel[]</code></td><td>For filter options, so the list cannot drift from the renderer</td></tr></tbody></table></div>
 <hr>
 <h2 id="related">Related</h2>

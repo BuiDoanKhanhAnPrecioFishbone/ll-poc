@@ -74,7 +74,7 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <li class="l2"><a href="#recent-changes">Recent changes</a></li>
 </ol></nav>
 <h1 id="grid-skeleton">Grid skeleton</h1>
-<blockquote><strong>Status: stable</strong> · <code>src/ui/GridSkeleton.tsx</code> · the first-load state of the standard list pattern. Written to the template set by <a href="button.html"><code>button.md</code></a>.</blockquote>
+<blockquote><code>src/ui/GridSkeleton.tsx</code> · the first-load state of the standard list pattern.</blockquote>
 <hr>
 <h2 id="when-to-use">When to use</h2>
 <p><strong>A first load, where nothing is on screen yet.</strong> The route has resolved, the rows have not arrived, and the user is looking at the screen they asked for.</p>
@@ -92,7 +92,7 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <blockquote>For the first moment of every list screen, the product says there is nothing there. Then the rows appear. The empty state and the loading state were wired to the same condition.</blockquote>
 <p><em>Loading</em> and <em>empty</em> are two different answers, and only one of them is true at a time.</p>
 <h2 id="accessibility">Accessibility</h2>
-<p>``<code>tsx role="status" aria-live="polite" aria-busy="true" </code>``</p>
+<pre class="code" data-lang="tsx"><code>role="status" aria-live="polite" aria-busy="true"</code></pre>
 <div class="t"><table><tbody><tr><td>Announced</td><td><strong>Once</strong>, in words — a <code>vy-sr-only</code> <em>"Loading records"</em> — not once per bar</td></tr><tr><td>The bars</td><td>Carry no text and no label, so a screen reader is not read a picture of a table 12 rows deep</td></tr><tr><td><code>aria-busy</code></td><td>Stays on the container until the real rows replace it</td></tr><tr><td>Reduced motion</td><td>The shimmer stops; the layout stays. See <a href="../design-system.html#b6--motion">B6</a></td></tr></tbody></table></div>
 <h2 id="api">API</h2>
 <div class="t"><table><thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Notes</th></tr></thead><tbody><tr><td><code>columns</code></td><td><code>ColumnSpec&lt;T&gt;[]</code></td><td>—</td><td>The screen's real columns, so the proportions cannot drift</td></tr><tr><td><code>rows</code></td><td><code>number</code></td><td><code>12</code></td><td>Match the page size, so nothing jumps when data lands</td></tr></tbody></table></div>

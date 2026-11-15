@@ -76,7 +76,7 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <li class="l2"><a href="#recent-changes">Recent changes</a></li>
 </ol></nav>
 <h1 id="dialog">Dialog</h1>
-<blockquote><strong>Status: stable</strong> · <code>src/ui/Overlays.tsx</code> · 30 call sites. Written to the template set by <a href="button.html"><code>button.md</code></a>.</blockquote>
+<blockquote><code>src/ui/Overlays.tsx</code> · 30 call sites.</blockquote>
 <hr>
 <h2 id="when-to-use">When to use</h2>
 <p>When the user must deal with <strong>one thing</strong> before carrying on: a question, a short form, or a work surface too big to sit inside the record.</p>
@@ -105,7 +105,7 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <h2 id="accessibility">Accessibility</h2>
 <div class="t"><table><tbody><tr><td>Focus</td><td>Trapped inside, returned to the trigger on close</td></tr><tr><td>Escape</td><td>Innermost first</td></tr><tr><td>Scrim</td><td>Each level dims the one beneath it, so the live layer is visible as well as focusable</td></tr><tr><td>Title</td><td>The accessible name of the dialog</td></tr><tr><td>Busy</td><td>While a confirmed action runs, both buttons disable — leaving mid-write is how a record ends up changed with nobody watching</td></tr></tbody></table></div>
 <h2 id="api">API</h2>
-<div class="t"><table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody><tr><td><code>open</code> / <code>onClose</code></td><td><code>boolean</code> / <code>() =&gt; void</code></td><td></td></tr><tr><td><code>title</code></td><td><code>string</code></td><td>Names the record where there is one</td></tr><tr><td><code>subtitle</code></td><td><code>ReactNode</code></td><td>The consequence, or the facts that do not change</td></tr><tr><td><code>size</code></td><td>`md \</td><td>lg \</td><td>xl`</td><td>Defaults to <code>md</code></td></tr><tr><td><code>startMaximised</code></td><td><code>boolean</code></td><td>Defaults to <strong>true</strong> for <code>lg</code> and <code>xl</code></td></tr><tr><td><code>actions</code></td><td><code>ReactNode</code></td><td></td></tr></tbody></table></div>
+<div class="t"><table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody><tr><td><code>open</code> / <code>onClose</code></td><td><code>boolean</code> / <code>() =&gt; void</code></td><td></td></tr><tr><td><code>title</code></td><td><code>string</code></td><td>Names the record where there is one</td></tr><tr><td><code>subtitle</code></td><td><code>ReactNode</code></td><td>The consequence, or the facts that do not change</td></tr><tr><td><code>size</code></td><td><code>md | lg | xl</code></td><td>Defaults to <code>md</code></td></tr><tr><td><code>startMaximised</code></td><td><code>boolean</code></td><td>Defaults to <strong>true</strong> for <code>lg</code> and <code>xl</code></td></tr><tr><td><code>actions</code></td><td><code>ReactNode</code></td><td></td></tr></tbody></table></div>
 <hr>
 <h2 id="related">Related</h2>
 <p><a href="button.html">Button</a> · <a href="select.html">Select</a> · <a href="../patterns/destructive-action.html">Destructive action</a> · <a href="../patterns/wizard.html">Wizard</a> · <a href="../design-system.html#d4--dialogs">D4 · Dialogs</a> · <a href="../design-system.html#b54-dialogs-and-shell">B5.4 · Dialogs and shell</a></p>

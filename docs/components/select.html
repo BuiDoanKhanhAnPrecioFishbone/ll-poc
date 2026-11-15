@@ -77,7 +77,7 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <li class="l2"><a href="#recent-changes">Recent changes</a></li>
 </ol></nav>
 <h1 id="select">Select</h1>
-<blockquote><strong>Status: stable</strong> · <code>src/ui/Overlays.tsx</code> · 39 call sites. Written to the template set by <a href="button.html"><code>button.md</code></a>.</blockquote>
+<blockquote><code>src/ui/Overlays.tsx</code> · 39 call sites.</blockquote>
 <p>It is a <strong>combobox</strong>: the field <em>is</em> the input, and the list filters as you type.</p>
 <hr>
 <h2 id="when-to-use">When to use</h2>
@@ -97,7 +97,8 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <blockquote>So the filter box was never the right shape. The field itself is.</blockquote>
 <hr>
 <h2 id="options-can-be-a-value-or-a-pair">Options can be a value or a pair</h2>
-<p>``<code>tsx options={['New', 'Repeat']}                       // the text IS the value options={views.map(v =&gt; ({ value: v.id, label: v.name }))} </code>``</p>
+<pre class="code" data-lang="tsx"><code>options={['New', 'Repeat']}                       // the text IS the value
+options={views.map(v =&gt; ({ value: v.id, label: v.name }))}</code></pre>
 <p><strong>The pair form exists because of the view pickers.</strong> A saved view is chosen by <code>id</code> and shown by <code>name</code>; view names are user-typed with no uniqueness check, so two views may legitimately read <em>My view</em>. Keying the control on the label would make one of them unreachable — a bug the plain <code>&lt;select&gt;</code> this replaced did <strong>not</strong> have, because it carried <code>value={v.id}</code>.</p>
 <hr>
 <h2 id="size-is-defaulted-not-optional-in-practice">Size is defaulted, not optional-in-practice</h2>
@@ -112,7 +113,7 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <h2 id="accessibility">Accessibility</h2>
 <div class="t"><table><tbody><tr><td>Role</td><td>Kendo's ComboBox carries the ARIA wiring; the appearance is ours</td></tr><tr><td>Label</td><td><code>label</code> renders a real label; <code>id</code> pairs them when the markup is split</td></tr><tr><td>Required / invalid</td><td>Passed through, so the field participates in the form's validation</td></tr><tr><td>Boundary</td><td><code>--vy-border-control</code>, mapped in the bridge — Kendo's own default measured 1.30:1</td></tr><tr><td>Keyboard</td><td>Type to narrow, arrows to move, Enter to choose, Esc to close the list <strong>before</strong> closing anything around it</td></tr></tbody></table></div>
 <h2 id="api">API</h2>
-<div class="t"><table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody><tr><td><code>options</code></td><td><code>readonly SelectOption[]</code></td><td><code>string</code> or <code>{ value, label }</code></td></tr><tr><td><code>value</code> / <code>onChange</code></td><td><code>string</code> / <code>(v: string) =&gt; void</code></td><td></td></tr><tr><td><code>size</code></td><td>`small \</td><td>medium`</td><td>Defaults to <code>medium</code> — never pass nothing to Kendo</td></tr><tr><td><code>label</code>, <code>id</code>, <code>required</code>, <code>invalid</code></td><td></td><td></td></tr><tr><td><code>footer</code></td><td><code>ReactNode</code></td><td>Pinned inside the popup</td></tr></tbody></table></div>
+<div class="t"><table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody><tr><td><code>options</code></td><td><code>readonly SelectOption[]</code></td><td><code>string</code> or <code>{ value, label }</code></td></tr><tr><td><code>value</code> / <code>onChange</code></td><td><code>string</code> / <code>(v: string) =&gt; void</code></td><td></td></tr><tr><td><code>size</code></td><td><code>small | medium</code></td><td>Defaults to <code>medium</code> — never pass nothing to Kendo</td></tr><tr><td><code>label</code>, <code>id</code>, <code>required</code>, <code>invalid</code></td><td></td><td></td></tr><tr><td><code>footer</code></td><td><code>ReactNode</code></td><td>Pinned inside the popup</td></tr></tbody></table></div>
 <hr>
 <h2 id="related">Related</h2>
 <p><a href="field.html">Field</a> · <a href="view-picker.html">View picker</a> · <a href="filter-toolbar.html">Filter toolbar</a> · <a href="../design-system.html#d2--fields">D2 · Fields</a> · <a href="../design-system.html#e2--kendoreact">E2 · KendoReact</a></p>
