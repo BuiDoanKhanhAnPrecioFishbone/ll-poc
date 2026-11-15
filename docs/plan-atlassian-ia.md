@@ -111,7 +111,7 @@ Mọi trang có: breadcrumb · sidebar trái · mục lục **Contents** bên ph
 
 | | Có gì | Ở đâu |
 |---|---|---|
-| Token | **414 token** `--vy-*`, 3 tầng (ramp → role → component) | `src/theme/tokens.css` |
+| Token | **238 token** `--vy-*` (khai 414 lần: `:root` + hai khối dark), 3 tầng (ramp → role → component) | `src/theme/tokens.css` |
 | Foundation | **Part B + C** của một file 1.625 dòng: colour · type · spacing · shape/elevation · sizing · motion · responsive · layout · icon · illustration | `docs/design-system.md` |
 | Component | **28 trang** `.md`, template cố định 13 mục | `docs/components/*.md` |
 | Pattern | **8 trang** | `docs/patterns/*.md` |
@@ -139,7 +139,7 @@ công bố bộ kiểm như vậy) · luật "specimen thắng tài liệu khi h
 | 4 | **14 trang foundation rời** | gộp trong Part B+C một file | tách 14 trang + 12 trang con | nặng |
 | 5 | **Release phases + nhãn vòng đời** | không có nhãn nào | trang policy + nhãn cho 29 component | nặng (rẻ nhưng lộ rõ) |
 | 6 | **Nhóm component** | danh sách phẳng A→Z | 13 nhóm, họ component (Button family) | vừa |
-| 7 | **Bảng all-tokens** | 414 token chỉ nằm trong CSS | trang tra cứu, lọc theo nhóm/theme | vừa |
+| 7 | **Bảng all-tokens** | 238 token chỉ nằm trong CSS | trang tra cứu, lọc theo nhóm/theme | vừa |
 | 8 | **Token là nguồn thật** | CSS là nguồn | JSON theo chuẩn DTCG → sinh ra CSS | vừa |
 | 9 | **Foundation: content design** | mục D6, một bảng | 5 trang con: voice & tone · ngữ pháp · viết bao trùm · ngày giờ · thiết kế thông báo | vừa |
 | 10 | **Foundation: border · radius · logos · data-viz colour** | rải trong B4/B1; 5 token `--vy-chart-*` có mặt trong B1.6 nhưng chỉ như một phần của status vocabulary | 4 trang — data-viz cần hướng dẫn thật: loại biểu đồ, bảng màu phân loại vs tuần tự, trục, legend | vừa |
@@ -326,16 +326,29 @@ còn nguyên (so hash danh sách heading trước/sau).
 **Verify:** mọi component trong `src/ui` hoặc có trang hoặc có một dòng trong
 danh sách helper. Không cái nào không được nhắc.
 
-### Phase 5 · Token: JSON thành nguồn + bảng all-tokens — **Haiku** chép, **Sonnet** script, ⏱ 3h
-- Sonnet: `scripts/tokens-build.mjs` — DTCG JSON → `tokens.css`; và
-  `tokens-table.mjs` → trang `/foundations/tokens/all-tokens`
-- Haiku: chép 414 token sang `docs/tokens/*.json` theo chuẩn DTCG
-  (`$value` · `$type` · `$description` · alias `{group.token}`)
-- **Tên CSS giữ nguyên `--vy-*`.** Không đổi tên gì trong phase này
+### Phase 5 · Token: bảng tra cứu và bản xuất máy đọc được — ✅ **XONG 15/11/2026**
 
-**Verify — chỗ hay nhất của plan:** CSS sinh ra phải **byte-identical** với
-`src/theme/tokens.css` hiện tại. Một lệnh `diff` chứng minh 414 token Haiku chép
-đúng từng cái. Không cần model nào đọc lại.
+> **Plan này sai chiều, và chính file nói ra điều đó.** Bản đầu viết: JSON
+> thành nguồn, sinh ngược ra `tokens.css`, chứng minh byte-identical. Đo trước
+> khi làm: `tokens.css` có **1.055 dòng**, trong đó **544 dòng (51%) là văn
+> xuôi** — độ lệch hue tính ra bằng số, tỉ lệ contrast kèm ngày đo, mã quyết
+> định, cái đã thử và đã bỏ. Chỉ **414 dòng (39%)** là khai báo.
+>
+> Làm theo plan nghĩa là nhét 544 dòng lý lẽ đó vào chuỗi JSON, nơi không đọc
+> được cũng không sửa được. Phép kiểm sẽ xanh trong khi **nửa giá trị nhất của
+> file thì hỏng**. Nên đảo chiều: **CSS vẫn là nguồn, JSON là bản xuất.**
+>
+> Thay vào đó kiểm bằng **vòng tròn**: mỗi khai báo được dựng lại từ mô hình đã
+> parse rồi so với đúng dòng nó sinh ra — **414/414 khớp từng ký tự**, kể cả
+> khoảng trắng căn lề và comment cuối dòng. Cùng một đảm bảo plan muốn, áp vào
+> phần máy đọc thay vì phần người đọc.
+>
+> Đã có: `scripts/tokens-build.mjs` · `docs/tokens/voyager.tokens.json` (chuẩn
+> W3C DTCG draft) · trang `/foundations/tokens/all-tokens` (238 token, 66 nhóm,
+> cả hai theme). Và **nó tìm ra một lỗi đếm của chính em**: "414 token" ghi
+> trong manifest và plan là **số dòng khai báo**, không phải số token — thật ra
+> là **238 token khai 414 lần**, vì mỗi cái được khai ở `:root` và ở **hai**
+> khối dark.
 
 ### Phase 5b · Cặp `on-` cho mọi surface — **Sonnet**, ⏱ 1.5h — *tuỳ chọn, nên làm*
 Thêm `--vy-surface-selected-on`, `-strong-on`, `-sunken-on`. Rồi `contrast:check`
