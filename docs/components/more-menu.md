@@ -1,8 +1,7 @@
 # More menu
 
-> **Status: stable** · `src/ui/MoreMenu.tsx` · the control that makes
-> [D1](../design-system.md#d1--buttons)'s "at most four visible" rule
-> possible. Written to the template set by [`button.md`](button.md).
+> `src/ui/MoreMenu.tsx` · the control that makes [D1](../design-system.md#d1--
+> buttons)'s "at most four visible" rule possible.
 
 ---
 

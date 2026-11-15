@@ -1,8 +1,7 @@
 # Toast
 
-> **Status: stable** · `src/ui/Toast.tsx` · **68 call sites**, reached
-> through `useToast()` rather than rendered directly.
-> Written to the template set by [`button.md`](button.md).
+> `src/ui/Toast.tsx` · **68 call sites**, reached through `useToast()` rather
+> than rendered directly.
 
 The behaviour and the four kinds are in
 [Feedback](../patterns/feedback.md). This page is the component: how to call

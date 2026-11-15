@@ -1,9 +1,8 @@
 # Record skeleton
 
-> **Status: stable** · `src/ui/RecordSkeleton.tsx` · the first-load state of a
-> [record form](../patterns/record-form.md), as
-> [`GridSkeleton`](grid-skeleton.md) is for the list.
-> Written to the template set by [`button.md`](button.md).
+> `src/ui/RecordSkeleton.tsx` · the first-load state of a [record
+> form](../patterns/record-form.md), as [`GridSkeleton`](grid-skeleton.md) is
+> for the list.
 
 ---
 

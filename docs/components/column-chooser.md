@@ -1,7 +1,6 @@
 # Column chooser
 
-> **Status: stable** · `src/ui/ColumnChooser.tsx` · 5 call sites.
-> Written to the template set by [`button.md`](button.md).
+> `src/ui/ColumnChooser.tsx` · 5 call sites.
 
 ---
 

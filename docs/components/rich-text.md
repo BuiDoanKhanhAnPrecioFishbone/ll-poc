@@ -1,8 +1,7 @@
 # Rich text
 
-> **Status: trial** · `src/ui/RichText.tsx` · the Conversations tab.
-> **Trial**, because the implementation is deliberately provisional — see
-> below. Written to the template set by [`button.md`](button.md).
+> `src/ui/RichText.tsx` · the Conversations tab. **Trial**, because the
+> implementation is deliberately provisional — see below.
 
 ---
 

@@ -1,7 +1,6 @@
 # Select
 
-> **Status: stable** · `src/ui/Overlays.tsx` · 39 call sites.
-> Written to the template set by [`button.md`](button.md).
+> `src/ui/Overlays.tsx` · 39 call sites.
 
 It is a **combobox**: the field *is* the input, and the list filters as you
 type.

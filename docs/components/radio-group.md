@@ -1,7 +1,6 @@
 # Radio group
 
-> **Status: stable** · `src/ui/Overlays.tsx` · two shapes, one component.
-> Written to the template set by [`button.md`](button.md).
+> `src/ui/Overlays.tsx` · two shapes, one component.
 
 ---
 

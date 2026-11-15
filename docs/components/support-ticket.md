@@ -1,10 +1,8 @@
 # Support ticket
 
-> **Status: trial** · `src/ui/SupportTicket.tsx` · the customer's screen of
-> **29 Oct**, reached from the [error state](error-state.md).
-> **Trial**, because what stands between it and a real ticket is one POST and
-> the answer to open question 12.
-> Written to the template set by [`button.md`](button.md).
+> `src/ui/SupportTicket.tsx` · the customer's screen of **29 Oct**, reached
+> from the [error state](error-state.md). **Trial**, because what stands
+> between it and a real ticket is one POST and the answer to open question 12.
 
 ---
 

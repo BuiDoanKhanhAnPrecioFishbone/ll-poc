@@ -1,8 +1,7 @@
 # Checkbox
 
-> **Status: stable** · `src/ui/Overlays.tsx` · a **native input wearing
-> Kendo's classes**, and that is the interesting part.
-> Written to the template set by [`button.md`](button.md).
+> `src/ui/Overlays.tsx` · a **native input wearing Kendo's classes**, and that
+> is the interesting part.
 
 ---
 

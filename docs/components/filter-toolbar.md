@@ -1,8 +1,7 @@
 # Filter toolbar
 
-> **Status: stable** · `src/ui/FilterToolbar.tsx` · 7 call sites, the most
-> used component in `src/ui` after Button.
-> Written to the template set by [`button.md`](button.md).
+> `src/ui/FilterToolbar.tsx` · 7 call sites, the most used component in
+> `src/ui` after Button.
 
 ---
 

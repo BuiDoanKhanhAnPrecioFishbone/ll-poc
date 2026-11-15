@@ -1,7 +1,6 @@
 # Tabs
 
-> **Status: stable** · `src/ui/Overlays.tsx` · 6 call sites, every one of
-> them a record. Written to the template set by [`button.md`](button.md).
+> `src/ui/Overlays.tsx` · 6 call sites, every one of them a record.
 
 ---
 

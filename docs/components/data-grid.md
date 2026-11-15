@@ -1,7 +1,6 @@
 # Data grid
 
-> **Status: stable** · `src/ui/DataGrid.tsx` · the whole list screen in one
-> component. Written to the template set by [`button.md`](button.md).
+> `src/ui/DataGrid.tsx` · the whole list screen in one component.
 
 ---
 

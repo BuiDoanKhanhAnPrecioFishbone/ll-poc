@@ -143,9 +143,9 @@ export const nav = [
         basis: 'grows from D6, a single 14-line table; all five sub-pages are new',
         src: 'docs/foundations/content/index.md',
         children: [
-          { slug: 'voice-tone',           title: 'Voice and tone',       src: 'docs/foundations/content/voice-tone.md',           kind: 'page', status: 'planned' },
-          { slug: 'language-and-grammar', title: 'Language and grammar', src: 'docs/foundations/content/language-and-grammar.md', kind: 'page', status: 'planned' },
-          { slug: 'inclusive-writing',    title: 'Inclusive writing',    src: 'docs/foundations/content/inclusive-writing.md',    kind: 'page', status: 'planned' },
+          { slug: 'voice-tone',           title: 'Voice and tone',       src: 'docs/foundations/content/voice-tone.md',           kind: 'page' },
+          { slug: 'language-and-grammar', title: 'Language and grammar', src: 'docs/foundations/content/language-and-grammar.md', kind: 'page' },
+          { slug: 'inclusive-writing',    title: 'Inclusive writing',    src: 'docs/foundations/content/inclusive-writing.md',    kind: 'page' },
           { slug: 'date-time',            title: 'Date and time',        src: 'docs/foundations/content/date-time.md',            kind: 'page' },
           { slug: 'designing-messages',   title: 'Designing messages',   src: 'docs/foundations/content/designing-messages.md',   kind: 'page' },
         ],

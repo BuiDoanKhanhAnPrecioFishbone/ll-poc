@@ -1,7 +1,6 @@
 # Loader
 
-> **Status: stable** · `src/ui/Loader.tsx` · two exports: `Loader` and
-> `BusyOverlay`. Written to the template set by [`button.md`](button.md).
+> `src/ui/Loader.tsx` · two exports: `Loader` and `BusyOverlay`.
 
 ---
 

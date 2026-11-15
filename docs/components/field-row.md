@@ -1,8 +1,7 @@
 # Field row
 
-> **Status: stable** · `src/ui/FieldRow.tsx` · **one labelled row — every
-> label-and-value pair in the app is this.** Written to the template set by
-> [`button.md`](button.md).
+> `src/ui/FieldRow.tsx` · **one labelled row — every label-and-value pair in
+> the app is this.**
 
 ---
 

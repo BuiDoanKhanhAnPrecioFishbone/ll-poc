@@ -1,8 +1,7 @@
 # Error state
 
-> **Status: stable** · `src/ui/ErrorState.tsx` · reached through
-> `ErrorBoundary`, and directly where one part of a record fails.
-> Written to the template set by [`button.md`](button.md).
+> `src/ui/ErrorState.tsx` · reached through `ErrorBoundary`, and directly
+> where one part of a record fails.
 
 ---
 

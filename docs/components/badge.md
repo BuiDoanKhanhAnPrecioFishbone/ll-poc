@@ -1,7 +1,6 @@
 # Status badge
 
-> **Status: stable** · `src/ui/Badge.tsx` · specimen at `/design-system`
-> Written to the template set by [`button.md`](button.md).
+> `src/ui/Badge.tsx` · specimen at `/design-system`
 
 ---
 

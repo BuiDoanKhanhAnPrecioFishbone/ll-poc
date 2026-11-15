@@ -1,8 +1,7 @@
 # View setting
 
-> **Status: stable** · `src/ui/ViewSetting.tsx` · the panel behind the gear,
-> and the place two other components point at.
-> Written to the template set by [`button.md`](button.md).
+> `src/ui/ViewSetting.tsx` · the panel behind the gear, and the place two
+> other components point at.
 
 ---
 

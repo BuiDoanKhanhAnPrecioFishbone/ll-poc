@@ -1,8 +1,7 @@
 # Grid skeleton
 
-> **Status: stable** · `src/ui/GridSkeleton.tsx` · the first-load state of the
-> standard list pattern. Written to the template set by
-> [`button.md`](button.md).
+> `src/ui/GridSkeleton.tsx` · the first-load state of the standard list
+> pattern.
 
 ---
 

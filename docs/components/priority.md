@@ -1,7 +1,6 @@
 # Priority
 
-> **Status: stable** · `src/ui/Priority.tsx` · 29 lines, the smallest
-> component here. Written to the template set by [`button.md`](button.md).
+> `src/ui/Priority.tsx` · 29 lines, the smallest component here.
 
 ---
 

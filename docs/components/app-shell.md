@@ -1,7 +1,6 @@
 # App shell
 
-> **Status: beta** · `src/components/AppShell.tsx` · no live specimen yet
-> Written to the template set by [`button.md`](button.md). **Ours**: it imports
+> `src/components/AppShell.tsx` · no live specimen yet **Ours**: it imports
 > neither KendoReact nor Radix. Production is KendoReact.
 
 ## When to use

@@ -1,8 +1,6 @@
 # MiniTable
 
-> **Status: stable** · `src/ui/MiniTable.tsx` · 15 call sites — the short
-> lists inside a record. Written to the template set by
-> [`button.md`](button.md).
+> `src/ui/MiniTable.tsx` · 15 call sites — the short lists inside a record.
 
 ---
 

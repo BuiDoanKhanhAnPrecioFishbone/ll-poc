@@ -1,9 +1,8 @@
 # File drop
 
-> **Status: trial** · `src/ui/FileDrop.tsx` · **4 call sites**, covering the
-> five places `live-component-sweep.md` named.
-> **Trial**, because what it returns is a file *name* — see below.
-> Written to the template set by [`button.md`](button.md).
+> `src/ui/FileDrop.tsx` · **4 call sites**, covering the five places `live-
+> component-sweep.md` named. **Trial**, because what it returns is a file
+> *name* — see below.
 
 The flow around it is [File upload](../patterns/file-upload.md). This page is
 the control.

@@ -1,8 +1,7 @@
 # People picker
 
-> **Status: stable** · `src/ui/PeoplePicker.tsx` · *Assigned To*, and every
-> other field that names colleagues.
-> Written to the template set by [`button.md`](button.md).
+> `src/ui/PeoplePicker.tsx` · *Assigned To*, and every other field that names
+> colleagues.
 
 ---
 

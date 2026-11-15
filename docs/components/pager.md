@@ -1,7 +1,6 @@
 # Pager
 
-> **Status: stable** · `src/ui/Pager.tsx` · at the foot of every grid.
-> Written to the template set by [`button.md`](button.md).
+> `src/ui/Pager.tsx` · at the foot of every grid.
 
 ---
 

@@ -1,7 +1,6 @@
 # Dialog
 
-> **Status: stable** · `src/ui/Overlays.tsx` · 30 call sites.
-> Written to the template set by [`button.md`](button.md).
+> `src/ui/Overlays.tsx` · 30 call sites.
 
 ---
 

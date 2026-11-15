@@ -1,8 +1,8 @@
 # Command palette
 
-> **Status: early access** · `src/components/CommandPalette.tsx` · no live specimen yet
-> Written to the template set by [`button.md`](button.md). **Ours**: it imports
-> neither KendoReact nor Radix. The pattern around it is [Search](../patterns/search.md).
+> `src/components/CommandPalette.tsx` · no live specimen yet **Ours**: it
+> imports neither KendoReact nor Radix. The pattern around it is
+> [Search](../patterns/search.md).
 
 ## When to use
 

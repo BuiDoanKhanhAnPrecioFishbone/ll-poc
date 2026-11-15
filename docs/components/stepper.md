@@ -1,9 +1,7 @@
 # Stepper
 
-> **Status: stable** · `src/ui/Stepper.tsx` · one call site, and it is the
-> product's only wizard. The flow around it is
-> [Wizard](../patterns/wizard.md); this is the control.
-> Written to the template set by [`button.md`](button.md).
+> `src/ui/Stepper.tsx` · one call site, and it is the product's only wizard.
+> The flow around it is [Wizard](../patterns/wizard.md); this is the control.
 
 ---
 

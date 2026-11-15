@@ -1,9 +1,8 @@
 # Chip
 
-> **Status: trial** — two call sites, both selected, one screen. The
-> unselected state is correct now but has still never shipped, so it has not
-> been in front of a real user. Written to the template set by
-> [`button.md`](button.md). `src/ui/Chip.tsx` · specimen at `/design-system`
+> Two call sites, both selected, one screen. The unselected state is correct
+> now but has still never shipped, so it has not been in front of a real user.
+> `src/ui/Chip.tsx` · specimen at `/design-system`
 
 ---
 

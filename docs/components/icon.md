@@ -1,8 +1,7 @@
 # Icon
 
-> **Status: beta** · `src/ui/icons.tsx` · no live specimen yet
-> Written to the template set by [`button.md`](button.md). The set itself is
-> catalogued on [Iconography](../foundations/iconography.md); this page is the component.
+> `src/ui/icons.tsx` · no live specimen yet The set itself is catalogued on
+> [Iconography](../foundations/iconography.md); this page is the component.
 
 ## When to use
 

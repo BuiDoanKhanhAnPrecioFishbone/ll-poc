@@ -1,8 +1,7 @@
 # View picker
 
-> **Status: stable** · `src/ui/ViewPicker.tsx` · 6 call sites, 44 lines —
-> the smallest component with a page, and it has one for a reason.
-> Written to the template set by [`button.md`](button.md).
+> `src/ui/ViewPicker.tsx` · 6 call sites, 44 lines — the smallest component
+> with a page, and it has one for a reason.
 
 ---
 

@@ -1,6 +1,6 @@
 # Button
 
-> **Status: stable** · `src/ui/Button.tsx` · specimen at `/design-system`
+> `src/ui/Button.tsx` · specimen at `/design-system`
 
 ---
 

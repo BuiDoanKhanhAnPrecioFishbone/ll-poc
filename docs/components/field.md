@@ -1,8 +1,7 @@
 # Field
 
-> **Status: stable** · `src/ui/Field.tsx` · **91 call sites** — the most used
-> component in the product. Written to the template set by
-> [`button.md`](button.md).
+> `src/ui/Field.tsx` · **91 call sites** — the most used component in the
+> product.
 
 Three controls in one file, because they are one idea wearing three shapes:
 `TextField`, `TextArea`, `SearchField`.
