@@ -119,3 +119,6 @@ for (const n of notes) console.log(`  note  ${n}`);
 console.log();
 if (fails.length) { console.error(`deploy-check FAILED — ${fails.length} problem(s) against ${BASE}`); process.exit(1); }
 console.log(`deploy-check OK — ${BASE} serves the site and every asset it asks for`);
+/* fetch keeps its connection pool warm, so node lingers after the last check.
+   Exit explicitly: a check that does not end cannot be put in a pipeline. */
+process.exit(0);
