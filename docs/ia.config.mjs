@@ -98,7 +98,7 @@ const c = (slug, title, group, phase, basis, impl = [], extra = {}) => ({
 });
 
 export const nav = [
-  { slug: '', title: 'Overview', src: 'docs/_pages/home.md', kind: 'overview', status: 'planned' },
+  { slug: '', title: 'Overview', src: 'docs/_pages/home.md', kind: 'overview' },
 
   {
     slug: 'get-started', title: 'Get started', kind: 'overview',

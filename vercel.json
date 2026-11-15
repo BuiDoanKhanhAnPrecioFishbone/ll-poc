@@ -1,6 +1,8 @@
 {
+  "redirects": [
+    { "source": "/ds", "destination": "/ds/", "permanent": false }
+  ],
   "rewrites": [
-    { "source": "/ds", "destination": "/ds/index.html" },
     { "source": "/((?!ds/).*)", "destination": "/index.html" }
   ]
 }
