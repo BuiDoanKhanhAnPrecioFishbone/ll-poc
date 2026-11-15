@@ -133,7 +133,7 @@ export const nav = [
       {
         slug: 'content', title: 'Content', kind: 'overview', phase: 'beta',
         basis: 'grows from D6, a single 14-line table; all five sub-pages are new',
-        src: 'docs/foundations/content/index.md', status: 'planned',
+        src: 'docs/foundations/content/index.md',
         children: [
           { slug: 'voice-tone',           title: 'Voice and tone',       src: 'docs/foundations/content/voice-tone.md',           kind: 'page', status: 'planned' },
           { slug: 'language-and-grammar', title: 'Language and grammar', src: 'docs/foundations/content/language-and-grammar.md', kind: 'page', status: 'planned' },
@@ -184,7 +184,7 @@ export const nav = [
 
   {
     slug: 'components', title: 'Components', kind: 'overview',
-    src: 'docs/components/index.md', status: 'planned',
+    src: 'docs/components/index.md',
     children: [
       // ---- Forms and input
       c('button', 'Button', 'Forms and input', 'ga', '33 files import it — the most used component in the system',
@@ -275,7 +275,7 @@ export const nav = [
   // labelling a pattern.
   {
     slug: 'patterns', title: 'Patterns', kind: 'overview',
-    src: 'docs/patterns/index.md', status: 'planned',
+    src: 'docs/patterns/index.md',
     children: [
       { slug: 'record-form',        title: 'Record form',            src: 'docs/patterns/record-form.md',        kind: 'pattern' },
       { slug: 'list-screen',        title: 'List screen',            src: 'docs/patterns/list-screen.md',        kind: 'pattern' },
@@ -286,12 +286,12 @@ export const nav = [
       { slug: 'file-upload',        title: 'File upload',            src: 'docs/patterns/file-upload.md',        kind: 'pattern' },
       { slug: 'dashboard',          title: 'Dashboard',              src: 'docs/patterns/dashboard.md',          kind: 'pattern' },
       // New in this restructure: Part D5 becomes a pattern of its own.
-      { slug: 'screen-states',      title: 'The four screen states', src: 'docs/patterns/screen-states.md',      kind: 'pattern', status: 'planned' },
+      { slug: 'screen-states',      title: 'The four screen states', src: 'docs/patterns/screen-states.md',      kind: 'pattern' },
     ],
   },
 
-  { slug: 'tools',          title: 'Tools',          src: 'docs/tools.md',          kind: 'page', status: 'planned' },
-  { slug: 'release-phases', title: 'Release phases', src: 'docs/release-phases.md', kind: 'page', status: 'planned' },
+  { slug: 'tools',          title: 'Tools',          src: 'docs/tools.md',          kind: 'page' },
+  { slug: 'release-phases', title: 'Release phases', src: 'docs/release-phases.md', kind: 'page' },
   { slug: 'whats-new',      title: "What's new",     kind: 'generated', generator: 'scripts/whats-new.mjs' },
 ];
 
