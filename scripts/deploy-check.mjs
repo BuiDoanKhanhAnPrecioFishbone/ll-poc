@@ -106,6 +106,35 @@ const spec = await get(`${BASE}/specimen/button`);
 if (spec.status !== 200 || spec.type !== 'text/html') fail(`/specimen/button → ${spec.status} ${spec.type}`);
 else ok('/specimen/button → 200 text/html (the live examples have somewhere to come from)');
 
+/* SAMPLE THE SITE, DO NOT LIST IT.
+   The five pages above are hand-picked, and a hand-picked list goes stale the
+   moment someone adds a page: twelve pages landed in one commit and this
+   check covered none of them, including the ones three directories deep whose
+   relative asset paths had never been requested from a real host. So the
+   sample now comes from the site's own search index — the deepest page at
+   each directory depth, which is where a `../../` is most likely to be wrong,
+   plus a few spread through the middle. New pages are covered without anyone
+   remembering to add them. */
+const sampleIdx = await get(`${BASE}/ds/search-index.json`);
+if (sampleIdx.status === 200 && sampleIdx.type.includes('json')) {
+  const all = (await sampleIdx.body.json()).map(e => e.path).filter(Boolean);
+  const byDepth = new Map();
+  for (const path of all) {
+    const d = path.split('/').length - 1;
+    if (!byDepth.has(d)) byDepth.set(d, []);
+    byDepth.get(d).push(path);
+  }
+  const sample = [];
+  for (const [d, paths] of [...byDepth].sort((a, b) => a[0] - b[0])) {
+    const sorted = paths.slice().sort();
+    sample.push(sorted[0]);                                   // first at this depth
+    if (sorted.length > 1) sample.push(sorted[sorted.length - 1]);   // and last
+    if (sorted.length > 6) sample.push(sorted[Math.floor(sorted.length / 2)]);
+  }
+  console.log(`\n  sampling ${sample.length} of ${all.length} pages, across ${byDepth.size} directory depths`);
+  for (const path of sample) await checkPage('/ds/' + path);
+}
+
 const idx = await get(`${BASE}/ds/search-index.json`);
 if (idx.status !== 200) fail(`/ds/search-index.json → HTTP ${idx.status}`);
 else if (!idx.type.includes('json')) fail(`/ds/search-index.json → ${idx.type}, expected application/json`);
