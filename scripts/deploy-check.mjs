@@ -125,7 +125,7 @@ if (sampleIdx.status === 200 && sampleIdx.type.includes('json')) {
     byDepth.get(d).push(path);
   }
   const sample = [];
-  for (const [d, paths] of [...byDepth].sort((a, b) => a[0] - b[0])) {
+  for (const [, paths] of [...byDepth].sort((a, b) => a[0] - b[0])) {
     const sorted = paths.slice().sort();
     sample.push(sorted[0]);                                   // first at this depth
     if (sorted.length > 1) sample.push(sorted[sorted.length - 1]);   // and last
