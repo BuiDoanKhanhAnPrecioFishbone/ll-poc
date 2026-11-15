@@ -318,9 +318,20 @@ function shell(p) {
   const idx = flat.indexOf(n);
   const prev = flat[idx - 1]; const next = flat[idx + 1];
   const root = up(from);
+  const tocList = p.toc.map(t => `<li><a href="#${attr(t.id)}">${esc(plain(t.text))}</a></li>`).join('');
   const toc = p.toc.length
-    ? `<aside class="toc" aria-label="Contents"><h2>Contents</h2><ol>${p.toc.map(t => `<li><a href="#${attr(t.id)}">${esc(plain(t.text))}</a></li>`).join('')}</ol></aside>`
+    ? `<aside class="toc" aria-label="Contents"><h2>Contents</h2><ol>${tocList}</ol></aside>`
     : '<aside class="toc"></aside>';
+
+  /* THE SAME CONTENTS, INLINE, FOR THE WIDTHS WHERE THE RAIL IS GONE.
+     The sticky one is hidden below 1180px and the sidebar collapses behind a
+     button below 860px, so between those widths — and on every phone — a long
+     page arrived as an unbroken wall of prose with nothing to show its shape.
+     Three sections is the floor: fewer than that, a list of links is longer
+     than the thing it indexes. */
+  const tocInline = p.toc.length >= 3
+    ? `<details class="toc-inline" open><summary>On this page</summary><ol>${tocList}</ol></details>`
+    : '';
   const tabs = p.tab || (n.tabs && p.kind === 'md')
     ? `<nav class="tabbar" aria-label="${attr(n.title)} sections"><ul>${n.tabs.map(t => {
         const f = `${n.path}/${t.name}.html`;
@@ -359,6 +370,7 @@ ${breadcrumb(n, from)}
 <h1>${heading}${badge(n)}</h1>
 ${tabs}
 <article class="doc">
+${tocInline}
 ${body}
 </article>
 <nav class="pn" aria-label="Previous and next">${pn(prev, 'prev', 'Previous')}${pn(next, 'next', 'Next')}</nav>

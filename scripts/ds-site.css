@@ -164,3 +164,23 @@ ul.children .grp{margin-top:var(--vy-space-8);font-size:var(--vy-text-sm);font-w
   border-radius:var(--vy-radius-lg);color-scheme:normal}
 .specimen figcaption{margin-top:var(--vy-space-4);font-size:var(--vy-text-sm);
   color:var(--vy-on-surface-soft)}
+
+/* The page's own contents, shown only where the sticky rail is not. Styled as
+   a quiet block rather than a card: it sits above the first paragraph, and a
+   heavy box there would read as the page's opening statement. */
+.toc-inline{display:none;margin:0 0 var(--vy-space-12);padding:var(--vy-space-6) 0;
+  border-top:1px solid var(--vy-border);border-bottom:1px solid var(--vy-border)}
+.toc-inline>summary{cursor:pointer;list-style:none;font-size:var(--vy-text-sm);font-weight:600;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--vy-on-surface-soft);
+  display:flex;align-items:center;gap:var(--vy-space-3)}
+.toc-inline>summary::-webkit-details-marker{display:none}
+.toc-inline>summary::before{content:"\25B8";color:var(--vy-on-surface-muted);
+  transition:transform var(--vy-dur-short) var(--vy-ease-standard)}
+.toc-inline[open]>summary::before{transform:rotate(90deg)}
+.toc-inline ol{list-style:none;margin:var(--vy-space-5) 0 0;padding:0;
+  columns:2;column-gap:var(--vy-space-12)}
+.toc-inline li{margin:0;break-inside:avoid}
+.toc-inline a{display:block;padding:var(--vy-space-2) 0;color:var(--vy-on-surface-soft)}
+.toc-inline a:hover{color:var(--vy-brand-text)}
+@media (max-width:1180px){.toc-inline{display:block}}
+@media (max-width:640px){.toc-inline ol{columns:1}}
