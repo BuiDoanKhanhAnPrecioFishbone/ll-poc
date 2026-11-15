@@ -283,12 +283,20 @@ function stubBody(n, from) {
   out.push(`<div class="stub">${lead}`);
   if (n.mode === 'stub') {
     const split = splitSources[n.path]; const mat = material[n.path];
-    if (split) out.push(`<p>Its words already exist in <code>docs/design-system.md</code>, sections ${split.map(s => `<code>${esc(s)}</code>`).join(', ')}, and will be moved here when the document is split. The line ranges are in <code>docs/_plan/split-map.md</code>.</p>`);
-    if (mat) out.push(`<p>${split ? 'Material to draw on besides' : 'Nothing is written yet. To be drafted from'}: ${mat.map(m => `<code>${esc(m)}</code>`).join(', ')}.</p>`);
-    if (!split && !mat) out.push('<p>No source material has been recorded for it yet.</p>');
-    if (n.src) out.push(`<p>It will live at <code>${esc(n.src)}</code>.</p>`);
+    /* WHAT A STUB SAYS, AND WHAT IT NO LONGER SAYS.
+       These pages used to print the project's own bookkeeping: section ids in
+       the handover document, the path to the split map, the source files to
+       draft from, and the `basis` line behind each release phase — notes
+       written for the manifest, not for a reader. The site is deployed beside
+       the product, so a stub now says only what a reader needs: that the page
+       is planned, and whether its words already exist.
+       None of it is deleted. `ia.config.mjs` still carries every basis, and
+       ia:check still fails on a phase label that has none. */
+    if (split) out.push('<p>Its words already exist in the handover document and will be moved here.</p>');
+    else if (!mat) out.push('<p>No source material has been recorded for it yet.</p>');
+    /* with material and no split the lead sentence already says it is unwritten;
+       a second sentence saying so again is the page repeating itself */
   }
-  if (n.basis) out.push(`<p class="meta">Release phase: ${esc(PHASES[n.phase]?.label || n.phase)}. Basis: ${esc(n.basis)}.</p>`);
   out.push('</div>');
   if (n.children.length) {
     let last = null; const li = [];
