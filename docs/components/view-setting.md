@@ -6,6 +6,8 @@
 
 ---
 
+<!-- ds:tab usage -->
+
 ## When to use
 
 To change **the saved View** — which filter fields appear, which columns, in
@@ -99,6 +101,8 @@ already there.
 | Reorder | Drag **and** a keyboard path — a drag-only reorder is a feature half the users cannot reach |
 | Dismiss | `Save` · `Discard`, and the panel's own close |
 
+<!-- ds:tab code -->
+
 ## API
 
 | Prop | Type | Notes |
@@ -111,11 +115,15 @@ already there.
 
 ---
 
+<!-- ds:tab usage -->
+
 ## Related
 
 [View picker](view-picker.md) · [Filter toolbar](filter-toolbar.md) ·
 [Column chooser](column-chooser.md) ·
 [List screen](../patterns/list-screen.md)
+
+<!-- ds:tab changelog -->
 
 ## Recent changes
 

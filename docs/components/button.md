@@ -1,15 +1,20 @@
 # Button
 
 > **Status: stable** · `src/ui/Button.tsx` · specimen at `/design-system`
+
+---
+
+<!-- ds:tab examples -->
+
+<!-- ds:specimen button -->
+
+<!-- ds:tab usage -->
+
 > **Model page.** This is the template every other component page should
 > follow. The order of the sections is the order a reader needs them in, and
 > it is the order Carbon, Atlassian and GOV.UK all arrive at: what it is for,
 > when *not* to use it, what it is made of, how it behaves, what it costs a
 > screen reader, and only then the API.
-
----
-
-<!-- ds:specimen button -->
 
 ## When to use
 
@@ -27,6 +32,8 @@ line, run the quotation.
 | Toggling something on and off | A checkbox or switch | A button does not carry state a user can read |
 
 ---
+
+<!-- ds:tab examples -->
 
 ## Anatomy
 
@@ -132,6 +139,8 @@ of the fill's own pair.
 
 ---
 
+<!-- ds:tab usage -->
+
 ## Content
 
 - Title Case, and the label **names the outcome**: `Publish`, not `OK`.
@@ -170,6 +179,8 @@ of the fill's own pair.
 | Target size | `sm` carries `min-height` to clear the 24px minimum (WCAG 2.5.8); padding alone left the pager one pixel short. `xs` clears it at 26px unaided |
 
 ---
+
+<!-- ds:tab code -->
 
 ## API
 
@@ -215,6 +226,8 @@ of the fill's own pair.
 
 ---
 
+<!-- ds:tab usage -->
+
 ## Gotcha worth knowing
 
 `.vy-btn--filled`, `--outlined`, `--text` and `--danger` in `components.css`
@@ -233,6 +246,8 @@ specificity problem.
 [D4 · Dialogs](../design-system.md#d4--dialogs) ·
 [D6 · Words](../design-system.md#d6--words) ·
 [E1 · Accessibility](../design-system.md#e1--accessibility)
+
+<!-- ds:tab changelog -->
 
 ## Recent changes
 

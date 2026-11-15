@@ -5,7 +5,11 @@
 
 ---
 
+<!-- ds:tab examples -->
+
 <!-- ds:specimen pager -->
+
+<!-- ds:tab usage -->
 
 ## When to use
 
@@ -21,6 +25,8 @@ At the foot of a grid, always. It carries both the **position** and the
 | Showing the total somewhere else | The pager | The 25 Aug review moved the count **out of the page title** and into here, on purpose |
 
 ---
+
+<!-- ds:tab examples -->
 
 ## Anatomy
 
@@ -40,6 +46,8 @@ navigate to the first, previous, next, and last page"*, each disabled at its
 own end. Without them, reaching the end of 17 pages is 17 clicks.
 
 ---
+
+<!-- ds:tab usage -->
 
 ## The number window
 
@@ -70,6 +78,8 @@ Virtualisation stays underneath, so a 200-row page is still cheap.
 
 ---
 
+<!-- ds:tab examples -->
+
 ## States
 
 | State | What happens |
@@ -79,6 +89,8 @@ Virtualisation stays underneath, so a 200-row page is still cheap.
 | **Current page** | `aria-current="page"` on that number |
 | **Empty** | Count reads `No items`; nav still renders at one page |
 | **Page size changed** | Jumps back to **page 0** — staying on page 7 of a list that now has 3 pages is a blank screen |
+
+<!-- ds:tab usage -->
 
 ## Content
 
@@ -95,6 +107,8 @@ Virtualisation stays underneath, so a 200-row page is still cheap.
 | Gap | `…` is `aria-hidden` — it is not a destination |
 | Target size | The arrows are `sm` Buttons, which carry a `min-height` floor for the 24px minimum; padding alone left them at 23px |
 
+<!-- ds:tab code -->
+
 ## API
 
 | Prop | Type | Notes |
@@ -107,11 +121,15 @@ Virtualisation stays underneath, so a 200-row page is still cheap.
 
 ---
 
+<!-- ds:tab usage -->
+
 ## Related
 
 [Button](button.md) · [Column chooser](column-chooser.md) ·
 [Filter toolbar](filter-toolbar.md) ·
 [D3 · Grids](../design-system.md#d3--grids)
+
+<!-- ds:tab changelog -->
 
 ## Recent changes
 

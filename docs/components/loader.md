@@ -5,7 +5,11 @@
 
 ---
 
+<!-- ds:tab examples -->
+
 <!-- ds:specimen loader -->
+
+<!-- ds:tab usage -->
 
 ## When to use
 
@@ -87,6 +91,8 @@ Two things it does that are easy to miss:
 | Underneath | `aria-hidden` while busy; `inert` as well when blocking |
 | Reduced motion | Honoured — see [B6](../design-system.md#b6--motion). Reduced motion is a **state**, not a switch: things that fade in stay |
 
+<!-- ds:tab code -->
+
 ## API
 
 **Loader**
@@ -108,11 +114,15 @@ Two things it does that are easy to miss:
 
 ---
 
+<!-- ds:tab usage -->
+
 ## Related
 
 [Button](button.md) · [Feedback](../patterns/feedback.md) ·
 [D5 · The four screen states](../design-system.md#d5--the-four-screen-states) ·
 [B6 · Motion](../design-system.md#b6--motion)
+
+<!-- ds:tab changelog -->
 
 ## Recent changes
 

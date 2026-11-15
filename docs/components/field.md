@@ -9,7 +9,11 @@ Three controls in one file, because they are one idea wearing three shapes:
 
 ---
 
+<!-- ds:tab examples -->
+
 <!-- ds:specimen field -->
+
+<!-- ds:tab usage -->
 
 ## When to use
 
@@ -29,6 +33,8 @@ Three controls in one file, because they are one idea wearing three shapes:
 | Filtering a list | [Filter toolbar](filter-toolbar.md) | Search finds a record you can name; filters describe a set |
 
 ---
+
+<!-- ds:tab examples -->
 
 ## Anatomy
 
@@ -50,6 +56,8 @@ accessible name and gets read as part of the field's title.
 what to do next, is one line too many.
 
 ---
+
+<!-- ds:tab usage -->
 
 ## Errors arrive on blur
 
@@ -119,6 +127,8 @@ carry it. Light is unchanged.
 | Search | `type="search"`, so the browser offers its own clear control |
 | Hover and focus | Both edges clear 3:1 on every ground in both themes, and `border:check` sweeps all three states — see above |
 
+<!-- ds:tab code -->
+
 ## API
 
 ```tsx
@@ -136,12 +146,16 @@ carry it. Light is unchanged.
 
 ---
 
+<!-- ds:tab usage -->
+
 ## Related
 
 [Select](select.md) · [Dialog](dialog.md) ·
 [D2 · Fields](../design-system.md#d2--fields) ·
 [Record form](../patterns/record-form.md) ·
 [B1.4 · Lines](../design-system.md#b14-lines)
+
+<!-- ds:tab changelog -->
 
 ## Recent changes
 

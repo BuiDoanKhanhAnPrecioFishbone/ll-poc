@@ -6,6 +6,8 @@
 
 ---
 
+<!-- ds:tab usage -->
+
 ## When to use
 
 To choose **one or more people** from the directory.
@@ -55,6 +57,8 @@ express multiple values**, and its focus scope is the thing that stopped
 `Popover` has no such scope, so **the filter input here is focusable and
 typing goes to it immediately** — the way the live filterable control behaves.
 
+<!-- ds:tab examples -->
+
 ## Anatomy
 
 | Part | Rule |
@@ -75,6 +79,8 @@ typing goes to it immediately** — the way the live filterable control behaves.
 | **Invalid** | `data-invalid` on the control; the message comes from the [field](field.md), not from here |
 | No match | *"No one matches "{query}"."* — a sentence naming what was typed, not a blank panel |
 
+<!-- ds:tab usage -->
+
 ## Accessibility
 
 | | |
@@ -87,6 +93,8 @@ typing goes to it immediately** — the way the live filterable control behaves.
 | Filter | Reachable and focused, which is the reason for Popover |
 | Target | Chip × meets the 24px minimum even though the glyph is smaller |
 
+<!-- ds:tab code -->
+
 ## API
 
 | Prop | Type | Notes |
@@ -98,11 +106,15 @@ typing goes to it immediately** — the way the live filterable control behaves.
 
 ---
 
+<!-- ds:tab usage -->
+
 ## Related
 
 [Select](select.md) · [Field](field.md) · [Chip](chip.md) ·
 [Record form](../patterns/record-form.md) ·
 [E2 · KendoReact](../design-system.md#e2--kendoreact)
+
+<!-- ds:tab changelog -->
 
 ## Recent changes
 

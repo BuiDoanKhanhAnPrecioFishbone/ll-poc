@@ -7,7 +7,11 @@
 
 ---
 
+<!-- ds:tab examples -->
+
 <!-- ds:specimen stepper -->
+
+<!-- ds:tab usage -->
 
 ## When to use
 
@@ -72,6 +76,8 @@ just no longer said twice at once.
 | Unreachable | Disabled, not hidden — the shape of the job stays visible |
 | Keyboard | Each step is a real button in document order |
 
+<!-- ds:tab code -->
+
 ## API
 
 | Prop | Type | Notes |
@@ -84,10 +90,14 @@ just no longer said twice at once.
 
 ---
 
+<!-- ds:tab usage -->
+
 ## Related
 
 [Wizard](../patterns/wizard.md) · [Tabs](tabs.md) ·
 [B7 · Responsive](../design-system.md#b7--responsive)
+
+<!-- ds:tab changelog -->
 
 ## Recent changes
 

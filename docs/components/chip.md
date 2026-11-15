@@ -7,7 +7,11 @@
 
 ---
 
+<!-- ds:tab examples -->
+
 <!-- ds:specimen chip -->
+
+<!-- ds:tab usage -->
 
 ## When to use
 
@@ -26,6 +30,8 @@ you get rid of it.
 | More than about six filters at once | `FilterToolbar` | Past that the chips wrap and the row stops being scannable |
 
 ---
+
+<!-- ds:tab examples -->
 
 ## Anatomy
 
@@ -67,6 +73,8 @@ already.
 > the sweep walked.
 
 ---
+
+<!-- ds:tab usage -->
 
 ## Two defects the resting state was hiding — fixed 8 Nov
 
@@ -134,6 +142,8 @@ and not told it is off. `false` is a different statement from absent. Now
 | Focus | `:focus-visible` only |
 | Colour | Selected is fill **and** border **and** check — never colour alone |
 
+<!-- ds:tab code -->
+
 ## API
 
 ```tsx
@@ -149,6 +159,8 @@ and not told it is off. `false` is a different statement from absent. Now
 
 ---
 
+<!-- ds:tab usage -->
+
 ## A naming mismatch worth settling
 
 The comment in `Chip.tsx` calls this an MD3 **input chip**. In MD3 an input
@@ -163,6 +175,8 @@ from this file.
 [Button](button.md) · [Status badge](badge.md) ·
 [B1.4 · Lines](../design-system.md#b14-lines) ·
 [E1 · Accessibility](../design-system.md#e1--accessibility)
+
+<!-- ds:tab changelog -->
 
 ## Recent changes
 

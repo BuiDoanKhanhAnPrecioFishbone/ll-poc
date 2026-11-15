@@ -5,7 +5,11 @@
 
 ---
 
+<!-- ds:tab examples -->
+
 <!-- ds:specimen radio-group -->
+
+<!-- ds:tab usage -->
 
 ## When to use
 
@@ -93,6 +97,8 @@ become one group, and choosing in the second would clear the first.
 | Disabled | Announced as disabled, with its reason as real text |
 | Keyboard | Arrows move within the group; the group is one tab stop |
 
+<!-- ds:tab code -->
+
 ## API
 
 | Prop | Type | Notes |
@@ -104,11 +110,15 @@ become one group, and choosing in the second would clear the first.
 
 ---
 
+<!-- ds:tab usage -->
+
 ## Related
 
 [Field row](field-row.md) · [Select](select.md) ·
 [Wizard](../patterns/wizard.md) ·
 [D2 · Fields](../design-system.md#d2--fields)
+
+<!-- ds:tab changelog -->
 
 ## Recent changes
 

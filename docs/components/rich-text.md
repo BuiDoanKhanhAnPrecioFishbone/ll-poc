@@ -6,6 +6,12 @@
 
 ---
 
+<!-- ds:tab examples -->
+
+<!-- ds:specimen rich-text -->
+
+<!-- ds:tab usage -->
+
 ## When to use
 
 Where a comment written **in the real system** can arrive formatted — the
@@ -78,6 +84,8 @@ engine is provisional.
 | Keyboard | The browser's own `Cmd/Ctrl+B/I/U` work, because the surface is a real editable region |
 | Colour menus | Each swatch is named — *Red*, *Amber* — not colour alone |
 
+<!-- ds:tab code -->
+
 ## API
 
 | Prop | Type | Notes |
@@ -89,11 +97,15 @@ engine is provisional.
 
 ---
 
+<!-- ds:tab usage -->
+
 ## Related
 
 [Field](field.md) · [Button](button.md) ·
 [B1.4 · Lines](../design-system.md#b14-lines) ·
 [E2 · KendoReact](../design-system.md#e2--kendoreact)
+
+<!-- ds:tab changelog -->
 
 ## Recent changes
 

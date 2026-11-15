@@ -6,7 +6,11 @@
 
 ---
 
+<!-- ds:tab examples -->
+
 <!-- ds:specimen mini-table -->
+
+<!-- ds:tab usage -->
 
 ## When to use
 
@@ -98,6 +102,8 @@ objects in every in-record table.
 | Tone | Never the only carrier — the legend names it and the cells say it |
 | Identifiers | Body face, semibold, `tabular-nums` — and **not** monospace, since 13 Oct |
 
+<!-- ds:tab code -->
+
 ## API
 
 The same `ColumnSpec` the main grid takes. **All eleven callers kept passing
@@ -106,12 +112,16 @@ to meet before it was allowed to happen.
 
 ---
 
+<!-- ds:tab usage -->
+
 ## Related
 
 [Data grid](data-grid.md) · [Status badge](badge.md) ·
 [D3 · Grids](../design-system.md#d3--grids) ·
 [B1.7 · Row tones and accents](../design-system.md#b17-row-tones-and-accents) ·
 [List screen](../patterns/list-screen.md)
+
+<!-- ds:tab changelog -->
 
 ## Recent changes
 

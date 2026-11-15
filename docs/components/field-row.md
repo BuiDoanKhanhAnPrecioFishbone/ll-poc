@@ -6,7 +6,11 @@
 
 ---
 
+<!-- ds:tab examples -->
+
 <!-- ds:specimen field-row -->
+
+<!-- ds:tab usage -->
 
 ## When to use
 
@@ -41,6 +45,8 @@ independently defined a helper called `ReadValue`, with different props.
 
 ---
 
+<!-- ds:tab examples -->
+
 ## Anatomy
 
 ![A record in edit mode — locked rows, hints and required markers](../assets/components/pattern-record-edit.png)
@@ -55,6 +61,8 @@ independently defined a helper called `ReadValue`, with different props.
 | **Error** | A validation message, **instead of** the hint — never both |
 
 ---
+
+<!-- ds:tab usage -->
 
 ## The note is what marks a row locked
 
@@ -101,6 +109,8 @@ for.
 | Locked | The note is real text beside the padlock, which is `aria-hidden` |
 | Empty | `empty` renders the value as **absent** rather than as a value — a blank box and *"nothing here"* are different facts |
 
+<!-- ds:tab code -->
+
 ## API
 
 | Prop | Type | Notes |
@@ -114,11 +124,15 @@ for.
 
 ---
 
+<!-- ds:tab usage -->
+
 ## Related
 
 [Field](field.md) · [Select](select.md) · [Radio group](radio-group.md) ·
 [D2 · Fields](../design-system.md#d2--fields) ·
 [Record form](../patterns/record-form.md)
+
+<!-- ds:tab changelog -->
 
 ## Recent changes
 
