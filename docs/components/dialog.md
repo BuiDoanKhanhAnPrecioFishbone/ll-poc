@@ -5,6 +5,12 @@
 
 ---
 
+<!-- ds:tab examples -->
+
+<!-- ds:specimen dialog -->
+
+<!-- ds:tab usage -->
+
 ## When to use
 
 When the user must deal with **one thing** before carrying on: a question, a
@@ -105,6 +111,8 @@ through a depth context.
 | Title | The accessible name of the dialog |
 | Busy | While a confirmed action runs, both buttons disable — leaving mid-write is how a record ends up changed with nobody watching |
 
+<!-- ds:tab code -->
+
 ## API
 
 | Prop | Type | Notes |
@@ -118,6 +126,8 @@ through a depth context.
 
 ---
 
+<!-- ds:tab usage -->
+
 ## Related
 
 [Button](button.md) · [Select](select.md) ·
@@ -125,6 +135,8 @@ through a depth context.
 [Wizard](../patterns/wizard.md) ·
 [D4 · Dialogs](../design-system.md#d4--dialogs) ·
 [B5.4 · Dialogs and shell](../design-system.md#b54-dialogs-and-shell)
+
+<!-- ds:tab changelog -->
 
 ## Recent changes
 

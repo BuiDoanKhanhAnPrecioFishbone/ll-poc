@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Split map — `design-system.md` → các trang của site</title>
+<style>
+:root{
+  --ink:#131820; --ink-2:#363e4b; --ink-3:#4d5766; --ink-4:#626d7e;
+  --line:#dde2e9; --line-soft:#eceff3; --paper:#ffffff; --app:#f5f7fa;
+  --brand:#1a419e; --brand-soft:#f1f4fa; --code:#15347e;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--app);color:var(--ink-2);
+  font:15px/1.65 "Inter","Segoe UI",system-ui,-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:40px 28px 80px;background:var(--paper);
+  box-shadow:0 1px 2px rgba(19,24,32,.06)}
+h1,h2,h3,h4{color:var(--ink);line-height:1.25;text-wrap:balance}
+h1{font-size:34px;font-weight:700;margin:0 0 8px;letter-spacing:-.01em}
+h2{font-size:25px;font-weight:650;margin:52px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line)}
+h3{font-size:19px;font-weight:600;margin:32px 0 10px}
+h4{font-size:16px;font-weight:600;margin:24px 0 8px;color:var(--ink-2)}
+p{margin:0 0 14px;max-width:86ch}
+ul,ol{margin:0 0 14px;padding-left:22px;max-width:86ch}
+li{margin:5px 0}
+a{color:var(--brand);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:.18em}
+hr{border:0;border-top:1px solid var(--line-soft);margin:34px 0}
+code{font:500 13px/1.5 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  background:var(--brand-soft);color:var(--code);padding:1px 5px;border-radius:3px}
+blockquote{margin:0 0 16px;padding:12px 16px;background:var(--brand-soft);
+  border-left:3px solid var(--brand);border-radius:0 4px 4px 0;color:var(--ink-2);max-width:86ch}
+blockquote p{margin:0}
+.t{overflow-x:auto;margin:0 0 18px}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th{text-align:left;font-weight:600;color:var(--ink);background:var(--app);
+  border-bottom:1px solid var(--line);padding:8px 10px;white-space:nowrap}
+td{border-bottom:1px solid var(--line-soft);padding:8px 10px;vertical-align:top}
+td code{white-space:nowrap}
+tr:last-child td{border-bottom:0}
+figure{margin:18px 0 24px}
+img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:6px}
+.toc{background:var(--app);border:1px solid var(--line);border-radius:8px;
+  padding:18px 22px;margin:26px 0 34px}
+.toc h2{margin:0 0 10px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink-4);border:0;padding:0}
+.toc ol{list-style:none;margin:0;padding:0;columns:2;column-gap:36px}
+.toc li{margin:3px 0;break-inside:avoid}
+.toc li.l1{font-weight:600;color:var(--ink);margin-top:10px}
+.toc li.l1:first-child{margin-top:0}
+.toc li.l2{padding-left:14px}
+@media (max-width:760px){.wrap{padding:24px 16px 60px}.toc ol{columns:1}h1{font-size:27px}}
+@media print{
+  body{background:#fff}
+  .wrap{max-width:none;padding:0;box-shadow:none}
+  h2{page-break-after:avoid}
+  figure,table,blockquote{page-break-inside:avoid}
+  .toc{break-after:page}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="toc"><h2>Mục lục</h2><ol>
+<li class="l2"><a href="#cách-đọc-cột-lines">Cách đọc cột `lines`</a></li>
+<li class="l2"><a href="#trang-đích-nhận-chữ-từ-nhiều-nguồn">Trang đích nhận chữ từ nhiều nguồn</a></li>
+<li class="l2"><a href="#merge-check--ghi-kết-quả-vào-đây">Merge-check — ghi kết quả vào đây</a></li>
+<li class="l2"><a href="#hợp-đồng-một-trang--chốt-14112026">Hợp đồng một trang — chốt 14/11/2026</a></li>
+<li class="l2"><a href="#phán-đoán-đã-dùng-trong-phase-1--ghi-lại-để-kiểm-được">Phán đoán đã dùng trong Phase 1 — ghi lại để kiểm được</a></li>
+<li class="l2"><a href="#luật-cho-agent-phase-1">Luật cho agent Phase 1</a></li>
+<li class="l2"><a href="#cách-tự-chứng-minh-không-mất-chữ">Cách tự chứng minh không mất chữ</a></li>
+<li class="l2"><a href="#trang-mẫu-vàng">Trang mẫu vàng</a></li>
+<li class="l2"><a href="#báo-về">Báo về</a></li>
+</ol></nav>
+<h1 id="split-map--design-systemmd--các-trang-của-site">Split map — <code>design-system.md</code> → các trang của site</h1>
+<p><strong>Phase 0 · 14/11/2026.</strong> Bảng này tồn tại để <strong>không agent nào phải đọc hết 1.625 dòng</strong> của <code>docs/design-system.md</code>. Mỗi dòng cho một khoảng dòng và một trang đích; agent chỉ <code>sed -n 'X,Yp' docs/design-system.md</code> phần của mình.</p>
+<p><code>npm run ia:check</code> kiểm bảng này: <strong>mọi dòng không trống</strong> trong tài liệu cũ phải được đúng một dòng ở đây nhận. Mất chữ im lặng là không thể xảy ra.</p>
+<h2 id="cách-đọc-cột-lines">Cách đọc cột <code>lines</code></h2>
+<div class="t"><table><thead><tr><th>Dạng</th><th>Nghĩa</th></tr></thead><tbody><tr><td><code>148-186</code></td><td>khoảng liền, thuộc độc quyền trang đích</td></tr><tr><td><code>384-424,426</code></td><td>nhiều khoảng rời — bảng gốc bị <strong>xen kẽ</strong>, phải tách theo đúng dòng</td></tr><tr><td><code>(663-673)</code></td><td><strong>ngữ cảnh dùng chung</strong>: đọc, nhưng không thuộc riêng trang nào. Phải <em>viết lại</em> mở đầu cho từng trang, không copy hai lần</td></tr><tr><td><code>—</code> ở cột đích</td><td><strong>cố ý không chuyển</strong>. Lý do ở cột ghi chú</td></tr></tbody></table></div>
+<p>Ba chỗ phải <strong>tách bảng</strong> (<code>TABLE SPLIT</code>) — đây là chỗ duy nhất trong Phase 1 cần phán đoán, phần còn lại là chuyển nguyên văn.</p>
+<div class="t"><table><thead><tr><th>id</th><th>→ trang đích</th><th>lines</th><th>ghi chú</th></tr></thead><tbody><tr><td>X0</td><td>—</td><td>1-38</td><td>Tiêu đề và lời mở của tài liệu cũ. Không chuyển: site có trang chủ và trang <code>about</code> riêng</td></tr><tr><td>X1</td><td>—</td><td>39-81</td><td>Mục lục viết tay. Không chuyển: nav sinh từ <code>ia.config.mjs</code></td></tr><tr><td>PA</td><td>—</td><td>82-83</td><td>Header <code>Part A</code>. Cấu trúc, không phải nội dung</td></tr><tr><td>A1</td><td>get-started/about</td><td>84-109</td><td><em>What this is</em> — mở đầu trang About</td></tr><tr><td>A2</td><td>foundations/tokens</td><td>110-126</td><td><em>The three layers</em> — thành Tokens overview</td></tr><tr><td>A3</td><td>get-started/develop</td><td>127-143</td><td><em>Five rules before you build</em> — mở đầu trang For developers</td></tr><tr><td>PB</td><td>—</td><td>144-145</td><td>Header <code>Part B</code></td></tr><tr><td>B1.0</td><td>foundations/color</td><td>146-147</td><td>Câu mở của mục Colour</td></tr><tr><td>B1.1</td><td>foundations/color/color-palette</td><td>148-186</td><td>Các ramp — tầng 1, không dùng trực tiếp trong component</td></tr><tr><td>B1.2</td><td>foundations/color</td><td>187-208</td><td>→ H2 <em>Surfaces</em></td></tr><tr><td>B1.3</td><td>foundations/color</td><td>209-248</td><td>→ H2 <em>Text color</em> (sáu bậc)</td></tr><tr><td>B1.4</td><td>foundations/border</td><td>249-330</td><td><em>Lines</em> thành trọn trang Border. 82 dòng</td></tr><tr><td>B1.5</td><td>foundations/color</td><td>331-383</td><td>→ H2 <em>Brand and danger</em></td></tr><tr><td>B1.6a</td><td>foundations/color/status-vocabulary</td><td>384-424,426</td><td><strong>TABLE SPLIT.</strong> Giữ các dòng <code>--vy-status-*</code>. Dòng <strong>426</strong> (<code>--vy-status-slot-w</code>) ở lại đây — nó là bề rộng ô status, không phải chart</td></tr><tr><td>B1.6b</td><td>foundations/color/data-visualization-color</td><td>425,428-440</td><td><strong>TABLE SPLIT.</strong> Dòng <strong>425</strong> (<code>--vy-chart-cancelled</code>) là giá trị chart-only duy nhất. 428-440 là ghi chú đã đo về năm fill chart</td></tr><tr><td>B1.7</td><td>foundations/color/accents</td><td>443-500</td><td>Row tones và accent</td></tr><tr><td>B1.8</td><td>foundations/color</td><td>501-526</td><td>→ H2 <em>How dark mode is wired</em> — <strong>giữ nguyên chữ của mình</strong>, chỉ bỏ mã <code>B1.8</code>. Atlassian gọi mục này là <em>Designing in dark mode</em>, nhưng mình copy <strong>cấu trúc</strong> của họ, không copy câu chữ</td></tr><tr><td>B2</td><td>foundations/typography</td><td>527-620</td><td>Gồm <em>Casing</em> (từ 606)</td></tr><tr><td>B3</td><td>foundations/spacing</td><td>621-662</td><td>Thang, và khe nào giữa hai control</td></tr><tr><td>B4a</td><td>foundations/radius</td><td>(663-673),674-677,682-683</td><td><strong>TABLE SPLIT.</strong> Bốn radius. 663-673 là mở đầu dùng chung với elevation — <strong>viết lại</strong>, đừng copy</td></tr><tr><td>B4b</td><td>foundations/elevation</td><td>(663-673),678-681</td><td><strong>TABLE SPLIT.</strong> Ba shadow + scrim</td></tr><tr><td>B4c</td><td>foundations/elevation</td><td>684-705</td><td><em>Z-index</em> — một danh sách phẳng</td></tr><tr><td>B5</td><td>foundations/sizing</td><td>706-783</td><td>Foundation thứ 15, lệch có ghi — xem DEV-02</td></tr><tr><td>B6</td><td>foundations/motion</td><td>784-823</td><td>Gồm loading clock và reduced motion</td></tr><tr><td>B7</td><td>foundations/grid</td><td>824-874</td><td>Breakpoint thành H2 đầu của trang Grid, đúng cách Atlassian xếp</td></tr><tr><td>B8</td><td>foundations/grid</td><td>875-1044</td><td>Thân trang Grid. 170 dòng</td></tr><tr><td>PC</td><td>—</td><td>1045-1046</td><td>Header <code>Part C</code></td></tr><tr><td>C1</td><td>foundations/iconography</td><td>1047-1074</td><td></td></tr><tr><td>C2</td><td>foundations/illustrations</td><td>1075-1180</td><td>Bảy asset, kèm cách sinh lại</td></tr><tr><td>D0</td><td>components</td><td>1181-1188</td><td>Câu mở <code>Part D</code></td></tr><tr><td>D0a</td><td>components</td><td>1189-1240</td><td>Bảng chỉ mục component. <strong>Sinh lại từ <code>ia.config.mjs</code></strong>, không copy — bảng cũ sẽ lệch ngay</td></tr><tr><td>D0b</td><td>patterns</td><td>1241-1259</td><td>Bảng chỉ mục pattern. Sinh lại, như trên</td></tr><tr><td>D1</td><td>merge-check → components/button.md</td><td>1260-1291</td><td>Đọc một lần, xác nhận không có gì riêng, ghi xác nhận vào §Merge-check, rồi bỏ</td></tr><tr><td>D2</td><td>merge-check → components/field.md</td><td>1292-1341</td><td>như trên</td></tr><tr><td>D3</td><td>merge-check → components/data-grid.md</td><td>1342-1364</td><td>như trên</td></tr><tr><td>D4</td><td>merge-check → components/dialog.md</td><td>1365-1377</td><td>như trên</td></tr><tr><td>D5</td><td>patterns/screen-states</td><td>1378-1401</td><td><em>The four screen states</em> thành một pattern riêng</td></tr><tr><td>D6</td><td>foundations/content</td><td>1402-1415</td><td><em>Words</em> — một bảng, thành hạt nhân của foundation Content</td></tr><tr><td>PE</td><td>—</td><td>1416-1417</td><td>Header <code>Part E</code></td></tr><tr><td>E1</td><td>foundations/accessibility</td><td>1418-1469</td><td></td></tr><tr><td>E2</td><td>tools</td><td>1470-1495</td><td>KendoReact thành mục đầu của trang Tools</td></tr><tr><td>PF</td><td>—</td><td>1496-1497</td><td>Header <code>Part F</code></td></tr><tr><td>F1</td><td>get-started/about</td><td>1498-1514</td><td>File map</td></tr><tr><td>F2</td><td>get-started/develop</td><td>1515-1536</td><td><em>How to change something</em></td></tr><tr><td>F3</td><td>release-phases</td><td>1537-1554</td><td>Governance — lớn lên thành trang Release phases</td></tr><tr><td>F4</td><td>get-started/about</td><td>1555-1606</td><td><em>What a handover should contain</em></td></tr><tr><td>F5</td><td>get-started/about</td><td>1607-1625</td><td>Source index, và dòng cuối về ảnh</td></tr></tbody></table></div>
+<h2 id="trang-đích-nhận-chữ-từ-nhiều-nguồn">Trang đích nhận chữ từ nhiều nguồn</h2>
+<p>Bốn trang được nối từ nhiều mảnh. Thứ tự nối là thứ tự trong bảng trên.</p>
+<div class="t"><table><thead><tr><th>Trang</th><th>Nhận từ</th><th>Việc thêm</th></tr></thead><tbody><tr><td><code>foundations/color</code></td><td>B1.0 · B1.2 · B1.3 · B1.5 · B1.8</td><td>Năm mảnh thành một trang. Heading cấp 3 → cấp 2</td></tr><tr><td><code>foundations/elevation</code></td><td>B4b · B4c</td><td>Mở đầu viết lại (dùng chung với radius)</td></tr><tr><td><code>foundations/grid</code></td><td>B7 · B8</td><td>Breakpoint lên trước, layout sau</td></tr><tr><td><code>get-started/about</code></td><td>A1 · F1 · F4 · F5</td><td>Trang dài nhất của tầng meta</td></tr><tr><td><code>get-started/develop</code></td><td>A3 · F2</td><td></td></tr></tbody></table></div>
+<h2 id="merge-check--ghi-kết-quả-vào-đây">Merge-check — ghi kết quả vào đây</h2>
+<p>Phase 1 đọc D1–D4 một lần rồi điền bảng này. <strong>Chưa điền thì chưa được bỏ.</strong></p>
+<div class="t"><table><thead><tr><th>id</th><th>Trang component tương ứng</th><th>Có gì riêng không?</th><th>Xử lý</th><th>Ngày</th></tr></thead><tbody><tr><td>D1</td><td><code>components/button.md</code></td><td><em>chưa soát</em></td><td></td><td></td></tr><tr><td>D2</td><td><code>components/field.md</code></td><td><em>chưa soát</em></td><td></td><td></td></tr><tr><td>D3</td><td><code>components/data-grid.md</code></td><td><em>chưa soát</em></td><td></td><td></td></tr><tr><td>D4</td><td><code>components/dialog.md</code></td><td><em>chưa soát</em></td><td></td><td></td></tr></tbody></table></div>
+<h2 id="hợp-đồng-một-trang--chốt-14112026">Hợp đồng một trang — chốt 14/11/2026</h2>
+<p>Đo từ <code>scripts/md-doc.mjs</code> chứ không phải quy ước em tự đặt:</p>
+<ol><li><strong>Mở đầu bằng <code># &lt;Title&gt;</code></strong>, đúng chữ <code>title</code> trong <code>ia.config.mjs</code>. <code>md-doc.mjs</code> lấy dòng <code># </code> đầu tiên làm tiêu đề trang.</li><li><strong>Không front-matter.</strong> <code>md-doc.mjs</code> đọc thẳng từng dòng, không hiểu YAML — front-matter sẽ <strong>hiện ra thành chữ</strong> trên trang. Metadata (phase, basis, group, origin) nằm ở <code>ia.config.mjs</code>, không lặp lại trong file md.</li><li><strong>Bỏ mã <code>B6</code>, <code>C2</code>, <code>B1.4</code>… khỏi tiêu đề.</strong> Đó là số thứ tự của một tài liệu đọc tuyến tính, không phải tên của thứ gì. Bản đồ chuyển đổi là chính bảng trên.</li><li><code>###</code> trong tài liệu cũ → <code>##</code> khi tiểu mục đó lên thành mục của trang.</li><li><strong>Đường ảnh thêm <code>../</code> theo độ sâu</strong>: trang ở <code>docs/foundations/</code> dùng <code>../assets/...</code>; trang ở <code>docs/foundations/color/</code> dùng <code>../../assets/...</code>.</li><li><strong>Bỏ dấu <code>---</code> phân cách</strong> ở cuối mỗi mục. Nó là vách giữa hai mục của một file dài; một trang không cần vách.</li><li><strong>Không tự viết mục lục.</strong> Generator dựng từ các <code>##</code>.</li><li>Link <code>.md</code> để nguyên dạng <code>.md</code> — <code>md-doc.mjs</code> tự đổi sang <code>.html</code> khi file đích có thật trên đĩa.</li><li><strong>Link <code>.md</code> tương đối cũng phải thêm <code>../</code> theo độ sâu</strong>, y như ảnh ở luật 5. Trang ở <code>foundations/</code> trỏ về <code>docs/</code> bằng <code>../ten-file.md</code>; trang ở <code>foundations/color/</code> bằng <code>../../ten-file.md</code>. Bỏ sót luật này thì link chết mà không ai thấy, vì <code>md-doc.mjs</code> im lặng để nguyên link khi file không có.</li></ol>
+<h2 id="phán-đoán-đã-dùng-trong-phase-1--ghi-lại-để-kiểm-được">Phán đoán đã dùng trong Phase 1 — ghi lại để kiểm được</h2>
+<p>Ba chỗ cả phase phải quyết thay vì chép. Không chỗ nào thêm một thông tin mới.</p>
+<div class="t"><table><thead><tr><th>Chỗ</th><th>Nguồn</th><th>Đã làm gì</th></tr></thead><tbody><tr><td>Câu mở <code>B4</code> dòng 665</td><td><em>"Four radii, three shadows. Elevation is for things that float…"</em></td><td>Cắt làm hai nửa của chính nó: <code>radius.md</code> lấy <strong>"Four radii."</strong>, <code>elevation.md</code> lấy <strong>"Three shadows."</strong> cộng phần còn lại nguyên văn. Đây là <strong>dòng duy nhất</strong> trong 1.625 dòng bị viết lại</td></tr><tr><td>Ảnh <code>elevation.png</code></td><td>specimen tiêu đề <em>Elevation</em>, năm bậc shadow</td><td>Chỉ nằm ở <code>elevation.md</code>. Agent 1B ban đầu đặt ở cả hai trang và <strong>tự báo là không chắc</strong>; mở ảnh ra xem thì nó vẽ shadow, không vẽ bo góc. <code>radius.md</code> do đó không có ảnh — và đúng là không có specimen radius nào trong <code>docs/assets/</code></td></tr><tr><td>Bảng <code>B4</code> dòng 674-681</td><td>một bảng, hai chủ đề</td><td>Tách: 4 dòng <code>--vy-radius-*</code> sang radius, 3 dòng <code>--vy-shadow-*</code> + <code>--vy-overlay-scrim</code> sang elevation. Header 672-673 chép nguyên văn vào cả hai</td></tr><tr><td>Bảng <code>B1.6</code> dòng 407-426</td><td>status và chart xen kẽ</td><td>Tách: dòng 425 (<code>--vy-chart-cancelled</code>) sang data-viz, dòng 426 (<code>--vy-status-slot-w</code>) ở lại status. Header 407-408 chép nguyên văn vào cả hai</td></tr><tr><td>Đường dẫn <code>.md</code> tương đối</td><td>7 link trong 3 trang</td><td>Hợp đồng chỉ nói độ sâu cho <strong>ảnh</strong>, quên nói cho <strong>link</strong> — thiếu sót của bản hợp đồng. Agent 1A báo đúng chỗ này thay vì tự sửa. Đã thêm <code>../</code> / <code>../../</code> cho cả 7, và bổ sung luật 9</td></tr><tr><td>Neo nội bộ <code>#b7--responsive</code></td><td>15 link trong 6 trang</td><td><strong>Hệ quả không ai lường của luật 3.</strong> Bỏ mã khỏi heading làm chết mọi neo trỏ theo mã. Agent Phase 2 phát hiện khi dựng site. Đã trỏ lại cả 15 — và <strong>đổi cả chữ của link</strong>: <code>[B1.5]</code> trỏ tới một mã không còn tồn tại ở đâu nữa, nên nó thành <code>[Brand and danger]</code>, tức là dùng chính chữ của heading đích. Đây là lần duy nhất chữ trong câu bị đổi, và danh sách đủ 15 chỗ nằm trong git</td></tr><tr><td><code>color</code> ở đâu</td><td>manifest ghi <code>color/index.md</code></td><td>Brief của Phase 1 lại ghi <code>color.md</code> — <strong>mâu thuẫn do người viết brief</strong>. Theo manifest: file đã chuyển sang <code>docs/foundations/color/index.md</code>, ảnh đổi sang <code>../../</code></td></tr></tbody></table></div>
+<h2 id="luật-cho-agent-phase-1">Luật cho agent Phase 1</h2>
+<ol><li><strong>Chỉ đọc khoảng dòng của mình.</strong> <code>sed -n '249,330p' docs/design-system.md</code>. Không <code>cat</code> cả file. Không đọc khoảng dòng của agent khác.</li><li><strong>Không sửa một chữ nào</strong> trong nội dung. Được sửa đúng năm thứ: cấp heading (luật 4) · đường ảnh (luật 5) · dấu phân cách (luật 6) · tiêu đề trang (luật 1, 3) · và mở đầu của những trang dùng chung ngữ cảnh <code>(…)</code>.</li><li><strong>Số đo và ngày là bất khả xâm phạm.</strong> Mọi giá trị trong tài liệu này đều kèm nguồn đo (luật A3.4). Làm tròn, bỏ ngày, hay "viết cho gọn" là làm hỏng thứ giá trị nhất của bộ tài liệu.</li><li><strong>KHÔNG sửa <code>docs/design-system.md</code>.</strong> Nó vẫn là bản đang chạy cho tới khi <code>ds-handover.mjs</code> sinh lại được nó (Phase 2). Agent khác đang đọc nó cùng lúc.</li><li><strong>Chỉ ghi vào file của mình.</strong> Không chạm <code>ia.config.mjs</code>, <code>docs/_plan/*</code>, <code>scripts/*</code>, <code>README.md</code> — mỗi file có một chủ, và chủ của những file đó không phải agent Phase 1.</li></ol>
+<h2 id="cách-tự-chứng-minh-không-mất-chữ">Cách tự chứng minh không mất chữ</h2>
+<p>Chạy cho <strong>từng trang</strong> trước khi báo xong. Khác biệt duy nhất được phép là dấu <code>---</code> phân cách (luật 6):</p>
+<p>``<code>bash A=249; B=330; PAGE=docs/foundations/border.md; DEPTH=.. sed -n "${A},${B}p" docs/design-system.md \   | sed "s|](assets/|](${DEPTH}/assets/|g" \   | sed 's/^### /## /' &gt; /tmp/src.md sed -n '2,$p' "$PAGE" &gt; /tmp/page.md diff /tmp/src.md /tmp/page.md     # chỉ được còn dòng --- và dòng trống của nó </code>``</p>
+<p>Rồi:</p>
+<p>``<code>bash node scripts/md-doc.mjs &lt;trang mới&gt; /tmp/x.html   # phải chạy không lỗi npm run ia:check                                   # phải OK </code>``</p>
+<p>Nếu <code>md-doc.mjs</code> báo lỗi: <strong>báo lại, đừng sửa nó.</strong> File đó đang có chủ khác (agent Phase 2) làm việc trên nó cùng lúc.</p>
+<h2 id="trang-mẫu-vàng">Trang mẫu vàng</h2>
+<p><code>docs/foundations/motion.md</code> — đã làm xong 14/11, từ B6 (784-823). Mở ra xem trước khi bắt đầu: nó thể hiện cả tám luật của hợp đồng, và <code>diff</code> của nó chỉ còn đúng hai dòng <code>---</code> và dòng trống.</p>
+<h2 id="báo-về">Báo về</h2>
+<p>Đường dẫn các file đã tạo + 5 dòng tóm tắt + kết quả <code>diff</code> của từng trang. <strong>Không paste nội dung trang.</strong></p>
+</div>
+</body>
+</html>

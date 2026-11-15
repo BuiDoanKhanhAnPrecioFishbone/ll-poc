@@ -5,6 +5,8 @@
 
 ---
 
+<!-- ds:tab usage -->
+
 ## When to use
 
 On **every grid with three or more columns** ([D3](../design-system.md#d3--grids)),
@@ -37,6 +39,8 @@ them the wording:
 A checklist has none of those, and it shows what is available.
 
 ---
+
+<!-- ds:tab examples -->
 
 ## Anatomy
 
@@ -71,6 +75,8 @@ wonders where it went.
 | **Required row** | Ticked, disabled, *always shown* beside it |
 | **Disabled checkbox** | Dimmed by `--vy-state-disabled`, **not** greyed by a fill — a grey wash took the white tick with it, on exactly the control whose job is to say "this column is always shown" |
 
+<!-- ds:tab usage -->
+
 ## Content
 
 - *Reset*, not *Restore defaults* — it is one word for one action, inside a
@@ -98,6 +104,8 @@ wonders where it went.
 | Indeterminate | The select-all header box is white with a blue dash; the dash carries the state at 5.9:1, and the bridge gives the box the same visible edge as an empty one |
 | Popover | Focus moves into it; `Esc` returns focus to the trigger |
 
+<!-- ds:tab code -->
+
 ## API
 
 | Prop | Type | Notes |
@@ -109,12 +117,16 @@ wonders where it went.
 
 ---
 
+<!-- ds:tab usage -->
+
 ## Related
 
 [Button](button.md) · [Filter toolbar](filter-toolbar.md) ·
 [View picker](view-picker.md) ·
 [D3 · Grids](../design-system.md#d3--grids) ·
 [E2 · KendoReact](../design-system.md#e2--kendoreact)
+
+<!-- ds:tab changelog -->
 
 ## Recent changes
 

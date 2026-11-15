@@ -8,6 +8,8 @@
 
 ---
 
+<!-- ds:tab usage -->
+
 ## When to use
 
 As the way out of an error **that is not *try again***.
@@ -69,6 +71,8 @@ The flow is kept whole so it can be demonstrated end to end, and the copy is
 the customer's own. Written down in three places — this page, the file's
 header, and the gap register — so nobody demonstrates it as working.
 
+<!-- ds:tab examples -->
+
 ## Anatomy
 
 | Part | Rule |
@@ -78,6 +82,8 @@ header, and the gap register — so nobody demonstrates it as working.
 | **Added for you** | The four facts above, in a `<dl>` |
 | **Send Ticket** | Disabled without a subject, **with the reason in `title`** |
 
+<!-- ds:tab usage -->
+
 ## Accessibility
 
 | | |
@@ -86,6 +92,8 @@ header, and the gap register — so nobody demonstrates it as working.
 | Required | The asterisk is `aria-hidden` and `required` carries the meaning, so it is not announced as *"star"* |
 | Disabled send | The reason is on the control, not only implied by the greying |
 | Confirmation | Announced; the ticket number is text, and the error id stays visible behind the dialog |
+
+<!-- ds:tab code -->
 
 ## API
 
@@ -100,10 +108,14 @@ Also exported: `browserName(ua?)` and `newErrorId()`.
 
 ---
 
+<!-- ds:tab usage -->
+
 ## Related
 
 [Error state](error-state.md) · [Dialog](dialog.md) ·
 [Field](field.md) · [Feedback](../patterns/feedback.md)
+
+<!-- ds:tab changelog -->
 
 ## Recent changes
 

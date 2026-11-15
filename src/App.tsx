@@ -12,6 +12,10 @@ import { QuotationDetail } from './pages/QuotationDetail';
 import { SitemapPage } from './pages/Sitemap';
 import { DesignSystemPage } from './pages/DesignSystem';
 import { BootScreen } from './ui/Loader';
+
+/* Lazy: the specimen exists for the design system site, and the product should
+   not carry its examples in the main chunk. */
+const Specimen = lazy(() => import('./pages/Specimen'));
 import { BootGate } from './ui/BootGate';
 import { AuditPage } from './pages/Audit';
 import { Placeholder } from './pages/Placeholder';
@@ -43,6 +47,12 @@ export default function App() {
             navigation — rendering it inside the shell would put a menu on the
             screen you reach before you have signed in. */}
         <Route path="/login" element={<Login />} />
+
+        {/* THE LIVE EXAMPLES THE DESIGN SYSTEM SITE FRAMES. Outside the boot
+            gate and the shell for the same reason `/login` is: there is no
+            workspace to load, and a navigation rail around a single button
+            would be the frame arguing with the example inside it. */}
+        <Route path="/specimen/:name" element={<Specimen />} />
 
         {/* THE BOOT GATE WRAPS THE AUTHENTICATED ROUTES ONLY. Booting before
             a password would be loading a workspace for nobody, and `/login`

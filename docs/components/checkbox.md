@@ -6,6 +6,12 @@
 
 ---
 
+<!-- ds:tab examples -->
+
+<!-- ds:specimen checkbox -->
+
+<!-- ds:tab usage -->
+
 ## When to use
 
 A single yes/no, or one of several independent yes/nos: *Conformal Coating*,
@@ -84,6 +90,8 @@ to show *"this column is always shown"*.
 | Disabled | Dimmed and announced; where it matters, the reason sits beside it |
 | Target | 20px box; where the label's target is off, the box carries it |
 
+<!-- ds:tab code -->
+
 ## API
 
 ```tsx
@@ -101,12 +109,16 @@ For a grid row or the column chooser, the raw input is used directly with
 
 ---
 
+<!-- ds:tab usage -->
+
 ## Related
 
 [Radio group](radio-group.md) · [Column chooser](column-chooser.md) ·
 [Data grid](data-grid.md) ·
 [E2 · KendoReact](../design-system.md#e2--kendoreact) ·
 [B1.4 · Lines](../design-system.md#b14-lines)
+
+<!-- ds:tab changelog -->
 
 ## Recent changes
 

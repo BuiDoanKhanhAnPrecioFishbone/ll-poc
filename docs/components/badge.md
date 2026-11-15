@@ -5,6 +5,12 @@
 
 ---
 
+<!-- ds:tab examples -->
+
+<!-- ds:specimen badge -->
+
+<!-- ds:tab usage -->
+
 ## When to use
 
 To show **what state a record is in** — on a record header, in a status
@@ -21,6 +27,8 @@ column, in an activity row. One word and one colour, together.
 
 ---
 
+<!-- ds:tab examples -->
+
 ## Anatomy
 
 A single `<span>`. The **word is the content** — there is no icon, no dot, and
@@ -33,6 +41,8 @@ not a status ([E1](../design-system.md#e1--accessibility)).
 | **Label** | `--vy-text-xs` at `--vy-weight-semibold`, never wraps |
 
 ---
+
+<!-- ds:tab usage -->
 
 ## The vocabulary
 
@@ -112,6 +122,8 @@ changes it is a separate thing beside it.
 | Role | None. A `<span>` of text is what a status is |
 | Contrast | Measured per pair, above |
 
+<!-- ds:tab code -->
+
 ## API
 
 ```tsx
@@ -126,6 +138,8 @@ The `status` column role renders this automatically — `renderCell.tsx` maps
 `data-role="status"` to it, so a grid never writes the badge by hand.
 
 ---
+
+<!-- ds:tab usage -->
 
 ## One thing worth fixing
 
@@ -142,6 +156,8 @@ differently.
 [B5.3 · Column roles](../design-system.md#b53-column-roles--a-width-is-chosen-once-by-role) ·
 [E1 · Accessibility](../design-system.md#e1--accessibility) ·
 [Chip](chip.md)
+
+<!-- ds:tab changelog -->
 
 ## Recent changes
 

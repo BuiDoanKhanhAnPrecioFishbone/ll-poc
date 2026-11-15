@@ -7,6 +7,12 @@
 
 ---
 
+<!-- ds:tab examples -->
+
+<!-- ds:specimen record-skeleton -->
+
+<!-- ds:tab usage -->
+
 ## When to use
 
 While one record's values are loading, on a screen whose **fields are already
@@ -67,6 +73,8 @@ This was found by measuring, not by looking:
 | First | The top rows were skipped entirely, so the field groups sat **92px too high** — when the record arrived the whole form jumped down, breaking the one promise a skeleton makes, in the same file whose comment claims it keeps it |
 | Second | Still **24px** out. 18 of those were margins living on `vy-back` and `vy-record-title`, so those two classes are worn as well |
 
+<!-- ds:tab examples -->
+
 ## Anatomy
 
 | Part | Treatment |
@@ -75,6 +83,8 @@ This was found by measuring, not by looking:
 | Group heading | **Real text**, with the icon slot left empty — the glyph is one more thing we have, and the title carries the meaning without it |
 | Field label | **Real text** |
 | Field value | A bar sized by the field's kind |
+
+<!-- ds:tab usage -->
 
 ## Accessibility
 
@@ -85,6 +95,8 @@ This was found by measuring, not by looking:
 | Labels | Read normally, because they are real — a screen reader user learns the shape of the form while it loads, which is what a sighted user gets too |
 | The bars | `aria-hidden`, including the whole top block |
 
+<!-- ds:tab code -->
+
 ## API
 
 | Prop | Type | Notes |
@@ -93,11 +105,15 @@ This was found by measuring, not by looking:
 
 ---
 
+<!-- ds:tab usage -->
+
 ## Related
 
 [Record form](../patterns/record-form.md) ·
 [Grid skeleton](grid-skeleton.md) · [Field row](field-row.md) ·
 [D5 · The four screen states](../design-system.md#d5--the-four-screen-states)
+
+<!-- ds:tab changelog -->
 
 ## Recent changes
 

@@ -5,6 +5,12 @@
 
 ---
 
+<!-- ds:tab examples -->
+
+<!-- ds:specimen priority -->
+
+<!-- ds:tab usage -->
+
 ## When to use
 
 Wherever a record's priority is shown — a grid column, a record header, a
@@ -19,6 +25,8 @@ queue card.
 | A severity that came from the system, not a person | A row tone or `danger` | Priority is somebody's judgement about a record |
 
 ---
+
+<!-- ds:tab examples -->
 
 ## Anatomy
 
@@ -38,6 +46,8 @@ cell look the same, and *no priority set* is a different fact from *low
 priority*. The ring says there is a value here.
 
 ---
+
+<!-- ds:tab usage -->
 
 ## It was three stars, and the change is the point
 
@@ -80,6 +90,8 @@ None. It is not focusable and not operable.
 | Colour | Never alone — the word is always present |
 | Greyscale | The three levels differ by fill **and** by shape, not only by tone |
 
+<!-- ds:tab code -->
+
 ## API
 
 ```tsx
@@ -94,11 +106,15 @@ None. It is not focusable and not operable.
 
 ---
 
+<!-- ds:tab usage -->
+
 ## Related
 
 [Status badge](badge.md) ·
 [B5.3 · Column roles](../design-system.md#b53-column-roles--a-width-is-chosen-once-by-role) ·
 [E1 · Accessibility](../design-system.md#e1--accessibility)
+
+<!-- ds:tab changelog -->
 
 ## Recent changes
 

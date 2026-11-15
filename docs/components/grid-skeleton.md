@@ -6,6 +6,12 @@
 
 ---
 
+<!-- ds:tab examples -->
+
+<!-- ds:specimen grid-skeleton -->
+
+<!-- ds:tab usage -->
+
 ## When to use
 
 **A first load, where nothing is on screen yet.** The route has resolved, the
@@ -69,6 +75,8 @@ role="status" aria-live="polite" aria-busy="true"
 | `aria-busy` | Stays on the container until the real rows replace it |
 | Reduced motion | The shimmer stops; the layout stays. See [B6](../design-system.md#b6--motion) |
 
+<!-- ds:tab code -->
+
 ## API
 
 | Prop | Type | Default | Notes |
@@ -78,11 +86,15 @@ role="status" aria-live="polite" aria-busy="true"
 
 ---
 
+<!-- ds:tab usage -->
+
 ## Related
 
 [Record skeleton](record-skeleton.md) · [Data grid](data-grid.md) ·
 [Loader](loader.md) ·
 [D5 · The four screen states](../design-system.md#d5--the-four-screen-states)
+
+<!-- ds:tab changelog -->
 
 ## Recent changes
 

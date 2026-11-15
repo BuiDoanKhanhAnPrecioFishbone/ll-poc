@@ -10,6 +10,12 @@ it, and what it does that you did not have to build.
 
 ---
 
+<!-- ds:tab examples -->
+
+<!-- ds:specimen toast -->
+
+<!-- ds:tab usage -->
+
 ## When to use
 
 To confirm something **that is already done** and that the user does not have
@@ -67,6 +73,8 @@ Radix Toast was taken for the parts that are **easy to get wrong**:
 
 ---
 
+<!-- ds:tab examples -->
+
 ## Anatomy
 
 | Part | Rule |
@@ -75,6 +83,8 @@ Radix Toast was taken for the parts that are **easy to get wrong**:
 | **Undo** | Only on `undoable` |
 | **Close** | Always. `aria-label="Dismiss"` |
 | **Viewport** | Bottom, stacked; swipe direction is down |
+
+<!-- ds:tab usage -->
 
 ## Content
 
@@ -94,6 +104,8 @@ Radix Toast was taken for the parts that are **easy to get wrong**:
 | Close | A real button with a label; the glyph is `aria-hidden` |
 | Swipe | Never the only way to dismiss |
 
+<!-- ds:tab code -->
+
 ## API
 
 ```tsx
@@ -106,11 +118,15 @@ the component count is one.
 
 ---
 
+<!-- ds:tab usage -->
+
 ## Related
 
 [Feedback](../patterns/feedback.md) · [Button](button.md) ·
 [D6 · Words](../design-system.md#d6--words) ·
 [A3 · Five rules before you build](../design-system.md#a3--five-rules-before-you-build)
+
+<!-- ds:tab changelog -->
 
 ## Recent changes
 

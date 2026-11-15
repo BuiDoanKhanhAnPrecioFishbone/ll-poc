@@ -8,6 +8,12 @@ type.
 
 ---
 
+<!-- ds:tab examples -->
+
+<!-- ds:specimen select -->
+
+<!-- ds:tab usage -->
+
 ## When to use
 
 To choose **one value from a list the system owns** — a customer, a project
@@ -109,6 +115,8 @@ short list with a way out is a different thing from a truncated list.
 | Boundary | `--vy-border-control`, mapped in the bridge — Kendo's own default measured 1.30:1 |
 | Keyboard | Type to narrow, arrows to move, Enter to choose, Esc to close the list **before** closing anything around it |
 
+<!-- ds:tab code -->
+
 ## API
 
 | Prop | Type | Notes |
@@ -121,12 +129,16 @@ short list with a way out is a different thing from a truncated list.
 
 ---
 
+<!-- ds:tab usage -->
+
 ## Related
 
 [Field](field.md) · [View picker](view-picker.md) ·
 [Filter toolbar](filter-toolbar.md) ·
 [D2 · Fields](../design-system.md#d2--fields) ·
 [E2 · KendoReact](../design-system.md#e2--kendoreact)
+
+<!-- ds:tab changelog -->
 
 ## Recent changes
 

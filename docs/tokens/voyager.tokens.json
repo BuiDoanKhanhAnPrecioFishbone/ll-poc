@@ -1,0 +1,1340 @@
+{
+  "blue": {
+    "50": {
+      "$value": "#f1f4fa",
+      "$type": "color"
+    },
+    "100": {
+      "$value": "#dae2f3",
+      "$type": "color"
+    },
+    "200": {
+      "$value": "#b0c2ea",
+      "$type": "color"
+    },
+    "300": {
+      "$value": "#7f9ce1",
+      "$type": "color"
+    },
+    "400": {
+      "$value": "#4973d4",
+      "$type": "color"
+    },
+    "500": {
+      "$value": "#2754bc",
+      "$type": "color"
+    },
+    "600": {
+      "$value": "#1a419e",
+      "$type": "color",
+      "$description": "PRIMARY"
+    },
+    "700": {
+      "$value": "#15347e",
+      "$type": "color"
+    },
+    "800": {
+      "$value": "#112960",
+      "$type": "color"
+    },
+    "900": {
+      "$value": "#0d1e44",
+      "$type": "color"
+    }
+  },
+  "red": {
+    "50": {
+      "$value": "#fdeceb",
+      "$type": "color",
+      "$description": "Accent — the red from the logo. Used ONLY for destructive actions and critical alerts. Never for decoration; it must stay rare to stay loud."
+    },
+    "500": {
+      "$value": "#e23a32",
+      "$type": "color"
+    },
+    "600": {
+      "$value": "#c62d26",
+      "$type": "color"
+    },
+    "700": {
+      "$value": "#9e231d",
+      "$type": "color"
+    }
+  },
+  "grey": {
+    "0": {
+      "$value": "#ffffff",
+      "$type": "color",
+      "$description": "Neutrals A true ramp. The legacy app used #333/#666/#ccc ad hoc, giving no reliable contrast tiers and failing AA on secondary text over tinted rows."
+    },
+    "25": {
+      "$value": "#fbfcfd",
+      "$type": "color"
+    },
+    "50": {
+      "$value": "#f5f7fa",
+      "$type": "color"
+    },
+    "100": {
+      "$value": "#eceff3",
+      "$type": "color"
+    },
+    "200": {
+      "$value": "#dde2e9",
+      "$type": "color"
+    },
+    "300": {
+      "$value": "#c3cbd6",
+      "$type": "color"
+    },
+    "400": {
+      "$value": "#97a2b2",
+      "$type": "color"
+    },
+    "500": {
+      "$value": "#626d7e",
+      "$type": "color"
+    },
+    "600": {
+      "$value": "#4d5766",
+      "$type": "color"
+    },
+    "700": {
+      "$value": "#363e4b",
+      "$type": "color"
+    },
+    "800": {
+      "$value": "#232a34",
+      "$type": "color"
+    },
+    "900": {
+      "$value": "#131820",
+      "$type": "color"
+    }
+  },
+  "border": {
+    "control": {
+      "$value": "#758096",
+      "$type": "color",
+      "$description": "worst ground 3.05 on surface-strong — see the light note",
+      "$extensions": {
+        "com.voyager.dark": "#707c8d"
+      }
+    },
+    "faint": {
+      "$value": "{grey.100}",
+      "$description": "Lines. `border` is STRUCTURE — panel edges, table rules, card outlines — which WCAG 1.4.11 does not cover. `border-control` is the boundary of something you can operate, which it does; it is defined below, on its own, because finding a value for it needed an argument.",
+      "$extensions": {
+        "com.voyager.dark": "#212936"
+      }
+    },
+    "base": {
+      "$value": "{grey.200}",
+      "$extensions": {
+        "com.voyager.dark": "#2a323f"
+      }
+    },
+    "strong": {
+      "$value": "{grey.300}",
+      "$extensions": {
+        "com.voyager.dark": "#3b4553"
+      }
+    },
+    "mid": {
+      "$value": "{grey.400}",
+      "$extensions": {
+        "com.voyager.dark": "#55606f"
+      }
+    },
+    "heavy": {
+      "$value": "{grey.500}",
+      "$extensions": {
+        "com.voyager.dark": "#55606f"
+      }
+    },
+    "control-hover": {
+      "$value": "{grey.500}",
+      "$description": "worst ground 3.95 on surface-strong — see the dark note",
+      "$extensions": {
+        "com.voyager.dark": "#858f9e"
+      }
+    },
+    "emphasis": {
+      "$value": "2px",
+      "$type": "dimension",
+      "$description": "active tab underline, checked radio, focus ring"
+    }
+  },
+  "surface": {
+    "app": {
+      "$value": "{grey.50}",
+      "$description": "Surfaces, lightest job to deepest. `sunken` is for insets that sit BELOW the page — a grid header, a well — not for anything a user acts on.",
+      "$extensions": {
+        "com.voyager.dark": "#0f131a"
+      }
+    },
+    "base": {
+      "$value": "{grey.0}",
+      "$extensions": {
+        "com.voyager.dark": "#161c25"
+      }
+    },
+    "raised": {
+      "$value": "{grey.0}",
+      "$description": "dialogs, menus — depth via shadow in light",
+      "$extensions": {
+        "com.voyager.dark": "#1e2531"
+      }
+    },
+    "subtle": {
+      "$value": "{grey.25}",
+      "$description": "a card that is barely off the page",
+      "$extensions": {
+        "com.voyager.dark": "#131922"
+      }
+    },
+    "sunken": {
+      "$value": "{grey.100}",
+      "$extensions": {
+        "com.voyager.dark": "#0b0e14"
+      }
+    },
+    "strong": {
+      "$value": "{grey.200}",
+      "$extensions": {
+        "com.voyager.dark": "#2a323f"
+      }
+    },
+    "hover": {
+      "$value": "{grey.50}",
+      "$extensions": {
+        "com.voyager.dark": "#1e2531"
+      }
+    },
+    "selected": {
+      "$value": "{blue.50}",
+      "$extensions": {
+        "com.voyager.dark": "#1b2a4a"
+      }
+    },
+    "chrome": {
+      "$value": "{grey.900}",
+      "$description": "CHROME — a surface that is deliberately dark and STAYS dark: the sidebar, the Login brand panel, the toast. Not \"inverse of the page\", which is the name it briefly had and the reason the sidebar came out light-on-light the first time dark mode was switched on. Inverting chrome is not what a dark theme means; chrome is dark in both, and only gets lighter to stay legible against a darker page.",
+      "$extensions": {
+        "com.voyager.dark": "#1e2531"
+      }
+    },
+    "chrome-soft": {
+      "$value": "{grey.700}",
+      "$extensions": {
+        "com.voyager.dark": "#2a323f"
+      }
+    }
+  },
+  "on": {
+    "surface-strong": {
+      "$value": "{grey.900}",
+      "$extensions": {
+        "com.voyager.dark": "#f5f8fc"
+      }
+    },
+    "surface": {
+      "$value": "{grey.800}",
+      "$extensions": {
+        "com.voyager.dark": "#e9edf3"
+      }
+    },
+    "surface-soft": {
+      "$value": "{grey.700}",
+      "$extensions": {
+        "com.voyager.dark": "#d3dae4"
+      }
+    },
+    "surface-muted": {
+      "$value": "{grey.600}",
+      "$extensions": {
+        "com.voyager.dark": "#aab4c3"
+      }
+    },
+    "surface-subtle": {
+      "$value": "#5b6575",
+      "$type": "color",
+      "$extensions": {
+        "com.voyager.dark": "#8f9aaa"
+      }
+    },
+    "surface-faint": {
+      "$value": "{grey.400}",
+      "$extensions": {
+        "com.voyager.dark": "#67727f"
+      }
+    },
+    "surface-invert": {
+      "$value": "{grey.0}",
+      "$extensions": {
+        "com.voyager.dark": "#0f131a"
+      }
+    },
+    "chrome-muted": {
+      "$value": "{grey.300}",
+      "$description": "Text on chrome. Not the same job as `on-surface-faint`: a grey that reads quiet on white is not the grey that reads quiet on near-black, which is a mistake the on-dark notes below already record once. It keeps the SAME value in the dark theme, because chrome keeps the same job."
+    },
+    "dark-fg": {
+      "$value": "#ffffff",
+      "$type": "color",
+      "$description": "On-dark surface The sidebar sits on --vy-grey-900. These are the only colours allowed to be translucent white, and they exist so no component reaches for rgba() inline."
+    },
+    "dark-secondary": {
+      "$value": "{grey.300}",
+      "$description": "Text tiers for the dark sidebar. Measured against --vy-grey-900, the greys originally used here failed WCAG AA: group purpose and the chevron sat at 2.43:1 and the group title at 3.88:1. A grey that reads as \"quiet\" on a light surface is not the same grey that reads as quiet on a dark one."
+    },
+    "dark-muted": {
+      "$value": "{grey.400}"
+    },
+    "dark-hairline": {
+      "$value": "rgba(255, 255, 255, .07)",
+      "$type": "color"
+    },
+    "dark-hover": {
+      "$value": "rgba(255, 255, 255, .05)",
+      "$type": "color"
+    },
+    "dark-active": {
+      "$value": "rgba(43, 99, 184, .22)",
+      "$type": "color"
+    }
+  },
+  "brand": {
+    "base": {
+      "$value": "{blue.600}",
+      "$extensions": {
+        "com.voyager.dark": "{blue.300}"
+      }
+    },
+    "hover": {
+      "$value": "{blue.700}",
+      "$extensions": {
+        "com.voyager.dark": "{blue.200}"
+      }
+    },
+    "active": {
+      "$value": "{blue.800}",
+      "$extensions": {
+        "com.voyager.dark": "{blue.100}"
+      }
+    },
+    "text": {
+      "$value": "{blue.600}",
+      "$extensions": {
+        "com.voyager.dark": "{blue.300}"
+      }
+    },
+    "text-hover": {
+      "$value": "{blue.700}",
+      "$extensions": {
+        "com.voyager.dark": "{blue.200}"
+      }
+    },
+    "text-deep": {
+      "$value": "{blue.800}",
+      "$extensions": {
+        "com.voyager.dark": "{blue.100}"
+      }
+    },
+    "on": {
+      "$value": "{grey.0}",
+      "$extensions": {
+        "com.voyager.dark": "#0f131a"
+      }
+    },
+    "subtle": {
+      "$value": "{blue.50}",
+      "$extensions": {
+        "com.voyager.dark": "#1b2a4a"
+      }
+    },
+    "subtle-strong": {
+      "$value": "{blue.100}",
+      "$extensions": {
+        "com.voyager.dark": "#223357"
+      }
+    },
+    "light": {
+      "$value": "{blue.400}",
+      "$extensions": {
+        "com.voyager.dark": "{blue.300}"
+      }
+    },
+    "soft": {
+      "$value": "{blue.500}",
+      "$extensions": {
+        "com.voyager.dark": "{blue.400}"
+      }
+    },
+    "boundary": {
+      "$value": "{blue.400}",
+      "$extensions": {
+        "com.voyager.dark": "{blue.300}"
+      }
+    },
+    "boundary-soft": {
+      "$value": "{blue.200}",
+      "$extensions": {
+        "com.voyager.dark": "{blue.500}"
+      }
+    },
+    "boundary-light": {
+      "$value": "{blue.300}"
+    },
+    "boundary-strong": {
+      "$value": "{blue.500}",
+      "$description": "tightest 7.22 — see the dark note",
+      "$extensions": {
+        "com.voyager.dark": "{blue.200}"
+      }
+    }
+  },
+  "danger": {
+    "base": {
+      "$value": "{red.600}"
+    },
+    "on": {
+      "$value": "{grey.0}"
+    },
+    "text": {
+      "$value": "{red.700}",
+      "$extensions": {
+        "com.voyager.dark": "#f0918a"
+      }
+    },
+    "text-deep": {
+      "$value": "{red.700}",
+      "$extensions": {
+        "com.voyager.dark": "#f5aba5"
+      }
+    },
+    "subtle": {
+      "$value": "{red.50}",
+      "$extensions": {
+        "com.voyager.dark": "#38201e"
+      }
+    },
+    "boundary": {
+      "$value": "{red.500}",
+      "$extensions": {
+        "com.voyager.dark": "#e0655c"
+      }
+    }
+  },
+  "status": {
+    "draft-fg": {
+      "$value": "{grey.600}",
+      "$description": "Status semantics One token per BUSINESS STATE, not per colour. Every module maps its own lifecycle onto these six, which is what makes status readable across Sales Orders, Purchase Orders, Work Orders and RMAs without relearning.",
+      "$extensions": {
+        "com.voyager.dark": "#aab4c3"
+      }
+    },
+    "draft-bg": {
+      "$value": "{grey.100}",
+      "$extensions": {
+        "com.voyager.dark": "#2a323f"
+      }
+    },
+    "open-fg": {
+      "$value": "#92400e",
+      "$type": "color",
+      "$extensions": {
+        "com.voyager.dark": "#eeb796"
+      }
+    },
+    "open-bg": {
+      "$value": "#fef3c7",
+      "$type": "color",
+      "$extensions": {
+        "com.voyager.dark": "#38281e"
+      }
+    },
+    "progress-fg": {
+      "$value": "#155e75",
+      "$type": "color",
+      "$description": "Added 8 Nov — see the note in the block above. A token must appear in all three blocks or the two ways of choosing dark disagree (B1.8).",
+      "$extensions": {
+        "com.voyager.dark": "#96e4ee"
+      }
+    },
+    "progress-bg": {
+      "$value": "#cffafe",
+      "$type": "color",
+      "$extensions": {
+        "com.voyager.dark": "#1e3838"
+      }
+    },
+    "done-fg": {
+      "$value": "#065f46",
+      "$type": "color",
+      "$extensions": {
+        "com.voyager.dark": "#96eed5"
+      }
+    },
+    "done-bg": {
+      "$value": "#d1fae5",
+      "$type": "color",
+      "$extensions": {
+        "com.voyager.dark": "#1e3831"
+      }
+    },
+    "waiting-fg": {
+      "$value": "#5b21b6",
+      "$type": "color",
+      "$description": "`waiting` is in the StatusToken union and had NO colours, so every \"Quoted\" badge in the app rendered unstyled. Purple, as the guideline specifies. Measures 7.3:1.",
+      "$extensions": {
+        "com.voyager.dark": "#b896ee"
+      }
+    },
+    "waiting-bg": {
+      "$value": "#ede9fe",
+      "$type": "color",
+      "$extensions": {
+        "com.voyager.dark": "#281e38"
+      }
+    },
+    "review-fg": {
+      "$value": "#0e7490",
+      "$type": "color",
+      "$description": "Cyan, because the guideline names it for a checklist document that has been uploaded and is awaiting approval: \"In Progress, displayed with a cyan label\". Deliberately not one of the blues — beside the primary blue a blue badge reads as a link. 5.15:1.",
+      "$extensions": {
+        "com.voyager.dark": "#96dbee"
+      }
+    },
+    "review-bg": {
+      "$value": "#ecfeff",
+      "$type": "color",
+      "$extensions": {
+        "com.voyager.dark": "#1e3338"
+      }
+    },
+    "blocked-fg": {
+      "$value": "{red.700}",
+      "$extensions": {
+        "com.voyager.dark": "#ee9a96"
+      }
+    },
+    "blocked-bg": {
+      "$value": "{red.50}",
+      "$extensions": {
+        "com.voyager.dark": "#38201e"
+      }
+    },
+    "cancelled-fg": {
+      "$value": "{grey.500}",
+      "$extensions": {
+        "com.voyager.dark": "#aab4c3"
+      }
+    },
+    "cancelled-bg": {
+      "$value": "{grey.100}",
+      "$extensions": {
+        "com.voyager.dark": "#2a323f"
+      }
+    },
+    "slot-w": {
+      "$value": "104px",
+      "$type": "dimension",
+      "$description": "GAP-01 — see docs/gap-register.md"
+    }
+  },
+  "chart": {
+    "cancelled": {
+      "$value": "{grey.700}",
+      "$description": "Chart-only. A cancelled SEGMENT has to be told apart from a New one at a glance, touching it in the same bar; a cancelled BADGE never does. Darker and cooler than draft's neutral, in both themes.",
+      "$extensions": {
+        "com.voyager.dark": "#5d6878"
+      }
+    },
+    "h": {
+      "$value": "220px",
+      "$type": "dimension",
+      "$description": "Home chart plot area"
+    },
+    "bar-w": {
+      "$value": "28px",
+      "$type": "dimension",
+      "$description": "a bar wide enough to segment, narrow enough for 12"
+    }
+  },
+  "tone": {
+    "excluded-bg": {
+      "$value": "{grey.100}",
+      "$extensions": {
+        "com.voyager.dark": "#2a323f"
+      }
+    },
+    "excluded-fg": {
+      "$value": "{grey.500}",
+      "$extensions": {
+        "com.voyager.dark": "#aab4c3"
+      }
+    },
+    "missing-bg": {
+      "$value": "{red.50}",
+      "$description": "No supplier found, and the same red as a part missing from Part Master — both mean \"this line cannot proceed as it stands\".",
+      "$extensions": {
+        "com.voyager.dark": "#38201e"
+      }
+    },
+    "missing-fg": {
+      "$value": "{red.700}",
+      "$extensions": {
+        "com.voyager.dark": "#ee9a96"
+      }
+    },
+    "short-bg": {
+      "$value": "{status.open-bg}",
+      "$description": "A supplier exists but cannot cover the quantity."
+    },
+    "covered-bg": {
+      "$value": "{status.done-bg}",
+      "$description": "Priced and covered, and a part already in Part Master."
+    },
+    "known-mfg-bg": {
+      "$value": "{status.open-bg}",
+      "$description": "A manufacturer already in Manufacturer Management."
+    },
+    "pending-bg": {
+      "$value": "{surface.sunken}",
+      "$description": "AWAITING THE QUOTE RUN — not an error. This pointed at the same red-50 as `missing`, so step 3 opened with 240 cells painted like failures for values that simply had not been fetched yet. We had written the criticism of the live screen doing exactly this into docs/run-quotation-rescan.md while shipping it ourselves. Grey says inert; red says wrong."
+    }
+  },
+  "font": {
+    "sans": {
+      "$value": "\"Inter Variable\", \"Inter\", system-ui, -apple-system, \"Segoe UI\", Arial, sans-serif"
+    }
+  },
+  "text": {
+    "2xs": {
+      "$value": "12px",
+      "$type": "dimension"
+    },
+    "xs": {
+      "$value": "12px",
+      "$type": "dimension"
+    },
+    "sm": {
+      "$value": "12px",
+      "$type": "dimension"
+    },
+    "base": {
+      "$value": "13px",
+      "$type": "dimension",
+      "$description": "grid + form default"
+    },
+    "md": {
+      "$value": "14px",
+      "$type": "dimension"
+    },
+    "lg": {
+      "$value": "16px",
+      "$type": "dimension"
+    },
+    "xl": {
+      "$value": "20px",
+      "$type": "dimension"
+    },
+    "2xl": {
+      "$value": "24px",
+      "$type": "dimension"
+    },
+    "3xl": {
+      "$value": "28px",
+      "$type": "dimension"
+    }
+  },
+  "radius": {
+    "sm": {
+      "$value": "3px",
+      "$type": "dimension",
+      "$description": "Shape"
+    },
+    "md": {
+      "$value": "4px",
+      "$type": "dimension",
+      "$description": "the house radius"
+    },
+    "lg": {
+      "$value": "6px",
+      "$type": "dimension"
+    },
+    "pill": {
+      "$value": "999px",
+      "$type": "dimension"
+    }
+  },
+  "shadow": {
+    "sm": {
+      "$value": "0 1px 2px rgba(19, 24, 32, .06)",
+      "$description": "Elevation"
+    },
+    "md": {
+      "$value": "0 2px 8px rgba(19, 24, 32, .10)"
+    },
+    "lg": {
+      "$value": "0 8px 28px rgba(19, 24, 32, .14)"
+    },
+    "tint": {
+      "$value": "#000000",
+      "$type": "color",
+      "$extensions": {
+        "com.voyager.dark": "#000000"
+      }
+    },
+    "key": {
+      "$value": "#000000",
+      "$type": "color",
+      "$extensions": {
+        "com.voyager.dark": "#000000"
+      }
+    }
+  },
+  "row": {
+    "h-compact": {
+      "$value": "28px",
+      "$type": "dimension",
+      "$description": "Density Three grid densities. `comfortable` is the default; `compact` is what the 21,941-row Part Master should ship with. The legacy app had one 50px row height everywhere, which is why only ~10 rows fit on a 900px screen."
+    },
+    "h-comfortable": {
+      "$value": "40px",
+      "$type": "dimension"
+    },
+    "h-relaxed": {
+      "$value": "48px",
+      "$type": "dimension"
+    }
+  },
+  "shell": {
+    "sidebar-w": {
+      "$value": "248px",
+      "$type": "dimension"
+    },
+    "sidebar-w-collapsed": {
+      "$value": "56px",
+      "$type": "dimension"
+    },
+    "topbar-h": {
+      "$value": "52px",
+      "$type": "dimension"
+    }
+  },
+  "space": {
+    "1": {
+      "$value": "2px",
+      "$type": "dimension",
+      "$description": "Spacing scale A 2px-step scale. Retrofitted from the hand-written values in app.css, which used 3, 5, 7, 9, 15, 18, 22 and 26px alongside the even steps — the one-off values are normalised onto the scale, which is the point of having one."
+    },
+    "2": {
+      "$value": "4px",
+      "$type": "dimension"
+    },
+    "3": {
+      "$value": "6px",
+      "$type": "dimension"
+    },
+    "4": {
+      "$value": "8px",
+      "$type": "dimension"
+    },
+    "5": {
+      "$value": "10px",
+      "$type": "dimension"
+    },
+    "6": {
+      "$value": "12px",
+      "$type": "dimension"
+    },
+    "7": {
+      "$value": "14px",
+      "$type": "dimension"
+    },
+    "8": {
+      "$value": "16px",
+      "$type": "dimension"
+    },
+    "9": {
+      "$value": "20px",
+      "$type": "dimension"
+    },
+    "10": {
+      "$value": "24px",
+      "$type": "dimension"
+    },
+    "11": {
+      "$value": "28px",
+      "$type": "dimension"
+    },
+    "12": {
+      "$value": "32px",
+      "$type": "dimension"
+    },
+    "14": {
+      "$value": "40px",
+      "$type": "dimension"
+    }
+  },
+  "target": {
+    "min": {
+      "$value": "44px",
+      "$type": "dimension",
+      "$description": "The floor for anything a finger has to hit. Not on the spacing scale on purpose — it is an accessibility minimum, not a rhythm step, and a control that needs it should say so rather than reach for whichever space token happens to be 44. WCAG 2.5.8 asks 24x24; 44 is the figure both Apple and Material settled on for touch, and this app is opened on phones."
+    }
+  },
+  "weight": {
+    "regular": {
+      "$value": "400",
+      "$type": "number",
+      "$description": "Weight scale"
+    },
+    "medium": {
+      "$value": "500",
+      "$type": "number"
+    },
+    "semibold": {
+      "$value": "600",
+      "$type": "number"
+    },
+    "bold": {
+      "$value": "650",
+      "$type": "number",
+      "$description": "headings — 700 reads heavy at these sizes"
+    },
+    "heavy": {
+      "$value": "700",
+      "$type": "number"
+    }
+  },
+  "swatch": {
+    "label-bg": {
+      "$value": "rgba(255, 255, 255, .85)",
+      "$type": "color",
+      "$description": "The chip a swatch's NAME sits on, so the name stays readable over any colour in the ramp. It is half of a pair — the text on it is `on-surface-soft`, which flips with the theme — so the chip has to flip too. It did not, and every dark swatch label measured about 1.05:1: light text on a white chip.",
+      "$extensions": {
+        "com.voyager.dark": "rgba(16, 21, 28, .85)"
+      }
+    },
+    "w": {
+      "$value": "78px",
+      "$type": "dimension"
+    },
+    "h": {
+      "$value": "52px",
+      "$type": "dimension"
+    }
+  },
+  "overlay": {
+    "scrim": {
+      "$value": "rgba(19, 24, 32, .45)",
+      "$type": "color",
+      "$extensions": {
+        "com.voyager.dark": "rgba(0, 0, 0, .62)"
+      }
+    }
+  },
+  "rocket": {
+    "hull": {
+      "$value": "{blue.600}",
+      "$description": "the body",
+      "$extensions": {
+        "com.voyager.dark": "{blue.300}"
+      }
+    },
+    "shade": {
+      "$value": "{blue.800}",
+      "$description": "its unlit side, fins, nose",
+      "$extensions": {
+        "com.voyager.dark": "{blue.500}"
+      }
+    },
+    "accent": {
+      "$value": "{blue.500}",
+      "$description": "turret, ticks, the schematic",
+      "$extensions": {
+        "com.voyager.dark": "{blue.300}"
+      }
+    },
+    "soft": {
+      "$value": "{blue.300}",
+      "$description": "arm, pad, the flame's edge",
+      "$extensions": {
+        "com.voyager.dark": "{blue.400}"
+      }
+    },
+    "detail": {
+      "$value": "{blue.200}",
+      "$description": "stars, craters, streaks",
+      "$extensions": {
+        "com.voyager.dark": "{blue.500}"
+      }
+    },
+    "trim": {
+      "$value": "{blue.100}",
+      "$description": "stripe, window, the crack"
+    },
+    "ground": {
+      "$value": "{blue.100}",
+      "$description": "the planet's lit half",
+      "$extensions": {
+        "com.voyager.dark": "{blue.800}"
+      }
+    },
+    "ground-sh": {
+      "$value": "#c3d1ee",
+      "$type": "color",
+      "$extensions": {
+        "com.voyager.dark": "#0d1e44"
+      }
+    },
+    "paper": {
+      "$value": "{blue.50}",
+      "$description": "the design doc's sheet",
+      "$extensions": {
+        "com.voyager.dark": "#1b2436"
+      }
+    },
+    "smoke": {
+      "$value": "{grey.400}",
+      "$extensions": {
+        "com.voyager.dark": "{grey.500}"
+      }
+    }
+  },
+  "accent": {
+    "positive": {
+      "$value": "#047857",
+      "$type": "color",
+      "$description": "Semantic accents. `caution` is the brighter amber used for borders and rules; `warning` is darkened so it still clears 4.5:1 as text on white.",
+      "$extensions": {
+        "com.voyager.dark": "#75f0cd"
+      }
+    },
+    "caution": {
+      "$value": "#d97706",
+      "$type": "color",
+      "$extensions": {
+        "com.voyager.dark": "#f0b775"
+      }
+    },
+    "warning": {
+      "$value": "#b45309",
+      "$type": "color",
+      "$extensions": {
+        "com.voyager.dark": "#f0aa75"
+      }
+    },
+    "waiting": {
+      "$value": "#6d28d9",
+      "$type": "color",
+      "$description": "`waiting` needs a hue that is neither the blue of in-progress nor the amber of needs-action. Kendo's stock tertiary is a light blue: 2.63:1 against white text, and close enough to the info blue to be confusable.",
+      "$extensions": {
+        "com.voyager.dark": "#a679ec"
+      }
+    },
+    "neutral": {
+      "$value": "#4d5766",
+      "$type": "color",
+      "$extensions": {
+        "com.voyager.dark": "#aab4c3"
+      }
+    },
+    "bar-w": {
+      "$value": "3px",
+      "$type": "dimension",
+      "$description": "left accent rule on queue cards"
+    }
+  },
+  "control": {
+    "sm": {
+      "$value": "28px",
+      "$type": "dimension",
+      "$description": "avatar, brand mark"
+    },
+    "row": {
+      "$value": "26px",
+      "$type": "dimension",
+      "$description": "icon button inside a grid row"
+    },
+    "md": {
+      "$value": "34px",
+      "$type": "dimension",
+      "$description": "input / locked-field height"
+    },
+    "dense": {
+      "$value": "32px",
+      "$type": "dimension",
+      "$description": "THE DENSE SIZE, which is what Kendo's `small` means in this product. A grid's control strip held four heights — funnel 28, Columns 29, view picker 35, search 37 — and a 9px spread reads as the row stepping in and out rather than as a row. 32px is the standard's compact figure for a screen whose main content is a working grid, which a list is."
+    }
+  },
+  "activity": {
+    "rail-w": {
+      "$value": "20rem",
+      "$type": "dimension",
+      "$description": "Activity log. The rail is fixed rather than a fraction: the list holds a name, a time and one short line, and half a tab would stretch three short strings while the diffs beside them wrapped."
+    },
+    "date-w": {
+      "$value": "7rem",
+      "$type": "dimension"
+    },
+    "list-h": {
+      "$value": "26rem",
+      "$type": "dimension"
+    },
+    "list-h-stacked": {
+      "$value": "16rem",
+      "$type": "dimension"
+    },
+    "detail-min-h": {
+      "$value": "20rem",
+      "$type": "dimension"
+    }
+  },
+  "change": {
+    "field-w": {
+      "$value": "10rem",
+      "$type": "dimension"
+    }
+  },
+  "quote": {
+    "fact-min": {
+      "$value": "5rem",
+      "$type": "dimension",
+      "$description": "A FLOOR, not a width. 9rem here gave \"27%\" the same 144px as a part number and pushed a seven-fact strip onto three rows; the boxes should size to what they hold and only stop being comically narrow."
+    },
+    "fact-wide": {
+      "$value": "180px",
+      "$type": "dimension",
+      "$description": "an assembly number or a description"
+    },
+    "qty-w": {
+      "$value": "92px",
+      "$type": "dimension",
+      "$description": "Build Qty / Attrition Set / Markup"
+    },
+    "fact-w": {
+      "$value": "190px",
+      "$type": "dimension",
+      "$description": "ONE COLUMN WIDTH FOR THE WHOLE SETUP STRIP. Wide enough for its longest value, \"Production-Competitive Cost\", so the field that needs the most room sets the measure and every other field matches it. The strip is `auto-fit`, so a wider panel takes more columns rather than wider ones."
+    },
+    "sup-w": {
+      "$value": "158px",
+      "$type": "dimension",
+      "$description": "\"Preferred Suppliers\" plus its summary"
+    },
+    "field-min": {
+      "$value": "240px",
+      "$type": "dimension",
+      "$description": "one field on the Config BoM grid"
+    },
+    "ref-field-min": {
+      "$value": "150px",
+      "$type": "dimension",
+      "$description": "The same field in the narrow reference panel, where two of them share the width: enough for \"MATERIAL PACKAGE TYPE\", the longest label there."
+    }
+  },
+  "sup": {
+    "group-w": {
+      "$value": "118px",
+      "$type": "dimension",
+      "$description": "the Group 1 / Group 2 picker in the dialog"
+    }
+  },
+  "mpn": {
+    "menu-w": {
+      "$value": "320px",
+      "$type": "dimension",
+      "$description": "an MPN and a full manufacturer name"
+    }
+  },
+  "assy": {
+    "field-min": {
+      "$value": "170px",
+      "$type": "dimension",
+      "$description": "Assembly Details: \"Assembly Part Number\" is the longest label in it."
+    }
+  },
+  "radio": {
+    "tile-min": {
+      "$value": "230px",
+      "$type": "dimension",
+      "$description": "One Action card: its label on one line and its sentence on no more than three. Below this the three drop to a column, which is the old layout."
+    }
+  },
+  "cost": {
+    "col-min": {
+      "$value": "170px",
+      "$type": "dimension",
+      "$description": "one figure in the cost summary"
+    },
+    "table-min": {
+      "$value": "340px",
+      "$type": "dimension",
+      "$description": "two money columns and their headings"
+    }
+  },
+  "run": {
+    "setup-min": {
+      "$value": "560px",
+      "$type": "dimension",
+      "$description": "How much a run's setup strip wants before the cost card stops sitting beside it: nine settings and three run facts, two rows. Step 4 and the saved result view share the strip, so they share the number."
+    }
+  },
+  "prose": {
+    "max": {
+      "$value": "96ch"
+    }
+  },
+  "icon": {
+    "sm": {
+      "$value": "16px",
+      "$type": "dimension",
+      "$description": "nav and toolbar glyphs"
+    }
+  },
+  "palette": {
+    "w": {
+      "$value": "620px",
+      "$type": "dimension"
+    }
+  },
+  "finding": {
+    "label-w": {
+      "$value": "128px",
+      "$type": "dimension"
+    },
+    "title-w": {
+      "$value": "260px",
+      "$type": "dimension"
+    }
+  },
+  "stat": {
+    "min-w": {
+      "$value": "150px",
+      "$type": "dimension"
+    }
+  },
+  "card": {
+    "min-w": {
+      "$value": "200px",
+      "$type": "dimension"
+    }
+  },
+  "link": {
+    "card-min-w": {
+      "$value": "220px",
+      "$type": "dimension"
+    }
+  },
+  "search": {
+    "w": {
+      "$value": "420px",
+      "$type": "dimension"
+    }
+  },
+  "grid": {
+    "search-min": {
+      "$value": "220px",
+      "$type": "dimension",
+      "$description": "below this the placeholder truncates"
+    }
+  },
+  "page": {
+    "max": {
+      "$value": "1180px",
+      "$type": "dimension"
+    }
+  },
+  "doc": {
+    "max-w": {
+      "$value": "{page.max}"
+    }
+  },
+  "z": {
+    "drawer": {
+      "$value": "10020",
+      "$type": "number"
+    },
+    "dialog": {
+      "$value": "10040",
+      "$type": "number"
+    },
+    "menu": {
+      "$value": "10070",
+      "$type": "number"
+    },
+    "palette": {
+      "$value": "10075",
+      "$type": "number"
+    },
+    "toast": {
+      "$value": "12500",
+      "$type": "number"
+    },
+    "skip": {
+      "$value": "12600",
+      "$type": "number"
+    }
+  },
+  "field": {
+    "group-min": {
+      "$value": "280px",
+      "$type": "dimension",
+      "$description": "Record screen Field-list column widths and the label column of a definition list."
+    }
+  },
+  "header": {
+    "field-min": {
+      "$value": "190px",
+      "$type": "dimension",
+      "$description": "record-header facts: label above value"
+    },
+    "group-min": {
+      "$value": "260px",
+      "$type": "dimension",
+      "$description": "one of the three header regions"
+    }
+  },
+  "condition": {
+    "col": {
+      "$value": "150px",
+      "$type": "dimension",
+      "$description": "field / operator column in the advanced filter"
+    }
+  },
+  "popover": {
+    "min-w": {
+      "$value": "240px",
+      "$type": "dimension"
+    }
+  },
+  "editor": {
+    "min-h": {
+      "$value": "110px",
+      "$type": "dimension",
+      "$description": "rich text composer"
+    }
+  },
+  "filter": {
+    "field-min": {
+      "$value": "190px",
+      "$type": "dimension",
+      "$description": "one control in the filter toolbar"
+    }
+  },
+  "viewsetting": {
+    "w": {
+      "$value": "460px",
+      "$type": "dimension",
+      "$description": "the View Setting right sidebar"
+    },
+    "max-w": {
+      "$value": "860px",
+      "$type": "dimension",
+      "$description": "the same sidebar, maximised"
+    }
+  },
+  "vs": {
+    "width-col": {
+      "$value": "88px",
+      "$type": "dimension",
+      "$description": "the Width input on the Column tab"
+    },
+    "action-col": {
+      "$value": "6rem",
+      "$type": "dimension",
+      "$description": "The right-hand cell of a Column row holds either a trash button or the words \"(*required)\", and they are not the same width — so the NAME field beside them came out long on one row and short on the next. Asked for on 13 October: \"we should have one width for delete and required so that the text field in the left column will not long and short\". Sized to the wider of the two."
+    }
+  },
+  "view": {
+    "picker-w": {
+      "$value": "180px",
+      "$type": "dimension"
+    }
+  },
+  "tz": {
+    "w": {
+      "$value": "180px",
+      "$type": "dimension",
+      "$description": "timezone select in the global header"
+    }
+  },
+  "kpi": {
+    "min-w": {
+      "$value": "140px",
+      "$type": "dimension"
+    }
+  },
+  "record": {
+    "max-w": {
+      "$value": "{page.max}"
+    }
+  },
+  "login": {
+    "form-w": {
+      "$value": "380px",
+      "$type": "dimension",
+      "$description": "the login form, held to a readable width"
+    }
+  },
+  "select": {
+    "col-w": {
+      "$value": "40px",
+      "$type": "dimension",
+      "$description": "the row-selection checkbox column"
+    }
+  },
+  "people": {
+    "menu-w": {
+      "$value": "320px",
+      "$type": "dimension",
+      "$description": "the people picker's list, sized for name + email"
+    }
+  },
+  "note": {
+    "min-w": {
+      "$value": "320px",
+      "$type": "dimension"
+    }
+  },
+  "contact": {
+    "field-min": {
+      "$value": "180px",
+      "$type": "dimension",
+      "$description": "One short contact field — name, job title, email or phone."
+    }
+  },
+  "assignee": {
+    "panel-w": {
+      "$value": "240px",
+      "$type": "dimension",
+      "$description": "the left column on Checklists"
+    }
+  },
+  "checklist": {
+    "col-min": {
+      "$value": "282px",
+      "$type": "dimension",
+      "$description": "measured minimum for a checklist row"
+    }
+  },
+  "dialog": {
+    "md": {
+      "$value": "640px",
+      "$type": "dimension",
+      "$description": "Dialog widths, named by size rather than set per dialog."
+    },
+    "lg": {
+      "$value": "960px",
+      "$type": "dimension"
+    },
+    "xl": {
+      "$value": "1180px",
+      "$type": "dimension"
+    }
+  }
+}

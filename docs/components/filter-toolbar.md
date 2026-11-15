@@ -6,6 +6,8 @@
 
 ---
 
+<!-- ds:tab usage -->
+
 ## When to use
 
 On a list screen, behind the funnel, to narrow what the grid shows by the
@@ -36,6 +38,8 @@ screen has no operators at all.
 Which fields appear is a property of the saved View, chosen in View Setting.
 
 ---
+
+<!-- ds:tab examples -->
 
 ## Anatomy
 
@@ -70,6 +74,8 @@ back to *any* is *Clear all*, which throws away every other field too.
 
 ---
 
+<!-- ds:tab usage -->
+
 ## Content
 
 - The field label is the **View's** label, unchanged. The toolbar does not
@@ -100,6 +106,8 @@ back to *any* is *Clear all*, which throws away every other field too.
 | Count | Plain text beside the button, read in order |
 | Panel | Absent rather than hidden, so nothing focusable is left behind it |
 
+<!-- ds:tab code -->
+
 ## API
 
 | Prop | Type | Notes |
@@ -113,11 +121,15 @@ back to *any* is *Clear all*, which throws away every other field too.
 
 ---
 
+<!-- ds:tab usage -->
+
 ## Related
 
 [Chip](chip.md) · [Button](button.md) ·
 [D3 · Grids](../design-system.md#d3--grids) ·
 [B5.3 · Column roles](../design-system.md#b53-column-roles--a-width-is-chosen-once-by-role)
+
+<!-- ds:tab changelog -->
 
 ## Recent changes
 

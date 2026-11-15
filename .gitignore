@@ -29,3 +29,10 @@ telerik-license.txt
 
 # Excel lock files, created when a workbook is open
 ~$*
+
+# The generated design-system site. `npm run ds:site` rebuilds it from the
+# markdown in seconds, and 12 of its 14 MB are copies of images already
+# committed under docs/assets. The self-contained single-file HTML handovers
+# in docs/ are NOT generated output in this sense — they are the deliverable
+# that gets sent, and they stay in the repository.
+docs/site

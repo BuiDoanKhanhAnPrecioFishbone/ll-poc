@@ -2573,3 +2573,29 @@ a.vy-btn, a.vy-btn:hover { text-decoration: none; }
   margin: var(--vy-space-4) 0 0; text-align: center;
   font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle);
 }
+
+/* ---------------------------------------------------------------------------
+   SPECIMEN — the live examples the design system site frames in an iframe.
+   Deliberately plain: the example is the subject, so the stage around it gets
+   a surface, a line and nothing else. No width cap, because the frame sets the
+   width and the page measures the height back. */
+.vy-specimen { padding: var(--vy-space-6); background: var(--vy-surface); }
+.vy-specimen section + section { margin-top: var(--vy-space-10); }
+.vy-specimen h2 {
+  margin: 0 0 var(--vy-space-2); font-size: var(--vy-text-sm); font-weight: 600;
+  letter-spacing: .06em; text-transform: uppercase; color: var(--vy-on-surface-soft);
+}
+.vy-specimen p { margin: 0 0 var(--vy-space-6); font-size: var(--vy-text-base); color: var(--vy-on-surface); }
+.vy-specimen-stage {
+  display: flex; flex-wrap: wrap; gap: var(--vy-space-6); align-items: center;
+  padding: var(--vy-space-8); border: 1px solid var(--vy-border);
+  border-radius: var(--vy-radius-lg); background: var(--vy-surface-subtle);
+}
+.vy-specimen-missing { color: var(--vy-on-surface-soft); }
+
+/* An example that renders ONE thing — a table, a skeleton, a drop zone — is
+   showing a block, and a flex item sizes to its content: the grid skeleton
+   came out 84px wide in an 832px stage, which reads as a bug rather than a
+   loading grid. A single child takes the width; several children still sit in
+   a row, which is what the button and chip examples want. */
+.vy-specimen-stage > :only-child { flex: 1 1 100%; }

@@ -10,6 +10,12 @@ the control.
 
 ---
 
+<!-- ds:tab examples -->
+
+<!-- ds:specimen file-drop -->
+
+<!-- ds:tab usage -->
+
 ## When to use
 
 To take a file from this machine: the BoM on Run Quotation and Create BoM
@@ -71,6 +77,8 @@ from the UI.
 When an endpoint exists, `saveUrl` arrives, the hint changes, and `onPick`
 starts carrying the file itself. Nothing else here moves.
 
+<!-- ds:tab examples -->
+
 ## Anatomy
 
 | Part | Rule |
@@ -90,6 +98,8 @@ starts carrying the file itself. Nothing else here moves.
 > A rejection names **which rule**. *Invalid file* tells someone to try the
 > same file again.
 
+<!-- ds:tab usage -->
+
 ## Accessibility
 
 | | |
@@ -100,6 +110,8 @@ starts carrying the file itself. Nothing else here moves.
 | Boundary | The box is drawn with Kendo's global border → `--vy-border`. It is a **container**, identified by the button and hint inside it, not by its edge — the 3:1 rule in [B1.4](../design-system.md#b14-lines) is for the controls within |
 | Focus | `.k-upload-button` and each `.k-file` get the app's own ring from the bridge, so a file row can be reached and removed by keyboard |
 | Not swept | `border:check` never reaches this control — it only appears inside dialogs the sweep does not open. Checked by hand instead, and recorded here so that is not mistaken for a pass |
+
+<!-- ds:tab code -->
 
 ## API
 
@@ -112,11 +124,15 @@ starts carrying the file itself. Nothing else here moves.
 
 ---
 
+<!-- ds:tab usage -->
+
 ## Related
 
 [File upload](../patterns/file-upload.md) ·
 [Support ticket](support-ticket.md) · [Dialog](dialog.md) ·
 [E2 · KendoReact](../design-system.md#e2--kendoreact)
+
+<!-- ds:tab changelog -->
 
 ## Recent changes
 

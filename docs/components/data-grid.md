@@ -5,6 +5,8 @@
 
 ---
 
+<!-- ds:tab usage -->
+
 ## When to use
 
 A module's main list: Project Requirements, Part Master, BoM List, Packing
@@ -19,6 +21,8 @@ List. One per screen.
 | Something the user reads once and never sorts | A list | Sorting, paging and a column chooser are furniture if nobody moves them |
 
 ---
+
+<!-- ds:tab examples -->
 
 ## Anatomy
 
@@ -37,6 +41,8 @@ each already exists here answering a written requirement — and two of a thing
 is worse than either.
 
 ---
+
+<!-- ds:tab usage -->
 
 ## Rules that are ours, not Kendo's
 
@@ -98,11 +104,15 @@ infinite scroll with a [pager](pager.md), and the pager offers 20, 50 or 100.
 > `useEffect` to re-measure on every density change. The page slice goes
 > straight to the Grid.
 
+<!-- ds:tab examples -->
+
 ## States
 
 Covered by [D5](../design-system.md#d5--the-four-screen-states) and the
 [list screen pattern](../patterns/list-screen.md): skeleton on first load,
 dimmed-with-overlay on a recalculation, a real empty state, an error screen.
+
+<!-- ds:tab usage -->
 
 ## Accessibility
 
@@ -121,6 +131,8 @@ dimmed-with-overlay on a recalculation, a real empty state, an error screen.
 [Column chooser](column-chooser.md) · [Filter toolbar](filter-toolbar.md) ·
 [List screen](../patterns/list-screen.md) ·
 [D3 · Grids](../design-system.md#d3--grids)
+
+<!-- ds:tab changelog -->
 
 ## Recent changes
 

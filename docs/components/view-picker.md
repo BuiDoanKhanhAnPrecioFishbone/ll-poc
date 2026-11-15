@@ -6,6 +6,8 @@
 
 ---
 
+<!-- ds:tab usage -->
+
 ## When to use
 
 In a grid toolbar, to switch between the **saved Views** of that list.
@@ -52,6 +54,8 @@ Keying on the label would leave one of them unreachable.
 
 ---
 
+<!-- ds:tab examples -->
+
 ## Anatomy
 
 ![The view picker in a grid toolbar](../assets/components/view-picker.png)
@@ -67,6 +71,8 @@ Keying on the label would leave one of them unreachable.
 native popup of plain rows, and the fact matters most at the moment of
 choosing — which is when the badge would not be rendered.
 
+<!-- ds:tab usage -->
+
 ## Behaviour
 
 Choosing a view replaces the grid's columns, filters and sort in one step.
@@ -81,6 +87,8 @@ loses nothing.
 | Options | Plain text, including `(default)` — a screen reader reads the fact, it is not carried by styling |
 | Height | `small` resolves through `kendo-bridge.css`, not a number written here |
 
+<!-- ds:tab code -->
+
 ## API
 
 | Prop | Type | Notes |
@@ -91,10 +99,14 @@ loses nothing.
 
 ---
 
+<!-- ds:tab usage -->
+
 ## Related
 
 [Filter toolbar](filter-toolbar.md) · [Column chooser](column-chooser.md) ·
 [D3 · Grids](../design-system.md#d3--grids)
+
+<!-- ds:tab changelog -->
 
 ## Recent changes
 

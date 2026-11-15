@@ -6,6 +6,12 @@
 
 ---
 
+<!-- ds:tab examples -->
+
+<!-- ds:specimen error-state -->
+
+<!-- ds:tab usage -->
+
 ## When to use
 
 **When a screen cannot show what the user came for** — a route threw, a fetch
@@ -87,6 +93,8 @@ with itself.
 | Error id | Real text, selectable, plus the Copy button — not an image or a tooltip |
 | Focus | Not stolen; the heading is the first thing in reading order |
 
+<!-- ds:tab code -->
+
 ## API
 
 | Prop | Type | Notes |
@@ -100,11 +108,15 @@ with itself.
 
 ---
 
+<!-- ds:tab usage -->
+
 ## Related
 
 [Support ticket](support-ticket.md) · [Toast](toast.md) ·
 [Feedback](../patterns/feedback.md) ·
 [D5 · The four screen states](../design-system.md#d5--the-four-screen-states)
+
+<!-- ds:tab changelog -->
 
 ## Recent changes
 

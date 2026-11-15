@@ -42,8 +42,9 @@ it, and it is why the component layer could be swapped twice without it moving.
 
 | | | |
 | --- | --- | --- |
-| **KendoReact** | grid, dialog, tabs, combobox, upload, Excel export, button | the production library, restyled through the bridge |
-| **Radix UI** | popover, radio group, toast, slot | the four primitives Kendo does not cover |
+| **KendoReact** | grid, dialog, tabs, combobox, upload, loader, Excel export, button | the production library, restyled through the bridge |
+| **Kendo's CSS, not its React component** | checkbox, radio group | a native `<input>` wearing `k-checkbox` / `k-radio`. Kendo's own `<Checkbox>` cannot express two things this app needs, and the radio group moved here from Radix on 15 Oct 2026 |
+| **Radix UI** | popover, toast, slot | the three primitives Kendo does not cover |
 | Everything visual | `src/ui` | ours, driven entirely by tokens |
 
 `src/theme/kendo-bridge.css` maps Voyager tokens onto Kendo's CSS variable API.

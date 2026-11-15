@@ -5,6 +5,12 @@
 
 ---
 
+<!-- ds:tab examples -->
+
+<!-- ds:specimen tabs -->
+
+<!-- ds:tab usage -->
+
 ## When to use
 
 To divide **one record** into sections the user switches between without
@@ -22,6 +28,8 @@ Conversations, Activity Logs.
 
 ---
 
+<!-- ds:tab examples -->
+
 ## Anatomy
 
 ![The record tab strip](../assets/components/tabs.png)
@@ -37,6 +45,8 @@ Conversations, Activity Logs.
 cost you the record number — see [Record form](../patterns/record-form.md).
 
 ---
+
+<!-- ds:tab usage -->
 
 ## Why this one is wrapped at all
 
@@ -94,6 +104,8 @@ the next person does not remove it as dead code.
 | Count | Inside the tab's label, so it is part of the accessible name — *"Checklists & Assignment 4"* |
 | Identity | The record number is **outside** the tablist, so it is not re-announced on every switch |
 
+<!-- ds:tab code -->
+
 ## API
 
 ```tsx
@@ -110,11 +122,15 @@ the next person does not remove it as dead code.
 
 ---
 
+<!-- ds:tab usage -->
+
 ## Related
 
 [Record form](../patterns/record-form.md) · [Dialog](dialog.md) ·
 [Wizard](../patterns/wizard.md) ·
 [E2 · KendoReact](../design-system.md#e2--kendoreact)
+
+<!-- ds:tab changelog -->
 
 ## Recent changes
 

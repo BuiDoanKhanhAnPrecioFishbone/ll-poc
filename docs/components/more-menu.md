@@ -6,6 +6,12 @@
 
 ---
 
+<!-- ds:tab examples -->
+
+<!-- ds:specimen more-menu -->
+
+<!-- ds:tab usage -->
+
 ## When to use
 
 On a record's action bar, to hold the actions that are **rare, heavy or
@@ -50,6 +56,8 @@ spacing chosen in September.
 
 ---
 
+<!-- ds:tab examples -->
+
 ## Anatomy
 
 ![The More menu, open](../assets/components/more-menu.png)
@@ -78,6 +86,8 @@ rare ones belong here.
 | **Item disabled** | `--vy-on-surface-subtle`, `cursor: not-allowed`, and a `title` saying **why** |
 | **No items** | The component renders **nothing** — not an empty menu, not a disabled trigger |
 
+<!-- ds:tab usage -->
+
 ## Content
 
 - The item is a verb phrase naming the outcome: *Cancel RFQ*, not *Cancel*.
@@ -103,6 +113,8 @@ rare ones belong here.
 | Danger | Colour **and** position — danger items sit apart, so the distinction is not carried by hue alone |
 | Disabled | A disabled item leaves the tab order; its reason is in `title` |
 
+<!-- ds:tab code -->
+
 ## API
 
 | Prop | Type | Notes |
@@ -114,12 +126,16 @@ rare ones belong here.
 
 ---
 
+<!-- ds:tab usage -->
+
 ## Related
 
 [Button](button.md) ·
 [D1 · Buttons](../design-system.md#d1--buttons) ·
 [D4 · Dialogs](../design-system.md#d4--dialogs) ·
 [D6 · Words](../design-system.md#d6--words)
+
+<!-- ds:tab changelog -->
 
 ## Recent changes
 
