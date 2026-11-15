@@ -130,9 +130,43 @@ const bySrc = new Map();           // repo-relative src → { entry, ids: Map(id
 const up = file => path.posix.relative(path.posix.dirname(file), '.') || '.';
 const rel = (from, to) => path.posix.relative(path.posix.dirname(from), to) || path.posix.basename(to);
 
+/**
+ * `<!-- ds:specimen <slug> -->` becomes a live example, framed from the app.
+ *
+ * It is spliced in AROUND renderMarkdown rather than handed to it, because the
+ * renderer drops standalone HTML comments — it has to, so a ds:tab directive
+ * never prints into the PDF handover — and a placeholder passed through it
+ * would be dropped the same way.
+ *
+ * The frame points at /specimen/<slug> on the SAME deploy, so there is an
+ * example to show only when the site is served (the Vercel preview, or
+ * `npm run preview`). Opened as a file:// copy there is no app to frame, which
+ * is why the caption says what it is rather than leaving a blank box.
+ */
+/* Which slugs the app actually has an example for, read straight out of the
+   registry: a directive naming a slug nobody wrote is a dead frame, and a
+   blank box on a page is exactly the kind of fault that survives a review. */
+const SPECIMEN_SLUGS = new Set(
+  fs.readdirSync(path.join(ROOT, 'src/specimens'))
+    .filter(f => f.endsWith('.tsx') && f !== 'registry.tsx')
+    .map(f => f.replace(/\.tsx$/, '')),
+);
+
+const SPECIMEN_RE = /^\s*<!--\s*ds:specimen\s+(\S+)\s*-->\s*$/;
+
+const specimenHtml = slug =>
+  `<figure class="specimen">`
+  /* NOT loading="lazy". The frame is the main thing on the page, and lazily
+     it loaded on some pages and stayed at about:blank on others depending on
+     where it fell in the viewport — an example that appears only sometimes is
+     worse than none. The CSS keeps a min-height so nothing jumps. */
+  + `<iframe src="/specimen/${attr(slug)}" title="Live example: ${attr(slug)}" `
+  + `data-specimen="${attr(slug)}"></iframe>`
+  + `<figcaption>Live example \u2014 the real component, not a picture.</figcaption></figure>`;
+
 function render(n, md, file) {
   const baseDir = path.dirname(path.join(ROOT, n.src));
-  const { html, title, toc } = renderMarkdown(md, {
+  const opts = {
     baseDir,
     tocLabel: 'Contents',
     imageHandler(href) {
@@ -155,8 +189,34 @@ function render(n, md, file) {
       const target = path.relative(ROOT, path.resolve(baseDir, r));
       return `vyref:${target}${frag ? '#' + frag : ''}`;
     },
-  });
-  return { html: html.replace(/^<h1 [^>]*>.*?<\/h1>\n?/, ''), title, toc: toc.filter(t => t.level === 2) };
+  };
+
+  /* Split on the directive, render the prose either side of it, and drop the
+     frame in between. With no directive this is one segment and behaves
+     exactly as it did before. */
+  const parts = []; let buf = [];
+  for (const line of md.split('\n')) {
+    const m = SPECIMEN_RE.exec(line);
+    if (m) { parts.push({ md: buf.join('\n') }, { specimen: m[1] }); buf = []; }
+    else buf.push(line);
+  }
+  parts.push({ md: buf.join('\n') });
+
+  let title = '', toc = [];
+  const html = parts.map(p => {
+    if (p.specimen) return specimenHtml(p.specimen);
+    if (!p.md.trim()) return '';
+    const r = renderMarkdown(p.md, opts);
+    if (!title && r.title) title = r.title;
+    toc = toc.concat(r.toc);
+    return r.html;
+  }).filter(Boolean).join('\n');
+
+  return {
+    html: html.replace(/^<h1 [^>]*>.*?<\/h1>\n?/, ''),
+    title: title || n.title,
+    toc: toc.filter(t => t.level === 2),
+  };
 }
 
 for (const n of flat) {
@@ -362,6 +422,15 @@ function checkLinks() {
     for (const m of html.matchAll(/\b(?:href|src)="([^"]*)"/g)) {
       const url = m[1].replace(/&amp;/g, '&');
       if (/^(https?:|mailto:|data:)/.test(url) || url.startsWith('url=')) continue;
+      /* /specimen/<slug> is a route in the app this site is deployed beside,
+         not a file in the site. It is the ONE absolute path allowed, named
+         rather than waved through, so any other absolute link is still a
+         dead link and still fails the build. */
+      if (/^\/specimen\//.test(url)) {
+        const slug = url.split('/')[2];
+        if (!SPECIMEN_SLUGS.has(slug)) dead.push(`${here}: ${url} (no specimen is registered for "${slug}")`);
+        continue;
+      }
       checked++;
       const [r, frag] = url.split('#');
       const target = r ? path.resolve(path.dirname(f), r) : f;

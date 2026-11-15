@@ -7,6 +7,8 @@
 
 ---
 
+<!-- ds:specimen chip -->
+
 ## When to use
 
 To show **a filter that is currently on**, and to let the user take it off in

@@ -6,6 +6,8 @@
 
 ---
 
+<!-- ds:specimen checkbox -->
+
 ## When to use
 
 A single yes/no, or one of several independent yes/nos: *Conformal Coating*,

@@ -5,6 +5,8 @@
 
 ---
 
+<!-- ds:specimen radio-group -->
+
 ## When to use
 
 One choice from **two to four options the user should see at once**.

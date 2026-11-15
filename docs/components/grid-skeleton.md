@@ -6,6 +6,8 @@
 
 ---
 
+<!-- ds:specimen grid-skeleton -->
+
 ## When to use
 
 **A first load, where nothing is on screen yet.** The route has resolved, the

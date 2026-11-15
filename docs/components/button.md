@@ -9,6 +9,8 @@
 
 ---
 
+<!-- ds:specimen button -->
+
 ## When to use
 
 A button performs an **action on this screen**: save, export, confirm, add a

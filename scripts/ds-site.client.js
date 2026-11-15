@@ -98,3 +98,39 @@
     });
   }
 })();
+
+/* ---- live examples ------------------------------------------------------
+   Two messages cross the frame, both same-origin:
+     in   vy-specimen-height  measured inside, because an iframe has no
+                              intrinsic height and a scrollbar around an
+                              example reads as our bug
+     out  vy-specimen-theme   this page's light/dark choice, forwarded, so the
+                              example never disagrees with the page around it.
+   The theme is sent when a frame first reports its height, which is also the
+   proof that it is listening. */
+(function () {
+  var frames = document.querySelectorAll('iframe[data-specimen]');
+  if (!frames.length) return;
+
+  function tell(frame) {
+    var t = document.documentElement.getAttribute('data-theme') || 'light';
+    try { frame.contentWindow.postMessage({ type: 'vy-specimen-theme', theme: t }, location.origin); } catch (e) { void e; }
+  }
+
+  window.addEventListener('message', function (e) {
+    if (e.origin !== location.origin) return;
+    var d = e.data;
+    if (!d || d.type !== 'vy-specimen-height') return;
+    for (var i = 0; i < frames.length; i++) {
+      if (frames[i].contentWindow === e.source) {
+        frames[i].style.height = d.height + 'px';
+        tell(frames[i]);
+      }
+    }
+  });
+
+  var html = document.documentElement;
+  new MutationObserver(function () {
+    for (var i = 0; i < frames.length; i++) tell(frames[i]);
+  }).observe(html, { attributes: true, attributeFilter: ['data-theme'] });
+})();

@@ -5,6 +5,8 @@
 
 ---
 
+<!-- ds:specimen loader -->
+
 ## When to use
 
 | Situation | Use |

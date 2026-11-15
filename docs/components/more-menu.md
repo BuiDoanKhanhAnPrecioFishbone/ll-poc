@@ -6,6 +6,8 @@
 
 ---
 
+<!-- ds:specimen more-menu -->
+
 ## When to use
 
 On a record's action bar, to hold the actions that are **rare, heavy or

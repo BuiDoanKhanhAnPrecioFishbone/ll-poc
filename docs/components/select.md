@@ -8,6 +8,8 @@ type.
 
 ---
 
+<!-- ds:specimen select -->
+
 ## When to use
 
 To choose **one value from a list the system owns** — a customer, a project

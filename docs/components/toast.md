@@ -10,6 +10,8 @@ it, and what it does that you did not have to build.
 
 ---
 
+<!-- ds:specimen toast -->
+
 ## When to use
 
 To confirm something **that is already done** and that the user does not have

@@ -6,6 +6,8 @@
 
 ---
 
+<!-- ds:specimen mini-table -->
+
 ## When to use
 
 A list **inside** something else: documents on a record, quotation results,

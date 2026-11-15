@@ -7,6 +7,8 @@
 
 ---
 
+<!-- ds:specimen record-skeleton -->
+
 ## When to use
 
 While one record's values are loading, on a screen whose **fields are already

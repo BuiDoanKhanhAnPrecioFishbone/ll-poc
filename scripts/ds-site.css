@@ -155,3 +155,12 @@ ul.children .grp{margin-top:var(--vy-space-8);font-size:var(--vy-text-sm);font-w
   h2{page-break-after:avoid}
   figure,table,blockquote{page-break-inside:avoid}
 }
+
+/* Live example. The stage inside the frame draws its own border and surface,
+   so the figure adds none — two nested boxes would read as a bug. The height
+   is set from inside, because an iframe has no intrinsic height. */
+.specimen{margin:var(--vy-space-10) 0}
+.specimen iframe{display:block;width:100%;height:220px;min-height:220px;border:0;background:transparent;
+  border-radius:var(--vy-radius-lg);color-scheme:normal}
+.specimen figcaption{margin-top:var(--vy-space-4);font-size:var(--vy-text-sm);
+  color:var(--vy-on-surface-soft)}

@@ -9,6 +9,8 @@ Three controls in one file, because they are one idea wearing three shapes:
 
 ---
 
+<!-- ds:specimen field -->
+
 ## When to use
 
 | Control | For |

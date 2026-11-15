@@ -5,6 +5,8 @@
 
 ---
 
+<!-- ds:specimen dialog -->
+
 ## When to use
 
 When the user must deal with **one thing** before carrying on: a question, a

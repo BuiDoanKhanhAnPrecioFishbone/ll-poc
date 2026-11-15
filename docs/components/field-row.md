@@ -6,6 +6,8 @@
 
 ---
 
+<!-- ds:specimen field-row -->
+
 ## When to use
 
 Wherever a label sits above a value: a record field, a dialog form, a computed

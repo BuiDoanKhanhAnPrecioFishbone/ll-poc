@@ -5,6 +5,8 @@
 
 ---
 
+<!-- ds:specimen priority -->
+
 ## When to use
 
 Wherever a record's priority is shown — a grid column, a record header, a

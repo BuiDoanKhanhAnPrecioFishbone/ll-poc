@@ -10,6 +10,8 @@ the control.
 
 ---
 
+<!-- ds:specimen file-drop -->
+
 ## When to use
 
 To take a file from this machine: the BoM on Run Quotation and Create BoM

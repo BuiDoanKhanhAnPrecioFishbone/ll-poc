@@ -5,6 +5,8 @@
 
 ---
 
+<!-- ds:specimen badge -->
+
 ## When to use
 
 To show **what state a record is in** — on a record header, in a status

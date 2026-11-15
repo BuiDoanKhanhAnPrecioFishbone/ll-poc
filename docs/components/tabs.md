@@ -5,6 +5,8 @@
 
 ---
 
+<!-- ds:specimen tabs -->
+
 ## When to use
 
 To divide **one record** into sections the user switches between without

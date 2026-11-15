@@ -5,6 +5,8 @@
 
 ---
 
+<!-- ds:specimen pager -->
+
 ## When to use
 
 At the foot of a grid, always. It carries both the **position** and the
