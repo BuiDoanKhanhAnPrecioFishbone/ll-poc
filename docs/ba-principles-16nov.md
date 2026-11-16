@@ -219,21 +219,10 @@ same row.
 **Question for her:** on a list showing Priority and Status together, how
 should a reader tell a high-priority row from a blocked one?
 
-### Still not applied
+### Still not applied *(at the time of the second pass — see below)*
 
-| | |
-|---|---|
-| **`value-box` / `value-box-line`** | the read-only field treatment — a filled box with a bottom line. This system has no token for it |
-| **`changed-border`** | a field whose value differs from the saved one. We have `data-changed` on exactly one button, not as a field state |
-| `disabled-bg` / `disabled-text` | no tokens here |
-| `section-bg` | no token here |
-| Dark tooltip | hers is `#131820` on white text |
-
-Those sit inside **Input widgets**, her largest section — 10,100 characters and
-180 px values, specifying every state of every field. It is the next piece of
-work, and it is a real one: it adds field states this system does not have,
-rather than recolouring states it does.
-
+`value-box` / `value-box-line`, `changed-border`, `disabled-bg` /
+`disabled-text`. All five landed in the third pass.
 
 ---
 
@@ -263,3 +252,26 @@ the bridge, and it had to target `.k-disabled` — Kendo disables with a class,
 not the `:disabled` attribute, and a Button never carries `.vy-btn` at all.
 The first two versions of the rule matched nothing and the button stayed
 brand blue. Only opening it in a browser showed that.
+
+### Where the reconciliation actually stands
+
+Measured, not estimated: her document carries **91 colour values in its spec
+text** (the other 36 in the file are the HTML page's own styling, not part of
+the spec). **71 are now in `src/`. Twenty are not**, and they are not
+scattered — they are four coherent pieces:
+
+| Still missing | Count | |
+|---|---|---|
+| **Her dark counterparts** for surfaces she gave us in light — card header `#1B2433`, grid column header `#1B222D`, smart-button `#2A3A5C`, shell open-nav item `#1F2A3D` with its `#7F9CE1` bar, brand steps `#3B63C4` / `#4A6FCC` / `#9DB4EC` | ~8 | the light halves were adopted; the dark halves are still ours |
+| **Message surfaces** — her info / success / warning / error backgrounds and text, both themes, each with the contrast ratio already measured | ~8 | `info-bg`, `success-bg`, `warning-bg`, `danger-bg` — no tokens here |
+| **File-type chips** — PDF `#FBE9E9`/`#9B2226`, XLS `#E2F3E6`/`#1A6B34`, DOC `#E7EDF9`/`#15347E` | 3–4 | a palette this system does not have at all |
+| **Priority dot** amber `#C27A12`, and `#1F8A4C` | 2 | flagged above; waiting on her answer, not on work |
+
+**The status palette is finished.** Light, dark, and the 1px border each dark
+pill carries — all seven families match her values exactly, checked value by
+value. That was the big one, and it is closed.
+
+**One correction to an earlier claim here.** The second pass said 48 of 87
+values were missing and that the number fell to 20. Both numbers were right;
+the 87 undercounted because it skipped her three-digit hex values. The count
+is 91, and the remaining 20 are the ones tabled above.
