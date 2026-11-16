@@ -14,6 +14,10 @@
 
 /** Column widths, keyed by the semantic role of the column. See table-patterns.md. */
 export const COLUMN_WIDTH = {
+  /* The eye that opens a line, and a user name. Both come from the BA's UI
+     principles of 16 Nov 2026; neither role existed here before. */
+  view: 40,
+  person: 160,
   ident: 240,
   text: 280,
   code: 96,

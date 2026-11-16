@@ -697,9 +697,9 @@
   },
   "row": {
     "h-compact": {
-      "$value": "28px",
+      "$value": "34px",
       "$type": "dimension",
-      "$description": "Density Three grid densities. `comfortable` is the default; `compact` is what the 21,941-row Part Master should ship with. The legacy app had one 50px row height everywhere, which is why only ~10 rows fit on a 900px screen."
+      "$description": "BA principles 16 Nov 2026 — was 28px"
     },
     "h-comfortable": {
       "$value": "40px",
@@ -1323,10 +1323,14 @@
     }
   },
   "dialog": {
+    "sm": {
+      "$value": "420px",
+      "$type": "dimension",
+      "$description": "BA principles 16 Nov 2026"
+    },
     "md": {
       "$value": "640px",
-      "$type": "dimension",
-      "$description": "Dialog widths, named by size rather than set per dialog."
+      "$type": "dimension"
     },
     "lg": {
       "$value": "960px",

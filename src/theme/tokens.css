@@ -431,7 +431,7 @@
      Three grid densities. `comfortable` is the default; `compact` is what the
      21,941-row Part Master should ship with. The legacy app had one 50px row
      height everywhere, which is why only ~10 rows fit on a 900px screen. */
-  --vy-row-h-compact:     28px;
+  --vy-row-h-compact:     34px;  /* BA principles 16 Nov 2026 — was 28px */
   /* COMFORTABLE WENT UP 4px ON 13 OCTOBER, asked for at the meeting: "increase
      height of table row => comfortable". 36px was a comfortable row only by
      comparison with compact — it left 11px of air around a 13px line, which on
@@ -762,6 +762,7 @@
   --vy-checklist-col-min: 282px;  /* measured minimum for a checklist row */
 
   /* Dialog widths, named by size rather than set per dialog. */
+  --vy-dialog-sm:        420px;  /* BA principles 16 Nov 2026 */
   --vy-dialog-md:        640px;
   --vy-dialog-lg:        960px;
   --vy-dialog-xl:       1180px;
