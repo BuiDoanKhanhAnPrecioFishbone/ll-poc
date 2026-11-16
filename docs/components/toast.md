@@ -55,6 +55,25 @@ exactly what happened before.
 `notImplemented` takes the **rest of a sentence**: `what` completes *"This
 would …"*, so the message cannot drift from screen to screen.
 
+### How one reads
+
+A toast is a tint of its meaning colour with that meaning's own text on it —
+`--vy-info-bg` / `--vy-info-text` and the matching pairs for success and
+error — at 8px 12px, radius 6px, 13px at 500, 12px from the bottom-right
+corner. The error alert also draws a 1px border, the base red at 30% of the
+surface, because it is the one that stays until it is dismissed.
+
+Every kind draws **its own mark**: a circle for success and information, an
+octagon for an error. That is not decoration. Until 16 Nov 2026 this component
+had no icon and said what it meant with a green or red fill alone, which is
+the one thing [Inclusive writing](../foundations/content/inclusive-writing.md)
+tells every other part of this system not to do. A pale tint carries even less
+signal than that fill did, so the mark had to arrive with it.
+
+The three shapes are drawn inside `Toast.tsx` rather than added to the icon
+set, because the product icon set is still open design and a house `info`
+glyph is not this component's to decide.
+
 ---
 
 ## What Radix handles, and why that is the whole reason
@@ -132,3 +151,4 @@ the component count is one.
 | Date | Change |
 |---|---|
 | 8 Nov 2026 | This page |
+| 16 Nov 2026 | The BA's notice look: a tint of the meaning colour instead of a solid fill, and **a mark per kind** — the old toast carried no icon at all |

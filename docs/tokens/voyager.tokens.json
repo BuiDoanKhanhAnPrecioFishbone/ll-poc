@@ -461,7 +461,7 @@
     "text": {
       "$value": "{red.700}",
       "$extensions": {
-        "com.voyager.dark": "#f0918a"
+        "com.voyager.dark": "#f28b82"
       }
     },
     "text-deep": {
@@ -473,13 +473,61 @@
     "subtle": {
       "$value": "{red.50}",
       "$extensions": {
-        "com.voyager.dark": "#38201e"
+        "com.voyager.dark": "#3d2025"
       }
     },
     "boundary": {
       "$value": "{red.500}",
       "$extensions": {
         "com.voyager.dark": "#e0655c"
+      }
+    }
+  },
+  "info": {
+    "bg": {
+      "$value": "#e5eaf7",
+      "$type": "color",
+      "$extensions": {
+        "com.voyager.dark": "#1a2846"
+      }
+    },
+    "text": {
+      "$value": "#15347e",
+      "$type": "color",
+      "$extensions": {
+        "com.voyager.dark": "#9db4ec"
+      }
+    }
+  },
+  "warning": {
+    "bg": {
+      "$value": "#f8efe3",
+      "$type": "color",
+      "$extensions": {
+        "com.voyager.dark": "#3c3121"
+      }
+    },
+    "text": {
+      "$value": "#7a4a05",
+      "$type": "color",
+      "$extensions": {
+        "com.voyager.dark": "#f2c27a"
+      }
+    }
+  },
+  "success": {
+    "bg": {
+      "$value": "#e4f1ea",
+      "$type": "color",
+      "$extensions": {
+        "com.voyager.dark": "#18342e"
+      }
+    },
+    "text": {
+      "$value": "#1a6b34",
+      "$type": "color",
+      "$extensions": {
+        "com.voyager.dark": "#7dd39a"
       }
     }
   },

@@ -4,7 +4,7 @@
 > which stays the source. Do not edit this page: edit the CSS, where each
 > value sits beside the reasoning and the measurement that chose it.
 
-254 tokens in 70 groups. A dash in **Dark** means the value does not change between themes.
+260 tokens in 73 groups. A dash in **Dark** means the value does not change between themes.
 
 A machine-readable export of the same set, in the W3C Design Tokens draft format, is at `docs/tokens/voyager.tokens.json`.
 
@@ -155,9 +155,9 @@ A machine-readable export of the same set, in the W3C Design Tokens draft format
 |---|---|---|
 | `--vy-danger` | `{red.600}` | — |
 | `--vy-danger-on` | `{grey.0}` | — |
-| `--vy-danger-text` | `{red.700}` | `#f0918a` |
+| `--vy-danger-text` | `{red.700}` | `#f28b82` |
 | `--vy-danger-text-deep` | `{red.700}` | `#f5aba5` |
-| `--vy-danger-subtle` | `{red.50}` | `#38201e` |
+| `--vy-danger-subtle` | `{red.50}` | `#3d2025` |
 | `--vy-danger-boundary` | `{red.500}` | `#e0655c` |
 
 ## dialog
@@ -248,6 +248,13 @@ A machine-readable export of the same set, in the W3C Design Tokens draft format
 | Token | Light | Dark |
 |---|---|---|
 | `--vy-icon-sm` | `16px` | — |
+
+## info
+
+| Token | Light | Dark |
+|---|---|---|
+| `--vy-info-bg` | `#e5eaf7` | `#1a2846` |
+| `--vy-info-text` | `#15347e` | `#9db4ec` |
 
 ## kpi
 
@@ -496,6 +503,13 @@ A machine-readable export of the same set, in the W3C Design Tokens draft format
 | `--vy-status-cancelled-bd` | `#b9c0ca` | `#4a5466` |
 | `--vy-status-slot-w` | `104px` | — |
 
+## success
+
+| Token | Light | Dark |
+|---|---|---|
+| `--vy-success-bg` | `#e4f1ea` | `#18342e` |
+| `--vy-success-text` | `#1a6b34` | `#7dd39a` |
+
 ## sup
 
 | Token | Light | Dark |
@@ -590,6 +604,13 @@ A machine-readable export of the same set, in the W3C Design Tokens draft format
 |---|---|---|
 | `--vy-vs-width-col` | `88px` | — |
 | `--vy-vs-action-col` | `6rem` | — |
+
+## warning
+
+| Token | Light | Dark |
+|---|---|---|
+| `--vy-warning-bg` | `#f8efe3` | `#3c3121` |
+| `--vy-warning-text` | `#7a4a05` | `#f2c27a` |
 
 ## weight
 

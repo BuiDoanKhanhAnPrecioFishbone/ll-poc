@@ -288,6 +288,33 @@
   --vy-danger-subtle:     var(--vy-red-50);
   --vy-danger-boundary:   var(--vy-red-500);
 
+  /* --- Meaning colours -----------------------------------------------------
+     The BA's settled set, 16 Nov 2026. Four colours carry meaning beyond the
+     brand blue, and each one always ships with its own icon and text, so the
+     meaning survives without the colour. The same colour means the same thing
+     in a field, a grid cell, a banner, a toast and a comparison.
+
+     Her derivation: one base per meaning, used in BOTH themes; the background
+     is that base mixed into the surface at 12% light and 22% dark. These are
+     her RESOLVED values, not the mix — she asks for them literally and warns
+     against rounding them to a ramp step, because they were picked by
+     measuring contrast rather than by walking a ramp.
+
+     Red is not here: it is `--vy-danger-subtle` / `--vy-danger-text` above,
+     which already hold her light pair exactly (#fdeceb / #9e231d).
+
+     Three of these four light tints equal a status pill tint by value. They
+     are kept separate on purpose: she states the pills carry their own tints,
+     and her red proves the two sets are not one — the pill is #f8e6e5 and the
+     meaning is #fdeceb. Aliasing them would tie two vocabularies together
+     that she keeps apart. */
+  --vy-info-bg:           #e5eaf7;
+  --vy-info-text:         #15347e;
+  --vy-warning-bg:        #f8efe3;
+  --vy-warning-text:      #7a4a05;
+  --vy-success-bg:        #e4f1ea;
+  --vy-success-text:      #1a6b34;
+
   /* --- Status semantics -----------------------------------------------------
      One token per BUSINESS STATE, not per colour. Every module maps its own
      lifecycle onto these six, which is what makes status readable across
@@ -926,10 +953,16 @@
      in the system, the tightest being `surface-strong` at 4.53. */
   --vy-danger: var(--vy-red-600);
   --vy-danger-on: var(--vy-grey-0);
-  --vy-danger-text: #f0918a;
+  --vy-danger-text: #f28b82;
   --vy-danger-text-deep: #f5aba5;
-  --vy-danger-subtle: #38201e;
+  --vy-danger-subtle: #3d2025;
   --vy-danger-boundary: #e0655c;
+  --vy-info-bg: #1a2846;
+  --vy-info-text: #9db4ec;
+  --vy-warning-bg: #3c3121;
+  --vy-warning-text: #f2c27a;
+  --vy-success-bg: #18342e;
+  --vy-success-text: #7dd39a;
   --vy-status-draft-fg: #d3dae3;
   --vy-status-draft-bg: #393f48;
   --vy-status-draft-bd: #646b75;
@@ -1054,10 +1087,16 @@
     --vy-brand-soft: var(--vy-blue-400);
     --vy-danger: var(--vy-red-600);
     --vy-danger-on: var(--vy-grey-0);
-    --vy-danger-text: #f0918a;
+    --vy-danger-text: #f28b82;
     --vy-danger-text-deep: #f5aba5;
-    --vy-danger-subtle: #38201e;
+    --vy-danger-subtle: #3d2025;
     --vy-danger-boundary: #e0655c;
+    --vy-info-bg: #1a2846;
+    --vy-info-text: #9db4ec;
+    --vy-warning-bg: #3c3121;
+    --vy-warning-text: #f2c27a;
+    --vy-success-bg: #18342e;
+    --vy-success-text: #7dd39a;
     --vy-status-draft-fg: #d3dae3;
     --vy-status-draft-bg: #393f48;
     --vy-status-draft-bd: #646b75;

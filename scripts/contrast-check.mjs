@@ -153,6 +153,16 @@ for (const [themeName, env] of [['light', light], ['dark', dark]]) {
   check('text', `${themeName}  value in a view box`, '--vy-on-surface', '--vy-value-box', env, TEXT_MIN);
   check('text', `${themeName}  link in a view box`, '--vy-brand-text-deep', '--vy-value-box', env, TEXT_MIN);
 
+  /* The BA's meaning colours, 16 Nov 2026. She publishes a ratio beside each
+     pair — 9.56 info, 6.57 warning, 5.65 success, 6.78 danger in light — so
+     these four lines are less a test than a witness: if a value here is ever
+     edited away from hers, the number moves and this says so. Her red pair is
+     `danger-subtle` / `danger-text`, which the light theme already held. */
+  check('text', `${themeName}  information notice`, '--vy-info-text', '--vy-info-bg', env, TEXT_MIN);
+  check('text', `${themeName}  warning notice`, '--vy-warning-text', '--vy-warning-bg', env, TEXT_MIN);
+  check('text', `${themeName}  success notice`, '--vy-success-text', '--vy-success-bg', env, TEXT_MIN);
+  check('text', `${themeName}  error notice`, '--vy-danger-text', '--vy-danger-subtle', env, TEXT_MIN);
+
   /* A BOUNDARY IS SET BY ITS WORST GROUND, exactly like a text tier, and this
      loop is here because the first version of this file checked the control
      boundary against the panel alone. `--vy-border-control` was chosen in

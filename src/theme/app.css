@@ -528,7 +528,10 @@
 .vy-flag-mark { font-weight: var(--vy-weight-heavy); width: var(--vy-space-5); color: var(--vy-on-surface-subtle); }
 .vy-flag-row[data-on="true"] .vy-flag-mark { color: var(--vy-accent-positive); }
 
-.vy-note-inline { font-size: var(--vy-text-xs); color: var(--vy-brand-text-hover); background: var(--vy-brand-subtle); border-radius: var(--vy-radius-sm); padding: var(--vy-space-2) var(--vy-space-4); margin: var(--vy-space-2) 0; }
+/* This is her info banner: the same tint and text as an info toast, so the
+   two read as one voice. It was brand-tinted before, which said "this is a
+   link or a selection" rather than "here is something you should know". */
+.vy-note-inline { font-size: var(--vy-text-xs); color: var(--vy-info-text); background: var(--vy-info-bg); border-radius: var(--vy-radius-lg); padding: var(--vy-space-2) var(--vy-space-4); margin: var(--vy-space-2) 0; }
 
 /* =============================================================================
    QUOTATION — CHECKLISTS & ASSIGNMENT

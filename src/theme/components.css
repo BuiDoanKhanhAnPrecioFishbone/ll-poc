@@ -461,24 +461,40 @@ html[data-kendo-bridged] .vy-btn:disabled {
 
    Full width on a narrow screen, because a corner on a 375px phone is most of
    the width anyway and a right-anchored strip would read as clipped. */
-.vy-toasts { position: fixed; right: var(--vy-space-9); bottom: var(--vy-space-9); display: flex; flex-direction: column; gap: var(--vy-space-4); z-index: var(--vy-z-toast); margin: 0; padding: 0; list-style: none; max-width: min(92vw, 420px); }
+.vy-toasts { position: fixed; right: var(--vy-space-6); bottom: var(--vy-space-6); display: flex; flex-direction: column; gap: var(--vy-space-4); z-index: var(--vy-z-toast); margin: 0; padding: 0; list-style: none; max-width: min(92vw, 420px); }
 @media (max-width: 560px) {
   .vy-toasts { left: var(--vy-space-6); right: var(--vy-space-6); max-width: none; }
 }
+/* The BA's notice look, 16 Nov 2026: a tint of the meaning colour with the
+   meaning's own text on it, not a solid fill with white text. Her sizes —
+   padding 8px 12px, radius 6px, 13px at 500 — and 12px from the screen edges.
+
+   Each kind also draws its mark, which is what makes the change safe: a pale
+   tint carries less signal than a solid fill did, and `inclusive-writing` here
+   has always said a state is a word AND a shape, never a colour alone. The old
+   toast broke that rule — it had no icon at all and leaned entirely on a green
+   or red fill. The shapes are the ones her spec names: a circle for success
+   and information, an octagon for an error. */
 .vy-toast {
   display: flex; align-items: flex-start; gap: var(--vy-space-5);
-  background: var(--vy-surface-chrome); color: var(--vy-on-dark-fg);
-  border-radius: var(--vy-shape-sm); box-shadow: var(--vy-elev-4);
-  padding: var(--vy-space-5) var(--vy-space-6); font-size: var(--vy-text-base);
+  border: 1px solid transparent;
+  border-radius: var(--vy-radius-lg); box-shadow: var(--vy-elev-4);
+  padding: var(--vy-space-4) var(--vy-space-6); font-size: var(--vy-text-base);
+  font-weight: var(--vy-weight-medium);
   animation: vy-toast-in var(--vy-dur-medium) var(--vy-ease-decelerate);
 }
-.vy-toast[data-kind="success"] { background: var(--vy-accent-positive); }
-/* red-600 rather than the red-500 accent: this carries white text, and the
-   accent red is reserved for destructive CONTROLS, where it sits under a label
-   rather than behind one. */
-.vy-toast[data-kind="error"] { background: var(--vy-danger); }
+.vy-toast[data-kind="info"]    { background: var(--vy-info-bg);       color: var(--vy-info-text); }
+.vy-toast[data-kind="success"] { background: var(--vy-success-bg);    color: var(--vy-success-text); }
+/* The error alert alone gets a border. She draws it as the base red at 30% of
+   the surface; that mix is written out rather than frozen into a hex, so it
+   stays correct in both themes without a second token. */
+.vy-toast[data-kind="error"] {
+  background: var(--vy-danger-subtle); color: var(--vy-danger-text);
+  border-color: color-mix(in srgb, var(--vy-danger) 30%, var(--vy-surface));
+}
+.vy-toast-mark { flex: none; margin-top: 1px; }
 .vy-toast[data-swipe="end"] { animation: vy-toast-out var(--vy-dur-short) var(--vy-ease-accelerate); }
-.vy-toast-text { margin: 0; }
+.vy-toast-text { margin: 0; flex: 1 1 auto; min-width: 0; }
 .vy-toast-close { background: none; border: 0; color: inherit; opacity: .7; cursor: pointer; padding: 0; display: inline-flex; }
 .vy-toast-close:hover { opacity: 1; }
 @keyframes vy-toast-in  { from { opacity: 0; transform: translateY(var(--vy-space-6)) } to { opacity: 1; transform: none } }
@@ -1015,7 +1031,7 @@ html[data-kendo-bridged] .vy-btn:disabled {
   color: inherit; text-decoration: underline; text-underline-offset: 3px;
   white-space: nowrap;
 }
-.vy-toast-undo:hover { background: rgba(255, 255, 255, .14); }
+.vy-toast-undo:hover { background: color-mix(in srgb, currentColor 12%, transparent); }
 .vy-toast-undo:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
 
 /* ---- Priority: dot + word ------------------------------------------------

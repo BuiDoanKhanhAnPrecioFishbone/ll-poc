@@ -275,3 +275,93 @@ value. That was the big one, and it is closed.
 values were missing and that the number fell to 20. Both numbers were right;
 the 87 undercounted because it skipped her three-digit hex values. The count
 is 91, and the remaining 20 are the ones tabled above.
+
+
+---
+
+## Fourth pass — the meaning colours
+
+**Her largest real gap, and it is now closed.** This system had `danger` and
+nothing else: no `info`, no `warning`, no `success`. Six tokens added across
+all three theme blocks, with her literal values, and `contrast:check` grew
+from 188 pairs to 196.
+
+Then the proof that the transcription is right: all eight ratios reproduce the
+figures printed in her own document, to two decimals.
+
+| | Light | Dark |
+|---|---|---|
+| Information | 9.56:1 | 7.09:1 |
+| Warning | 6.57:1 | 7.73:1 |
+| Success | 5.65:1 | 7.43:1 |
+| Error | 6.78:1 | 6.14:1 |
+
+Her error pair was already here under our own names — `--vy-danger-subtle` /
+`--vy-danger-text` held `#fdeceb` / `#9e231d` before either document was
+compared with the other.
+
+**What changed on screen.** Toast moves from a solid green or red fill with
+white text to her tint-plus-meaning-text look, at her sizes. The inline note
+becomes her info banner; it was brand-tinted, which said *"this is a link"*
+rather than *"here is something you should know"*.
+
+**And a fault this uncovered.** Toast had **no icon at all** — it said success
+or failure with a green or red fill and nothing else. That is the one thing
+this system's own Inclusive writing page tells everything else not to do, and
+it had been sitting in a component with 68 call sites. A pale tint carries
+less signal than that fill did, so each kind now draws its mark: a circle for
+success and information, an octagon for an error, the shapes her notice spec
+names.
+
+Her values are now 79 of 91 present, up from 71.
+
+### The twelve that remain are not a backlog — they are four questions
+
+Every one of them is a case where **both documents hold the same colour under
+a different name**. Nothing is missing; the roles disagree. Flipping any of
+them changes how the app looks without adding a value, so they are yours to
+settle with her rather than ours to overwrite.
+
+**1. `border-input` — the one where we have a measurement she does not.**
+Hers is `#8A94A6`, and her document states 3.06:1, which is correct against
+white. Her own spec puts inputs on surfaces that are not white:
+
+| Ground | Hers `#8A94A6` | Ours `#758096` |
+|---|---|---|
+| `surface` `#FFFFFF` | 3.06:1 ok | 3.97:1 ok |
+| her `ground` `#F5F7FA` | **2.85:1 fails** | 3.70:1 ok |
+| her `section-bg` `#F1F4FA` | **2.78:1 fails** | 3.61:1 ok |
+| her `value-box` `#F1F3F6` | **2.75:1 fails** | 3.57:1 ok |
+
+WCAG 1.4.11 asks 3:1 for a control boundary. Ours clears it on every ground in
+her system; hers clears it only on white. **Recommend keeping ours** and
+telling her why — this is a case where her number is right and the ground it
+was measured against is the thing to revisit.
+
+**2. Focus is a different mechanism in the two documents.** Hers: the
+control's own border turns the focus colour at 2px, *no ring outside the box*.
+Ours: a 2px ring on the ground beside the control, offset 2px — which is why
+our dark focus value was picked to clear the **ground** (blue-400 reached only
+2.88 on `surface-strong`; blue-300 clears every dark ground). Her model needs
+the value to clear the control's own fill instead. Same intent, different
+geometry, and `focus:check` is built on ours. **This one needs a decision
+before either value moves.**
+
+**3. `text` and `strong` are swapped between the two documents.** Hers:
+`text` `#131820`, `strong` `#232A34`. Ours: `--vy-on-surface` `#232a34`,
+`--vy-on-surface-strong` `#131820`. Both values live in both systems. The
+effect is that her body text is one step darker than ours. Adopting it re-inks
+every screen, and only improves contrast, so it is safe — but it is not a
+quiet change and should be a deliberate one.
+
+**4. Dark surfaces and the dark brand, same pattern.** Her `header-bar` dark
+`#0B0E14` is exactly our `--vy-surface-sunken` dark; our `--vy-surface-chrome`
+dark `#1e2531` is exactly her `surface-raised`. Her dark primary is `#3B63C4`
+carrying white text; ours is a light blue carrying dark text, because
+**Kendo computes `on-primary` from `primary` by a contrast switch** — a lighter
+primary gets dark text automatically. Hers is reachable, but it means setting
+`brand-on` to white in dark at the same time, in one deliberate move.
+
+Still genuinely absent, and both are **components rather than colours**: her
+**file-type chip** (the XLS / DOC / PDF badge on a file row) and her **warning
+banner**. Neither exists here, so their colours belong with the component.

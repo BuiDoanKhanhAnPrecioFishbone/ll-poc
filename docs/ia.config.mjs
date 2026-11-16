@@ -161,6 +161,8 @@ export const nav = [
         children: [
           { slug: 'color-palette',            title: 'Color palette',         src: 'docs/foundations/color/color-palette.md',            kind: 'page' },
           { slug: 'accents',                  title: 'Accents and row tones', src: 'docs/foundations/color/accents.md',                  kind: 'page' },
+          { slug: 'meaning',                  title: 'Color meaning',         src: 'docs/foundations/color/meaning.md',                  kind: 'page', phase: 'ga',
+            basis: "the BA's four meaning colours, 16 Nov 2026; eight pairs in contrast:check" },
           { slug: 'status-vocabulary',        title: 'Status vocabulary',     src: 'docs/foundations/color/status-vocabulary.md',        kind: 'page', phase: 'ga',
             basis: 'eight statuses in the B1.6 table; progress joined them on 8 Nov 2026' },
           { slug: 'data-visualization-color', title: 'Data visualization',    src: 'docs/foundations/color/data-visualization-color.md', kind: 'page', phase: 'beta',
