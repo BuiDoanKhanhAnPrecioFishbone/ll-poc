@@ -11,7 +11,7 @@
      Part Master  Active / Inactive / Obsolete / Pending
    ========================================================================== */
 
-export type StatusToken = 'draft' | 'open' | 'progress' | 'waiting' | 'done' | 'blocked' | 'cancelled';
+export type StatusToken = 'draft' | 'open' | 'progress' | 'waiting' | 'review' | 'done' | 'blocked' | 'cancelled';
 
 /*
  * Seven tokens, not six. `waiting` was added after the Quotations screen showed
@@ -32,12 +32,18 @@ export type StatusToken = 'draft' | 'open' | 'progress' | 'waiting' | 'done' | '
  *   cancelled closed without completing
  */
 export const STATUS_TOKEN: Record<string, StatusToken> = {
+  /* The family each word belongs to comes from the BA's UI principles of
+     16 Nov 2026, which list the words per family. Three moved on that sheet:
+     Quoted and Released are COMMITTED (blue), not waiting or done, and Closed
+     is DONE (green), not ended. `review` had no word pointing at it until
+     now — it is the blue family. */
   Draft: 'draft', Pending: 'draft',
   New: 'open', Open: 'open',
   'In-Progress': 'progress', Partial: 'progress',
-  Quoted: 'waiting', Submitted: 'waiting', 'Awaiting Approval': 'waiting',
-  Active: 'done', Released: 'done', Completed: 'done', Paid: 'done',
-  Inactive: 'cancelled', Cancelled: 'cancelled', Closed: 'cancelled',
+  Quoted: 'review', Released: 'review', Submitted: 'review',
+  'Awaiting Approval': 'waiting',
+  Active: 'done', Completed: 'done', Paid: 'done', Closed: 'done',
+  Inactive: 'cancelled', Cancelled: 'cancelled',
   Obsolete: 'blocked', Blocked: 'blocked', Overdue: 'blocked',
 };
 
@@ -53,6 +59,7 @@ export const STATUS_THEME: Record<StatusToken, BadgeTheme> = {
   open: 'warning',
   progress: 'info',
   waiting: 'tertiary',
+  review: 'primary',
   done: 'success',
   blocked: 'error',
   cancelled: 'secondary',

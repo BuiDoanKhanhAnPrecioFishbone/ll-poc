@@ -4,7 +4,7 @@
 > which stays the source. Do not edit this page: edit the CSS, where each
 > value sits beside the reasoning and the measurement that chose it.
 
-239 tokens in 66 groups. A dash in **Dark** means the value does not change between themes.
+247 tokens in 66 groups. A dash in **Dark** means the value does not change between themes.
 
 A machine-readable export of the same set, in the W3C Design Tokens draft format, is at `docs/tokens/voyager.tokens.json`.
 
@@ -450,22 +450,30 @@ A machine-readable export of the same set, in the W3C Design Tokens draft format
 
 | Token | Light | Dark |
 |---|---|---|
-| `--vy-status-draft-fg` | `{grey.600}` | `#aab4c3` |
-| `--vy-status-draft-bg` | `{grey.100}` | `#2a323f` |
-| `--vy-status-open-fg` | `#92400e` | `#eeb796` |
-| `--vy-status-open-bg` | `#fef3c7` | `#38281e` |
-| `--vy-status-progress-fg` | `#155e75` | `#96e4ee` |
-| `--vy-status-progress-bg` | `#cffafe` | `#1e3838` |
-| `--vy-status-done-fg` | `#065f46` | `#96eed5` |
-| `--vy-status-done-bg` | `#d1fae5` | `#1e3831` |
-| `--vy-status-waiting-fg` | `#5b21b6` | `#b896ee` |
-| `--vy-status-waiting-bg` | `#ede9fe` | `#281e38` |
-| `--vy-status-review-fg` | `#0e7490` | `#96dbee` |
-| `--vy-status-review-bg` | `#ecfeff` | `#1e3338` |
-| `--vy-status-blocked-fg` | `{red.700}` | `#ee9a96` |
-| `--vy-status-blocked-bg` | `{red.50}` | `#38201e` |
-| `--vy-status-cancelled-fg` | `{grey.500}` | `#aab4c3` |
-| `--vy-status-cancelled-bg` | `{grey.100}` | `#2a323f` |
+| `--vy-status-draft-fg` | `#4d5766` | `#d3dae3` |
+| `--vy-status-draft-bg` | `#eceff3` | `#393f48` |
+| `--vy-status-draft-bd` | `transparent` | `#646b75` |
+| `--vy-status-open-fg` | `#4d5766` | `#d3dae3` |
+| `--vy-status-open-bg` | `#eceff3` | `#393f48` |
+| `--vy-status-open-bd` | `transparent` | `#646b75` |
+| `--vy-status-progress-fg` | `#0e5a52` | `#8be3d8` |
+| `--vy-status-progress-bg` | `#d9f0ee` | `#244145` |
+| `--vy-status-progress-bd` | `transparent` | `#366e6d` |
+| `--vy-status-done-fg` | `#1a6b34` | `#98e3b7` |
+| `--vy-status-done-bg` | `#e4f1ea` | `#28413c` |
+| `--vy-status-done-bd` | `transparent` | `#3e6e5a` |
+| `--vy-status-waiting-fg` | `#7a4a05` | `#f8cc6e` |
+| `--vy-status-waiting-bg` | `#f8efe3` | `#433b2b` |
+| `--vy-status-waiting-bd` | `transparent` | `#7a6232` |
+| `--vy-status-review-fg` | `#15347e` | `#b4cbfa` |
+| `--vy-status-review-bg` | `#e5eaf7` | `#2e3a4f` |
+| `--vy-status-review-bd` | `transparent` | `#4c5f83` |
+| `--vy-status-blocked-fg` | `#9b2226` | `#f7ada6` |
+| `--vy-status-blocked-bg` | `#f8e6e5` | `#423238` |
+| `--vy-status-blocked-bd` | `transparent` | `#794e4f` |
+| `--vy-status-cancelled-fg` | `#4d5766` | `#aab4c3` |
+| `--vy-status-cancelled-bg` | `#ffffff` | `#161c25` |
+| `--vy-status-cancelled-bd` | `#b9c0ca` | `#4a5466` |
 | `--vy-status-slot-w` | `104px` | — |
 
 ## sup
@@ -525,9 +533,9 @@ A machine-readable export of the same set, in the W3C Design Tokens draft format
 | `--vy-tone-excluded-fg` | `{grey.500}` | `#aab4c3` |
 | `--vy-tone-missing-bg` | `{red.50}` | `#38201e` |
 | `--vy-tone-missing-fg` | `{red.700}` | `#ee9a96` |
-| `--vy-tone-short-bg` | `{status.open-bg}` | — |
+| `--vy-tone-short-bg` | `#fef3c7` | — |
 | `--vy-tone-covered-bg` | `{status.done-bg}` | — |
-| `--vy-tone-known-mfg-bg` | `{status.open-bg}` | — |
+| `--vy-tone-known-mfg-bg` | `#fef3c7` | — |
 | `--vy-tone-pending-bg` | `{surface.sunken}` | — |
 
 ## tz

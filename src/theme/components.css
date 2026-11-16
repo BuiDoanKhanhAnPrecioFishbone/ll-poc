@@ -95,14 +95,21 @@ a.vy-btn, a.vy-btn:hover { text-decoration: none; }
   width: var(--vy-status-slot-w); padding: var(--vy-space-1) var(--vy-space-4);
   font-size: var(--vy-text-xs); font-weight: var(--vy-weight-semibold);
   border-radius: var(--vy-shape-full); white-space: nowrap;
+  /* A 1px border of the family's own colour. In light it is transparent for
+     six of the seven and visible on `cancelled`, which the BA's principles of
+     16 Nov draw as an outline pill rather than a filled one; in dark every
+     family carries it, which is how that sheet separates a 20% tint from the
+     surface behind it. */
+  border: 1px solid var(--vy-status-bd, transparent);
 }
-.vy-badge[data-token="draft"]     { color: var(--vy-status-draft-fg);     background: var(--vy-status-draft-bg); }
-.vy-badge[data-token="open"]      { color: var(--vy-status-open-fg);      background: var(--vy-status-open-bg); }
-.vy-badge[data-token="progress"]  { color: var(--vy-status-progress-fg);  background: var(--vy-status-progress-bg); }
-.vy-badge[data-token="waiting"]   { color: var(--vy-status-waiting-fg);   background: var(--vy-status-waiting-bg); }
-.vy-badge[data-token="done"]      { color: var(--vy-status-done-fg);      background: var(--vy-status-done-bg); }
-.vy-badge[data-token="blocked"]   { color: var(--vy-status-blocked-fg);   background: var(--vy-status-blocked-bg); }
-.vy-badge[data-token="cancelled"] { color: var(--vy-status-cancelled-fg); background: var(--vy-status-cancelled-bg); }
+.vy-badge[data-token="draft"]     { color: var(--vy-status-draft-fg);     background: var(--vy-status-draft-bg); border-color: var(--vy-status-draft-bd); }
+.vy-badge[data-token="open"]      { color: var(--vy-status-open-fg);      background: var(--vy-status-open-bg); border-color: var(--vy-status-open-bd); }
+.vy-badge[data-token="progress"]  { color: var(--vy-status-progress-fg);  background: var(--vy-status-progress-bg); border-color: var(--vy-status-progress-bd); }
+.vy-badge[data-token="waiting"]   { color: var(--vy-status-waiting-fg);   background: var(--vy-status-waiting-bg); border-color: var(--vy-status-waiting-bd); }
+.vy-badge[data-token="review"]    { color: var(--vy-status-review-fg);    background: var(--vy-status-review-bg); border-color: var(--vy-status-review-bd); }
+.vy-badge[data-token="done"]      { color: var(--vy-status-done-fg);      background: var(--vy-status-done-bg); border-color: var(--vy-status-done-bd); }
+.vy-badge[data-token="blocked"]   { color: var(--vy-status-blocked-fg);   background: var(--vy-status-blocked-bg); border-color: var(--vy-status-blocked-bd); }
+.vy-badge[data-token="cancelled"] { color: var(--vy-status-cancelled-fg); background: var(--vy-status-cancelled-bg); border-color: var(--vy-status-cancelled-bd); }
 /* Not a workflow status — a mode. Blue, because the standard's blue means
    "changed", which is exactly what the record is while this shows. */
 .vy-badge[data-token="editing"] { color: var(--vy-brand-text-deep); background: var(--vy-brand-subtle-strong); }

@@ -3,9 +3,14 @@
 A tone is a row's **state in the quote**, not a severity. Three of them paint
 most of a BoM grid, and the legend under the grid names all three.
 
+> **Updated 16 Nov 2026.** The BA's principles move `Open` into the gray
+> status family, so amber now does **two** jobs here, not three. The argument
+> below still holds for the two row tones, and the status is no longer one of
+> them — the tones hold their own `#fef3c7` rather than aliasing the status.
+
 **Amber does three jobs, and that is allowed because of two rules.** The same
-`#fef3c7` is the `open` status, the `short` row tone and the `known-mfg` row
-tone. The objection writes itself — *yellow should mean warning and nothing
+`#fef3c7` was the `open` status, and is the `short` row tone and the
+`known-mfg` row tone. The objection writes itself — *yellow should mean warning and nothing
 else* — so here is the measured answer rather than an assertion:
 
 1. **They never meet.** `short` paints the Quoting and Quote Result grids,

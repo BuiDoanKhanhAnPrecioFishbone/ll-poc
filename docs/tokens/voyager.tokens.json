@@ -428,113 +428,168 @@
   },
   "status": {
     "draft-fg": {
-      "$value": "{grey.600}",
+      "$value": "#4d5766",
+      "$type": "color",
       "$description": "Status semantics One token per BUSINESS STATE, not per colour. Every module maps its own lifecycle onto these six, which is what makes status readable across Sales Orders, Purchase Orders, Work Orders and RMAs without relearning.",
       "$extensions": {
-        "com.voyager.dark": "#aab4c3"
+        "com.voyager.dark": "#d3dae3"
       }
     },
     "draft-bg": {
-      "$value": "{grey.100}",
+      "$value": "#eceff3",
+      "$type": "color",
       "$extensions": {
-        "com.voyager.dark": "#2a323f"
+        "com.voyager.dark": "#393f48"
+      }
+    },
+    "draft-bd": {
+      "$value": "transparent",
+      "$extensions": {
+        "com.voyager.dark": "#646b75"
       }
     },
     "open-fg": {
-      "$value": "#92400e",
+      "$value": "#4d5766",
       "$type": "color",
       "$extensions": {
-        "com.voyager.dark": "#eeb796"
+        "com.voyager.dark": "#d3dae3"
       }
     },
     "open-bg": {
-      "$value": "#fef3c7",
+      "$value": "#eceff3",
       "$type": "color",
       "$extensions": {
-        "com.voyager.dark": "#38281e"
+        "com.voyager.dark": "#393f48"
+      }
+    },
+    "open-bd": {
+      "$value": "transparent",
+      "$extensions": {
+        "com.voyager.dark": "#646b75"
       }
     },
     "progress-fg": {
-      "$value": "#155e75",
+      "$value": "#0e5a52",
       "$type": "color",
       "$description": "Added 8 Nov — see the note in the block above. A token must appear in all three blocks or the two ways of choosing dark disagree (B1.8).",
       "$extensions": {
-        "com.voyager.dark": "#96e4ee"
+        "com.voyager.dark": "#8be3d8"
       }
     },
     "progress-bg": {
-      "$value": "#cffafe",
+      "$value": "#d9f0ee",
       "$type": "color",
       "$extensions": {
-        "com.voyager.dark": "#1e3838"
+        "com.voyager.dark": "#244145"
+      }
+    },
+    "progress-bd": {
+      "$value": "transparent",
+      "$extensions": {
+        "com.voyager.dark": "#366e6d"
       }
     },
     "done-fg": {
-      "$value": "#065f46",
+      "$value": "#1a6b34",
       "$type": "color",
       "$extensions": {
-        "com.voyager.dark": "#96eed5"
+        "com.voyager.dark": "#98e3b7"
       }
     },
     "done-bg": {
-      "$value": "#d1fae5",
+      "$value": "#e4f1ea",
       "$type": "color",
       "$extensions": {
-        "com.voyager.dark": "#1e3831"
+        "com.voyager.dark": "#28413c"
+      }
+    },
+    "done-bd": {
+      "$value": "transparent",
+      "$extensions": {
+        "com.voyager.dark": "#3e6e5a"
       }
     },
     "waiting-fg": {
-      "$value": "#5b21b6",
+      "$value": "#7a4a05",
       "$type": "color",
       "$description": "`waiting` is in the StatusToken union and had NO colours, so every \"Quoted\" badge in the app rendered unstyled. Purple, as the guideline specifies. Measures 7.3:1.",
       "$extensions": {
-        "com.voyager.dark": "#b896ee"
+        "com.voyager.dark": "#f8cc6e"
       }
     },
     "waiting-bg": {
-      "$value": "#ede9fe",
+      "$value": "#f8efe3",
       "$type": "color",
       "$extensions": {
-        "com.voyager.dark": "#281e38"
+        "com.voyager.dark": "#433b2b"
+      }
+    },
+    "waiting-bd": {
+      "$value": "transparent",
+      "$extensions": {
+        "com.voyager.dark": "#7a6232"
       }
     },
     "review-fg": {
-      "$value": "#0e7490",
+      "$value": "#15347e",
       "$type": "color",
       "$description": "Cyan, because the guideline names it for a checklist document that has been uploaded and is awaiting approval: \"In Progress, displayed with a cyan label\". Deliberately not one of the blues — beside the primary blue a blue badge reads as a link. 5.15:1.",
       "$extensions": {
-        "com.voyager.dark": "#96dbee"
+        "com.voyager.dark": "#b4cbfa"
       }
     },
     "review-bg": {
-      "$value": "#ecfeff",
+      "$value": "#e5eaf7",
       "$type": "color",
       "$extensions": {
-        "com.voyager.dark": "#1e3338"
+        "com.voyager.dark": "#2e3a4f"
+      }
+    },
+    "review-bd": {
+      "$value": "transparent",
+      "$extensions": {
+        "com.voyager.dark": "#4c5f83"
       }
     },
     "blocked-fg": {
-      "$value": "{red.700}",
+      "$value": "#9b2226",
+      "$type": "color",
       "$extensions": {
-        "com.voyager.dark": "#ee9a96"
+        "com.voyager.dark": "#f7ada6"
       }
     },
     "blocked-bg": {
-      "$value": "{red.50}",
+      "$value": "#f8e6e5",
+      "$type": "color",
       "$extensions": {
-        "com.voyager.dark": "#38201e"
+        "com.voyager.dark": "#423238"
+      }
+    },
+    "blocked-bd": {
+      "$value": "transparent",
+      "$extensions": {
+        "com.voyager.dark": "#794e4f"
       }
     },
     "cancelled-fg": {
-      "$value": "{grey.500}",
+      "$value": "#4d5766",
+      "$type": "color",
       "$extensions": {
         "com.voyager.dark": "#aab4c3"
       }
     },
     "cancelled-bg": {
-      "$value": "{grey.100}",
+      "$value": "#ffffff",
+      "$type": "color",
       "$extensions": {
-        "com.voyager.dark": "#2a323f"
+        "com.voyager.dark": "#161c25"
+      }
+    },
+    "cancelled-bd": {
+      "$value": "#b9c0ca",
+      "$type": "color",
+      "$extensions": {
+        "com.voyager.dark": "#4a5466"
       }
     },
     "slot-w": {
@@ -589,15 +644,17 @@
       }
     },
     "short-bg": {
-      "$value": "{status.open-bg}",
-      "$description": "A supplier exists but cannot cover the quantity."
+      "$value": "#fef3c7",
+      "$type": "color",
+      "$description": "AMBER OF ITS OWN, no longer an alias of `open`. These two row tones were `var(--vy-status-open-bg)`, which was #fef3c7 — and the BA's principles of 16 Nov move `Open` into the gray family, so the alias would have turned two row tones gray as a side effect of a change to status pills. A tone is a row's state in the quote, not a status (B1.7); it keeps its amber."
     },
     "covered-bg": {
       "$value": "{status.done-bg}",
       "$description": "Priced and covered, and a part already in Part Master."
     },
     "known-mfg-bg": {
-      "$value": "{status.open-bg}",
+      "$value": "#fef3c7",
+      "$type": "color",
       "$description": "A manufacturer already in Manufacturer Management."
     },
     "pending-bg": {

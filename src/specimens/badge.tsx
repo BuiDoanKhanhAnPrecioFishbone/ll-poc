@@ -4,7 +4,7 @@ import type { Example } from './types';
 export const examples: Example[] = [
   {
     title: 'The vocabulary',
-    note: 'Seven reachable tokens, one real lifecycle word each. A word and a colour together, never a colour alone.',
+    note: 'Seven families, one per stage of a record\u2019s life. A word and a colour together, never a colour alone.',
     render: () => (
       <>
         <StatusBadge value="Draft" />
@@ -19,7 +19,7 @@ export const examples: Example[] = [
   },
   {
     title: 'Different words, one token',
-    note: 'Modules map their own lifecycle onto the shared tokens, so Active, Released, Completed and Paid all read as done.',
+    note: 'Modules map their own lifecycle onto the shared families, so Active, Completed and Paid all read as done \u2014 while Released is committed, not finished.',
     render: () => (
       <>
         <StatusBadge value="Active" />
@@ -31,7 +31,7 @@ export const examples: Example[] = [
   },
   {
     title: 'Who is blocked',
-    note: 'New needs you today; Quoted is waiting on the customer. They used to share one amber.',
+    note: 'They used to share one amber. The BA\u2019s principles of 16 Nov split them: New is not started, Quoted is committed, and amber is kept for Waiting for Approval alone.',
     render: () => (
       <>
         <StatusBadge value="New" />

@@ -55,10 +55,19 @@ record has reached.
 | `draft` | nothing has happened yet | Draft, Pending |
 | `open` | waiting on **us** — this is what a work queue filters to | New, Open |
 | `progress` | actively being worked by us | In-Progress, Partial |
-| `waiting` | waiting on **someone else** — a customer, a supplier, an approver | Quoted, Submitted, Awaiting Approval |
-| `done` | closed successfully | Active, Released, Completed, Paid |
+| `review` | committed — sent, approved, released; the ball is elsewhere | Quoted, Released, Submitted |
+| `waiting` | waiting on **someone else**, by name | Awaiting Approval |
+| `done` | closed successfully | Active, Completed, Paid, Closed |
 | `blocked` | stopped, needs intervention | Obsolete, Blocked, Overdue |
-| `cancelled` | closed without completing | Inactive, Cancelled, Closed |
+| `cancelled` | ended without completing — drawn as an outline, not a fill | Inactive, Cancelled |
+
+> **Updated 16 Nov 2026.** The BA's UI principles name the words in each
+> family, and three moved: **Quoted** and **Released** are committed (the blue
+> family, `review` — which until then had no word pointing at it), and
+> **Closed** is done rather than ended. `waiting` now holds one word, *Waiting
+> for Approval*, and amber is kept for it alone. The argument below is why
+> the distinction existed in the first place, and it still holds — only the
+> family each word lands in has changed.
 
 > **Seven, not six.** `waiting` was added after the Quotations screen showed
 > why six is one short: an RFQ that is *New* (nobody has picked it up) and one

@@ -278,10 +278,12 @@
      One token per BUSINESS STATE, not per colour. Every module maps its own
      lifecycle onto these six, which is what makes status readable across
      Sales Orders, Purchase Orders, Work Orders and RMAs without relearning. */
-  --vy-status-draft-fg:      var(--vy-grey-600);
-  --vy-status-draft-bg:      var(--vy-grey-100);
-  --vy-status-open-fg:       #92400e;
-  --vy-status-open-bg:       #fef3c7;
+  --vy-status-draft-fg: #4d5766;
+  --vy-status-draft-bg: #eceff3;
+  --vy-status-draft-bd: transparent;
+  --vy-status-open-fg: #4d5766;
+  --vy-status-open-bg: #eceff3;
+  --vy-status-open-bd: transparent;
   /* In-Progress is GREEN, per the customer's Testing Guideline. It was blue.
      Solid rather than pale, so it stays distinct from Completed — the guideline
      names them "Green" and "Light Green", which only works if one of them is
@@ -296,29 +298,35 @@
      green at hue 149 and measures 1.01:1 against it, which is no difference at
      all. #CFFAFE is 36° away and reads as a different colour rather than a
      paler one. 6.49:1 on the fill, against 6.78:1 for the done pill. */
-  --vy-status-progress-fg:   #155e75;
-  --vy-status-progress-bg:   #cffafe;
-  --vy-status-done-fg:       #065f46;
-  --vy-status-done-bg:       #d1fae5;
+  --vy-status-progress-fg: #0e5a52;
+  --vy-status-progress-bg: #d9f0ee;
+  --vy-status-progress-bd: transparent;
+  --vy-status-done-fg: #1a6b34;
+  --vy-status-done-bg: #e4f1ea;
+  --vy-status-done-bd: transparent;
   /* `waiting` is in the StatusToken union and had NO colours, so every
      "Quoted" badge in the app rendered unstyled. Purple, as the guideline
      specifies. Measures 7.3:1. */
-  --vy-status-waiting-fg:    #5b21b6;
-  --vy-status-waiting-bg:    #ede9fe;
+  --vy-status-waiting-fg: #7a4a05;
+  --vy-status-waiting-bg: #f8efe3;
+  --vy-status-waiting-bd: transparent;
   /* Cyan, because the guideline names it for a checklist document that has been
      uploaded and is awaiting approval: "In Progress, displayed with a cyan
      label". Deliberately not one of the blues — beside the primary blue a blue
      badge reads as a link. 5.15:1. */
-  --vy-status-review-fg:     #0e7490;
-  --vy-status-review-bg:     #ecfeff;
-  --vy-status-blocked-fg:    var(--vy-red-700);
-  --vy-status-blocked-bg:    var(--vy-red-50);
-  --vy-status-cancelled-fg:  var(--vy-grey-500);
+  --vy-status-review-fg: #15347e;
+  --vy-status-review-bg: #e5eaf7;
+  --vy-status-review-bd: transparent;
+  --vy-status-blocked-fg: #9b2226;
+  --vy-status-blocked-bg: #f8e6e5;
+  --vy-status-blocked-bd: transparent;
+  --vy-status-cancelled-fg: #4d5766;
   /* Chart-only. A cancelled SEGMENT has to be told apart from a New one at a
      glance, touching it in the same bar; a cancelled BADGE never does. Darker
      and cooler than draft's neutral, in both themes. */
   --vy-chart-cancelled:      var(--vy-grey-700);
-  --vy-status-cancelled-bg:  var(--vy-grey-100);
+  --vy-status-cancelled-bg: #ffffff;
+  --vy-status-cancelled-bd: #b9c0ca;
 
   /* --- BoM line tones -------------------------------------------------------
      Colour as DATA, for the Run Quotation grids. The Testing Guideline assigns
@@ -337,11 +345,16 @@
   --vy-tone-missing-bg:      var(--vy-red-50);
   --vy-tone-missing-fg:      var(--vy-red-700);
   /* A supplier exists but cannot cover the quantity. */
-  --vy-tone-short-bg:        var(--vy-status-open-bg);
+  /* AMBER OF ITS OWN, no longer an alias of `open`. These two row tones were
+     `var(--vy-status-open-bg)`, which was #fef3c7 — and the BA's principles of
+     16 Nov move `Open` into the gray family, so the alias would have turned
+     two row tones gray as a side effect of a change to status pills. A tone is
+     a row's state in the quote, not a status (B1.7); it keeps its amber. */
+  --vy-tone-short-bg:        #fef3c7;
   /* Priced and covered, and a part already in Part Master. */
   --vy-tone-covered-bg:      var(--vy-status-done-bg);
   /* A manufacturer already in Manufacturer Management. */
-  --vy-tone-known-mfg-bg:    var(--vy-status-open-bg);
+  --vy-tone-known-mfg-bg:    #fef3c7;
   /* AWAITING THE QUOTE RUN — not an error. This pointed at the same red-50 as
      `missing`, so step 3 opened with 240 cells painted like failures for
      values that simply had not been fetched yet. We had written the criticism
@@ -896,10 +909,12 @@
   --vy-danger-text-deep: #f5aba5;
   --vy-danger-subtle: #38201e;
   --vy-danger-boundary: #e0655c;
-  --vy-status-draft-fg: #aab4c3;
-  --vy-status-draft-bg: #2a323f;
-  --vy-status-open-fg: #eeb796;
-  --vy-status-open-bg: #38281e;
+  --vy-status-draft-fg: #d3dae3;
+  --vy-status-draft-bg: #393f48;
+  --vy-status-draft-bd: #646b75;
+  --vy-status-open-fg: #d3dae3;
+  --vy-status-open-bg: #393f48;
+  --vy-status-open-bd: #646b75;
   /* PROGRESS WAS THE ONE STATUS NOBODY DARKENED. Seven of the eight invert
      here; `progress` kept its light pair — `#155e75` on `#cffafe` — so a
      dark grid showed one bright cyan chip among seven dark ones. Contrast
@@ -914,19 +929,25 @@
      is. Here they are 6° apart. The word is what separates them, which is
      what B1.6 says a status is — but if the two are ever confused on screen,
      the fix is a different hue for one of them, not a darker cyan. */
-  --vy-status-progress-fg: #96e4ee;
-  --vy-status-progress-bg: #1e3838;
-  --vy-status-done-fg: #96eed5;
-  --vy-status-done-bg: #1e3831;
-  --vy-status-waiting-fg: #b896ee;
-  --vy-status-waiting-bg: #281e38;
-  --vy-status-review-fg: #96dbee;
-  --vy-status-review-bg: #1e3338;
-  --vy-status-blocked-fg: #ee9a96;
-  --vy-status-blocked-bg: #38201e;
+  --vy-status-progress-fg: #8be3d8;
+  --vy-status-progress-bg: #244145;
+  --vy-status-progress-bd: #366e6d;
+  --vy-status-done-fg: #98e3b7;
+  --vy-status-done-bg: #28413c;
+  --vy-status-done-bd: #3e6e5a;
+  --vy-status-waiting-fg: #f8cc6e;
+  --vy-status-waiting-bg: #433b2b;
+  --vy-status-waiting-bd: #7a6232;
+  --vy-status-review-fg: #b4cbfa;
+  --vy-status-review-bg: #2e3a4f;
+  --vy-status-review-bd: #4c5f83;
+  --vy-status-blocked-fg: #f7ada6;
+  --vy-status-blocked-bg: #423238;
+  --vy-status-blocked-bd: #794e4f;
   --vy-status-cancelled-fg: #aab4c3;
   --vy-chart-cancelled: #5d6878;
-  --vy-status-cancelled-bg: #2a323f;
+  --vy-status-cancelled-bg: #161c25;
+  --vy-status-cancelled-bd: #4a5466;
   --vy-tone-excluded-bg: #2a323f;
   --vy-tone-excluded-fg: #aab4c3;
   --vy-tone-missing-bg: #38201e;
@@ -1009,25 +1030,33 @@
     --vy-danger-text-deep: #f5aba5;
     --vy-danger-subtle: #38201e;
     --vy-danger-boundary: #e0655c;
-    --vy-status-draft-fg: #aab4c3;
-    --vy-status-draft-bg: #2a323f;
-    --vy-status-open-fg: #eeb796;
-    --vy-status-open-bg: #38281e;
+    --vy-status-draft-fg: #d3dae3;
+    --vy-status-draft-bg: #393f48;
+    --vy-status-draft-bd: #646b75;
+    --vy-status-open-fg: #d3dae3;
+    --vy-status-open-bg: #393f48;
+    --vy-status-open-bd: #646b75;
     /* Added 8 Nov — see the note in the block above. A token must appear in
        all three blocks or the two ways of choosing dark disagree (B1.8). */
-    --vy-status-progress-fg: #96e4ee;
-    --vy-status-progress-bg: #1e3838;
-    --vy-status-done-fg: #96eed5;
-    --vy-status-done-bg: #1e3831;
-    --vy-status-waiting-fg: #b896ee;
-    --vy-status-waiting-bg: #281e38;
-    --vy-status-review-fg: #96dbee;
-    --vy-status-review-bg: #1e3338;
-    --vy-status-blocked-fg: #ee9a96;
-    --vy-status-blocked-bg: #38201e;
+    --vy-status-progress-fg: #8be3d8;
+    --vy-status-progress-bg: #244145;
+    --vy-status-progress-bd: #366e6d;
+    --vy-status-done-fg: #98e3b7;
+    --vy-status-done-bg: #28413c;
+    --vy-status-done-bd: #3e6e5a;
+    --vy-status-waiting-fg: #f8cc6e;
+    --vy-status-waiting-bg: #433b2b;
+    --vy-status-waiting-bd: #7a6232;
+    --vy-status-review-fg: #b4cbfa;
+    --vy-status-review-bg: #2e3a4f;
+    --vy-status-review-bd: #4c5f83;
+    --vy-status-blocked-fg: #f7ada6;
+    --vy-status-blocked-bg: #423238;
+    --vy-status-blocked-bd: #794e4f;
     --vy-status-cancelled-fg: #aab4c3;
     --vy-chart-cancelled: #5d6878;
-    --vy-status-cancelled-bg: #2a323f;
+    --vy-status-cancelled-bg: #161c25;
+    --vy-status-cancelled-bd: #4a5466;
     --vy-tone-excluded-bg: #2a323f;
     --vy-tone-excluded-fg: #aab4c3;
     --vy-tone-missing-bg: #38201e;
