@@ -98,14 +98,22 @@ const GROUNDS = ['surface', 'surface-app', 'surface-raised', 'surface-subtle',
 const STATUSES = ['draft', 'open', 'progress', 'done', 'waiting', 'review', 'blocked', 'cancelled'];
 const TONES = ['excluded', 'missing'];   /* the two that carry their own fg */
 
-/* Declared exemption — B1.3. Decoration only, never text to read. */
-const DECORATIVE = ['--vy-on-surface-faint'];
+/* Declared exemptions, never inferred.
+   `--vy-on-surface-faint` — B1.3, decoration, never text anyone reads.
+   `--vy-disabled-text` — the BA's principles of 16 Nov pair it with
+   `--vy-disabled-bg` at **2.47:1 in light and 2.95:1 in dark**. WCAG 1.4.3
+   exempts an inactive control, so the pair is hers to set and this file does
+   not fail on it — but the number is written down here rather than left for
+   someone to rediscover. If a disabled control ever has to be read, that is
+   the figure to argue with. */
+const DECORATIVE = ['--vy-on-surface-faint', '--vy-disabled-text'];
 
 /* The Home chart's five stacked series, named as the legend names them. */
 const CHART_SERIES = [
   { name: 'New',         token: '--vy-status-draft-fg' },
   { name: 'In-Progress', token: '--vy-status-progress-fg' },
-  { name: 'Quoted',      token: '--vy-status-open-fg' },
+  /* Quoted moved to the committed family on 16 Nov 2026 — BA principles. */
+  { name: 'Quoted',      token: '--vy-status-review-fg' },
   { name: 'Completed',   token: '--vy-status-done-fg' },
   { name: 'Cancelled',   token: '--vy-chart-cancelled' },
 ];
@@ -138,6 +146,12 @@ for (const [themeName, env] of [['light', light], ['dark', dark]]) {
     check('text', `${themeName}  status ${s}`, `--vy-status-${s}-fg`, `--vy-status-${s}-bg`, env, TEXT_MIN);
   for (const t of TONES)
     check('text', `${themeName}  row tone ${t}`, `--vy-tone-${t}-fg`, `--vy-tone-${t}-bg`, env, TEXT_MIN);
+
+  /* FIELD SURFACES, added with the BA's principles of 16 Nov 2026. A value in
+     view mode and a link inside one are text someone reads, so they are held
+     to the text threshold like anything else. */
+  check('text', `${themeName}  value in a view box`, '--vy-on-surface', '--vy-value-box', env, TEXT_MIN);
+  check('text', `${themeName}  link in a view box`, '--vy-brand-text-deep', '--vy-value-box', env, TEXT_MIN);
 
   /* A BOUNDARY IS SET BY ITS WORST GROUND, exactly like a text tier, and this
      loop is here because the first version of this file checked the control
@@ -205,7 +219,13 @@ const worst = Math.min(...checked);
 console.log(`\ncontrast:check  ${checked.length} token pairs, both themes  ·  self-test passed (planted 1.92:1 detected)`);
 if (failures.length === 0) {
   console.log(`  no pair below its threshold — tightest is ${worst.toFixed(2)}:1`);
-  console.log(`  ${DECORATIVE.length} declared exemption: --vy-on-surface-faint, decoration only (B1.3)\n`);
+  const why = {
+    '--vy-on-surface-faint': 'decoration only (B1.3)',
+    '--vy-disabled-text': 'inactive control, WCAG 1.4.3 — 2.47:1 light, 2.95:1 dark',
+  };
+  console.log(`  ${DECORATIVE.length} declared exemption${DECORATIVE.length === 1 ? '' : 's'}:`);
+  for (const d of DECORATIVE) console.log(`    ${d} — ${why[d] || 'declared'}`);
+  console.log();
   process.exit(0);
 }
 console.log(`\n  ${failures.length} BELOW THRESHOLD\n`);

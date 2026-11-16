@@ -233,3 +233,33 @@ Those sit inside **Input widgets**, her largest section — 10,100 characters an
 180 px values, specifying every state of every field. It is the next piece of
 work, and it is a real one: it adds field states this system does not have,
 rather than recolouring states it does.
+
+
+---
+
+## Third pass — Input widgets
+
+Her largest section turned out to be far smaller than its size suggested.
+10,100 characters and 180 px values, and **only four colour values in it were
+new to this system**: the rest name ramp values we already had under our own
+names — her `border-input` is our grey-400, her `focus` is blue-500, her
+`text-label` is grey-600, her `changed-border` is the brand.
+
+Five tokens added, and wired: `--vy-value-box` and `--vy-value-box-line` (the
+read-only value box, which this system already drew but with borrowed
+tokens), `--vy-changed-border`, `--vy-disabled-bg` and `--vy-disabled-text`.
+`contrast:check` now measures 188 pairs rather than 184.
+
+**One number she should see.** Her disabled pair measures **2.47:1 in light
+and 2.95:1 in dark**. WCAG 1.4.3 exempts an inactive control, so this is
+permitted and the check declares it rather than failing — but a disabled label
+at 2.47:1 is hard to read for more people than the exemption implies, and some
+teams deliberately exceed it. The figure is now printed by `contrast:check` on
+every run rather than buried.
+
+**Two Kendo traps, both already written down here, both walked into anyway.**
+The disabled rule had to be prefixed `html[data-kendo-bridged]` to outweigh
+the bridge, and it had to target `.k-disabled` — Kendo disables with a class,
+not the `:disabled` attribute, and a Button never carries `.vy-btn` at all.
+The first two versions of the rule matched nothing and the button stayed
+brand blue. Only opening it in a browser showed that.

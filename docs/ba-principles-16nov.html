@@ -70,6 +70,7 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <li class="l2"><a href="#what-she-leaves-open">What she leaves open</a></li>
 <li class="l2"><a href="#what-has-not-been-compared-yet">What has NOT been compared yet</a></li>
 <li class="l2"><a href="#second-pass-16-nov">Second pass, 16 Nov</a></li>
+<li class="l2"><a href="#third-pass--input-widgets">Third pass — Input widgets</a></li>
 </ol></nav>
 <h1 id="viq-ui-principles-16-nov-2026--checked-against-this-system">VIQ UI Principles, 16 Nov 2026 — checked against this system</h1>
 <p>The BA's settled answers to the open design questions, received as <code>VIQ_UI_Principles_26Nov16.html</code> and compared value by value against <code>src/theme/</code> and the pages here.</p>
@@ -126,6 +127,12 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <h3 id="still-not-applied">Still not applied</h3>
 <div class="t"><table><tbody><tr><td><strong><code>value-box</code> / <code>value-box-line</code></strong></td><td>the read-only field treatment — a filled box with a bottom line. This system has no token for it</td></tr><tr><td><strong><code>changed-border</code></strong></td><td>a field whose value differs from the saved one. We have <code>data-changed</code> on exactly one button, not as a field state</td></tr><tr><td><code>disabled-bg</code> / <code>disabled-text</code></td><td>no tokens here</td></tr><tr><td><code>section-bg</code></td><td>no token here</td></tr><tr><td>Dark tooltip</td><td>hers is <code>#131820</code> on white text</td></tr></tbody></table></div>
 <p>Those sit inside <strong>Input widgets</strong>, her largest section — 10,100 characters and 180 px values, specifying every state of every field. It is the next piece of work, and it is a real one: it adds field states this system does not have, rather than recolouring states it does.</p>
+<hr>
+<h2 id="third-pass--input-widgets">Third pass — Input widgets</h2>
+<p>Her largest section turned out to be far smaller than its size suggested. 10,100 characters and 180 px values, and <strong>only four colour values in it were new to this system</strong>: the rest name ramp values we already had under our own names — her <code>border-input</code> is our grey-400, her <code>focus</code> is blue-500, her <code>text-label</code> is grey-600, her <code>changed-border</code> is the brand.</p>
+<p>Five tokens added, and wired: <code>--vy-value-box</code> and <code>--vy-value-box-line</code> (the read-only value box, which this system already drew but with borrowed tokens), <code>--vy-changed-border</code>, <code>--vy-disabled-bg</code> and <code>--vy-disabled-text</code>. <code>contrast:check</code> now measures 188 pairs rather than 184.</p>
+<p><strong>One number she should see.</strong> Her disabled pair measures <strong>2.47:1 in light and 2.95:1 in dark</strong>. WCAG 1.4.3 exempts an inactive control, so this is permitted and the check declares it rather than failing — but a disabled label at 2.47:1 is hard to read for more people than the exemption implies, and some teams deliberately exceed it. The figure is now printed by <code>contrast:check</code> on every run rather than buried.</p>
+<p><strong>Two Kendo traps, both already written down here, both walked into anyway.</strong> The disabled rule had to be prefixed <code>html[data-kendo-bridged]</code> to outweigh the bridge, and it had to target <code>.k-disabled</code> — Kendo disables with a class, not the <code>:disabled</code> attribute, and a Button never carries <code>.vy-btn</code> at all. The first two versions of the rule matched nothing and the button stayed brand blue. Only opening it in a browser showed that.</p>
 </div>
 </body>
 </html>

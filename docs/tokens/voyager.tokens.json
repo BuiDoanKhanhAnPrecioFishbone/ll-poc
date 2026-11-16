@@ -248,6 +248,46 @@
       }
     }
   },
+  "value": {
+    "box": {
+      "$value": "#f1f3f6",
+      "$type": "color",
+      "$description": "Field surfaces, from the BA's UI principles of 16 Nov 2026. Most of her field spec turned out to name ramp values this system already had — border-input is grey-400, focus is blue-500, text-label is grey-600 — so only the roles below needed a token of their own.",
+      "$extensions": {
+        "com.voyager.dark": "#2e3746"
+      }
+    },
+    "box-line": {
+      "$value": "{grey.300}",
+      "$extensions": {
+        "com.voyager.dark": "#3a4352"
+      }
+    }
+  },
+  "changed": {
+    "border": {
+      "$value": "{brand.base}",
+      "$extensions": {
+        "com.voyager.dark": "{blue.300}"
+      }
+    }
+  },
+  "disabled": {
+    "bg": {
+      "$value": "#eceff3",
+      "$type": "color",
+      "$extensions": {
+        "com.voyager.dark": "#232a34"
+      }
+    },
+    "text": {
+      "$value": "#8f9aaa",
+      "$type": "color",
+      "$extensions": {
+        "com.voyager.dark": "#67727f"
+      }
+    }
+  },
   "on": {
     "surface-strong": {
       "$value": "{grey.900}",

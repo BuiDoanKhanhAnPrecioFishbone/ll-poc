@@ -42,7 +42,21 @@ a.vy-btn, a.vy-btn:hover { text-decoration: none; }
   padding: var(--vy-space-1) var(--vy-space-3); font-size: var(--vy-text-sm);
   min-height: var(--vy-control-row);
 }
-.vy-btn:disabled { opacity: var(--vy-state-disabled); cursor: not-allowed; }
+/* Her sheet gives disabled its own fill and ink rather than an opacity, so a
+   disabled control reads the same on every ground instead of showing whatever
+   is behind it. The pair is 5.11:1 light and 2.95:1 dark — declared in
+   contrast-check.mjs, since WCAG 1.4.3 exempts an inactive control. */
+/* TWO KENDO TRAPS IN ONE RULE, both of them written down in this repo before
+   I walked into them. `html[data-kendo-bridged] .k-button` outweighs a plain
+   `.vy-btn:disabled`, so the rule carries the same prefix. And Kendo disables
+   with the CLASS `.k-disabled`, not the `:disabled` attribute — a Button
+   renders as `k-button … k-disabled` and never carries `.vy-btn` at all, so
+   the first two attempts at this rule matched nothing. */
+html[data-kendo-bridged] .k-button.k-disabled,
+html[data-kendo-bridged] .vy-btn:disabled {
+  background: var(--vy-disabled-bg); color: var(--vy-disabled-text);
+  border-color: transparent; box-shadow: none; cursor: not-allowed;
+}
 .vy-btn:disabled::after { display: none; }
 
 .vy-btn--filled   { background: var(--vy-brand); color: var(--vy-brand-on); box-shadow: var(--vy-elev-1); }
@@ -1794,8 +1808,13 @@ a.vy-btn, a.vy-btn:hover { text-decoration: none; }
   margin: 0; min-height: var(--vy-control-md);
   display: flex; align-items: center; gap: var(--vy-space-4);
   padding: var(--vy-space-3) var(--vy-space-5);
-  background: var(--vy-surface-sunken);
-  border: 1px solid var(--vy-border-strong);
+  /* The BA's principles of 16 Nov 2026 name this surface `value-box` and give
+     it a bottom line rather than a full border: a read value is a box, and the
+     one line is what says it is not a control. Measured on it: the value at
+     13.01:1 light / 10.21:1 dark, a value that opens a record at 12.51 / 9.23. */
+  background: var(--vy-value-box);
+  border: 1px solid transparent;
+  border-bottom-color: var(--vy-value-box-line);
   border-radius: var(--vy-radius-sm);
   font-size: var(--vy-text-base); color: var(--vy-on-surface-soft);
 }

@@ -150,6 +150,15 @@
      scroll bar and every other one was the browser's. */
   --vy-scroll-thumb:       #b9c0ca;
   --vy-scroll-thumb-hover: #8a94a6;
+  /* Field surfaces, from the BA's UI principles of 16 Nov 2026. Most of her
+     field spec turned out to name ramp values this system already had —
+     border-input is grey-400, focus is blue-500, text-label is grey-600 — so
+     only the roles below needed a token of their own. */
+  --vy-value-box:       #f1f3f6;
+  --vy-value-box-line:  var(--vy-grey-300);
+  --vy-changed-border:  var(--vy-brand);
+  --vy-disabled-bg:     #eceff3;
+  --vy-disabled-text:   #8f9aaa;
 
   /* Text. SIX tiers, because the stylesheets were already using six greys for
      text and collapsing them here would have been a redesign smuggled into a
@@ -822,6 +831,11 @@
   --vy-surface-chrome-soft: #2a323f;
   --vy-scroll-thumb: #3a4352;
   --vy-scroll-thumb-hover: #5a6577;
+  --vy-value-box:       #2e3746;
+  --vy-value-box-line:  #3a4352;
+  --vy-changed-border:  var(--vy-blue-300);
+  --vy-disabled-bg:     #232a34;
+  --vy-disabled-text:   #67727f;
   --vy-on-surface-strong: #f5f8fc;
   --vy-on-surface: #e9edf3;
   --vy-on-surface-soft: #d3dae4;
@@ -996,6 +1010,11 @@
     --vy-surface-chrome-soft: #2a323f;
     --vy-scroll-thumb: #3a4352;
     --vy-scroll-thumb-hover: #5a6577;
+    --vy-value-box:       #2e3746;
+    --vy-value-box-line:  #3a4352;
+    --vy-changed-border:  var(--vy-blue-300);
+    --vy-disabled-bg:     #232a34;
+    --vy-disabled-text:   #67727f;
     --vy-on-surface-strong: #f5f8fc;
     --vy-on-surface: #e9edf3;
     --vy-on-surface-soft: #d3dae4;

@@ -4,7 +4,7 @@
 > which stays the source. Do not edit this page: edit the CSS, where each
 > value sits beside the reasoning and the measurement that chose it.
 
-249 tokens in 67 groups. A dash in **Dark** means the value does not change between themes.
+254 tokens in 70 groups. A dash in **Dark** means the value does not change between themes.
 
 A machine-readable export of the same set, in the W3C Design Tokens draft format, is at `docs/tokens/voyager.tokens.json`.
 
@@ -101,6 +101,12 @@ A machine-readable export of the same set, in the W3C Design Tokens draft format
 |---|---|---|
 | `--vy-change-field-w` | `10rem` | — |
 
+## changed
+
+| Token | Light | Dark |
+|---|---|---|
+| `--vy-changed-border` | `{brand.base}` | `{blue.300}` |
+
 ## chart
 
 | Token | Light | Dark |
@@ -162,6 +168,13 @@ A machine-readable export of the same set, in the W3C Design Tokens draft format
 | `--vy-dialog-md` | `640px` | — |
 | `--vy-dialog-lg` | `960px` | — |
 | `--vy-dialog-xl` | `1180px` | — |
+
+## disabled
+
+| Token | Light | Dark |
+|---|---|---|
+| `--vy-disabled-bg` | `#eceff3` | `#232a34` |
+| `--vy-disabled-text` | `#8f9aaa` | `#67727f` |
 
 ## doc
 
@@ -550,6 +563,13 @@ A machine-readable export of the same set, in the W3C Design Tokens draft format
 | Token | Light | Dark |
 |---|---|---|
 | `--vy-tz-w` | `180px` | — |
+
+## value
+
+| Token | Light | Dark |
+|---|---|---|
+| `--vy-value-box` | `#f1f3f6` | `#2e3746` |
+| `--vy-value-box-line` | `{grey.300}` | `#3a4352` |
 
 ## view
 
