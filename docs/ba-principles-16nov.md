@@ -9,7 +9,7 @@ The BA's settled answers to the open design questions, received as
 documents state a number they match on 31 of the 38 checked. That is not a
 coincidence — it is the same system written from the other side.
 
-Three values were adopted straight away. Four are flagged below, because this
+Five values were adopted straight away. Three are flagged below, because this
 system holds a measurement that disagrees, and a measurement is worth raising
 before it is overwritten.
 
@@ -23,34 +23,27 @@ before it is overwritten.
 | `COLUMN_WIDTH.view` | — | **40px** | The eye column that opens a line. We had the column; it had no role |
 | `COLUMN_WIDTH.person` | — | **160px** | A user name. Role did not exist here |
 | `--vy-dialog-sm` | — | **420px** | Her popup ladder is 420 · 640 · 960 · 1180; we had the last three |
+| `COLUMN_WIDTH.date` | 150px | **110px** | The 150 was measured against the **live** system, which renders `09/09/2026 16:35:29`. This app's `regional.ts` formats 2-digit day and month — `11/14/2026`, her format at her width. The old number was sized for a format we no longer produce |
+| `COLUMN_WIDTH.datetime` | 190px | **170px** | `11/14/2026 09:14 AM` and our `10/13/2026 10:56:15` are both 19 characters, so 170 holds either |
 
 ---
 
 ## Flagged — please settle these with her
 
-### 1. Date and date-time column widths
+### 1. The date-time FORMAT, now that the width is settled
 
-| Role | Hers | Ours | |
-|---|---|---|---|
-| `col-date` | 110px | **150px** | |
-| `col-datetime` | 170px | **190px** | |
+Adopting her widths surfaced a difference the widths were hiding. Both
+examples are 19 characters, so 170px fits either — but they are not the same
+format:
 
-Not adopted, because `tokens.ts` carries the reason in a comment and the
-reason is a measurement of the **live system**:
+| | Example |
+|---|---|
+| Her principles | `11/14/2026 09:14 AM` — 12-hour, no seconds |
+| `fmtDateTime` here | `10/13/2026 10:56:15` — 24-hour, with seconds |
 
-> The live Part Master renders LAST CHANGE as `09/09/2026 16:35:29` and the
-> MPN list renders LAST SYNCED AT the same way, so a column that carries a
-> timestamp needs room for one — 150px fits "16 May 2026" and clips the time
-> off the end of it.
-
-Her widths assume the numeric format `11/14/2026` and `11/14/2026 09:14 AM`.
-If that format is now settled for every date column, **her numbers are right
-and ours are oversized** — but the date format itself is still listed as
-unresolved (see below), so changing the width before the format would be
-building on the thing that moves.
-
-**Question for her:** is `11/14/2026` the format for every date column,
-including LAST CHANGE and LAST SYNCED AT?
+The date-only format matches exactly. Only the time part differs, and her own
+list still carries date format as unresolved, so this is the question to close
+next: **12-hour without seconds, or 24-hour with them?**
 
 ### 2. Which Kendo step `control-row` sits on
 
