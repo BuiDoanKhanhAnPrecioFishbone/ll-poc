@@ -122,3 +122,65 @@ Setting panel" exists as [View setting](components/data-grid/view-setting.md),
 and the **screen-reader and keyboard order** she defers is already specified
 in [Accessibility](foundations/accessibility.md) and measured by `focus:check`
 on every push.
+
+---
+
+## What has NOT been compared yet
+
+The check above covered the numeric foundations. Her document has **46
+sections**; nine were compared, and **45 remain — about 60,000 characters**,
+including the two densest specs in it. Listing them so nobody assumes this
+reconciliation is finished.
+
+| Her section | Size | New colour values | |
+|---|---|---|---|
+| **More tokens · light and dark** | 1.6k | **33** | the status pill sheet — see below |
+| **Input widgets** | **10.1k** | 11 | 180 px values; the full spec for every field state |
+| Color meaning | 2.6k | 15 | |
+| Toast · Banner · Popup | 2.1k | 13 | |
+| Image, files and conversation | 3.5k | 10 | |
+| Grid cells · Colors · Large editable grid | 5.6k | 10 · 10 · 9 | |
+| Buttons · Hover and focus · Tab/Group/Card | 5.0k | 6 · 5 · 4 | |
+| App shell · Busy and screen states | 3.4k | 3 · 1 | |
+| Component specs · Popups · Text styles | 5.5k | **0** | likely already matching |
+
+Of the 87 hex values in her document, **48 appear nowhere in `src/`**, and she
+uses **17 semantic token names we do not have**: `input-bg`, `value-box`,
+`value-box-line`, `changed-border`, `info-bg`, `info-text`, `primary-text`,
+`danger-bg`, `danger-fill`, `disabled-bg`, `disabled-text`, `section-bg`,
+`success-bg`, `success-text`, `warning-bg`, `warning-text`, `col-text`.
+
+Some are ours under another name — her `primary-text` `#1A419E` is our
+`--vy-brand`. Others are states this system has no token for at all: the
+**read-only value box** and the **changed** field. We have `data-changed` on
+exactly one button, not as a field state.
+
+### The one that is not a detail: the status pills
+
+Her pills are **seven stage families**, and they are not our eight tokens
+recoloured — the structure differs too.
+
+| Her family | Her light bg / text | Nearest token here | Ours |
+|---|---|---|---|
+| gray · not started | `#ECEFF3` / `#4D5766` | `draft` | `grey-100` / `grey-600` — close |
+| teal · in progress | `#D9F0EE` / `#0E5A52` | `progress` | `#cffafe` / `#155e75` — **cyan, not teal** |
+| **blue · committed** | `#E5EAF7` / `#15347E` | — | **no blue status family exists here** |
+| green · done | `#E4F1EA` / `#1A6B34` | `done` | `#d1fae5` / `#065f46` — different |
+| red · blocked | `#F8E6E5` / `#9B2226` | `blocked` | `red-50` / `red-700` — different |
+| **amber · waiting** | `#F8EFE3` / `#7A4A05` | `waiting` | `#ede9fe` / `#5b21b6` — **violet, not amber** |
+| **outline · ended** | white + `#B9C0CA` border | `cancelled` | a filled grey pill — **not an outline** |
+
+She also names the business words each family holds, which this system has
+never had written down — *Quoted, Confirmed, Released, Sent, Approved* all
+sit in her blue family, and we have no blue.
+
+**This is not a patch.** Changing it rewrites the status palette, which
+`contrast:check` measures at 184 pairs, which B1.6 documents pair by pair with
+dates, and which the row tones and the five chart fills are built on. It needs
+a decision, not an edit: her palette is the one the client will see, and ours
+is the one that has been measured. The work is real either way, and it should
+be planned rather than slipped in.
+
+Also unapplied from that same sheet: **priority dot colours** (High `#C62D26`,
+Medium `#C27A12`, Low `#8A94A6`), **scroll bar thumb** colours, and a **dark
+tooltip** (`#131820` / `#FFFFFF`).
