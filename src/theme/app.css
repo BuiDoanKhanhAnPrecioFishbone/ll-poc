@@ -41,8 +41,17 @@
 .vy-brand-text span { color: var(--vy-on-dark-muted); font-size: var(--vy-text-xs); white-space: nowrap; }
 
 .vy-nav { flex: 1; overflow-y: auto; padding: var(--vy-space-4) 0 var(--vy-space-8); }
-.vy-nav::-webkit-scrollbar { width: var(--vy-space-4); }
-.vy-nav::-webkit-scrollbar-thumb { background: var(--vy-surface-chrome-soft); border-radius: var(--vy-radius-md); }
+/* EVERY scroll bar, not just the nav's. The BA's principles of 16 Nov give
+   the thumb a colour and leave the track without one; until now only this one
+   rail was styled and every other scroll bar in the product was the
+   browser's default. */
+*::-webkit-scrollbar { width: var(--vy-space-4); height: var(--vy-space-4); }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+  background: var(--vy-scroll-thumb); border-radius: var(--vy-radius-md);
+}
+*::-webkit-scrollbar-thumb:hover { background: var(--vy-scroll-thumb-hover); }
+* { scrollbar-color: var(--vy-scroll-thumb) transparent; }
 
 .vy-nav-group { margin-bottom: var(--vy-space-5); }
 .vy-nav-group-head { padding: var(--vy-space-5) var(--vy-space-8) var(--vy-space-2); }

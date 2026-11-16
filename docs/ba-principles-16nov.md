@@ -9,7 +9,8 @@ The BA's settled answers to the open design questions, received as
 documents state a number they match on 31 of the 38 checked. That is not a
 coincidence — it is the same system written from the other side.
 
-Five values were adopted straight away. Three are flagged below, because this
+Most of it is now adopted — the status palette, the sizes and the scroll
+bars. Four things are flagged below, because this
 system holds a measurement that disagrees, and a measurement is worth raising
 before it is overwritten.
 
@@ -184,3 +185,51 @@ be planned rather than slipped in.
 Also unapplied from that same sheet: **priority dot colours** (High `#C62D26`,
 Medium `#C27A12`, Low `#8A94A6`), **scroll bar thumb** colours, and a **dark
 tooltip** (`#131820` / `#FFFFFF`).
+
+
+---
+
+## Second pass, 16 Nov
+
+After the status palette landed, the count of her colour values missing from
+`src/` fell from **48 to 20**. That sheet was the bulk of the difference.
+
+**Also adopted:** the scroll bar thumb, `#b9c0ca` / hover `#8a94a6` light and
+`#3a4352` / `#5a6577` dark, with no colour on the track. It now applies to
+**every** scroll bar; before this only the navigation rail was styled and the
+rest were the browser's default.
+
+### Flagged: the priority dot
+
+Hers is **High `#C62D26` red · Medium `#C27A12` amber · Low `#8A94A6` grey**.
+This system draws three steps of one ink — solid, half, hollow — and the
+reason is in the code:
+
+> High was red and Medium amber, which borrowed the two colours this product
+> uses for "something is wrong" and spent them on a CATEGORY. A high-priority
+> RFQ is not an error; an overdue one is, and on a list that shows both the
+> reader had no way to tell the two reds apart.
+
+That change was made on the stated grounds that **"the standard never mentions
+Priority, so the palette was ours to choose"**. Her document now does mention
+it, so that premise is gone — but the collision it describes is not. Under her
+palette a High priority dot is red and a blocked status pill is red, on the
+same row.
+
+**Question for her:** on a list showing Priority and Status together, how
+should a reader tell a high-priority row from a blocked one?
+
+### Still not applied
+
+| | |
+|---|---|
+| **`value-box` / `value-box-line`** | the read-only field treatment — a filled box with a bottom line. This system has no token for it |
+| **`changed-border`** | a field whose value differs from the saved one. We have `data-changed` on exactly one button, not as a field state |
+| `disabled-bg` / `disabled-text` | no tokens here |
+| `section-bg` | no token here |
+| Dark tooltip | hers is `#131820` on white text |
+
+Those sit inside **Input widgets**, her largest section — 10,100 characters and
+180 px values, specifying every state of every field. It is the next piece of
+work, and it is a real one: it adds field states this system does not have,
+rather than recolouring states it does.

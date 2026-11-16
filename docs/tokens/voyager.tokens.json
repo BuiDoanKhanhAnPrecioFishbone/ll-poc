@@ -231,6 +231,23 @@
       }
     }
   },
+  "scroll": {
+    "thumb": {
+      "$value": "#b9c0ca",
+      "$type": "color",
+      "$description": "Scroll bar thumb, from the BA's principles of 16 Nov 2026. The track has no colour; only the thumb does. Until now only the nav had a styled scroll bar and every other one was the browser's.",
+      "$extensions": {
+        "com.voyager.dark": "#3a4352"
+      }
+    },
+    "thumb-hover": {
+      "$value": "#8a94a6",
+      "$type": "color",
+      "$extensions": {
+        "com.voyager.dark": "#5a6577"
+      }
+    }
+  },
   "on": {
     "surface-strong": {
       "$value": "{grey.900}",
