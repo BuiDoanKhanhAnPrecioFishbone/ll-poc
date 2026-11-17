@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Questions on the UI principles, 16 Nov 2026</title>
+<style>
+:root{
+  --ink:#131820; --ink-2:#363e4b; --ink-3:#4d5766; --ink-4:#626d7e;
+  --line:#dde2e9; --line-soft:#eceff3; --paper:#ffffff; --app:#f5f7fa;
+  --brand:#1a419e; --brand-soft:#f1f4fa; --code:#15347e;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--app);color:var(--ink-2);
+  font:15px/1.65 "Inter","Segoe UI",system-ui,-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:40px 28px 80px;background:var(--paper);
+  box-shadow:0 1px 2px rgba(19,24,32,.06)}
+h1,h2,h3,h4{color:var(--ink);line-height:1.25;text-wrap:balance}
+h1{font-size:34px;font-weight:700;margin:0 0 8px;letter-spacing:-.01em}
+h2{font-size:25px;font-weight:650;margin:52px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line)}
+h3{font-size:19px;font-weight:600;margin:32px 0 10px}
+h4{font-size:16px;font-weight:600;margin:24px 0 8px;color:var(--ink-2)}
+p{margin:0 0 14px;max-width:86ch}
+ul,ol{margin:0 0 14px;padding-left:22px;max-width:86ch}
+li{margin:5px 0}
+a{color:var(--brand);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:.18em}
+hr{border:0;border-top:1px solid var(--line-soft);margin:34px 0}
+code{font:500 13px/1.5 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  background:var(--brand-soft);color:var(--code);padding:1px 5px;border-radius:3px}
+blockquote{margin:0 0 16px;padding:12px 16px;background:var(--brand-soft);
+  border-left:3px solid var(--brand);border-radius:0 4px 4px 0;color:var(--ink-2);max-width:86ch}
+blockquote p{margin:0}
+.t{overflow-x:auto;margin:0 0 18px}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th{text-align:left;font-weight:600;color:var(--ink);background:var(--app);
+  border-bottom:1px solid var(--line);padding:8px 10px;white-space:nowrap}
+td{border-bottom:1px solid var(--line-soft);padding:8px 10px;vertical-align:top}
+td code{white-space:nowrap}
+tr:last-child td{border-bottom:0}
+figure{margin:18px 0 24px}
+img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:6px}
+.toc{background:var(--app);border:1px solid var(--line);border-radius:8px;
+  padding:18px 22px;margin:26px 0 34px}
+.toc h2{margin:0 0 10px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink-4);border:0;padding:0}
+.toc ol{list-style:none;margin:0;padding:0;columns:2;column-gap:36px}
+.toc li{margin:3px 0;break-inside:avoid}
+.toc li.l1{font-weight:600;color:var(--ink);margin-top:10px}
+.toc li.l1:first-child{margin-top:0}
+.toc li.l2{padding-left:14px}
+@media (max-width:760px){.wrap{padding:24px 16px 60px}.toc ol{columns:1}h1{font-size:27px}}
+@media print{
+  body{background:#fff}
+  .wrap{max-width:none;padding:0;box-shadow:none}
+  h2{page-break-after:avoid}
+  figure,table,blockquote{page-break-inside:avoid}
+  .toc{break-after:page}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="toc"><h2>Mục lục</h2><ol>
+<li class="l2"><a href="#a--three-that-will-fail-an-accessibility-review">A · Three that will fail an accessibility review</a></li>
+<li class="l2"><a href="#b--four-places-the-document-disagrees-with-itself">B · Four places the document disagrees with itself</a></li>
+<li class="l2"><a href="#c--five-that-are-simply-not-stated">C · Five that are simply not stated</a></li>
+<li class="l2"><a href="#d--two-where-we-hold-a-measurement-she-may-not-have">D · Two where we hold a measurement she may not have</a></li>
+<li class="l2"><a href="#what-this-list-is-not">What this list is not</a></li>
+</ol></nav>
+<h1 id="questions-on-the-ui-principles-16-nov-2026">Questions on the UI principles, 16 Nov 2026</h1>
+<p>Everything below is a question for the BA, not a decision taken without her. Each one quotes her document and, where a number decides it, gives the measurement rather than an opinion.</p>
+<p><strong>The document is good, and that is why this list is worth having.</strong> It is specific enough to be checked, which most design documents are not: 91 colour values, ratios printed beside the pairs, sizes per widget. Eight of her contrast figures were re-measured here and all eight matched to the second decimal. The items below are the ones that did not survive the same treatment.</p>
+<hr>
+<h2 id="a--three-that-will-fail-an-accessibility-review">A · Three that will fail an accessibility review</h2>
+<h3 id="a1-focus-on-a-primary-button-is-a-fill-change-and-nothing-else">A1. Focus on a primary button is a fill change and nothing else</h3>
+<blockquote><em>"Focus: lighter fill primary-focus #2754BC · #4A6FCC, one step lighter; <strong>no ring, no border</strong>"</em></blockquote>
+<p>WCAG 2.4.11 asks a focus indicator to reach <strong>3:1 against the unfocused state</strong>. Measured:</p>
+<div class="t"><table><thead><tr><th></th><th>Resting → focused</th><th></th></tr></thead><tbody><tr><td>Light</td><td><code>#1A419E</code> → <code>#2754BC</code></td><td><strong>1.34:1</strong></td></tr><tr><td>Dark</td><td><code>#3B63C4</code> → <code>#4A6FCC</code></td><td><strong>1.18:1</strong></td></tr></tbody></table></div>
+<p>A keyboard user cannot see where focus is. Her secondary button does not have this problem — it takes <em>"border focus #2754BC at 2px"</em>, which is a real indicator — so this looks like an oversight on one row rather than a position.</p>
+<p><strong>Question:</strong> can the primary button take the same 2px focus border as the secondary one?</p>
+<h3 id="a2-two-controls-have-no-focus-state-at-all">A2. Two controls have no focus state at all</h3>
+<blockquote>Menu item — Focus: <em>"<strong>The same as hover</strong>; no outline"</em> Link — Focus: <em>"Underline, <strong>as on hover</strong>; no outline"</em></blockquote>
+<p>If focus looks exactly like hover, then with a mouse resting anywhere on the page there are two identical highlights and no way to tell which one the keyboard will act on. This is WCAG 2.4.7, and it is also simply confusing.</p>
+<p><strong>Question:</strong> may these take a focus treatment distinct from hover?</p>
+<h3 id="a3-three-things-can-only-be-discovered-by-hovering">A3. Three things can only be discovered by hovering</h3>
+<p>Her own user profile and devices make this the sharpest one:</p>
+<blockquote><em>"program managers, purchasing managers, planners, warehouse and accounting staff … <strong>not tech-savvy</strong>. Age: <strong>30 to 60+</strong>"</em> <em>"VIQ runs on office screens and on <strong>shop-floor terminals</strong>"</em> — and her own device list includes <strong>iPad 820</strong> and <strong>iPhone 390</strong>.</blockquote>
+<p>On a shop-floor terminal or a tablet there is no hover. These three are hover-only:</p>
+<div class="t"><table><thead><tr><th>Her rule</th><th>What is unreachable without a mouse</th></tr></thead><tbody><tr><td><em>"The reason … shows in a tooltip <strong>on hover</strong> of the box. <strong>Never a lock icon</strong>"</em></td><td>Why a field cannot be edited</td></tr><tr><td><em>"Field help … <strong>Hover or keyboard focus</strong> opens a tooltip … No help line under the field"</em></td><td>The field help itself</td></tr><tr><td><em>"Editable and read-only cells <strong>look the same until hover</strong>"</em></td><td>Which grid cells can be edited</td></tr></tbody></table></div>
+<p>The lock line is the one to look at first, because the rule removes the only signal that works without a pointer. This system currently draws a lock glyph <strong>and</strong> the reason in words, from a 14 Oct decision — <em>"read only with lock icon and disable fill bg"</em> — so adopting her rule would be a step back on exactly the devices she names.</p>
+<p><strong>Question:</strong> on touch, what replaces hover for these three?</p>
+<hr>
+<h2 id="b--four-places-the-document-disagrees-with-itself">B · Four places the document disagrees with itself</h2>
+<h3 id="b1-the-icons-are-emoji">B1. The icons are emoji</h3>
+<p>Her Icons section is unambiguous:</p>
+<blockquote><em>"One set, drawn the same way: a <strong>20 × 20 box, strokes only, no fill</strong>, one stroke width (1.5px), round ends. <strong>Icons take the color of the text around them</strong>."</em></blockquote>
+<p>The examples then use <strong>11 different emoji</strong> — 👁 ×13, 🔍 ×5, 📅 ×5, 🗑 ×4, ✏ ×4, ☰ ×3, 🔗 ×2, 📎 ×2, 📄, 🧾, 🔔 — and emoji are filled, multicoloured, drawn by the operating system's font rather than by anyone here, and different on Windows, macOS and Android. They are the opposite of every clause in that sentence.</p>
+<p>Nothing in the document says they stand in for icons still to be drawn, and her <em>"Open for design"</em> list does name 19 icons as undrawn — so that is probably what they are. It needs saying in the document, because anyone implementing it literally ships emoji.</p>
+<p><strong>Question:</strong> confirm the emoji are placeholders, and that the 19 undrawn icons are the real list?</p>
+<h3 id="b2-9px-text-under-her-own-floor">B2. 9px text, under her own floor</h3>
+<blockquote><em>"Nothing below 12px on desktop"</em> — and the file row's type chip is <em>"9px 700"</em>.</blockquote>
+<p>Built as 9px here, because a three-letter mark in a fixed 30×20 box is recognised rather than read, and named <code>--vy-text-chip</code> so the exception is visible rather than buried. It is still her floor being crossed by her own spec.</p>
+<h3 id="b3-the-file-rows-two-numbers-cannot-both-hold">B3. The file row's two numbers cannot both hold</h3>
+<blockquote><em>"Row <strong>34px</strong> · padding <strong>6px</strong> 10px"</em> — with her own download button in a row at <strong>26px</strong>.</blockquote>
+<p>26 + 6 + 6 = 38. The height was kept and the vertical padding dropped, because a list of files is read down its left edge and rows that vary by 4px because one has a button read as ragged.</p>
+<h3 id="b4-the-type-scale-defines-two-steps-it-then-forbids">B4. The type scale defines two steps it then forbids</h3>
+<blockquote><code>2xs</code> 10px, <code>xs</code> 11px — Role: <em>"<strong>Not used on desktop</strong> (below the 12px floor)"</em></blockquote>
+<p>A scale with rungs nobody may stand on invites someone to use them by accident. This system sets both to 12px outright; same result on screen, and her reasoning is the better-written half.</p>
+<hr>
+<h2 id="c--five-that-are-simply-not-stated">C · Five that are simply not stated</h2>
+<div class="t"><table><tbody><tr><td><strong>Dark values for the file-type chips</strong></td><td>She gives light for PDF, XLS and DOC and names IMG teal and ZIP gray. Nothing for dark. These use her dark values for the nearest family she names</td></tr><tr><td><strong>The status pill's width</strong></td><td>Not mentioned. This system fixes a 104px slot, because badges of different lengths in a status column left a ragged edge</td></tr><tr><td><strong>12-hour or 24-hour</strong></td><td>Her Datetime example reads <code>10:30 AM</code>; this app reads <code>10:30</code> and stamps logs at <code>10:56:15</code>. Her own open list still carries date format as unresolved</td></tr><tr><td><strong><code>control-row</code> on which Kendo step</strong></td><td>She writes <em>"26px (Kendo sm)"</em>; this system's sizing page says the same 26px is Kendo's <code>xs</code>. The value agrees, the rung name does not, and one of them will mislead whoever configures the scale</td></tr><tr><td><strong>Icon names</strong></td><td>Hers are <code>icon-md</code> 16px and <code>icon-sm</code> 14px; this system has one <code>--vy-icon-sm</code> at 16px and no 14px step</td></tr></tbody></table></div>
+<hr>
+<h2 id="d--two-where-we-hold-a-measurement-she-may-not-have">D · Two where we hold a measurement she may not have</h2>
+<p>Not errors — cases where her number is right and the ground it was measured against is worth revisiting.</p>
+<h3 id="d1-border-input-clears-31-on-white-only">D1. <code>border-input</code> clears 3:1 on white only</h3>
+<p>She states 3.06:1 for <code>#8A94A6</code>, which is correct against white. Her own spec puts inputs on surfaces that are not white:</p>
+<div class="t"><table><thead><tr><th>Ground</th><th>Hers <code>#8A94A6</code></th><th>Ours <code>#758096</code></th></tr></thead><tbody><tr><td><code>surface</code> <code>#FFFFFF</code></td><td>3.06:1 ok</td><td>3.97:1 ok</td></tr><tr><td>her <code>ground</code> <code>#F5F7FA</code></td><td><strong>2.85:1 fails</strong></td><td>3.70:1 ok</td></tr><tr><td>her <code>section-bg</code> <code>#F1F4FA</code></td><td><strong>2.78:1 fails</strong></td><td>3.61:1 ok</td></tr><tr><td>her <code>value-box</code> <code>#F1F3F6</code></td><td><strong>2.75:1 fails</strong></td><td>3.57:1 ok</td></tr></tbody></table></div>
+<p>WCAG 1.4.11 asks 3:1 for a control boundary. Recommend keeping ours.</p>
+<h3 id="d2-the-priority-dot">D2. The priority dot</h3>
+<p>Hers is High red <code>#C62D26</code>, Medium amber <code>#C27A12</code>. Those are the two colours this product already spends on <em>"something is wrong"</em>. On a list showing Priority and Status together, a high-priority row and a blocked row are both red. This system draws three steps of one ink instead, so the ranking survives greyscale — which is also her own <em>"never a colour alone"</em> rule applied to a ranking.</p>
+<p><strong>Question:</strong> on a list showing both, how should a reader tell a high-priority row from a blocked one?</p>
+<hr>
+<h2 id="what-this-list-is-not">What this list is not</h2>
+<p>It is not a disagreement about direction. Her structure, her palette, her sizes and her status vocabulary have been taken as written here — 79 of her 91 colour values are in the system, every widget in her Input widgets section is built, and the eight contrast figures she published were reproduced exactly. These are the places where following the document literally would produce something she would not want.</p>
+</div>
+</body>
+</html>
