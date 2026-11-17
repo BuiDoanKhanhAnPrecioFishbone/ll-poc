@@ -4,7 +4,7 @@
 > which stays the source. Do not edit this page: edit the CSS, where each
 > value sits beside the reasoning and the measurement that chose it.
 
-261 tokens in 73 groups. A dash in **Dark** means the value does not change between themes.
+263 tokens in 75 groups. A dash in **Dark** means the value does not change between themes.
 
 A machine-readable export of the same set, in the W3C Design Tokens draft format, is at `docs/tokens/voyager.tokens.json`.
 
@@ -237,6 +237,12 @@ A machine-readable export of the same set, in the W3C Design Tokens draft format
 | `--vy-grid-header` | `{grey.50}` | `#1b222d` |
 | `--vy-grid-search-min` | `220px` | — |
 
+## head
+
+| Token | Light | Dark |
+|---|---|---|
+| `--vy-head-h` | `36px` | — |
+
 ## header
 
 | Token | Light | Dark |
@@ -425,6 +431,12 @@ A machine-readable export of the same set, in the W3C Design Tokens draft format
 | Token | Light | Dark |
 |---|---|---|
 | `--vy-search-w` | `420px` | — |
+
+## section
+
+| Token | Light | Dark |
+|---|---|---|
+| `--vy-section-bg` | `{blue.50}` | `#1b2433` |
 
 ## select
 

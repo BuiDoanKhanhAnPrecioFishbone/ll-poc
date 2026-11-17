@@ -73,7 +73,7 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <h1 id="storybook-what-is-covered-and-what-is-not">Storybook: what is covered, and what is not</h1>
 <p>Measured on 17 Nov 2026, not estimated. "Live example" means a specimen that renders the real component in an iframe on its Examples tab — the thing you can click, tab through and read in both themes.</p>
 <h2 id="where-it-stands">Where it stands</h2>
-<div class="t"><table><tbody><tr><td>Components in the system</td><td><strong>37</strong></td></tr><tr><td>With a live example</td><td><strong>27</strong></td></tr><tr><td>Live examples in total</td><td><strong>79</strong></td></tr></tbody></table></div>
+<div class="t"><table><tbody><tr><td>Components in the system</td><td><strong>39</strong></td></tr><tr><td>With a live example</td><td><strong>29</strong></td></tr><tr><td>Live examples in total</td><td><strong>85</strong></td></tr></tbody></table></div>
 <p><em>Updated 17 Nov 2026. The BA's <strong>Input widgets</strong> section is now fully built: every widget in it either exists here or is one she ruled out.</em></p>
 <p>The BA's principles of 16 Nov 2026 name roughly <strong>60 widgets and states</strong> across her five widget sections. The gap below is measured against those.</p>
 <hr>
@@ -98,9 +98,10 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <h3 id="yes--no-field-and-multi-column-list--built-17-nov-2026">~~Yes / no field~~ and ~~Multi-column list~~ — <strong>built, 17 Nov 2026</strong></h3>
 <p>The last two of her Input widgets. The yes/no field is a boolean that reads as a word written for its field — <em>Required</em> / <em>Not required</em> — which is what separates it from a bare checkbox. The multi-column list is a lookup whose popup is a small grid, and it exists for one reason: <code>0455-300-0017-11</code> and <code>0455-300-0017-12</code> differ in the last character of sixteen.</p>
 <p>It also put <code>--vy-grid-header</code> in the system, one more of her values. In light it is what Kendo was already using; in dark hers is lighter than ours was.</p>
-<h3 id="cards-and-groups--no-package-needed">Cards and groups — no package needed</h3>
-<p><strong>Card</strong>, <strong>Split card</strong>, <strong>Collapsible group</strong> and <strong>Section heading</strong> are four of the six rows in her <em>Tab · Group · Card</em> section. Only Tab exists here. There is no card component under any name — checked for <code>card</code>, <code>panel</code>, <code>surface</code>, <code>tile</code>, <code>pane</code> and <code>well</code>.</p>
-<p>This one matters more than it looks: <code>--vy-section-bg</code>, one of the values of hers still unapplied, is for <em>"card headers and the grid toolbar band"</em>. The token has nowhere to go until the card exists.</p>
+<h3 id="cards-and-groups--built-17-nov-2026">~~Cards and groups~~ — <strong>built, 17 Nov 2026</strong></h3>
+<p>All four: <a href="components/card.md">Card</a> and Split card, <a href="components/group.md">Group</a>, Section heading and Collapsible group. The division she draws is the useful part — a card is a surface of its own, a group divides one surface, and her whole note on the group is <em>"no box, no fill"</em>.</p>
+<p>It gave <code>--vy-section-bg</code> its first use. The token had nowhere to go while this system had no card.</p>
+<p><strong>Tab was already here but did not match her spec</strong>, which only measuring showed: 33px tall, touching, and 400 weight for both states, so the active tab was marked by its underline alone. Now 36px, 24px apart, 500 with the active at 600. She writes <em>22px apart</em> and 22 is not on the spacing scale — not on ours and not on hers, which agree step for step — so it takes the 24px step, written down rather than quietly rounded.</p>
 <h3 id="images-and-conversation--no-package-needed">Images and conversation — no package needed</h3>
 <p><strong>Image</strong> in three states, plus <strong>Conversation</strong>, <strong>Email</strong>, <strong>Notes</strong>, <strong>Preview</strong> and <strong>Download</strong>, are specified and absent. <code>file-drop</code> and the file row cover the upload half of that section and nothing else.</p>
 <hr>

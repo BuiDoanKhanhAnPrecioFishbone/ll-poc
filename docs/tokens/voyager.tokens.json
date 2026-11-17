@@ -497,6 +497,15 @@
       "$description": "below this the placeholder truncates"
     }
   },
+  "section": {
+    "bg": {
+      "$value": "{blue.50}",
+      "$description": "The band a card header sits on, and the one her principles name for the grid toolbar too. It was the last of her surface values with nowhere to go: this system had no card until 17 Nov 2026, so the token would have been a declaration with no rule behind it.",
+      "$extensions": {
+        "com.voyager.dark": "#1b2433"
+      }
+    }
+  },
   "info": {
     "bg": {
       "$value": "#e5eaf7",
@@ -1211,6 +1220,13 @@
       "$value": "150px",
       "$type": "dimension",
       "$description": "The same field in the narrow reference panel, where two of them share the width: enough for \"MATERIAL PACKAGE TYPE\", the longest label there."
+    }
+  },
+  "head": {
+    "h": {
+      "$value": "36px",
+      "$type": "dimension",
+      "$description": "Her header row: a card header and a tab are both 36px in her principles, so it is a step in her scale rather than a one-off."
     }
   },
   "sup": {

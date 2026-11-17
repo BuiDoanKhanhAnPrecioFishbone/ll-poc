@@ -178,15 +178,89 @@ html[data-kendo-bridged] .vy-btn:disabled {
   border-radius: var(--vy-shape-sm); padding: var(--vy-space-4) var(--vy-space-5); width: 100%;
   transition: border-color var(--vy-dur-short) var(--vy-ease-standard);
 }
-/* Her Multi-column list popup: "a small grid — header 12px 600 on
-   grid-header, rows 30px". The header is what separates this from a plain
-   dropdown: without it the extra columns are three unlabelled strings. */
-html[data-kendo-bridged] .k-popup .k-table-thead,
-html[data-kendo-bridged] .k-popup .k-grid-header {
-  font-size: var(--vy-text-2xs); font-weight: var(--vy-weight-semibold);
-  background: var(--vy-grid-header);
+/* --- Card, Group, Section heading ------------------------------------------
+   The BA's Tab · Group · Card section, 16 Nov 2026, taken as written.
+
+   THE DIVISION IS THE DESIGN. A card is a surface of its own: border, radius,
+   a header band. A group divides ONE surface into readable parts, and her
+   note on it is two words long — "No box, no fill". Reaching for a card where
+   a group belongs is how a form becomes a column of boxes inside a box.
+
+   Her card has NO SHADOW, which this system should keep deliberately: a
+   shadow says a thing floats above the page, and that signal is spent on
+   popups, where it means "this will go away". */
+.vy-card {
+  border: 1px solid var(--vy-border);
+  border-radius: var(--vy-shape-md);
+  background: var(--vy-surface);
+  overflow: hidden;                 /* so the header band meets the radius */
 }
-html[data-kendo-bridged] .k-popup .k-table-row { block-size: 30px; }
+.vy-card-head {
+  display: flex; align-items: center; gap: var(--vy-space-6);
+  min-block-size: var(--vy-head-h);
+  padding: 0 var(--vy-space-8);
+  background: var(--vy-section-bg);
+  border-block-end: 1px solid var(--vy-border);
+}
+.vy-card-title {
+  margin: 0; font-size: var(--vy-text-md); font-weight: var(--vy-weight-semibold);
+  color: var(--vy-on-surface-strong);
+}
+.vy-card-aside { margin-inline-start: auto; display: flex; align-items: center; gap: var(--vy-space-5); }
+.vy-card-body { padding: var(--vy-space-8); }
+/* Two halves, 28px apart, NO DIVIDER — the gap is already separating them,
+   and a rule down the middle makes two cards pretending to be one. */
+.vy-card--split > .vy-card-body {
+  display: grid; grid-template-columns: 1fr 1fr; gap: var(--vy-space-11);
+}
+
+/* Her Group heading, and her Section heading, which she specifies as the
+   same thing: 12px 600 in Title Case with a rule beside it. The rule is not
+   decoration — it is what stops a 12px heading from reading as a field
+   label, which at this size it otherwise would. */
+.vy-section-heading {
+  display: flex; align-items: center; gap: var(--vy-space-6);
+  margin: 0 0 var(--vy-space-7);
+  font-size: var(--vy-text-2xs); font-weight: var(--vy-weight-semibold);
+  line-height: 16px; color: var(--vy-on-surface-strong);
+}
+.vy-section-heading::after {
+  content: ''; flex: 1 1 auto; block-size: 1px; background: var(--vy-border);
+}
+.vy-section-heading--toggle { gap: 0; }
+.vy-group-toggle {
+  display: flex; align-items: center; gap: var(--vy-space-4);
+  appearance: none; background: none; border: 0; padding: 0; margin-inline-end: var(--vy-space-6);
+  font: inherit; color: inherit; cursor: pointer;
+}
+.vy-group-toggle:hover { color: var(--vy-brand-text); }
+.vy-group-toggle:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; border-radius: var(--vy-radius-sm); }
+.vy-group-caret { transition: transform var(--vy-dur-short) var(--vy-ease-standard); }
+.vy-group-caret[data-open] { transform: rotate(90deg); }
+.vy-group + .vy-group { margin-block-start: var(--vy-space-11); }
+/* A stack for a specimen that has to show two of something: the stage lays
+   its children out in a row, so anything vertical needs one box around it. */
+.vy-specimen-stack { inline-size: 100%; }
+.vy-group-fields {
+  display: grid; gap: var(--vy-space-6) var(--vy-space-11);
+}
+.vy-group-fields[data-columns="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.vy-group-fields[data-columns="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+/* CONTAINER QUERIES, NOT A VIEWPORT BREAKPOINT. A card can sit in a full-width
+   page, in half a split card, or in a specimen frame 470px wide, and what
+   decides whether three columns fit is the space the card HAS — not the size
+   of the window around it. The first version of this used `max-width: 720px`
+   and collapsed a split card that had plenty of room, because the browser was
+   narrow for an unrelated reason. */
+.vy-card-body, .vy-group { container-type: inline-size; }
+@container (max-width: 560px) {
+  .vy-group-fields[data-columns="3"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .vy-card--split > .vy-card-body { grid-template-columns: 1fr; }
+}
+@container (max-width: 380px) {
+  .vy-group-fields[data-columns] { grid-template-columns: 1fr; }
+}
 
 /* Her Yes / no field, 16 Nov 2026. A box 16px with the word 8px after it,
    both inside a box shaped like an edit input — padding 0 10px, height 34px.
@@ -464,6 +538,41 @@ html[data-kendo-bridged] .k-popup .k-table-row { block-size: 30px; }
    Radix's `data-state` to know when to switch to the emphasised palette. */
 .vy-tab-count { font-size: var(--vy-text-xs); background: var(--vy-surface-sunken); color: var(--vy-on-surface-muted); border-radius: var(--vy-shape-full); padding: 0 var(--vy-space-3); }
 .vy-tabs .k-tabstrip-item.k-active .vy-tab-count { background: var(--vy-brand-subtle-strong); color: var(--vy-brand-text-deep); }
+
+/* Her tab, 16 Nov 2026, measured against what Kendo was giving us:
+
+     height     36px   was 33
+     apart      24px   was 0 — 4px of item padding and nothing between
+                       labels. SHE WROTE 22px, and 22 is not on the spacing
+                       scale — not on ours and not on hers, which agree step
+                       for step. A one-off literal loses to the scale it sits
+                       beside, and 2px of tab spacing is not visible; the
+                       number is written down here so the choice is not a
+                       silent one.
+     weight     500    was 400, and the active tab was 400 too, so the only
+                       thing marking it was the underline
+     underline  3px    Kendo's own, kept
+     strip rule 1px    already right
+
+   The weight is the one that mattered. A tab strip where the active tab is
+   the same weight as the rest leans entirely on a 3px line, and that line is
+   the first thing lost to a low-contrast screen or a colour-blind reader —
+   the same argument this system makes everywhere else about never letting
+   one signal carry a state alone. */
+.vy-tabs .k-tabstrip-items .k-tabstrip-item { padding-inline: 0; }
+.vy-tabs .k-tabstrip-items .k-tabstrip-item + .k-tabstrip-item { margin-inline-start: var(--vy-space-10); }
+.vy-tabs .k-tabstrip-items .k-link {
+  min-block-size: var(--vy-head-h);
+  padding-inline: 0;
+  font-weight: var(--vy-weight-medium);
+}
+/* `.k-tabstrip-item`, not `.k-item` — the third Kendo class assumption to
+   fail silently in this system, after `.k-disabled` on buttons and the
+   `.vy-btn` that a Kendo Button never carries. The first version of these two
+   rules matched NOTHING: the height and weight below came through, because
+   `.k-link` is real, so the strip looked almost right and the active tab
+   stayed at 500. Only measuring the class list found it. */
+.vy-tabs .k-tabstrip-items .k-tabstrip-item.k-active .k-link { font-weight: var(--vy-weight-semibold); }
 
 /* Kendo draws its own panel border and padding; ours sat inside a plain div and
    the surrounding screens are built to that spacing. Reset only the box, not

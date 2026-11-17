@@ -547,3 +547,13 @@ html[data-kendo-bridged] .k-grid-header-wrap,
 html[data-kendo-bridged] .k-table-thead {
   background: var(--vy-grid-header);
 }
+
+/* Her Multi-column list popup: "a small grid — header 12px 600 on
+   grid-header, rows 30px". The header is what separates this from a plain
+   dropdown: without it the extra columns are three unlabelled strings. */
+html[data-kendo-bridged] .k-popup .k-table-thead,
+html[data-kendo-bridged] .k-popup .k-grid-header {
+  font-size: var(--vy-text-2xs); font-weight: var(--vy-weight-semibold);
+  background: var(--vy-grid-header);
+}
+html[data-kendo-bridged] .k-popup .k-table-row { block-size: 30px; }

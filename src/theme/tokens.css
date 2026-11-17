@@ -314,6 +314,11 @@
      is the same instinct as `surface-raised` — a header that matches the
      page behind it stops reading as a header. */
   --vy-grid-header:       var(--vy-grey-50);
+  /* The band a card header sits on, and the one her principles name for the
+     grid toolbar too. It was the last of her surface values with nowhere to
+     go: this system had no card until 17 Nov 2026, so the token would have
+     been a declaration with no rule behind it. */
+  --vy-section-bg:        var(--vy-blue-50);
   --vy-info-bg:           #e5eaf7;
   --vy-info-text:         #15347e;
   --vy-warning-bg:        #f8efe3;
@@ -650,6 +655,9 @@
      number and pushed a seven-fact strip onto three rows; the boxes should
      size to what they hold and only stop being comically narrow. */
   --vy-quote-fact-min:         5rem;
+  /* Her header row: a card header and a tab are both 36px in her principles,
+     so it is a step in her scale rather than a one-off. */
+  --vy-head-h:            36px;
   --vy-control-md:        34px;  /* input / locked-field height */
   /* THE DENSE SIZE, which is what Kendo's `small` means in this product. A
      grid's control strip held four heights — funnel 28, Columns 29, view
@@ -964,6 +972,7 @@
   --vy-danger-subtle: #3d2025;
   --vy-danger-boundary: #e0655c;
   --vy-grid-header: #1b222d;
+  --vy-section-bg: #1b2433;
   --vy-info-bg: #1a2846;
   --vy-info-text: #9db4ec;
   --vy-warning-bg: #3c3121;
@@ -1099,6 +1108,7 @@
     --vy-danger-subtle: #3d2025;
     --vy-danger-boundary: #e0655c;
     --vy-grid-header: #1b222d;
+    --vy-section-bg: #1b2433;
     --vy-info-bg: #1a2846;
     --vy-info-text: #9db4ec;
     --vy-warning-bg: #3c3121;

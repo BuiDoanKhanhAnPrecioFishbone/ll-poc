@@ -8,9 +8,9 @@ can click, tab through and read in both themes.
 
 | | |
 |---|---|
-| Components in the system | **37** |
-| With a live example | **27** |
-| Live examples in total | **79** |
+| Components in the system | **39** |
+| With a live example | **29** |
+| Live examples in total | **85** |
 
 *Updated 17 Nov 2026. The BA's **Input widgets** section is now fully built:
 every widget in it either exists here or is one she ruled out.*
@@ -98,16 +98,23 @@ popup is a small grid, and it exists for one reason: `0455-300-0017-11` and
 It also put `--vy-grid-header` in the system, one more of her values. In light
 it is what Kendo was already using; in dark hers is lighter than ours was.
 
-### Cards and groups — no package needed
+### ~~Cards and groups~~ — **built, 17 Nov 2026**
 
-**Card**, **Split card**, **Collapsible group** and **Section heading** are
-four of the six rows in her *Tab · Group · Card* section. Only Tab exists
-here. There is no card component under any name — checked for `card`, `panel`,
-`surface`, `tile`, `pane` and `well`.
+All four: [Card](components/card.md) and Split card,
+[Group](components/group.md), Section heading and Collapsible group. The
+division she draws is the useful part — a card is a surface of its own, a
+group divides one surface, and her whole note on the group is *"no box, no
+fill"*.
 
-This one matters more than it looks: `--vy-section-bg`, one of the values of
-hers still unapplied, is for *"card headers and the grid toolbar band"*. The
-token has nowhere to go until the card exists.
+It gave `--vy-section-bg` its first use. The token had nowhere to go while
+this system had no card.
+
+**Tab was already here but did not match her spec**, which only measuring
+showed: 33px tall, touching, and 400 weight for both states, so the active tab
+was marked by its underline alone. Now 36px, 24px apart, 500 with the active
+at 600. She writes *22px apart* and 22 is not on the spacing scale — not on
+ours and not on hers, which agree step for step — so it takes the 24px step,
+written down rather than quietly rounded.
 
 ### Images and conversation — no package needed
 

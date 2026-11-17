@@ -236,6 +236,10 @@ export const nav = [
         '3 files import it; two of the client’s own sources still disagree on stars vs label (open-questions §6)', ['Priority.tsx']),
 
       // ---- Layout and structure
+      c('card', 'Card', 'Layout and structure', 'ga', "the BA's card and split card, 17 Nov 2026",
+        ['Card.tsx']),
+      c('group', 'Group', 'Layout and structure', 'ga', "the BA's group, section heading and collapsible group, 17 Nov 2026",
+        ['Group.tsx']),
       c('app-shell', 'App shell', 'Layout and structure', 'beta',
         'src/components/AppShell.tsx; built, and the sitemap restructure was declined (decision D1). No KendoReact or Radix import \u2014 ours. No page written',
         [], { src: `docs/components/app-shell.md` }),
