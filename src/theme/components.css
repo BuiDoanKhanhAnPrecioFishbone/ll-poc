@@ -178,6 +178,56 @@ html[data-kendo-bridged] .vy-btn:disabled {
   border-radius: var(--vy-shape-sm); padding: var(--vy-space-4) var(--vy-space-5); width: 100%;
   transition: border-color var(--vy-dur-short) var(--vy-ease-standard);
 }
+/* Her Multi-column list popup: "a small grid — header 12px 600 on
+   grid-header, rows 30px". The header is what separates this from a plain
+   dropdown: without it the extra columns are three unlabelled strings. */
+html[data-kendo-bridged] .k-popup .k-table-thead,
+html[data-kendo-bridged] .k-popup .k-grid-header {
+  font-size: var(--vy-text-2xs); font-weight: var(--vy-weight-semibold);
+  background: var(--vy-grid-header);
+}
+html[data-kendo-bridged] .k-popup .k-table-row { block-size: 30px; }
+
+/* Her Yes / no field, 16 Nov 2026. A box 16px with the word 8px after it,
+   both inside a box shaped like an edit input — padding 0 10px, height 34px.
+   No helper text under it, which is her rule and a sound one: the word IS
+   the explanation, so a hint beneath would be saying it twice. */
+.vy-yesno {
+  display: flex; align-items: center; gap: var(--vy-space-4);
+  padding: 0 var(--vy-space-5); min-height: var(--vy-control-md);
+  position: relative; cursor: pointer;
+}
+.vy-yesno--read { cursor: default; }
+/* The real control, carrying the keyboard and the announcement; the drawn
+   box beside it is what the eye gets. Not `display: none` — a hidden input
+   is not focusable, and this one has to be. */
+.vy-yesno-input {
+  position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer;
+}
+.vy-yesno-box {
+  flex: none; inline-size: 16px; block-size: 16px;
+  border: 1.5px solid var(--vy-border-control);
+  border-radius: var(--vy-radius-sm); background: var(--vy-surface);
+  transition: background var(--vy-dur-short) var(--vy-ease-standard);
+}
+.vy-yesno-box[data-on] {
+  background: var(--vy-brand); border-color: var(--vy-brand);
+  /* The tick, drawn rather than imported: at 16px a mask is sharper than a
+     glyph and needs no icon decision while her set is still open. */
+  background-image: linear-gradient(var(--vy-brand), var(--vy-brand));
+  box-shadow: inset 0 0 0 1px var(--vy-brand);
+}
+.vy-yesno-box[data-on]::after {
+  content: ''; display: block;
+  inline-size: 4px; block-size: 8px; margin: 1px auto 0;
+  border: solid var(--vy-brand-on); border-width: 0 1.6px 1.6px 0;
+  transform: rotate(45deg);
+}
+.vy-yesno-word { font-size: var(--vy-text-base); color: var(--vy-on-surface); }
+.vy-yesno-input:focus-visible ~ .vy-yesno-box { border-color: var(--vy-brand-boundary-strong); box-shadow: 0 0 0 1px var(--vy-brand-boundary-strong); }
+.vy-yesno-input:disabled ~ .vy-yesno-box { background: var(--vy-disabled-bg); border-color: var(--vy-border-strong); }
+.vy-yesno-input:disabled ~ .vy-yesno-word { color: var(--vy-disabled-text); }
+
 /* Her four number widgets, 16 Nov 2026: right-aligned, tabular figures, no
    spin buttons. The alignment is the part that matters — a column of prices
    that agrees on the decimal point can be scanned for an outlier, and one
@@ -489,6 +539,7 @@ html[data-kendo-bridged] .vy-btn:disabled {
    box holds something new" and not "this row is selected". */
 html[data-kendo-bridged] .vy-field--changed .k-input,
 html[data-kendo-bridged] .vy-field--changed .k-picker,
+.vy-field--changed .vy-input,
 .vy-field--changed input, .vy-field--changed textarea, .vy-field--changed .vy-read-value {
   border-color: var(--vy-changed-border);
 }

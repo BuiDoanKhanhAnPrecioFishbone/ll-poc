@@ -8,11 +8,12 @@ can click, tab through and read in both themes.
 
 | | |
 |---|---|
-| Components in the system | **35** |
-| With a live example | **25** |
-| Live examples in total | **73** |
+| Components in the system | **37** |
+| With a live example | **27** |
+| Live examples in total | **79** |
 
-*Updated 17 Nov 2026, after the number and date fields landed.*
+*Updated 17 Nov 2026. The BA's **Input widgets** section is now fully built:
+every widget in it either exists here or is one she ruled out.*
 
 The BA's principles of 16 Nov 2026 name roughly **60 widgets and states**
 across her five widget sections. The gap below is measured against those.
@@ -85,6 +86,17 @@ the reason is on the Number field page.
 Her spec names Switch only to rule it out — the row reads *"Not used"* — so
 there is nothing to build, and building one would have added a control she
 has decided against. The row is a decision, not a gap.
+
+### ~~Yes / no field~~ and ~~Multi-column list~~ — **built, 17 Nov 2026**
+
+The last two of her Input widgets. The yes/no field is a boolean that reads as
+a word written for its field — *Required* / *Not required* — which is what
+separates it from a bare checkbox. The multi-column list is a lookup whose
+popup is a small grid, and it exists for one reason: `0455-300-0017-11` and
+`0455-300-0017-12` differ in the last character of sixteen.
+
+It also put `--vy-grid-header` in the system, one more of her values. In light
+it is what Kendo was already using; in dark hers is lighter than ours was.
 
 ### Cards and groups — no package needed
 

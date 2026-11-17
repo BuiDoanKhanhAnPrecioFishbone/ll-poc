@@ -308,6 +308,12 @@
      and her red proves the two sets are not one — the pill is #f8e6e5 and the
      meaning is #fdeceb. Aliasing them would tie two vocabularies together
      that she keeps apart. */
+  /* The band a grid's column headers sit on. Hers, 16 Nov 2026. In light it
+     is the value Kendo was already using through `--kendo-color-base`, so
+     naming it changes nothing; in dark hers is lighter than ours was, which
+     is the same instinct as `surface-raised` — a header that matches the
+     page behind it stops reading as a header. */
+  --vy-grid-header:       var(--vy-grey-50);
   --vy-info-bg:           #e5eaf7;
   --vy-info-text:         #15347e;
   --vy-warning-bg:        #f8efe3;
@@ -957,6 +963,7 @@
   --vy-danger-text-deep: #f5aba5;
   --vy-danger-subtle: #3d2025;
   --vy-danger-boundary: #e0655c;
+  --vy-grid-header: #1b222d;
   --vy-info-bg: #1a2846;
   --vy-info-text: #9db4ec;
   --vy-warning-bg: #3c3121;
@@ -1091,6 +1098,7 @@
     --vy-danger-text-deep: #f5aba5;
     --vy-danger-subtle: #3d2025;
     --vy-danger-boundary: #e0655c;
+    --vy-grid-header: #1b222d;
     --vy-info-bg: #1a2846;
     --vy-info-text: #9db4ec;
     --vy-warning-bg: #3c3121;

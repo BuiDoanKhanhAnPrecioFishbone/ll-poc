@@ -538,3 +538,12 @@ html[data-kendo-bridged] .k-popup {
   border-radius: var(--vy-shape-md);
   box-shadow: var(--vy-elev-3);
 }
+
+/* Her `grid-header`, 16 Nov 2026: the band a column header sits on. Set on
+   the header rather than on `--kendo-color-base`, which Kendo also spends on
+   button bases and panel edges — one token, one job. */
+html[data-kendo-bridged] .k-grid-header,
+html[data-kendo-bridged] .k-grid-header-wrap,
+html[data-kendo-bridged] .k-table-thead {
+  background: var(--vy-grid-header);
+}

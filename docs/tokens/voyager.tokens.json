@@ -483,6 +483,20 @@
       }
     }
   },
+  "grid": {
+    "header": {
+      "$value": "{grey.50}",
+      "$description": "The band a grid's column headers sit on. Hers, 16 Nov 2026. In light it is the value Kendo was already using through `--kendo-color-base`, so naming it changes nothing; in dark hers is lighter than ours was, which is the same instinct as `surface-raised` — a header that matches the page behind it stops reading as a header.",
+      "$extensions": {
+        "com.voyager.dark": "#1b222d"
+      }
+    },
+    "search-min": {
+      "$value": "220px",
+      "$type": "dimension",
+      "$description": "below this the placeholder truncates"
+    }
+  },
   "info": {
     "bg": {
       "$value": "#e5eaf7",
@@ -1296,13 +1310,6 @@
     "w": {
       "$value": "420px",
       "$type": "dimension"
-    }
-  },
-  "grid": {
-    "search-min": {
-      "$value": "220px",
-      "$type": "dimension",
-      "$description": "below this the placeholder truncates"
     }
   },
   "page": {
