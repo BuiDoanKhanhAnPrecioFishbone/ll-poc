@@ -1,5 +1,8 @@
 # Questions on the UI principles, 16 Nov 2026
 
+> Vietnamese version, written to send to her:
+> [Một số câu hỏi về bản UI Principles 16/11](ba-questions-vi.md)
+
 Everything below is a question for the BA, not a decision taken without her.
 Each one quotes her document and, where a number decides it, gives the
 measurement rather than an opinion.

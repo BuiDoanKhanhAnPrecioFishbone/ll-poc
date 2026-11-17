@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Một số câu hỏi về bản UI Principles 16/11</title>
+<style>
+:root{
+  --ink:#131820; --ink-2:#363e4b; --ink-3:#4d5766; --ink-4:#626d7e;
+  --line:#dde2e9; --line-soft:#eceff3; --paper:#ffffff; --app:#f5f7fa;
+  --brand:#1a419e; --brand-soft:#f1f4fa; --code:#15347e;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--app);color:var(--ink-2);
+  font:15px/1.65 "Inter","Segoe UI",system-ui,-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:40px 28px 80px;background:var(--paper);
+  box-shadow:0 1px 2px rgba(19,24,32,.06)}
+h1,h2,h3,h4{color:var(--ink);line-height:1.25;text-wrap:balance}
+h1{font-size:34px;font-weight:700;margin:0 0 8px;letter-spacing:-.01em}
+h2{font-size:25px;font-weight:650;margin:52px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line)}
+h3{font-size:19px;font-weight:600;margin:32px 0 10px}
+h4{font-size:16px;font-weight:600;margin:24px 0 8px;color:var(--ink-2)}
+p{margin:0 0 14px;max-width:86ch}
+ul,ol{margin:0 0 14px;padding-left:22px;max-width:86ch}
+li{margin:5px 0}
+a{color:var(--brand);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:.18em}
+hr{border:0;border-top:1px solid var(--line-soft);margin:34px 0}
+code{font:500 13px/1.5 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  background:var(--brand-soft);color:var(--code);padding:1px 5px;border-radius:3px}
+blockquote{margin:0 0 16px;padding:12px 16px;background:var(--brand-soft);
+  border-left:3px solid var(--brand);border-radius:0 4px 4px 0;color:var(--ink-2);max-width:86ch}
+blockquote p{margin:0}
+.t{overflow-x:auto;margin:0 0 18px}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th{text-align:left;font-weight:600;color:var(--ink);background:var(--app);
+  border-bottom:1px solid var(--line);padding:8px 10px;white-space:nowrap}
+td{border-bottom:1px solid var(--line-soft);padding:8px 10px;vertical-align:top}
+td code{white-space:nowrap}
+tr:last-child td{border-bottom:0}
+figure{margin:18px 0 24px}
+img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:6px}
+.toc{background:var(--app);border:1px solid var(--line);border-radius:8px;
+  padding:18px 22px;margin:26px 0 34px}
+.toc h2{margin:0 0 10px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink-4);border:0;padding:0}
+.toc ol{list-style:none;margin:0;padding:0;columns:2;column-gap:36px}
+.toc li{margin:3px 0;break-inside:avoid}
+.toc li.l1{font-weight:600;color:var(--ink);margin-top:10px}
+.toc li.l1:first-child{margin-top:0}
+.toc li.l2{padding-left:14px}
+@media (max-width:760px){.wrap{padding:24px 16px 60px}.toc ol{columns:1}h1{font-size:27px}}
+@media print{
+  body{background:#fff}
+  .wrap{max-width:none;padding:0;box-shadow:none}
+  h2{page-break-after:avoid}
+  figure,table,blockquote{page-break-inside:avoid}
+  .toc{break-after:page}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="toc"><h2>Mục lục</h2><ol>
+<li class="l2"><a href="#a--ba-chỗ-sẽ-không-qua-được-kiểm-accessibility">A · Ba chỗ sẽ không qua được kiểm accessibility</a></li>
+<li class="l2"><a href="#b--bốn-chỗ-tài-liệu-tự-mâu-thuẫn">B · Bốn chỗ tài liệu tự mâu thuẫn</a></li>
+<li class="l2"><a href="#c--năm-chỗ-tài-liệu-chưa-nêu">C · Năm chỗ tài liệu chưa nêu</a></li>
+<li class="l2"><a href="#d--hai-chỗ-số-của-chị-đúng-nhưng-nền-đo-thì-nên-xem-lại">D · Hai chỗ số của chị đúng, nhưng nền đo thì nên xem lại</a></li>
+<li class="l2"><a href="#danh-sách-này-không-phải-là-gì">Danh sách này không phải là gì</a></li>
+</ol></nav>
+<h1 id="một-số-câu-hỏi-về-bản-ui-principles-1611">Một số câu hỏi về bản UI Principles 16/11</h1>
+<p>Chị Huyền ơi, em đã áp bản của chị vào hệ thống và trong lúc làm có vài chỗ em muốn hỏi lại chị. Mỗi mục dưới đây em trích nguyên văn tài liệu của chị, và chỗ nào quyết định bằng con số thì em để số đo chứ không để ý kiến.</p>
+<p><strong>Trước hết: bản của chị tốt, và chính vì thế danh sách này mới có ý nghĩa.</strong> Nó đủ cụ thể để kiểm được — 91 giá trị màu, có ghi tỉ lệ tương phản bên cạnh từng cặp, có kích thước cho từng widget. Em đo lại 8 tỉ lệ chị công bố thì <strong>cả 8 đều trùng khít tới hai chữ số thập phân</strong>. Những mục dưới đây là những chỗ không qua được phép kiểm tương tự.</p>
+<hr>
+<h2 id="a--ba-chỗ-sẽ-không-qua-được-kiểm-accessibility">A · Ba chỗ sẽ không qua được kiểm accessibility</h2>
+<h3 id="a1-focus-của-nút-primary-chỉ-là-đổi-nền">A1. Focus của nút primary chỉ là đổi nền</h3>
+<blockquote><em>"Focus: lighter fill primary-focus #2754BC · #4A6FCC, one step lighter; <strong>no ring, no border</strong>"</em></blockquote>
+<p>WCAG 2.4.11 yêu cầu chỉ báo focus đạt <strong>3:1 so với trạng thái chưa focus</strong>. Em đo:</p>
+<div class="t"><table><thead><tr><th></th><th>Thường → focus</th><th></th></tr></thead><tbody><tr><td>Sáng</td><td><code>#1A419E</code> → <code>#2754BC</code></td><td><strong>1.34:1</strong></td></tr><tr><td>Tối</td><td><code>#3B63C4</code> → <code>#4A6FCC</code></td><td><strong>1.18:1</strong></td></tr></tbody></table></div>
+<p>Người dùng bàn phím sẽ không thấy mình đang đứng ở đâu. Nút secondary của chị thì <strong>không bị</strong> — nó có <em>"border focus #2754BC at 2px"</em>, là một chỉ báo thật — nên em nghĩ đây là sót một dòng chứ không phải chủ ý.</p>
+<p><strong>Hỏi chị:</strong> nút primary dùng luôn viền focus 2px giống nút secondary được không ạ?</p>
+<h3 id="a2-hai-control-không-có-trạng-thái-focus">A2. Hai control không có trạng thái focus</h3>
+<blockquote>Menu item — Focus: <em>"<strong>The same as hover</strong>; no outline"</em> Link — Focus: <em>"Underline, <strong>as on hover</strong>; no outline"</em></blockquote>
+<p>Nếu focus trông y hệt hover thì khi con chuột đang nằm ở đâu đó trên trang, màn hình có hai vùng sáng giống hệt nhau và không cách nào biết bàn phím đang ở cái nào. Đây là WCAG 2.4.7, và ngoài chuyện tiêu chuẩn thì nó cũng gây nhầm thật.</p>
+<p><strong>Hỏi chị:</strong> hai cái này có thể có cách thể hiện focus khác hover không ạ?</p>
+<h3 id="a3-ba-thứ-chỉ-hover-mới-thấy-được">A3. Ba thứ chỉ hover mới thấy được</h3>
+<p>Chỗ này em thấy rõ nhất, vì nó chọi với chính phần đầu tài liệu của chị:</p>
+<blockquote><em>"program managers, purchasing managers, planners, warehouse and accounting staff … <strong>not tech-savvy</strong>. Age: <strong>30 to 60+</strong>"</em> <em>"VIQ runs on office screens and on <strong>shop-floor terminals</strong>"</em> — và danh sách thiết bị của chị có <strong>iPad 820</strong> và <strong>iPhone 390</strong>.</blockquote>
+<p>Trên máy đặt ở xưởng hoặc trên tablet thì <strong>không có hover</strong>. Ba thứ sau đang phụ thuộc hoàn toàn vào hover:</p>
+<div class="t"><table><thead><tr><th>Quy tắc của chị</th><th>Thứ không với tới được nếu không có chuột</th></tr></thead><tbody><tr><td><em>"The reason … shows in a tooltip <strong>on hover</strong> of the box. <strong>Never a lock icon</strong>"</em></td><td>Vì sao field không sửa được</td></tr><tr><td><em>"Field help … <strong>Hover or keyboard focus</strong> opens a tooltip … No help line under the field"</em></td><td>Chính phần trợ giúp của field</td></tr><tr><td><em>"Editable and read-only cells <strong>look the same until hover</strong>"</em></td><td>Ô nào trong grid sửa được</td></tr></tbody></table></div>
+<p>Dòng về khoá là cái em muốn hỏi trước, vì quy tắc <em>"never a lock icon"</em> <strong>gỡ đúng cái tín hiệu duy nhất không cần con trỏ</strong>. Hệ thống hiện đang vẽ icon khoá <strong>kèm</strong> lý do bằng chữ, theo chốt ngày 14/10 — <em>"read only with lock icon and disable fill bg"</em> — nên nếu theo bản mới thì mình lùi lại đúng ở những thiết bị chị nêu.</p>
+<p><strong>Hỏi chị:</strong> trên cảm ứng thì cái gì thay cho hover ở ba chỗ này ạ?</p>
+<hr>
+<h2 id="b--bốn-chỗ-tài-liệu-tự-mâu-thuẫn">B · Bốn chỗ tài liệu tự mâu thuẫn</h2>
+<h3 id="b1-icon-đang-là-emoji">B1. Icon đang là emoji</h3>
+<p>Mục Icons của chị viết rất rõ:</p>
+<blockquote><em>"One set, drawn the same way: a <strong>20 × 20 box, strokes only, no fill</strong>, one stroke width (1.5px), round ends. <strong>Icons take the color of the text around them</strong>."</em></blockquote>
+<p>Nhưng phần ví dụ dùng <strong>11 emoji khác nhau</strong> — 👁 ×13, 🔍 ×5, 📅 ×5, 🗑 ×4, ✏ ×4, ☰ ×3, 🔗 ×2, 📎 ×2, 📄, 🧾, 🔔. Mà emoji thì <strong>được tô, nhiều màu, do font của hệ điều hành vẽ</strong> chứ không phải mình vẽ, và hiện khác nhau trên Windows, macOS, Android. Nó ngược lại từng vế trong câu trên.</p>
+<p>Em đoán đây là ký hiệu tạm cho 19 icon mà mục <em>"Open for design"</em> của chị ghi là còn phải vẽ. Nhưng <strong>tài liệu không chỗ nào nói vậy</strong>, nên ai làm đúng theo chữ sẽ ship emoji thật.</p>
+<p><strong>Hỏi chị:</strong> xác nhận giúp em đây là ký hiệu tạm, và danh sách 19 icon kia mới là bộ thật ạ?</p>
+<h3 id="b2-chữ-9px-dưới-chính-sàn-chị-đặt">B2. Chữ 9px, dưới chính sàn chị đặt</h3>
+<blockquote><em>"Nothing below 12px on desktop"</em> — mà chip loại file trong file row là <em>"9px 700"</em>.</blockquote>
+<p>Em đã dựng đúng 9px, vì một nhãn ba chữ cái trong khung cố định 30×20 là thứ người ta <strong>nhận ra</strong> chứ không <strong>đọc</strong>, và em đặt tên nó là <code>--vy-text-chip</code> để ngoại lệ này nhìn thấy được chứ không chôn trong một rule nào đó. Nhưng dù sao đó vẫn là sàn của chị bị vượt bởi chính spec của chị.</p>
+<h3 id="b3-hai-con-số-của-file-row-không-cùng-đúng-được">B3. Hai con số của file row không cùng đúng được</h3>
+<blockquote><em>"Row <strong>34px</strong> · padding <strong>6px</strong> 10px"</em> — mà nút tải xuống trong hàng của chính chị là <strong>26px</strong>.</blockquote>
+<p>26 + 6 + 6 = 38. Em giữ <strong>chiều cao</strong>, bỏ padding dọc, vì một danh sách file được đọc dọc theo mép trái, mà hàng nào có nút thì cao hơn 4px sẽ làm cả danh sách trông so le.</p>
+<h3 id="b4-thang-chữ-định-nghĩa-hai-bậc-rồi-cấm-dùng">B4. Thang chữ định nghĩa hai bậc rồi cấm dùng</h3>
+<blockquote><code>2xs</code> 10px, <code>xs</code> 11px — cột Role ghi: <em>"<strong>Not used on desktop</strong> (below the 12px floor)"</em></blockquote>
+<p>Một cái thang có bậc không được đứng lên thì sớm muộn sẽ có người đứng nhầm. Hệ thống hiện đặt cả hai thành 12px luôn — kết quả trên màn hình như nhau, mà phần lý do chị viết thì rõ hơn của mình.</p>
+<hr>
+<h2 id="c--năm-chỗ-tài-liệu-chưa-nêu">C · Năm chỗ tài liệu chưa nêu</h2>
+<div class="t"><table><tbody><tr><td><strong>Giá trị dark của chip loại file</strong></td><td>Chị cho sáng cho PDF, XLS, DOC và gọi tên IMG teal, ZIP gray. Dark thì không có. Em đang lấy giá trị dark của họ màu gần nhất mà chị đặt tên</td></tr><tr><td><strong>Bề rộng status pill</strong></td><td>Không thấy nêu. Hệ thống đang cố định một ô 104px, vì badge dài ngắn khác nhau trong cột status làm mép phải so le</td></tr><tr><td><strong>12 giờ hay 24 giờ</strong></td><td>Ví dụ Datetime của chị là <code>10:30 AM</code>; app này đang đọc <code>10:30</code> và ghi log <code>10:56:15</code>. Danh sách mở của chị vẫn còn để date format là chưa chốt</td></tr><tr><td><strong><code>control-row</code> nằm ở bậc Kendo nào</strong></td><td>Chị ghi <em>"26px (Kendo sm)"</em>; trang sizing của hệ thống ghi đúng 26px đó là bậc <code>xs</code> của Kendo. Giá trị thì khớp, tên bậc thì không, và một trong hai sẽ làm người cấu hình thang Kendo hiểu sai</td></tr><tr><td><strong>Tên token icon</strong></td><td>Của chị là <code>icon-md</code> 16px và <code>icon-sm</code> 14px; hệ thống có một <code>--vy-icon-sm</code> 16px và không có bậc 14px</td></tr></tbody></table></div>
+<hr>
+<h2 id="d--hai-chỗ-số-của-chị-đúng-nhưng-nền-đo-thì-nên-xem-lại">D · Hai chỗ số của chị đúng, nhưng nền đo thì nên xem lại</h2>
+<p>Hai mục này em không gọi là lỗi.</p>
+<h3 id="d1-border-input-chỉ-đạt-31-trên-nền-trắng">D1. <code>border-input</code> chỉ đạt 3:1 trên nền trắng</h3>
+<p>Chị ghi 3.06:1 cho <code>#8A94A6</code> — đúng, nếu nền là trắng. Nhưng chính spec của chị đặt input lên những nền không trắng:</p>
+<div class="t"><table><thead><tr><th>Nền</th><th>Của chị <code>#8A94A6</code></th><th>Của mình <code>#758096</code></th></tr></thead><tbody><tr><td><code>surface</code> <code>#FFFFFF</code></td><td>3.06:1 đạt</td><td>3.97:1 đạt</td></tr><tr><td><code>ground</code> của chị <code>#F5F7FA</code></td><td><strong>2.85:1 không đạt</strong></td><td>3.70:1 đạt</td></tr><tr><td><code>section-bg</code> của chị <code>#F1F4FA</code></td><td><strong>2.78:1 không đạt</strong></td><td>3.61:1 đạt</td></tr><tr><td><code>value-box</code> của chị <code>#F1F3F6</code></td><td><strong>2.75:1 không đạt</strong></td><td>3.57:1 đạt</td></tr></tbody></table></div>
+<p>WCAG 1.4.11 yêu cầu 3:1 cho viền của một control. Em đề nghị giữ giá trị hiện tại và báo chị biết lý do.</p>
+<h3 id="d2-dot-priority">D2. Dot priority</h3>
+<p>Của chị là High đỏ <code>#C62D26</code>, Medium hổ phách <code>#C27A12</code>. Đó đúng là hai màu mà sản phẩm này đã dành cho <em>"có chuyện rồi"</em>. Trên một danh sách hiển thị cả Priority lẫn Status, một dòng ưu tiên cao và một dòng bị chặn đều đỏ. Hệ thống hiện vẽ ba bậc của <strong>một</strong> sắc mực, để thứ hạng vẫn còn khi in đen trắng — cũng chính là quy tắc <em>"không bao giờ chỉ dùng màu"</em> của chị, áp cho một thứ tự.</p>
+<p><strong>Hỏi chị:</strong> trên danh sách hiện cả hai cột, người đọc phân biệt dòng ưu tiên cao với dòng bị chặn bằng cách nào ạ?</p>
+<hr>
+<h2 id="danh-sách-này-không-phải-là-gì">Danh sách này không phải là gì</h2>
+<p>Không phải bất đồng về hướng đi. Cấu trúc, bảng màu, kích thước và bộ từ vựng status của chị em đã lấy nguyên: <strong>79 trong 91 giá trị màu</strong> của chị đã vào hệ thống, <strong>toàn bộ widget trong mục Input widgets</strong> đã dựng xong, và 8 tỉ lệ tương phản chị công bố em đo lại đều đúng. Đây chỉ là những chỗ mà nếu làm đúng từng chữ thì ra một kết quả em nghĩ chị cũng không muốn.</p>
+</div>
+</body>
+</html>
