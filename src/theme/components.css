@@ -178,6 +178,44 @@ html[data-kendo-bridged] .vy-btn:disabled {
   border-radius: var(--vy-shape-sm); padding: var(--vy-space-4) var(--vy-space-5); width: 100%;
   transition: border-color var(--vy-dur-short) var(--vy-ease-standard);
 }
+/* The app shell, shown inside a specimen frame. It is built to fill a
+   viewport, so it needs a viewport-shaped box to fill rather than the
+   content-height stage every other example gets. */
+.vy-specimen-shell {
+  inline-size: 100%; overflow: hidden;
+  border: 1px solid var(--vy-border); border-radius: var(--vy-shape-md);
+  position: relative; isolation: isolate;
+}
+.vy-specimen-shell > .vy-shell { block-size: 100%; }
+/* NO SCALED VARIANT. One was written: a 1280px box transformed down to fit,
+   so the Examples tab could show the rail. It puts the right pixels on screen
+   and leaves the rail off-canvas anyway, because the shell's breakpoints are
+   `@media` queries and those read the VIEWPORT rather than the box an element
+   sits in. Measured at 0.39 scale with the sidebar still translated -248px.
+   Only a nested iframe gets its own viewport, and that is a heavier thing
+   than this page needs. */
+
+/* The icon sheet, for the design system's own Examples tab. Names under the
+   glyphs because an icon set is looked up by name far more often than it is
+   browsed. */
+.vy-icon-grid {
+  list-style: none; margin: 0; padding: 0; inline-size: 100%;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: var(--vy-space-6);
+}
+.vy-icon-grid > li {
+  display: flex; flex-direction: column; align-items: center; gap: var(--vy-space-3);
+  padding: var(--vy-space-5) var(--vy-space-3);
+  border: 1px solid var(--vy-border-faint); border-radius: var(--vy-radius-md);
+  font-size: var(--vy-text-2xs); color: var(--vy-on-surface-subtle);
+  text-align: center; word-break: break-word;
+}
+.vy-icon-inks { display: flex; flex-wrap: wrap; gap: var(--vy-space-8); margin: 0; align-items: center; }
+.vy-icon-inks > span { display: inline-flex; align-items: center; gap: var(--vy-space-3); font-size: var(--vy-text-base); }
+.vy-ink-brand  { color: var(--vy-brand-text); }
+.vy-ink-danger { color: var(--vy-danger-text); }
+.vy-ink-muted  { color: var(--vy-on-surface-subtle); }
+
 /* --- Files, images and conversation ----------------------------------------
    Her "Image, files and conversation" section, 16 Nov 2026. */
 

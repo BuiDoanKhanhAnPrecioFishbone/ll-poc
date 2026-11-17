@@ -41,6 +41,8 @@ A checklist has none of those, and it shows what is available.
 
 <!-- ds:tab examples -->
 
+<!-- ds:specimen column-chooser -->
+
 ## Anatomy
 
 ![The column chooser, open](../assets/components/column-chooser.png)
@@ -131,4 +133,5 @@ wonders where it went.
 
 | Date | Change |
 |---|---|
+| 17 Nov 2026 | Live examples — it had a page and a photograph, but nothing that could be pressed |
 | 8 Nov 2026 | This page |

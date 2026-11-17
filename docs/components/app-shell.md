@@ -1,7 +1,26 @@
 # App shell
 
-> `src/components/AppShell.tsx` · no live specimen yet **Ours**: it imports
-> neither KendoReact nor Radix. Production is KendoReact.
+**Ours**: it imports neither KendoReact nor Radix. Production is KendoReact.
+
+<!-- ds:tab examples -->
+
+<!-- ds:specimen app-shell -->
+
+**The example is the narrow shell, and deliberately so.** A specimen frame
+here is about 560px; the rail collapses to icons below 1180px and goes
+off-canvas below 820px, so what fits in the frame is the narrow state.
+
+A scaled copy was tried and does not work, which is worth recording because it
+looks like it should: rendering the shell in a 1280px box and scaling it down
+puts the right pixels on screen and leaves the rail off-canvas anyway. The
+breakpoints are `@media` queries and those read the **viewport**, not the box
+the element sits in. The scale applied at 0.39 and the sidebar stayed
+translated -248px.
+
+**For the full-width rail, open the product itself** — it is the same build,
+one origin over, and every screen in it is wearing this component.
+
+<!-- ds:tab usage -->
 
 ## When to use
 
@@ -60,13 +79,18 @@ negative step, and it is declared rather than fixed.
 | Nav toggle | `aria-expanded`, but the label is always "Open navigation" |
 | Rail | Collapsed items carry `title` only, `Group › Item`; the label is not rendered |
 
+<!-- ds:tab code -->
+
 ## API
 
 `<AppShell />` takes no props. State lives in the component; the nav comes from
 `liveNav` and `reviewPages` in `src/data/sitemap`.
 
+<!-- ds:tab changelog -->
+
 ## Recent changes
 
 | Date | Change |
 |---|---|
+| 17 Nov 2026 | Live examples, and the four-tab layout every other component already had |
 | 15 Nov 2026 | This page |

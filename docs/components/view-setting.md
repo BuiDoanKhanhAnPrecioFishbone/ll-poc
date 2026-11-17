@@ -5,6 +5,10 @@
 
 ---
 
+<!-- ds:tab examples -->
+
+<!-- ds:specimen view-setting -->
+
 <!-- ds:tab usage -->
 
 ## When to use
@@ -128,6 +132,7 @@ already there.
 
 | Date | Change |
 |---|---|
+| 17 Nov 2026 | Live examples — it had a page and a photograph, but nothing that could be pressed |
 | 8 Nov 2026 | This page |
 | 9 Nov 2026 | The density radio's **checked** border was `--vy-brand-boundary-soft` — 1.37:1 in light, 1.89 in dark. The control is transparent at rest, so that border is its whole boundary, and `brand-subtle` on a panel is 1.14 in dark, so the fill does not rescue it. Now `--vy-brand-boundary` (3.44 / 4.76) |
 | 9 Nov 2026 | The sort-direction pill drew its resting edge with `--vy-border` at 1.30:1 and its pressed edge with `boundary-light` at 2.08 — pressing it made the boundary fainter. Now `border-control` and `brand-boundary`. `border:check` never swept either: it does not open this panel |

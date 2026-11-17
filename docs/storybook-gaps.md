@@ -9,8 +9,8 @@ can click, tab through and read in both themes.
 | | |
 |---|---|
 | Components in the system | **42** |
-| With a live example | **32** |
-| Live examples in total | **94** |
+| With a live example | **42 — all of them** |
+| Live examples in total | **106** |
 
 *Updated 17 Nov 2026. The BA's **Input widgets** section is now fully built:
 every widget in it either exists here or is one she ruled out.*
@@ -20,28 +20,36 @@ across her five widget sections. The gap below is measured against those.
 
 ---
 
-## A · Components that exist but have no live example — 10
+## A · ~~Components with no live example~~ — **closed, 17 Nov 2026**
 
-These are built, used in the app, and documented in prose. They are missing
-only the thing you can click.
+All ten now have one: `icon` (the whole set, counted from `ICONS` so the
+number on the page cannot go stale), `support-ticket`, `people-picker`,
+`command-palette`, `data-grid` with its four satellites, and `app-shell`.
+`icon`, `app-shell` and `command-palette` also gained the four-tab layout
+every other component already had.
 
-| Component | Why it is not there yet |
-|---|---|
-| `data-grid` | The heaviest one: the Grid chunk is 663 KB and a specimen has to seed its own rows. Also the one most worth having |
-| `column-chooser` · `filter-toolbar` · `view-picker` · `view-setting` | All four are grid satellites. Each needs the grid around it to make sense, so they follow the grid |
-| `people-picker` | Needs a people fixture; otherwise straightforward |
-| `command-palette` | Opens over the whole page, so a specimen needs a frame it can own |
-| `app-shell` | A specimen of the shell is a specimen of the whole app. Probably a screenshot rather than an iframe |
-| `icon` | Should be a grid of all 45, which is easy and overdue |
-| `support-ticket` | Straightforward |
+**Three things worth keeping from the work:**
 
-**Three of these also have no tab structure at all** — `icon`, `app-shell` and
-`command-palette` have a page but not the four-tab layout every other
-component has.
+**The app shell cannot be shown at desktop width in a 560px frame, and
+scaling does not fix it.** A 1280px box transformed down puts the right pixels
+on screen and leaves the rail off-canvas anyway: the shell's breakpoints are
+`@media` queries, which read the viewport rather than the box an element sits
+in. Measured at 0.39 scale with the sidebar still translated -248px. The page
+says so and points at the product.
 
-**Suggested order:** `icon` first (easy, high use), then `support-ticket` and
-`people-picker`, then the grid and its four satellites as one piece, then
-`command-palette`. `app-shell` last, and probably not as an iframe.
+**`ROW_H` was dead and had drifted.** `DataGrid` exported
+`{compact: 28, comfortable: 36, relaxed: 44}` with a comment saying
+`GridSkeleton` sized its rows from it. Nothing imported it, the skeleton uses
+padding, and by the time it was found the tokens said `{34, 40, 48}` — the
+BA's density change on 16 Nov moved the tokens and left this behind. Deleted;
+the row height lives in `--vy-row-h-*` and there is one copy of it.
+
+**The icon count on the Icon page was wrong, and had been copied onward.**
+It said 45; the set has 43, and the figure had already reached the comparison
+with the BA's principles under a heading saying it was checked. The Examples
+tab now counts the set itself. The stroke moved to her 1.5 at the same time;
+it had been 1.6, which nobody chose.
+
 
 ---
 

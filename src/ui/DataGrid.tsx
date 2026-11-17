@@ -19,11 +19,13 @@ import { kendoDomProps, kendoHeaderProps } from './kendoDomProps';
 import { renderCell, fmtDate } from './renderCell';
 
 export type Density = 'compact' | 'comfortable' | 'relaxed';
-/* The density scale, kept here because it is the app's row-height vocabulary
-   and `GridSkeleton` sizes its placeholder rows from it. The GRID itself gets
-   density from `[data-density]` in the stylesheet — see the note on `rowHeight`
-   below for why it is not passed to Kendo. */
-export const ROW_H: Record<Density, number> = { compact: 28, comfortable: 36, relaxed: 44 };
+/* `ROW_H` WAS HERE AND IS GONE, 17 Nov 2026. It claimed `GridSkeleton` sized
+   its placeholder rows from it; nothing imported it, and the skeleton sizes
+   its rows with padding. By the time it was found it held {28, 36, 44} while
+   the tokens held {34, 40, 48} — the BA's density change on 16 Nov moved the
+   tokens and left this behind, because an export nobody reads cannot drift
+   loudly. The row height lives in `--vy-row-h-*` and is applied by
+   `[data-density]` in the stylesheet; there is one copy of it now. */
 /* The checkbox track is fixed and narrow — it holds one control whose size never
    changes, so a role width would only make it wider than its content.
 

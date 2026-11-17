@@ -97,8 +97,13 @@ export function Icon({ name, size = 16 }: { name: string; size?: number }) {
      the DOM for whoever is looking. */
   if (!d) return <svg width={size} height={size} data-unknown-icon={name} aria-hidden />;
   return (
+    /* 1.5, her number. It was 1.6, which nobody chose — it is the default
+       this file was written with, and her Icons section states the set is
+       drawn at one stroke width of 1.5px. Too small a difference to see on
+       one icon and exactly the kind that makes a set look uneven beside a
+       new icon drawn to spec. */
     <svg viewBox="0 0 20 20" width={size} height={size} fill="none" stroke="currentColor"
-         strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+         strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
       <path d={d} />
     </svg>
   );

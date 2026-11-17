@@ -1,7 +1,13 @@
 # Icon
 
-> `src/ui/icons.tsx` · no live specimen yet The set itself is catalogued on
-> [Iconography](../foundations/iconography.md); this page is the component.
+The set itself is catalogued on
+[Iconography](../foundations/iconography.md); this page is the component.
+
+<!-- ds:tab examples -->
+
+<!-- ds:specimen icon -->
+
+<!-- ds:tab usage -->
 
 ## When to use
 
@@ -16,20 +22,26 @@ something is.
 |---|---|---|
 | A name that is not in the set | Add it to `ICONS`, in `icons.tsx` | An unknown name draws nothing. The file's own history is the reason: a second map in `SmartButtons` fell back to a document glyph, and a fix made in one map did not reach the other |
 | A glyph drawn inline in a screen | The shared set | The set was one map in the shell plus one in `SmartButtons`, overlapping on six names. `AppShell.tsx` still draws four SVGs inline (collapse, hamburger, search, bell) |
-| A second weight or a filled variant | Nothing | The stroke is fixed at 1.6 on a 20×20 box. `size` is the only prop |
+| A second weight or a filled variant | Nothing | The stroke is fixed at 1.5 on a 20×20 box. `size` is the only prop |
 
 ## What it is made of
 
 One `<svg>`, one `<path>`. `viewBox="0 0 20 20"`, `fill="none"`,
-`stroke="currentColor"`, `strokeWidth="1.6"`, round caps and joins. The colour
+`stroke="currentColor"`, `strokeWidth="1.5"`, round caps and joins. The colour
 is whatever text colour surrounds it. Paths are stroked rather than filled so
 they stay legible down to 15px (the file's own note).
 
-**45 names**, in four runs: workflow (`task`, `chat`, `log`); 26 record and
-object glyphs from `quote` to `doc`; 9 nav-group glyphs (`home` to `settings`);
-and 7 interface glyphs (`chevron-down`, `chevron-right`, `eye`, `download`,
-`clip`, `trash`, `check`). Two of them carry a stated job: `chevron-down` opens a
-menu below itself; `chevron-right` says "this opens somewhere else".
+**43 names.** This page said 45 until 17 Nov 2026, and the figure had been
+copied from here into the comparison with the BA's principles, where it sat
+under a heading saying it had been checked. It had not: the Examples tab now
+counts the set from `ICONS` itself, so the number on screen cannot be wrong
+again.
+
+The stroke moved at the same time, from **1.6 to 1.5**. Nobody had chosen 1.6
+— it is what the file was written with — and her Icons section states the set
+is drawn at one stroke width of 1.5px. Too small to see on one glyph, and
+exactly the kind of difference that makes a set look uneven beside the next
+icon drawn to spec.
 
 ## How it behaves
 
@@ -51,6 +63,8 @@ menu below itself; `chevron-right` says "this opens somewhere else".
 | Colour | Inherits `currentColor`, so contrast is the surrounding text's, not the icon's |
 | Size | Nothing enforces a floor. The file says "down to 15px"; 11, 13 and 14px are in use |
 
+<!-- ds:tab code -->
+
 ## API
 
 ```tsx
@@ -63,8 +77,11 @@ menu below itself; `chevron-right` says "this opens somewhere else".
 | `name` | `string` | — | A key of `ICONS`. Typed `string`, not `keyof typeof ICONS`, so a wrong name is a runtime bug, not a type error |
 | `size` | `number` | `16` | Sets `width` and `height` together |
 
+<!-- ds:tab changelog -->
+
 ## Recent changes
 
 | Date | Change |
 |---|---|
 | 15 Nov 2026 | This page |
+| 17 Nov 2026 | Live examples: the whole set, counted from `ICONS` rather than written down. The count was wrong — 43, not 45 — and the stroke moved to the BA's 1.5 |

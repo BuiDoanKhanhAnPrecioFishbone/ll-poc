@@ -87,7 +87,17 @@ as ours does) · the whole spacing scale including the gap where `space-13`
 would be · motion, all four curves and three durations · `control-md` 34px ·
 `control-row` 26px · `target-min` 44px · shell 248 · 56 · 52 · popup 640 ·
 960 · 1180 · column roles ident 240, text 280, code 96, number 104, money 124,
-status 128, priority 104 · the icon set at 45.
+status 128, priority 104.
+
+**A correction to this list.** It used to end "· the icon set at 45". That was
+wrong twice: this system has **43** icons, and **she gives no count at all** —
+her Icons section shows "some of the set" and specifies how they are drawn,
+not how many there are. It was an assertion, not a measurement, and it sat
+under a heading that says everything beneath it was checked.
+
+What she does specify there is the drawing: a 20 × 20 box, strokes only, no
+fill, **one stroke width at 1.5px**, round ends. This system drew them at
+**1.6** until 17 Nov 2026.
 
 **One difference that is not a conflict.** Her type scale gives `2xs` 10px and
 `xs` 11px and says they are "not used on desktop, below the 12px floor"; ours

@@ -71,6 +71,8 @@ header, and the gap register — so nobody demonstrates it as working.
 
 <!-- ds:tab examples -->
 
+<!-- ds:specimen support-ticket -->
+
 ## Anatomy
 
 | Part | Rule |
@@ -119,4 +121,5 @@ Also exported: `browserName(ua?)` and `newErrorId()`.
 
 | Date | Change |
 |---|---|
+| 17 Nov 2026 | Live examples — it had a page and a photograph, but nothing that could be pressed |
 | 8 Nov 2026 | This page |

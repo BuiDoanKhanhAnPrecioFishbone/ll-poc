@@ -55,6 +55,8 @@ Keying on the label would leave one of them unreachable.
 
 <!-- ds:tab examples -->
 
+<!-- ds:specimen view-picker -->
+
 ## Anatomy
 
 ![The view picker in a grid toolbar](../assets/components/view-picker.png)
@@ -111,4 +113,5 @@ loses nothing.
 
 | Date | Change |
 |---|---|
+| 17 Nov 2026 | Live examples — it had a page and a photograph, but nothing that could be pressed |
 | 8 Nov 2026 | This page |

@@ -65,7 +65,7 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <div class="wrap">
 <nav class="toc"><h2>Mục lục</h2><ol>
 <li class="l2"><a href="#where-it-stands">Where it stands</a></li>
-<li class="l2"><a href="#a--components-that-exist-but-have-no-live-example--10">A · Components that exist but have no live example — 10</a></li>
+<li class="l2"><a href="#a--components-with-no-live-example--closed-17-nov-2026">A · ~~Components with no live example~~ — **closed, 17 Nov 2026**</a></li>
 <li class="l2"><a href="#b--thin-examples">B · Thin examples</a></li>
 <li class="l2"><a href="#c--widgets-the-ba-specifies-that-do-not-exist-here-at-all">C · Widgets the BA specifies that do not exist here at all</a></li>
 <li class="l2"><a href="#what-this-adds-up-to">What this adds up to</a></li>
@@ -73,15 +73,16 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <h1 id="storybook-what-is-covered-and-what-is-not">Storybook: what is covered, and what is not</h1>
 <p>Measured on 17 Nov 2026, not estimated. "Live example" means a specimen that renders the real component in an iframe on its Examples tab — the thing you can click, tab through and read in both themes.</p>
 <h2 id="where-it-stands">Where it stands</h2>
-<div class="t"><table><tbody><tr><td>Components in the system</td><td><strong>42</strong></td></tr><tr><td>With a live example</td><td><strong>32</strong></td></tr><tr><td>Live examples in total</td><td><strong>94</strong></td></tr></tbody></table></div>
+<div class="t"><table><tbody><tr><td>Components in the system</td><td><strong>42</strong></td></tr><tr><td>With a live example</td><td><strong>42 — all of them</strong></td></tr><tr><td>Live examples in total</td><td><strong>106</strong></td></tr></tbody></table></div>
 <p><em>Updated 17 Nov 2026. The BA's <strong>Input widgets</strong> section is now fully built: every widget in it either exists here or is one she ruled out.</em></p>
 <p>The BA's principles of 16 Nov 2026 name roughly <strong>60 widgets and states</strong> across her five widget sections. The gap below is measured against those.</p>
 <hr>
-<h2 id="a--components-that-exist-but-have-no-live-example--10">A · Components that exist but have no live example — 10</h2>
-<p>These are built, used in the app, and documented in prose. They are missing only the thing you can click.</p>
-<div class="t"><table><thead><tr><th>Component</th><th>Why it is not there yet</th></tr></thead><tbody><tr><td><code>data-grid</code></td><td>The heaviest one: the Grid chunk is 663 KB and a specimen has to seed its own rows. Also the one most worth having</td></tr><tr><td><code>column-chooser</code> · <code>filter-toolbar</code> · <code>view-picker</code> · <code>view-setting</code></td><td>All four are grid satellites. Each needs the grid around it to make sense, so they follow the grid</td></tr><tr><td><code>people-picker</code></td><td>Needs a people fixture; otherwise straightforward</td></tr><tr><td><code>command-palette</code></td><td>Opens over the whole page, so a specimen needs a frame it can own</td></tr><tr><td><code>app-shell</code></td><td>A specimen of the shell is a specimen of the whole app. Probably a screenshot rather than an iframe</td></tr><tr><td><code>icon</code></td><td>Should be a grid of all 45, which is easy and overdue</td></tr><tr><td><code>support-ticket</code></td><td>Straightforward</td></tr></tbody></table></div>
-<p><strong>Three of these also have no tab structure at all</strong> — <code>icon</code>, <code>app-shell</code> and <code>command-palette</code> have a page but not the four-tab layout every other component has.</p>
-<p><strong>Suggested order:</strong> <code>icon</code> first (easy, high use), then <code>support-ticket</code> and <code>people-picker</code>, then the grid and its four satellites as one piece, then <code>command-palette</code>. <code>app-shell</code> last, and probably not as an iframe.</p>
+<h2 id="a--components-with-no-live-example--closed-17-nov-2026">A · ~~Components with no live example~~ — <strong>closed, 17 Nov 2026</strong></h2>
+<p>All ten now have one: <code>icon</code> (the whole set, counted from <code>ICONS</code> so the number on the page cannot go stale), <code>support-ticket</code>, <code>people-picker</code>, <code>command-palette</code>, <code>data-grid</code> with its four satellites, and <code>app-shell</code>. <code>icon</code>, <code>app-shell</code> and <code>command-palette</code> also gained the four-tab layout every other component already had.</p>
+<p><strong>Three things worth keeping from the work:</strong></p>
+<p><strong>The app shell cannot be shown at desktop width in a 560px frame, and scaling does not fix it.</strong> A 1280px box transformed down puts the right pixels on screen and leaves the rail off-canvas anyway: the shell's breakpoints are <code>@media</code> queries, which read the viewport rather than the box an element sits in. Measured at 0.39 scale with the sidebar still translated -248px. The page says so and points at the product.</p>
+<p><strong><code>ROW_H</code> was dead and had drifted.</strong> <code>DataGrid</code> exported <code>{compact: 28, comfortable: 36, relaxed: 44}</code> with a comment saying <code>GridSkeleton</code> sized its rows from it. Nothing imported it, the skeleton uses padding, and by the time it was found the tokens said <code>{34, 40, 48}</code> — the BA's density change on 16 Nov moved the tokens and left this behind. Deleted; the row height lives in <code>--vy-row-h-*</code> and there is one copy of it.</p>
+<p><strong>The icon count on the Icon page was wrong, and had been copied onward.</strong> It said 45; the set has 43, and the figure had already reached the comparison with the BA's principles under a heading saying it was checked. The Examples tab now counts the set itself. The stroke moved to her 1.5 at the same time; it had been 1.6, which nobody chose.</p>
 <hr>
 <h2 id="b--thin-examples">B · Thin examples</h2>
 <p>Twenty-three specimens hold sixty-six examples, so just under three each. The thinnest are the ones to look at first, because a single example cannot show a state:</p>

@@ -58,6 +58,8 @@ typing goes to it immediately** — the way the live filterable control behaves.
 
 <!-- ds:tab examples -->
 
+<!-- ds:specimen people-picker -->
+
 ## Anatomy
 
 | Part | Rule |
@@ -119,5 +121,6 @@ typing goes to it immediately** — the way the live filterable control behaves.
 
 | Date | Change |
 |---|---|
+| 17 Nov 2026 | Live examples — it had a page and a photograph, but nothing that could be pressed |
 | 8 Nov 2026 | This page |
 | 8 Nov 2026 | `.vy-people-add`'s dashed edge moved to `--vy-border-control`. It was the structure token at **1.64:1**, and a dashed edge with one muted word in it is the whole of that control. Its hover no longer touches the border either — it went to `--vy-border-mid` at **2.58:1**, *fainter* than the resting edge. Found by hand while writing this page; `border:check` had not reached it, because it only renders once a record is in edit mode |

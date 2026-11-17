@@ -40,6 +40,8 @@ Which fields appear is a property of the saved View, chosen in View Setting.
 
 <!-- ds:tab examples -->
 
+<!-- ds:specimen filter-toolbar -->
+
 ## Anatomy
 
 ![The filter panel, open](../assets/components/filter-toolbar.png)
@@ -134,4 +136,5 @@ back to *any* is *Clear all*, which throws away every other field too.
 
 | Date | Change |
 |---|---|
+| 17 Nov 2026 | Live examples — it had a page and a photograph, but nothing that could be pressed |
 | 8 Nov 2026 | This page |

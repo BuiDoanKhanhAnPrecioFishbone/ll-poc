@@ -1,8 +1,13 @@
 # Command palette
 
-> `src/components/CommandPalette.tsx` · no live specimen yet **Ours**: it
-> imports neither KendoReact nor Radix. The pattern around it is
-> [Search](../patterns/search.md).
+**Ours**: it imports neither KendoReact nor Radix. The pattern around it is
+[Search](../patterns/search.md).
+
+<!-- ds:tab examples -->
+
+<!-- ds:specimen command-palette -->
+
+<!-- ds:tab usage -->
 
 ## When to use
 
@@ -55,6 +60,8 @@ What the file renders, and so what a screen reader gets:
 | Results | A real `ul`/`li`, and rows are not buttons: a keyboard user opens them only with Enter from the input |
 | Focus | Taken on open. Nothing in the file returns it on close or holds it inside |
 
+<!-- ds:tab code -->
+
 ## API
 
 ```tsx
@@ -69,8 +76,11 @@ What the file renders, and so what a screen reader gets:
 It navigates itself with `useNavigate`. The placeholder suggests `What If`,
 `RMA` and `so-mst`; the last is a route, and returned nothing until 9 Nov.
 
+<!-- ds:tab changelog -->
+
 ## Recent changes
 
 | Date | Change |
 |---|---|
+| 17 Nov 2026 | Live examples, and the four-tab layout every other component already had |
 | 15 Nov 2026 | This page |

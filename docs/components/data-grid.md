@@ -23,6 +23,8 @@ List. One per screen.
 
 <!-- ds:tab examples -->
 
+<!-- ds:specimen data-grid -->
+
 ## Anatomy
 
 ![The grid](../assets/components/datagrid.png)
@@ -137,5 +139,6 @@ dimmed-with-overlay on a recalculation, a real empty state, an error screen.
 
 | Date | Change |
 |---|---|
+| 17 Nov 2026 | Live examples — it had a page and a photograph, but nothing that could be pressed |
 | 8 Nov 2026 | This page |
 | 9 Nov 2026 | The inline cell editor's focus edge is fixed in dark — `--vy-brand-boundary-strong` blue-400 → blue-200, 2.88 → 7.22 on its worst ground. Its *hover* edge was already right, and is now swept: `border:check` measures hover and focus as well as rest |
