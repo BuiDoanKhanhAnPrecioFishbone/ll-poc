@@ -4,7 +4,7 @@
 > which stays the source. Do not edit this page: edit the CSS, where each
 > value sits beside the reasoning and the measurement that chose it.
 
-263 tokens in 75 groups. A dash in **Dark** means the value does not change between themes.
+274 tokens in 76 groups. A dash in **Dark** means the value does not change between themes.
 
 A machine-readable export of the same set, in the W3C Design Tokens draft format, is at `docs/tokens/voyager.tokens.json`.
 
@@ -193,6 +193,21 @@ A machine-readable export of the same set, in the W3C Design Tokens draft format
 | Token | Light | Dark |
 |---|---|---|
 | `--vy-field-group-min` | `280px` | — |
+
+## file
+
+| Token | Light | Dark |
+|---|---|---|
+| `--vy-file-pdf-bg` | `#fbe9e9` | `#423238` |
+| `--vy-file-pdf-fg` | `#9b2226` | `#f7ada6` |
+| `--vy-file-xls-bg` | `#e2f3e6` | `#28413c` |
+| `--vy-file-xls-fg` | `#1a6b34` | `#98e3b7` |
+| `--vy-file-doc-bg` | `#e7edf9` | `#2e3a4f` |
+| `--vy-file-doc-fg` | `#15347e` | `#b4cbfa` |
+| `--vy-file-img-bg` | `#d9f0ee` | `#244145` |
+| `--vy-file-img-fg` | `#0e5a52` | `#8be3d8` |
+| `--vy-file-other-bg` | `#eceff3` | `#393f48` |
+| `--vy-file-other-fg` | `#4d5766` | `#d3dae3` |
 
 ## filter
 
@@ -562,6 +577,7 @@ A machine-readable export of the same set, in the W3C Design Tokens draft format
 
 | Token | Light | Dark |
 |---|---|---|
+| `--vy-text-chip` | `9px` | — |
 | `--vy-text-2xs` | `12px` | — |
 | `--vy-text-xs` | `12px` | — |
 | `--vy-text-sm` | `12px` | — |

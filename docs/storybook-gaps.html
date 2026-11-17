@@ -73,7 +73,7 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <h1 id="storybook-what-is-covered-and-what-is-not">Storybook: what is covered, and what is not</h1>
 <p>Measured on 17 Nov 2026, not estimated. "Live example" means a specimen that renders the real component in an iframe on its Examples tab — the thing you can click, tab through and read in both themes.</p>
 <h2 id="where-it-stands">Where it stands</h2>
-<div class="t"><table><tbody><tr><td>Components in the system</td><td><strong>39</strong></td></tr><tr><td>With a live example</td><td><strong>29</strong></td></tr><tr><td>Live examples in total</td><td><strong>85</strong></td></tr></tbody></table></div>
+<div class="t"><table><tbody><tr><td>Components in the system</td><td><strong>42</strong></td></tr><tr><td>With a live example</td><td><strong>32</strong></td></tr><tr><td>Live examples in total</td><td><strong>94</strong></td></tr></tbody></table></div>
 <p><em>Updated 17 Nov 2026. The BA's <strong>Input widgets</strong> section is now fully built: every widget in it either exists here or is one she ruled out.</em></p>
 <p>The BA's principles of 16 Nov 2026 name roughly <strong>60 widgets and states</strong> across her five widget sections. The gap below is measured against those.</p>
 <hr>
@@ -102,8 +102,10 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <p>All four: <a href="components/card.md">Card</a> and Split card, <a href="components/group.md">Group</a>, Section heading and Collapsible group. The division she draws is the useful part — a card is a surface of its own, a group divides one surface, and her whole note on the group is <em>"no box, no fill"</em>.</p>
 <p>It gave <code>--vy-section-bg</code> its first use. The token had nowhere to go while this system had no card.</p>
 <p><strong>Tab was already here but did not match her spec</strong>, which only measuring showed: 33px tall, touching, and 400 weight for both states, so the active tab was marked by its underline alone. Now 36px, 24px apart, 500 with the active at 600. She writes <em>22px apart</em> and 22 is not on the spacing scale — not on ours and not on hers, which agree step for step — so it takes the 24px step, written down rather than quietly rounded.</p>
-<h3 id="images-and-conversation--no-package-needed">Images and conversation — no package needed</h3>
-<p><strong>Image</strong> in three states, plus <strong>Conversation</strong>, <strong>Email</strong>, <strong>Notes</strong>, <strong>Preview</strong> and <strong>Download</strong>, are specified and absent. <code>file-drop</code> and the file row cover the upload half of that section and nothing else.</p>
+<h3 id="images-and-conversation--built-17-nov-2026">~~Images and conversation~~ — <strong>built, 17 Nov 2026</strong></h3>
+<p><a href="components/file-row.md">File row</a> with its five type chips and four states, <a href="components/image-box.md">Image box</a> in both states, and <a href="components/conversation.md">Conversation</a>, which also covers Notes — she specifies Notes as <em>"As Conversation"</em>, so building two would only guarantee they drift.</p>
+<p><strong>Still open from that section:</strong> the image popup and the file <strong>Preview</strong> are both her <em>Popup Large 960px</em>, which is a dialog size this system already has; the dialog that goes in it is a screen, not a component. <strong>Email</strong> is her <em>Popup Medium 640px</em> with inputs that now all exist.</p>
+<p><strong>Two things to raise with her.</strong> She gives <strong>no dark values for the file-type chips</strong> — these use her dark values for the nearest family she names. And her chip text is <strong>9px</strong>, below the 12px desktop floor her own type scale sets; it is kept because a three-letter mark in a fixed 30×20 box is recognised rather than read, and it is named <code>--vy-text-chip</code> so the exception is visible instead of buried in a rule.</p>
 <hr>
 <h2 id="what-this-adds-up-to">What this adds up to</h2>
 <p><strong>A and B are finishing work</strong> on things that already exist — a few days, no decisions, and they make the storybook genuinely complete for what the system holds today.</p>

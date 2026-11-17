@@ -365,3 +365,39 @@ primary gets dark text automatically. Hers is reachable, but it means setting
 Still genuinely absent, and both are **components rather than colours**: her
 **file-type chip** (the XLS / DOC / PDF badge on a file row) and her **warning
 banner**. Neither exists here, so their colours belong with the component.
+
+
+---
+
+## Fifth pass — the widgets, built
+
+Four sittings on 17 Nov 2026 took her document from a comparison to an
+implementation. **Her Input widgets, Tab · Group · Card, and Image, files and
+conversation sections are now built**, which is the state she will be looking
+for when she reviews: not "we read it", but "it is on screen".
+
+| Her section | Built |
+|---|---|
+| Input widgets | Date · Datetime · Date range · Integer · Decimal · Currency · Percent · Yes/no field · Multi-column list |
+| Tab · Group · Card | Card · Split card · Group · Section heading · Collapsible group, and Tab brought to her spec |
+| Image, files and conversation | File row with five type chips and four states · Image box · Conversation, which covers Notes |
+
+Four of her values that had been sitting unused now have somewhere to go:
+`--vy-section-bg` (the card header), `--vy-grid-header`, `--vy-surface-raised`
+and `--vy-changed-border`.
+
+### Four things she should decide
+
+1. **No dark values for the file-type chips.** Her spec gives light values for
+   PDF, XLS and DOC and names IMG teal and ZIP gray. Nothing for dark. These
+   take her dark values for the nearest family she names.
+2. **The chip text is 9px**, below the 12px desktop floor her own type scale
+   sets. Kept, because a three-letter mark in a fixed 30×20 box is recognised
+   rather than read — and named `--vy-text-chip` so the exception is visible.
+3. **Her file row's two numbers cannot both hold.** *"Row 34px · padding 6px
+   10px"* with her own 26px row button makes 38. The height was kept.
+4. **Tabs: she writes 22px apart**, and 22 is on neither spacing scale — hers
+   or ours, which agree step for step. It took the 24px step.
+
+And one her own document rules out, which this file had wrongly listed as a
+gap: **Switch is "Not used"**. That row is a decision, not something missing.

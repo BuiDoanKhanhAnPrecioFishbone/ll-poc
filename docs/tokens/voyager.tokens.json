@@ -506,6 +506,78 @@
       }
     }
   },
+  "file": {
+    "pdf-bg": {
+      "$value": "#fbe9e9",
+      "$type": "color",
+      "$extensions": {
+        "com.voyager.dark": "#423238"
+      }
+    },
+    "pdf-fg": {
+      "$value": "#9b2226",
+      "$type": "color",
+      "$extensions": {
+        "com.voyager.dark": "#f7ada6"
+      }
+    },
+    "xls-bg": {
+      "$value": "#e2f3e6",
+      "$type": "color",
+      "$extensions": {
+        "com.voyager.dark": "#28413c"
+      }
+    },
+    "xls-fg": {
+      "$value": "#1a6b34",
+      "$type": "color",
+      "$extensions": {
+        "com.voyager.dark": "#98e3b7"
+      }
+    },
+    "doc-bg": {
+      "$value": "#e7edf9",
+      "$type": "color",
+      "$extensions": {
+        "com.voyager.dark": "#2e3a4f"
+      }
+    },
+    "doc-fg": {
+      "$value": "#15347e",
+      "$type": "color",
+      "$extensions": {
+        "com.voyager.dark": "#b4cbfa"
+      }
+    },
+    "img-bg": {
+      "$value": "#d9f0ee",
+      "$type": "color",
+      "$extensions": {
+        "com.voyager.dark": "#244145"
+      }
+    },
+    "img-fg": {
+      "$value": "#0e5a52",
+      "$type": "color",
+      "$extensions": {
+        "com.voyager.dark": "#8be3d8"
+      }
+    },
+    "other-bg": {
+      "$value": "#eceff3",
+      "$type": "color",
+      "$extensions": {
+        "com.voyager.dark": "#393f48"
+      }
+    },
+    "other-fg": {
+      "$value": "#4d5766",
+      "$type": "color",
+      "$extensions": {
+        "com.voyager.dark": "#d3dae3"
+      }
+    }
+  },
   "info": {
     "bg": {
       "$value": "#e5eaf7",
@@ -796,6 +868,10 @@
     }
   },
   "text": {
+    "chip": {
+      "$value": "9px",
+      "$type": "dimension"
+    },
     "2xs": {
       "$value": "12px",
       "$type": "dimension"

@@ -142,7 +142,11 @@
   cursor: pointer; border-radius: var(--vy-radius-md);
 }
 .vy-icon-btn:hover { background: var(--vy-surface-sunken); color: var(--vy-on-surface); }
-.vy-avatar { width: var(--vy-control-sm); height: var(--vy-control-sm); border-radius: 50%; background: var(--vy-brand-subtle-strong); color: var(--vy-brand-text-deep); display: grid; place-items: center; font-weight: var(--vy-weight-semibold); font-size: var(--vy-text-sm); }
+/* `brand-text`, her `primary-text`, rather than the deeper blue it used to
+   carry: her conversation spec names it outright. 7.04:1 on the circle,
+   where the old ink was 10.70 — both clear, and hers is the one written
+   down. */
+.vy-avatar { width: var(--vy-control-sm); height: var(--vy-control-sm); border-radius: 50%; background: var(--vy-brand-subtle-strong); color: var(--vy-brand-text); display: grid; place-items: center; font-weight: var(--vy-weight-semibold); font-size: var(--vy-text-sm); }
 
 /* `position: relative` is LOAD-BEARING, not decoration.
    `.vy-sr-only` hides text with `position: absolute`, and an absolutely

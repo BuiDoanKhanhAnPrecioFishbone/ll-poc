@@ -8,9 +8,9 @@ can click, tab through and read in both themes.
 
 | | |
 |---|---|
-| Components in the system | **39** |
-| With a live example | **29** |
-| Live examples in total | **85** |
+| Components in the system | **42** |
+| With a live example | **32** |
+| Live examples in total | **94** |
 
 *Updated 17 Nov 2026. The BA's **Input widgets** section is now fully built:
 every widget in it either exists here or is one she ruled out.*
@@ -116,11 +116,25 @@ at 600. She writes *22px apart* and 22 is not on the spacing scale — not on
 ours and not on hers, which agree step for step — so it takes the 24px step,
 written down rather than quietly rounded.
 
-### Images and conversation — no package needed
+### ~~Images and conversation~~ — **built, 17 Nov 2026**
 
-**Image** in three states, plus **Conversation**, **Email**, **Notes**,
-**Preview** and **Download**, are specified and absent. `file-drop` and the
-file row cover the upload half of that section and nothing else.
+[File row](components/file-row.md) with its five type chips and four states,
+[Image box](components/image-box.md) in both states, and
+[Conversation](components/conversation.md), which also covers Notes — she
+specifies Notes as *"As Conversation"*, so building two would only guarantee
+they drift.
+
+**Still open from that section:** the image popup and the file **Preview** are
+both her *Popup Large 960px*, which is a dialog size this system already has;
+the dialog that goes in it is a screen, not a component. **Email** is her
+*Popup Medium 640px* with inputs that now all exist.
+
+**Two things to raise with her.** She gives **no dark values for the file-type
+chips** — these use her dark values for the nearest family she names. And her
+chip text is **9px**, below the 12px desktop floor her own type scale sets;
+it is kept because a three-letter mark in a fixed 30×20 box is recognised
+rather than read, and it is named `--vy-text-chip` so the exception is
+visible instead of buried in a rule.
 
 ---
 

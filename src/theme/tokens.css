@@ -319,6 +319,35 @@
      go: this system had no card until 17 Nov 2026, so the token would have
      been a declaration with no rule behind it. */
   --vy-section-bg:        var(--vy-blue-50);
+
+  /* --- File type chips --------------------------------------------------
+     Her file row, 16 Nov 2026: a 30×20 chip at 9px 700 that says what the
+     file is. She names five — "PDF red, XLS green, DOC blue, IMG teal, ZIP
+     and others gray" — and gives the LIGHT values for the first three in her
+     own example markup.
+
+     IMG and ZIP: she names only the colour, so these take the teal and the
+     gray she herself defines, from the status pill sheet. That is reading her
+     palette rather than inventing one.
+
+     DARK: she gives none for chips at all. These are her dark values for the
+     nearest family she names, which keeps the chip legible in both themes
+     without anyone choosing a new colour. Worth confirming with her —
+     recorded in docs/ba-principles-16nov.md rather than left as a surprise.
+
+     Note these are NOT the status pill tints, though three of them are
+     within a shade. Her PDF is #fbe9e9 and her blocked pill is #f8e6e5: a
+     file type is not a state, and tying them would make one move the other. */
+  --vy-file-pdf-bg:       #fbe9e9;
+  --vy-file-pdf-fg:       #9b2226;
+  --vy-file-xls-bg:       #e2f3e6;
+  --vy-file-xls-fg:       #1a6b34;
+  --vy-file-doc-bg:       #e7edf9;
+  --vy-file-doc-fg:       #15347e;
+  --vy-file-img-bg:       #d9f0ee;
+  --vy-file-img-fg:       #0e5a52;
+  --vy-file-other-bg:     #eceff3;
+  --vy-file-other-fg:     #4d5766;
   --vy-info-bg:           #e5eaf7;
   --vy-info-text:         #15347e;
   --vy-warning-bg:        #f8efe3;
@@ -443,6 +472,17 @@
      `2xs` WAS THE ONE STILL UNDER THE FLOOR, at 10px, in ten rules the floor
      was meant to cover — badges, the avatar chip, `.vy-column-req`,
      `.vy-vs-required`. Raised 7 Nov. */
+  /* BELOW THE FLOOR, ON PURPOSE AND ON HER SPEC. Every other size here stops
+     at 12px, which her principles call the desktop floor and which this ramp
+     enforces by making 2xs and xs the same 12. This one is 9px because her
+     file row asks for it: a three-letter chip in a fixed 30×20 box, all caps
+     at 700, which is a mark rather than prose — nobody reads "PDF", they
+     recognise it.
+
+     It is still below her own floor, so it is named rather than written as a
+     literal, and it is raised with her in docs/ba-principles-16nov.md. If it
+     goes, the chip grows; nothing else uses this. */
+  --vy-text-chip: 9px;
   --vy-text-2xs:  12px;
   --vy-text-xs:   12px;
   --vy-text-sm:   12px;
@@ -973,6 +1013,16 @@
   --vy-danger-boundary: #e0655c;
   --vy-grid-header: #1b222d;
   --vy-section-bg: #1b2433;
+  --vy-file-pdf-bg: #423238;
+  --vy-file-pdf-fg: #f7ada6;
+  --vy-file-xls-bg: #28413c;
+  --vy-file-xls-fg: #98e3b7;
+  --vy-file-doc-bg: #2e3a4f;
+  --vy-file-doc-fg: #b4cbfa;
+  --vy-file-img-bg: #244145;
+  --vy-file-img-fg: #8be3d8;
+  --vy-file-other-bg: #393f48;
+  --vy-file-other-fg: #d3dae3;
   --vy-info-bg: #1a2846;
   --vy-info-text: #9db4ec;
   --vy-warning-bg: #3c3121;
@@ -1109,6 +1159,16 @@
     --vy-danger-boundary: #e0655c;
     --vy-grid-header: #1b222d;
     --vy-section-bg: #1b2433;
+    --vy-file-pdf-bg: #423238;
+    --vy-file-pdf-fg: #f7ada6;
+    --vy-file-xls-bg: #28413c;
+    --vy-file-xls-fg: #98e3b7;
+    --vy-file-doc-bg: #2e3a4f;
+    --vy-file-doc-fg: #b4cbfa;
+    --vy-file-img-bg: #244145;
+    --vy-file-img-fg: #8be3d8;
+    --vy-file-other-bg: #393f48;
+    --vy-file-other-fg: #d3dae3;
     --vy-info-bg: #1a2846;
     --vy-info-text: #9db4ec;
     --vy-warning-bg: #3c3121;

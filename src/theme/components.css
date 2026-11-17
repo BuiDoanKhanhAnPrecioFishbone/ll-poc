@@ -178,6 +178,123 @@ html[data-kendo-bridged] .vy-btn:disabled {
   border-radius: var(--vy-shape-sm); padding: var(--vy-space-4) var(--vy-space-5); width: 100%;
   transition: border-color var(--vy-dur-short) var(--vy-ease-standard);
 }
+/* --- Files, images and conversation ----------------------------------------
+   Her "Image, files and conversation" section, 16 Nov 2026. */
+
+/* The chip is the point of the file row: at 30×20 and 9px 700 it says what
+   the file is before the name has been read. Five families, her words —
+   PDF red, XLS green, DOC blue, IMG teal, ZIP and others gray. */
+.vy-file-chip {
+  flex: none; display: inline-flex; align-items: center; justify-content: center;
+  inline-size: 30px; block-size: 20px; border-radius: var(--vy-radius-md);
+  font-size: var(--vy-text-chip); font-weight: var(--vy-weight-heavy); letter-spacing: .03em;
+  background: var(--vy-file-other-bg); color: var(--vy-file-other-fg);
+}
+.vy-file-chip[data-kind="pdf"] { background: var(--vy-file-pdf-bg); color: var(--vy-file-pdf-fg); }
+.vy-file-chip[data-kind="xls"] { background: var(--vy-file-xls-bg); color: var(--vy-file-xls-fg); }
+.vy-file-chip[data-kind="doc"] { background: var(--vy-file-doc-bg); color: var(--vy-file-doc-fg); }
+.vy-file-chip[data-kind="img"] { background: var(--vy-file-img-bg); color: var(--vy-file-img-fg); }
+
+/* HEIGHT 34px, HORIZONTAL PADDING 10px, AND NO VERTICAL PADDING. Her row
+   says "34px · padding 6px 10px", and those two cannot both hold: her own
+   download button in a row is 26px, which with 6px above and below makes 38.
+   The HEIGHT is the number that matters — a list of files is read down its
+   left edge, and rows that vary by 4px because one has a button read as a
+   ragged list. So the row is 34 and the button centres inside it. */
+.vy-file-row {
+  display: flex; align-items: center; gap: var(--vy-space-5);
+  block-size: var(--vy-control-md); padding: 0 var(--vy-space-5);
+  border-block-end: 1px solid var(--vy-border-faint);
+}
+.vy-file-row:last-child { border-block-end: 0; }
+.vy-file-row:hover { background: var(--vy-grid-header); }
+/* Added and not saved: her information tint, which says "this is new here"
+   in the same colour a changed field does. */
+.vy-file-row[data-state="added"] { background: var(--vy-info-bg); }
+.vy-file-row[data-state="rejected"] {
+  background: var(--vy-danger-subtle); color: var(--vy-danger-text);
+}
+.vy-file-row[data-state="rejected"]:hover { background: var(--vy-danger-subtle); }
+.vy-file-mark { flex: none; }
+.vy-file-name {
+  font-size: var(--vy-text-base); color: var(--vy-brand-text);
+  min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  text-decoration: none;
+}
+.vy-file-name:hover { text-decoration: underline; }
+.vy-file-name--plain { color: inherit; }
+.vy-file-name--plain:hover { text-decoration: none; }
+.vy-file-meta {
+  margin-inline-start: auto; flex: none;
+  font-size: var(--vy-text-2xs); color: var(--vy-on-surface-subtle);
+}
+.vy-file-row[data-state="rejected"] .vy-file-meta { color: inherit; }
+.vy-file-action { flex: none; display: flex; align-items: center; }
+.vy-file-progress { margin-inline-start: auto; display: flex; align-items: center; gap: var(--vy-space-4); }
+/* Her bar: 90 × 4, track on border-soft, fill on primary. */
+.vy-file-bar {
+  inline-size: 90px; block-size: 4px; border-radius: var(--vy-radius-pill);
+  background: var(--vy-border-faint); overflow: hidden;
+}
+.vy-file-bar > span { display: block; block-size: 100%; background: var(--vy-brand); }
+.vy-file-progress .vy-file-meta { margin-inline-start: 0; }
+
+/* Her image slot: one box in two states, so the layout does not jump when an
+   image arrives. Max 220 × 132, her numbers. */
+.vy-image-box {
+  display: flex; align-items: center; justify-content: center;
+  inline-size: 100%; max-inline-size: 220px; block-size: 132px;
+  border: 1px solid var(--vy-border); border-radius: var(--vy-shape-md);
+  background: var(--vy-surface); padding: 0; overflow: hidden; cursor: pointer;
+}
+.vy-image-box > img { max-inline-size: 100%; max-block-size: 100%; object-fit: contain; }
+.vy-image-box--empty {
+  flex-direction: column; gap: var(--vy-space-2); cursor: default;
+  border: 1.5px dashed var(--vy-border-control);
+  text-align: center; padding: var(--vy-space-6);
+}
+.vy-image-prompt { margin: 0; font-size: var(--vy-text-base); color: var(--vy-on-surface-muted); }
+.vy-image-types { margin: 0; font-size: var(--vy-text-2xs); color: var(--vy-on-surface-subtle); }
+.vy-image-browse {
+  appearance: none; background: none; border: 0; padding: 0; cursor: pointer;
+  font: inherit; font-weight: var(--vy-weight-semibold); color: var(--vy-brand-text);
+}
+.vy-image-browse:hover { text-decoration: underline; }
+.vy-image-box--empty:focus-within, .vy-image-box--empty[data-over] { border-color: var(--vy-brand); }
+
+/* Conversation and Notes — one shape, her note: "Notes: As Conversation". */
+/* NO `.vy-avatar` RULE HERE. One was written and deleted: the class already
+   exists in app.css, used by five files, and app.css loads later — so the new
+   rule was overridden and the avatar kept its old colour while looking like
+   it had been restyled. It already matches her spec (28px, primary-soft,
+   12px 600); only the ink differed, and that is fixed where it lives. */
+.vy-conversation-list { display: flex; flex-direction: column; gap: var(--vy-space-8); }
+.vy-conversation-top { margin-block-end: var(--vy-space-8); }
+.vy-msg { display: flex; gap: var(--vy-space-5); align-items: flex-start; }
+.vy-msg-body { min-inline-size: 0; flex: 1 1 auto; }
+.vy-msg-head { margin: 0 0 var(--vy-space-2); display: flex; align-items: baseline; gap: var(--vy-space-4); flex-wrap: wrap; }
+.vy-msg-author { font-size: var(--vy-text-base); font-weight: var(--vy-weight-semibold); }
+.vy-msg-time { font-size: var(--vy-text-2xs); color: var(--vy-on-surface-subtle); }
+/* An outside sender is a warning, not an error: nothing is wrong, there is
+   something to check before replying. Her tint says exactly that. */
+.vy-msg-outside {
+  font-size: var(--vy-text-2xs); border-radius: var(--vy-radius-sm);
+  padding: 0 var(--vy-space-3);
+  background: var(--vy-warning-bg); color: var(--vy-warning-text);
+}
+.vy-msg-email {
+  margin: 0 0 var(--vy-space-3); display: flex; gap: var(--vy-space-6); flex-wrap: wrap;
+  font-size: var(--vy-text-2xs); color: var(--vy-on-surface-muted);
+}
+.vy-msg-text { font-size: var(--vy-text-base); }
+.vy-msg-text > :first-child { margin-block-start: 0; }
+.vy-msg-text > :last-child { margin-block-end: 0; }
+/* Status changes are not something anyone said, so they get no avatar and no
+   name — giving them one makes a thread look busier than the conversation. */
+.vy-msg-status {
+  margin: 0; font-size: var(--vy-text-2xs); color: var(--vy-on-surface-subtle);
+}
+
 /* --- Card, Group, Section heading ------------------------------------------
    The BA's Tab · Group · Card section, 16 Nov 2026, taken as written.
 
