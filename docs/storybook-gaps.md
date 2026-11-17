@@ -158,6 +158,15 @@ visible instead of buried in a rule.
 
 ---
 
+## And a correction to this page
+
+It has been reporting on **the widget sections** of her document and reading
+as though that were the document. Walking all 31 sections on 18 Nov found
+**eleven that had never been opened**, four of which hold real unbuilt work —
+the radius scale, the danger and no-permission buttons, six grid-cell states,
+and the large-editable-grid mode. They are listed in
+[What of the BA's document has actually been checked](ba-coverage.md).
+
 ## What this adds up to
 
 **A and B are finishing work** on things that already exist — a few days, no
