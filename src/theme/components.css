@@ -178,6 +178,21 @@ html[data-kendo-bridged] .vy-btn:disabled {
   border-radius: var(--vy-shape-sm); padding: var(--vy-space-4) var(--vy-space-5); width: 100%;
   transition: border-color var(--vy-dur-short) var(--vy-ease-standard);
 }
+/* Her four number widgets, 16 Nov 2026: right-aligned, tabular figures, no
+   spin buttons. The alignment is the part that matters — a column of prices
+   that agrees on the decimal point can be scanned for an outlier, and one
+   that does not has to be read. `tabular-nums` is what keeps the digits in
+   their columns while the value is still being typed. */
+.vy-input--number {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* "Two boxes H 34px, 8px apart" — her Date range, drawn as she drew it. The
+   two halves share the row evenly so neither looks like the main one. */
+.vy-date-range { display: flex; gap: var(--vy-space-4); }
+.vy-date-range > * { flex: 1 1 0; min-width: 0; }
+
 /* ON THE SAME SCALE AS EVERY OTHER CONTROL. Its padding had put it at 36.8px
    beside a 34px read-value box in the same field — the two shapes the 14 Oct
    rule says a user reads as one control in two states. A TEXTAREA is exempt:
@@ -226,7 +241,10 @@ html[data-kendo-bridged] .vy-btn:disabled {
    was never told about. The scale is told to it now, in kendo-bridge.css, so
    there is nothing left to patch. Horizontal padding only. */
 .vy-select .k-input-inner { padding-inline: var(--vy-space-5); }
-.vy-menu { background: var(--vy-surface); border: 1px solid var(--vy-border); border-radius: var(--vy-shape-md); box-shadow: var(--vy-elev-3); padding: var(--vy-space-2); z-index: var(--vy-z-menu); }
+/* `surface-raised`, not `surface`: see the floating-surfaces note in
+   kendo-bridge.css. In light the two are the same white; in dark this is the
+   step that gives a menu an edge. */
+.vy-menu { background: var(--vy-surface-raised); border: 1px solid var(--vy-border); border-radius: var(--vy-shape-md); box-shadow: var(--vy-elev-3); padding: var(--vy-space-2); z-index: var(--vy-z-menu); }
 /* --- Checkbox / radio ------------------------------------------------------ */
 /* The LABEL carries the 24px minimum target, not the box. The whole label is
    clickable, so it is the target — and it was 20px tall because that is the box

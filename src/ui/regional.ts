@@ -152,3 +152,33 @@ export function fmtMoney(n: number, { decimals = 2 } = {}): string {
     minimumFractionDigits: decimals, maximumFractionDigits: decimals,
   }).format(n);
 }
+
+/**
+ * The date pattern for the current region, in Kendo's placeholder language —
+ * `MM/dd/yyyy` for en-US, `dd.MM.yyyy` for de-DE.
+ *
+ * KENDO CANNOT READ `Intl`. Its date controls format through
+ * `@progress/kendo-react-intl`, which is accurate but wants CLDR data loaded
+ * per locale; four locales of CLDR is a large download to make one calendar
+ * agree with the rest of the app. So the ORDER is read out of `Intl` here —
+ * the same source `fmtDate` uses, so the two cannot drift — and handed to
+ * Kendo as a pattern. Padding is ours either way, for the reason `DATE_PARTS`
+ * gives: a two-digit year on a quotation spanning 2026 and 2027 is the
+ * ambiguity this setting exists to remove.
+ */
+export function datePattern({ withTime = false } = {}): string {
+  const parts = new Intl.DateTimeFormat(current.locale, DATE_PARTS).formatToParts(new Date());
+  const date = parts.map(p => (
+    p.type === 'year' ? 'yyyy'
+      : p.type === 'month' ? 'MM'
+      : p.type === 'day' ? 'dd'
+      : p.value
+  )).join('');
+  /* 24-hour, with no seconds. Seconds belong to `fmtDateTime`, which stamps a
+     log line; a picker is something a person types into, and a field that
+     demands `:00` to be valid is a field that rejects what they meant. The
+     12-versus-24 question is open with the BA — her examples read `10:30 AM`
+     and this app reads `10:30` — so it follows this app until she settles it,
+     rather than splitting the difference. */
+  return withTime ? `${date} HH:mm` : date;
+}

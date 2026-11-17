@@ -73,7 +73,8 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <h1 id="storybook-what-is-covered-and-what-is-not">Storybook: what is covered, and what is not</h1>
 <p>Measured on 17 Nov 2026, not estimated. "Live example" means a specimen that renders the real component in an iframe on its Examples tab — the thing you can click, tab through and read in both themes.</p>
 <h2 id="where-it-stands">Where it stands</h2>
-<div class="t"><table><tbody><tr><td>Components in the system</td><td><strong>33</strong></td></tr><tr><td>With a live example</td><td><strong>23</strong></td></tr><tr><td>Live examples in total</td><td><strong>66</strong></td></tr><tr><td>Pages on the site</td><td>205, 0 dead links of 17,674</td></tr></tbody></table></div>
+<div class="t"><table><tbody><tr><td>Components in the system</td><td><strong>35</strong></td></tr><tr><td>With a live example</td><td><strong>25</strong></td></tr><tr><td>Live examples in total</td><td><strong>73</strong></td></tr></tbody></table></div>
+<p><em>Updated 17 Nov 2026, after the number and date fields landed.</em></p>
 <p>The BA's principles of 16 Nov 2026 name roughly <strong>60 widgets and states</strong> across her five widget sections. The gap below is measured against those.</p>
 <hr>
 <h2 id="a--components-that-exist-but-have-no-live-example--10">A · Components that exist but have no live example — 10</h2>
@@ -90,10 +91,10 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <hr>
 <h2 id="c--widgets-the-ba-specifies-that-do-not-exist-here-at-all">C · Widgets the BA specifies that do not exist here at all</h2>
 <p>This is not a storybook gap — there is nothing to put in it. These are components to build, and the first two groups need Kendo packages that are <strong>not installed</strong>.</p>
-<h3 id="dates--needs-progresskendo-react-dateinputs">Dates — needs <code>@progress/kendo-react-dateinputs</code></h3>
-<p>Her Input widgets section specifies <strong>Date</strong>, <strong>Datetime</strong> and <strong>Date range</strong> as three separate widgets with their own widths. This system has no date control of any kind. It formats dates for display, which is why the 12-hour-versus-24-hour question is already open — but nothing here lets a user pick one.</p>
-<h3 id="numbers--needs-progresskendo-react-inputs">Numbers — needs <code>@progress/kendo-react-inputs</code></h3>
-<p><strong>Integer</strong>, <strong>Decimal</strong>, <strong>Currency</strong> and <strong>Percent</strong> are four distinct widgets in her spec, each with its own alignment and column width. This system has text fields. The same package holds <strong>Switch</strong>, which she also specifies.</p>
+<h3 id="dates-and-numbers--built-17-nov-2026">~~Dates~~ and ~~numbers~~ — <strong>built, 17 Nov 2026</strong></h3>
+<p><strong>Date</strong>, <strong>Datetime</strong>, <strong>Date range</strong>, <strong>Integer</strong>, <strong>Decimal</strong>, <strong>Currency</strong> and <strong>Percent</strong> — seven of her widgets, none of which existed. See <a href="components/number-field.md">Number field</a> and <a href="components/date-field.md">Date field</a>.</p>
+<p>Only one package was needed in the end, <code>@progress/kendo-react-dateinputs</code>, and it was already in <code>node_modules</code> as a transitive dependency; it is now declared directly. Numbers did <strong>not</strong> take <code>@progress/kendo-react-inputs</code> — the reason is on the Number field page.</p>
+<p><strong>A correction to this page.</strong> It listed <strong>Switch</strong> among the missing widgets. Her spec names Switch only to rule it out — the row reads <em>"Not used"</em> — so there is nothing to build, and building one would have added a control she has decided against. The row is a decision, not a gap.</p>
 <h3 id="cards-and-groups--no-package-needed">Cards and groups — no package needed</h3>
 <p><strong>Card</strong>, <strong>Split card</strong>, <strong>Collapsible group</strong> and <strong>Section heading</strong> are four of the six rows in her <em>Tab · Group · Card</em> section. Only Tab exists here. There is no card component under any name — checked for <code>card</code>, <code>panel</code>, <code>surface</code>, <code>tile</code>, <code>pane</code> and <code>well</code>.</p>
 <p>This one matters more than it looks: <code>--vy-section-bg</code>, one of the values of hers still unapplied, is for <em>"card headers and the grid toolbar band"</em>. The token has nowhere to go until the card exists.</p>
@@ -102,7 +103,7 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <hr>
 <h2 id="what-this-adds-up-to">What this adds up to</h2>
 <p><strong>A and B are finishing work</strong> on things that already exist — a few days, no decisions, and they make the storybook genuinely complete for what the system holds today.</p>
-<p><strong>C is product scope.</strong> Nine of her widgets need two Kendo packages added; nine more need components designed from scratch. That is a plan to agree with her and with you, not a gap to quietly fill — and it is worth saying to her that her own spec is ahead of the build in these four areas, since she may be specifying for a milestone this mockup was never meant to reach.</p>
+<p><strong>C is product scope.</strong> Seven of those widgets are now built; the rest need components designed from scratch. That is a plan to agree with her and with you, not a gap to quietly fill — and it is worth saying to her that her own spec is ahead of the build in these four areas, since she may be specifying for a milestone this mockup was never meant to reach.</p>
 </div>
 </body>
 </html>

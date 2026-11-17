@@ -8,10 +8,11 @@ can click, tab through and read in both themes.
 
 | | |
 |---|---|
-| Components in the system | **33** |
-| With a live example | **23** |
-| Live examples in total | **66** |
-| Pages on the site | 205, 0 dead links of 17,674 |
+| Components in the system | **35** |
+| With a live example | **25** |
+| Live examples in total | **73** |
+
+*Updated 17 Nov 2026, after the number and date fields landed.*
 
 The BA's principles of 16 Nov 2026 name roughly **60 widgets and states**
 across her five widget sections. The gap below is measured against those.
@@ -68,19 +69,22 @@ This is not a storybook gap — there is nothing to put in it. These are
 components to build, and the first two groups need Kendo packages that are
 **not installed**.
 
-### Dates — needs `@progress/kendo-react-dateinputs`
+### ~~Dates~~ and ~~numbers~~ — **built, 17 Nov 2026**
 
-Her Input widgets section specifies **Date**, **Datetime** and **Date range**
-as three separate widgets with their own widths. This system has no date
-control of any kind. It formats dates for display, which is why the
-12-hour-versus-24-hour question is already open — but nothing here lets a user
-pick one.
+**Date**, **Datetime**, **Date range**, **Integer**, **Decimal**, **Currency**
+and **Percent** — seven of her widgets, none of which existed. See
+[Number field](components/number-field.md) and
+[Date field](components/date-field.md).
 
-### Numbers — needs `@progress/kendo-react-inputs`
+Only one package was needed in the end, `@progress/kendo-react-dateinputs`,
+and it was already in `node_modules` as a transitive dependency; it is now
+declared directly. Numbers did **not** take `@progress/kendo-react-inputs` —
+the reason is on the Number field page.
 
-**Integer**, **Decimal**, **Currency** and **Percent** are four distinct
-widgets in her spec, each with its own alignment and column width. This system
-has text fields. The same package holds **Switch**, which she also specifies.
+**A correction to this page.** It listed **Switch** among the missing widgets.
+Her spec names Switch only to rule it out — the row reads *"Not used"* — so
+there is nothing to build, and building one would have added a control she
+has decided against. The row is a decision, not a gap.
 
 ### Cards and groups — no package needed
 
@@ -107,8 +111,8 @@ file row cover the upload half of that section and nothing else.
 decisions, and they make the storybook genuinely complete for what the system
 holds today.
 
-**C is product scope.** Nine of her widgets need two Kendo packages added;
-nine more need components designed from scratch. That is a plan to agree with
+**C is product scope.** Seven of those widgets are now built; the rest need
+components designed from scratch. That is a plan to agree with
 her and with you, not a gap to quietly fill — and it is worth saying to her
 that her own spec is ahead of the build in these four areas, since she may be
 specifying for a milestone this mockup was never meant to reach.

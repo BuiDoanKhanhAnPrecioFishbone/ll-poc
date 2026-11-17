@@ -518,3 +518,23 @@ html[data-kendo-bridged] .k-icon-button > .k-button-text > .k-button-icon > svg 
    a MINIMUM on a coarse pointer rather than a scale, and belongs with the other
    pointer rules.
    ========================================================================== */
+
+/* --- Floating surfaces ------------------------------------------------------
+   The BA's principles of 16 Nov 2026 name four things that float over the
+   page — menus, dropdown lists, date pickers and the bell list — and give
+   them one rule: in dark they sit ONE STEP LIGHTER than the panel beneath,
+   because a popup the same colour as its background has no edge except its
+   shadow, and a shadow is the first thing a low-contrast screen loses.
+
+   `--vy-surface-raised` held exactly that value and was used by nothing. The
+   calendar made it visible: Kendo's date popup arrived with no rule of ours
+   at all — square corners, Kendo's own surface colour — while every other
+   popup in the app had been styled one at a time.
+
+   Her numbers: surface-raised, 1px border, radius 8px, menu shadow. */
+html[data-kendo-bridged] .k-popup {
+  background: var(--vy-surface-raised);
+  border: 1px solid var(--vy-border);
+  border-radius: var(--vy-shape-md);
+  box-shadow: var(--vy-elev-3);
+}
