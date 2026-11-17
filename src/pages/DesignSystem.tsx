@@ -1,3 +1,4 @@
+import { Banner } from '../ui/Banner';
 import { ROLE_WIDTH } from '../components/column-model';
 import { Fragment, useEffect, useState } from 'react';
 import { RocketLaunch } from '../ui/RocketLaunch';
@@ -75,7 +76,7 @@ export function DesignSystemPage() {
       <Section title="How to read this page"
         note="Raw ramps are values. The semantic layer is roles, and roles are what the stylesheets reference — 553 of them, with no raw primitive left in any component file. That indirection is the whole reason a dark theme is a change to one block rather than to every screen. Switch it in the user menu under Appearance; every swatch below follows.">
         <div className="vy-badge-row">
-          <span className="vy-note-inline">Light and dark are both live — this page renders in whichever is on.</span>
+          <Banner>Light and dark are both live — this page renders in whichever is on.</Banner>
         </div>
       </Section>
 

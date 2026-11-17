@@ -465,6 +465,16 @@ html[data-kendo-bridged] .vy-btn:disabled {
 @media (max-width: 560px) {
   .vy-toasts { left: var(--vy-space-6); right: var(--vy-space-6); max-width: none; }
 }
+/* A field whose value differs from the one that was saved. Her border, her
+   colour — `--vy-changed-border`, the brand in light and blue-300 in dark.
+   It sits on the control itself rather than on the row, so it reads as "this
+   box holds something new" and not "this row is selected". */
+html[data-kendo-bridged] .vy-field--changed .k-input,
+html[data-kendo-bridged] .vy-field--changed .k-picker,
+.vy-field--changed input, .vy-field--changed textarea, .vy-field--changed .vy-read-value {
+  border-color: var(--vy-changed-border);
+}
+
 /* The BA's notice look, 16 Nov 2026: a tint of the meaning colour with the
    meaning's own text on it, not a solid fill with white text. Her sizes —
    padding 8px 12px, radius 6px, 13px at 500 — and 12px from the screen edges.
@@ -940,7 +950,7 @@ html[data-kendo-bridged] .vy-btn:disabled {
 /* --- Assignee picker --------------------------------------------------------- */
 .vy-assignee-picker { display: flex; align-items: center; gap: var(--vy-space-3); margin-top: var(--vy-space-2); }
 .vy-assignee-picker .vy-select { flex: 1; min-width: 0; }
-.vy-assignee-warn { display: block; margin-top: var(--vy-space-2); font-size: var(--vy-text-xs); color: var(--vy-accent-warning); }
+.vy-assignee-warn { display: block; margin-top: var(--vy-space-2); font-size: var(--vy-text-xs); color: var(--vy-warning-text); }
 
 /* --- Checklist tasks ---------------------------------------------------------
    The ticked checklist items are the task rows. Selecting an item is choosing

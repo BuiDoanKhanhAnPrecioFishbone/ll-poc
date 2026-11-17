@@ -239,6 +239,8 @@ export const nav = [
       c('record-skeleton', 'Record skeleton', 'Loading', 'beta', '1 file imports it', ['RecordSkeleton.tsx']),
 
       // ---- Messaging
+      c('banner', 'Banner', 'Messaging', 'ga', 'the inline note, used on 3 pages',
+        ['Banner.tsx']),
       c('toast', 'Toast', 'Messaging', 'ga', '23 files import it',
         ['Toast.tsx'], { origin: { pkg: RADIX.toast, as: 'Toast' } }),
       c('error-state', 'Error state', 'Messaging', 'beta', 'imported only by ErrorBoundary.tsx', ['ErrorState.tsx']),

@@ -25,7 +25,7 @@ import { Icon } from './icons';
  * exactly what the four local copies were for.
  */
 export function FieldRow({
-  label, htmlFor, labelId, required, hint, note, error, invalid, editing, empty, variant, children,
+  label, htmlFor, labelId, required, hint, note, error, invalid, editing, empty, changed, variant, children,
 }: {
   /** Omit where the control carries its own label — a checkbox does. */
   label?: ReactNode;
@@ -52,12 +52,20 @@ export function FieldRow({
   editing?: boolean;
   /** Renders the value as absent rather than as a value. */
   empty?: boolean;
+  /**
+   * The value differs from the one that was saved. The BA's principles of
+   * 16 Nov 2026 draw this as a border in the brand colour, and are specific
+   * about what it compares: the CURRENT value against the SAVED one, nothing
+   * else. 30 → 50 → 30 is not changed. There is no old-value tag and no count.
+   */
+  changed?: boolean;
   /** A layout modifier: `radio` for options shown in full, `wide` to span. */
   variant?: 'radio' | 'wide';
   children: ReactNode;
 }) {
   const cls = ['vy-field'];
   if (editing) cls.push('vy-field--editing');
+  if (changed) cls.push('vy-field--changed');
   if (variant) cls.push(`vy-field--${variant}`);
 
   const heading = (

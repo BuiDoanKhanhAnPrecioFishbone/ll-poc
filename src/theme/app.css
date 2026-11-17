@@ -532,6 +532,10 @@
    two read as one voice. It was brand-tinted before, which said "this is a
    link or a selection" rather than "here is something you should know". */
 .vy-note-inline { font-size: var(--vy-text-xs); color: var(--vy-info-text); background: var(--vy-info-bg); border-radius: var(--vy-radius-lg); padding: var(--vy-space-2) var(--vy-space-4); margin: var(--vy-space-2) 0; }
+/* Her warning banner is the same element in the other meaning: something to
+   check that does not block. Kept as a kind on one element rather than a
+   second class, because the two differ by colour and by nothing else. */
+.vy-note-inline[data-kind="warning"] { color: var(--vy-warning-text); background: var(--vy-warning-bg); }
 
 /* =============================================================================
    QUOTATION — CHECKLISTS & ASSIGNMENT

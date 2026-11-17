@@ -1,3 +1,4 @@
+import { Banner } from '../ui/Banner';
 import { legacyNav, proposedNav, settingsNav, legacyStats } from '../data/sitemap';
 
 /**
@@ -93,10 +94,10 @@ export function SitemapPage() {
                   </div>
                   {i.wasCalled && <div className="vy-was">was: {i.wasCalled}</div>}
                   {i.keepsLegacyRoute && (
-                    <div className="vy-note-inline">
+                    <Banner block>
                       Keeps the production URL so the mockup and the live system can be compared
                       at the same address; the new path redirects here.
-                    </div>
+                    </Banner>
                   )}
                 </div>
               ))}
