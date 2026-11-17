@@ -26,4 +26,34 @@ export const examples: Example[] = [
       />
     ),
   },
+  {
+    title: 'During a launch',
+    note: '`step` says how far the start-up got before it stopped. A failure at step 3 of 5 is a different message from one at step 0, and the reader can tell support which.',
+    render: () => (
+      <ErrorState
+        title="Voyager IQ could not finish starting"
+        body="Your settings loaded; the part catalogue did not. Nothing is lost — this is a start-up problem, not your data."
+        step={3}
+        errorId="VY-0C91B4"
+        screen="Start-up"
+        onRetry={() => {}}
+        retryLabel="Start again"
+      />
+    ),
+  },
+  {
+    title: 'With something of its own to say',
+    note: 'Anything passed as children sits under the body — a list of what did load, a link, a second way out.',
+    render: () => (
+      <ErrorState
+        title="This BoM could not be read"
+        body="The file opened, but no column looked like a part number."
+        screen="Import BoM"
+        onRetry={() => {}}
+        retryLabel="Choose another file"
+      >
+        <p>Columns found: <code>Item</code>, <code>Qty</code>, <code>Notes</code>.</p>
+      </ErrorState>
+    ),
+  },
 ];

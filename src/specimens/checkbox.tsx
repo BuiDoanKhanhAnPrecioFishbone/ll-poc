@@ -2,50 +2,40 @@ import { useState } from 'react';
 import { Checkbox } from '../ui/Overlays';
 import type { Example } from './types';
 
-function Independent() {
-  const [coating, setCoating] = useState(true);
-  const [alt, setAlt] = useState(false);
-  return (
-    <>
-      <Checkbox checked={coating} onCheckedChange={setCoating} label="Conformal Coating" />
-      <Checkbox checked={alt} onCheckedChange={setAlt} label="Provide Alt AML For Out of Stock" />
-    </>
-  );
-}
-
-function SelectAll() {
-  const [rows, setRows] = useState([true, false, false]);
-  const count = rows.filter(Boolean).length;
-  return (
-    <>
-      <label className="vy-check">
-        <input
-          type="checkbox"
-          className="k-checkbox k-checkbox-lg"
-          aria-label="Select all rows"
-          checked={count === rows.length}
-          ref={el => { if (el) el.indeterminate = count > 0 && count < rows.length; }}
-          onChange={e => setRows(rows.map(() => e.target.checked))}
-        />
-        <span>Select all</span>
-      </label>
-      {rows.map((on, i) => (
-        <Checkbox key={i} checked={on} label={`Row ${i + 1}`}
-                  onCheckedChange={c => setRows(rows.map((r, j) => (j === i ? c : r)))} />
-      ))}
-    </>
-  );
+function Live() {
+  const [on, setOn] = useState(true);
+  return <Checkbox checked={on} onCheckedChange={setOn} label="Save as default" />;
 }
 
 export const examples: Example[] = [
   {
-    title: 'Independent yes/nos',
-    note: 'Each box stands alone; ticking one never changes another.',
-    render: () => <Independent />,
+    title: 'On and off',
+    note: 'Kendo’s checkbox element with our classes, not KendoReact’s component — the whole label is the target, which is what carries the 24px minimum.',
+    render: () => (
+      <>
+        <Checkbox checked onCheckedChange={() => {}} label="Include inactive" />
+        <Checkbox checked={false} onCheckedChange={() => {}} label="Franchised only" />
+      </>
+    ),
   },
   {
-    title: 'Indeterminate select-all',
-    note: 'Tick some rows and the header shows a dash. The prop does not exist, so it is set on the DOM node.',
-    render: () => <SelectAll />,
+    title: 'Click it',
+    note: 'Press the words, not just the box: the label is the control’s target and the reason this stays usable on a touch screen.',
+    render: () => <Live />,
+  },
+  {
+    title: 'Read-only',
+    note: 'The BA’s "view and read-only: muted, not clickable". Added 17 Nov 2026 — her spec named the state and this component had no way to draw it, so a read-only checkbox was an ordinary one that quietly ignored clicks.',
+    render: () => (
+      <>
+        <Checkbox checked disabled onCheckedChange={() => {}} label="ITAR controlled" />
+        <Checkbox checked={false} disabled onCheckedChange={() => {}} label="Obsolete" />
+      </>
+    ),
+  },
+  {
+    title: 'Error',
+    note: 'Her red border. The box carries it; the label does not change colour, because the label is not what is wrong.',
+    render: () => <Checkbox checked={false} invalid onCheckedChange={() => {}} label="I have checked the drawing" />,
   },
 ];

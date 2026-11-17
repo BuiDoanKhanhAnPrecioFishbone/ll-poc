@@ -216,6 +216,13 @@ html[data-kendo-bridged] .vy-btn:disabled {
 .vy-ink-danger { color: var(--vy-danger-text); }
 .vy-ink-muted  { color: var(--vy-on-surface-subtle); }
 
+/* Her checkbox states, 16 Nov 2026. "View and read-only: muted, not
+   clickable" and "error: red border" — two states her spec names and this
+   component had no way to draw. */
+.vy-check[data-disabled] { cursor: default; }
+.vy-check[data-disabled] > span { color: var(--vy-disabled-text); }
+html[data-kendo-bridged] .vy-check .k-checkbox.k-invalid { border-color: var(--vy-danger-boundary); }
+
 /* --- Files, images and conversation ----------------------------------------
    Her "Image, files and conversation" section, 16 Nov 2026. */
 
@@ -691,6 +698,10 @@ html[data-kendo-bridged] .vy-btn:disabled {
    What stays is the COUNT BADGE, which Kendo has no equivalent for. It rides
    inside Kendo's `title` node, so it needs Kendo's active class rather than
    Radix's `data-state` to know when to switch to the emphasised palette. */
+/* Her error marker on a tab: a red * after the name, and the name keeps its
+   own colour. A whole red tab would say the tab is broken; what is true is
+   that a field inside it is, and the user still has to read which tab. */
+.vy-tab-error { color: var(--vy-danger-text); font-weight: var(--vy-weight-semibold); margin-inline-start: 2px; }
 .vy-tab-count { font-size: var(--vy-text-xs); background: var(--vy-surface-sunken); color: var(--vy-on-surface-muted); border-radius: var(--vy-shape-full); padding: 0 var(--vy-space-3); }
 .vy-tabs .k-tabstrip-item.k-active .vy-tab-count { background: var(--vy-brand-subtle-strong); color: var(--vy-brand-text-deep); }
 

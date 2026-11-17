@@ -123,5 +123,6 @@ For a grid row or the column chooser, the raw input is used directly with
 
 | Date | Change |
 |---|---|
+| 17 Nov 2026 | `disabled` and `invalid` — the BA names both states and this component could not draw either, so a read-only checkbox was an ordinary one that ignored clicks |
 | 8 Nov 2026 | This page |
 | 8 Nov 2026 | `--vy-border-control` re-measured against every ground — the unchecked box was reading 2.85 on the page |

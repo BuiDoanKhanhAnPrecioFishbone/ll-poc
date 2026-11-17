@@ -215,7 +215,19 @@ export function Dialog({ open, onClose, title, subtitle, children, actions, size
  * along inside the tab label with no wrapper of its own.
  */
 export function Tabs({ tabs, value, onValueChange }: {
-  tabs: { value: string; label: string; count?: number; content: ReactNode }[];
+  tabs: {
+    value: string; label: string; count?: number; content: ReactNode;
+    /**
+     * This tab holds something the user must fix before saving. Her
+     * principles of 16 Nov 2026: "a red * after the name; the label keeps
+     * its colour".
+     *
+     * KEEPING THE LABEL'S COLOUR IS THE POINT. Turning the whole tab red
+     * would mean the tab is broken; what is actually true is that a FIELD
+     * inside it is, and the user still has to be able to read which tab.
+     */
+    error?: boolean;
+  }[];
   value: string; onValueChange: (v: string) => void;
 }) {
   const found = tabs.findIndex(t => t.value === value);
@@ -234,6 +246,7 @@ export function Tabs({ tabs, value, onValueChange }: {
           title={
             <>
               {t.label}
+              {t.error && <span className="vy-tab-error" aria-label="has errors">*</span>}
               {t.count !== undefined && t.count > 0 && <span className="vy-tab-count">{t.count}</span>}
             </>
           }
@@ -274,13 +287,26 @@ export function Tabs({ tabs, value, onValueChange }: {
  * by a fifth — including the grid's, where the label's 24px target is switched
  * off and the box IS the pointer target.
  */
-export function Checkbox({ checked, onCheckedChange, label }: {
+export function Checkbox({ checked, onCheckedChange, label, disabled, invalid }: {
   checked: boolean; onCheckedChange: (c: boolean) => void; label: ReactNode;
+  /**
+   * Her "view and read-only: muted, not clickable", 16 Nov 2026. Added
+   * because her spec names the state and this component could not express
+   * it: a read-only checkbox was being drawn as an ordinary one that quietly
+   * ignored clicks.
+   */
+  disabled?: boolean;
+  /** Her "error: red border". */
+  invalid?: boolean;
 }) {
   return (
-    <label className="vy-check">
-      <input type="checkbox" className="k-checkbox k-checkbox-lg"
-             checked={checked}
+    <label className="vy-check" data-disabled={disabled || undefined}>
+      {/* `.k-disabled` as well as the attribute: Kendo's own styling keys on
+          the CLASS, which this system has been caught by twice before. */}
+      <input type="checkbox"
+             className={`k-checkbox k-checkbox-lg${disabled ? ' k-disabled' : ''}${invalid ? ' k-invalid' : ''}`}
+             checked={checked} disabled={disabled}
+             aria-invalid={invalid || undefined}
              onChange={e => onCheckedChange(e.target.checked)} />
       <span>{label}</span>
     </label>

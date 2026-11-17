@@ -66,14 +66,14 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <nav class="toc"><h2>Mục lục</h2><ol>
 <li class="l2"><a href="#where-it-stands">Where it stands</a></li>
 <li class="l2"><a href="#a--components-with-no-live-example--closed-17-nov-2026">A · ~~Components with no live example~~ — **closed, 17 Nov 2026**</a></li>
-<li class="l2"><a href="#b--thin-examples">B · Thin examples</a></li>
+<li class="l2"><a href="#b--thin-examples--worked-through-17-nov-2026">B · ~~Thin examples~~ — **worked through, 17 Nov 2026**</a></li>
 <li class="l2"><a href="#c--widgets-the-ba-specifies-that-do-not-exist-here-at-all">C · Widgets the BA specifies that do not exist here at all</a></li>
 <li class="l2"><a href="#what-this-adds-up-to">What this adds up to</a></li>
 </ol></nav>
 <h1 id="storybook-what-is-covered-and-what-is-not">Storybook: what is covered, and what is not</h1>
 <p>Measured on 17 Nov 2026, not estimated. "Live example" means a specimen that renders the real component in an iframe on its Examples tab — the thing you can click, tab through and read in both themes.</p>
 <h2 id="where-it-stands">Where it stands</h2>
-<div class="t"><table><tbody><tr><td>Components in the system</td><td><strong>42</strong></td></tr><tr><td>With a live example</td><td><strong>42 — all of them</strong></td></tr><tr><td>Live examples in total</td><td><strong>106</strong></td></tr></tbody></table></div>
+<div class="t"><table><tbody><tr><td>Components in the system</td><td><strong>42</strong></td></tr><tr><td>With a live example</td><td><strong>42 — all of them</strong></td></tr><tr><td>Live examples in total</td><td><strong>124</strong></td></tr></tbody></table></div>
 <p><em>Updated 17 Nov 2026. The BA's <strong>Input widgets</strong> section is now fully built: every widget in it either exists here or is one she ruled out.</em></p>
 <p>The BA's principles of 16 Nov 2026 name roughly <strong>60 widgets and states</strong> across her five widget sections. The gap below is measured against those.</p>
 <hr>
@@ -84,11 +84,11 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <p><strong><code>ROW_H</code> was dead and had drifted.</strong> <code>DataGrid</code> exported <code>{compact: 28, comfortable: 36, relaxed: 44}</code> with a comment saying <code>GridSkeleton</code> sized its rows from it. Nothing imported it, the skeleton uses padding, and by the time it was found the tokens said <code>{34, 40, 48}</code> — the BA's density change on 16 Nov moved the tokens and left this behind. Deleted; the row height lives in <code>--vy-row-h-*</code> and there is one copy of it.</p>
 <p><strong>The icon count on the Icon page was wrong, and had been copied onward.</strong> It said 45; the set has 43, and the figure had already reached the comparison with the BA's principles under a heading saying it was checked. The Examples tab now counts the set itself. The stroke moved to her 1.5 at the same time; it had been 1.6, which nobody chose.</p>
 <hr>
-<h2 id="b--thin-examples">B · Thin examples</h2>
-<p>Twenty-three specimens hold sixty-six examples, so just under three each. The thinnest are the ones to look at first, because a single example cannot show a state:</p>
-<div class="t"><table><thead><tr><th>Specimen</th><th>Examples</th></tr></thead><tbody><tr><td><code>toast</code></td><td><strong>1</strong></td></tr><tr><td><code>checkbox</code> · <code>chip</code> · <code>error-state</code> · <code>file-drop</code> · <code>grid-skeleton</code> · <code>priority</code> · <code>record-skeleton</code> · <code>rich-text</code> · <code>tabs</code></td><td><strong>2</strong> each</td></tr></tbody></table></div>
-<p><code>toast</code> is the clearest case: it now has four kinds and shows them through one button row rather than as four examples.</p>
-<p>By contrast <code>field-row</code> has six, including the two added today, and that is roughly the right shape for anything with states.</p>
+<h2 id="b--thin-examples--worked-through-17-nov-2026">B · ~~Thin examples~~ — <strong>worked through, 17 Nov 2026</strong></h2>
+<p>Eighteen examples added across nine specimens, and the useful finding is why the rest were not touched.</p>
+<p><strong>Two of them were thin because the COMPONENT was thin, and her spec said so.</strong> <code>Checkbox</code> took <code>checked</code>, <code>onCheckedChange</code> and <code>label</code> — no disabled, no error — while her spec names <em>"view and read-only: muted, not clickable"</em> and <em>"error: red border"</em>. A read-only checkbox was being drawn as an ordinary one that quietly ignored clicks. <code>Tabs</code> had no way to mark a tab holding a field the user must fix, which her spec draws as a red <code>*</code> after the name with the label keeping its colour. Both props added, then shown.</p>
+<p><strong>Where a second example was the whole argument for the component</strong>, it was worth writing: <code>view-picker</code> now shows <strong>two views that share a name</strong> — legal, because a view name is user-typed and nothing checks it — and prints the chosen id, so you can see that a picker keyed on the label would hand back the wrong one. <code>column-chooser</code> shows the real Quotation list where <strong>6 of 11 columns are required</strong>, because that changes what the control is.</p>
+<p><strong>Fifteen specimens still sit at two examples and should stay there.</strong> In each the component has two states and no more: <code>card</code> is Card and Split card, <code>chip</code> is selected and not, <code>image-box</code> is with an image and without, <code>view-setting</code> is a view you own and one you cannot overwrite. <code>app-shell</code> and <code>command-palette</code> have one each, for the same reason. A third example there would be a copy of the first with different words — one was written for <code>toast</code>, noticed, and deleted.</p>
 <hr>
 <h2 id="c--widgets-the-ba-specifies-that-do-not-exist-here-at-all">C · Widgets the BA specifies that do not exist here at all</h2>
 <p>This is not a storybook gap — there is nothing to put in it. These are components to build, and the first two groups need Kendo packages that are <strong>not installed</strong>.</p>

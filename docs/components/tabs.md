@@ -135,5 +135,6 @@ the next person does not remove it as dead code.
 
 | Date | Change |
 |---|---|
+| 17 Nov 2026 | A tab can carry her error marker: a red * after the name, with the name keeping its colour |
 | 17 Nov 2026 | Aligned with the BA's tab spec: 36px tall, 24px apart, 500 with the active tab at 600. It had been 33px, touching, and 400 for both — so the active tab was marked by its underline alone |
 | 8 Nov 2026 | This page |

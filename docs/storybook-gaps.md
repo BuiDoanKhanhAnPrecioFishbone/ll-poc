@@ -10,7 +10,7 @@ can click, tab through and read in both themes.
 |---|---|
 | Components in the system | **42** |
 | With a live example | **42 — all of them** |
-| Live examples in total | **106** |
+| Live examples in total | **124** |
 
 *Updated 17 Nov 2026. The BA's **Input widgets** section is now fully built:
 every widget in it either exists here or is one she ruled out.*
@@ -53,22 +53,34 @@ it had been 1.6, which nobody chose.
 
 ---
 
-## B · Thin examples
+## B · ~~Thin examples~~ — **worked through, 17 Nov 2026**
 
-Twenty-three specimens hold sixty-six examples, so just under three each. The
-thinnest are the ones to look at first, because a single example cannot show a
-state:
+Eighteen examples added across nine specimens, and the useful finding is why
+the rest were not touched.
 
-| Specimen | Examples |
-|---|---|
-| `toast` | **1** |
-| `checkbox` · `chip` · `error-state` · `file-drop` · `grid-skeleton` · `priority` · `record-skeleton` · `rich-text` · `tabs` | **2** each |
+**Two of them were thin because the COMPONENT was thin, and her spec said so.**
+`Checkbox` took `checked`, `onCheckedChange` and `label` — no disabled, no
+error — while her spec names *"view and read-only: muted, not clickable"* and
+*"error: red border"*. A read-only checkbox was being drawn as an ordinary one
+that quietly ignored clicks. `Tabs` had no way to mark a tab holding a field
+the user must fix, which her spec draws as a red `*` after the name with the
+label keeping its colour. Both props added, then shown.
 
-`toast` is the clearest case: it now has four kinds and shows them through one
-button row rather than as four examples.
+**Where a second example was the whole argument for the component**, it was
+worth writing: `view-picker` now shows **two views that share a name** — legal,
+because a view name is user-typed and nothing checks it — and prints the
+chosen id, so you can see that a picker keyed on the label would hand back the
+wrong one. `column-chooser` shows the real Quotation list where **6 of 11
+columns are required**, because that changes what the control is.
 
-By contrast `field-row` has six, including the two added today, and that is
-roughly the right shape for anything with states.
+**Fifteen specimens still sit at two examples and should stay there.** In each
+the component has two states and no more: `card` is Card and Split card,
+`chip` is selected and not, `image-box` is with an image and without,
+`view-setting` is a view you own and one you cannot overwrite. `app-shell` and
+`command-palette` have one each, for the same reason. A third example there
+would be a copy of the first with different words — one was written for
+`toast`, noticed, and deleted.
+
 
 ---
 
