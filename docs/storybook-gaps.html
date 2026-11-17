@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Storybook: what is covered, and what is not</title>
+<style>
+:root{
+  --ink:#131820; --ink-2:#363e4b; --ink-3:#4d5766; --ink-4:#626d7e;
+  --line:#dde2e9; --line-soft:#eceff3; --paper:#ffffff; --app:#f5f7fa;
+  --brand:#1a419e; --brand-soft:#f1f4fa; --code:#15347e;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--app);color:var(--ink-2);
+  font:15px/1.65 "Inter","Segoe UI",system-ui,-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:40px 28px 80px;background:var(--paper);
+  box-shadow:0 1px 2px rgba(19,24,32,.06)}
+h1,h2,h3,h4{color:var(--ink);line-height:1.25;text-wrap:balance}
+h1{font-size:34px;font-weight:700;margin:0 0 8px;letter-spacing:-.01em}
+h2{font-size:25px;font-weight:650;margin:52px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line)}
+h3{font-size:19px;font-weight:600;margin:32px 0 10px}
+h4{font-size:16px;font-weight:600;margin:24px 0 8px;color:var(--ink-2)}
+p{margin:0 0 14px;max-width:86ch}
+ul,ol{margin:0 0 14px;padding-left:22px;max-width:86ch}
+li{margin:5px 0}
+a{color:var(--brand);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:.18em}
+hr{border:0;border-top:1px solid var(--line-soft);margin:34px 0}
+code{font:500 13px/1.5 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  background:var(--brand-soft);color:var(--code);padding:1px 5px;border-radius:3px}
+blockquote{margin:0 0 16px;padding:12px 16px;background:var(--brand-soft);
+  border-left:3px solid var(--brand);border-radius:0 4px 4px 0;color:var(--ink-2);max-width:86ch}
+blockquote p{margin:0}
+.t{overflow-x:auto;margin:0 0 18px}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th{text-align:left;font-weight:600;color:var(--ink);background:var(--app);
+  border-bottom:1px solid var(--line);padding:8px 10px;white-space:nowrap}
+td{border-bottom:1px solid var(--line-soft);padding:8px 10px;vertical-align:top}
+td code{white-space:nowrap}
+tr:last-child td{border-bottom:0}
+figure{margin:18px 0 24px}
+img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:6px}
+.toc{background:var(--app);border:1px solid var(--line);border-radius:8px;
+  padding:18px 22px;margin:26px 0 34px}
+.toc h2{margin:0 0 10px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink-4);border:0;padding:0}
+.toc ol{list-style:none;margin:0;padding:0;columns:2;column-gap:36px}
+.toc li{margin:3px 0;break-inside:avoid}
+.toc li.l1{font-weight:600;color:var(--ink);margin-top:10px}
+.toc li.l1:first-child{margin-top:0}
+.toc li.l2{padding-left:14px}
+@media (max-width:760px){.wrap{padding:24px 16px 60px}.toc ol{columns:1}h1{font-size:27px}}
+@media print{
+  body{background:#fff}
+  .wrap{max-width:none;padding:0;box-shadow:none}
+  h2{page-break-after:avoid}
+  figure,table,blockquote{page-break-inside:avoid}
+  .toc{break-after:page}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="toc"><h2>Mục lục</h2><ol>
+<li class="l2"><a href="#where-it-stands">Where it stands</a></li>
+<li class="l2"><a href="#a--components-that-exist-but-have-no-live-example--10">A · Components that exist but have no live example — 10</a></li>
+<li class="l2"><a href="#b--thin-examples">B · Thin examples</a></li>
+<li class="l2"><a href="#c--widgets-the-ba-specifies-that-do-not-exist-here-at-all">C · Widgets the BA specifies that do not exist here at all</a></li>
+<li class="l2"><a href="#what-this-adds-up-to">What this adds up to</a></li>
+</ol></nav>
+<h1 id="storybook-what-is-covered-and-what-is-not">Storybook: what is covered, and what is not</h1>
+<p>Measured on 17 Nov 2026, not estimated. "Live example" means a specimen that renders the real component in an iframe on its Examples tab — the thing you can click, tab through and read in both themes.</p>
+<h2 id="where-it-stands">Where it stands</h2>
+<div class="t"><table><tbody><tr><td>Components in the system</td><td><strong>33</strong></td></tr><tr><td>With a live example</td><td><strong>23</strong></td></tr><tr><td>Live examples in total</td><td><strong>66</strong></td></tr><tr><td>Pages on the site</td><td>205, 0 dead links of 17,674</td></tr></tbody></table></div>
+<p>The BA's principles of 16 Nov 2026 name roughly <strong>60 widgets and states</strong> across her five widget sections. The gap below is measured against those.</p>
+<hr>
+<h2 id="a--components-that-exist-but-have-no-live-example--10">A · Components that exist but have no live example — 10</h2>
+<p>These are built, used in the app, and documented in prose. They are missing only the thing you can click.</p>
+<div class="t"><table><thead><tr><th>Component</th><th>Why it is not there yet</th></tr></thead><tbody><tr><td><code>data-grid</code></td><td>The heaviest one: the Grid chunk is 663 KB and a specimen has to seed its own rows. Also the one most worth having</td></tr><tr><td><code>column-chooser</code> · <code>filter-toolbar</code> · <code>view-picker</code> · <code>view-setting</code></td><td>All four are grid satellites. Each needs the grid around it to make sense, so they follow the grid</td></tr><tr><td><code>people-picker</code></td><td>Needs a people fixture; otherwise straightforward</td></tr><tr><td><code>command-palette</code></td><td>Opens over the whole page, so a specimen needs a frame it can own</td></tr><tr><td><code>app-shell</code></td><td>A specimen of the shell is a specimen of the whole app. Probably a screenshot rather than an iframe</td></tr><tr><td><code>icon</code></td><td>Should be a grid of all 45, which is easy and overdue</td></tr><tr><td><code>support-ticket</code></td><td>Straightforward</td></tr></tbody></table></div>
+<p><strong>Three of these also have no tab structure at all</strong> — <code>icon</code>, <code>app-shell</code> and <code>command-palette</code> have a page but not the four-tab layout every other component has.</p>
+<p><strong>Suggested order:</strong> <code>icon</code> first (easy, high use), then <code>support-ticket</code> and <code>people-picker</code>, then the grid and its four satellites as one piece, then <code>command-palette</code>. <code>app-shell</code> last, and probably not as an iframe.</p>
+<hr>
+<h2 id="b--thin-examples">B · Thin examples</h2>
+<p>Twenty-three specimens hold sixty-six examples, so just under three each. The thinnest are the ones to look at first, because a single example cannot show a state:</p>
+<div class="t"><table><thead><tr><th>Specimen</th><th>Examples</th></tr></thead><tbody><tr><td><code>toast</code></td><td><strong>1</strong></td></tr><tr><td><code>checkbox</code> · <code>chip</code> · <code>error-state</code> · <code>file-drop</code> · <code>grid-skeleton</code> · <code>priority</code> · <code>record-skeleton</code> · <code>rich-text</code> · <code>tabs</code></td><td><strong>2</strong> each</td></tr></tbody></table></div>
+<p><code>toast</code> is the clearest case: it now has four kinds and shows them through one button row rather than as four examples.</p>
+<p>By contrast <code>field-row</code> has six, including the two added today, and that is roughly the right shape for anything with states.</p>
+<hr>
+<h2 id="c--widgets-the-ba-specifies-that-do-not-exist-here-at-all">C · Widgets the BA specifies that do not exist here at all</h2>
+<p>This is not a storybook gap — there is nothing to put in it. These are components to build, and the first two groups need Kendo packages that are <strong>not installed</strong>.</p>
+<h3 id="dates--needs-progresskendo-react-dateinputs">Dates — needs <code>@progress/kendo-react-dateinputs</code></h3>
+<p>Her Input widgets section specifies <strong>Date</strong>, <strong>Datetime</strong> and <strong>Date range</strong> as three separate widgets with their own widths. This system has no date control of any kind. It formats dates for display, which is why the 12-hour-versus-24-hour question is already open — but nothing here lets a user pick one.</p>
+<h3 id="numbers--needs-progresskendo-react-inputs">Numbers — needs <code>@progress/kendo-react-inputs</code></h3>
+<p><strong>Integer</strong>, <strong>Decimal</strong>, <strong>Currency</strong> and <strong>Percent</strong> are four distinct widgets in her spec, each with its own alignment and column width. This system has text fields. The same package holds <strong>Switch</strong>, which she also specifies.</p>
+<h3 id="cards-and-groups--no-package-needed">Cards and groups — no package needed</h3>
+<p><strong>Card</strong>, <strong>Split card</strong>, <strong>Collapsible group</strong> and <strong>Section heading</strong> are four of the six rows in her <em>Tab · Group · Card</em> section. Only Tab exists here. There is no card component under any name — checked for <code>card</code>, <code>panel</code>, <code>surface</code>, <code>tile</code>, <code>pane</code> and <code>well</code>.</p>
+<p>This one matters more than it looks: <code>--vy-section-bg</code>, one of the values of hers still unapplied, is for <em>"card headers and the grid toolbar band"</em>. The token has nowhere to go until the card exists.</p>
+<h3 id="images-and-conversation--no-package-needed">Images and conversation — no package needed</h3>
+<p><strong>Image</strong> in three states, plus <strong>Conversation</strong>, <strong>Email</strong>, <strong>Notes</strong>, <strong>Preview</strong> and <strong>Download</strong>, are specified and absent. <code>file-drop</code> and the file row cover the upload half of that section and nothing else.</p>
+<hr>
+<h2 id="what-this-adds-up-to">What this adds up to</h2>
+<p><strong>A and B are finishing work</strong> on things that already exist — a few days, no decisions, and they make the storybook genuinely complete for what the system holds today.</p>
+<p><strong>C is product scope.</strong> Nine of her widgets need two Kendo packages added; nine more need components designed from scratch. That is a plan to agree with her and with you, not a gap to quietly fill — and it is worth saying to her that her own spec is ahead of the build in these four areas, since she may be specifying for a milestone this mockup was never meant to reach.</p>
+</div>
+</body>
+</html>

@@ -1,0 +1,114 @@
+# Storybook: what is covered, and what is not
+
+Measured on 17 Nov 2026, not estimated. "Live example" means a specimen that
+renders the real component in an iframe on its Examples tab — the thing you
+can click, tab through and read in both themes.
+
+## Where it stands
+
+| | |
+|---|---|
+| Components in the system | **33** |
+| With a live example | **23** |
+| Live examples in total | **66** |
+| Pages on the site | 205, 0 dead links of 17,674 |
+
+The BA's principles of 16 Nov 2026 name roughly **60 widgets and states**
+across her five widget sections. The gap below is measured against those.
+
+---
+
+## A · Components that exist but have no live example — 10
+
+These are built, used in the app, and documented in prose. They are missing
+only the thing you can click.
+
+| Component | Why it is not there yet |
+|---|---|
+| `data-grid` | The heaviest one: the Grid chunk is 663 KB and a specimen has to seed its own rows. Also the one most worth having |
+| `column-chooser` · `filter-toolbar` · `view-picker` · `view-setting` | All four are grid satellites. Each needs the grid around it to make sense, so they follow the grid |
+| `people-picker` | Needs a people fixture; otherwise straightforward |
+| `command-palette` | Opens over the whole page, so a specimen needs a frame it can own |
+| `app-shell` | A specimen of the shell is a specimen of the whole app. Probably a screenshot rather than an iframe |
+| `icon` | Should be a grid of all 45, which is easy and overdue |
+| `support-ticket` | Straightforward |
+
+**Three of these also have no tab structure at all** — `icon`, `app-shell` and
+`command-palette` have a page but not the four-tab layout every other
+component has.
+
+**Suggested order:** `icon` first (easy, high use), then `support-ticket` and
+`people-picker`, then the grid and its four satellites as one piece, then
+`command-palette`. `app-shell` last, and probably not as an iframe.
+
+---
+
+## B · Thin examples
+
+Twenty-three specimens hold sixty-six examples, so just under three each. The
+thinnest are the ones to look at first, because a single example cannot show a
+state:
+
+| Specimen | Examples |
+|---|---|
+| `toast` | **1** |
+| `checkbox` · `chip` · `error-state` · `file-drop` · `grid-skeleton` · `priority` · `record-skeleton` · `rich-text` · `tabs` | **2** each |
+
+`toast` is the clearest case: it now has four kinds and shows them through one
+button row rather than as four examples.
+
+By contrast `field-row` has six, including the two added today, and that is
+roughly the right shape for anything with states.
+
+---
+
+## C · Widgets the BA specifies that do not exist here at all
+
+This is not a storybook gap — there is nothing to put in it. These are
+components to build, and the first two groups need Kendo packages that are
+**not installed**.
+
+### Dates — needs `@progress/kendo-react-dateinputs`
+
+Her Input widgets section specifies **Date**, **Datetime** and **Date range**
+as three separate widgets with their own widths. This system has no date
+control of any kind. It formats dates for display, which is why the
+12-hour-versus-24-hour question is already open — but nothing here lets a user
+pick one.
+
+### Numbers — needs `@progress/kendo-react-inputs`
+
+**Integer**, **Decimal**, **Currency** and **Percent** are four distinct
+widgets in her spec, each with its own alignment and column width. This system
+has text fields. The same package holds **Switch**, which she also specifies.
+
+### Cards and groups — no package needed
+
+**Card**, **Split card**, **Collapsible group** and **Section heading** are
+four of the six rows in her *Tab · Group · Card* section. Only Tab exists
+here. There is no card component under any name — checked for `card`, `panel`,
+`surface`, `tile`, `pane` and `well`.
+
+This one matters more than it looks: `--vy-section-bg`, one of the values of
+hers still unapplied, is for *"card headers and the grid toolbar band"*. The
+token has nowhere to go until the card exists.
+
+### Images and conversation — no package needed
+
+**Image** in three states, plus **Conversation**, **Email**, **Notes**,
+**Preview** and **Download**, are specified and absent. `file-drop` and the
+file row cover the upload half of that section and nothing else.
+
+---
+
+## What this adds up to
+
+**A and B are finishing work** on things that already exist — a few days, no
+decisions, and they make the storybook genuinely complete for what the system
+holds today.
+
+**C is product scope.** Nine of her widgets need two Kendo packages added;
+nine more need components designed from scratch. That is a plan to agree with
+her and with you, not a gap to quietly fill — and it is worth saying to her
+that her own spec is ahead of the build in these four areas, since she may be
+specifying for a milestone this mockup was never meant to reach.
