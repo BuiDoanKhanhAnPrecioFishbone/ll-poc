@@ -12,10 +12,48 @@ import { COLUMN_WIDTH, type ColumnRole } from '../theme/tokens';
 export type { ColumnRole };
 export const ROLE_WIDTH = COLUMN_WIDTH;
 
+/**
+ * What a single cell is saying about itself, from the BA's Grid cells
+ * section, 16 Nov 2026. The COLUMN declares how to read it off a row, so a
+ * screen says "this cell is in error" once rather than styling cells by hand.
+ *
+ * `changed` and `match` are about the value; `warning`, `error` and `loading`
+ * are about the row's data. Her precedence, stated in the Large editable grid
+ * section: **red wins over yellow, yellow over blue** — so a cell that is both
+ * changed and in error reads as the error.
+ */
+export type CellState = 'changed' | 'warning' | 'error' | 'match' | 'loading';
+
+/** Her precedence, highest first. Used when more than one would apply. */
+export const CELL_STATE_ORDER: CellState[] = ['error', 'warning', 'changed', 'match', 'loading'];
+
 export type ColumnSpec<T> = {
   field: Extract<keyof T, string>;
   title: string;
   role: ColumnRole;
+
+  /**
+   * The cell's state for this row, or nothing. See `CellState`.
+   *
+   * A FUNCTION OF THE ROW, not a value, because the state is per cell and the
+   * column is the only place that knows how to find it: a price cell is in
+   * warning when the row has no quote, and only the column knows which field
+   * that is.
+   */
+  cellState?: (row: T) => CellState | undefined;
+
+  /**
+   * Every cell under this column must hold a value. Draws the BA's red `*`
+   * after the header name, from her Grid cells section.
+   *
+   * NOT `required`, which is already taken on this type and means something
+   * else entirely: that the Column tab refuses to HIDE the column. The two
+   * are independent — a column can be unhideable and optional (Status), or
+   * hideable and mandatory. One of the names is poor and it is the older
+   * one; renaming it would touch every column definition in the app, so the
+   * new concept takes the unambiguous name instead.
+   */
+  valueRequired?: boolean;
 
   /**
    * A distinct identity, where `field` is not one.

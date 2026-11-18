@@ -6,6 +6,48 @@
 
 <!-- ds:tab usage -->
 
+## What a cell can say about itself
+
+The BA's Grid cells section, 16 Nov 2026. A **column** declares how to read a
+state off a row — `cellState: row => 'warning' | undefined` — and the
+stylesheet draws it. A screen says "this cell is in error" once, rather than
+styling cells by hand.
+
+| State | Look | Mark |
+|---|---|---|
+| `changed` | `info-bg` fill, `changed-border`, text at 500 | — |
+| `warning` | `warning-bg` fill and ink | **triangle** |
+| `error` | `danger-bg` fill and ink | **octagon** |
+| `match` | a `*` in the brand ink after the value | — |
+| `loading` | the value at 40% opacity | — |
+
+**The mark is not decoration.** A warning cell is a yellow fill and a yellow
+ink, and both are gone on a greyscale screen or to a colour-blind reader; the
+triangle and the octagon are what survive. The same argument
+[Toast](toast.md) makes, and the reason her spec names a shape for each.
+
+**Which edge the mark sits on follows the alignment** — left on a number,
+right on text — so it never lands between the eye and the value. She states
+that twice without naming it as a rule, and it is read off the column's role
+rather than passed as a second prop nobody would remember.
+
+**Precedence is hers**: red over yellow over blue. A cell that is both
+changed and in error reads as the error.
+
+## A required column
+
+`valueRequired` draws her red `*` after the header name. **Not `required`**,
+which is already on the column model and means the Column tab refuses to
+*hide* the column — the two are independent, and a column can be unhideable
+and optional. The older name is the poor one; renaming it would touch every
+column definition in the app.
+
+## A focused line
+
+The row takes `row-focus` **and** a 3px bar down its left. The bar is what
+makes it a focus indicator: her focus tint and her hover tint are **1.12:1**
+apart, which on its own would not pass WCAG 2.4.11.
+
 ## When to use
 
 A module's main list: Project Requirements, Part Master, BoM List, Packing
@@ -139,6 +181,7 @@ dimmed-with-overlay on a recalculation, a real empty state, an error screen.
 
 | Date | Change |
 |---|---|
+| 18 Nov 2026 | The BA's cell states — changed, warning, error, system match, loading — plus her required-column `*` and the focused line with its 3px bar |
 | 17 Nov 2026 | Live examples — it had a page and a photograph, but nothing that could be pressed |
 | 8 Nov 2026 | This page |
 | 9 Nov 2026 | The inline cell editor's focus edge is fixed in dark — `--vy-brand-boundary-strong` blue-400 → blue-200, 2.88 → 7.22 on its worst ground. Its *hover* edge was already right, and is now swept: `border:check` measures hover and focus as well as rest |

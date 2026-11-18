@@ -578,11 +578,34 @@ export function DataGrid<T extends { id: string | number }>({
                   title={spec.title}
                   width={widthOf(spec)}
                   cells={{
+                    /* Her red `*` after a required column's name. A custom
+                       header replaces Kendo's wrapper, so the `<th>` is ours
+                       to render and `kendoHeaderProps` keeps the sort state
+                       it was carrying. */
+                    ...(spec.valueRequired ? {
+                      headerCell: ({ thProps }: GridCustomHeaderCellProps) => (
+                        <th {...kendoHeaderProps(thProps)}>
+                          {spec.title}
+                          <span className="vy-col-required" aria-hidden>*</span>
+                          <span className="vy-sr-only"> (required)</span>
+                        </th>
+                      ),
+                    } : {}),
                     data: ({ dataItem, tdProps }: GridCustomCellProps) => (
                       /* `data-role` carries the column role through, so width
                          and alignment still come from the role model rather
-                         than from Kendo's defaults. */
-                      <td {...kendoDomProps(tdProps)} data-role={spec.role}>
+                         than from Kendo's defaults.
+
+                         `data-cell-state` is the BA's Grid cells section: the
+                         column says how to read the state off the row, and the
+                         stylesheet draws it. The MARK — her triangle and
+                         octagon — is a pseudo-element, and which edge it sits
+                         on follows the role's alignment rather than a second
+                         prop: a right-aligned number puts it on the left, a
+                         left-aligned value on the right, which is the rule
+                         she states twice and never names. */
+                      <td {...kendoDomProps(tdProps)} data-role={spec.role}
+                          data-cell-state={spec.cellState?.(dataItem as T)}>
                         {cellFor(spec)(dataItem as T)}
                       </td>
                     ),

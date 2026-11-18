@@ -2899,6 +2899,100 @@ html[data-kendo-bridged] .vy-field--changed .k-picker,
 .vy-grid-k td[data-role="ident"] { font-weight: var(--vy-weight-semibold); font-variant-numeric: tabular-nums; }
 .vy-grid-k td[data-role="status"] { overflow: visible; }
 
+/* --- Grid cell states ------------------------------------------------------
+   The BA's Grid cells section, 16 Nov 2026. A column declares how to read a
+   state off a row (`cellState` in the column model) and this draws it.
+
+   THE MARK IS NOT DECORATION. A warning cell is a yellow fill and a yellow
+   ink, and both are lost to a greyscale screen or a colour-blind reader;
+   the triangle and the octagon are what survive. Same argument the toast
+   makes, and the reason her spec names a shape for each.
+
+   WHICH EDGE. She puts the mark on the left of a number and the right of
+   text, twice, without naming the rule — it follows the alignment, so the
+   mark never lands between the eye and the value. Taken from `data-role`
+   rather than from a second prop nobody would remember to pass.
+
+   PRECEDENCE: red over yellow over blue, her words. CSS source order does
+   it, so `error` is written last.
+
+   SHE WRITES 30px FOR THE PADDING and the spacing scale — hers and ours,
+   which agree step for step — goes 24, 28, 32. This takes 28, which clears
+   a 16px mark inset 8px with 4px to spare. The fourth one-off of hers to
+   land outside her own scales, after the 22px tab gap, the 3px checkbox
+   radius and the 9px chip; they are listed together in ba-questions.md. */
+/* ONLY THE TWO STATES THAT HAVE A MARK RESERVE ROOM FOR ONE. Written first
+   as `[data-cell-state]`, which gave `changed` and `loading` 28px of empty
+   space for an absent triangle — on a right-aligned column that pushes the
+   number off its own edge, so a changed quantity no longer lined up with the
+   one above it. Caught by measuring the padding, not by looking at it. */
+.vy-grid-k td[data-cell-state="warning"],
+.vy-grid-k td[data-cell-state="error"] { position: relative; }
+.vy-grid-k td[data-cell-state="warning"]::after,
+.vy-grid-k td[data-cell-state="error"]::after {
+  content: ''; position: absolute; inline-size: 16px; block-size: 16px;
+  inset-block-start: 50%; transform: translateY(-50%);
+  background: currentColor;
+  -webkit-mask: var(--vy-cell-mark) center / 16px 16px no-repeat;
+          mask: var(--vy-cell-mark) center / 16px 16px no-repeat;
+  inset-inline-end: 8px;
+}
+/* Text columns: value on the left, mark on the right. */
+.vy-grid-k td[data-cell-state="warning"],
+.vy-grid-k td[data-cell-state="error"] { padding-inline-end: var(--vy-space-11); }
+/* Right-aligned columns: the reverse, so the mark is never between the eye
+   and the digits. */
+.vy-grid-k td[data-role="number"]:is([data-cell-state="warning"], [data-cell-state="error"]),
+.vy-grid-k td[data-role="money"]:is([data-cell-state="warning"], [data-cell-state="error"]),
+.vy-grid-k td[data-role="date"]:is([data-cell-state="warning"], [data-cell-state="error"]) {
+  padding-inline: var(--vy-space-11) var(--vy-space-5);
+}
+.vy-grid-k td[data-role="number"]:is([data-cell-state="warning"], [data-cell-state="error"])::after,
+.vy-grid-k td[data-role="money"]:is([data-cell-state="warning"], [data-cell-state="error"])::after,
+.vy-grid-k td[data-role="date"]:is([data-cell-state="warning"], [data-cell-state="error"])::after {
+  inset-inline: 8px auto;
+}
+
+/* `changed` and `match` carry no mark: nothing is wrong, so there is no
+   warning to survive greyscale — and her own spec gives them none. */
+.vy-grid-k td[data-cell-state="changed"] {
+  background: var(--vy-info-bg); color: var(--vy-info-text);
+  font-weight: var(--vy-weight-medium);
+  box-shadow: inset 0 0 0 1px var(--vy-changed-border);
+}
+/* Her system match: the value, then a `*` in the brand ink, which opens the
+   pick list. Drawn rather than written into the value so it cannot be
+   copied out with the part number. */
+/* AFTER the value, which is where she puts it — `::after`, not `::before`.
+   The first version used `::before` because `::after` was taken by the mark,
+   and the asterisk came out in front of the part number. `match` carries no
+   mark, so `::after` was free all along. */
+.vy-grid-k td[data-cell-state="match"]::after {
+  content: '*'; margin-inline-start: 2px;
+  font-weight: var(--vy-weight-semibold); color: var(--vy-brand-text);
+}
+.vy-grid-k td[data-cell-state="loading"] { opacity: .4; }
+.vy-grid-k td[data-cell-state="warning"] {
+  background: var(--vy-warning-bg); color: var(--vy-warning-text);
+  --vy-cell-mark: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.2 15 13.6H1z"/><path d="M8 6.4v3.1M8 11.7h.01"/></svg>');
+}
+.vy-grid-k td[data-cell-state="error"] {
+  background: var(--vy-danger-subtle); color: var(--vy-danger-text);
+  --vy-cell-mark: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5.4 1.4h5.2l3.9 3.9v5.4l-3.9 3.9H5.4L1.5 10.7V5.3z"/><path d="M8 4.6v4.1M8 11.3h.01"/></svg>');
+}
+
+/* Her required column: a red `*` after the name. The header keeps its own
+   colour — the column is not in error, it is asking for something. */
+.vy-col-required { color: var(--vy-danger-text); margin-inline-start: 2px; font-weight: var(--vy-weight-semibold); }
+
+/* Her focused line: the tint AND a 3px bar down the left. The bar is what
+   makes it a focus indicator rather than a second hover — the two fills are
+   1.12:1 apart, which on their own would not pass WCAG 2.4.11. */
+.vy-grid-k tbody tr:focus-within > td { background: var(--vy-info-bg); }
+.vy-grid-k tbody tr:focus-within > td:first-child {
+  box-shadow: inset 3px 0 0 var(--vy-brand-boundary-strong);
+}
+
 /* KNOWN, MEASURED, NOT FIXED: a grid header is 41px where the grid is
    selectable and 36px where it is not — the checkbox label's 40px target floor
    showing through. Two attempts failed and neither is left in the file:

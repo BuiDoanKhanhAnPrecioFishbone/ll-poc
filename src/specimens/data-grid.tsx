@@ -23,6 +23,20 @@ const COLUMNS: ColumnSpec<Line>[] = [
   { field: 'status', title: 'Status',      role: 'status' },
 ];
 
+/* The same five columns, now saying what each cell is. One `cellState` per
+   column, read off the row — which is the whole API. */
+const STATEFUL: ColumnSpec<Line>[] = [
+  { field: 'part',  title: 'Part Number', role: 'ident', valueRequired: true,
+    cellState: r => (r.id === 3 ? 'match' : r.id === 5 ? 'error' : undefined) },
+  { field: 'desc',  title: 'Description', role: 'text',
+    cellState: r => (r.id === 4 ? 'warning' : undefined) },
+  { field: 'qty',   title: 'Qty', role: 'number', valueRequired: true,
+    cellState: r => (r.id === 2 ? 'changed' : undefined) },
+  { field: 'price', title: 'Unit Price', role: 'money',
+    cellState: r => (r.id === 1 ? 'warning' : r.id === 5 ? 'loading' : undefined) },
+  { field: 'status', title: 'Status', role: 'status' },
+];
+
 function Live() {
   /* A Set, not an array: `selected` is `ReadonlySet` and the grid calls
      `.has()` on it per row. An array type-checks nowhere near here — it fails
@@ -56,6 +70,21 @@ export const examples: Example[] = [
     render: () => (
       <DataGrid title="Quotation Lines" data={[]} columns={COLUMNS}
                 emptyHint="No lines on this quotation yet." />
+    ),
+  },
+  {
+    title: 'What a cell can say about itself',
+    note: 'Her six cell states. The mark is not decoration — a yellow fill and a yellow ink are both lost to greyscale, and the triangle and the octagon are what survive. Which edge it sits on follows the alignment, so it never lands between the eye and a number.',
+    render: () => (
+      <DataGrid title="Quotation Lines" data={LINES} columns={STATEFUL}
+                subtitle="Changed · warning · error · system match · loading, and two required columns" />
+    ),
+  },
+  {
+    title: 'A focused line',
+    note: 'Tab into the grid. The tint alone would be 1.12:1 against the hover fill — the 3px bar down the left is what makes it a focus indicator rather than a second hover.',
+    render: () => (
+      <DataGrid title="Quotation Lines" data={LINES} columns={COLUMNS} />
     ),
   },
 ];

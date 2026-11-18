@@ -47,7 +47,13 @@ Also from this section:
 - She has **three shadows**; this system has five. Different systems rather
   than a disagreement.
 
-### Grid cells — six of her nine cell states do not exist
+### ~~Grid cells~~ — **built, 18 Nov 2026**
+
+All of it: the five cell states, the required-column `*` and the focused line
+with its 3px bar. See [Data grid](components/data-grid.md). What follows is
+what was missing before.
+
+#### Grid cells — six of her nine cell states did not exist
 
 `renderCell` handles the column ROLES (ident, status, date, money, number,
 code) and nothing else. These are specified and unbuilt:
