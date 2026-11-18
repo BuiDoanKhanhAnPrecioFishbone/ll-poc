@@ -2766,7 +2766,20 @@
    a dead rule that read like the header was already handled, which is part of
    why the misalignment survived. The header is centred in components.css, next
    to the rest of the Kendo grid. */
-.vy-td--select { display: flex; align-items: center; justify-content: center; }
+/* NOT `display: flex` ON THE CELL, 18 Nov 2026. It was, and the file next
+   door already said why that is wrong — components.css warns, for the
+   HEADER checkbox, that "`display: flex` on a table cell takes it out of
+   table layout". The same line was sitting here on the `<td>`.
+
+   What it cost: a select cell measured 32px inside a 40px row, so it no
+   longer stretched with its siblings. Invisible while the cell had no
+   background or border of its own, and the moment the focused row grew a
+   3px bar the bar came out 8px short, floating in the middle of the row
+   with a gap above and below. The bar was correct; the cell had been wrong
+   since the column was built.
+
+   The LABEL is centred instead, which is exactly what the header does. */
+.vy-td--select .vy-check { inline-size: 100%; justify-content: center; }
 
 /* ---- The View column ------------------------------------------------------
    Back on 13 October at the customer's request, answering question B2. The

@@ -51,6 +51,18 @@ for (const path of FILES) {
      to ignore the check. */
   let inReducedMotion = false, depth = 0, inComment = false;
 
+  /* The selector the current declarations belong to. Rules here are written
+     both on one line and across several, so a check that needs to know WHAT
+     is being styled cannot read the declaration alone.
+
+     `ruleSelector`, not `selector`: check 6 below already declares a `const
+     selector` in this same block, and a `const` anywhere in a block puts the
+     whole block in its temporal dead zone — so assigning to a second
+     `selector` here threw on the first line of every file. The check ran,
+     crashed, and printed nothing, which reads exactly like a clean pass.
+     Caught by planting the bug it was written to find. */
+  let ruleSelector = '';
+
   lines.forEach((raw, i) => {
     const n = i + 1;
     if (/@media[^{]*prefers-reduced-motion/.test(raw)) { inReducedMotion = true; depth = 0; }
@@ -74,6 +86,11 @@ for (const path of FILES) {
       }
     }
     if (!line.trim()) return;
+    /* Everything before the first `{` on a line that opens a rule is the
+       selector; a line that only closes one ends it. */
+    const open = line.indexOf('{');
+    if (open !== -1) ruleSelector = line.slice(0, open);
+    else if (/^\s*\}/.test(line)) ruleSelector = '';
 
     /* 1. Spacing that is not on the scale. Border widths and 0 are not spacing,
           and percentages/viewport units are layout, not the scale. */
@@ -84,6 +101,31 @@ for (const path of FILES) {
         if (v[1] === '0' || v[1] === '1') continue;
         if (!SPACE.has(v[1])) add(path, n, 'spacing', m[0], `${v[1]}px is not on the space scale`);
       }
+    }
+
+    /* 1b. A TABLE CELL MADE A FLEX CONTAINER.
+          `display: flex` on a <td> or <th> takes it out of table layout, so
+          the cell stops stretching to its row. It looks fine while the cell
+          has no background or border of its own and breaks the moment it
+          gets one.
+
+          This is not hypothetical. `.vy-td--select` carried it from the day
+          the column was built: the select cell measured 32px inside a 40px
+          row, invisible until the focused row grew a 3px bar on 18 Nov 2026
+          and the bar came out 8px short. The file next door had already
+          written the warning down, for the HEADER checkbox, while the same
+          line sat on the <td>.
+
+          The fix is always the same: centre the CONTENT, not the cell.
+
+          THE PATTERN HAS TO BE TIGHT. Written first as `\b(t[dh]|vy-td-)`,
+          it flagged `.vy-thread` — `\bth` matches the start of "thread".
+          So: `td`/`th` only as a whole element selector, or our own
+          `vy-td--` / `vy-th--` class convention. */
+    const cellSel = /(^|[\s>+~,(])t[dh]([\s>+~,:.[]|$)|\.vy-t[dh]--/;
+    if (cellSel.test(ruleSelector) && /display:\s*(inline-)?(flex|grid)/.test(line)) {
+      add(path, n, 'table-cell', line.trim(),
+        `${ruleSelector.trim().slice(0, 48)} is a table cell and display:flex takes it out of table layout — centre the content instead`);
     }
 
     /* 2. Font sizes off the ramp. */
