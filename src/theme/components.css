@@ -1010,13 +1010,26 @@ html[data-kendo-bridged] .vy-field--changed .k-picker,
    the point rather than a compromise: the fill means "not typeable". In read
    mode nothing is, so every value is identical and nothing needs a lock; in
    edit mode the lock appears exactly where it distinguishes. */
+/* THIS is the record form's value box, and it is the one the BA's
+   `value-box` tokens are for. They were wired to `.vy-read-value` on
+   17 Nov, which looked right — that class IS a value box — but the record
+   form does not use it: `RecordField` renders through `FieldRow`, so the
+   box is this `dd`. `.vy-read-value` is used by two dialogs and the file
+   row, and nowhere on the screens her spec is mostly about. So the token
+   was adopted and reached almost nothing.
+
+   Her treatment: the fill, a TRANSPARENT border with one line along the
+   bottom, and the radius she files value boxes under, which is the same
+   6px as the inputs they stand in for. The full border this had was what
+   made a read value look like a disabled input rather than a value. */
 .vy-field dd {
   margin: 0;
   min-height: var(--vy-control-md);
   padding: var(--vy-space-3) var(--vy-space-5);
-  background: var(--vy-surface-sunken);
-  border: 1px solid var(--vy-border-strong);
-  border-radius: var(--vy-radius-sm);
+  background: var(--vy-value-box);
+  border: 1px solid transparent;
+  border-bottom-color: var(--vy-value-box-line);
+  border-radius: var(--vy-radius-md);
   font-size: var(--vy-text-base);
   color: var(--vy-on-surface-strong);
 }
