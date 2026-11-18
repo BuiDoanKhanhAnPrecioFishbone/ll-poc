@@ -912,17 +912,15 @@
   },
   "radius": {
     "sm": {
-      "$value": "3px",
-      "$type": "dimension",
-      "$description": "Shape"
+      "$value": "4px",
+      "$type": "dimension"
     },
     "md": {
-      "$value": "4px",
-      "$type": "dimension",
-      "$description": "the house radius"
+      "$value": "6px",
+      "$type": "dimension"
     },
     "lg": {
-      "$value": "6px",
+      "$value": "8px",
       "$type": "dimension"
     },
     "pill": {

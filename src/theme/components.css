@@ -10,7 +10,7 @@
 .vy-btn {
   display: inline-flex; align-items: center; justify-content: center; gap: var(--vy-space-3);
   font-family: inherit; font-size: var(--vy-text-base); font-weight: var(--vy-weight-medium);
-  border-radius: var(--vy-shape-full); border: 1px solid transparent;
+  border-radius: var(--vy-radius-pill); border: 1px solid transparent;
   padding: var(--vy-space-3) var(--vy-space-8); cursor: pointer; white-space: nowrap;
   transition: background-color var(--vy-dur-short) var(--vy-ease-standard),
               border-color var(--vy-dur-short) var(--vy-ease-standard),
@@ -108,7 +108,7 @@ html[data-kendo-bridged] .vy-btn:disabled {
   display: inline-flex; align-items: center; justify-content: center;
   width: var(--vy-status-slot-w); padding: var(--vy-space-1) var(--vy-space-4);
   font-size: var(--vy-text-xs); font-weight: var(--vy-weight-semibold);
-  border-radius: var(--vy-shape-full); white-space: nowrap;
+  border-radius: var(--vy-radius-pill); white-space: nowrap;
   /* A 1px border of the family's own colour. In light it is transparent for
      six of the seven and visible on `cancelled`, which the BA's principles of
      16 Nov draw as an outline pill rather than a filled one; in dark every
@@ -127,7 +127,7 @@ html[data-kendo-bridged] .vy-btn:disabled {
 /* Not a workflow status — a mode. Blue, because the standard's blue means
    "changed", which is exactly what the record is while this shows. */
 .vy-badge[data-token="editing"] { color: var(--vy-brand-text-deep); background: var(--vy-brand-subtle-strong); }
-.vy-pill { font-size: var(--vy-text-xs); color: var(--vy-on-surface-muted); background: var(--vy-surface-sunken); border-radius: var(--vy-shape-full); padding: 1px var(--vy-space-4); }
+.vy-pill { font-size: var(--vy-text-xs); color: var(--vy-on-surface-muted); background: var(--vy-surface-sunken); border-radius: var(--vy-radius-pill); padding: 1px var(--vy-space-4); }
 
 /* --- Chip ------------------------------------------------------------------ */
 .vy-chip {
@@ -143,7 +143,7 @@ html[data-kendo-bridged] .vy-btn:disabled {
      reasons carefully about the SELECTED border and says nothing about this
      one, which is how it survived. */
   background: var(--vy-surface); border: 1px solid var(--vy-border-control);
-  border-radius: var(--vy-shape-sm); padding: var(--vy-space-2) var(--vy-space-5); cursor: pointer;
+  border-radius: var(--vy-radius-md); padding: var(--vy-space-2) var(--vy-space-5); cursor: pointer;
   transition: background-color var(--vy-dur-short) var(--vy-ease-standard);
 }
 /* blue-400, not blue-300, and found while verifying the border token rather
@@ -175,7 +175,7 @@ html[data-kendo-bridged] .vy-btn:disabled {
 .vy-input {
   font-family: inherit; font-size: var(--vy-text-base); color: var(--vy-on-surface-strong);
   background: var(--vy-surface); border: 1px solid var(--vy-border-control);
-  border-radius: var(--vy-shape-sm); padding: var(--vy-space-4) var(--vy-space-5); width: 100%;
+  border-radius: var(--vy-radius-md); padding: var(--vy-space-4) var(--vy-space-5); width: 100%;
   transition: border-color var(--vy-dur-short) var(--vy-ease-standard);
 }
 /* The app shell, shown inside a specimen frame. It is built to fill a
@@ -183,7 +183,7 @@ html[data-kendo-bridged] .vy-btn:disabled {
    content-height stage every other example gets. */
 .vy-specimen-shell {
   inline-size: 100%; overflow: hidden;
-  border: 1px solid var(--vy-border); border-radius: var(--vy-shape-md);
+  border: 1px solid var(--vy-border); border-radius: var(--vy-radius-lg);
   position: relative; isolation: isolate;
 }
 .vy-specimen-shell > .vy-shell { block-size: 100%; }
@@ -289,7 +289,7 @@ html[data-kendo-bridged] .vy-check .k-checkbox.k-invalid { border-color: var(--v
 .vy-image-box {
   display: flex; align-items: center; justify-content: center;
   inline-size: 100%; max-inline-size: 220px; block-size: 132px;
-  border: 1px solid var(--vy-border); border-radius: var(--vy-shape-md);
+  border: 1px solid var(--vy-border); border-radius: var(--vy-radius-lg);
   background: var(--vy-surface); padding: 0; overflow: hidden; cursor: pointer;
 }
 .vy-image-box > img { max-inline-size: 100%; max-block-size: 100%; object-fit: contain; }
@@ -353,7 +353,7 @@ html[data-kendo-bridged] .vy-check .k-checkbox.k-invalid { border-color: var(--v
    popups, where it means "this will go away". */
 .vy-card {
   border: 1px solid var(--vy-border);
-  border-radius: var(--vy-shape-md);
+  border-radius: var(--vy-radius-lg);
   background: var(--vy-surface);
   overflow: hidden;                 /* so the header band meets the radius */
 }
@@ -530,7 +530,7 @@ html[data-kendo-bridged] .vy-check .k-checkbox.k-invalid { border-color: var(--v
 /* `surface-raised`, not `surface`: see the floating-surfaces note in
    kendo-bridge.css. In light the two are the same white; in dark this is the
    step that gives a menu an edge. */
-.vy-menu { background: var(--vy-surface-raised); border: 1px solid var(--vy-border); border-radius: var(--vy-shape-md); box-shadow: var(--vy-elev-3); padding: var(--vy-space-2); z-index: var(--vy-z-menu); }
+.vy-menu { background: var(--vy-surface-raised); border: 1px solid var(--vy-border); border-radius: var(--vy-radius-lg); box-shadow: var(--vy-elev-3); padding: var(--vy-space-2); z-index: var(--vy-z-menu); }
 /* --- Checkbox / radio ------------------------------------------------------ */
 /* The LABEL carries the 24px minimum target, not the box. The whole label is
    clickable, so it is the target — and it was 20px tall because that is the box
@@ -570,7 +570,7 @@ html[data-kendo-bridged] .vy-check .k-checkbox.k-invalid { border-color: var(--v
   padding: var(--vy-space-5);
   background: var(--vy-surface);
   border: 1px solid var(--vy-border);
-  border-radius: var(--vy-shape-md);
+  border-radius: var(--vy-radius-lg);
   cursor: pointer;
 }
 .vy-radios--tiles .vy-radio-row[data-checked] {
@@ -613,7 +613,7 @@ html[data-kendo-bridged] .vy-check .k-checkbox.k-invalid { border-color: var(--v
    flex, which is why the old `translate(-50%, -50%)` is gone. */
 .vy-dialog .k-dialog {
   width: min(var(--vy-dialog-md), 94vw); max-height: 88vh;
-  border-radius: var(--vy-shape-lg); box-shadow: var(--vy-elev-5);
+  border-radius: var(--vy-radius-lg); box-shadow: var(--vy-elev-5);
   animation: vy-rise var(--vy-dur-long) var(--vy-ease-emphasised);
 }
 .vy-dialog--lg .k-dialog { width: min(var(--vy-dialog-lg), 94vw); }
@@ -702,7 +702,7 @@ html[data-kendo-bridged] .vy-check .k-checkbox.k-invalid { border-color: var(--v
    own colour. A whole red tab would say the tab is broken; what is true is
    that a field inside it is, and the user still has to read which tab. */
 .vy-tab-error { color: var(--vy-danger-text); font-weight: var(--vy-weight-semibold); margin-inline-start: 2px; }
-.vy-tab-count { font-size: var(--vy-text-xs); background: var(--vy-surface-sunken); color: var(--vy-on-surface-muted); border-radius: var(--vy-shape-full); padding: 0 var(--vy-space-3); }
+.vy-tab-count { font-size: var(--vy-text-xs); background: var(--vy-surface-sunken); color: var(--vy-on-surface-muted); border-radius: var(--vy-radius-pill); padding: 0 var(--vy-space-3); }
 .vy-tabs .k-tabstrip-item.k-active .vy-tab-count { background: var(--vy-brand-subtle-strong); color: var(--vy-brand-text-deep); }
 
 /* Her tab, 16 Nov 2026, measured against what Kendo was giving us:
@@ -789,7 +789,7 @@ html[data-kendo-bridged] .vy-check .k-checkbox.k-invalid { border-color: var(--v
 .vy-content:has(.vy-page--grid) { display: flex; flex-direction: column; overflow: hidden; }
 .vy-page--grid { flex: 1; min-height: 0; display: flex; flex-direction: column; padding-bottom: var(--vy-space-6); }
 .vy-page--grid .vy-grid-shell { flex: 1; min-height: 0; }
-.vy-grid-shell { background: var(--vy-surface); border: 1px solid var(--vy-border); border-radius: var(--vy-shape-md); box-shadow: var(--vy-elev-1); overflow: hidden; display: flex; flex-direction: column; }
+.vy-grid-shell { background: var(--vy-surface); border: 1px solid var(--vy-border); border-radius: var(--vy-radius-lg); box-shadow: var(--vy-elev-1); overflow: hidden; display: flex; flex-direction: column; }
 /* The list's own actions, above the table's card and left-aligned. A row of
    its own rather than a corner of the search strip: the two are different
    tiers — one acts on the DATA, the other on the VIEW of it. */
@@ -832,7 +832,9 @@ html[data-kendo-bridged] .vy-field--changed .k-picker,
 .vy-toast {
   display: flex; align-items: flex-start; gap: var(--vy-space-5);
   border: 1px solid transparent;
-  border-radius: var(--vy-radius-lg); box-shadow: var(--vy-elev-4);
+  /* md, not lg: she files banners and toasts with the inputs at 6px, and
+     puts popups, cards and menus at 8. */
+  border-radius: var(--vy-radius-md); box-shadow: var(--vy-elev-4);
   padding: var(--vy-space-4) var(--vy-space-6); font-size: var(--vy-text-base);
   font-weight: var(--vy-weight-medium);
   animation: vy-toast-in var(--vy-dur-medium) var(--vy-ease-decelerate);
@@ -858,7 +860,7 @@ html[data-kendo-bridged] .vy-field--changed .k-picker,
 
 /* --- Design-system page: elevation demo ------------------------------------ */
 .vy-elev-row { display: flex; gap: var(--vy-space-9); flex-wrap: wrap; padding: var(--vy-space-4) 0; }
-.vy-elev-swatch { width: var(--vy-space-14); height: var(--vy-space-14); border-radius: var(--vy-shape-md); background: var(--vy-surface); display: grid; place-items: center; font-size: var(--vy-text-sm); color: var(--vy-on-surface-subtle); }
+.vy-elev-swatch { width: var(--vy-space-14); height: var(--vy-space-14); border-radius: var(--vy-radius-lg); background: var(--vy-surface); display: grid; place-items: center; font-size: var(--vy-text-sm); color: var(--vy-on-surface-subtle); }
 .vy-elev-swatch[data-level="0"] { box-shadow: var(--vy-elev-0); border: 1px solid var(--vy-border); }
 .vy-elev-swatch[data-level="1"] { box-shadow: var(--vy-elev-1); }
 .vy-elev-swatch[data-level="2"] { box-shadow: var(--vy-elev-2); }
@@ -873,7 +875,7 @@ html[data-kendo-bridged] .vy-field--changed .k-picker,
   display: flex; align-items: center; gap: var(--vy-space-4); width: 100%;
   font-family: inherit; text-align: left; background: transparent;
   border: 0; border-top: var(--vy-border-emphasis) solid var(--vy-border);
-  padding: var(--vy-space-5) var(--vy-space-4) var(--vy-space-4); border-radius: var(--vy-shape-sm);
+  padding: var(--vy-space-5) var(--vy-space-4) var(--vy-space-4); border-radius: var(--vy-radius-md);
   cursor: default; color: var(--vy-on-surface-subtle);
 }
 .vy-step-btn[data-reachable] { cursor: pointer; }
@@ -908,7 +910,7 @@ html[data-kendo-bridged] .vy-field--changed .k-picker,
   margin: 0 0 var(--vy-space-8); padding: var(--vy-space-4) var(--vy-space-6);
   background: var(--vy-brand-subtle); color: var(--vy-brand-text-deep);
   border-left: var(--vy-accent-bar-w) solid var(--vy-brand);
-  border-radius: var(--vy-shape-sm); font-size: var(--vy-text-base);
+  border-radius: var(--vy-radius-md); font-size: var(--vy-text-base);
 }
 
 /* =============================================================================
@@ -1128,7 +1130,7 @@ html[data-kendo-bridged] .vy-field--changed .k-picker,
 .vy-check-row {
   display: flex; align-items: center; gap: var(--vy-space-4);
   padding: var(--vy-space-3) var(--vy-space-3) var(--vy-space-3) 0;
-  cursor: pointer; border-radius: var(--vy-shape-sm);
+  cursor: pointer; border-radius: var(--vy-radius-md);
   font-size: var(--vy-text-base); color: var(--vy-on-surface);
 }
 .vy-check-row:hover { background: var(--vy-brand-subtle); }
@@ -1212,7 +1214,7 @@ html[data-kendo-bridged] .vy-field--changed .k-picker,
 .vy-cell-link {
   background: none; border: 0; padding: 0; font: inherit; text-align: left;
   color: var(--vy-brand-text); text-decoration: none; cursor: pointer;
-  border-radius: var(--vy-shape-xs);
+  border-radius: var(--vy-radius-sm);
   display: flex; align-items: center; height: 100%; min-width: 0;
 }
 .vy-cell-link:hover { color: var(--vy-brand-text-hover); text-decoration: underline; text-underline-offset: .18em; }
@@ -1773,7 +1775,7 @@ html[data-kendo-bridged] .vy-field--changed .k-picker,
 .vy-create-general {
   background: var(--vy-surface-app);
   border: 1px solid var(--vy-border);
-  border-radius: var(--vy-shape-md);
+  border-radius: var(--vy-radius-lg);
   padding: var(--vy-space-8);
 }
 
@@ -1832,7 +1834,7 @@ html[data-kendo-bridged] .vy-field--changed .k-picker,
   padding: var(--vy-space-4) var(--vy-space-6);
   background: var(--vy-surface-app);
   border: 1px solid var(--vy-border);
-  border-radius: var(--vy-shape-md);
+  border-radius: var(--vy-radius-lg);
 }
 /* The assembly, as a heading above the settings rather than as two more boxes
    in the row — see QuoteContext.tsx. */
@@ -1850,7 +1852,7 @@ html[data-kendo-bridged] .vy-field--changed .k-picker,
   min-width: 0;
   background: var(--vy-brand-subtle);
   border-bottom: 1px solid var(--vy-border);
-  border-radius: var(--vy-shape-md) var(--vy-shape-md) 0 0;
+  border-radius: var(--vy-radius-lg) var(--vy-radius-lg) 0 0;
   font-size: var(--vy-text-sm); color: var(--vy-on-surface-muted);
 }
 /* `flex: none`, because an icon that is a flex item is an icon that shrinks —
@@ -1984,7 +1986,7 @@ html[data-kendo-bridged] .vy-field--changed .k-picker,
   padding: var(--vy-space-1) var(--vy-space-3);
   font: inherit; text-align: start; cursor: pointer;
   color: inherit; background: none;
-  border: 1px solid transparent; border-radius: var(--vy-shape-sm);
+  border: 1px solid transparent; border-radius: var(--vy-radius-md);
 }
 .vy-mpn-pick:hover { background: var(--vy-surface); border-color: var(--vy-border-control); }
 .vy-mpn-pick:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
@@ -2083,7 +2085,7 @@ html[data-kendo-bridged] .vy-field--changed .k-picker,
   font: inherit; font-size: var(--vy-text-sm); text-align: start; cursor: pointer;
   color: var(--vy-on-surface-strong);
   background: var(--vy-surface);
-  border: 1px solid var(--vy-border-control); border-radius: var(--vy-shape-sm);
+  border: 1px solid var(--vy-border-control); border-radius: var(--vy-radius-md);
 }
 .vy-sup-btn-label { color: var(--vy-on-surface-muted); }
 .vy-sup-btn-value { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -2120,7 +2122,7 @@ html[data-kendo-bridged] .vy-field--changed .k-picker,
 .vy-sup-tag {
   font-size: var(--vy-text-xs); color: var(--vy-on-surface-muted);
   background: var(--vy-surface); border: 1px solid var(--vy-border);
-  border-radius: var(--vy-shape-full); padding: 1px var(--vy-space-4); white-space: nowrap;
+  border-radius: var(--vy-radius-pill); padding: 1px var(--vy-space-4); white-space: nowrap;
 }
 .vy-sup-row .vy-select { inline-size: var(--vy-sup-group-w); flex: 0 0 auto; }
 .vy-sup-empty { font-size: var(--vy-text-sm); color: var(--vy-on-surface-muted); margin: var(--vy-space-4) 0 0; }
@@ -2185,7 +2187,10 @@ html[data-kendo-bridged] .vy-field--changed .k-picker,
   background: var(--vy-value-box);
   border: 1px solid transparent;
   border-bottom-color: var(--vy-value-box-line);
-  border-radius: var(--vy-radius-sm);
+  /* `radius-md`, with the inputs: she files "inputs, value boxes, buttons"
+     together at 6px, and the view and edit shapes of one field reading as
+     the same control is the whole reason that grouping exists. */
+  border-radius: var(--vy-radius-md);
   font-size: var(--vy-text-base); color: var(--vy-on-surface-soft);
 }
 .vy-read-value-text { min-width: 0; }
@@ -2719,7 +2724,7 @@ html[data-kendo-bridged] .vy-field--changed .k-picker,
    `docs/table-patterns.md` still describes what happens. */
 .vy-minitable-k {
   border: 1px solid var(--vy-border);
-  border-radius: var(--vy-shape-md);
+  border-radius: var(--vy-radius-lg);
   /* `hidden` would round the corners and then CLIP Kendo's own horizontal
      scroller, so a wide grid simply lost its right-hand columns with no way to
      reach them. `auto` still clips to the radius and keeps the scrollbar. */

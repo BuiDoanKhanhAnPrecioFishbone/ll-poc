@@ -112,8 +112,9 @@ html[data-kendo-bridged] {
   --kendo-font-size-lg: var(--vy-text-md);
 
   /* ---- Shape -------------------------------------------------------------
-     4px is the house radius. Kendo's md is 4px too, which is luck rather than
-     agreement, so it is stated rather than assumed. */
+     Stated rather than assumed, and now it matters: since 18 Nov the house
+     radius is the BA's 6px, where Kendo's own md is 4px. Mapping it is what
+     makes a Kendo input agree with a `.vy-input` beside it. */
   --kendo-border-radius-md: var(--vy-radius-md);
   --kendo-border-radius-sm: var(--vy-radius-sm);
   --kendo-border-radius-lg: var(--vy-radius-lg);
@@ -535,7 +536,7 @@ html[data-kendo-bridged] .k-icon-button > .k-button-text > .k-button-icon > svg 
 html[data-kendo-bridged] .k-popup {
   background: var(--vy-surface-raised);
   border: 1px solid var(--vy-border);
-  border-radius: var(--vy-shape-md);
+  border-radius: var(--vy-radius-lg);
   box-shadow: var(--vy-elev-3);
 }
 

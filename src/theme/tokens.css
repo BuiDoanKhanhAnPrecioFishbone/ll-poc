@@ -522,9 +522,27 @@
   }
 
   /* --- Shape ---------------------------------------------------------------- */
-  --vy-radius-sm: 3px;
-  --vy-radius-md: 4px;   /* the house radius */
-  --vy-radius-lg: 6px;
+  /* THE BA'S FOUR RADII, 16 Nov 2026, and the only radius scale in this
+     system. Her values and her jobs:
+
+       sm  4px   the editor box in a grid cell, skeleton bars, a coloured cell
+       md  6px   inputs, value boxes, buttons, icon buttons, banners, toasts
+       lg  8px   popups, cards, panels, grid boxes, file lists, menus
+       pill        status pills, chips, counts, avatars
+
+     This replaced 3 / 4 / 6. Every value she names already existed here — it
+     was the NAMES that pointed one step lower, so `radius-md`, which this
+     file used to call "the house radius" and which buttons and inputs take,
+     was 4px where she draws 6.
+
+     A SECOND SCALE WAS DELETED WITH THIS. `--vy-shape-none|xs|sm|md|lg|xl|full`
+     lived in md3.css and ran 0/2/4/8/12/16/999, overlapping this one at three
+     values and disagreeing at the rest; 32 rules used it and 125 used this.
+     Two radius scales means a reader has to know which file a component was
+     written in to know what shape it is. */
+  --vy-radius-sm: 4px;
+  --vy-radius-md: 6px;
+  --vy-radius-lg: 8px;
   --vy-radius-pill: 999px;
 
   /* --- Elevation ------------------------------------------------------------ */

@@ -106,7 +106,10 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <h3 id="b3-hai-con-số-của-file-row-không-cùng-đúng-được">B3. Hai con số của file row không cùng đúng được</h3>
 <blockquote><em>"Row <strong>34px</strong> · padding <strong>6px</strong> 10px"</em> — mà nút tải xuống trong hàng của chính chị là <strong>26px</strong>.</blockquote>
 <p>26 + 6 + 6 = 38. Em giữ <strong>chiều cao</strong>, bỏ padding dọc, vì một danh sách file được đọc dọc theo mép trái, mà hàng nào có nút thì cao hơn 4px sẽ làm cả danh sách trông so le.</p>
-<h3 id="b4-thang-chữ-định-nghĩa-hai-bậc-rồi-cấm-dùng">B4. Thang chữ định nghĩa hai bậc rồi cấm dùng</h3>
+<h3 id="b4-checkbox-bo-3px-mà-thang-radius-của-chị-không-có-bậc-3px">B4. Checkbox bo 3px, mà thang radius của chị không có bậc 3px</h3>
+<blockquote>Checkbox (bare): <em>"radius <strong>3px</strong>"</em> — trong khi mục Shape and elevation ghi bốn bán kính: <strong>4 · 6 · 8 · pill</strong>.</blockquote>
+<p>Cùng kiểu với mục 9px ở trên: một giá trị lẻ nằm ngoài chính cái thang chị đặt. Hệ thống đang vẽ 4px, tức bậc gần nhất trên thang của chị.</p>
+<h3 id="b5-thang-chữ-định-nghĩa-hai-bậc-rồi-cấm-dùng">B5. Thang chữ định nghĩa hai bậc rồi cấm dùng</h3>
 <blockquote><code>2xs</code> 10px, <code>xs</code> 11px — cột Role ghi: <em>"<strong>Not used on desktop</strong> (below the 12px floor)"</em></blockquote>
 <p>Một cái thang có bậc không được đứng lên thì sớm muộn sẽ có người đứng nhầm. Hệ thống hiện đặt cả hai thành 12px luôn — kết quả trên màn hình như nhau, mà phần lý do chị viết thì rõ hơn của mình.</p>
 <hr>

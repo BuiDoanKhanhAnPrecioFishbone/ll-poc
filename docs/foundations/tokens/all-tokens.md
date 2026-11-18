@@ -385,9 +385,9 @@ A machine-readable export of the same set, in the W3C Design Tokens draft format
 
 | Token | Light | Dark |
 |---|---|---|
-| `--vy-radius-sm` | `3px` | — |
-| `--vy-radius-md` | `4px` | — |
-| `--vy-radius-lg` | `6px` | — |
+| `--vy-radius-sm` | `4px` | — |
+| `--vy-radius-md` | `6px` | — |
+| `--vy-radius-lg` | `8px` | — |
 | `--vy-radius-pill` | `999px` | — |
 
 ## record

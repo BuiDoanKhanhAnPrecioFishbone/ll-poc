@@ -535,7 +535,7 @@
 /* This is her info banner: the same tint and text as an info toast, so the
    two read as one voice. It was brand-tinted before, which said "this is a
    link or a selection" rather than "here is something you should know". */
-.vy-note-inline { font-size: var(--vy-text-xs); color: var(--vy-info-text); background: var(--vy-info-bg); border-radius: var(--vy-radius-lg); padding: var(--vy-space-2) var(--vy-space-4); margin: var(--vy-space-2) 0; }
+.vy-note-inline { font-size: var(--vy-text-xs); color: var(--vy-info-text); background: var(--vy-info-bg); border-radius: var(--vy-radius-md); padding: var(--vy-space-2) var(--vy-space-4); margin: var(--vy-space-2) 0; }
 /* Her warning banner is the same element in the other meaning: something to
    check that does not block. Kept as a kind on one element rather than a
    second class, because the two differ by colour and by nothing else. */
@@ -1279,7 +1279,7 @@
    — see RecordSkeleton. Heights are measured off the real controls: back link
    24, action buttons 34, record bar 23, title 35. */
 .vy-rec-sk-back  { block-size: var(--vy-space-10); inline-size: 11rem; }
-.vy-rec-sk-btn   { block-size: var(--vy-control-md); inline-size: 6rem; border-radius: var(--vy-shape-full); }
+.vy-rec-sk-btn   { block-size: var(--vy-control-md); inline-size: 6rem; border-radius: var(--vy-radius-pill); }
 .vy-rec-sk-title { block-size: var(--vy-control-md); inline-size: 22rem; }
 /* The identifier strip stands at the height of the line of text it replaces,
    not of the bar it sits in — measured at 23, and 24 is the rung above it. */
@@ -1294,7 +1294,7 @@
 .vy-rec-sk-value .vy-skeleton-cell { block-size: var(--vy-space-5); }
 
 .vy-skeleton-cell[data-sk="ident"]    { inline-size: 11rem; block-size: var(--vy-space-9); }
-.vy-skeleton-cell[data-sk="chip"]     { inline-size: 4.5rem; block-size: var(--vy-space-8); border-radius: var(--vy-shape-full); }
+.vy-skeleton-cell[data-sk="chip"]     { inline-size: 4.5rem; block-size: var(--vy-space-8); border-radius: var(--vy-radius-pill); }
 .vy-skeleton-cell[data-sk="lookup"]   { inline-size: 12rem; }
 .vy-skeleton-cell[data-sk="combo"]    { inline-size: 12rem; }
 .vy-skeleton-cell[data-sk="select"]   { inline-size: 9rem; }
@@ -1953,7 +1953,7 @@
      to ask for the height. */
   min-height: var(--vy-target-min); padding: var(--vy-space-3) var(--vy-space-4);
   margin-inline: calc(-1 * var(--vy-space-4));
-  border-radius: var(--vy-shape-sm); text-decoration: none;
+  border-radius: var(--vy-radius-md); text-decoration: none;
   font-size: var(--vy-text-base); font-weight: var(--vy-weight-medium);
   color: var(--vy-on-surface-strong);
 }
@@ -2643,7 +2643,7 @@
   margin: 0; padding: var(--vy-space-5) var(--vy-space-6);
   background: var(--vy-status-blocked-bg); color: var(--vy-status-blocked-fg);
   border-left: var(--vy-accent-bar-w) solid var(--vy-danger);
-  border-radius: var(--vy-shape-xs); font-size: var(--vy-text-base);
+  border-radius: var(--vy-radius-sm); font-size: var(--vy-text-base);
 }
 .vy-login-legal { margin: var(--vy-space-6) 0 0; display: flex; align-items: center; justify-content: center; gap: var(--vy-space-4); font-size: var(--vy-text-sm); color: var(--vy-on-surface-subtle); }
 

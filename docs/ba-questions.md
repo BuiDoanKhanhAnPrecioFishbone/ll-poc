@@ -119,7 +119,15 @@ spec.
 a list of files is read down its left edge and rows that vary by 4px because
 one has a button read as ragged.
 
-### B4. The type scale defines two steps it then forbids
+### B4. The checkbox is 3px, and her radius scale has no 3px
+
+> Checkbox (bare): *"radius **3px**"* — while her Shape and elevation section
+> names four radii: **4 · 6 · 8 · pill**.
+
+The same shape as the 9px item above: a one-off value outside the scale she
+sets herself. Drawn here at 4px, the nearest rung on her own scale.
+
+### B5. The type scale defines two steps it then forbids
 
 > `2xs` 10px, `xs` 11px — Role: *"**Not used on desktop** (below the 12px
 > floor)"*

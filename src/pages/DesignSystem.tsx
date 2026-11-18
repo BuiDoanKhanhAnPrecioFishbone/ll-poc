@@ -170,7 +170,7 @@ export function DesignSystemPage() {
         <div className="vy-anatomy">
           <Button variant="filled" icon={<Icon name="download" />}>Export</Button>
           <div className="vy-anatomy-parts">
-            <div><b>1</b><span>Container — <code>--vy-shape-full</code>, height from the size rung, 1px transparent border so outlined and filled measure the same</span></div>
+            <div><b>1</b><span>Container — <code>--vy-radius-pill</code>, height from the size rung, 1px transparent border so outlined and filled measure the same</span></div>
             <div><b>2</b><span>Icon slot — optional, <code>aria-hidden</code> unless it is the busy indicator. Alone, it makes the button square</span></div>
             <div><b>3</b><span>Label — <code>--vy-text-base</code> at <code>--vy-weight-medium</code>, Title Case, never wraps</span></div>
           </div>

@@ -115,7 +115,15 @@ dù sao đó vẫn là sàn của chị bị vượt bởi chính spec của ch�
 được đọc dọc theo mép trái, mà hàng nào có nút thì cao hơn 4px sẽ làm cả
 danh sách trông so le.
 
-### B4. Thang chữ định nghĩa hai bậc rồi cấm dùng
+### B4. Checkbox bo 3px, mà thang radius của chị không có bậc 3px
+
+> Checkbox (bare): *"radius **3px**"* — trong khi mục Shape and elevation ghi
+> bốn bán kính: **4 · 6 · 8 · pill**.
+
+Cùng kiểu với mục 9px ở trên: một giá trị lẻ nằm ngoài chính cái thang chị
+đặt. Hệ thống đang vẽ 4px, tức bậc gần nhất trên thang của chị.
+
+### B5. Thang chữ định nghĩa hai bậc rồi cấm dùng
 
 > `2xs` 10px, `xs` 11px — cột Role ghi: *"**Not used on desktop** (below the
 > 12px floor)"*
