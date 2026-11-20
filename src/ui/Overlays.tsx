@@ -3,7 +3,8 @@ import { Dialog as KendoDialog, DialogActionsBar } from '@progress/kendo-react-d
 import { TabStrip, TabStripTab } from '@progress/kendo-react-layout';
 import { DialogDismiss } from './dismiss';
 import { markDialogOpen } from './dialogOpen';
-import { cloneElement, createContext, type ReactNode, useContext, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { DialogDepth } from './dialogDepth';
+import { cloneElement, type ReactNode, useContext, useEffect, useId, useMemo, useRef, useState } from 'react';
 
 /* =============================================================================
    Radix primitives, styled from tokens.
@@ -49,7 +50,6 @@ import { cloneElement, createContext, type ReactNode, useContext, useEffect, use
  *
  * Each level now steps its own scrim and panel above the level before it.
  */
-const DialogDepth = createContext(0);
 
 
 export function Dialog({ open, onClose, title, subtitle, children, actions, size = 'md',

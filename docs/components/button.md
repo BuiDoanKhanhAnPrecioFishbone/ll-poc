@@ -10,6 +10,13 @@
 
 <!-- ds:tab usage -->
 
+<!-- ds:specimen button-usage -->
+
+> The five cards above are the rules on this page that are about
+> **appearance**, drawn rather than described — asked for on 20 Nov. They are
+> the real components, in the real stylesheet, so a "Don't" card cannot quietly
+> stop being wrong.
+
 > **Model page.** This is the template every other component page should
 > follow. The order of the sections is the order a reader needs them in, and
 > it is the order Carbon, Atlassian and GOV.UK all arrive at: what it is for,
@@ -41,7 +48,7 @@ line, run the quotation.
 
 | | Part | Rule |
 |---|---|---|
-| 1 | **Container** | `--vy-shape-full`. Height comes from the size rung, never from padding. A 1px transparent border so `outlined` and `filled` measure the same |
+| 1 | **Container** | `--vy-radius-pill`. Height comes from the size rung, never from padding. A 1px transparent border so `outlined` and `filled` measure the same |
 | 2 | **Icon slot** | Optional. `aria-hidden` — except while busy, when it holds the indicator and carries the only machine-readable statement that the action is running |
 | 3 | **Label** | `--vy-text-base` at `--vy-weight-medium`, Title Case ([B2](../design-system.md#b2--typography)), `white-space: nowrap` |
 
@@ -62,6 +69,28 @@ The ladder is Material 3's, and it encodes **emphasis, not colour**.
 | `text` | Tertiary, inside dense rows | 18 |
 | `tonal` | A secondary action that still needs weight | 7 |
 | `danger` | Destructive — and it goes behind `More ▾` | 6 |
+
+**`danger` draws itself two ways, and the component picks.** The BA's Buttons
+section, 16 Nov: *"Danger in a toolbar: outlined, 1px danger border and danger
+text. Danger in a confirm popup: filled, white text."* Her rule is about
+**place**, so the component reads the place — `useInDialog()`, out of
+`ui/dialogDepth.ts` — instead of asking each call site which one it is in. A
+second variant name would have put the same decision in 6 call sites and every
+future one, where it can be got wrong without anyone noticing.
+
+| Where | Fill | Why |
+|---|---|---|
+| A toolbar, a record bar, a panel | **outlined** | It sits beside Save and Export and must not out-shout them |
+| Inside a `Dialog` | **filled** | The question has already been asked; the red button *is* the answer |
+
+> **The outlined half does not use Kendo's `outline-error`,** and the reason is
+> dark mode. `--kendo-color-error` is `--vy-danger` (red-600), which measures
+> **5.52:1** on white — fine — and **3.10:1** on the dark surface, which clears
+> 1.4.11's 3 for the border and fails 1.4.3's 4.5 for the label. The fill has no
+> such problem, because white on red-600 *is* 5.52, which is exactly why that
+> token is a fill and why text has its own. So the outlined danger takes
+> `--vy-danger-text` (7.74 light, 7.16 dark) and `--vy-danger-boundary` (4.30 /
+> 5.04). Nothing else about Kendo's button is touched.
 
 ![Button variants and the states that hold still](../assets/design-system/button-states.png)
 
@@ -105,6 +134,7 @@ token that drives them.
 | **Press** | The same layer, heavier | `--vy-state-press: .12` |
 | **Disabled** | Dimmed, `cursor: not-allowed`, no state layer | `--vy-state-disabled: .6` — deliberately **not** MD3's `.38`, which is past legible at 13px |
 | **Busy** | Indicator in the icon slot, and the button is **disabled** | — |
+| **Unavailable** | The disabled *look*, but not `disabled`: hoverable, focusable, and the reason is in the tooltip | `--vy-disabled-bg` / `--vy-disabled-text` |
 
 **`busy` is two things, and the disable is the load-bearing half.** The
 indicator says something is happening; the disable is what stops a second
@@ -130,6 +160,43 @@ of the fill's own pair.
 | `filled`, dark | `#7f9ce1` | `#0f131a` | — | **6.86:1** |
 | `danger` | `--vy-danger` | `--vy-danger-on` | 1.97:1 | **5.52:1** |
 | `tonal` / `outlined` / `text` | — | `--vy-brand-text` | 8.31–9.16:1 | unchanged |
+
+---
+
+### Unavailable, and why it is not `disabled`
+
+The BA specifies a **No permission** state: *"looks like Disabled, tooltip:
+You don't have permission to {action}. Ask your admin."* It is worth having —
+a user who cannot tell *not yet* from *not allowed* asks support about the
+wrong thing — and it cannot be built out of `disabled`.
+
+**A disabled button has no hover target.** Kendo disables with `.k-disabled`,
+which sets `pointer-events: none`, so a `title` on it never opens. This
+codebase had already written two of these reasons and shipped them unread:
+ViewSetting's *"A new view needs a name"* and *"Built-in views cannot be
+deleted"* had been on screen since they were typed and had never once appeared.
+Measured on 20 Nov, which is when they were moved to `unavailable`.
+
+So the state keeps the button **in** the page:
+
+| | |
+|---|---|
+| `aria-disabled="true"` | says it cannot be used, without removing it — also the ARIA practices' own advice where the user needs to find out *why* |
+| Stays in the tab order | a keyboard user who cannot reach the control cannot read the reason either |
+| The press is swallowed in the component | `onClickCapture` and `onKeyDownCapture`, so a handler on an ancestor row does not fire either |
+| `cursor: not-allowed` | the pointer is the only thing that tells a mouse user to stop and hover |
+
+`noPermission('delete this view')` returns her sentence, so the wording is in
+one place rather than four slightly different places. `disabled` is still the
+right prop for a control that is merely **not ready** — a Save with nothing
+changed — where there is nothing to explain.
+
+> **No permission is not wired to anything in the product**, because this
+> prototype has no permission model to read. The state exists, is documented
+> and is on the usage cards; the first screen that knows a user's role passes
+> the prop.
+
+---
 
 > Both of those pairs are **already in `contrast:check`** as *label on the
 > brand fill* and *label on the danger fill*. Using the paired token instead
@@ -196,7 +263,8 @@ of the fill's own pair.
 | `size` | `xs \| sm \| md` | `md` | |
 | `icon` | `ReactNode` | — | Arbitrary node, not a Kendo icon name. Alone, makes the button square |
 | `busy` | `boolean` | `false` | Sets `disabled` and `aria-busy`, swaps the icon for the indicator |
-| `disabled` | `boolean` | `false` | |
+| `disabled` | `boolean` | `false` | For *not ready yet*. Leaves the tab order, and a tooltip on it will not open |
+| `unavailable` | `string` | — | For *you can't, and here is why*. The disabled look, `aria-disabled`, press swallowed, sentence in the tooltip. `noPermission(action)` builds the BA's permission wording |
 | `asChild` | `boolean` | `false` | Render the styling onto the child instead |
 | `ref` | `Ref<HTMLButtonElement>` | — | Hands back the **DOM node**, not Kendo's handle |
 | …rest | `ButtonHTMLAttributes` | — | Minus `ref` |
@@ -206,7 +274,8 @@ of the fill's own pair.
 | Variant | `themeColor` | `fillMode` |
 |---|---|---|
 | `filled` | primary | solid |
-| `danger` | error | solid |
+| `danger` (in a dialog) | error | solid |
+| `danger` (anywhere else) | error | **outline** + `.vy-btn--danger-outline` |
 | `outlined` | base | outline |
 | `text` | primary | flat |
 | `tonal` | primary | **solid** + `.vy-btn--tonal` |
@@ -253,6 +322,9 @@ specificity problem.
 
 | Date | Change |
 |---|---|
+| 20 Nov 2026 | **Usage tab drawn.** Five Do/Don't card pairs, from the rules already on this page — live components, not exported images, so a card cannot go stale against a token change. The mechanism is `compare` on a specimen `Example`, so any component page can do the same |
+| 20 Nov 2026 | **`danger` resolves its fill from where it is** — outlined on a toolbar, filled in a dialog, per the BA's Buttons section. Via `useInDialog()`, not a second variant name. The outlined half takes `--vy-danger-text` / `--vy-danger-boundary` rather than Kendo's `outline-error`, which measured **3.10:1** for its label on the dark surface |
+| 20 Nov 2026 | **`unavailable` added** — the BA's No-permission state, generalised to every "you can't, because". Found while building it: `.k-disabled` sets `pointer-events: none`, so the two reasons already written on ViewSetting's Save and Delete had never been readable. Both moved over |
 | 8 Nov 2026 | `.vy-btn--outlined` moved to `--vy-border-control`. It reaches the DOM only through `asChild` — a router Link wearing a button's clothes, such as *Back to Home* on the [error state](error-state.md) — so the bridge's `.k-button-outline` correction never touched it and it kept the structure token at **1.64:1**. Its hover, which went to `--vy-border-mid` at **2.58:1**, no longer moves the border at all: `data-state-layer` already carries the state |
 | 8 Nov 2026 | Busy indicator moved to the fill's `on-` token — 1.19:1 → 9.16:1 on `filled`, 1.97:1 → 5.52:1 on `danger` |
 | 8 Nov 2026 | This page, and two specimens on `/design-system`. The first state specimen drew hover and press with Kendo's `.k-hover` / `.k-active` classes and was wrong: Kendo never sets them, and `.k-hover` turned a tonal button solid primary. Replaced with the three states that hold still |

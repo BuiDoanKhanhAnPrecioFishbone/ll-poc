@@ -10,6 +10,12 @@ needs any of those, it is a [Toast](toast.md).
 
 <!-- ds:tab usage -->
 
+
+<!-- ds:specimen banner-usage -->
+
+> The three rules below, drawn — asked for on 20 Nov. Live components, so a
+> "Don't" card cannot quietly stop being wrong.
+
 ## Two kinds, and only two
 
 | Kind | Says | Tokens |
@@ -66,4 +72,5 @@ attribute at all — the common case costs nothing to read in the DOM.
 
 | Date | Change |
 |---|---|
+| 20 Nov 2026 | Usage tab drawn: three Do/Don't card pairs — one at a time, the words carrying the meaning, and not for what just happened |
 | 17 Nov 2026 | This page. The element existed and was brand-tinted, which read as a link; it now draws the BA's information and warning pairs |

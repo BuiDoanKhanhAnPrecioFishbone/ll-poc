@@ -38,7 +38,7 @@ you get rid of it.
 
 | Part | Rule |
 |---|---|
-| **Container** | `<button type="button">`, `--vy-shape-sm`, 1px border. Not a `<div>` with a click handler — it has to be reachable and operable from the keyboard |
+| **Container** | `<button type="button">`, `--vy-radius-md`, 1px border. Not a `<div>` with a click handler — it has to be reachable and operable from the keyboard |
 | **Check** | 13px, leading, `aria-hidden`. Present **only** when selected |
 | **Label** | `--vy-text-base`. `--vy-weight-medium` when selected, regular when not |
 

@@ -1,4 +1,5 @@
 import type { InputHTMLAttributes, Ref, TextareaHTMLAttributes } from 'react';
+import { RequiredMark } from './FieldRow';
 
 /* `ref` is declared rather than inherited: React 19 passes it to a function
    component as an ordinary prop, but `InputHTMLAttributes` does not carry it,
@@ -9,7 +10,15 @@ export function TextField({ label, hint, className = '', ...rest }: {
 } & InputHTMLAttributes<HTMLInputElement>) {
   return (
     <label className={`vy-field-control ${className}`.trim()}>
-      {label && <span className="vy-field-label">{label}</span>}
+      {/* THE ASTERISK WAS SPECIFIED AND NOT BUILT. `docs/components/field.md`
+          has said *"Required: a red asterisk right after the label, in view
+          and in edit mode"* since the page was written; `required` reached
+          the input, where it drives native validation, and nothing reached
+          the label. Found on 20 Nov by drawing the Do/Don't card for that
+          exact rule and seeing the Do card have nothing to point at.
+          `RequiredMark` is the one the record form already uses, so the two
+          cannot drift. */}
+      {label && <span className="vy-field-label">{label}{rest.required && <RequiredMark />}</span>}
       <input className="vy-input" {...rest} />
       {hint && <span className="vy-field-hint">{hint}</span>}
     </label>
@@ -21,7 +30,7 @@ export function TextArea({ label, hint, className = '', ...rest }: {
 } & TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return (
     <label className={`vy-field-control ${className}`.trim()}>
-      {label && <span className="vy-field-label">{label}</span>}
+      {label && <span className="vy-field-label">{label}{rest.required && <RequiredMark />}</span>}
       <textarea className="vy-input vy-textarea" {...rest} />
       {hint && <span className="vy-field-hint">{hint}</span>}
     </label>

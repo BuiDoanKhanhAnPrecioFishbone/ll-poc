@@ -1819,8 +1819,19 @@
    name reads first either way, and matching their screens costs nothing. */
 .vy-smart-n { font-variant-numeric: tabular-nums; }
 /* A zero keeps its place in the row — a row whose buttons appear and disappear
-   cannot be learned by position — but stops competing for attention. */
-.vy-smart-btn[data-empty] { color: var(--vy-on-surface-subtle); }
+   cannot be learned by position — but stops competing for attention. This is
+   the BA's *"smart button at zero: grey border, text-label text, grey badge"*;
+   the count is in brackets inside the label here rather than in a badge, as
+   the customer's own bar draws it, so greying the label greys the number with
+   it and there is no third rule.
+
+   ONE DECLARATION, not two. It was written twice — `--vy-on-surface-subtle`
+   on one line and `--vy-on-surface-muted` on the next — so the first was dead
+   from the day it was typed, and reading the file suggested a decision had
+   been made about which grey when it had only been made last. Muted is the
+   one that was on screen, and it is also the one her sheet names: her
+   `text-label` IS grey-600. Measured on the panel: muted 7.32:1, subtle
+   5.89:1 — both pass, so this was a tidying rather than a fix. */
 .vy-smart-btn[data-empty] { color: var(--vy-on-surface-muted); border-color: var(--vy-border); }
 
 /* =============================================================================

@@ -1,7 +1,9 @@
-import { useCallback, type ButtonHTMLAttributes, type ReactNode, type Ref } from 'react';
+import { useCallback, type ButtonHTMLAttributes, type KeyboardEvent, type MouseEvent,
+         type ReactNode, type Ref } from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { Button as KendoButton } from '@progress/kendo-react-buttons';
 import { Loader } from './Loader';
+import { useInDialog } from './dialogDepth';
 
 type Variant = 'filled' | 'tonal' | 'outlined' | 'text' | 'danger';
 type Size = 'xs' | 'sm' | 'md';
@@ -71,7 +73,12 @@ const KSIZE: Record<Size, 'xs' | 'small' | 'medium'> = {
   xs: 'xs', sm: 'small', md: 'medium',
 };
 const FILL: Record<Variant, 'solid' | 'outline' | 'flat'> = {
-  filled: 'solid', danger: 'solid', outlined: 'outline', text: 'flat',
+  filled: 'solid',
+  /* `danger` IS OVERRIDDEN AT RENDER TIME — see `dangerFilled` below. This is
+     the value it takes inside a confirm dialog; in a toolbar it goes to
+     `outline`. The map keeps an entry so the type stays total. */
+  danger: 'solid',
+  outlined: 'outline', text: 'flat',
   /* SOLID, not flat, and the reason is Kendo's stylesheet rather than taste.
      `.k-button-flat` sets `background: initial !important`, which no amount of
      specificity beats — the tint simply vanished while the text colour from the
@@ -82,8 +89,28 @@ const FILL: Record<Variant, 'solid' | 'outline' | 'flat'> = {
   tonal: 'solid',
 };
 
+/**
+ * The BA's No-permission sentence, in one place.
+ *
+ * Her Buttons section specifies the state as *"looks like Disabled, tooltip:
+ * You don't have permission to {action}. Ask your admin."* The wording is
+ * hers and it is the same on every button, so the only thing a call site
+ * supplies is the action — `noPermission('delete this view')`. Hand-written at
+ * each site, this is the sentence that ends up as four slightly different
+ * sentences.
+ *
+ * It returns a reason for `unavailable`, which draws the disabled LOOK while
+ * leaving the control hoverable and focusable. That is not a flourish: a
+ * `disabled` button carries `.k-disabled`, Kendo sets `pointer-events: none`
+ * on it, and a `title` on something that cannot be hovered never appears. A
+ * No-permission state whose tooltip cannot be read is just a dead button.
+ */
+export const noPermission = (action: string) =>
+  `You don't have permission to ${action}. Ask your admin.`;
+
 export function Button({
-  variant = 'outlined', size = 'md', icon, busy, disabled, asChild, className = '', children, ref, ...rest
+  variant = 'outlined', size = 'md', icon, busy, disabled, unavailable, asChild,
+  className = '', children, ref, ...rest
 }: {
   variant?: Variant; size?: Size; icon?: ReactNode; asChild?: boolean; children?: ReactNode;
   /**
@@ -103,6 +130,31 @@ export function Button({
    * control does not appear to rotate.
    */
   busy?: boolean;
+  /**
+   * The control cannot be used, and this sentence says why.
+   *
+   * It is the BA's **No permission** state generalised to the one shape it
+   * shares with every other "you can't, because": it draws the DISABLED LOOK
+   * but is not `disabled`. For her permission case, pass
+   * `unavailable={noPermission('delete this view')}` so the wording is hers.
+   *
+   * WHY NOT `disabled` WITH A `title`. That is what this codebase did, in
+   * ViewSetting's Save and Delete, and the tooltip never appeared once:
+   * Kendo's `.k-disabled` sets `pointer-events: none`, so a disabled button
+   * has no hover target and the browser has nothing to attach a tooltip to.
+   * The reason was written, shipped and unreadable.
+   *
+   * So the state keeps the button in the page: `aria-disabled` instead of
+   * `disabled` — which is also what the ARIA practices recommend when the
+   * user needs to find out WHY — the press is swallowed, and the sentence
+   * goes in `title`, the same tooltip mechanism the rest of this system uses.
+   * It stays in the tab order on purpose, because a keyboard user who cannot
+   * reach the control cannot read the reason either.
+   *
+   * `disabled` is still the right prop for a control that is merely not ready
+   * — a Save with nothing changed — where there is nothing to explain.
+   */
+  unavailable?: string;
   /** Pulled out of the spread deliberately — see the note above. */
   ref?: Ref<HTMLButtonElement>;
 } & Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'ref'>) {
@@ -115,6 +167,16 @@ export function Button({
   /* An icon with nothing beside it. Kendo has a class for exactly this and it
      carries the squareness, so the test is here rather than at each call site. */
   const iconOnly = icon != null && children == null;
+  /**
+   * A DESTRUCTIVE BUTTON TAKES ITS WEIGHT FROM WHERE IT IS.
+   *
+   * Filled inside a confirm dialog, outlined everywhere else — the BA's rule,
+   * read off the place instead of asked of the call site. See
+   * `dialogDepth.ts` for why it is a context and not a variant name.
+   */
+  const inDialog = useInDialog();
+  const dangerFilled = variant === 'danger' && inDialog;
+  const dangerOutline = variant === 'danger' && !dangerFilled;
   /**
    * THE INDICATOR TAKES THE `on-` COLOUR OF THE FILL IT SITS ON.
    *
@@ -134,11 +196,32 @@ export function Button({
    * and the indicator stays legible without a second rule.
    */
   const onFill = variant === 'filled' ? ' vy-btn-busy--on-brand'
-    : variant === 'danger' ? ' vy-btn-busy--on-danger' : '';
+    : dangerFilled ? ' vy-btn-busy--on-danger' : '';
   const shown = busy
     ? <span className={`vy-btn-busy${onFill}`}><Loader size="small" type="pulsing"
              themeColor="primary" label="Working" /></span>
     : icon;
+
+  /**
+   * The props that turn the press into nothing, AFTER the spread.
+   *
+   * It is an object rather than four attributes because it has to be applied
+   * after `{...rest}`: props are applied in source order, so the spread is the
+   * last word on anything still inside it. `disabled` was fixed the same way,
+   * after a busy button stayed clickable because `rest` carried its own
+   * `disabled={false}`.
+   *
+   * `capture`, so a handler on an ancestor — a grid row that opens a record —
+   * does not run either.
+   */
+  const blocked = unavailable ? {
+    'aria-disabled': true,
+    title: unavailable,
+    onClickCapture: (e: MouseEvent) => { e.preventDefault(); e.stopPropagation(); },
+    onKeyDownCapture: (e: KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); }
+    },
+  } : undefined;
 
   const forwardToDom = useCallback((handle: { element?: HTMLElement | null } | null) => {
     const node = (handle?.element ?? null) as HTMLButtonElement | null;
@@ -150,12 +233,16 @@ export function Button({
      element — a router Link — so navigation stays a real anchor. */
   if (asChild) {
     return (
-      <Slot className={`vy-btn vy-btn--${variant} vy-btn--${size} ${className}`.trim()}
+      <Slot className={[`vy-btn vy-btn--${variant} vy-btn--${size}`,
+                        dangerOutline && 'vy-btn--danger-outline',
+                        unavailable && 'vy-btn--unavailable', className]
+                        .filter(Boolean).join(' ')}
             data-state-layer
-            data-on-dark={variant === 'filled' || variant === 'danger' ? '' : undefined}
+            data-on-dark={variant === 'filled' || dangerFilled ? '' : undefined}
             ref={ref}
             aria-disabled={disabled || undefined}
-            {...rest}>
+            {...rest}
+            {...blocked}>
         {children}
       </Slot>
     );
@@ -173,7 +260,7 @@ export function Button({
       disabled={busy || disabled}
       aria-busy={busy || undefined}
       themeColor={THEME[variant]}
-      fillMode={FILL[variant]}
+      fillMode={dangerOutline ? 'outline' : FILL[variant]}
       size={KSIZE[size]}
       rounded="medium"
       /* ONLY the tonal class, and only for tonal. `components.css` loads after
@@ -189,9 +276,12 @@ export function Button({
          KendoReact only adds it for an icon passed through its own `icon` /
          `svgIcon` props, which take a Kendo icon name or an SVG descriptor —
          ours are arbitrary nodes and stay children. */
-      className={[iconOnly && 'k-icon-button', variant === 'tonal' && 'vy-btn--tonal', className]
+      className={[iconOnly && 'k-icon-button', variant === 'tonal' && 'vy-btn--tonal',
+                  dangerOutline && 'vy-btn--danger-outline',
+                  unavailable && 'vy-btn--unavailable', className]
         .filter(Boolean).join(' ')}
       {...rest}
+      {...blocked}
     >
       {/* Kendo takes an icon NAME or an SVG descriptor, not arbitrary nodes.
           Ours are arbitrary nodes, so they stay children — where they rendered

@@ -213,6 +213,12 @@ for (const [themeName, env] of [['light', light], ['dark', dark]]) {
     check('non-text', `${themeName}  control boundary, hovered, on ${ground}`, '--vy-border-control-hover', `--vy-${ground}`, env, NONTEXT_MIN);
     check('non-text', `${themeName}  focus ring on ${ground}`, '--vy-brand-boundary', `--vy-${ground}`, env, NONTEXT_MIN);
     check('non-text', `${themeName}  focus border on ${ground}`, '--vy-brand-boundary-strong', `--vy-${ground}`, env, NONTEXT_MIN);
+    /* The outlined danger button's edge. Added 20 Nov with the BA's rule that
+       a destructive action is outlined on a toolbar: the border is then the
+       whole shape of the control, which is exactly what 1.4.11 covers. The
+       pair it replaced — Kendo's own `error` colour, red-600 — measured 3.10
+       on the dark surface as a LABEL, which is where this started. */
+    check('non-text', `${themeName}  danger button edge on ${ground}`, '--vy-danger-boundary', `--vy-${ground}`, env, NONTEXT_MIN);
   }
 }
 

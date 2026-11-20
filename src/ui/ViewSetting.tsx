@@ -132,16 +132,19 @@ export function ViewSetting<T>({
         </header>
 
         <div className="vy-vs-actions">
-          <Button variant="filled" disabled={!canSave}
-                  title={canSave ? undefined : 'A new view needs a name'}
+          {/* `unavailable`, not `disabled` + `title`: Kendo's `.k-disabled`
+              sets `pointer-events: none`, so this reason was never once
+              readable until 20 Nov. See `ui/Button.tsx`. */}
+          <Button variant="filled"
+                  unavailable={canSave ? undefined : 'A new view needs a name'}
                   onClick={() => onSave({ ...draft, name: asNew ? name.trim() : draft.name }, asNew)}>
             Save
           </Button>
           <Button onClick={onDiscard}>Discard</Button>
           {/* A built-in view cannot be deleted, so the control says why rather
-              than sitting there dead. */}
-          <Button variant="danger" disabled={!canDelete}
-                  title={canDelete ? undefined : 'Built-in views cannot be deleted'}
+              than sitting there dead — and since 20 Nov the saying works. */}
+          <Button variant="danger"
+                  unavailable={canDelete ? undefined : 'Built-in views cannot be deleted'}
                   onClick={onDelete}>
             Delete
           </Button>

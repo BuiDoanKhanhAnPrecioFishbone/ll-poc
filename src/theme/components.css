@@ -59,6 +59,84 @@ html[data-kendo-bridged] .vy-btn:disabled {
 }
 .vy-btn:disabled::after { display: none; }
 
+/* =============================================================================
+   DANGER IN A TOOLBAR IS OUTLINED. 20 Nov 2026, the BA's Buttons section.
+   -----------------------------------------------------------------------------
+   *"Danger in a toolbar: outlined, 1px danger border and danger text. Danger
+   in a confirm popup: filled, white text."* The component decides which by
+   reading whether it is inside a Dialog — see `ui/dialogDepth.ts`. This rule
+   is the paint for the outlined half.
+
+   WHY IT PAINTS OVER KENDO AT ALL, when the file above says doing that runs
+   two button systems at once. Kendo's own `outline-error` already draws a red
+   edge and red text, and in LIGHT it is fine: `--kendo-color-error` is
+   `--vy-danger` (red-600), which measures 5.52:1 on white as text and as an
+   edge. In DARK, `--vy-danger` stays red-600 against a `#161C25` surface:
+   **3.10:1**, which clears 1.4.11's 3 for the border and fails 1.4.3's 4.5
+   for the label. The fill has no such problem — white on red-600 is 5.52 —
+   which is exactly why the token is a FILL and why text has its own.
+
+   So the outlined danger takes the two tokens that exist for these jobs:
+
+     text    --vy-danger-text       light 7.74:1   dark 7.16:1
+     border  --vy-danger-boundary   light 4.30:1   dark 5.04:1
+
+   Both declared in contrast-check.mjs. Nothing else about Kendo's button is
+   touched — the box, the height, the state layer and the focus ring are all
+   still Kendo's. ========================================================== */
+/* `:not(.k-disabled)` IS LOAD-BEARING. The disabled rule above has exactly the
+   same specificity — `html[…] .k-button.<class>` on both — so the later one in
+   this file wins, and this one is later. Without the exclusion a DISABLED
+   danger button kept its red edge and red label and only dimmed, which is the
+   one case where the control must stop looking pressable. Measured in the
+   specimen on 20 Nov, two minutes after the rule was written. */
+html[data-kendo-bridged] .k-button.vy-btn--danger-outline:not(.k-disabled):not(.vy-btn--unavailable),
+.vy-btn.vy-btn--danger-outline:not(:disabled):not(.vy-btn--unavailable) {
+  background: transparent;
+  border-color: var(--vy-danger-boundary);
+  color: var(--vy-danger-text);
+}
+html[data-kendo-bridged] .k-button.vy-btn--danger-outline:not(.k-disabled):not(.vy-btn--unavailable):hover,
+.vy-btn.vy-btn--danger-outline:not(:disabled):not(.vy-btn--unavailable):hover {
+  background: var(--vy-danger-subtle);
+  border-color: var(--vy-danger);
+  color: var(--vy-danger-text-deep);
+}
+/* The busy indicator sits on the surface here, not on red, so it takes the
+   text colour rather than `--vy-danger-on` (white, which would vanish). */
+.vy-btn--danger-outline .vy-btn-busy { color: var(--vy-danger-text); }
+
+/* =============================================================================
+   UNAVAILABLE — the BA's "No permission", and every other "you can't, because".
+   -----------------------------------------------------------------------------
+   Her state is *"looks like Disabled, tooltip: You don't have permission to
+   {action}. Ask your admin."* The look is the disabled look, so it is the same
+   two tokens as the rule above; the DIFFERENCE is that this button is not
+   `disabled`, and that is the load-bearing part.
+
+   `.k-disabled` sets `pointer-events: none`. A `title` on something with no
+   hover target never appears — which is why the reasons already written on
+   ViewSetting's Save and Delete had never once been read. So this state uses
+   `aria-disabled`, keeps the button hoverable and in the tab order, and
+   swallows the press in the component. See `ui/Button.tsx`.
+
+   `cursor: not-allowed` rather than `default`: the pointer is the only thing
+   that tells a mouse user to stop and hover. ======================= */
+html[data-kendo-bridged] .k-button.vy-btn--unavailable,
+.vy-btn.vy-btn--unavailable {
+  background: var(--vy-disabled-bg); color: var(--vy-disabled-text);
+  border-color: transparent; box-shadow: none; cursor: not-allowed;
+}
+/* Kendo's hover rules sit at two classes and would otherwise lighten this on
+   the way past; the state must not move, or it reads as pressable. */
+html[data-kendo-bridged] .k-button.vy-btn--unavailable:hover,
+html[data-kendo-bridged] .k-button.vy-btn--unavailable:active,
+.vy-btn.vy-btn--unavailable:hover {
+  background: var(--vy-disabled-bg); color: var(--vy-disabled-text);
+  border-color: transparent; box-shadow: none;
+}
+.vy-btn--unavailable::after { display: none; }
+
 .vy-btn--filled   { background: var(--vy-brand); color: var(--vy-brand-on); box-shadow: var(--vy-elev-1); }
 .vy-btn--filled:hover  { box-shadow: var(--vy-elev-2); }
 /* The one place we paint over Kendo. MD3's tonal is a filled button at low
@@ -3106,4 +3184,74 @@ html[data-kendo-bridged] .vy-field--changed .k-picker,
    came out 84px wide in an 832px stage, which reads as a bug rather than a
    loading grid. A single child takes the width; several children still sit in
    a row, which is what the button and chip examples want. */
+/* A LONE CONTROL IS NOT A BLOCK. The rule above exists for the one-element
+   examples that ARE blocks — a grid skeleton, a drop zone, a table — and a
+   single `<button>` caught in it stretched the full width of the stage, which
+   is the one shape a button never has in this product. Found on the Do/Don't
+   card that shows a single unavailable Delete, 20 Nov. */
 .vy-specimen-stage > :only-child { flex: 1 1 100%; }
+.vy-specimen-stage > button:only-child,
+.vy-specimen-stage > a:only-child { flex: 0 1 auto; }
+
+/* ---------------------------------------------------------------------------
+   DO / DON'T CARDS. 20 Nov 2026, asked for: *"the usage sections could be
+   prettier — an illustration like Atlassian's would be easier to understand"*.
+
+   Two cards side by side, each a real stage with a verdict under it. The
+   colour is a SECOND carrier only: the word Do or Don't is in the caption, so
+   a reader who cannot separate the green from the red still gets the rule
+   (WCAG 1.4.1). The tick and cross add a third, for the same reason.
+
+   NOT `.vy-compare`, WHICH IS TAKEN. That class belongs to the sitemap's
+   before/after columns in `app.css` — and `app.css` loads after this file, so
+   the first draft of these cards inherited its 16px gap and its
+   `max-width: 1100px` single-column rule, and read as "the container query
+   does not work". It looked almost right, which is how this costs an hour.
+   Second time this project has paid for a duplicate class name after
+   `.vy-avatar`; `scripts/css-consistency.js` now reports them (check 7).
+
+   A CONTAINER QUERY, not a breakpoint. The cards live in an iframe whose
+   width the design system page sets, and that page is read on a phone too —
+   `@media` would measure the phone while the frame stayed 820px wide, or the
+   other way round. The cards stack below 34rem of their OWN width. Fifth
+   component in this system on a container query rather than a viewport one.
+   --------------------------------------------------------------------------- */
+.vy-specimen { container-type: inline-size; }
+.vy-dodont {
+  display: grid; gap: var(--vy-space-6);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+@container (max-width: 34rem) {
+  .vy-dodont { grid-template-columns: minmax(0, 1fr); }
+}
+.vy-dodont-card {
+  margin: 0; display: flex; flex-direction: column;
+  border: 1px solid var(--vy-border); border-radius: var(--vy-radius-lg);
+  background: var(--vy-surface); overflow: hidden;
+}
+/* The stage loses the border and the radius it has when it stands alone — the
+   card already draws both, and two rounded edges 1px apart read as a mistake.
+   `flex: 1` so a tall example on one side does not leave the other card's
+   caption floating halfway up. */
+.vy-dodont-stage {
+  flex: 1 1 auto; border: 0; border-radius: 0;
+  border-bottom: 2px solid var(--vy-border);
+  padding: var(--vy-space-9) var(--vy-space-8);
+  align-items: flex-start; align-content: flex-start;
+}
+.vy-dodont-card[data-verdict="do"]   .vy-dodont-stage { border-bottom-color: var(--vy-success-text); }
+.vy-dodont-card[data-verdict="dont"] .vy-dodont-stage { border-bottom-color: var(--vy-danger-text); }
+.vy-dodont-card figcaption {
+  padding: var(--vy-space-6) var(--vy-space-8) var(--vy-space-8);
+  font-size: var(--vy-text-base); color: var(--vy-on-surface);
+  display: flex; flex-direction: column; gap: var(--vy-space-2);
+}
+.vy-dodont-verdict {
+  display: inline-flex; align-items: center; gap: var(--vy-space-3);
+  font-weight: var(--vy-weight-medium);
+}
+.vy-dodont-card[data-verdict="do"]   .vy-dodont-verdict { color: var(--vy-success-text); }
+.vy-dodont-card[data-verdict="dont"] .vy-dodont-verdict { color: var(--vy-danger-text); }
+/* `.vy-specimen p` puts 12px under every note; inside a caption the gap is the
+   flex gap's job, so the paragraph form is reset if an example ever uses one. */
+.vy-dodont-card figcaption p { margin: 0; }

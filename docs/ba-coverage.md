@@ -84,18 +84,34 @@ the open accessibility questions — *"editable and read-only cells look the
 same until hover"* cannot work on the shop-floor terminals and tablets her own
 Screen sizes section names.
 
-### Buttons — four differences
+### ~~Buttons~~ — **built, 20 Nov 2026**
 
-| | Hers | Ours |
-|---|---|---|
-| Radius | 6px | **4px** (see Shape, above) |
-| **Danger in a toolbar** | **outlined** — 1px danger border and danger text | `.vy-btn--danger` is **filled** everywhere |
-| Danger in a confirm popup | filled `danger-fill`, white text | the same filled button |
-| **No permission** | looks like Disabled, tooltip *"You don't have permission to {action}. Ask your admin."* | **no such state** — indistinguishable from disabled |
-| **Smart button at zero** | grey border, `text-label` text, grey badge | the count stays visible; the button does not change its look |
+All four differences closed. See [Button](components/button.md). What follows
+is what they were.
 
-The **No permission** one is worth doing: a user who cannot tell "not yet" from
-"not allowed" asks support about the wrong thing.
+| | Hers | Ours, before | Now |
+|---|---|---|---|
+| Radius | 6px | **4px** | 6px, with the radius scale |
+| **Danger in a toolbar** | **outlined** — 1px danger border and danger text | filled everywhere | outlined, and the component picks by reading whether it is in a dialog |
+| Danger in a confirm popup | filled `danger-fill`, white text | the same filled button | unchanged — and now it is the only place the fill appears |
+| **No permission** | looks like Disabled, tooltip *"You don't have permission to {action}. Ask your admin."* | **no such state** | `unavailable`, with `noPermission()` holding her wording |
+| **Smart button at zero** | grey border, `text-label` text, grey badge | the count stays visible | already so — her `text-label` **is** our `--vy-on-surface-muted`. One dead duplicate rule removed |
+
+Three things came out of building it that were not in the comparison:
+
+- **The outlined danger could not use Kendo's own `outline-error`.** Its colour
+  is `--vy-danger` (red-600), which is **5.52:1** on white and **3.10:1** on
+  the dark surface — fine as a border, a 1.4.3 failure as a label. It takes
+  `--vy-danger-text` and `--vy-danger-boundary` instead, 7.74 / 4.30 light and
+  7.16 / 5.04 dark.
+- **A tooltip on a disabled button never opens.** Kendo's `.k-disabled` sets
+  `pointer-events: none`. Two reasons already written in this codebase —
+  ViewSetting's *"A new view needs a name"* and *"Built-in views cannot be
+  deleted"* — had been on screen unread since the day they were typed. Both
+  moved to `unavailable`, which is `aria-disabled` and stays hoverable.
+- **No permission is not wired to anything**, because this prototype has no
+  permission model. The state exists and is documented; the first screen that
+  knows a user's role passes the prop.
 
 ### Busy and screen states — mostly already here
 
@@ -133,9 +149,12 @@ hold real unbuilt work and are listed above with what is missing.
 
 ## Suggested order
 
-1. **Shape and elevation**, because the radius names affect everything else
-   and it is a token change rather than a component one.
-2. **Buttons**: the outlined danger and the No-permission state.
-3. **Grid cells**: changed, warning, error, system match, loading, row focus.
+1. ~~**Shape and elevation**~~ — built 18 Nov.
+2. ~~**Grid cells**~~ — built 18 Nov.
+3. ~~**Buttons**~~ — built 20 Nov.
 4. **Large editable grid**, which needs her answer on the touch question
    first — it is built on hover.
+
+What is left after that is small and listed above: the 3px blur behind an open
+popup, the 45% dim over data being reloaded, and tokens for her `z-sticky 2`
+and `z-toolbar 10`.

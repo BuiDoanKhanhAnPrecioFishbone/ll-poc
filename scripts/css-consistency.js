@@ -37,6 +37,17 @@ const COLOURS = new Set(
   [...tokens.matchAll(/#([0-9a-fA-F]{3,8})\b/g)].map(m => m[1].toLowerCase()),
 );
 
+/* Check 7's state. Collected while the files are walked, reported after, since
+   the question it asks is about two files at once. */
+const baseRule = new Map();            // `vy-foo` -> [{ file, line }, …]
+/* Declared, with the reason, rather than left to be re-judged every time the
+   check runs. `.vy-page--doc` lives beside it in app.css, in the page-layout
+   family; the flex behaviour lives with the grid shell in components.css.
+   Split on purpose, and both halves are one line. */
+const DUP_OK = new Map([
+  ['vy-page--grid', 'app.css adds max-width beside .vy-page--doc; components.css owns the flex'],
+]);
+
 const findings = [];
 const add = (file, line, kind, text, note) =>
   findings.push({ file: file.split('/').pop(), line, kind, text: text.trim(), note });
@@ -62,6 +73,13 @@ for (const path of FILES) {
      crashed, and printed nothing, which reads exactly like a clean pass.
      Caught by planting the bug it was written to find. */
   let ruleSelector = '';
+
+  /* Nesting depth, so check 7 can tell a top-level rule from one inside an
+     `@media` or `@container`. The first version could not, reported a
+     container-query override of the rule five lines above it, and named two
+     lines in the SAME file as if they were the collision — caught by planting
+     the duplicate it was written to find. */
+  let braceDepth = 0;
 
   lines.forEach((raw, i) => {
     const n = i + 1;
@@ -162,6 +180,38 @@ for (const path of FILES) {
     if (/!important/.test(line) && !inReducedMotion)
       add(path, n, 'important', line, 'overrides by force');
 
+    /* 7. THE SAME CLASS GIVEN A BASE RULE IN TWO STYLESHEETS.
+          `app.css` loads after `components.css`, so when both write
+          `.vy-thing { … }` the second silently wins — and the giveaway is
+          that the component looks ALMOST right, which is the expensive kind
+          of wrong.
+
+          Twice now. `.vy-avatar` was written in components.css while app.css
+          already had it, and looked restyled for a day. `.vy-compare` was
+          taken by the sitemap's before/after columns when the Do/Don't cards
+          claimed it, and inherited its gap and its 1100px single-column
+          media query — which read as "container queries don't work here".
+
+          ONLY A BARE `.vy-thing {`, nothing else. A modifier, a descendant,
+          a state or a responsive override in `responsive.css` is the system
+          working as designed; two files both saying what a thing IS is not.
+          That narrowing is what takes this from 82 findings to 1. */
+    const depthHere = braceDepth;
+    braceDepth += (line.match(/\{/g) || []).length - (line.match(/\}/g) || []).length;
+
+    if ((name === 'components.css' || name === 'app.css') && depthHere === 0) {
+      const opened = line.indexOf('{');
+      if (opened !== -1) {
+        for (const part of line.slice(0, opened).split(',')) {
+          const only = /^\s*\.(vy-[a-z0-9-]+)\s*$/.exec(part);
+          if (!only) continue;
+          const at = baseRule.get(only[1]) ?? [];
+          at.push({ file: name, line: n });
+          baseRule.set(only[1], at);
+        }
+      }
+    }
+
     /* 6. UNSCOPED KENDO OVERRIDES.
           Since the migration this app styles a third-party library, and the
           rule is that it only ever does so INSIDE one of our own containers —
@@ -184,6 +234,17 @@ for (const path of FILES) {
         'styles a Kendo class without a .vy- ancestor — this reaches every screen');
     }
   });
+}
+
+for (const [cls, at] of baseRule) {
+  if (DUP_OK.has(cls)) continue;
+  const first = at[0];
+  /* The one that LOSES is the earlier file's, so the finding is filed against
+     the later one — that is the line someone has to look at. */
+  const later = at.find(a => a.file !== first.file);
+  if (!later) continue;              // twice in one file is a different problem
+  add(`src/theme/${later.file}`, later.line, 'duplicate-class', `.${cls} { … }`,
+    `.${cls} already has a base rule at ${first.file}:${first.line} — whichever file loads last wins, silently`);
 }
 
 const hard = findings.filter(f => !SOFT.has(f.file));

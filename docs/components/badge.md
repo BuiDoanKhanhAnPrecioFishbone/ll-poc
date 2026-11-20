@@ -36,7 +36,7 @@ not a status ([E1](../design-system.md#e1--accessibility)).
 
 | Part | Rule |
 |---|---|
-| **Container** | `--vy-status-slot-w` = **104px fixed**, `--vy-shape-full`. The fixed width is the point: a status column scans as a straight edge instead of a ragged one. This was GAP-01 against the old library; with our own component it is one token |
+| **Container** | `--vy-status-slot-w` = **104px fixed**, `--vy-radius-pill`. The fixed width is the point: a status column scans as a straight edge instead of a ragged one. This was GAP-01 against the old library; with our own component it is one token |
 | **Label** | `--vy-text-xs` at `--vy-weight-semibold`, never wraps |
 
 ---

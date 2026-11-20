@@ -14,6 +14,13 @@ Three controls in one file, because they are one idea wearing three shapes:
 
 <!-- ds:tab usage -->
 
+
+<!-- ds:specimen field-usage -->
+
+> The three rules on this page that are about **where something sits**, drawn
+> — asked for on 20 Nov. Two of the "Don't" cards are hand-drawn markup,
+> because `Field` has no way to produce the wrong shape; each says so.
+
 ## When to use
 
 | Control | For |
@@ -160,6 +167,8 @@ carry it. Light is unchanged.
 
 | Date | Change |
 |---|---|
+| 20 Nov 2026 | **The required asterisk is now rendered.** This page has specified *"a red asterisk right after the label"* since it was written; `required` reached the `<input>`, where it drives native validation, and nothing reached the label. Found by drawing the Do/Don't card for that exact rule and finding the Do card had nothing to point at. It uses `RequiredMark`, the same one the record form uses, so the two cannot drift. No product screen changes — every call site passing `required` was a specimen |
+| 20 Nov 2026 | Usage tab drawn: three Do/Don't card pairs. Two of the "Don't" cards are hand-written markup, because `Field` has no way to produce the wrong shape |
 | 8 Nov 2026 | This page |
 | 8 Nov 2026 | `--vy-border-control` re-measured against every ground: 2.35–3.06 → 3.05–3.97 |
 | 9 Nov 2026 | `:hover` moved to the new `--vy-border-control-hover`: 2.68 → 5.23 on the dark panel, 2.02 → 3.95 on its worst ground. Light unchanged |
