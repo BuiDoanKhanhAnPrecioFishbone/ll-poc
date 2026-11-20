@@ -6,6 +6,8 @@
 
 <!-- ds:tab usage -->
 
+<!-- ds:specimen data-grid-usage -->
+
 ## What a cell can say about itself
 
 The BA's Grid cells section, 16 Nov 2026. A **column** declares how to read a
@@ -181,6 +183,7 @@ dimmed-with-overlay on a recalculation, a real empty state, an error screen.
 
 | Date | Change |
 |---|---|
+| 20 Nov 2026 | Usage tab drawn: 2 Do/Don't card pairs, from rules already on this page. Live components, so a card cannot go stale against a token change |
 | 18 Nov 2026 | The BA's cell states — changed, warning, error, system match, loading — plus her required-column `*` and the focused line with its 3px bar |
 | 17 Nov 2026 | Live examples — it had a page and a photograph, but nothing that could be pressed |
 | 8 Nov 2026 | This page |

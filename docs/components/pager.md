@@ -10,6 +10,8 @@
 
 <!-- ds:tab usage -->
 
+<!-- ds:specimen pager-usage -->
+
 ## When to use
 
 At the foot of a grid, always. It carries both the **position** and the
@@ -134,4 +136,5 @@ Virtualisation stays underneath, so a 200-row page is still cheap.
 
 | Date | Change |
 |---|---|
+| 20 Nov 2026 | Usage tab drawn: 1 Do/Don't card pair, from rules already on this page. Live components, so a card cannot go stale against a token change |
 | 8 Nov 2026 | This page. The page-size `<select>` moved to `--vy-border-control`; it was on the structure token at 1.27:1 |

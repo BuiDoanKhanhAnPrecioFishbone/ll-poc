@@ -9,6 +9,8 @@ The set itself is catalogued on
 
 <!-- ds:tab usage -->
 
+<!-- ds:specimen icon-usage -->
+
 ## When to use
 
 To mark a **destination, an action or a state that also has words of its own**:
@@ -83,5 +85,6 @@ icon drawn to spec.
 
 | Date | Change |
 |---|---|
+| 20 Nov 2026 | Usage tab drawn: 2 Do/Don't card pairs, from rules already on this page. Live components, so a card cannot go stale against a token change |
 | 15 Nov 2026 | This page |
 | 17 Nov 2026 | Live examples: the whole set, counted from `ICONS` rather than written down. The count was wrong — 43, not 45 — and the stroke moved to the BA's 1.5 |

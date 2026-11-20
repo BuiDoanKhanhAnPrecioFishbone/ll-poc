@@ -13,9 +13,6 @@ needs any of those, it is a [Toast](toast.md).
 
 <!-- ds:specimen banner-usage -->
 
-> The three rules below, drawn — asked for on 20 Nov. Live components, so a
-> "Don't" card cannot quietly stop being wrong.
-
 ## Two kinds, and only two
 
 | Kind | Says | Tokens |

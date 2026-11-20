@@ -10,6 +10,8 @@
 
 <!-- ds:tab usage -->
 
+<!-- ds:specimen mini-table-usage -->
+
 ## When to use
 
 A list **inside** something else: documents on a record, quotation results,
@@ -125,4 +127,5 @@ to meet before it was allowed to happen.
 
 | Date | Change |
 |---|---|
+| 20 Nov 2026 | Usage tab drawn: 2 Do/Don't card pairs, from rules already on this page. Live components, so a card cannot go stale against a token change |
 | 8 Nov 2026 | This page |

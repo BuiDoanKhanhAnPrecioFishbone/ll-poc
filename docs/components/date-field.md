@@ -10,6 +10,8 @@ first week; nothing here let a user pick one.
 
 <!-- ds:tab usage -->
 
+<!-- ds:specimen date-field-usage -->
+
 ## Three shapes, one control
 
 | | |
@@ -87,4 +89,5 @@ written.
 
 | Date | Change |
 |---|---|
+| 20 Nov 2026 | Usage tab drawn: 2 Do/Don't card pairs, from rules already on this page. Live components, so a card cannot go stale against a token change |
 | 17 Nov 2026 | This component and this page. Also the first use of `--vy-surface-raised` — the BA's rule that a floating surface sits one step lighter in dark now applies to every Kendo popup |

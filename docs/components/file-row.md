@@ -9,6 +9,8 @@ principles of 16 Nov 2026 give it four states and a 34px row.
 
 <!-- ds:tab usage -->
 
+<!-- ds:specimen file-row-usage -->
+
 ## The chip is the point
 
 At 30×20 and 9px at 700, the chip says what a file is before the name has
@@ -85,4 +87,5 @@ not a state, and tying them would make one move the other.
 
 | Date | Change |
 |---|---|
+| 20 Nov 2026 | Usage tab drawn: 2 Do/Don't card pairs, from rules already on this page. Live components, so a card cannot go stale against a token change |
 | 17 Nov 2026 | This component and this page, with the five file-type tokens |

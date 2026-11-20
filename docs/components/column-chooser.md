@@ -6,6 +6,8 @@
 
 <!-- ds:tab usage -->
 
+<!-- ds:specimen column-chooser-usage -->
+
 ## When to use
 
 On **every grid with three or more columns** ([D3](../design-system.md#d3--grids)),
@@ -133,5 +135,6 @@ wonders where it went.
 
 | Date | Change |
 |---|---|
+| 20 Nov 2026 | Usage tab drawn: 1 Do/Don't card pair, from rules already on this page. Live components, so a card cannot go stale against a token change |
 | 17 Nov 2026 | Live examples — it had a page and a photograph, but nothing that could be pressed |
 | 8 Nov 2026 | This page |

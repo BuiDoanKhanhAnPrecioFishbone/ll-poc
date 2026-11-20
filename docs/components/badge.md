@@ -10,6 +10,8 @@
 
 <!-- ds:tab usage -->
 
+<!-- ds:specimen badge-usage -->
+
 ## When to use
 
 To show **what state a record is in** — on a record header, in a status
@@ -171,5 +173,6 @@ differently.
 
 | Date | Change |
 |---|---|
+| 20 Nov 2026 | Usage tab drawn: 3 Do/Don't card pairs, from rules already on this page. Live components, so a card cannot go stale against a token change |
 | 8 Nov 2026 | This page. The file comment said "six-token vocabulary" and had done since `waiting` was added — corrected to seven |
 | 8 Nov 2026 | `progress` given a dark pair — it was the one status still rendering its light colours on a dark grid |

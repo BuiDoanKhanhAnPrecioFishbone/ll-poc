@@ -9,6 +9,8 @@ A thread of messages, emails and status changes. The BA specifies **Notes** as
 
 <!-- ds:tab usage -->
 
+<!-- ds:specimen conversation-usage -->
+
 ## One shape for messages and notes
 
 Her spec gives Notes no look of its own — only *Add Note above the list on the
@@ -72,4 +74,5 @@ Its ink is now her `primary-text`, fixed where the class actually lives.
 
 | Date | Change |
 |---|---|
+| 20 Nov 2026 | Usage tab drawn: 2 Do/Don't card pairs, from rules already on this page. Live components, so a card cannot go stale against a token change |
 | 17 Nov 2026 | This component and this page. The avatar also moved to her `primary-text` — 7.04:1 on the circle, where the old ink was 10.70 |

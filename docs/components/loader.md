@@ -10,6 +10,8 @@
 
 <!-- ds:tab usage -->
 
+<!-- ds:specimen loader-usage -->
+
 ## When to use
 
 | Situation | Use |
@@ -127,5 +129,6 @@ Two things it does that are easy to miss:
 
 | Date | Change |
 |---|---|
+| 20 Nov 2026 | Usage tab drawn: 2 Do/Don't card pairs, from rules already on this page. Live components, so a card cannot go stale against a token change |
 | 8 Nov 2026 | This page |
 | 8 Nov 2026 | The button's busy indicator moved to the fill's `on-` token — it was 1.19:1 on `filled` |

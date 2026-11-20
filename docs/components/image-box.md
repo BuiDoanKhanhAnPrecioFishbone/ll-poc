@@ -8,6 +8,8 @@ A picture on a record, and the slot it leaves when there is none.
 
 <!-- ds:tab usage -->
 
+<!-- ds:specimen image-box-usage -->
+
 ## One box, two states
 
 Her sizes: as tall as the record header, **max 220 × 132**. The empty state is
@@ -49,4 +51,5 @@ part, not the file.
 
 | Date | Change |
 |---|---|
+| 20 Nov 2026 | Usage tab drawn: 2 Do/Don't card pairs, from rules already on this page. Live components, so a card cannot go stale against a token change |
 | 17 Nov 2026 | This component and this page |

@@ -11,6 +11,8 @@ every form was typed into a plain text box.
 
 <!-- ds:tab usage -->
 
+<!-- ds:specimen number-field-usage -->
+
 ## The four kinds
 
 | `kind` | Decimals | Her example |
@@ -93,4 +95,5 @@ of the app.
 
 | Date | Change |
 |---|---|
+| 20 Nov 2026 | Usage tab drawn: 2 Do/Don't card pairs, from rules already on this page. Live components, so a card cannot go stale against a token change |
 | 17 Nov 2026 | This component and this page. Four of the BA's widgets that had no implementation at all |

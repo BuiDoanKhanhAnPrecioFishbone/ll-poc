@@ -7,6 +7,8 @@
 
 <!-- ds:tab usage -->
 
+<!-- ds:specimen filter-toolbar-usage -->
+
 ## When to use
 
 On a list screen, behind the funnel, to narrow what the grid shows by the
@@ -136,5 +138,6 @@ back to *any* is *Clear all*, which throws away every other field too.
 
 | Date | Change |
 |---|---|
+| 20 Nov 2026 | Usage tab drawn: 2 Do/Don't card pairs, from rules already on this page. Live components, so a card cannot go stale against a token change |
 | 17 Nov 2026 | Live examples — it had a page and a photograph, but nothing that could be pressed |
 | 8 Nov 2026 | This page |

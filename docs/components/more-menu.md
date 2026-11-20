@@ -11,6 +11,8 @@
 
 <!-- ds:tab usage -->
 
+<!-- ds:specimen more-menu-usage -->
+
 ## When to use
 
 On a record's action bar, to hold the actions that are **rare, heavy or
@@ -140,4 +142,5 @@ rare ones belong here.
 
 | Date | Change |
 |---|---|
+| 20 Nov 2026 | Usage tab drawn: 2 Do/Don't card pairs, from rules already on this page. Live components, so a card cannot go stale against a token change |
 | 8 Nov 2026 | This page |

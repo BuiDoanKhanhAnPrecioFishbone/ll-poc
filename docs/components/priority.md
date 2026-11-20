@@ -10,6 +10,8 @@
 
 <!-- ds:tab usage -->
 
+<!-- ds:specimen priority-usage -->
+
 ## When to use
 
 Wherever a record's priority is shown — a grid column, a record header, a
@@ -119,4 +121,5 @@ None. It is not focusable and not operable.
 
 | Date | Change |
 |---|---|
+| 20 Nov 2026 | Usage tab drawn: 2 Do/Don't card pairs, from rules already on this page. Live components, so a card cannot go stale against a token change |
 | 8 Nov 2026 | This page |

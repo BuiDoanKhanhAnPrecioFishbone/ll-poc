@@ -13,6 +13,8 @@ type.
 
 <!-- ds:tab usage -->
 
+<!-- ds:specimen select-usage -->
+
 ## When to use
 
 To choose **one value from a list the system owns** — a customer, a project
@@ -143,4 +145,5 @@ short list with a way out is a different thing from a truncated list.
 
 | Date | Change |
 |---|---|
+| 20 Nov 2026 | Usage tab drawn: 1 Do/Don't card pair, from rules already on this page. Live components, so a card cannot go stale against a token change |
 | 8 Nov 2026 | This page |

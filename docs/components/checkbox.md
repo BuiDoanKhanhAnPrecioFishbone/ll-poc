@@ -11,6 +11,8 @@
 
 <!-- ds:tab usage -->
 
+<!-- ds:specimen checkbox-usage -->
+
 ## When to use
 
 A single yes/no, or one of several independent yes/nos: *Conformal Coating*,
@@ -123,6 +125,7 @@ For a grid row or the column chooser, the raw input is used directly with
 
 | Date | Change |
 |---|---|
+| 20 Nov 2026 | Usage tab drawn: 2 Do/Don't card pairs, from rules already on this page. Live components, so a card cannot go stale against a token change |
 | 17 Nov 2026 | `disabled` and `invalid` — the BA names both states and this component could not draw either, so a read-only checkbox was an ordinary one that ignored clicks |
 | 8 Nov 2026 | This page |
 | 8 Nov 2026 | `--vy-border-control` re-measured against every ground — the unchecked box was reading 2.85 on the page |

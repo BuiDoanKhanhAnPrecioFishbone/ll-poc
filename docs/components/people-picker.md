@@ -7,6 +7,8 @@
 
 <!-- ds:tab usage -->
 
+<!-- ds:specimen people-picker-usage -->
+
 ## When to use
 
 To choose **one or more people** from the directory.
@@ -121,6 +123,7 @@ typing goes to it immediately** — the way the live filterable control behaves.
 
 | Date | Change |
 |---|---|
+| 20 Nov 2026 | Usage tab drawn: 1 Do/Don't card pair, from rules already on this page. Live components, so a card cannot go stale against a token change |
 | 17 Nov 2026 | Live examples — it had a page and a photograph, but nothing that could be pressed |
 | 8 Nov 2026 | This page |
 | 8 Nov 2026 | `.vy-people-add`'s dashed edge moved to `--vy-border-control`. It was the structure token at **1.64:1**, and a dashed edge with one muted word in it is the whole of that control. Its hover no longer touches the border either — it went to `--vy-border-mid` at **2.58:1**, *fainter* than the resting edge. Found by hand while writing this page; `border:check` had not reached it, because it only renders once a record is in edit mode |

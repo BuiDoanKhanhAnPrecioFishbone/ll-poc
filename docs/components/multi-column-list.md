@@ -9,6 +9,8 @@ only one of them that exists because of a specific reading problem.
 
 <!-- ds:tab usage -->
 
+<!-- ds:specimen multi-column-list-usage -->
+
 ## Why the extra columns
 
 Her own example makes the case better than an argument would:
@@ -79,4 +81,5 @@ so typing over a chosen part and clicking away would lose it.
 
 | Date | Change |
 |---|---|
+| 20 Nov 2026 | Usage tab drawn: 2 Do/Don't card pairs, from rules already on this page. Live components, so a card cannot go stale against a token change |
 | 17 Nov 2026 | This component and this page. The last of the BA's Input widgets that had no implementation |

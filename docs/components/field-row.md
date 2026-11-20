@@ -11,6 +11,8 @@
 
 <!-- ds:tab usage -->
 
+<!-- ds:specimen field-row-usage -->
+
 ## When to use
 
 Wherever a label sits above a value: a record field, a dialog form, a computed
@@ -137,4 +139,5 @@ for.
 
 | Date | Change |
 |---|---|
+| 20 Nov 2026 | Usage tab drawn: 2 Do/Don't card pairs, from rules already on this page. Live components, so a card cannot go stale against a token change |
 | 8 Nov 2026 | This page |

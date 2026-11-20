@@ -17,10 +17,6 @@ Three controls in one file, because they are one idea wearing three shapes:
 
 <!-- ds:specimen field-usage -->
 
-> The three rules on this page that are about **where something sits**, drawn
-> — asked for on 20 Nov. Two of the "Don't" cards are hand-drawn markup,
-> because `Field` has no way to produce the wrong shape; each says so.
-
 ## When to use
 
 | Control | For |

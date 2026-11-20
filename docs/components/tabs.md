@@ -10,6 +10,8 @@
 
 <!-- ds:tab usage -->
 
+<!-- ds:specimen tabs-usage -->
+
 ## When to use
 
 To divide **one record** into sections the user switches between without
@@ -135,6 +137,7 @@ the next person does not remove it as dead code.
 
 | Date | Change |
 |---|---|
+| 20 Nov 2026 | Usage tab drawn: 2 Do/Don't card pairs, from rules already on this page. Live components, so a card cannot go stale against a token change |
 | 17 Nov 2026 | A tab can carry her error marker: a red * after the name, with the name keeping its colour |
 | 17 Nov 2026 | Aligned with the BA's tab spec: 36px tall, 24px apart, 500 with the active tab at 600. It had been 33px, touching, and 400 for both — so the active tab was marked by its underline alone |
 | 8 Nov 2026 | This page |

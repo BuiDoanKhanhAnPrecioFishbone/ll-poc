@@ -11,6 +11,8 @@
 
 <!-- ds:tab usage -->
 
+<!-- ds:specimen grid-skeleton-usage -->
+
 ## When to use
 
 **A first load, where nothing is on screen yet.** The route has resolved, the
@@ -99,4 +101,5 @@ role="status" aria-live="polite" aria-busy="true"
 
 | Date | Change |
 |---|---|
+| 20 Nov 2026 | Usage tab drawn: 1 Do/Don't card pair, from rules already on this page. Live components, so a card cannot go stale against a token change |
 | 8 Nov 2026 | This page |

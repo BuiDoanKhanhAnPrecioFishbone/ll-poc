@@ -10,6 +10,8 @@ having both.
 
 <!-- ds:tab usage -->
 
+<!-- ds:specimen yes-no-field-usage -->
+
 ## The difference from a checkbox
 
 | | |
@@ -72,4 +74,5 @@ visible box is a sibling, driven by `:checked` and `:focus-visible`.
 
 | Date | Change |
 |---|---|
+| 20 Nov 2026 | Usage tab drawn: 2 Do/Don't card pairs, from rules already on this page. Live components, so a card cannot go stale against a token change |
 | 17 Nov 2026 | This component and this page. One of the BA's Input widgets that had no implementation |

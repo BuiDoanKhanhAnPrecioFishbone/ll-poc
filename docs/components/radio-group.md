@@ -10,6 +10,8 @@
 
 <!-- ds:tab usage -->
 
+<!-- ds:specimen radio-group-usage -->
+
 ## When to use
 
 One choice from **two to four options the user should see at once**.
@@ -123,4 +125,5 @@ become one group, and choosing in the second would clear the first.
 
 | Date | Change |
 |---|---|
+| 20 Nov 2026 | Usage tab drawn: 3 Do/Don't card pairs, from rules already on this page. Live components, so a card cannot go stale against a token change |
 | 8 Nov 2026 | This page |

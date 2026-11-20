@@ -11,6 +11,8 @@
 
 <!-- ds:tab usage -->
 
+<!-- ds:specimen stepper-usage -->
+
 ## When to use
 
 To show where someone is in a job with **a real order**, and to let them go
@@ -101,4 +103,5 @@ just no longer said twice at once.
 
 | Date | Change |
 |---|---|
+| 20 Nov 2026 | Usage tab drawn: 2 Do/Don't card pairs, from rules already on this page. Live components, so a card cannot go stale against a token change |
 | 8 Nov 2026 | This page |

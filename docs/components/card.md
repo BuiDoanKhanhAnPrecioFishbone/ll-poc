@@ -8,6 +8,8 @@ A titled box: border, radius, a header band — and **no shadow**.
 
 <!-- ds:tab usage -->
 
+<!-- ds:specimen card-usage -->
+
 ## Card or group?
 
 This is the decision the component exists to make easy, and the BA's
@@ -93,4 +95,5 @@ rather than card by card.
 
 | Date | Change |
 |---|---|
+| 20 Nov 2026 | Usage tab drawn: 3 Do/Don't card pairs, from rules already on this page. Live components, so a card cannot go stale against a token change |
 | 17 Nov 2026 | This component and this page. It also gave `--vy-section-bg` its first use — the token had nowhere to go while this system had no card |

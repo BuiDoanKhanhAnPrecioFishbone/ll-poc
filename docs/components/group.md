@@ -9,6 +9,8 @@ specification for it is two words: **no box, no fill**.
 
 <!-- ds:tab usage -->
 
+<!-- ds:specimen group-usage -->
+
 ## Three shapes, one heading
 
 | | |
@@ -69,4 +71,5 @@ card behaves without anyone configuring it.
 
 | Date | Change |
 |---|---|
+| 20 Nov 2026 | Usage tab drawn: 3 Do/Don't card pairs, from rules already on this page. Live components, so a card cannot go stale against a token change |
 | 17 Nov 2026 | This component and this page |

@@ -12,6 +12,8 @@
 
 <!-- ds:tab usage -->
 
+<!-- ds:specimen chip-usage -->
+
 ## When to use
 
 To show **a filter that is currently on**, and to let the user take it off in
@@ -181,5 +183,6 @@ from this file.
 
 | Date | Change |
 |---|---|
+| 20 Nov 2026 | Usage tab drawn: 3 Do/Don't card pairs, from rules already on this page. Live components, so a card cannot go stale against a token change |
 | 8 Nov 2026 | Resting border moved from `--vy-border-strong` to `--vy-border-control` — 1.64:1 → 3.06:1; `aria-pressed` now renders `"false"` instead of vanishing |
 | 8 Nov 2026 | This page. Unselected state added to the specimen, which is what surfaced both defects |
