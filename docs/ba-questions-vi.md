@@ -74,6 +74,55 @@ những thiết bị chị nêu.
 
 ---
 
+### A4. Lưới sửa lớn — chỗ duy nhất trong tài liệu em chưa dựng được
+
+Đây là **mục cuối cùng trong bản của chị em chưa làm**, và nó dừng đúng ở câu
+hỏi trên chứ không phải ở việc khó làm.
+
+Mục *Large editable grid* của chị (em diễn đạt lại, không phải trích nguyên
+văn): lưới trên khoảng **200 dòng** thì ô sửa được **không vẽ viền gì cả**
+cho tới khi hover, chỉ ô đã đổi mới giữ viền xanh cho tới lúc Save; còn lưới
+nhỏ nằm trong form thì mọi ô sửa được đều có viền thấy ngay.
+
+Em hiểu vì sao chị chia làm hai, và em đồng ý với lý do: lưới báo giá của hệ
+này có **22 cột**, và chỉ **4 ô** trong đó gõ được. Vẽ viền cho cả 22 cột thì
+ra một bức tường hộp, mà bốn ô gõ được lại chìm trong đó. Chính vì vậy
+`.vy-cell-input` hiện **đã trong suốt lúc nghỉ** và viền chỉ hiện khi hover —
+tức là chế độ của chị, hệ này đã chạy sẵn ở lưới nhỏ.
+
+Vấn đề chỉ còn là: **viền hover đang là thứ duy nhất nói rằng ô đó gõ được.**
+Không chuột thì không còn gì.
+
+#### Em đề xuất một cách, chị chốt giúp em
+
+Hệ này đã có sẵn một tầng `@media (pointer: coarse)` và nó được dựng đúng cho
+loại quyết định này — sàn chạm 44px chỉ áp ở nơi có ngón tay, còn trên chuột
+thì giữ nguyên mật độ, vì mật độ mới là thứ khiến người ta làm việc được
+trong ERP.
+
+Cùng một cách chia đó, áp cho bốn chỗ hover ở trên:
+
+| Trên chuột | Trên cảm ứng |
+|---|---|
+| Đúng như chị viết: ô sửa được không viền cho tới khi hover | Vẽ viền sẵn lúc nghỉ, chỉ ở ô sửa được |
+| Lý do khoá hiện trong tooltip, không icon khoá | Giữ icon khoá |
+| Field help hiện khi hover hoặc focus | Giữ nguyên — focus bàn phím vẫn với tới được, nhưng cần một cách mở bằng chạm |
+
+Giá phải trả của cách này: trên iPad, lưới báo giá sẽ có 4 ô viền giữa 22 cột
+— **không** phải bức tường 22 hộp mà chị muốn tránh, và cũng không phải màn
+hình trống trơn.
+
+Hai lựa chọn khác, để chị so:
+
+- **Vẽ viền sẵn ở mọi nơi.** Bỏ hẳn hai chế độ. Mất đúng cái chị đang giữ.
+- **Để người dùng bật/tắt.** Thêm một thiết lập, và thêm một quyết định cho
+  người mà chính tài liệu của chị mô tả là *not tech-savvy*.
+
+**Hỏi chị:** chốt giúp em cách ở bảng trên — chuột giữ nguyên bản của chị,
+cảm ứng vẽ viền sẵn — được không ạ? Chị gật là em dựng được mục này ngay.
+
+---
+
 ## B · Bốn chỗ tài liệu tự mâu thuẫn
 
 ### B1. Icon đang là emoji

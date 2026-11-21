@@ -76,6 +76,56 @@ exactly the devices she names.
 
 ---
 
+### A4. Large editable grid — the one section of her document we have not built
+
+This is the **last unbuilt section**, and it is stopped at the question above
+rather than at anything hard to make.
+
+Her *Large editable grid* (paraphrased, not quoted): a grid over roughly
+**200 lines** draws **no box at all** on an editable cell until hover, keeping
+only a changed cell boxed in blue until Save; a small grid inside a form keeps
+a visible box in every editable cell.
+
+The reasoning is right, and this build already agrees with it: the quoting
+grid has **22 columns** and only **4 cells** in it can be typed into. Bordering
+all 22 is a wall of boxes with the four live ones lost inside it — which is
+why `.vy-cell-input` is **already transparent at rest** here and the border
+arrives on hover. Her mode is running, on the small grid.
+
+What is left is one sentence: **the hover border is the only thing that says
+the cell can be typed into.** Without a pointer there is nothing.
+
+#### A proposal, for her to confirm or replace
+
+This system already has a `@media (pointer: coarse)` layer, built for exactly
+this kind of decision — the 44px touch floor applies only where there is a
+finger, and a mouse keeps the density, because density is what makes an ERP
+workable.
+
+The same split, applied to the four hover cases:
+
+| With a mouse | On touch |
+|---|---|
+| Exactly as she writes it: no box until hover | Draw the box at rest, on editable cells only |
+| The locked reason in a tooltip, no lock glyph | Keep the lock glyph |
+| Field help on hover or keyboard focus | Unchanged — keyboard focus still reaches it, but it needs a way to open by touch |
+
+What it costs: on an iPad the quoting grid shows 4 bordered cells among 22
+columns — **not** the wall of 22 boxes she is avoiding, and not a blank screen
+either.
+
+Two alternatives, for comparison:
+
+- **Box at rest everywhere.** Drops the two modes entirely, and loses the
+  thing she is protecting.
+- **A user setting.** One more preference, and one more decision for the
+  person her own document describes as *not tech-savvy*.
+
+**Question:** can she confirm the table above — mouse unchanged, touch draws
+the box at rest? A yes unblocks the section.
+
+---
+
 ## B · Four places the document disagrees with itself
 
 ### B1. The icons are emoji

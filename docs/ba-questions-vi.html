@@ -93,6 +93,20 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <p>Dòng về khoá là cái em muốn hỏi trước, vì quy tắc <em>"never a lock icon"</em> <strong>gỡ đúng cái tín hiệu duy nhất không cần con trỏ</strong>. Hệ thống hiện đang vẽ icon khoá <strong>kèm</strong> lý do bằng chữ, theo chốt ngày 14/10 — <em>"read only with lock icon and disable fill bg"</em> — nên nếu theo bản mới thì mình lùi lại đúng ở những thiết bị chị nêu.</p>
 <p><strong>Hỏi chị:</strong> trên cảm ứng thì cái gì thay cho hover ở ba chỗ này ạ?</p>
 <hr>
+<h3 id="a4-lưới-sửa-lớn--chỗ-duy-nhất-trong-tài-liệu-em-chưa-dựng-được">A4. Lưới sửa lớn — chỗ duy nhất trong tài liệu em chưa dựng được</h3>
+<p>Đây là <strong>mục cuối cùng trong bản của chị em chưa làm</strong>, và nó dừng đúng ở câu hỏi trên chứ không phải ở việc khó làm.</p>
+<p>Mục <em>Large editable grid</em> của chị (em diễn đạt lại, không phải trích nguyên văn): lưới trên khoảng <strong>200 dòng</strong> thì ô sửa được <strong>không vẽ viền gì cả</strong> cho tới khi hover, chỉ ô đã đổi mới giữ viền xanh cho tới lúc Save; còn lưới nhỏ nằm trong form thì mọi ô sửa được đều có viền thấy ngay.</p>
+<p>Em hiểu vì sao chị chia làm hai, và em đồng ý với lý do: lưới báo giá của hệ này có <strong>22 cột</strong>, và chỉ <strong>4 ô</strong> trong đó gõ được. Vẽ viền cho cả 22 cột thì ra một bức tường hộp, mà bốn ô gõ được lại chìm trong đó. Chính vì vậy <code>.vy-cell-input</code> hiện <strong>đã trong suốt lúc nghỉ</strong> và viền chỉ hiện khi hover — tức là chế độ của chị, hệ này đã chạy sẵn ở lưới nhỏ.</p>
+<p>Vấn đề chỉ còn là: <strong>viền hover đang là thứ duy nhất nói rằng ô đó gõ được.</strong> Không chuột thì không còn gì.</p>
+<h4 id="em-đề-xuất-một-cách-chị-chốt-giúp-em">Em đề xuất một cách, chị chốt giúp em</h4>
+<p>Hệ này đã có sẵn một tầng <code>@media (pointer: coarse)</code> và nó được dựng đúng cho loại quyết định này — sàn chạm 44px chỉ áp ở nơi có ngón tay, còn trên chuột thì giữ nguyên mật độ, vì mật độ mới là thứ khiến người ta làm việc được trong ERP.</p>
+<p>Cùng một cách chia đó, áp cho bốn chỗ hover ở trên:</p>
+<div class="t"><table><thead><tr><th>Trên chuột</th><th>Trên cảm ứng</th></tr></thead><tbody><tr><td>Đúng như chị viết: ô sửa được không viền cho tới khi hover</td><td>Vẽ viền sẵn lúc nghỉ, chỉ ở ô sửa được</td></tr><tr><td>Lý do khoá hiện trong tooltip, không icon khoá</td><td>Giữ icon khoá</td></tr><tr><td>Field help hiện khi hover hoặc focus</td><td>Giữ nguyên — focus bàn phím vẫn với tới được, nhưng cần một cách mở bằng chạm</td></tr></tbody></table></div>
+<p>Giá phải trả của cách này: trên iPad, lưới báo giá sẽ có 4 ô viền giữa 22 cột — <strong>không</strong> phải bức tường 22 hộp mà chị muốn tránh, và cũng không phải màn hình trống trơn.</p>
+<p>Hai lựa chọn khác, để chị so:</p>
+<ul><li><strong>Vẽ viền sẵn ở mọi nơi.</strong> Bỏ hẳn hai chế độ. Mất đúng cái chị đang giữ.</li><li><strong>Để người dùng bật/tắt.</strong> Thêm một thiết lập, và thêm một quyết định cho người mà chính tài liệu của chị mô tả là <em>not tech-savvy</em>.</li></ul>
+<p><strong>Hỏi chị:</strong> chốt giúp em cách ở bảng trên — chuột giữ nguyên bản của chị, cảm ứng vẽ viền sẵn — được không ạ? Chị gật là em dựng được mục này ngay.</p>
+<hr>
 <h2 id="b--bốn-chỗ-tài-liệu-tự-mâu-thuẫn">B · Bốn chỗ tài liệu tự mâu thuẫn</h2>
 <h3 id="b1-icon-đang-là-emoji">B1. Icon đang là emoji</h3>
 <p>Mục Icons của chị viết rất rõ:</p>

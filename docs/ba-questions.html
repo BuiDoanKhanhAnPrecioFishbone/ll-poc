@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="vi">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -63,7 +63,7 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 </head>
 <body>
 <div class="wrap">
-<nav class="toc"><h2>Mục lục</h2><ol>
+<nav class="toc"><h2>Contents</h2><ol>
 <li class="l2"><a href="#a--three-that-will-fail-an-accessibility-review">A · Three that will fail an accessibility review</a></li>
 <li class="l2"><a href="#b--four-places-the-document-disagrees-with-itself">B · Four places the document disagrees with itself</a></li>
 <li class="l2"><a href="#c--five-that-are-simply-not-stated">C · Five that are simply not stated</a></li>
@@ -93,6 +93,20 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border
 <div class="t"><table><thead><tr><th>Her rule</th><th>What is unreachable without a mouse</th></tr></thead><tbody><tr><td><em>"The reason … shows in a tooltip <strong>on hover</strong> of the box. <strong>Never a lock icon</strong>"</em></td><td>Why a field cannot be edited</td></tr><tr><td><em>"Field help … <strong>Hover or keyboard focus</strong> opens a tooltip … No help line under the field"</em></td><td>The field help itself</td></tr><tr><td><em>"Editable and read-only cells <strong>look the same until hover</strong>"</em></td><td>Which grid cells can be edited</td></tr></tbody></table></div>
 <p>The lock line is the one to look at first, because the rule removes the only signal that works without a pointer. This system currently draws a lock glyph <strong>and</strong> the reason in words, from a 14 Oct decision — <em>"read only with lock icon and disable fill bg"</em> — so adopting her rule would be a step back on exactly the devices she names.</p>
 <p><strong>Question:</strong> on touch, what replaces hover for these three?</p>
+<hr>
+<h3 id="a4-large-editable-grid--the-one-section-of-her-document-we-have-not-built">A4. Large editable grid — the one section of her document we have not built</h3>
+<p>This is the <strong>last unbuilt section</strong>, and it is stopped at the question above rather than at anything hard to make.</p>
+<p>Her <em>Large editable grid</em> (paraphrased, not quoted): a grid over roughly <strong>200 lines</strong> draws <strong>no box at all</strong> on an editable cell until hover, keeping only a changed cell boxed in blue until Save; a small grid inside a form keeps a visible box in every editable cell.</p>
+<p>The reasoning is right, and this build already agrees with it: the quoting grid has <strong>22 columns</strong> and only <strong>4 cells</strong> in it can be typed into. Bordering all 22 is a wall of boxes with the four live ones lost inside it — which is why <code>.vy-cell-input</code> is <strong>already transparent at rest</strong> here and the border arrives on hover. Her mode is running, on the small grid.</p>
+<p>What is left is one sentence: <strong>the hover border is the only thing that says the cell can be typed into.</strong> Without a pointer there is nothing.</p>
+<h4 id="a-proposal-for-her-to-confirm-or-replace">A proposal, for her to confirm or replace</h4>
+<p>This system already has a <code>@media (pointer: coarse)</code> layer, built for exactly this kind of decision — the 44px touch floor applies only where there is a finger, and a mouse keeps the density, because density is what makes an ERP workable.</p>
+<p>The same split, applied to the four hover cases:</p>
+<div class="t"><table><thead><tr><th>With a mouse</th><th>On touch</th></tr></thead><tbody><tr><td>Exactly as she writes it: no box until hover</td><td>Draw the box at rest, on editable cells only</td></tr><tr><td>The locked reason in a tooltip, no lock glyph</td><td>Keep the lock glyph</td></tr><tr><td>Field help on hover or keyboard focus</td><td>Unchanged — keyboard focus still reaches it, but it needs a way to open by touch</td></tr></tbody></table></div>
+<p>What it costs: on an iPad the quoting grid shows 4 bordered cells among 22 columns — <strong>not</strong> the wall of 22 boxes she is avoiding, and not a blank screen either.</p>
+<p>Two alternatives, for comparison:</p>
+<ul><li><strong>Box at rest everywhere.</strong> Drops the two modes entirely, and loses the thing she is protecting.</li><li><strong>A user setting.</strong> One more preference, and one more decision for the person her own document describes as <em>not tech-savvy</em>.</li></ul>
+<p><strong>Question:</strong> can she confirm the table above — mouse unchanged, touch draws the box at rest? A yes unblocks the section.</p>
 <hr>
 <h2 id="b--four-places-the-document-disagrees-with-itself">B · Four places the document disagrees with itself</h2>
 <h3 id="b1-the-icons-are-emoji">B1. The icons are emoji</h3>
