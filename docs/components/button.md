@@ -303,8 +303,12 @@ changed — where there is nothing to explain.
 `asChild` path takes its geometry from `.vy-btn` in `components.css`; every
 other button takes Kendo's. `.vy-btn` carried `--vy-radius-pill` and Kendo's
 `rounded="medium"` draws 6px, so on the [error state](error-state.md) *Try
-again* and *Back to Home* sat in one row at 6px and 999px — same height, same
-ink, different shape. Three links in the whole build reach that rule, which is
+again* and *Back to Home* sat in one row at 6px and 999px. The height was off
+by 1.15px underneath it, for the same reason: `.vy-btn--md` had no rule at
+all, so it took the base padding instead of the 34px rung. Both halves now
+floor on the tokens `kendo-subset.scss` is itself built from —
+`--vy-control-row`, `--vy-control-dense`, `--vy-control-md` — which is what
+makes an anchor and a button of the same size the same size. Three links in the whole build reach that rule, which is
 why it survived the radius pass that repointed its token without asking
 whether the value was still right.
 
@@ -336,6 +340,7 @@ specificity problem.
 
 | Date | Change |
 |---|---|
+| 21 Nov 2026 | `.vy-btn--md` had no size rule and `--sm` was floored at the 24px WCAG minimum rather than Kendo's 32. Both now take the control rungs, so an `asChild` anchor measures what the button beside it measures |
 | 21 Nov 2026 | **The `asChild` path was drawing a pill.** `.vy-btn` carried `--vy-radius-pill` while every real button takes Kendo's `k-rounded-md` at 6px, so *Try again* and *Back to Home* sat side by side on the error state at 6px and 999px. A leftover from MD3's `shape-full`: the radius pass of 18 Nov repointed the token and never asked whether the value was right, because only three links reach this rule |
 | 20 Nov 2026 | **Usage tab drawn.** Five Do/Don't card pairs, from the rules already on this page — live components, not exported images, so a card cannot go stale against a token change. The mechanism is `compare` on a specimen `Example`, so any component page can do the same |
 | 20 Nov 2026 | **`danger` resolves its fill from where it is** — outlined on a toolbar, filled in a dialog, per the BA's Buttons section. Via `useInDialog()`, not a second variant name. The outlined half takes `--vy-danger-text` / `--vy-danger-boundary` rather than Kendo's `outline-error`, which measured **3.10:1** for its label on the dark surface |

@@ -37,14 +37,30 @@
 a.vy-btn, a.vy-btn:hover { text-decoration: none; }
 
 
-/* min-height carries this to the 24px minimum target size (WCAG 2.2, 2.5.8).
-   Padding alone left the pager's « ‹ › » at 23px — one pixel short, which is the
-   least useful way to fail a threshold: invisible to review, and a real miss for
-   anyone aiming with a coarse pointer. */
+/* THE SIZE RUNGS ARE THE SAME TOKENS KENDO IS BUILT FROM. `kendo-subset.scss`
+   derives `$kendo-button-{xs,sm,md}-padding-y` from `--vy-control-row`,
+   `--vy-control-dense` and `--vy-control-md`, so an anchor floored at the same
+   token is the same height as the button beside it — which is the whole point
+   of these three rules, as the `xs` note below already said.
+
+   `md` HAD NO RULE AT ALL until 21 Nov: it fell through to the base padding
+   and came out 32.84px against Kendo's 33.99, a 1.15px step between Try again
+   and Back to Home on the error state. The same look at the same row that
+   found the radius; An saw the corners, the height was underneath it.
+
+   `sm` was floored at 24px — the WCAG 2.5.8 minimum, which is a FLOOR and not
+   a size. The argument below is still right and the number was still wrong:
+   Kendo's small is 32, so an anchor at 24 cleared the standard and did not
+   match the control next to it. */
 .vy-btn--sm {
   padding: var(--vy-space-1) var(--vy-space-5); font-size: var(--vy-text-sm);
-  min-height: var(--vy-space-10);
+  min-height: var(--vy-control-dense);
 }
+.vy-btn--md { min-height: var(--vy-control-md); }
+/* The 24px minimum target size (WCAG 2.2, 2.5.8) is cleared by all three rungs
+   with room to spare. Padding alone had left the pager's « ‹ › » at 23px — one
+   pixel short, which is the least useful way to fail a threshold: invisible to
+   review, and a real miss for anyone aiming with a coarse pointer. */
 /* The row rung, for the one path Kendo cannot take: `asChild`, where the
    styling is rendered onto a router Link so navigation stays a real anchor.
    The Kendo path gets 26px from `$kendo-button-xs-padding-y` and never reads
