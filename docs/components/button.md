@@ -48,7 +48,7 @@ line, run the quotation.
 
 | | Part | Rule |
 |---|---|---|
-| 1 | **Container** | `--vy-radius-pill`. Height comes from the size rung, never from padding. A 1px transparent border so `outlined` and `filled` measure the same |
+| 1 | **Container** | `--vy-radius-md`, 6px — her Shape section's figure for a button, and what Kendo's `rounded="medium"` already drew. Height comes from the size rung, never from padding. A 1px transparent border so `outlined` and `filled` measure the same |
 | 2 | **Icon slot** | Optional. `aria-hidden` — except while busy, when it holds the indicator and carries the only machine-readable statement that the action is running |
 | 3 | **Label** | `--vy-text-base` at `--vy-weight-medium`, Title Case ([B2](../design-system.md#b2--typography)), `white-space: nowrap` |
 
@@ -299,6 +299,20 @@ changed — where there is nothing to explain.
 
 ## Gotcha worth knowing
 
+**The two paths have to be kept in step, and on 21 Nov they were not.** The
+`asChild` path takes its geometry from `.vy-btn` in `components.css`; every
+other button takes Kendo's. `.vy-btn` carried `--vy-radius-pill` and Kendo's
+`rounded="medium"` draws 6px, so on the [error state](error-state.md) *Try
+again* and *Back to Home* sat in one row at 6px and 999px — same height, same
+ink, different shape. Three links in the whole build reach that rule, which is
+why it survived the radius pass that repointed its token without asking
+whether the value was still right.
+
+**Nothing automated catches this.** `css-consistency` reads the stylesheets
+and sees two legitimate tokens; `contrast:check` reads colour. It is a
+computed value on two elements that are supposed to be the same object, and it
+was found by a person looking at a screenshot.
+
 `.vy-btn--filled`, `--outlined`, `--text` and `--danger` in `components.css`
 apply **only on the `asChild` path**. A normal button goes through Kendo and
 carries Kendo's classes alone, so those rules never match it. Only
@@ -322,6 +336,7 @@ specificity problem.
 
 | Date | Change |
 |---|---|
+| 21 Nov 2026 | **The `asChild` path was drawing a pill.** `.vy-btn` carried `--vy-radius-pill` while every real button takes Kendo's `k-rounded-md` at 6px, so *Try again* and *Back to Home* sat side by side on the error state at 6px and 999px. A leftover from MD3's `shape-full`: the radius pass of 18 Nov repointed the token and never asked whether the value was right, because only three links reach this rule |
 | 20 Nov 2026 | **Usage tab drawn.** Five Do/Don't card pairs, from the rules already on this page — live components, not exported images, so a card cannot go stale against a token change. The mechanism is `compare` on a specimen `Example`, so any component page can do the same |
 | 20 Nov 2026 | **`danger` resolves its fill from where it is** — outlined on a toolbar, filled in a dialog, per the BA's Buttons section. Via `useInDialog()`, not a second variant name. The outlined half takes `--vy-danger-text` / `--vy-danger-boundary` rather than Kendo's `outline-error`, which measured **3.10:1** for its label on the dark surface |
 | 20 Nov 2026 | **`unavailable` added** — the BA's No-permission state, generalised to every "you can't, because". Found while building it: `.k-disabled` sets `pointer-events: none`, so the two reasons already written on ViewSetting's Save and Delete had never been readable. Both moved over |

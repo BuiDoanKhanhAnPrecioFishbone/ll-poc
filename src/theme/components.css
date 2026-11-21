@@ -10,7 +10,20 @@
 .vy-btn {
   display: inline-flex; align-items: center; justify-content: center; gap: var(--vy-space-3);
   font-family: inherit; font-size: var(--vy-text-base); font-weight: var(--vy-weight-medium);
-  border-radius: var(--vy-radius-pill); border: 1px solid transparent;
+  /* 6px, NOT a pill, and the difference was on screen for anyone to see.
+     `.vy-btn` reaches the DOM only through `asChild` — a router Link wearing
+     a button's clothes — while every real button goes through Kendo and takes
+     `k-rounded-md`. On the error state those two sit side by side: Try again
+     came out 6px and Back to Home 999px, two button systems in one row, 34px
+     tall apiece. An spotted it on 21 Nov from the Do/Don't card.
+
+     Six is the right half of the pair: the BA's Shape section puts "inputs,
+     value boxes, buttons, icon buttons, banners, toasts" at radius-md, which
+     is what Kendo is already drawing. The pill was MD3's shape-full, left
+     behind when the radius scale was adopted on 18 Nov — the token was
+     repointed and the VALUE was never questioned, because nothing on the
+     Kendo path uses this rule and the one path that does is three links. */
+  border-radius: var(--vy-radius-md); border: 1px solid transparent;
   padding: var(--vy-space-3) var(--vy-space-8); cursor: pointer; white-space: nowrap;
   transition: background-color var(--vy-dur-short) var(--vy-ease-standard),
               border-color var(--vy-dur-short) var(--vy-ease-standard),
