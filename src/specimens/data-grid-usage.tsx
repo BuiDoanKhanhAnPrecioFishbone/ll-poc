@@ -12,24 +12,25 @@ const LINES: Line[] = [
   { id: 4, part: '0455-300-0019-04', qty: 36, price: 8.9 },
 ];
 
+/* TWO COLUMNS, not three. A card is about 430px wide on the published page
+   and this grid's roles are 240 + 104 + 124, so the money column sat outside
+   the card and a caption that pointed at it was pointing off-screen. The
+   states moved onto the columns that fit. Measured 21 Nov. */
 const PLAIN: ColumnSpec<Line>[] = [
   { field: 'part', title: 'Part Number', role: 'ident' },
   { field: 'qty', title: 'Qty', role: 'number' },
-  { field: 'price', title: 'Unit Price', role: 'money' },
 ];
 
 /* The same three columns, now saying what each cell is. One `cellState` per
    column, read off the row — which is the whole API. */
 const STATEFUL: ColumnSpec<Line>[] = [
-  { field: 'part', title: 'Part Number', role: 'ident', valueRequired: true },
+  { field: 'part', title: 'Part Number', role: 'ident', valueRequired: true,
+    cellState: r => (r.id === 4 ? 'error' : r.id === 1 ? 'warning' : undefined) },
   { field: 'qty', title: 'Qty', role: 'number', valueRequired: true,
     cellState: r => (r.id === 2 ? 'changed' : undefined) },
-  { field: 'price', title: 'Unit Price', role: 'money',
-    cellState: r => (r.id === 4 ? 'error' : r.id === 1 ? 'warning' : undefined) },
 ];
 
-const REQUIRED_ONLY: ColumnSpec<Line>[] = PLAIN.map((c, i) =>
-  i < 2 ? { ...c, valueRequired: true } : c);
+const REQUIRED_ONLY: ColumnSpec<Line>[] = PLAIN.map(c => ({ ...c, valueRequired: true }));
 
 function Grid({ columns }: { columns: ColumnSpec<Line>[] }) {
   const [selected, setSelected] = useState<Set<string | number>>(() => new Set());
@@ -59,7 +60,7 @@ export const examples: Example[] = [
     compare: [
       {
         verdict: 'do',
-        caption: 'The changed line, the short price and the one in error are visible without reading a single number.',
+        caption: 'The changed quantity, the line to check and the one in error are all visible without reading a single number.',
         render: () => <Grid columns={STATEFUL} />,
       },
       {

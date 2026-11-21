@@ -47,6 +47,43 @@ two reasons, and the reason is the same one that makes a card worth having:
 | [Support ticket](support-ticket.md) | Its one usage rule is *a recoverable failure gets Try again instead*, which is drawn on the [error state](error-state.md) cards, from the side where the right answer lives |
 | [File drop](file-drop.md) | Its rules are about what happens after the drop — `autoUpload` off, no `saveUrl` — and nothing about them is visible |
 
+### They are checked as painted
+
+```
+npm run dodont:check
+```
+
+Part of `check:visual`, so CI runs it on every push. It opens all 34 pages in
+Chrome and looks for the four ways a card fails that a build cannot see:
+
+| | |
+|---|---|
+| **A stage that renders nothing** | A component given props it quietly ignores paints an empty box, and an empty box under a green tick reads as *do nothing* |
+| **A pair whose halves are the same** | The whole argument of a card is the difference between its two sides |
+| **A page that overflows its width** | An iframe hides this by scrolling rather than by complaining |
+| **A console error** | From a specimen nobody opens by hand |
+
+It plants an identical pair in the DOM and checks it is caught before it
+trusts the real pages, because a checker that silently stops checking reads
+exactly like a clean run.
+
+**It earned its keep on the first run.** The Mini table page was rendering
+**nothing at all** — a `date` column hands its value to `Intl`, which throws
+`RangeError: Invalid time value` on a string, and `ColumnSpec` types the field
+rather than what the role expects of it, so `tsc` was happy. The More menu's
+second pair was the same closed `More ▾` button on both sides. The Data grid's
+money column sat outside the card while the caption pointed at it, and the
+Mini table's Do card promised a filter row it did not have, because that
+component draws one from the eighth row and the card had five.
+
+Six more pairs came back as *identical* and all six were the checker's fault,
+not the cards': the first signature read tag names and classes, which cannot
+see a badge whose family is a `data-token`, a divider that is an inline
+border, a checkbox whose third state is a DOM property, or an input whose
+value is a property and not text. **A check that reports a real pair as
+identical is worse than no check**, so it now reads the state attributes, the
+input flags and values, and the computed paint.
+
 **Three things learned drawing them.**
 
 **Put the rules the page already gives on the cards, not new ones.** If a card

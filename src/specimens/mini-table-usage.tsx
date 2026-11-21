@@ -5,7 +5,7 @@ import type { ColumnSpec } from '../components/column-model';
 import type { Example } from './types';
 
 type Fact = { id: number; field: string; value: string };
-type Doc = { id: number; name: string; kind: string; added: string };
+type Doc = { id: number; name: string; kind: string; added: Date };
 
 const factCols: ColumnSpec<Fact>[] = [
   { field: 'field', title: 'Field', role: 'text' },
@@ -18,12 +18,26 @@ const docCols: ColumnSpec<Doc>[] = [
   { field: 'added', title: 'Added', role: 'date' },
 ];
 
+/* REAL `Date`s, not strings. A `date` column hands its value straight to
+   `fmtDate`, which hands it to `Intl.DateTimeFormat.format` — and that throws
+   `RangeError: Invalid time value` on a string, taking the whole specimen
+   down with it. The page rendered nothing at all and `tsc` was happy, because
+   `ColumnSpec` types the FIELD and not what the role expects of it. Found by
+   `dodont:check` on the morning after these cards were written. */
 const docs: Doc[] = [
-  { id: 1, name: 'Gerber pack rev C', kind: 'Drawing', added: '2026-11-04' },
-  { id: 2, name: 'Customer BoM', kind: 'Spreadsheet', added: '2026-11-04' },
-  { id: 3, name: 'Approval email', kind: 'Message', added: '2026-11-11' },
-  { id: 4, name: 'Test spec', kind: 'Document', added: '2026-11-12' },
-  { id: 5, name: 'Quote PDF', kind: 'Document', added: '2026-11-18' },
+  { id: 1, name: 'Gerber pack rev C', kind: 'Drawing', added: new Date('2026-11-04') },
+  { id: 2, name: 'Customer BoM', kind: 'Spreadsheet', added: new Date('2026-11-04') },
+  { id: 3, name: 'Approval email', kind: 'Message', added: new Date('2026-11-11') },
+  { id: 4, name: 'Test spec', kind: 'Document', added: new Date('2026-11-12') },
+  { id: 5, name: 'Quote PDF', kind: 'Document', added: new Date('2026-11-18') },
+  /* NINE, not five, and the number is load-bearing: `MiniTable` draws the
+     filter row at eight rows and above. At five the Do card showed no filter
+     cells while its caption promised "a filter row that earns its height" —
+     a card arguing for something it was not showing. */
+  { id: 6, name: 'Stencil drawing', kind: 'Drawing', added: new Date('2026-11-18') },
+  { id: 7, name: 'Component datasheet', kind: 'Document', added: new Date('2026-11-19') },
+  { id: 8, name: 'Shipping manifest', kind: 'Spreadsheet', added: new Date('2026-11-19') },
+  { id: 9, name: 'Signed NDA', kind: 'Document', added: new Date('2026-11-20') },
 ];
 
 function Facts() {
@@ -84,7 +98,7 @@ export const examples: Example[] = [
     compare: [
       {
         verdict: 'do',
-        caption: 'Five documents with a type and a date: columns worth sorting, and a filter row that earns its height.',
+        caption: 'Nine documents with a type and a date: columns worth sorting, and — from the eighth row — a filter row that earns its height.',
         render: () => <MiniTable columns={docCols} data={docs} />,
       },
       {

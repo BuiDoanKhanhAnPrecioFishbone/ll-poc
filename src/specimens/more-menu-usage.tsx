@@ -1,6 +1,13 @@
+import { useState } from 'react';
 import { Button } from '../ui/Button';
 import { MoreMenu, type MoreItem } from '../ui/MoreMenu';
+import { Select } from '../ui/Overlays';
 import type { Example } from './types';
+
+function PriorityValue() {
+  const [v, setV] = useState('Medium');
+  return <Select label="Priority" options={['High', 'Medium', 'Low']} value={v} onChange={setV} />;
+}
 
 const RARE: MoreItem[] = [
   { label: 'Confirm RFQ', note: 'Commits the quote to the customer.', onSelect: () => {} },
@@ -57,13 +64,18 @@ export const examples: Example[] = [
     compare: [
       {
         verdict: 'do',
-        caption: 'Verbs, each with the sentence a rare action needs. Pressing one starts something.',
-        render: () => <MoreMenu items={RARE} />,
+        caption: 'A value the user can read without pressing anything, and change in one press.',
+        render: () => <PriorityValue />,
       },
       {
         verdict: 'dont',
-        caption: 'Three readings of one value. The menu cannot show which is current, so the user opens it to find out and has to choose to get out.',
-        render: () => <MoreMenu items={VALUES} />,
+        /* The FIRST version of this card put a plain More menu on both sides,
+           and both sides were a closed button reading "More" — the same card
+           twice, which `dodont:check` caught on its first run. The label is
+           what makes the mistake visible: a menu named after a field, holding
+           that field's values. */
+        caption: 'A menu named after a field, holding its values. It cannot show which is current, so the user opens it to find out and has to choose something to get out.',
+        render: () => <MoreMenu items={VALUES} label="Priority" />,
       },
     ],
   },

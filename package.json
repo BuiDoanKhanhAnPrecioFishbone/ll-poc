@@ -19,7 +19,7 @@
     "css:check": "npm run css:orphans && npm run css:consistency && npm run contrast:check",
     "check": "npm run check:fast && npm run check:visual",
     "check:fast": "npm run lint && npm run ia:check && npm run css:check && npm run build",
-    "check:visual": "node scripts/with-server.mjs render:check touch:check mobile:check focus:check hover:check border:check grid:check",
+    "check:visual": "node scripts/with-server.mjs render:check touch:check mobile:check focus:check hover:check border:check grid:check dodont:check",
     "render:check": "node scripts/render-check.mjs",
     "touch:check": "node scripts/touch-targets.mjs",
     "mobile:check": "node scripts/mobile-check.mjs",
@@ -38,7 +38,8 @@
     "doc:ds-pdf": "node scripts/with-server.mjs doc:ds-print",
     "doc:ds-print": "node scripts/print-pdf.mjs docs/design-system.html docs/design-system.pdf && node scripts/print-pdf.mjs docs/design-system-vi.html docs/design-system-vi.pdf",
     "postinstall": "node scripts/activate-kendo-licence.mjs",
-    "prepare": "git rev-parse --git-dir >/dev/null 2>&1 && git config core.hooksPath .githooks || true"
+    "prepare": "git rev-parse --git-dir >/dev/null 2>&1 && git config core.hooksPath .githooks || true",
+    "dodont:check": "node scripts/dodont-check.mjs"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",
