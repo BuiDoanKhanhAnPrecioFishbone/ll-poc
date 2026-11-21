@@ -2229,7 +2229,9 @@
 /* The date stays put while its entries scroll under it — the one label you
    need while reading a long log is which day you are in. */
 .vy-activity-date {
-  position: sticky; top: 0; z-index: 1;
+  /* Her `z-sticky`, adopted 21 Nov. It was a bare 1 — correct, and a number
+     nobody could check against anything. */
+  position: sticky; top: 0; z-index: var(--vy-z-sticky);
   margin: 0;
   padding: var(--vy-space-4) var(--vy-space-5);
   background: var(--vy-surface-app);

@@ -37,13 +37,24 @@ Nothing is broken, everything is slightly tighter than she drew.
 
 Also from this section:
 
-- **The 3px blur behind an open popup is not implemented.** There is no
-  `backdrop-filter` anywhere in this system. Her overlay is
-  `rgba(19,24,32,.32) + blur 3px`; ours is `rgba(19,24,32,.45)` and no blur —
-  darker, to do the same job the blur does for her.
+- ~~**The 3px blur behind an open popup is not implemented.**~~ **Built
+  21 Nov 2026.** Her overlay is `rgba(19,24,32,.32) + blur 3px`; ours was
+  `rgba(19,24,32,.45)` and no blur — darker, doing by opacity what she does by
+  defocusing. Hers is the better of the two, and the reason is that the two
+  are not the same thing: opacity makes the page behind dimmer and leaves it
+  just as readable, where a blur makes it unreadable and leaves it just as
+  bright. A row of part numbers at 55% is still a row of part numbers the eye
+  can try to read. Measured after: `rgba(19,24,32,.32)` + `blur(3px)` light,
+  `rgba(0,0,0,.5)` + `blur(3px)` dark. The `.45` stays as the fallback behind
+  an `@supports` guard, because at `.32` with no blur the scrim is too weak to
+  be the only separator.
 - **Her z-index list matches ours exactly** where both name a layer: drawer
-  10020, popup 10040, menu 10070, toast 12500, skip 12600. Her two lowest,
-  `z-sticky 2` and `z-toolbar 10`, have no token here.
+  10020, popup 10040, menu 10070, toast 12500, skip 12600. ~~Her two lowest,
+  `z-sticky 2` and `z-toolbar 10`, have no token here.~~ **Added 21 Nov.**
+  `--vy-z-sticky` replaced a bare `1` on the activity log's sticky date;
+  `--vy-z-toolbar` has **no user today** — nothing in this build has a toolbar
+  that scrolls under anything — and is there so the first one that does takes
+  her number instead of inventing one.
 - She has **three shadows**; this system has five. Different systems rather
   than a disagreement.
 
@@ -118,9 +129,20 @@ Three things came out of building it that were not in the comparison:
 Her five states, checked one by one: busy button ✓, skeleton loading ✓,
 empty ✓, error screen ✓ (`ErrorState` carries the error id, Reload, Back to
 Home and Send a Support Ticket, as she specifies), not-built-yet ✓
-(`Placeholder`). The one gap is **loading over data already on screen** —
-her *"dim it to 45% and put the spinner and the doing-word on top; never swap
-back to a skeleton"*. No 45% dim exists here.
+(`Placeholder`). And **loading over data already on screen** — her *"dim it
+to 45% and put the spinner and the doing-word on top; never swap back to a
+skeleton"* — ✓ as well.
+
+> **This page said "No 45% dim exists here", and that was wrong.** It is
+> `BusyOverlay`, it has been in the build since **25 October**, and it does
+> exactly what she asks: `opacity: .45` on the content, `pointer-events: none`,
+> a converging spinner and the doing-word over the top in a `role="status"`.
+> Measured 21 Nov on the Loader page's own cards. The claim was written on
+> 18 Nov by walking her document and searching this one for the figure `45`,
+> which the stylesheet writes as `.45` — a grep that answered its own question
+> and not the one being asked. Corrected rather than deleted, because a
+> coverage page that quietly drops its own mistakes is worth less than one
+> that keeps them.
 
 ---
 
@@ -155,6 +177,8 @@ hold real unbuilt work and are listed above with what is missing.
 4. **Large editable grid**, which needs her answer on the touch question
    first — it is built on hover.
 
-What is left after that is small and listed above: the 3px blur behind an open
-popup, the 45% dim over data being reloaded, and tokens for her `z-sticky 2`
-and `z-toolbar 10`.
+The three small items listed above are **done, 21 Nov**: the 3px blur behind
+an open popup is built, the two layer tokens are in, and the 45% dim over
+reloading data turned out to have been built on 25 October — this page had it
+wrong. That leaves **Large editable grid** as the only unbuilt section of her
+document, and it is waiting on her answer about touch.

@@ -646,7 +646,21 @@
      too. It did not, and every dark swatch label measured about 1.05:1: light
      text on a white chip. */
   --vy-swatch-label-bg:       rgba(255, 255, 255, .85);
+  /* TWO SCRIMS, and which one runs depends on the browser. The BA's Shape and
+     elevation section, 16 Nov: an open popup sits over `rgba(19,24,32,.32)`
+     with a **3px blur** behind it. This system had her colour at `.45` and no
+     blur anywhere — darker, doing by opacity what she does by defocusing.
+
+     Hers is the better of the two and it only works WITH the blur: at .32
+     alone the page behind stays legible enough to keep competing for the eye,
+     which is the whole thing a scrim is for. So `.45` stays as the value, and
+     `--vy-overlay-scrim-blurred` is what `@supports (backdrop-filter)` swaps
+     in — see `.vy-scrim` in components.css. Every engine this product is used
+     on has had `backdrop-filter` for years; the guard is there because the
+     fallback has to be RIGHT, not because it is expected to run. */
   --vy-overlay-scrim:         rgba(19, 24, 32, .45);
+  --vy-overlay-scrim-blurred: rgba(19, 24, 32, .32);
+  --vy-overlay-blur:          3px;
 
   /* ---- The rocket -----------------------------------------------------
      Ten roles rather than ten hex values, because the drawing has to survive
@@ -831,6 +845,18 @@
 
    THE SKIP LINK IS LAST because it is only visible while focused, and when it
    is focused nothing else matters. */
+  /* HER TWO LOWEST RUNGS, 16 Nov. They are not part of the overlay ladder
+     below — they are the in-page layers, where the question is only "does
+     this sit over the rows it scrolls past".
+
+     `--vy-z-toolbar` HAS NO USER TODAY. Nothing in this build has a toolbar
+     that scrolls under anything, so the number is here for the first one that
+     does rather than being invented then. That is the same argument that
+     adopted her radius scale: a scale is worth having complete, and the cost
+     of a rung nobody stands on is one line. */
+  --vy-z-sticky:  2;
+  --vy-z-toolbar: 10;
+
   --vy-z-drawer:  10020;
   /* DIALOGS ARE A BAND, not a single value, because this app stacks them three
      deep. Each level takes two steps — its scrim, then its panel — so a child's
@@ -1108,7 +1134,10 @@
   --vy-rocket-paper:     #1b2436;
   --vy-rocket-smoke:     var(--vy-grey-500);
   --vy-shadow-key: #000000;
+  /* Her figure is a light-theme one; the dark pair is ours, and it keeps the
+     same relationship — a step lighter once the blur is doing part of the job. */
   --vy-overlay-scrim: rgba(0, 0, 0, .62);
+  --vy-overlay-scrim-blurred: rgba(0, 0, 0, .5);
   color-scheme: dark;
 }
 
@@ -1243,6 +1272,7 @@
     --vy-rocket-smoke:     var(--vy-grey-500);
     --vy-shadow-key: #000000;
     --vy-overlay-scrim: rgba(0, 0, 0, .62);
+    --vy-overlay-scrim-blurred: rgba(0, 0, 0, .5);
     color-scheme: dark;
   }
 }

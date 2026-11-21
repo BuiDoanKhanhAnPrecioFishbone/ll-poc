@@ -731,6 +731,50 @@ html[data-kendo-bridged] .vy-check .k-checkbox.k-invalid { border-color: var(--v
    and dimmed the page half as much as the token says. */
 .vy-dialog .k-overlay { background: var(--vy-overlay-scrim); opacity: 1; }
 
+/* THE 3px BLUR BEHIND AN OPEN POPUP. Her Shape and elevation section, 16 Nov,
+   and the one thing in it this system had nothing for: there was no
+   `backdrop-filter` anywhere here.
+
+   WHY IT IS WORTH HAVING AT ALL, since a darker scrim dims the page just as
+   well. It does not do the same thing. Opacity makes the page behind DIMMER
+   and leaves it just as readable; a blur makes it UNREADABLE and leaves it
+   just as bright. A row of part numbers at 55% is still a row of part numbers
+   the eye can try to read behind a dialog — defocused, it stops being text
+   and becomes the texture it should have been all along. That is why her
+   scrim can be lighter than ours and still separate better.
+
+   `@supports`, because the fallback has to be right rather than merely
+   present: without the blur, .32 is too weak to be the only separator, so
+   .45 stays the value and the pair swaps together. The `-webkit-` prefix is
+   for Safari before 18, which is on iPads that are still in service.
+
+   IT SITS BELOW `.vy-dialog .k-overlay` ON PURPOSE. Written above that rule,
+   the blur applied and the colour did not: both selectors are two classes, so
+   the later one in the file wins and Kendo's overlay kept the unblurred
+   value. Third time this project has paid for source order at equal
+   specificity, after `.vy-avatar` and `.vy-compare`, and the first two were
+   invisible — this one showed a 3px blur behind a scrim that had not
+   lightened, which is how it was caught in one measurement.
+
+   STACKED DIALOGS COMPOUND IT, and that is correct: each level's scrim blurs
+   everything behind it, so a dialog three deep sits over a page that is 9px
+   out of focus and its own parent at 3. The live level is the sharp one,
+   which is the same rule the z-index band exists to express. */
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .vy-scrim,
+  .vy-dialog .k-overlay {
+    background: var(--vy-overlay-scrim-blurred);
+    -webkit-backdrop-filter: blur(var(--vy-overlay-blur));
+    backdrop-filter: blur(var(--vy-overlay-blur));
+  }
+}
+/* NO `prefers-reduced-motion` EXCEPTION, and it was written and taken out
+   again. A static blur is not motion, and dropping it for someone who asked
+   for less of that changes their scrim on a signal that was never about
+   filters. If the cost shows up on the shop-floor terminals her Screen sizes
+   section names, the answer is a measurement and then a decision, not a media
+   query that sounds responsible. */
+
 /* Kendo's titlebar holds the close button; the title slot holds everything else,
    so our title, subtitle and maximise button live inside it as one row. */
 .vy-dialog .k-dialog-titlebar { padding: var(--vy-space-8) var(--vy-space-9) var(--vy-space-5); }
