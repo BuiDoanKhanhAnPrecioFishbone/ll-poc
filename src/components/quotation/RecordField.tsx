@@ -1,4 +1,5 @@
 import { TextField, TextArea } from '../../ui/Field';
+import { DateField, NumberField, YesNoField, formatOnScale } from '../../ui/Inputs';
 import { Select, Checkbox, RadioGroup } from '../../ui/Overlays';
 import { Priority, priorityLevel, PRIORITY_LEVELS, type PriorityLevel } from '../../ui/Priority';
 import { OPTION_MEANINGS } from '../../data/metadata';
@@ -61,7 +62,24 @@ export type FieldKind =
    * one required field naming the project became impossible to fill.
    */
   | { kind: 'combo'; optionsFor: (row: any) => readonly string[] }
-  | { kind: 'number'; suffix?: string; min?: number; max?: number }
+  /**
+   * A number, on one of her four scales.
+   *
+   * `suffix` IS GONE, and that is the point of this field's rewrite. It put the
+   * unit INSIDE the box — `[ 12.00 ] %` — and her Number widget says the unit
+   * belongs in the label: *"Markup (%)"*, *"Unit Price (USD)"*. The reason
+   * stands on its own: a suffix inside the box is something the user has to
+   * type around, and a user who types `12%` into a field already showing `%`
+   * has made an error the field invented. The design system's own Number field
+   * page has carried that as a Do/Don't card since 20 Nov, drawn from her
+   * sheet — and this form was the Don't card, three times over.
+   *
+   * `scale` replaces it: `NumberField` formats by her four kinds (integer 0
+   * decimals, decimal 2, currency 6, percent 2) rather than by a string glued
+   * to the end of the value.
+   */
+  | { kind: 'number'; scale?: 'integer' | 'decimal' | 'currency' | 'percent';
+      min?: number; max?: number }
   /**
    * A calendar date, held as a Date and read back in the system's one format.
    *
@@ -83,7 +101,28 @@ export type FieldKind =
    * Formatting both with one helper is how the time got dropped.
    */
   | { kind: 'datetime' }
-  | { kind: 'flag' }
+  /**
+   * A boolean. WITH `words` it is a record attribute; without, it is a
+   * question the user answers.
+   *
+   * Her Yes/no field draws the line: *"label ITAR, value **Required** or
+   * **Not required**. The label is the question, the value is the answer"* —
+   * against a checkbox, where the label IS the question and a tick answers it.
+   * Her rule for which: the value has to read as a word written for that
+   * field, never "yes", never "true", and **never a ticked box sitting on its
+   * own with the reader left to work out what a tick means here**.
+   *
+   * ITAR was exactly that. It rendered as `– ITAR` in view mode, and a dash
+   * beside an acronym does not say whether ITAR is not required, not checked,
+   * or not filled in. `Conformal Coating` is the other case and keeps its
+   * tick: there the label is the question and `✓ Conformal Coating` reads.
+   *
+   * `words` HAS NO DEFAULT, deliberately, the same as on the component. A
+   * field that cannot say what its two states are called in its own vocabulary
+   * is a checkbox, and this type makes that the author's decision rather than
+   * a fallback nobody notices.
+   */
+  | { kind: 'flag'; words?: { on: string; off: string } }
   /** High / Medium / Low, stored 1-3. Rendered as a dot and a word, not stars. */
   | { kind: 'priority' }
   /**
@@ -267,24 +306,30 @@ export function RecordField<T extends Record<string, any>>({
         </FieldRow>
       );
     case 'date':
+      /* `DateField`, not `<input type="date">`. The native control draws the
+         browser's own calendar in the browser's own date order, which is the
+         one thing the Regional Format setting exists to decide — a user whose
+         records read 13/10/2026 was being asked to type into a box that said
+         10/13/2026. Her Date widget is a text box in the system's format with
+         a calendar at the right, and typing still works. */
       return (
         <FieldRow {...rowProps}>
-          <TextField id={`f-${def.name}`} type="date" value={toDateInput(value)}
-                     aria-invalid={missing || undefined}
-                     onBlur={() => onBlur?.(def.name)}
-                     onChange={e => onChange(def.name, fromDateInput(e.target.value))} />
+          <DateField id={`f-${def.name}`}
+                     value={(value as unknown) instanceof Date ? (value as Date) : null}
+                     required={def.required} invalid={Boolean(missing)}
+                     onChange={d => { onChange(def.name, d); onBlur?.(def.name); }} />
         </FieldRow>
       );
     case 'number':
+      /* The unit is in the label now; the box holds the number and nothing
+         else. `NumberField` formats at rest on her scale and hands back the
+         raw value while it is being typed. */
       return (
         <FieldRow {...rowProps}>
-          <div className="vy-suffixed">
-            <TextField id={`f-${def.name}`} type="number" value={String(value ?? '')}
-                       min={def.min} max={def.max} aria-invalid={missing || undefined}
-                       onBlur={() => onBlur?.(def.name)}
-                       onChange={e => onChange(def.name, Number(e.target.value))} />
-            {def.suffix && <span className="vy-suffix">{def.suffix}</span>}
-          </div>
+          <NumberField id={`f-${def.name}`} kind={def.scale ?? 'integer'}
+                       value={typeof value === 'number' ? value : null}
+                       required={def.required} invalid={Boolean(missing)}
+                       onChange={n => onChange(def.name, n)} />
         </FieldRow>
       );
     case 'flag':
@@ -293,10 +338,19 @@ export function RecordField<T extends Record<string, any>>({
            repeating it would announce the field twice. The HINT still shows,
            which it did not before: these are the fields whose consequences most
            need explaining. */
-        <FieldRow {...rowProps} label={undefined} htmlFor={undefined}>
-          <Checkbox checked={Boolean(value)} onCheckedChange={c => onChange(def.name, c)}
-                    label={def.label} />
-        </FieldRow>
+        def.words ? (
+          /* With words it is an attribute of the record, so it keeps the row's
+             own label and puts the ANSWER in the value slot. */
+          <FieldRow {...rowProps}>
+            <YesNoField id={`f-${def.name}`} words={def.words} value={Boolean(value)}
+                        onChange={v => onChange(def.name, v)} />
+          </FieldRow>
+        ) : (
+          <FieldRow {...rowProps} label={undefined} htmlFor={undefined}>
+            <Checkbox checked={Boolean(value)} onCheckedChange={c => onChange(def.name, c)}
+                      label={def.label} />
+          </FieldRow>
+        )
       );
     case 'notes':
       return (
@@ -321,6 +375,21 @@ export function RecordField<T extends Record<string, any>>({
 
 function ReadField<T>({ def, value, editing }: { def: FieldDef<T>; value: unknown; editing?: boolean }) {
   if (def.kind === 'flag') {
+    /* WITH WORDS IT IS A ROW, NOT A TICK. ITAR is read-only and derived, so
+       it never reaches the edit switch — it has always rendered here, and
+       here it was `– ITAR`. A dash beside an acronym does not say whether
+       ITAR is not required, not ticked, or not filled in, which is the exact
+       failure her Yes/no field exists to stop. `readOnly` on the control, so
+       it draws her muted value box rather than something that looks
+       pressable. */
+    if (def.words) {
+      return (
+        <FieldRow label={def.label} required={def.required}
+                  note={editing && def.readOnly ? lockReason(def) : undefined}>
+          <YesNoField words={def.words} value={Boolean(value)} readOnly onChange={() => {}} />
+        </FieldRow>
+      );
+    }
     return (
       <div className="vy-flag-row" data-on={Boolean(value)} data-locked={editing && def.readOnly || undefined}>
         <span className="vy-flag-mark" aria-hidden>{value ? '✓' : '–'}</span>
@@ -385,9 +454,14 @@ function ReadField<T>({ def, value, editing }: { def: FieldDef<T>; value: unknow
     );
   }
   const empty = value === undefined || value === null || value === '';
-  /* "42%" but "12 days": a symbol binds to its number, a word does not. */
-  const shown = def.kind === 'number' && !empty && def.suffix
-    ? `${value}${/^[%°]/.test(def.suffix) ? '' : ' '}${def.suffix}`
+  /* THE SAME FORMATTER THE BOX USES. This line used to glue the unit onto the
+     value — "42%", "12 days" — which was the read-mode half of the suffix the
+     edit control has now dropped: the unit is in the label, and printing it
+     again beside the number says it twice. It also printed `String(value)`
+     where the box prints `12.00`, so pressing Edit changed the number on
+     screen without changing the record. */
+  const shown = def.kind === 'number' && typeof value === 'number'
+    ? formatOnScale(def.scale ?? 'integer', value)
     : value;
   return (
     <FieldRow {...base} empty={empty} variant={def.kind === 'notes' ? 'wide' : undefined}>
@@ -409,21 +483,14 @@ function lockReason<T>(def: FieldDef<T>): string {
 }
 
 
-/* ---- Date <-> <input type="date"> ------------------------------------------
-   Built from LOCAL parts, not toISOString(). An ISO string is UTC, so for any
-   user east of Greenwich — which is all of them, this customer being in
-   Ho Chi Minh City — a date at midnight local renders as the PREVIOUS day in
-   the input. The field would show one date while the record held another. */
-function toDateInput(v: unknown): string {
-  if (!(v instanceof Date) || Number.isNaN(v.getTime())) return '';
-  const p = (n: number) => String(n).padStart(2, '0');
-  return `${v.getFullYear()}-${p(v.getMonth() + 1)}-${p(v.getDate())}`;
-}
+/* `toDateInput` / `fromDateInput` LIVED HERE and are gone, 23 Nov. They
+   converted a Date to and from the `yyyy-mm-dd` an `<input type="date">`
+   wants, carefully, out of LOCAL parts rather than `toISOString()` — because
+   an ISO string is UTC, and for any user east of Greenwich a date at local
+   midnight renders as the previous day in the box.
 
-/** Parsed as local midnight for the same reason, rather than `new Date(str)`,
- *  which reads a bare yyyy-mm-dd as UTC. */
-function fromDateInput(s: string): Date | undefined {
-  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
-  if (!m) return undefined;
-  return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
-}
+   The whole problem went with the native input. `DateField` holds a `Date`
+   and prints it through the Regional Format, so there is no string in the
+   middle to get the timezone wrong in. `MpnMapping.tsx` still has its own
+   copy of `toDateInput` for its own native input; that one is a separate
+   swap, not collateral of this one. */

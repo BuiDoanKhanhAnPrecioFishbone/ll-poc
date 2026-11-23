@@ -36,6 +36,23 @@ const SHAPE: Record<Kind, { decimals: number; money?: true }> = {
   percent:  { decimals: 2 },
 };
 
+/**
+ * The same number, the same way, wherever it is shown.
+ *
+ * Exported because the record form reads a value in VIEW mode and edits it in
+ * this control, and the two were free to disagree: the view row printed
+ * `String(value)` while the box printed `12.00`. Pressing Edit changed the
+ * number on screen without changing the record, which is the kind of thing a
+ * user reports as a bug in the data. One function, both places. 23 Nov.
+ */
+export function formatOnScale(kind: Kind, value: number | null): string {
+  const { decimals, money } = SHAPE[kind];
+  if (value == null) return '';
+  return money
+    ? fmtMoney(value, { decimals })
+    : fmtNumber(value, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+}
+
 export function NumberField({
   kind, label, hint, value, onChange, id, required, invalid, disabled, className = '',
 }: {
@@ -53,7 +70,6 @@ export function NumberField({
   className?: string;
 }) {
   useRegion();                       // re-render when the region setting changes
-  const { decimals, money } = SHAPE[kind];
 
   /* FORMATTED AT REST, RAW WHILE EDITING. A field that reformats under the
      cursor fights the person typing — delete the "." in "1,240.00" and a
@@ -61,11 +77,7 @@ export function NumberField({
      the formatted text is what you see until focus arrives, and the plain
      number is what you edit. */
   const [draft, setDraft] = useState<string | null>(null);
-  const shown = draft ?? (
-    value == null ? ''
-      : money ? fmtMoney(value, { decimals })
-      : fmtNumber(value, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
-  );
+  const shown = draft ?? formatOnScale(kind, value);
 
   return (
     <label className={`vy-field-control ${className}`.trim()}>

@@ -97,7 +97,12 @@ export const HEADER: FieldDef<Quotation>[] = [
    * from the customer's `isItar`. Marking a customer as export-controlled is a
    * decision made on the customer, not per RFQ.
    */
-  { name: 'itar', label: 'ITAR', kind: 'flag', readOnly: true, derivedFrom: 'Customer' },
+  /* HER OWN EXAMPLE, down to the two words. It rendered as `– ITAR`, and a
+     dash beside an acronym does not say whether ITAR is not required, not
+     ticked, or not filled in. The other three flags on this form keep their
+     tick, because there the label is the question. */
+  { name: 'itar', label: 'ITAR', kind: 'flag', words: { on: 'Required', off: 'Not required' },
+    readOnly: true, derivedFrom: 'Customer' },
   { name: 'projectType', label: 'Project Type', kind: 'select', options: PROJECT_TYPE },
   { name: 'orderType', label: 'Order Type', kind: 'select', options: ORDER_TYPE, required: true },
   /* SELECTABLE, not derived. The live form writes this from the customer
@@ -205,9 +210,15 @@ export const COMMERCIAL: FieldDef<Quotation>[] = [
   /* Defaults from the customer's `priceMarkup`, but stays editable: the live
      code only writes the default while markup is still unset, which is what an
      overridable default looks like. */
-  { name: 'markup', label: 'Markup', kind: 'number', suffix: '%', min: 0, max: 100, required: true,
+  /* THE UNIT MOVED INTO THE LABEL, 23 Nov. Her Number widget writes its own
+     examples that way — "Markup (%)", "Unit Price (USD)" — and the three
+     number fields on this form were the only place left in the product still
+     putting it inside the box. */
+  { name: 'markup', label: 'Markup (%)', kind: 'number', scale: 'percent', min: 0, max: 100, required: true,
     hint: 'Applied to material and labour to produce the quoted total. Suggested from the customer.' },
-  { name: 'leadTimeDays', label: 'Acceptable LeadTime In Day', kind: 'number', suffix: 'days',
+  /* No "(days)" added: the live label already ends in "In Day", and the unit
+     twice is the same noise in the other direction. */
+  { name: 'leadTimeDays', label: 'Acceptable LeadTime In Day', kind: 'number', scale: 'integer',
     min: 1, required: true,
     hint: 'Parts quoted beyond this are flagged rather than silently accepted.' },
   /* A TEXTAREA in the live system, not a number: it holds the quantities
@@ -223,7 +234,7 @@ export const TECHNICAL: FieldDef<Quotation>[] = [
      an inference, not a lookup, and still worth confirming with the business. */
   { name: 'buildRequirement', label: 'Build Requirement', kind: 'select', options: APPLICATION, required: true },
   { name: 'testRequirements', label: 'Test Requirements', kind: 'select', options: TEST_REQUIREMENTS, required: true },
-  { name: 'assemblyTurnTime', label: 'Assembly Turn Time', kind: 'number', suffix: 'days', min: 1 },
+  { name: 'assemblyTurnTime', label: 'Assembly Turn Time (days)', kind: 'number', scale: 'integer', min: 1 },
   /* Lower-case "and", as the live form writes it. */
   /* Radio, not a dropdown — the live form shows all options at once, and the
      guideline says "allows the user to check one option" of each. */

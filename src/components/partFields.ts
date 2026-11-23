@@ -89,7 +89,12 @@ export const PART_HANDLING: FieldDef<Part>[] = [
 export const PART_SALES_PURCHASE: FieldDef<Part>[] = [
   { name: 'customerSalesPrice', label: 'Customer Sales Price', kind: 'number', min: 0,
     hint: 'The price offered to the customer. Manual, or computed.' },
-  { name: 'salesPriceTaxes', label: 'Sales Price Taxes', kind: 'number', min: 0, suffix: '%' },
+  /* THE UNIT IS IN THE LABEL, 23 Nov. Seven number fields on this form were
+     drawing it inside the box; her Number widget puts it in the label and the
+     design system's own card has said so since 20 Nov. Same change as the
+     quotation form's three — they share one `FieldDef`, which is why one
+     decision reached both screens. */
+  { name: 'salesPriceTaxes', label: 'Sales Price Taxes (%)', kind: 'number', min: 0, scale: 'percent' },
   { name: 'materialPrice', label: 'Material Price', kind: 'number', min: 0,
     hint: 'The cost to acquire or produce the material.' },
   { name: 'highestCost', label: 'Highest Cost', kind: 'number', min: 0,
@@ -159,7 +164,7 @@ export const PART_REORDERING: FieldDef<Part>[] = [
 export const PART_DEMAND: FieldDef<Part>[] = [
   { name: 'eau', label: 'Estimated Annual Usage', kind: 'number', min: 0,
     hint: 'EAU — projected yearly consumption, used for forecasting and volume discounts.' },
-  { name: 'attrition', label: 'Attrition', kind: 'number', min: 0, max: 100, suffix: '%',
+  { name: 'attrition', label: 'Attrition (%)', kind: 'number', min: 0, max: 100, scale: 'percent',
     hint: 'Expected loss during production. MRP adds this buffer so the output meets demand.' },
   { name: 'mrpRequest', label: 'MRP Request', kind: 'number', min: 0,
     hint: 'The quantity needed for upcoming demand, which triggers purchase or production.' },
@@ -175,15 +180,15 @@ export const PART_DEMAND: FieldDef<Part>[] = [
  * question rather than a silent choice.
  */
 export const PART_LEAD_TIME: FieldDef<Part>[] = [
-  { name: 'pullIn', label: 'Pull in', kind: 'number', min: 0, suffix: 'days',
+  { name: 'pullIn', label: 'Pull in (days)', kind: 'number', min: 0, scale: 'integer',
     hint: 'How far an existing order may be advanced to meet earlier demand, instead of raising a new one.' },
-  { name: 'pushOut', label: 'Push Out', kind: 'number', min: 0, suffix: 'days',
+  { name: 'pushOut', label: 'Push Out (days)', kind: 'number', min: 0, scale: 'integer',
     hint: 'How far an existing order may be delayed when demand drops, to prevent excess stock.' },
-  { name: 'purchaseLeadTime', label: 'Purchase Lead Time', kind: 'number', min: 0, suffix: 'days',
+  { name: 'purchaseLeadTime', label: 'Purchase Lead Time (days)', kind: 'number', min: 0, scale: 'integer',
     hint: 'Order placed to parts received and ready to use.' },
-  { name: 'kittingLeadTime', label: 'Kitting Lead Time', kind: 'number', min: 0, suffix: 'days',
+  { name: 'kittingLeadTime', label: 'Kitting Lead Time (days)', kind: 'number', min: 0, scale: 'integer',
     hint: 'Time to pick and group components into a kit for production.' },
-  { name: 'productionLeadTime', label: 'Production Lead Time', kind: 'number', min: 0, suffix: 'days',
+  { name: 'productionLeadTime', label: 'Production Lead Time (days)', kind: 'number', min: 0, scale: 'integer',
     hint: 'Time to physically manufacture or assemble the item.' },
 ];
 
