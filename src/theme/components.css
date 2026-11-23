@@ -920,6 +920,33 @@ html[data-kendo-bridged] .vy-check .k-checkbox.k-invalid { border-color: var(--v
   width: 100%;
 }
 
+/* ROOM FOR THE FOCUS RING, which this container was cutting in half.
+   Reported 23 Nov from a screenshot: the ring round a focused field in a tab
+   came out severed at both ends.
+
+   `--vy-focus-ring` is `0 0 0 2px #fff, 0 0 0 4px #2754bc` — it is painted
+   **4px outside** the control's border box. `.k-animation-container` carries
+   `overflow: hidden` (Kendo needs it to clip the slide between tabs) and the
+   field grid runs flush to it: measured slack of **0.0px** on the left and
+   right of every input in the panel. So the outer 4px of the indicator was
+   clipped on both sides — on every field of every tab, and on the tab strip
+   itself. Not new, and not the number fields: the untouched
+   `quantitiesToQuote` textarea measured the same 0.0.
+
+   THE RING IS NOT DECORATION. WCAG 2.4.11 is about the indicator being
+   visible, and half of one reads as a rendering fault rather than as focus.
+
+   `overflow: visible` would have been the one-word fix and would have let
+   tab content slide outside the panel while it animates. This keeps the clip
+   and moves it 4px outwards instead: `width: calc(100% + 8px)` with a -4px
+   margin puts the element back exactly where it was, and the padding is the
+   gap the ring is allowed to use. Nothing in the layout moves. */
+.vy-tabs .k-animation-container {
+  width: calc(100% + var(--vy-space-4));
+  margin-inline: calc(var(--vy-space-2) * -1);
+  padding-inline: var(--vy-space-2);
+}
+
 /* =============================================================================
    DATA GRID — the frame around Kendo's
    -----------------------------------------------------------------------------
@@ -1223,22 +1250,20 @@ html[data-kendo-bridged] .vy-field--changed .k-picker,
    use — inside a field the column decides the width, not the control. */
 .vy-field--editing .vy-select,
 .vy-field--editing .vy-input,
-.vy-field--editing .vy-field-control,
-.vy-field--editing .vy-suffixed { width: 100%; min-width: 0; }
-/* NO `flex: 1` ON THE INPUT, and it cost three fields their height.
-   The rule that was here meant "fill the row beside the suffix" — but the
-   input's flex parent is `.vy-field-control`, which is a flex COLUMN, so
-   `flex: 1` resolved against the block axis instead: basis 0, no free space to
-   grow into, and Markup, Acceptable LeadTime and Assembly Turn Time rendered
-   17.5px tall beside 34px everywhere else. The width it was reaching for is
-   already there — `.vy-input` is `width: 100%` and the rule above repeats it,
-   and `.vy-suffixed .vy-field-control { flex: 1 }` is what actually claims the
-   row. Fourth time the wrong axis has cost something in this file. */
+.vy-field--editing .vy-field-control { width: 100%; min-width: 0; }
+/* `.vy-suffixed` AND `.vy-suffix` ARE GONE, 23 Nov, with the thing they drew.
+   They put the unit inside the box — `[ 12 ] %` — and her Number widget puts
+   it in the label. Ten fields across two forms were doing it.
+
+   Worth keeping the scar: the rule here once read `flex: 1` on the INPUT,
+   meaning "fill the row beside the suffix", and the input's flex parent is
+   `.vy-field-control`, a flex COLUMN — so it resolved against the block axis,
+   basis 0, nothing to grow into, and Markup, Acceptable LeadTime and Assembly
+   Turn Time rendered 17.5px tall beside 34px everywhere else. Fourth time the
+   wrong axis cost something in this file, and the layout that needed it no
+   longer exists. */
 .vy-field--wide { grid-template-columns: 1fr; }
 .vy-field--wide dt { padding-top: 0; }
-.vy-suffixed { display: flex; align-items: center; gap: var(--vy-space-3); }
-.vy-suffixed .vy-field-control { flex: 1; }
-.vy-suffix { font-size: var(--vy-text-base); color: var(--vy-on-surface-subtle); white-space: nowrap; }
 .vy-notes-edit { display: grid; grid-template-columns: repeat(auto-fit, minmax(var(--vy-note-min-w), 1fr)); gap: var(--vy-space-8); margin-top: var(--vy-space-9); }
 
 /* --- Identifiers are TEXT, not code ----------------------------------------
