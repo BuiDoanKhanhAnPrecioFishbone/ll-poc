@@ -25,7 +25,15 @@
 import fs from 'node:fs';
 import path from 'node:path';
 const cssFiles=['tokens','base','md3','components','app','responsive'].map(f=>`src/theme/${f}.css`);
-const css=cssFiles.map(f=>fs.readFileSync(f,'utf8')).join('\n');
+/* COMMENTS STRIPPED, and that was not a tidying. `declared` is a regex over
+   the stylesheet text, so every class name mentioned in a COMMENT counted as
+   a declaration — and this project comments heavily, often naming the class a
+   rule replaced. A note reading ".vy-suffixed is gone" declared `.vy-suffixed`
+   all over again, so deleting a rule could never clear its orphan: the entry
+   moved from the CSS to the prose and stayed on the list. Found on 23 Nov by
+   deleting two rules and watching the count not move. */
+const strip = t => t.replace(/\/\*[\s\S]*?\*\//g, '');
+const css=cssFiles.map(f=>strip(fs.readFileSync(f,'utf8'))).join('\n');
 function walk(d,out=[]){for(const e of fs.readdirSync(d,{withFileTypes:true})){const p=path.join(d,e.name);
  if(e.isDirectory())walk(p,out); else if(/\.(tsx|ts)$/.test(e.name))out.push(p);} return out;}
 const src=walk('src').map(f=>fs.readFileSync(f,'utf8')).join('\n');
@@ -60,9 +68,14 @@ for (const f of cssFiles.filter(f => !f.endsWith('responsive.css'))) {
   /* Only BARE definitions — `.vy-foo {`. A descendant or state selector
      (`.vy-foo .bar`, `.vy-foo:has(...)`) legitimately refines a class defined
      elsewhere; two bare rules for the same class is the bug. */
-  for (const m of body.matchAll(/^\.(vy-[a-z0-9-]+)\s*\{/gm)) (perFile[m[1]] ??= new Set()).add(f);
+  for (const m of strip(body).matchAll(/^\.(vy-[a-z0-9-]+)\s*\{/gm)) (perFile[m[1]] ??= new Set()).add(f);
 }
-const dupes = Object.entries(perFile).filter(([, files]) => files.size > 1);
+/* Declared, with the reason, rather than re-judged on every run. `.vy-page--doc`
+   sits beside it in app.css in the page-layout family; the flex behaviour sits
+   with the grid shell in components.css. Split on purpose, both halves one line. */
+const DUP_OK = new Set(['vy-page--grid']);
+const dupes = Object.entries(perFile)
+  .filter(([c, files]) => files.size > 1 && !DUP_OK.has(c));
 if (dupes.length) {
   console.log('\nDEFINED IN MORE THAN ONE FILE — later file wins, silently:');
   for (const [cls, files] of dupes) console.log('  .' + cls, '→', [...files].join(', '));
@@ -74,4 +87,15 @@ if(runtime.length){
   console.log(`  from ${[...dynamic].sort().join(', ')}`);
   console.log('  '+runtime.join('\n  '));
 }
-process.exit(0);
+/* A DUPLICATE NOW FAILS, 23 Nov. This check has been here since 25 August,
+   it was right every time, and it printed into a script that always exited 0 —
+   so `css:check` stayed green and the line scrolled past in a wall of output.
+   It has since watched `.vy-avatar` and `.vy-compare` go in and said so,
+   twice, to nobody; on 21 Nov a SECOND duplicate check was added to
+   css-consistency.js by someone who had not read this one's output. That
+   check is gone again and this one has teeth instead.
+
+   The orphan list stays a report. An orphan is a judgement call — the
+   runtime-built names below are the reason — and a check that fails on a
+   judgement call teaches people to pass `--no-verify`. */
+process.exit(dupes.length ? 1 : 0);
