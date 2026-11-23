@@ -1518,7 +1518,17 @@ html[data-kendo-bridged] .vy-field--changed .k-picker,
 }
 .vy-about[open] > summary::before { transform: rotate(90deg); }
 .vy-about > summary:hover { color: var(--vy-on-dark-fg); background: var(--vy-on-dark-hover); }
-.vy-about > summary:focus-visible { box-shadow: var(--vy-focus-ring); outline: none; }
+/* INSET, like everything else in the sidebar: this sits in `.vy-nav`'s
+   scroller, which clips horizontally because `overflow-y: auto` forces the
+   other axis to `auto` too. The ring lost its left side — the last of the 39
+   `focus:check` found on 23 Nov. It needs its own rule because
+   `.vy-about > summary` out-specifies the sidebar's blanket one by the single
+   element in it. */
+.vy-about > summary:focus-visible {
+  outline: var(--vy-space-1) solid var(--vy-brand-boundary-light);
+  outline-offset: calc(var(--vy-space-1) * -1);
+  box-shadow: none;
+}
 .vy-about-links { display: flex; flex-direction: column; padding: var(--vy-space-1) 0 var(--vy-space-2) var(--vy-space-6); }
 .vy-about-link {
   /* Same 24px floor. These are 236px wide and easy to hit horizontally, but the

@@ -119,6 +119,43 @@ const PROBE = `(async () => {
              left: box.left, top: box.top, right: box.right, bottom: box.bottom };
   };
 
+  /* HOW FAR THE INDICATOR IS DRAWN OUTSIDE THE CONTROL'S OWN BOX.
+     Our ring is two spreading shadows, the outer one 4px. An INSET shadow and
+     an inset outline reach nothing, which is exactly why grid cells and tab
+     items use one — see the note in kendo-bridge.css. */
+  const reachOf = el => {
+    const cs = getComputedStyle(el);
+    let reach = 0;
+    for (const part of (cs.boxShadow || 'none').split(/,(?![^()]*\\))/)) {
+      if (part.indexOf('inset') !== -1) continue;
+      const nums = (part.match(/-?[\\d.]+px/g) || []).map(parseFloat);
+      if (nums.length) reach = Math.max(reach, Math.max.apply(null, nums.map(Math.abs)));
+    }
+    if (cs.outlineStyle !== 'none') {
+      const w = parseFloat(cs.outlineWidth) || 0;
+      const off = parseFloat(cs.outlineOffset) || 0;
+      if (off >= 0) reach = Math.max(reach, w + off);
+    }
+    return reach;
+  };
+
+  /* The clip rect alone — NOT intersected with the element, which is what
+     painted does. The question here is the opposite one: how much room is
+     there AROUND the control before an ancestor starts cutting. */
+  const clipBox = el => {
+    const box = { left: -Infinity, top: -Infinity, right: Infinity, bottom: Infinity };
+    for (let p = el.parentElement; p; p = p.parentElement) {
+      const cs = getComputedStyle(p);
+      if (cs.overflowX === 'visible' && cs.overflowY === 'visible') continue;
+      const c = p.getBoundingClientRect();
+      box.left = Math.max(box.left, c.left);
+      box.top = Math.max(box.top, c.top);
+      box.right = Math.min(box.right, c.right);
+      box.bottom = Math.min(box.bottom, c.bottom);
+    }
+    return box;
+  };
+
   const drawnAs = el => {
     const cs = getComputedStyle(el);
     return [cs.outlineStyle, cs.outlineWidth, cs.outlineColor, cs.boxShadow,
@@ -140,6 +177,7 @@ const PROBE = `(async () => {
 
   const obscured = [];
   const noIndicator = [];
+  const clipped = [];
 
   for (const el of candidates) {
     /* BLUR FIRST. The resting appearance has to be measured while the element
@@ -150,11 +188,24 @@ const PROBE = `(async () => {
       el.blur();
       await new Promise(r => setTimeout(r, 12));
     }
-    const before = drawnAs(el);
+    /* THE INDICATOR MAY BE ON THE WRAPPER, NOT ON THE CONTROL. A combobox's
+       caret is a real button inside .k-input, and the honest place to draw
+       its focus is the box the user sees as the control — so the caret itself
+       changes not at all. Measuring only the element reported that as "no
+       visible indicator" the moment the dropdown was fixed on 23 Nov, which
+       is a check calling a correct control broken. Two ancestors is enough
+       for every composite in this build and keeps the walk cheap. */
+    const chain = [el, el.parentElement, el.parentElement && el.parentElement.parentElement]
+      .filter(Boolean);
+    const before = chain.map(drawnAs);
     el.focus();
     await new Promise(r => setTimeout(r, 12));
     if (document.activeElement !== el) continue;   // refused focus; not ours to judge
-    const after = drawnAs(el);
+    const after = chain.map(drawnAs);
+    /* The element that actually changed is the one carrying the indicator, and
+       so the one whose ring has to fit. */
+    const movedAt = after.findIndex((a, i) => a !== before[i]);
+    const indicated = chain[movedAt] || el;
     const p = painted(el);
 
     /* Off screen, or clipped away, WHILE FOCUSED. */
@@ -166,14 +217,36 @@ const PROBE = `(async () => {
                       left: Math.round(p.left), top: Math.round(p.top) });
     }
 
-    if (before === after) {
+    if (movedAt === -1) {
       noIndicator.push({ sel: where(el), what: label(el) });
+    }
+
+    /* HALF A RING READS AS A RENDERING FAULT, NOT AS FOCUS. The indicator can
+       be present, on screen, and still cut down one side by an ancestor that
+       clips — which 'obscured' does not catch, because the control itself is
+       perfectly visible. Two of these were found by eye in one afternoon on
+       23 Nov: every field in a tab panel (the panel ran flush to Kendo's
+       animation container) and every combobox (the ring was on the inner
+       input, inside a wrapper with overflow hidden). Both had been there for
+       weeks. WCAG 2.4.11 is about the indicator being visible. */
+    const reach = reachOf(indicated);
+    if (reach > 0.5) {
+      const r = indicated.getBoundingClientRect();
+      const c = clipBox(indicated);
+      const slack = { left: r.left - c.left, top: r.top - c.top,
+                      right: c.right - r.right, bottom: c.bottom - r.bottom };
+      const cut = Object.keys(slack).filter(k => slack[k] < reach - 0.5);
+      if (cut.length) {
+        clipped.push({ sel: where(el), what: label(el), reach: Math.round(reach),
+                       sides: cut.join('+'),
+                       slack: cut.map(k => k + ' ' + slack[k].toFixed(1)).join(', ') });
+      }
     }
     el.blur();
   }
 
   stopMotion.remove();
-  return { checked: candidates.length, obscured, noIndicator };
+  return { checked: candidates.length, obscured, noIndicator, clipped };
 })()`;
 
 const SELFTEST = `(() => {
@@ -187,16 +260,27 @@ const SELFTEST = `(() => {
      invisible however hard the browser tries, which is the state this check
      exists to find.
      b: focus styling suppressed entirely — must be reported NOINDICATOR.
-     c: an ordinary button — must be reported by neither. */
+     c: an ordinary button — must be reported by neither.
+     d: a 4px ring on a control sitting FLUSH inside a parent that clips —
+        visible, focusable, indicator present, and the ring cut on every side.
+        Must be reported CLIPPED-RING and by nothing else. */
   host.innerHTML =
     '<div id="vy-st-scroller" style="width:60px;overflow:hidden;position:relative;height:30px">' +
       '<button id="vy-st-a" style="position:absolute;left:-4000px;width:50px;height:24px">a</button>' +
     '</div>' +
     '<button id="vy-st-b" style="width:60px;height:24px;outline:none!important;box-shadow:none!important">b</button>' +
-    '<button id="vy-st-c" style="width:60px;height:24px">c</button>';
+    '<button id="vy-st-c" style="width:60px;height:24px">c</button>' +
+    '<div id="vy-st-clip" style="width:60px;height:24px;overflow:hidden">' +
+      '<button id="vy-st-d" style="width:60px;height:24px">d</button>' +
+    '</div>';
   document.body.appendChild(host);
   const b = host.querySelector('#vy-st-b');
   b.addEventListener('focus', () => { b.style.outline = 'none'; b.style.boxShadow = 'none'; });
+  const d = host.querySelector('#vy-st-d');
+  d.addEventListener('focus', () => {
+    d.style.outline = 'none';
+    d.style.boxShadow = '0 0 0 2px #ffffff, 0 0 0 4px #2754bc';
+  });
 })()`;
 
 
@@ -243,6 +327,16 @@ async function main() {
     if (selfTest) { await send('Runtime.evaluate', { expression: SELFTEST, returnByValue: true }); await sleep(150); }
     const r = await send('Runtime.evaluate',
       { expression: PROBE, awaitPromise: true, returnByValue: true });
+    /* A PROBE THAT THROWS RETURNS `undefined`, WHICH READS AS "NOTHING WRONG".
+       It cost a round trip on 23 Nov: a regex written with single backslashes
+       inside this template literal reached Chrome as `/,(?![^()]*))/` and the
+       whole probe died, so all three checks reported zero and the self-test
+       reported three failures with no reason. The exception is on the CDP
+       result the whole time; it just was not being read. */
+    if (r.result?.exceptionDetails) {
+      console.error('probe threw on ' + route + ': '
+        + (r.result.exceptionDetails.exception?.description || '').slice(0, 200));
+    }
     return r.result?.result?.value;
   };
 
@@ -250,11 +344,13 @@ async function main() {
   const st = await visit('/', VIEWPORTS[0], true);
   const caughtObscured = !!st?.obscured?.some(o => /vy-st-a/.test(o.sel) || o.what === 'a');
   const caughtNoIndicator = !!st?.noIndicator?.some(o => o.what === 'b');
+  const caughtClipped = !!st?.clipped?.some(o => o.what === 'd');
   const cleanOne = !st?.obscured?.some(o => o.what === 'c') &&
-                   !st?.noIndicator?.some(o => o.what === 'c');
-  if (!caughtObscured || !caughtNoIndicator || !cleanOne) {
+                   !st?.noIndicator?.some(o => o.what === 'c') &&
+                   !st?.clipped?.some(o => o.what === 'c');
+  if (!caughtObscured || !caughtNoIndicator || !caughtClipped || !cleanOne) {
     console.error('self-test failed — the check cannot see its own planted faults');
-    console.error(`  obscured caught: ${caughtObscured}  no-indicator caught: ${caughtNoIndicator}  clean control quiet: ${cleanOne}`);
+    console.error(`  obscured caught: ${caughtObscured}  no-indicator caught: ${caughtNoIndicator}  clipped-ring caught: ${caughtClipped}  clean control quiet: ${cleanOne}`);
     ws.close(); chrome.kill();
     process.exit(2);
   }
@@ -270,6 +366,8 @@ async function main() {
         findings.push({ vp: vp.label, route, kind: 'obscured', ...o });
       for (const o of v.noIndicator)
         findings.push({ vp: vp.label, route, kind: 'no-indicator', ...o });
+      for (const o of v.clipped)
+        findings.push({ vp: vp.label, route, kind: 'clipped-ring', ...o });
     }
   }
 
@@ -289,14 +387,15 @@ async function main() {
   const rows = [...byControl.values()];
   const obscured = rows.filter(r => r.kind === 'obscured');
   const noInd = rows.filter(r => r.kind === 'no-indicator');
+  const clip = rows.filter(r => r.kind === 'clipped-ring');
 
   console.log(`focusable controls focused ${checked} across ${ROUTES.length} routes x ${VIEWPORTS.length} widths  self-test passed`);
-  console.log(`OBSCURED ${obscured.length}   NO VISIBLE INDICATOR ${noInd.length}   controls, not instances`);
+  console.log(`OBSCURED ${obscured.length}   NO VISIBLE INDICATOR ${noInd.length}   RING CLIPPED ${clip.length}   controls, not instances`);
   for (const r of rows) {
-    console.log(`  [${r.kind}] ${r.sel} "${r.what}"${r.box ? '  painted ' + r.box + ' at ' + r.left + ',' + r.top : ''}`);
+    console.log(`  [${r.kind}] ${r.sel} "${r.what}"${r.box ? '  painted ' + r.box + ' at ' + r.left + ',' + r.top : ''}${r.sides ? '  ring ' + r.reach + 'px cut ' + r.sides + ' (' + r.slack + ')' : ''}`);
     console.log(`        ${[...r.vps].join(' + ')} · ${[...r.routes].slice(0, 3).join(' ')}`);
   }
-  if (!rows.length) console.log('  every focused control was on screen and visibly focused');
+  if (!rows.length) console.log('  every focused control was on screen, visibly focused, and its ring drawn whole');
   process.exit(rows.length ? 1 : 0);
 }
 

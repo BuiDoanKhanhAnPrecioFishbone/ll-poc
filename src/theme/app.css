@@ -937,6 +937,35 @@
 }
 .vy-sidebar :where(a, button):focus-visible { outline-color: var(--vy-brand-boundary-light); }
 
+/* THE SIDEBAR'S RING TURNS INWARDS, and the reason is one line of CSS further
+   up: `.vy-nav` is `overflow-y: auto`, and CSS does not let one axis scroll
+   while the other stays visible — the other computes to `auto` too. So the
+   nav clips horizontally even though nothing ever scrolls that way, and a
+   2px outline at a 2px offset lost both its left and right sides. Measured
+   23 Nov by `focus:check`: 27 controls, slack 0.0px on both sides.
+
+   Inline padding on `.vy-nav` would have been the other fix and would have
+   cost the thing the sidebar is drawn for: nav items are full-bleed, the
+   active one carries a left accent bar against the sidebar edge, and insetting
+   them 4px moves every row away from that edge.
+
+   An inset outline draws inside the item's own box, cannot be clipped by
+   anything, and sits on the same dark ground the colour was picked against.
+   Same answer, and the same reasoning, as the grid cells and tab items in
+   kendo-bridge.css. */
+.vy-sidebar :where(a, button, summary):focus-visible,
+.vy-sidebar .vy-nav-item:focus-visible,
+.vy-sidebar .vy-nav-group-head:focus-visible {
+  outline-offset: calc(var(--vy-space-1) * -1);
+  /* AND THE SHADOW RING GOES, because these controls were wearing two.
+     `md3.css` gives every focusable element `box-shadow: var(--vy-focus-ring)`
+     through a `:where()` rule, and this file adds an outline on top for the
+     dark sidebar — so turning the outline inwards moved one indicator and left
+     the other 4px outside, still clipped. The check kept reporting 4px after
+     the "fix", which is how it was caught. One indicator per control. */
+  box-shadow: none;
+}
+
 /* Skip link: with a 24-item sidebar, a keyboard or screen-reader user otherwise
    tabs through the whole nav on every page load. */
 .vy-skip {

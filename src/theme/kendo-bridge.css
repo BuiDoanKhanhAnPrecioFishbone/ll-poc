@@ -366,10 +366,52 @@ html[data-kendo-bridged] .k-checkbox:checked:hover:not(:disabled) {
 html[data-kendo-bridged] .k-button:focus-visible,
 html[data-kendo-bridged] .k-checkbox:focus-visible,
 html[data-kendo-bridged] .k-radio:focus-visible,
-html[data-kendo-bridged] .k-input-inner:focus-visible,
 html[data-kendo-bridged] .k-dropdownlist:focus-visible,
 html[data-kendo-bridged] .k-upload-button:focus-visible,
 html[data-kendo-bridged] .k-upload .k-file:focus-visible {
+  outline: none !important;
+  box-shadow: var(--vy-focus-ring) !important;
+}
+
+/* A COMPOSITE CONTROL IS RINGED ON ITS WRAPPER, NOT ON THE INPUT INSIDE IT.
+   Reported 23 Nov from a screenshot of the Priority combobox: the ring showed
+   as a single blue bar down the right-hand side of the text area and nowhere
+   else.
+
+   `.k-input-inner` used to be in the list above. It is the bare input inside
+   `.k-combobox`, `.k-datepicker`, `.k-multicolumncombobox` — and that wrapper
+   carries `overflow: hidden` (measured), because it has the border and the
+   6px radius and has to clip the square input to them. The ring is two
+   shadows spreading 4px OUTSIDE the input, so the wrapper ate all of it
+   except the one edge where the input meets the caret button, which is not a
+   clipped ring so much as a sliver of one.
+
+   THE ELEMENT THAT LOOKS LIKE THE CONTROL IS THE ONE TO RING. The wrapper is
+   what a user sees as "the dropdown": it draws the border, the background and
+   the radius, and the caret sits inside it. Its own ring is outside its box,
+   where nothing clips it.
+
+   `:has()` RATHER THAN `.k-focus`, which Kendo also puts on the wrapper.
+   `.k-focus` follows plain focus, so it fires on a mouse click too — and this
+   system's rule is a ring for the keyboard and nothing for a click.
+   `:has(:focus-visible)` keeps that decision in the selector instead of
+   depending on which class Kendo chose to set. */
+html[data-kendo-bridged] .k-input:has(> .k-input-inner:focus-visible),
+html[data-kendo-bridged] .k-picker:has(> .k-input-inner:focus-visible) {
+  outline: none !important;
+  box-shadow: var(--vy-focus-ring) !important;
+}
+/* …and the inner input keeps none of its own, or the two draw on top of each
+   other 4px apart. */
+html[data-kendo-bridged] .k-input > .k-input-inner:focus-visible,
+html[data-kendo-bridged] .k-picker > .k-input-inner:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+/* An inner input that is NOT inside one of those wrappers still rings itself:
+   nothing in this build renders one today, and a bare `.k-input-inner` with no
+   indicator would be a silent 2.4.7 failure rather than a visible mistake. */
+html[data-kendo-bridged] .k-input-inner:focus-visible:not(.k-input > *):not(.k-picker > *) {
   outline: none !important;
   box-shadow: var(--vy-focus-ring) !important;
 }
@@ -395,6 +437,43 @@ html[data-kendo-bridged] .k-table-th:focus-visible,
 html[data-kendo-bridged] .k-tabstrip-item:focus-visible {
   outline: 2px solid var(--vy-brand-boundary-strong) !important;
   outline-offset: -2px !important;
+  box-shadow: none !important;
+}
+
+/* THE SAME GEOMETRY, THE SAME ANSWER, for everything else that sits flush
+   inside something that clips. Found by `focus:check` on 23 Nov once it
+   learned to measure a ring against its clipping ancestors rather than only
+   ask whether one exists.
+
+     .vy-view-btn, .k-checkbox   the eye and the tick in a grid ROW. On the
+                                 last row of a scrolling grid the outward ring
+                                 is cut by the scroller's bottom edge — 0.0px
+                                 of slack, measured on four screens.
+     .k-tabstrip-content         the panel itself takes focus, and its ring is
+                                 cut by its own container.
+
+   A tab panel and a grid row cannot grow 4px of margin for an indicator
+   without moving the data, so the indicator moves inside instead. */
+html[data-kendo-bridged] .vy-grid-k .vy-view-btn:focus-visible,
+html[data-kendo-bridged] .vy-grid-k .k-checkbox:focus-visible,
+html[data-kendo-bridged] .k-tabstrip-content:focus-visible {
+  outline: 2px solid var(--vy-brand-boundary-strong) !important;
+  outline-offset: -2px !important;
+  box-shadow: none !important;
+}
+
+/* THE CARET IS PART OF THE DROPDOWN, so focusing it rings the dropdown.
+   `.k-button` inside `.k-input` / `.k-picker` is the expand arrow; it is a
+   real button and takes focus of its own, and its ring was being eaten by the
+   same wrapper that ate the inner input's — 1.0px of slack on three sides. */
+html[data-kendo-bridged] .k-input:has(> .k-button:focus-visible),
+html[data-kendo-bridged] .k-picker:has(> .k-button:focus-visible) {
+  outline: none !important;
+  box-shadow: var(--vy-focus-ring) !important;
+}
+html[data-kendo-bridged] .k-input > .k-button:focus-visible,
+html[data-kendo-bridged] .k-picker > .k-button:focus-visible {
+  outline: none !important;
   box-shadow: none !important;
 }
 
