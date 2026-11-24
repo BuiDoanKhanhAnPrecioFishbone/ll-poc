@@ -23,7 +23,7 @@ export function Avatar({ name }: { name: string }) {
   return <span className="vy-avatar" aria-hidden>{initials}</span>;
 }
 
-export function Message({ author, time, children, email, outside }: {
+export function Message({ author, time, children, email, outside, tag }: {
   author: string;
   /** "03:20 PM" in her example; whatever the region's clock gives here. */
   time: ReactNode;
@@ -32,6 +32,21 @@ export function Message({ author, time, children, email, outside }: {
   email?: { to: string; subject: string };
   /** The sender is outside this company — her warning tint, as a tag. */
   outside?: boolean;
+  /**
+   * One more word in the head, beside the time.
+   *
+   * ADDED 24 NOV, when the Conversations tab moved onto this component and
+   * brought a fact her three entry kinds have no slot for: a comment that was
+   * ALSO sent to the customer. It is not her Email kind — that one is an
+   * email, and prints the To and Subject it was sent with — and this data
+   * carries no subject to print. Inventing one to fit the richer shape would
+   * put a sentence on screen that nobody wrote.
+   *
+   * So the tab keeps the word it had, in the place her `outside` tag already
+   * occupies, and the gap goes to her as a question rather than into the
+   * component as a guess.
+   */
+  tag?: ReactNode;
 }) {
   return (
     <article className="vy-msg">
@@ -41,6 +56,7 @@ export function Message({ author, time, children, email, outside }: {
           <span className="vy-msg-author">{author}</span>
           <span className="vy-msg-time">{time}</span>
           {outside && <span className="vy-msg-outside">Outside sender</span>}
+          {tag}
         </p>
         {email && (
           <p className="vy-msg-email">

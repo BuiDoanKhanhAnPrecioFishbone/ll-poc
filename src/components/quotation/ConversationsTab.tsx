@@ -3,6 +3,7 @@ import { fmtDateTime } from '../../ui/regional';
 import { Button } from '../../ui/Button';
 import { RichText } from '../../ui/RichText';
 import { useToast } from '../../ui/Toast';
+import { Conversation, Message } from '../../ui/Conversation';
 import type { Comment, Quotation } from '../../data/quotations';
 
 const when = (d: Date) => fmtDateTime(d);
@@ -67,22 +68,28 @@ export function ConversationsTab({ q }: { q: Quotation }) {
           are the record of why decisions were made.
         </div>
       ) : (
-        <ol className="vy-thread">
+        /* `Conversation` and `Message`, built on 17 Nov from her Conversation
+           section and until today with no call site in the product — this tab
+           was drawing its own thread from `.vy-thread` and `.vy-comment`. The
+           two were already nearly identical, which is the point: two places
+           describing one object stay nearly identical right up until one of
+           them is edited.
+
+           The avatar's initials come from the NAME now rather than from the
+           stored `initials` field. Both produce the same two letters — the
+           seed computes them the same way — but a name is the fact and the
+           initials were a copy of it. */
+        <Conversation>
           {comments.map(c => (
-            <li key={c.id} className="vy-comment">
-              <span className="vy-avatar vy-avatar--sm">{c.initials}</span>
-              <div className="vy-comment-body">
-                <div className="vy-comment-meta">
-                  <strong>{c.author}</strong>
-                  <span>{when(c.at)}</span>
-                  {c.emailed && <span className="vy-pill" title="Also sent to the customer by email">emailed</span>}
-                </div>
-                {/* Comments may carry formatting from the rich editor. */}
-                <div className="vy-comment-text" dangerouslySetInnerHTML={{ __html: c.body }} />
-              </div>
-            </li>
+            <Message key={c.id} author={c.author} time={when(c.at)}
+                     tag={c.emailed
+                       ? <span className="vy-pill" title="Also sent to the customer by email">emailed</span>
+                       : undefined}>
+              {/* Comments may carry formatting from the rich editor. */}
+              <div dangerouslySetInnerHTML={{ __html: c.body }} />
+            </Message>
           ))}
-        </ol>
+        </Conversation>
       )}
 
       <div className="vy-composer" data-mode={mode}>

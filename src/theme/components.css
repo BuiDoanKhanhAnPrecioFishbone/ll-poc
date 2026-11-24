@@ -1915,9 +1915,15 @@ html[data-kendo-bridged] .vy-field--changed .k-picker,
 .vy-composer[data-mode="email"] .vy-conv-audience { color: var(--vy-accent-warning); }
 .vy-composer[data-mode="email"] .vy-richtext { border-color: var(--vy-accent-caution); }
 
-.vy-comment-text p { margin: 0 0 var(--vy-space-3); }
-.vy-comment-text p:last-child { margin-bottom: 0; }
-.vy-comment-text ul, .vy-comment-text ol { margin: 0 0 var(--vy-space-3); padding-left: var(--vy-space-9); }
+/* PROSE INSIDE A MESSAGE. These were `.vy-comment-text` and moved here on
+   24 Nov with the Conversations tab: the body of a message can carry whatever
+   the rich editor produced, so the paragraphs and lists need spacing that the
+   two first/last-child resets above do not give them. They belong to the
+   component's own text slot now rather than to one screen's class. */
+.vy-msg-text { max-width: var(--vy-prose-max); }
+.vy-msg-text p { margin: 0 0 var(--vy-space-3); }
+.vy-msg-text p:last-child { margin-bottom: 0; }
+.vy-msg-text ul, .vy-msg-text ol { margin: 0 0 var(--vy-space-3); padding-left: var(--vy-space-9); }
 
 /* Colour and highlight pickers. A native <details> — it closes on Escape and on
    outside click without any of that being written, and the whole control is

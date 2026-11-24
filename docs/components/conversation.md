@@ -74,5 +74,6 @@ Its ink is now her `primary-text`, fixed where the class actually lives.
 
 | Date | Change |
 |---|---|
+| 24 Nov 2026 | **The Conversations tab moved onto this component**, which until then had no call site in the product — the tab drew its own thread from `.vy-thread` and `.vy-comment`. The two were within a few pixels of each other, which is how a duplicate survives: it never looks wrong, it just has to be changed twice. The prose rules for a formatted body came with it, onto `.vy-msg-text`. A `tag` slot was added for the one fact her three entry kinds have no room for — a comment that was *also* emailed — because this data carries no subject to print in her Email shape, and inventing one would put a sentence on screen nobody wrote |
 | 20 Nov 2026 | Usage tab drawn: 2 Do/Don't card pairs, from rules already on this page. Live components, so a card cannot go stale against a token change |
 | 17 Nov 2026 | This component and this page. The avatar also moved to her `primary-text` — 7.04:1 on the circle, where the old ink was 10.70 |

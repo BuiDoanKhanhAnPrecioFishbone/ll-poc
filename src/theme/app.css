@@ -621,12 +621,18 @@
    so it shares the composer's edge on this tab without changing the other eight
    places .vy-empty-inline is used. */
 .vy-conv > .vy-empty-inline { max-width: none; }
-.vy-comment-text { max-width: var(--vy-prose-max); }
-.vy-thread { list-style: none; margin: 0 0 var(--vy-space-9); padding: 0; display: flex; flex-direction: column; gap: var(--vy-space-7); }
-.vy-comment { display: grid; grid-template-columns: auto 1fr; gap: var(--vy-space-5); }
-.vy-comment-meta { display: flex; align-items: baseline; gap: var(--vy-space-4); flex-wrap: wrap; font-size: var(--vy-text-xs); color: var(--vy-on-surface-subtle); margin-bottom: var(--vy-space-2); }
-.vy-comment-meta strong { color: var(--vy-on-surface); font-size: var(--vy-text-base); }
-.vy-comment-body p { margin: 0; font-size: var(--vy-text-base); color: var(--vy-on-surface-soft); }
+/* `.vy-thread`, `.vy-comment` AND ITS PARTS ARE GONE, 24 Nov — the tab draws
+   its thread with `ui/Conversation` now. The two had been within a few pixels
+   of each other the whole time (a grid against a flex row, the same 10px gap,
+   the same baseline-aligned head), which is exactly how a duplicate survives:
+   it never looks wrong, it just has to be changed twice.
+
+   The rules with no home in the component moved INTO it — the prose spacing
+   and the reading width for a formatted body, both now on `.vy-msg-text` in
+   components.css. Declaring the width here instead was the first attempt and
+   `css:orphans` failed the push for it within the minute: `.vy-msg-text` would
+   have had a base rule in two files, which is the duplicate this project has
+   now paid for four times. */
 .vy-composer { border-top: 1px solid var(--vy-border); padding-top: var(--vy-space-7); }
 .vy-composer-foot { display: flex; align-items: center; justify-content: space-between; gap: var(--vy-space-6); margin-top: var(--vy-space-4); flex-wrap: wrap; }
 
