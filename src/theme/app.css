@@ -1908,10 +1908,6 @@
    anyone adds later and decide its icon colour for them. */
 .vy-header-groups .vy-card-title svg { color: var(--vy-brand-text); }
 
-/* The Documents tab: two named groups of file rows, 24px apart. The heading
-   brings its own bottom margin, so only the gap BETWEEN groups is set here. */
-.vy-doc-tab > section + section { margin-top: var(--vy-space-10); }
-
 /* =============================================================================
    FILTERS — quick + advanced
    -----------------------------------------------------------------------------

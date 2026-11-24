@@ -70,6 +70,15 @@ Documents are the one judgement call: there is no Documents tab, but the
 document *is* the Checklists tab's Document column, and that column is where a
 user who pressed "3 Documents" would have to end up anyway. It goes there.
 
+> **Re-opened and closed again, 24 Nov 2026.** A Documents tab was built and
+> reverted the same day. It was proposed on two claims, and both were wrong:
+> that *no source asks for it* — this paragraph is a source, and it decided
+> against it — and that a BoM file *appears nowhere else as a file*, when
+> `ResultTab.tsx` has a column headed **BoM File**. With both gone it was a
+> third list of records that already have two, which is the fault this page
+> was written to fix. Reverted in full; nothing was kept from it but the tab
+> strip's padding, which was a separate defect found at the same time.
+
 **Customer stays a toast.** There is no customer record screen in this
 prototype, and inventing a destination for a navigation button is worse than
 admitting it has none.

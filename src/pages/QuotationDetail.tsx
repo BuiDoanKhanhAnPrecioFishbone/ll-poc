@@ -24,7 +24,6 @@ import { RecordField, isMissing } from '../components/quotation/RecordField';
 import { smartButtonsFor, SmartIcon } from '../components/quotation/SmartButtons';
 import { canSee } from '../data/itar';
 import { Card } from '../ui/Card';
-import { DocumentsTab } from '../components/quotation/DocumentsTab';
 import { HISTORICAL_RFQ_FIELD, showsHistoricalRfq, HEADER_GROUPS, COMMERCIAL, TECHNICAL, INVENTORY, NOTES, ALL_FIELDS,
          setHistoricalRfqOptions } from '../components/quotation/requirementFields';
 import { pageActionsProps } from '../ui/pageActions';
@@ -312,10 +311,6 @@ export function QuotationDetail() {
   }
   /* Tab labels carry counts so the record's state is legible without opening
      each tab. The live TabStrip gives five bare nouns. */
-  /* Both kinds of file this record holds — see `DocumentsTab` for why those
-     are the two. */
-  const docCount = q.tasks.filter(t => t.documentName).length
-    + q.results.filter(r => r.bomFile).length;
   const checklistOutstanding = q.tasks.filter(t => taskStatus(t) !== 'Completed').length;
 
   /* What the related-records row needs, and nothing else.
@@ -654,10 +649,6 @@ export function QuotationDetail() {
              since 29 Oct the grid folds every run of an assembly into one.
              `q.results.length` counted three where the tab shows one. */
           { value: 'result',       label: 'Quotation Result', count: assemblyRuns(q.results).length, content: <ResultTab q={q} onRun={() => setRunOpen(true)} /> },
-          /* BETWEEN the result and the conversation, because that is the order
-             a file arrives in: a run produces a BoM file, a checklist task
-             collects a document, and people talk about both afterwards. */
-          { value: 'documents',    label: 'Documents', count: docCount,         content: <DocumentsTab q={q} /> },
           { value: 'conversations',label: 'Conversations',count: q.comments.length,    content: <ConversationsTab q={q} /> },
           { value: 'activity',     label: 'Activity Logs', count: q.activity.length, content: <ActivityTab q={q} /> },
         ]}
