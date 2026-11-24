@@ -882,8 +882,19 @@ html[data-kendo-bridged] .vy-check .k-checkbox.k-invalid { border-color: var(--v
    the first thing lost to a low-contrast screen or a colour-blind reader —
    the same argument this system makes everywhere else about never letting
    one signal carry a state alone. */
-.vy-tabs .k-tabstrip-items .k-tabstrip-item { padding-inline: 0; }
-.vy-tabs .k-tabstrip-items .k-tabstrip-item + .k-tabstrip-item { margin-inline-start: var(--vy-space-10); }
+/* 8px OF INLINE PADDING, AND THE GAP GIVES IT BACK. The padding was 0 and the
+   focus ring is drawn INSIDE the item — `outline-offset: -2px`, because the
+   strip's own wrapper clips an outward one — so with nothing to sit in, the
+   ring landed hard against the label on one side and the count chip on the
+   other. Reported 24 Nov from a screenshot of the Conversations tab, where
+   the chip measured **1.0px** from the ring.
+
+   The rhythm does not move: 24px between labels was one 24px margin and is
+   now 8 + 8 + 8. The strip pulls back by the same 8 so the first tab still
+   starts on the content's left edge. */
+.vy-tabs .k-tabstrip-items .k-tabstrip-item { padding-inline: var(--vy-space-4); }
+.vy-tabs .k-tabstrip-items .k-tabstrip-item + .k-tabstrip-item { margin-inline-start: var(--vy-space-4); }
+.vy-tabs .k-tabstrip-items { margin-inline-start: calc(var(--vy-space-4) * -1); }
 .vy-tabs .k-tabstrip-items .k-link {
   min-block-size: var(--vy-head-h);
   padding-inline: 0;

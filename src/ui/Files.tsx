@@ -39,7 +39,7 @@ export function FileTypeChip({ name }: { name: string }) {
 }
 
 export function FileRow({
-  name, meta, state = 'view', progress, reason, action,
+  name, meta, state = 'view', progress, reason, action, onPreview,
 }: {
   name: string;
   /** "ver. 1 · 2.4 MB" — her format, built by the caller. */
@@ -57,6 +57,16 @@ export function FileRow({
   reason?: ReactNode;
   /** The trailing control — a download button, a More menu. */
   action?: ReactNode;
+  /**
+   * What the NAME opens, in `view` state.
+   *
+   * Her note is that the name is the link and there is no eye icon, so the
+   * name is the only way in — and until 24 Nov it went nowhere: the anchor
+   * called `preventDefault` and stopped. That is fine in a specimen and is a
+   * dead control on a screen, which this repo has had to say before about a
+   * Post button that enabled itself and did nothing.
+   */
+  onPreview?: () => void;
 }) {
   if (state === 'rejected') {
     return (
@@ -81,7 +91,8 @@ export function FileRow({
         /* A link, because her note is explicit: "the name is a link that
            opens the preview; no eye icon". A separate eye button would be a
            second control for the thing the name already does. */
-        ? <a className="vy-file-name" href="#preview" onClick={e => e.preventDefault()}>{name}</a>
+        ? <a className="vy-file-name" href="#preview"
+             onClick={e => { e.preventDefault(); onPreview?.(); }}>{name}</a>
         : <span className="vy-file-name vy-file-name--plain">{name}</span>}
       {state === 'uploading'
         ? (
