@@ -1,5 +1,5 @@
 import { TextField, TextArea } from '../../ui/Field';
-import { DateField, NumberField, YesNoField, formatOnScale } from '../../ui/Inputs';
+import { DateField, NumberField, YesNoField, YesNoValue, formatOnScale } from '../../ui/Inputs';
 import { Select, Checkbox, RadioGroup } from '../../ui/Overlays';
 import { Priority, priorityLevel, PRIORITY_LEVELS, type PriorityLevel } from '../../ui/Priority';
 import { OPTION_MEANINGS } from '../../data/metadata';
@@ -383,10 +383,14 @@ function ReadField<T>({ def, value, editing }: { def: FieldDef<T>; value: unknow
        it draws her muted value box rather than something that looks
        pressable. */
     if (def.words) {
+      /* `YesNoValue`, not `YesNoField readOnly`: this row's `dd` is already
+         her value box, and the control would bring a second one — the same
+         fill inside the same fill, the same line under the same line. See the
+         note on `YesNoValue`. */
       return (
         <FieldRow label={def.label} required={def.required}
                   note={editing && def.readOnly ? lockReason(def) : undefined}>
-          <YesNoField words={def.words} value={Boolean(value)} readOnly onChange={() => {}} />
+          <YesNoValue words={def.words} value={Boolean(value)} />
         </FieldRow>
       );
     }

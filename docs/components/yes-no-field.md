@@ -74,5 +74,6 @@ visible box is a sibling, driven by `:checked` and `:focus-visible`.
 
 | Date | Change |
 |---|---|
+| 24 Nov 2026 | **The read state no longer brings its own box into a row that has one.** In a record form `FieldRow`'s `dd` IS the value box — grey fill, one bottom line — and every other read field puts plain content inside it. ITAR put a whole `YesNoField readOnly` in, which drew the same fill inside the same fill and the same line under the same line, and grew the row from 34px to 48. Reported as a double underline, which is what it was. `YesNoValue` is the read state's contents with no box; standalone, `YesNoField` still draws one. The box also became `inline-block`: it had been taking its 16×16 from being a flex item, and in a block row it rendered 3px wide |
 | 20 Nov 2026 | Usage tab drawn: 2 Do/Don't card pairs, from rules already on this page. Live components, so a card cannot go stale against a token change |
 | 17 Nov 2026 | This component and this page. One of the BA's Input widgets that had no implementation |

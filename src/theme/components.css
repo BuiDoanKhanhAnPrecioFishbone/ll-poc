@@ -565,7 +565,14 @@ html[data-kendo-bridged] .vy-check .k-checkbox.k-invalid { border-color: var(--v
 .vy-yesno-input {
   position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer;
 }
+/* `inline-block`, NOT a bare inline span. The box used to be a flex item
+   inside `.vy-read-value` and took its size from being one; the moment the
+   read state was handed to a row that owns its own box — `.vy-field dd`, a
+   BLOCK — the width and height stopped applying and 16px rendered as a 3px
+   sliver. A control that carries its own dimensions should not depend on the
+   display mode of whatever it is dropped into. Measured 24 Nov. */
 .vy-yesno-box {
+  display: inline-block; vertical-align: middle;
   flex: none; inline-size: 16px; block-size: 16px;
   border: 1.5px solid var(--vy-border-control);
   border-radius: var(--vy-radius-sm); background: var(--vy-surface);
@@ -585,6 +592,9 @@ html[data-kendo-bridged] .vy-check .k-checkbox.k-invalid { border-color: var(--v
   transform: rotate(45deg);
 }
 .vy-yesno-word { font-size: var(--vy-text-base); color: var(--vy-on-surface); }
+/* The gap came from `.vy-read-value`'s flex when the control drew its own
+   box. In a row that owns the box there is no flex to supply it. */
+.vy-yesno-box + .vy-read-value-text { margin-inline-start: var(--vy-space-4); }
 .vy-yesno-input:focus-visible ~ .vy-yesno-box { border-color: var(--vy-brand-boundary-strong); box-shadow: 0 0 0 1px var(--vy-brand-boundary-strong); }
 .vy-yesno-input:disabled ~ .vy-yesno-box { background: var(--vy-disabled-bg); border-color: var(--vy-border-strong); }
 .vy-yesno-input:disabled ~ .vy-yesno-word { color: var(--vy-disabled-text); }

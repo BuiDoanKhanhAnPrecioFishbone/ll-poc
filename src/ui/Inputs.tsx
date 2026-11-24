@@ -177,6 +177,32 @@ export function DateRangeField({
  * That is why `words` has no default. A field that cannot say what its two
  * states mean in its own vocabulary should be a checkbox instead.
  */
+/**
+ * The read state's CONTENTS — the box and the word — with no box of its own.
+ *
+ * SPLIT OUT 24 NOV, because the whole read state was being drawn twice. In a
+ * record form `FieldRow`'s `dd` IS her value box: grey fill, 6px radius, one
+ * bottom line, and every other read field — Customer, Priority — puts plain
+ * content inside it. ITAR put a whole `YesNoField readOnly` in there instead,
+ * which brought its own `.vy-read-value`: the same fill inside the same fill
+ * and the same line under the same line, with the row growing from 34px to 48
+ * to hold it. An saw it as a double underline, which is exactly what it was.
+ *
+ * So the box belongs to whoever owns the row. Standalone, `YesNoField` still
+ * draws one; inside a field row, the row has already drawn it and this is
+ * what goes in.
+ */
+export function YesNoValue({ words, value }: {
+  words: { on: string; off: string }; value: boolean;
+}) {
+  return (
+    <>
+      <span className="vy-yesno-box" data-on={value || undefined} aria-hidden />
+      <span className="vy-read-value-text">{value ? words.on : words.off}</span>
+    </>
+  );
+}
+
 export function YesNoField({
   label, words, value, onChange, id, changed, disabled, readOnly,
 }: {
@@ -198,8 +224,7 @@ export function YesNoField({
       <label className="vy-field-control">
         {label && <span className="vy-field-label">{label}</span>}
         <p className="vy-read-value vy-yesno vy-yesno--read">
-          <span className="vy-yesno-box" data-on={value || undefined} aria-hidden />
-          <span className="vy-read-value-text">{word}</span>
+          <YesNoValue words={words} value={value} />
         </p>
       </label>
     );
