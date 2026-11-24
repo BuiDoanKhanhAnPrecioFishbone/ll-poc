@@ -211,9 +211,21 @@ html[data-kendo-bridged] .k-button.vy-btn--unavailable:active,
 /* --- Badge / pill ---------------------------------------------------------
    Fixed width so a status column scans as a straight edge. This was GAP-01
    against the old library; with our own component it is simply a token. */
+/* HER GEOMETRY, 24 Nov. The height was the one dimension of this component
+   that nothing declared: it fell out of `padding + line-height` and measured
+   **23.1px on the list and 23.4px on the record** — the same pill, two heights,
+   because the two screens' text differs. Her sheet gives `height 20px,
+   padding 0 · 10px`, and the comparison of 16 Nov recorded the gap as "Hers
+   20px / Ours: from padding" without closing it.
+
+   A fixed height is also what makes her radius note true: she writes `10px`
+   where this system writes a pill, and the two are the same shape only at
+   20px tall. Found by measuring every control height on two screens and
+   finding six values where the scale declares four. */
 .vy-badge {
   display: inline-flex; align-items: center; justify-content: center;
-  width: var(--vy-status-slot-w); padding: var(--vy-space-1) var(--vy-space-4);
+  width: var(--vy-status-slot-w); block-size: var(--vy-status-pill-h);
+  padding: 0 var(--vy-space-5);
   font-size: var(--vy-text-xs); font-weight: var(--vy-weight-semibold);
   border-radius: var(--vy-radius-pill); white-space: nowrap;
   /* A 1px border of the family's own colour. In light it is transparent for
@@ -729,6 +741,7 @@ html[data-kendo-bridged] .vy-check .k-checkbox.k-invalid { border-color: var(--v
   border-radius: var(--vy-radius-lg); box-shadow: var(--vy-elev-5);
   animation: vy-rise var(--vy-dur-long) var(--vy-ease-emphasised);
 }
+.vy-dialog--sm .k-dialog { width: min(var(--vy-dialog-sm), 94vw); }
 .vy-dialog--lg .k-dialog { width: min(var(--vy-dialog-lg), 94vw); }
 .vy-dialog--xl .k-dialog { width: min(var(--vy-dialog-xl), 96vw); }
 /* `opacity: 1` is not redundant. Kendo puts `opacity: .5` on the overlay and

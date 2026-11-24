@@ -55,7 +55,17 @@ import { cloneElement, type ReactNode, useContext, useEffect, useId, useMemo, us
 export function Dialog({ open, onClose, title, subtitle, children, actions, size = 'md',
                          startMaximised = size !== 'md' }: {
   open: boolean; onClose: () => void; title: string; subtitle?: ReactNode;
-  children: ReactNode; actions?: ReactNode; size?: 'md' | 'lg' | 'xl';
+  children: ReactNode; actions?: ReactNode;
+  /**
+   * Her popup ladder: 420 · 640 · 960 · 1180.
+   *
+   * `sm` ADDED 24 NOV, during a size audit. `--vy-dialog-sm` had been declared
+   * from her sheet on 18 Nov and this union forbade it, so the token read as
+   * supported and could not be reached by anything — worse than not having it.
+   * Nothing asks for a 420px dialog today; the rung is here because the
+   * ladder is hers and a ladder with a missing rung is read as a mistake.
+   */
+  size?: 'sm' | 'md' | 'lg' | 'xl';
   /**
    * Open filling the screen, with Restore down still offered.
    *
