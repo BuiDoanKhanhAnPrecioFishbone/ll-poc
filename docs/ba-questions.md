@@ -196,7 +196,39 @@ her reasoning is the better-written half.
 | **The status pill's width** | Not mentioned. This system fixes a 104px slot, because badges of different lengths in a status column left a ragged edge |
 | **12-hour or 24-hour** | Her Datetime example reads `10:30 AM`; this app reads `10:30` and stamps logs at `10:56:15`. Her own open list still carries date format as unresolved |
 | **`control-row` on which Kendo step** | She writes *"26px (Kendo sm)"*; this system's sizing page says the same 26px is Kendo's `xs`. The value agrees, the rung name does not, and one of them will mislead whoever configures the scale |
-| **Icon names** | Hers are `icon-md` 16px and `icon-sm` 14px; this system has one `--vy-icon-sm` at 16px and no 14px step |
+| **Icon names** | → **C1 below**: after the measurement of 24 Nov this is no longer a naming question |
+
+### C1. Icons are drawn at five sizes, and one is declared
+
+Pulled out of the table because measuring it made it answerable.
+
+The set is drawn on a 20×20 box and takes its size as a plain number. Counted
+in the running code:
+
+| Size | Call sites |
+|---|---|
+| 16px | 2 |
+| 15px | 4 |
+| 14px | 5 |
+| 13px | 5 |
+| 11px | 1 |
+
+Plus **4 call sites that pass no size** and take the default 16. So: **five
+sizes, one token** — and that token, `--vy-icon-sm`, is **16px**.
+
+Her sheet names **two** rungs, and names where each one goes:
+
+> *icon-md **16px*** — toolbars, banners, menus
+> *icon-sm **14px*** — inside icon buttons and grid rows
+
+Her rule is the right one and we would like to take it whole: two rungs, split
+by PLACE rather than by nearest number. One thing is in the way —
+`--vy-icon-sm` here carries 16px, so adopting hers means renaming the token,
+and that name is used by the app shell's own rules.
+
+**Question:** can she confirm the two rungs, 16 and 14, and where each goes?
+The 17 sites that state a size then move onto them, and the token is renamed to match. If a
+third rung is needed, we need its number and its place.
 
 ---
 

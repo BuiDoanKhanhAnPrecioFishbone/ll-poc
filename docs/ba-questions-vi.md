@@ -191,7 +191,40 @@ mà phần lý do chị viết thì rõ hơn của mình.
 | **Bề rộng status pill** | Không thấy nêu. Hệ thống đang cố định một ô 104px, vì badge dài ngắn khác nhau trong cột status làm mép phải so le |
 | **12 giờ hay 24 giờ** | Ví dụ Datetime của chị là `10:30 AM`; app này đang đọc `10:30` và ghi log `10:56:15`. Danh sách mở của chị vẫn còn để date format là chưa chốt |
 | **`control-row` nằm ở bậc Kendo nào** | Chị ghi *"26px (Kendo sm)"*; trang sizing của hệ thống ghi đúng 26px đó là bậc `xs` của Kendo. Giá trị thì khớp, tên bậc thì không, và một trong hai sẽ làm người cấu hình thang Kendo hiểu sai |
-| **Tên token icon** | Của chị là `icon-md` 16px và `icon-sm` 14px; hệ thống có một `--vy-icon-sm` 16px và không có bậc 14px |
+| **Tên token icon** | → **C1 ngay dưới đây**: đo ngày 24/11 xong thì mục này không còn là chuyện đặt tên nữa |
+
+### C1. Icon đang dùng 5 cỡ, mà hệ thống chỉ khai 1
+
+Mục này em tách riêng ra, vì sau khi đo thì nó trả lời được chứ không còn
+là ghi chú.
+
+Bộ icon vẽ trên khung 20×20 và nhận cỡ bằng một con số. Em đếm trong code
+đang chạy:
+
+| Cỡ | Số chỗ dùng |
+|---|---|
+| 16px | 2 |
+| 15px | 4 |
+| 14px | 5 |
+| 13px | 5 |
+| 11px | 1 |
+
+Cộng thêm **4 chỗ không ghi cỡ**, tức ăn mặc định 16. Vậy là **năm cỡ, một
+token** — và cái token duy nhất ấy (`--vy-icon-sm`) đang là **16px**.
+
+Bản của chị chốt **hai** bậc, và chốt cả chỗ đứng của từng bậc:
+
+> *icon-md **16px*** — thanh công cụ, banner, menu
+> *icon-sm **14px*** — bên trong nút icon và hàng lưới
+
+Em thấy luật của chị đúng và muốn áp nguyên: hai bậc, chia theo **chỗ đứng**
+chứ không theo cỡ gần nhất. Vướng đúng một chỗ: `--vy-icon-sm` của hệ thống
+đang mang giá trị 16px, nên đổi theo chị là phải đổi tên token, mà tên đó
+đang nằm trong chính rule của app shell.
+
+**Hỏi chị:** xác nhận giúp em hai bậc 16 / 14 và chỗ đứng của từng bậc —
+em sẽ đưa cả 17 chỗ ghi cỡ về đúng hai bậc đó và đặt lại tên token cho khớp.
+Nếu chị thấy cần bậc thứ ba thì cho em số và chỗ dùng của nó.
 
 ---
 
