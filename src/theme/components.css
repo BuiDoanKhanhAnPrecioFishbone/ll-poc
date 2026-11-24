@@ -471,7 +471,13 @@ html[data-kendo-bridged] .vy-check .k-checkbox.k-invalid { border-color: var(--v
   background: var(--vy-section-bg);
   border-block-end: 1px solid var(--vy-border);
 }
+/* FLEX, so a title can carry a leading glyph. The record header's three
+   regions each name themselves with an icon — read off the reviewed invoice
+   mockup — and a bare `<svg>` inside an `h3` sits on the text baseline
+   instead of on its centre. Nothing else about the title changes, and a card
+   without an icon cannot tell the difference. 24 Nov. */
 .vy-card-title {
+  display: flex; align-items: center; gap: var(--vy-space-3);
   margin: 0; font-size: var(--vy-text-md); font-weight: var(--vy-weight-semibold);
   color: var(--vy-on-surface-strong);
 }

@@ -1,3 +1,4 @@
+import { Card } from './Card';
 import type { HeaderGroup } from '../components/quotation/requirementFields';
 
 /**
@@ -63,10 +64,12 @@ export function RecordSkeleton({ groups }: { groups: readonly HeaderGroup[] }) {
 
       <div className="vy-header-groups">
         {groups.map(g => (
-          <section className="vy-header-group" key={g.id}>
-            {/* Real heading, real icon slot left empty — the glyph is one more
-                thing we have and the title carries the meaning without it. */}
-            <h2 className="vy-header-group-title">{g.title}</h2>
+          /* THE SAME `Card` THE RECORD USES, which is the whole principle of
+             this file: it wears the record's own containers so the two cannot
+             drift when one is edited. The heading is real and the icon slot is
+             left empty — the glyph is one more thing we have, and the title
+             carries the meaning without it. */
+          <Card key={g.id} title={g.title}>
             <dl className="vy-record-fields">
               {g.fields.map(def => (
                 <div className="vy-field-slot" key={def.name}>
@@ -84,7 +87,7 @@ export function RecordSkeleton({ groups }: { groups: readonly HeaderGroup[] }) {
                 </div>
               ))}
             </dl>
-          </section>
+          </Card>
         ))}
       </div>
     </header>

@@ -1877,30 +1877,30 @@
   padding-top: var(--vy-space-7);
   border-top: 1px solid var(--vy-border);
 }
-.vy-header-group {
-  border: 1px solid var(--vy-border);
-  border-radius: var(--vy-radius-md);
-  overflow: hidden;
-  min-width: 0;
-}
-/* A tinted bar, as in the reviewed invoice mockup. It is what makes the region
-   read as a region rather than as three fields that happen to sit together. */
-.vy-header-group-title {
-  display: flex; align-items: center; gap: var(--vy-space-3);
-  margin: 0; padding: var(--vy-space-4) var(--vy-space-6);
-  background: var(--vy-brand-subtle);
-  border-bottom: 1px solid var(--vy-border);
-  font-size: var(--vy-text-sm); font-weight: var(--vy-weight-semibold);
-  color: var(--vy-on-surface);
-}
-.vy-header-group-title svg { color: var(--vy-brand-text); }
+/* `.vy-header-group` AND ITS TITLE ARE GONE, 24 Nov — the regions are `Card`s
+   now. The two had been drawing the same shape from two places: a border, a
+   radius and a tinted band, written here on 8 Oct from the reviewed invoice
+   mockup, and again in `ui/Card` on 17 Nov from her Shape section. Hers is the
+   one with figures behind it, and in LIGHT her band and this one resolved to
+   the same `#f1f4fa` — so the visible change is the radius (6 → 8), the title
+   (12 → 14px), the band height (34 → 36) and the dark theme, where this one
+   tinted the band blue and hers keeps it neutral.
+
+   `.vy-header-groups` stays: the GRID of regions is this screen's layout, not
+   the card's business. */
 /* Inside a region the fields stack in one column: a region is already narrow,
-   and two columns inside three regions is six columns of very short values. */
-.vy-header-group .vy-record-fields {
+   and two columns inside three regions is six columns of very short values.
+   No padding here any more — `.vy-card-body` brings its own, and two paddings
+   is how the old version came to sit 12px in where every other card sits 16. */
+.vy-header-groups .vy-card-body .vy-record-fields {
   grid-template-columns: 1fr;
-  margin: 0; padding: var(--vy-space-6);
+  margin: 0;
   border-top: 0;
 }
+/* The region glyph, in the brand ink. Scoped to the record header, which is
+   the only place a card title has one — a blanket rule would reach every card
+   anyone adds later and decide its icon colour for them. */
+.vy-header-groups .vy-card-title svg { color: var(--vy-brand-text); }
 
 /* =============================================================================
    FILTERS — quick + advanced

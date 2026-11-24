@@ -95,5 +95,6 @@ rather than card by card.
 
 | Date | Change |
 |---|---|
+| 24 Nov 2026 | **The record header's three regions became `Card`s.** They had been a hand-written section with a border, a radius and a tinted band — drawn on 8 Oct from the reviewed invoice mockup, and drawn again here on 17 Nov from her Shape section. In light both bands resolved to the same `#f1f4fa`; what moved is the radius (6 → 8), the title (12 → 14px), the band (34 → 36px) and the dark theme, where the old one tinted blue and hers stays neutral. `RecordSkeleton` moved with them, which is the whole point of its wearing the record's own containers. `.vy-card-title` is a flex row now, so a title can carry a leading glyph |
 | 20 Nov 2026 | Usage tab drawn: 3 Do/Don't card pairs, from rules already on this page. Live components, so a card cannot go stale against a token change |
 | 17 Nov 2026 | This component and this page. It also gave `--vy-section-bg` its first use — the token had nowhere to go while this system had no card |

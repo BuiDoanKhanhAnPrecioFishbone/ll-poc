@@ -23,6 +23,7 @@ import { useToast } from '../ui/Toast';
 import { RecordField, isMissing } from '../components/quotation/RecordField';
 import { smartButtonsFor, SmartIcon } from '../components/quotation/SmartButtons';
 import { canSee } from '../data/itar';
+import { Card } from '../ui/Card';
 import { HISTORICAL_RFQ_FIELD, showsHistoricalRfq, HEADER_GROUPS, COMMERCIAL, TECHNICAL, INVENTORY, NOTES, ALL_FIELDS,
          setHistoricalRfqOptions } from '../components/quotation/requirementFields';
 import { pageActionsProps } from '../ui/pageActions';
@@ -559,10 +560,15 @@ export function QuotationDetail() {
 
         <div className="vy-header-groups" data-editing={editing || undefined}>
           {HEADER_GROUPS.map(g => (
-            <section className="vy-header-group" key={g.id}>
-              <h2 className="vy-header-group-title">
-                <SmartIcon name={g.icon} />{g.title}
-              </h2>
+            /* `Card`, not a hand-written section. The two drew the same shape
+               from two places: a border, a radius and a tinted band, written
+               here on 8 Oct from the invoice mockup and again in `ui/Card` on
+               17 Nov from her Shape section. Hers is the one with figures
+               behind it — radius-lg, `--vy-section-bg`, a 36px band, a 14px
+               title — and in LIGHT her band colour and ours are the same
+               `#f1f4fa`, so what changes is mostly the dark theme, where this
+               one had a blue tint and hers is neutral. */
+            <Card key={g.id} title={<><SmartIcon name={g.icon} />{g.title}</>}>
               <dl className="vy-record-fields" data-editing={editing || undefined}>
                 {g.fields
                   /* The project name is the heading while reading, so printing
@@ -602,7 +608,7 @@ export function QuotationDetail() {
                                touched={touched.has('historicalRfq')} onBlur={markTouched} />
                 )}
               </dl>
-            </section>
+            </Card>
           ))}
         </div>
       </header>

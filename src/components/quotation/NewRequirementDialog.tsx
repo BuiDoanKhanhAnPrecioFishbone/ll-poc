@@ -8,6 +8,7 @@ import { RecordField, isMissing } from './RecordField';
 import { FieldRow } from '../../ui/FieldRow';
 import { SmartIcon } from './SmartButtons';
 import { ChecklistsTab } from './ChecklistsTab';
+import { Card } from '../../ui/Card';
 import {
   HEADER_GROUPS, HISTORICAL_RFQ_FIELD, showsHistoricalRfq, ALL_FIELDS,
   COMMERCIAL, TECHNICAL, INVENTORY, NOTES,
@@ -159,10 +160,7 @@ export function NewRequirementDialog({ open, onClose }: {
         <section className="vy-create-general">
           <div className="vy-header-groups" data-editing>
             {HEADER_GROUPS.map(g => (
-              <section className="vy-header-group" key={g.id}>
-                <h2 className="vy-header-group-title">
-                  <SmartIcon name={g.icon} />{g.title}
-                </h2>
+              <Card key={g.id} title={<><SmartIcon name={g.icon} />{g.title}</>}>
                 <dl className="vy-record-fields" data-editing>
                   {/* "New Customer?" heads the customer group because it decides
                       what the two fields under it even are. Asking it after the
@@ -206,7 +204,7 @@ export function NewRequirementDialog({ open, onClose }: {
                                  touched={touched.has('historicalRfq')} onBlur={markTouched} />
                   )}
                 </dl>
-              </section>
+              </Card>
             ))}
           </div>
         </section>
